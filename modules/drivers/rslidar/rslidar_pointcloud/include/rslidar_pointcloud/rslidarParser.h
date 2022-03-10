@@ -104,20 +104,20 @@ static const uint16_t UPPER_BANK = 0xeeff;  //
 static const uint16_t LOWER_BANK = 0xddff;
 
 /** Special Defines for RS16 support **/
-static const int   RS16_FIRINGS_PER_BLOCK = 2;
-static const int   RS16_SCANS_PER_FIRING  = 16;
-static const float RS16_BLOCK_TDURATION   = 100.0f;  // [µs]
-static const float RS16_DSR_TOFFSET       = 3.0f;    // [µs]
-static const float RS16_FIRING_TOFFSET    = 50.0f;   // [µs]
-static const int RS16_DATA_NUMBER_PER_SCAN = 40000;  // Set 40000 to be large enough
+static const int   RS16_FIRINGS_PER_BLOCK    = 2;
+static const int   RS16_SCANS_PER_FIRING     = 16;
+static const float RS16_BLOCK_TDURATION      = 100.0f;  // [µs]
+static const float RS16_DSR_TOFFSET          = 3.0f;    // [µs]
+static const float RS16_FIRING_TOFFSET       = 50.0f;   // [µs]
+static const int   RS16_DATA_NUMBER_PER_SCAN = 40000;   // Set 40000 to be large enough
 
 /** Special Defines for RS32 support **/
-static const int   RS32_FIRINGS_PER_BLOCK = 1;
-static const int   RS32_SCANS_PER_FIRING  = 32;
-static const float RS32_BLOCK_TDURATION   = 50.0f;   // [µs]
-static const float RS32_DSR_TOFFSET       = 3.0f;    // [µs]
-static const float RL32_FIRING_TOFFSET    = 50.0f;   // [µs]
-static const int RS32_DATA_NUMBER_PER_SCAN = 70000;  // Set 70000 to be large enough
+static const int   RS32_FIRINGS_PER_BLOCK    = 1;
+static const int   RS32_SCANS_PER_FIRING     = 32;
+static const float RS32_BLOCK_TDURATION      = 50.0f;  // [µs]
+static const float RS32_DSR_TOFFSET          = 3.0f;   // [µs]
+static const float RL32_FIRING_TOFFSET       = 50.0f;  // [µs]
+static const int   RS32_DATA_NUMBER_PER_SCAN = 70000;  // Set 70000 to be large enough
 
 static const int TEMPERATURE_MIN = 31;
 
@@ -125,7 +125,7 @@ static calibration_parse* calibration_;
 typedef struct raw_block {
   uint16_t header;  ///< UPPER_BANK or LOWER_BANK
   uint8_t  rotation_1;
-  uint8_t  rotation_2;  /// combine rotation1 and rotation2 together to get 0-35999, divide by 100 to
+  uint8_t rotation_2;  /// combine rotation1 and rotation2 together to get 0-35999, divide by 100 to
                        /// get degrees
   uint8_t data[BLOCK_DATA_SIZE];  // 96
 } raw_block_t;
