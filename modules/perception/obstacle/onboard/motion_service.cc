@@ -47,8 +47,8 @@ bool MotionService::InitInternal() {
   AdapterManager::AddImageFrontCallback(&MotionService::ImageCallback, this);
 
   CHECK(shared_data_manager_ != NULL);
-  camera_shared_data_ = dynamic_cast<CameraSharedData*>(
-      shared_data_manager_->GetSharedData("CameraSharedData"));
+  camera_shared_data_ =
+      dynamic_cast<CameraSharedData*>(shared_data_manager_->GetSharedData("CameraSharedData"));
   if (camera_shared_data_ == nullptr) {
     AERROR << "Failed to get CameraSharedData.";
     return false;
@@ -73,40 +73,39 @@ void MotionService::ImageCallback(const sensor_msgs::Image& message) {
   camera_timestamp_ = curr_timestamp;
 }
 
-void MotionService::OnLocalization(
-    const localization::LocalizationEstimate& localization) {
+void MotionService::OnLocalization(const localization::LocalizationEstimate& localization) {
   const auto& velocity = localization.pose().linear_velocity();
   // Get VehicleStatus
   VehicleStatus vehicle_status;
-  double velx = velocity.x();
-  double vely = velocity.y();
-  double velz = velocity.z();
-  vehicle_status.velocity = sqrt(velx * velx + vely * vely + velz * velz);
+  double        velx        = velocity.x();
+  double        vely        = velocity.y();
+  double        velz        = velocity.z();
+  vehicle_status.velocity   = sqrt(velx * velx + vely * vely + velz * velz);
   vehicle_status.velocity_x = velx;
   vehicle_status.velocity_y = vely;
   vehicle_status.velocity_z = velz;
-  double timestamp_diff = 0;
+  double timestamp_diff     = 0;
   if (!start_flag_) {
-    start_flag_ = true;
+    start_flag_             = true;
     vehicle_status.yaw_rate = 0;
-    timestamp_diff = 0;
-    vehicle_status.time_d = 0;
-    vehicle_status.time_ts = 0;
+    timestamp_diff          = 0;
+    vehicle_status.time_d   = 0;
+    vehicle_status.time_ts  = 0;
 
   } else {
-    vehicle_status.roll_rate = localization.pose().angular_velocity_vrf().y();
+    vehicle_status.roll_rate  = localization.pose().angular_velocity_vrf().y();
     vehicle_status.pitch_rate = -localization.pose().angular_velocity_vrf().x();
-    vehicle_status.yaw_rate = localization.pose().angular_velocity_vrf().z();
-    timestamp_diff = localization.measurement_time() - pre_timestamp_;
-    vehicle_status.time_d = timestamp_diff;
-    vehicle_status.time_ts = localization.measurement_time();
+    vehicle_status.yaw_rate   = localization.pose().angular_velocity_vrf().z();
+    timestamp_diff            = localization.measurement_time() - pre_timestamp_;
+    vehicle_status.time_d     = timestamp_diff;
+    vehicle_status.time_ts    = localization.measurement_time();
   }
 
   VehicleInformation vehicle_information;
   vehicle_information.timestamp = localization.measurement_time();
 
-  vehicle_information.velocity = vehicle_status.velocity;
-  vehicle_information.yaw_rate = vehicle_status.yaw_rate;
+  vehicle_information.velocity  = vehicle_status.velocity;
+  vehicle_information.yaw_rate  = vehicle_status.yaw_rate;
   vehicle_information.time_diff = timestamp_diff;
 
   {
@@ -129,20 +128,17 @@ void MotionService::OnLocalization(
     if (std::abs(camera_timestamp - pre_camera_timestamp_) <
         std::numeric_limits<double>::epsilon()) {
       ADEBUG << "Motion_status: accum";
-      vehicle_planemotion_->add_new_motion(
-          pre_camera_timestamp_, camera_timestamp, PlaneMotion::ACCUM_MOTION,
-          &vehicle_status);
+      vehicle_planemotion_->add_new_motion(pre_camera_timestamp_, camera_timestamp,
+                                           PlaneMotion::ACCUM_MOTION, &vehicle_status);
     } else if (camera_timestamp > pre_camera_timestamp_) {
       ADEBUG << "Motion_status: accum_push";
-      vehicle_planemotion_->add_new_motion(
-          pre_camera_timestamp_, camera_timestamp,
-          PlaneMotion::ACCUM_PUSH_MOTION, &vehicle_status);
+      vehicle_planemotion_->add_new_motion(pre_camera_timestamp_, camera_timestamp,
+                                           PlaneMotion::ACCUM_PUSH_MOTION, &vehicle_status);
       PublishEvent(camera_timestamp);
     } else {
       ADEBUG << "Motion_status: pop";
-      vehicle_planemotion_->add_new_motion(pre_camera_timestamp_,
-                                           camera_timestamp, PlaneMotion::RESET,
-                                           &vehicle_status);
+      vehicle_planemotion_->add_new_motion(pre_camera_timestamp_, camera_timestamp,
+                                           PlaneMotion::RESET, &vehicle_status);
     }
   }
 
@@ -152,14 +148,11 @@ void MotionService::OnLocalization(
   }
 }
 
-void MotionService::GetVehicleInformation(
-    float timestamp, VehicleInformation* vehicle_information) {
+void MotionService::GetVehicleInformation(float               timestamp,
+                                          VehicleInformation* vehicle_information) {
   MutexLock lock(&mutex_);
-  if (vehicle_information_buffer_.empty()) {
-    return;
-  }
-  std::list<VehicleInformation>::iterator iter =
-      vehicle_information_buffer_.begin();
+  if (vehicle_information_buffer_.empty()) { return; }
+  std::list<VehicleInformation>::iterator iter = vehicle_information_buffer_.begin();
   std::list<VehicleInformation>::iterator vehicle_information_iter1 = iter;
   ++iter;
   if (vehicle_information_iter1->timestamp >= timestamp) {
@@ -172,11 +165,10 @@ void MotionService::GetVehicleInformation(
     ++iter;
     if (vehicle_information_iter1->timestamp <= timestamp &&
         vehicle_information_iter2->timestamp >= timestamp) {
-      *vehicle_information =
-          fabs(vehicle_information_iter1->timestamp - timestamp) <
-                  fabs(vehicle_information_iter2->timestamp - timestamp)
-              ? *vehicle_information_iter1
-              : *vehicle_information_iter2;
+      *vehicle_information = fabs(vehicle_information_iter1->timestamp - timestamp) <
+                                     fabs(vehicle_information_iter2->timestamp - timestamp) ?
+                                 *vehicle_information_iter1 :
+                                 *vehicle_information_iter2;
       break;
     }
     vehicle_information_buffer_.erase(vehicle_information_iter1);
@@ -188,10 +180,10 @@ void MotionService::PublishEvent(const double timestamp) {
   //  AINFO << "MotionService: pub size " << pub_meta_events_.size();
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
     const EventMeta& event_meta = pub_meta_events_[idx];
-    Event event;
-    event.event_id = event_meta.event_id;
+    Event            event;
+    event.event_id  = event_meta.event_id;
     event.timestamp = timestamp;
-    event.reserve = device_id_;
+    event.reserve   = device_id_;
     event_manager_->Publish(event);
     //    AINFO << "MotionService: event_id " << event.event_id
     //      << " timestamp " << timestamp <<", device_id "
@@ -205,7 +197,7 @@ MotionBuffer MotionService::GetMotionBuffer() {
 
 double MotionService::GetLatestTimestamp() {
   MutexLock lock(&image_mutex_);
-  double rst = pre_camera_timestamp_;
+  double    rst = pre_camera_timestamp_;
   return rst;
 }
 

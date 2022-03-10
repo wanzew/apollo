@@ -28,14 +28,13 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-bool BoundaryProjection::Project(const CameraCoeffient &camera_coeffient,
-                                 const Eigen::Matrix4d &pose,
-                                 const apollo::hdmap::Signal &tl_info,
-                                 Light *light) const {
+bool BoundaryProjection::Project(const CameraCoeffient&       camera_coeffient,
+                                 const Eigen::Matrix4d&       pose,
+                                 const apollo::hdmap::Signal& tl_info,
+                                 Light*                       light) const {
   int bound_size = tl_info.boundary().point_size();
   if (bound_size < 4) {
-    AERROR << "Light boundary should be rectangle, which has four points! Got :"
-           << bound_size;
+    AERROR << "Light boundary should be rectangle, which has four points! Got :" << bound_size;
     return false;
   }
 
@@ -43,8 +42,7 @@ bool BoundaryProjection::Project(const CameraCoeffient &camera_coeffient,
   std::vector<int> y(bound_size);
 
   for (int i = 0; i < bound_size; ++i) {
-    if (!ProjectPointDistort(camera_coeffient, pose,
-                             tl_info.boundary().point(i), &x[i], &y[i])) {
+    if (!ProjectPointDistort(camera_coeffient, pose, tl_info.boundary().point(i), &x[i], &y[i])) {
       return false;
     }
   }
@@ -55,34 +53,31 @@ bool BoundaryProjection::Project(const CameraCoeffient &camera_coeffient,
 
   cv::Rect roi(minx, miny, maxx - minx, maxy - miny);
   AINFO << "projection get ROI:" << roi;
-  if (minx < 0 || miny < 0 ||
-      maxx >= static_cast<int>(camera_coeffient.image_width) ||
+  if (minx < 0 || miny < 0 || maxx >= static_cast<int>(camera_coeffient.image_width) ||
       maxy >= static_cast<int>(camera_coeffient.image_height)) {
     AWARN << "Projection get ROI outside the image. ";
     return false;
   }
-  light->region.projection_roi = RefinedBox(
-      roi,
-      cv::Size(camera_coeffient.image_width, camera_coeffient.image_height));
+  light->region.projection_roi =
+      RefinedBox(roi, cv::Size(camera_coeffient.image_width, camera_coeffient.image_height));
   AINFO << "refined ROI:" << light->region.projection_roi;
 
   return true;
 }
-bool BoundaryProjection::ProjectPoint(const CameraCoeffient &coeffient,
-                                      const Eigen::Matrix4d &pose,
-                                      const apollo::common::Point3D &point,
-                                      int *center_x, int *center_y) const {
+bool BoundaryProjection::ProjectPoint(const CameraCoeffient&         coeffient,
+                                      const Eigen::Matrix4d&         pose,
+                                      const apollo::common::Point3D& point,
+                                      int*                           center_x,
+                                      int*                           center_y) const {
   Eigen::Matrix<double, 4, 1> TL_loc_LTM;
   Eigen::Matrix<double, 3, 1> TL_loc_cam;
 
-  TL_loc_LTM << point.x(), point.y(), point.z() + FLAGS_light_height_adjust,
-      1.0;
+  TL_loc_LTM << point.x(), point.y(), point.z() + FLAGS_light_height_adjust, 1.0;
   TL_loc_LTM = coeffient.camera_extrinsic * pose.inverse() * TL_loc_LTM;
 
   // The light may behind the car, we can't project them on the images.
   if (TL_loc_LTM(2) < 0) {
-    AWARN << "Compute a light behind the car. light to car Pose:\n"
-          << TL_loc_LTM;
+    AWARN << "Compute a light behind the car. light to car Pose:\n" << TL_loc_LTM;
     return false;
   }
   TL_loc_cam = coeffient.camera_intrinsic * TL_loc_LTM;
@@ -94,21 +89,19 @@ bool BoundaryProjection::ProjectPoint(const CameraCoeffient &coeffient,
   return true;
 }
 
-bool BoundaryProjection::ProjectPointDistort(const CameraCoeffient &coeffient,
-                                             const Eigen::Matrix4d &pose,
-                                             const common::PointENU &point,
-                                             int *center_x,
-                                             int *center_y) const {
+bool BoundaryProjection::ProjectPointDistort(const CameraCoeffient&  coeffient,
+                                             const Eigen::Matrix4d&  pose,
+                                             const common::PointENU& point,
+                                             int*                    center_x,
+                                             int*                    center_y) const {
   Eigen::Matrix<double, 4, 1> TL_loc_LTM;
   Eigen::Matrix<double, 3, 1> TL_loc_cam;
 
-  TL_loc_LTM << point.x(), point.y(), point.z() + FLAGS_light_height_adjust,
-      1.0;
+  TL_loc_LTM << point.x(), point.y(), point.z() + FLAGS_light_height_adjust, 1.0;
   TL_loc_LTM = coeffient.camera_extrinsic * pose.inverse() * TL_loc_LTM;
 
   if (TL_loc_LTM(2) < 0) {
-    AWARN << "Compute a light behind the car. light to car Pose:\n"
-          << TL_loc_LTM;
+    AWARN << "Compute a light behind the car. light to car Pose:\n" << TL_loc_LTM;
     return false;
   }
 
@@ -116,19 +109,18 @@ bool BoundaryProjection::ProjectPointDistort(const CameraCoeffient &coeffient,
   pt2d[0] = TL_loc_LTM[0] / TL_loc_LTM[2];
   pt2d[1] = TL_loc_LTM[1] / TL_loc_LTM[2];
 
-  pt2d = PixelDenormalize(pt2d, coeffient.camera_intrinsic,
-                          coeffient.distort_params);
+  pt2d      = PixelDenormalize(pt2d, coeffient.camera_intrinsic, coeffient.distort_params);
   *center_x = pt2d[0];
   *center_y = pt2d[1];
   return true;
 }
 
-Eigen::Matrix<double, 2, 1> BoundaryProjection::PixelDenormalize(
-    const Eigen::Matrix<double, 2, 1> &pt2d,
-    const Eigen::Matrix<double, 3, 4> &camera_intrinsic,
-    const Eigen::Matrix<double, 5, 1> &distort_params) const {
+Eigen::Matrix<double, 2, 1>
+BoundaryProjection::PixelDenormalize(const Eigen::Matrix<double, 2, 1>& pt2d,
+                                     const Eigen::Matrix<double, 3, 4>& camera_intrinsic,
+                                     const Eigen::Matrix<double, 5, 1>& distort_params) const {
   // add distortion
-  double r_sq = pt2d[0] * pt2d[0] + pt2d[1] * pt2d[1];
+  double                      r_sq = pt2d[0] * pt2d[0] + pt2d[1] * pt2d[1];
   Eigen::Matrix<double, 2, 1> pt2d_radial =
       pt2d * (1 + distort_params[0] * r_sq + distort_params[1] * r_sq * r_sq +
               distort_params[4] * r_sq * r_sq * r_sq);
@@ -145,8 +137,8 @@ Eigen::Matrix<double, 2, 1> BoundaryProjection::PixelDenormalize(
   // add intrinsic K
   double focal_length_x = camera_intrinsic(0, 0);
   double focal_length_y = camera_intrinsic(1, 1);
-  double center_x = camera_intrinsic(0, 2);
-  double center_y = camera_intrinsic(1, 2);
+  double center_x       = camera_intrinsic(0, 2);
+  double center_y       = camera_intrinsic(1, 2);
 
   Eigen::Matrix<double, 2, 1> pt;
   pt[0] = pt2d_distort[0] * focal_length_x + center_x;

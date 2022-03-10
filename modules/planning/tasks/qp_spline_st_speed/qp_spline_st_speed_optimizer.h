@@ -45,16 +45,16 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
   bool Init(const PlanningConfig& config) override;
 
  private:
-  common::Status Process(const SLBoundary& adc_sl_boundary,
-                         const PathData& path_data,
+  common::Status Process(const SLBoundary&                      adc_sl_boundary,
+                         const PathData&                        path_data,
                          const apollo::common::TrajectoryPoint& init_point,
-                         const ReferenceLine& reference_line,
-                         const SpeedData& reference_speed_data,
-                         PathDecision* const path_decision,
-                         SpeedData* const speed_data) override;
+                         const ReferenceLine&                   reference_line,
+                         const SpeedData&                       reference_speed_data,
+                         PathDecision* const                    path_decision,
+                         SpeedData* const                       speed_data) override;
 
-  QpStSpeedConfig qp_st_speed_config_;
-  StBoundaryConfig st_boundary_config_;
+  QpStSpeedConfig                    qp_st_speed_config_;
+  StBoundaryConfig                   st_boundary_config_;
   std::unique_ptr<Spline1dGenerator> spline_generator_;
 };
 

@@ -30,8 +30,9 @@ using apollo::drivers::canbus::Byte;
 RadarState201::RadarState201() {}
 const uint32_t RadarState201::ID = 0x201;
 
-void RadarState201::Parse(const std::uint8_t* bytes, int32_t length,
-                          RacobitRadar* racobit_radar) const {
+void RadarState201::Parse(const std::uint8_t* bytes,
+                          int32_t             length,
+                          RacobitRadar*       racobit_radar) const {
   auto state = racobit_radar->mutable_radar_state();
   state->set_max_distance(max_dist(bytes, length));
   state->set_output_type(output_type(bytes, length));
@@ -42,10 +43,10 @@ void RadarState201::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 int RadarState201::max_dist(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+  Byte     t0(bytes + 1);
   uint32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte     t1(bytes + 2);
   uint32_t t = t1.get_byte(6, 2);
   x <<= 2;
   x |= t;
@@ -54,12 +55,11 @@ int RadarState201::max_dist(const std::uint8_t* bytes, int32_t length) const {
   return ret;
 }
 
-int RadarState201::radar_power(const std::uint8_t* bytes,
-                               int32_t length) const {
-  Byte t0(bytes + 3);
+int RadarState201::radar_power(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 3);
   uint32_t x = t0.get_byte(0, 2);
 
-  Byte t1(bytes + 4);
+  Byte     t1(bytes + 4);
   uint32_t t = t1.get_byte(7, 1);
   x <<= 1;
   x |= t;
@@ -68,50 +68,39 @@ int RadarState201::radar_power(const std::uint8_t* bytes,
   return ret;
 }
 
-OutputType RadarState201::output_type(const std::uint8_t* bytes,
-                                      int32_t length) const {
-  Byte t0(bytes + 5);
+OutputType RadarState201::output_type(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 5);
   uint32_t x = t0.get_byte(2, 2);
 
   switch (x) {
-    case 0x0:
-      return OUTPUT_TYPE_NONE;
-    case 0x1:
-      return OUTPUT_TYPE_OBJECTS;
-    case 0x2:
-      return OUTPUT_TYPE_CLUSTERS;
-    default:
-      return OUTPUT_TYPE_ERROR;
+    case 0x0: return OUTPUT_TYPE_NONE;
+    case 0x1: return OUTPUT_TYPE_OBJECTS;
+    case 0x2: return OUTPUT_TYPE_CLUSTERS;
+    default: return OUTPUT_TYPE_ERROR;
   }
 }
 
-RcsThreshold RadarState201::rcs_threshold(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 7);
+RcsThreshold RadarState201::rcs_threshold(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 7);
   uint32_t x = t0.get_byte(2, 3);
 
   switch (x) {
-    case 0x0:
-      return RCS_THRESHOLD_STANDARD;
-    case 0x1:
-      return RCS_THRESHOLD_HIGH_SENSITIVITY;
-    default:
-      return RCS_THRESHOLD_ERROR;
+    case 0x0: return RCS_THRESHOLD_STANDARD;
+    case 0x1: return RCS_THRESHOLD_HIGH_SENSITIVITY;
+    default: return RCS_THRESHOLD_ERROR;
   }
 }
 
-bool RadarState201::send_quality(const std::uint8_t* bytes,
-                                 int32_t length) const {
-  Byte t0(bytes + 5);
+bool RadarState201::send_quality(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 5);
   uint32_t x = t0.get_byte(4, 1);
 
   bool ret = (x == 0x1);
   return ret;
 }
 
-bool RadarState201::send_ext_info(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 5);
+bool RadarState201::send_ext_info(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 5);
   uint32_t x = t0.get_byte(5, 1);
 
   bool ret = (x == 0x1);

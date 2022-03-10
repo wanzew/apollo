@@ -42,10 +42,10 @@ template <typename T>
 class CameraModel {
  public:
   CameraModel() {
-    focal_length_x_ = 1;
-    focal_length_y_ = 1;
-    center_x_ = 0;
-    center_y_ = 0;
+    focal_length_x_  = 1;
+    focal_length_y_  = 1;
+    center_x_        = 0;
+    center_y_        = 0;
     intrinsic_(0, 0) = 1;
     intrinsic_(0, 1) = 0;
     intrinsic_(0, 2) = 0;
@@ -55,28 +55,27 @@ class CameraModel {
     intrinsic_(2, 0) = 0;
     intrinsic_(2, 1) = 0;
     intrinsic_(2, 2) = 1;
-    width_ = 1;
-    height_ = 1;
+    width_           = 1;
+    height_          = 1;
   }
 
   void set(const Eigen::Matrix<T, 3, 3>& params, T w, T h) {
-    intrinsic_ = params;
+    intrinsic_      = params;
     focal_length_x_ = intrinsic_(0, 0);
     focal_length_y_ = intrinsic_(1, 1);
-    center_x_ = intrinsic_(0, 2);
-    center_y_ = intrinsic_(1, 2);
-    width_ = w;
-    height_ = h;
+    center_x_       = intrinsic_(0, 2);
+    center_y_       = intrinsic_(1, 2);
+    width_          = w;
+    height_         = h;
   }
 
-  void set(T focal_length_x, T focal_length_y, T center_x, T center_y, T w,
-           T h) {
-    focal_length_x_ = focal_length_x;
-    focal_length_y_ = focal_length_y;
-    center_x_ = center_x;
-    center_y_ = center_y;
-    width_ = w;
-    height_ = h;
+  void set(T focal_length_x, T focal_length_y, T center_x, T center_y, T w, T h) {
+    focal_length_x_  = focal_length_x;
+    focal_length_y_  = focal_length_y;
+    center_x_        = center_x;
+    center_y_        = center_y;
+    width_           = w;
+    height_          = h;
     intrinsic_(0, 0) = focal_length_x_;
     intrinsic_(1, 1) = focal_length_y_;
     intrinsic_(0, 2) = center_x_;
@@ -84,8 +83,7 @@ class CameraModel {
   }
 
   /**@brief Project a 3D point on an image. */
-  virtual Eigen::Matrix<T, 2, 1> project(
-      const Eigen::Matrix<T, 3, 1>& pt3d) const {
+  virtual Eigen::Matrix<T, 2, 1> project(const Eigen::Matrix<T, 3, 1>& pt3d) const {
     Eigen::Matrix<T, 2, 1> pt2d;
 
     pt2d[0] = pt3d[0] / pt3d[2];
@@ -95,8 +93,7 @@ class CameraModel {
   }
 
   /**@brief Unproject a pixel to 3D point on a given XY plane, where z = 1 */
-  virtual Eigen::Matrix<T, 3, 1> unproject(
-      const Eigen::Matrix<T, 2, 1>& pt2d) const {
+  virtual Eigen::Matrix<T, 3, 1> unproject(const Eigen::Matrix<T, 2, 1>& pt2d) const {
     Eigen::Matrix<T, 3, 1> pt3d;
 
     Eigen::Matrix<T, 2, 1> pt2d_tmp = pixel_normalize(pt2d);
@@ -109,9 +106,8 @@ class CameraModel {
   }
 
   /**@brief Project a 3D point on an image. */
-  virtual Eigen::Matrix<T, 2, 1> project(
-      const Eigen::Matrix<T, 4, 4>& transform,
-      const Eigen::Matrix<T, 3, 1>& pt3d) const {
+  virtual Eigen::Matrix<T, 2, 1> project(const Eigen::Matrix<T, 4, 4>& transform,
+                                         const Eigen::Matrix<T, 3, 1>& pt3d) const {
     Eigen::Matrix<T, 3, 1> local_pt3d;
     local_pt3d[0] = transform(0, 0) * pt3d[0] + transform(0, 1) * pt3d[1] +
                     transform(0, 2) * pt3d[2] + transform(0, 3);
@@ -133,14 +129,10 @@ class CameraModel {
                     transform(1, 2) * pt3d[2] + transform(1, 3);
     local_pt3d[2] = transform(2, 0) * pt3d[0] + transform(2, 1) * pt3d[1] +
                     transform(2, 2) * pt3d[2] + transform(2, 3);
-    if (local_pt3d[2] <= 0) {
-      return false;
-    }
+    if (local_pt3d[2] <= 0) { return false; }
 
     Eigen::Matrix<T, 2, 1> pt2d = project(local_pt3d);
-    if (pt2d[0] > 0 && pt2d[0] < width_ && pt2d[1] > 0 && pt2d[1] < height_) {
-      return true;
-    }
+    if (pt2d[0] > 0 && pt2d[0] < width_ && pt2d[1] > 0 && pt2d[1] < height_) { return true; }
     return false;
   }
 
@@ -153,9 +145,7 @@ class CameraModel {
   /**@brief Get the optical center y. */
   inline T get_center_y() const { return center_y_; }
   /**@brief Get the intrinsic matrix K. */
-  inline const Eigen::Matrix<T, 3, 3>& get_intrinsic() const {
-    return intrinsic_;
-  }
+  inline const Eigen::Matrix<T, 3, 3>& get_intrinsic() const { return intrinsic_; }
   /**@brief Get the intrinsic matrix K. */
   inline Eigen::Matrix<T, 3, 3>& get_intrinsic() { return intrinsic_; }
   /**@brief Get the image width */
@@ -163,15 +153,13 @@ class CameraModel {
   /**@brief Get the image height */
   inline T get_height() const { return height_; }
 
-  friend std::ostream& operator<<<>(std::ostream& out,
-                                    const CameraModel<T>& camera);
+  friend std::ostream& operator<<<>(std::ostream& out, const CameraModel<T>& camera);
 
  protected:
   /**@brief Normalize a 2D pixel. Convert a 2D pixel as if the image is taken
    * with a camera,
    * whose K = identity matrix. */
-  virtual Eigen::Matrix<T, 2, 1> pixel_normalize(
-      const Eigen::Matrix<T, 2, 1>& pt2d) const {
+  virtual Eigen::Matrix<T, 2, 1> pixel_normalize(const Eigen::Matrix<T, 2, 1>& pt2d) const {
     Eigen::Matrix<T, 2, 1> p;
     p[0] = (pt2d[0] - center_x_) / focal_length_x_;
     p[1] = (pt2d[1] - center_y_) / focal_length_y_;
@@ -182,8 +170,7 @@ class CameraModel {
   /**@brief Denormalize a 2D pixel. Convert a 2D pixel as if the image is taken
    * with a camera,
    * whose K = intrinsic_. */
-  virtual Eigen::Matrix<T, 2, 1> pixel_denormalize(
-      const Eigen::Matrix<T, 2, 1>& pt2d) const {
+  virtual Eigen::Matrix<T, 2, 1> pixel_denormalize(const Eigen::Matrix<T, 2, 1>& pt2d) const {
     Eigen::Matrix<T, 2, 1> p;
     p[0] = pt2d[0] * focal_length_x_ + center_x_;
     p[1] = pt2d[1] * focal_length_y_ + center_y_;
@@ -222,8 +209,7 @@ class CameraDistort : public CameraModel<T> {
   }
 
   /**@brief Project a 3D point on an image. */
-  virtual Eigen::Matrix<T, 2, 1> project(
-      const Eigen::Matrix<T, 3, 1>& pt3d) const {
+  virtual Eigen::Matrix<T, 2, 1> project(const Eigen::Matrix<T, 3, 1>& pt3d) const {
     Eigen::Matrix<T, 2, 1> pt2d;
     pt2d[0] = pt3d[0] / pt3d[2];
     pt2d[1] = pt3d[1] / pt3d[2];
@@ -231,8 +217,7 @@ class CameraDistort : public CameraModel<T> {
   }
 
   /**@brief Unproject a pixel to 3D point on a given XY plane, where z = 1 */
-  virtual Eigen::Matrix<T, 3, 1> unproject(
-      const Eigen::Matrix<T, 2, 1>& pt2d) const {
+  virtual Eigen::Matrix<T, 3, 1> unproject(const Eigen::Matrix<T, 2, 1>& pt2d) const {
     Eigen::Matrix<T, 3, 1> pt3d;
 
     Eigen::Matrix<T, 2, 1> pt2d_tmp = pixel_normalize(pt2d);
@@ -245,9 +230,8 @@ class CameraDistort : public CameraModel<T> {
   }
 
   /**@brief Project a 3D point on an image. */
-  virtual Eigen::Matrix<T, 2, 1> project(
-      const Eigen::Matrix<T, 4, 4>& transform,
-      const Eigen::Matrix<T, 3, 1>& pt3d) const {
+  virtual Eigen::Matrix<T, 2, 1> project(const Eigen::Matrix<T, 4, 4>& transform,
+                                         const Eigen::Matrix<T, 3, 1>& pt3d) const {
     Eigen::Matrix<T, 3, 1> local_pt3d;
     local_pt3d[0] = transform(0, 0) * pt3d[0] + transform(0, 1) * pt3d[1] +
                     transform(0, 2) * pt3d[2] + transform(0, 3);
@@ -269,46 +253,32 @@ class CameraDistort : public CameraModel<T> {
   }
 
   /**@brief Set the distortion parameters. */
-  inline void set_distort_params(const Eigen::Matrix<T, 5, 1>& params) {
-    distort_params_ = params;
-  }
+  inline void set_distort_params(const Eigen::Matrix<T, 5, 1>& params) { distort_params_ = params; }
 
   /**@brief Get the distortion parameters. */
-  inline const Eigen::Matrix<T, 5, 1>& get_distort_params() const {
-    return distort_params_;
-  }
+  inline const Eigen::Matrix<T, 5, 1>& get_distort_params() const { return distort_params_; }
 
   /**@brief Get the distortion parameters. */
-  inline Eigen::Matrix<T, 5, 1>& get_distort_params() {
-    return distort_params_;
-  }
+  inline Eigen::Matrix<T, 5, 1>& get_distort_params() { return distort_params_; }
 
-  friend std::ostream& operator<<<>(std::ostream& out,
-                                    const CameraDistort<T>& camera);
+  friend std::ostream& operator<<<>(std::ostream& out, const CameraDistort<T>& camera);
 
  protected:
   /**@brief Normalize a 2D pixel. Convert a 2D pixel as if the image is taken
    * with a camera,
    * whose K = identity matrix. */
-  virtual Eigen::Matrix<T, 2, 1> pixel_normalize(
-      const Eigen::Matrix<T, 2, 1>& pt2d) const {
+  virtual Eigen::Matrix<T, 2, 1> pixel_normalize(const Eigen::Matrix<T, 2, 1>& pt2d) const {
     Eigen::Matrix<T, 2, 1> pt2d_distort = CameraModel<T>::pixel_normalize(pt2d);
 
     Eigen::Matrix<T, 2, 1> pt2d_undistort = pt2d_distort;  // Initial guess
     for (unsigned int i = 0; i < 20; ++i) {
-      T r_sq = pt2d_undistort[0] * pt2d_undistort[0] +
-               pt2d_undistort[1] * pt2d_undistort[1];
-      T k_radial = 1.0 + distort_params_[0] * r_sq +
-                   distort_params_[1] * r_sq * r_sq +
+      T r_sq     = pt2d_undistort[0] * pt2d_undistort[0] + pt2d_undistort[1] * pt2d_undistort[1];
+      T k_radial = 1.0 + distort_params_[0] * r_sq + distort_params_[1] * r_sq * r_sq +
                    distort_params_[4] * r_sq * r_sq * r_sq;
-      T delta_x_0 =
-          2 * distort_params_[2] * pt2d_undistort[0] * pt2d_undistort[1] +
-          distort_params_[3] *
-              (r_sq + 2 * pt2d_undistort[0] * pt2d_undistort[0]);
-      T delta_x_1 =
-          distort_params_[2] *
-              (r_sq + 2 * pt2d_undistort[1] * pt2d_undistort[1]) +
-          2 * distort_params_[3] * pt2d_undistort[0] * pt2d_undistort[1];
+      T delta_x_0 = 2 * distort_params_[2] * pt2d_undistort[0] * pt2d_undistort[1] +
+                    distort_params_[3] * (r_sq + 2 * pt2d_undistort[0] * pt2d_undistort[0]);
+      T delta_x_1 = distort_params_[2] * (r_sq + 2 * pt2d_undistort[1] * pt2d_undistort[1]) +
+                    2 * distort_params_[3] * pt2d_undistort[0] * pt2d_undistort[1];
       pt2d_undistort[0] = (pt2d_distort[0] - delta_x_0) / k_radial;
       pt2d_undistort[1] = (pt2d_distort[1] - delta_x_1) / k_radial;
     }
@@ -318,14 +288,12 @@ class CameraDistort : public CameraModel<T> {
   /**@brief Denormalize a 2D pixel. Convert a 2D pixel as if the image is taken
    * with a camera,
    * whose K = intrinsic_. */
-  virtual Eigen::Matrix<T, 2, 1> pixel_denormalize(
-      const Eigen::Matrix<T, 2, 1>& pt2d) const {
+  virtual Eigen::Matrix<T, 2, 1> pixel_denormalize(const Eigen::Matrix<T, 2, 1>& pt2d) const {
     // Add distortion
-    T r_sq = pt2d[0] * pt2d[0] + pt2d[1] * pt2d[1];
+    T                      r_sq = pt2d[0] * pt2d[0] + pt2d[1] * pt2d[1];
     Eigen::Matrix<T, 2, 1> pt2d_radial =
-        pt2d *
-        (1 + distort_params_[0] * r_sq + distort_params_[1] * r_sq * r_sq +
-         distort_params_[4] * r_sq * r_sq * r_sq);
+        pt2d * (1 + distort_params_[0] * r_sq + distort_params_[1] * r_sq * r_sq +
+                distort_params_[4] * r_sq * r_sq * r_sq);
     Eigen::Matrix<T, 2, 1> dpt2d;
     dpt2d[0] = 2 * distort_params_[2] * pt2d[0] * pt2d[1] +
                distort_params_[3] * (r_sq + 2 * pt2d[0] * pt2d[0]);
@@ -350,21 +318,19 @@ class CameraDistort : public CameraModel<T> {
 
 template <typename T>
 std::ostream& operator<<(std::ostream& cout, const CameraModel<T>& camera) {
-  cout << camera.intrinsic_ << "\n [" << camera.width_ << "," << camera.height_
-       << "]\n";
+  cout << camera.intrinsic_ << "\n [" << camera.width_ << "," << camera.height_ << "]\n";
   return cout;
 }
 
 template <typename T>
 std::ostream& operator<<(std::ostream& cout, const CameraDistort<T>& camera) {
-  cout << camera.intrinsic_ << "\n [" << camera.width_ << "," << camera.height_
-       << "]\n";
+  cout << camera.intrinsic_ << "\n [" << camera.width_ << "," << camera.height_ << "]\n";
   cout << camera.distort_params_;
 
   return cout;
 }
 
-typedef CameraModel<double> CameraD;
+typedef CameraModel<double>   CameraD;
 typedef CameraDistort<double> CameraDistortD;
 
 }  // namespace perception

@@ -23,8 +23,8 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Controlcommand115 : public ::apollo::drivers::canbus::ProtocolData<
-                              ::apollo::canbus::ChassisDetail> {
+class Controlcommand115
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -49,8 +49,7 @@ class Controlcommand115 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 8, 'name': 'CTRL_CMD', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  void set_p_ctrl_cmd(uint8_t* data,
-                      Control_command_115::Ctrl_cmdType ctrl_cmd);
+  void set_p_ctrl_cmd(uint8_t* data, Control_command_115::Ctrl_cmdType ctrl_cmd);
 
  private:
   Control_command_115::Ctrl_cmdType ctrl_cmd_;

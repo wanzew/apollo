@@ -17,10 +17,10 @@
 #ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_pointcloud_dump_H_
 #define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_pointcloud_dump_H_
 
-#include <pcl_ros/point_cloud.h>
-#include <ros/ros.h>
 #include <fstream>
 #include <iostream>
+#include <pcl_ros/point_cloud.h>
+#include <ros/ros.h>
 
 #include "velodyne_pointcloud/velodyne_parser.h"
 
@@ -42,7 +42,7 @@ class PointCloudDump {
   // sub topic name
   std::string topic_name_;
   // save file prefix,file will be prefix_msgseq.msg
-  std::string file_prefix_;
+  std::string     file_prefix_;
   ros::Subscriber pointcloud_sub_;
 };
 

@@ -44,7 +44,6 @@ class GLRasterText {
   void print_string(const std::string s);
   void print_multiline(const std::string s, int top_left_x, int top_left_y);
 
-
  private:
   void make_raster_font();
 
@@ -52,7 +51,7 @@ class GLRasterText {
   static GLubyte s_letters_bitmaps_[][13];
   static GLubyte s_numbers_bitmaps_[][13];
   static GLubyte s_asccii_bitmaps_[][13];
-  static GLuint s_font_offset_;
+  static GLuint  s_font_offset_;
 };
 
 }  // namespace lowcostvisualizer

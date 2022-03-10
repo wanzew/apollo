@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
+#include <gtest/gtest.h>
 
 namespace apollo {
 namespace localization {
@@ -41,12 +41,10 @@ TEST_F(BaseMapNodeIndexTestSuite, GetMethodTest) {
   option.map_resolutions_.push_back(0.125);
   Eigen::Vector3d coordinate3d;
   coordinate3d << 435816.184008, 4435662.333578, 36.606647;
-  MapNodeIndex node_index1 =
-      MapNodeIndex::GetMapNodeIndex(option, coordinate3d, 0, 50);
+  MapNodeIndex    node_index1 = MapNodeIndex::GetMapNodeIndex(option, coordinate3d, 0, 50);
   Eigen::Vector2d coordinate2d;
   coordinate2d << 435816.184008, 4435662.333578;
-  MapNodeIndex node_index2 =
-      MapNodeIndex::GetMapNodeIndex(option, coordinate2d, 0, 50);
+  MapNodeIndex node_index2 = MapNodeIndex::GetMapNodeIndex(option, coordinate2d, 0, 50);
 
   ASSERT_TRUE(node_index1 == node_index2);
 }
@@ -69,7 +67,7 @@ TEST_F(BaseMapNodeIndexTestSuite, OperatorTest) {
   ASSERT_TRUE(res);
 
   node_index2.n_ = 0;
-  res = node_index1 == node_index2;
+  res            = node_index1 == node_index2;
   ASSERT_TRUE(res);
 
   std::cout << node_index2 << std::endl;

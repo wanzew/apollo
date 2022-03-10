@@ -68,7 +68,7 @@ class LatController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  common::Status Init(const ControlConf *control_conf) override;
+  common::Status Init(const ControlConf* control_conf) override;
 
   /**
    * @brief compute steering target based on current vehicle status
@@ -79,10 +79,10 @@ class LatController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      ControlCommand *cmd) override;
+  common::Status ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                                       const canbus::Chassis*                    chassis,
+                                       const planning::ADCTrajectory*            trajectory,
+                                       ControlCommand*                           cmd) override;
 
   /**
    * @brief reset Lateral Controller
@@ -102,7 +102,7 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleLateralDebug *debug);
+  void UpdateState(SimpleLateralDebug* debug);
 
   void UpdateMatrix();
 
@@ -110,16 +110,18 @@ class LatController : public Controller {
 
   double ComputeFeedForward(double ref_curvature) const;
 
-  void ComputeLateralErrors(const double x, const double y, const double theta,
-                            const double linear_v, const double angular_v,
-                            const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug);
-  bool LoadControlConf(const ControlConf *control_conf);
-  void InitializeFilters(const ControlConf *control_conf);
-  void LoadLatGainScheduler(const LatControllerConf &lat_controller_conf);
+  void ComputeLateralErrors(const double              x,
+                            const double              y,
+                            const double              theta,
+                            const double              linear_v,
+                            const double              angular_v,
+                            const TrajectoryAnalyzer& trajectory_analyzer,
+                            SimpleLateralDebug*       debug);
+  bool LoadControlConf(const ControlConf* control_conf);
+  void InitializeFilters(const ControlConf* control_conf);
+  void LoadLatGainScheduler(const LatControllerConf& lat_controller_conf);
   void LogInitParameters();
-  void ProcessLogs(const SimpleLateralDebug *debug,
-                   const canbus::Chassis *chassis);
+  void ProcessLogs(const SimpleLateralDebug* debug, const canbus::Chassis* chassis);
 
   void CloseLogFile();
 

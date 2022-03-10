@@ -16,8 +16,8 @@
 
 #include "modules/common/util/disjoint_set.h"
 
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {
@@ -51,8 +51,8 @@ class DisjointSetTest : public testing::Test {
   }
   void TearDown() {}
   struct Node {
-    Node* parent = nullptr;
-    char node_rank = 0;
+    Node* parent    = nullptr;
+    char  node_rank = 0;
   };
   Node* node1_ = nullptr;
   Node* node2_ = nullptr;
@@ -85,9 +85,7 @@ TEST_F(DisjointSetTest, DisjointSetFind) {
   EXPECT_EQ(node1_, root_node3->parent);
 }
 
-TEST_F(DisjointSetTest, DisjointSetMerge) {
-  DisjointSetMerge<Node>(node1_, node2_);
-}
+TEST_F(DisjointSetTest, DisjointSetMerge) { DisjointSetMerge<Node>(node1_, node2_); }
 
 TEST_F(DisjointSetTest, DisjointSetUnion) {
   DisjointSetUnion<Node>(node1_, node2_);

@@ -23,11 +23,11 @@ namespace common {
 namespace math {
 
 TEST(MPCSolverTest, MPC) {
-  const int STATES = 4;
-  int CONTROLS = 2;
-  const int HORIZON = 10;
-  const double EPS = 0.01;
-  const int MAX_ITER = 100;
+  const int    STATES   = 4;
+  int          CONTROLS = 2;
+  const int    HORIZON  = 10;
+  const double EPS      = 0.01;
+  const int    MAX_ITER = 100;
 
   Eigen::MatrixXd A(STATES, STATES);
   A << 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1;
@@ -67,8 +67,8 @@ TEST(MPCSolverTest, MPC) {
       control[i - 1] = control[i];
     }
     control[HORIZON - 1] = control_matrix;
-    SolveLinearMPC(A, B, C, Q, R, lower_bound, upper_bound, initial_state,
-                   reference, EPS, MAX_ITER, &control);
+    SolveLinearMPC(A, B, C, Q, R, lower_bound, upper_bound, initial_state, reference, EPS, MAX_ITER,
+                   &control);
     EXPECT_FLOAT_EQ(upper_bound(0), control[0](0));
   }
   CONTROLS = 1;
@@ -100,8 +100,8 @@ TEST(MPCSolverTest, MPC) {
     for (unsigned int i = 1; i < control1.size(); ++i) {
       control1[i - 1] = control1[i];
     }
-    SolveLinearMPC(A, B1, C, Q, R1, lower_bound1, upper_bound1, initial_state1,
-                   reference1, EPS, MAX_ITER, &control1);
+    SolveLinearMPC(A, B1, C, Q, R1, lower_bound1, upper_bound1, initial_state1, reference1, EPS,
+                   MAX_ITER, &control1);
     EXPECT_FLOAT_EQ(lower_bound1(0), control1[0](0));
   }
 
@@ -133,8 +133,8 @@ TEST(MPCSolverTest, MPC) {
     for (unsigned int i = 1; i < control2.size(); ++i) {
       control2[i - 1] = control2[i];
     }
-    SolveLinearMPC(A, B2, C, Q, R2, lower_bound2, upper_bound2, initial_state2,
-                   reference2, EPS, MAX_ITER, &control2);
+    SolveLinearMPC(A, B2, C, Q, R2, lower_bound2, upper_bound2, initial_state2, reference2, EPS,
+                   MAX_ITER, &control2);
     EXPECT_NEAR(0.0, control2[0](0), 1e-7);
   }
 }

@@ -19,13 +19,13 @@
 
 #include "velodyne_pointcloud/const_variables.h"
 
+#include <Eigen/Eigen>
 #include <eigen_conversions/eigen_msg.h>
 #include <pcl/common/time.h>
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/String.h>
 #include <tf2_ros/transform_listener.h>
-#include <Eigen/Eigen>
 
 namespace apollo {
 namespace drivers {
@@ -38,39 +38,38 @@ class Compensator {
 
  private:
   /**
-  * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
-  * compensator
-  */
+   * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
+   * compensator
+   */
   void pointcloud_callback(sensor_msgs::PointCloud2ConstPtr msg);
   /**
-  * @brief get pose affine from tf2 by gps timestamp
-  *   novatel-preprocess broadcast the tf2 transfrom.
-  */
-  bool query_pose_affine_from_tf2(const double timestamp,
-                                  Eigen::Affine3d& pose);
+   * @brief get pose affine from tf2 by gps timestamp
+   *   novatel-preprocess broadcast the tf2 transfrom.
+   */
+  bool query_pose_affine_from_tf2(const double timestamp, Eigen::Affine3d& pose);
   /**
-  * @brief check if message is valid, check width, height, timestamp.
-  *   set timestamp_offset and point data type
-  */
+   * @brief check if message is valid, check width, height, timestamp.
+   *   set timestamp_offset and point data type
+   */
   bool check_message(sensor_msgs::PointCloud2ConstPtr msg);
   /**
-  * @brief motion compensation for point cloud
-  */
+   * @brief motion compensation for point cloud
+   */
   template <typename Scalar>
   void motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
-                           const double timestamp_min,
-                           const double timestamp_max,
-                           const Eigen::Affine3d& pose_min_time,
-                           const Eigen::Affine3d& pose_max_time);
+                           const double                   timestamp_min,
+                           const double                   timestamp_max,
+                           const Eigen::Affine3d&         pose_min_time,
+                           const Eigen::Affine3d&         pose_max_time);
   /**
-  * @brief get min timestamp and max timestamp from points in pointcloud2
-  */
-  inline void get_timestamp_interval(
-      sensor_msgs::PointCloud2ConstPtr msg, double& timestamp_min,
-      double& timestamp_max);
+   * @brief get min timestamp and max timestamp from points in pointcloud2
+   */
+  inline void get_timestamp_interval(sensor_msgs::PointCloud2ConstPtr msg,
+                                     double&                          timestamp_min,
+                                     double&                          timestamp_max);
   /**
-  * @brief get point field size by sensor_msgs::datatype
-  */
+   * @brief get point field size by sensor_msgs::datatype
+   */
   inline uint get_field_size(const int data_type);
 
   // subscribe velodyne pointcloud2 msg.
@@ -84,13 +83,13 @@ class Compensator {
   tf2_ros::TransformListener tf2_transform_listener_;
   // transform child frame id(world -> child frame)
   std::string child_frame_id_;
-  float tf_timeout_;
+  float       tf_timeout_;
 
   // variables for point fields value, we get point x,y,z by these offset
-  int x_offset_;
-  int y_offset_;
-  int z_offset_;
-  int timestamp_offset_;
+  int  x_offset_;
+  int  y_offset_;
+  int  z_offset_;
+  int  timestamp_offset_;
   uint timestamp_data_size_;
 
   // topic names

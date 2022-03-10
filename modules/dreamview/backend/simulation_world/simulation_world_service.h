@@ -65,14 +65,13 @@ class SimulationWorldService {
    * @param map_service the pointer of MapService.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldService(const MapService *map_service,
-                         bool routing_from_file = false);
+  SimulationWorldService(const MapService* map_service, bool routing_from_file = false);
 
   /**
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const { return world_; }
+  inline const SimulationWorld& world() const { return world_; }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
@@ -89,8 +88,9 @@ class SimulationWorldService {
    * @param sim_world_with_planning_data output of binary format sim_world
    * string with planning_data.
    */
-  void GetWireFormatString(double radius, std::string *sim_world,
-                           std::string *sim_world_with_planning_data);
+  void GetWireFormatString(double       radius,
+                           std::string* sim_world,
+                           std::string* sim_world_with_planning_data);
 
   /**
    * @brief Returns the json representation of the map element Ids and hash
@@ -125,16 +125,15 @@ class SimulationWorldService {
    * @param log_level defined in
    *        modules/common/monitor_log/proto/monitor_log.proto
    */
-  void PublishMonitorMessage(
-      apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
-      const std::string &msg) {
+  void PublishMonitorMessage(apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
+                             const std::string&                                    msg) {
     apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.AddMonitorMsgItem(log_level, msg);
   }
 
-  void GetMapElementIds(double radius, MapElementIds *ids) const;
+  void GetMapElementIds(double radius, MapElementIds* ids) const;
 
-  const apollo::hdmap::Map &GetRelativeMap() const;
+  const apollo::hdmap::Map& GetRelativeMap() const;
 
   nlohmann::json GetRoutePathAsJson() const;
 
@@ -144,52 +143,44 @@ class SimulationWorldService {
    * localization, planning, perception, etc.
    */
   template <typename DataType>
-  void UpdateSimulationWorld(const DataType &data);
+  void UpdateSimulationWorld(const DataType& data);
 
-  Object &CreateWorldObjectIfAbsent(
-      const apollo::perception::PerceptionObstacle &obstacle);
-  void SetObstacleInfo(const apollo::perception::PerceptionObstacle &obstacle,
-                       Object *world_object);
-  void SetObstaclePolygon(
-      const apollo::perception::PerceptionObstacle &obstacle,
-      Object *world_object);
-  void UpdatePlanningTrajectory(
-      const apollo::planning::ADCTrajectory &trajectory);
-  bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
-                    Decision *world_decision);
-  void FindNudgeRegion(const apollo::planning::ObjectDecisionType &decision,
-                       const Object &world_obj, Decision *world_decision);
-  void UpdateDecision(const apollo::planning::DecisionResult &decision_res,
-                      double header_time);
-  void UpdateMainStopDecision(
-      const apollo::planning::MainDecision &main_decision,
-      double update_timestamp_sec, Object *world_main_stop);
+  Object& CreateWorldObjectIfAbsent(const apollo::perception::PerceptionObstacle& obstacle);
+  void    SetObstacleInfo(const apollo::perception::PerceptionObstacle& obstacle,
+                          Object*                                       world_object);
+  void    SetObstaclePolygon(const apollo::perception::PerceptionObstacle& obstacle,
+                             Object*                                       world_object);
+  void    UpdatePlanningTrajectory(const apollo::planning::ADCTrajectory& trajectory);
+  bool LocateMarker(const apollo::planning::ObjectDecisionType& decision, Decision* world_decision);
+  void FindNudgeRegion(const apollo::planning::ObjectDecisionType& decision,
+                       const Object&                               world_obj,
+                       Decision*                                   world_decision);
+  void UpdateDecision(const apollo::planning::DecisionResult& decision_res, double header_time);
+  void UpdateMainStopDecision(const apollo::planning::MainDecision& main_decision,
+                              double                                update_timestamp_sec,
+                              Object*                               world_main_stop);
 
   template <typename MainDecision>
-  void UpdateMainChangeLaneDecision(const MainDecision &decision,
-                                    Object *world_main_decision) {
+  void UpdateMainChangeLaneDecision(const MainDecision& decision, Object* world_main_decision) {
     if (decision.has_change_lane_type() &&
         (decision.change_lane_type() == apollo::routing::ChangeLaneType::LEFT ||
-         decision.change_lane_type() ==
-             apollo::routing::ChangeLaneType::RIGHT)) {
-      auto *change_lane_decision = world_main_decision->add_decision();
+         decision.change_lane_type() == apollo::routing::ChangeLaneType::RIGHT)) {
+      auto* change_lane_decision = world_main_decision->add_decision();
       change_lane_decision->set_change_lane_type(decision.change_lane_type());
-      change_lane_decision->set_position_x(
-          world_.auto_driving_car().position_x() + map_service_->GetXOffset());
-      change_lane_decision->set_position_y(
-          world_.auto_driving_car().position_y() + map_service_->GetYOffset());
+      change_lane_decision->set_position_x(world_.auto_driving_car().position_x() +
+                                           map_service_->GetXOffset());
+      change_lane_decision->set_position_y(world_.auto_driving_car().position_y() +
+                                           map_service_->GetYOffset());
       change_lane_decision->set_heading(world_.auto_driving_car().heading());
     }
   }
 
-  void CreatePredictionTrajectory(
-      const apollo::prediction::PredictionObstacle &obstacle,
-      Object *world_object);
+  void CreatePredictionTrajectory(const apollo::prediction::PredictionObstacle& obstacle,
+                                  Object*                                       world_object);
 
-  void DownsamplePath(const apollo::common::Path &paths,
-                      apollo::common::Path *downsampled_path);
+  void DownsamplePath(const apollo::common::Path& paths, apollo::common::Path* downsampled_path);
 
-  void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
+  void UpdatePlanningData(const apollo::planning_internal::PlanningData& data);
 
   void PopulateMapInfo(double radius);
 
@@ -198,12 +189,12 @@ class SimulationWorldService {
    * SimulationWorld object when triggered by refresh timer.
    */
   template <typename AdapterType>
-  void UpdateWithLatestObserved(const std::string &adapter_name,
-                                AdapterType *adapter, bool logging = true) {
+  void UpdateWithLatestObserved(const std::string& adapter_name,
+                                AdapterType*       adapter,
+                                bool               logging = true) {
     if (adapter->Empty()) {
       if (logging) {
-        AINFO_EVERY(100) << adapter_name
-                         << " adapter has not received any data yet.";
+        AINFO_EVERY(100) << adapter_name << " adapter has not received any data yet.";
       }
       return;
     }
@@ -213,27 +204,25 @@ class SimulationWorldService {
 
   void RegisterMessageCallbacks();
 
-  void ReadRoutingFromFile(const std::string &routing_response_file);
+  void ReadRoutingFromFile(const std::string& routing_response_file);
 
   void UpdateDelays();
 
   template <typename Points>
-  void DownsampleSpeedPointsByInterval(const Points &points,
-                                       size_t downsampleInterval,
-                                       Points *downsampled_points) {
-    if (points.size() == 0) {
-      return;
-    }
+  void DownsampleSpeedPointsByInterval(const Points& points,
+                                       size_t        downsampleInterval,
+                                       Points*       downsampled_points) {
+    if (points.size() == 0) { return; }
 
     for (int i = 0; i < points.size() - 1; i += downsampleInterval) {
-      auto *point = downsampled_points->Add();
+      auto* point = downsampled_points->Add();
       point->set_s(points[i].s());
       point->set_t(points[i].t());
       point->set_v(points[i].v());
     }
 
     // add the last point
-    auto *point = downsampled_points->Add();
+    auto* point = downsampled_points->Add();
     point->set_s(points[points.size() - 1].s());
     point->set_t(points[points.size() - 1].t());
     point->set_v(points[points.size() - 1].v());
@@ -247,7 +236,7 @@ class SimulationWorldService {
   std::vector<RoutePath> route_paths_;
 
   // The handle of MapService, not owned by SimulationWorldService.
-  const MapService *map_service_;
+  const MapService* map_service_;
 
   // The map holding obstacle string id to the actual object
   std::unordered_map<std::string, Object> obj_map_;

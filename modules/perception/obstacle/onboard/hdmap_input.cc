@@ -16,8 +16,8 @@
 
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
 
-#include <stdlib.h>
 #include <algorithm>
+#include <stdlib.h>
 #include <vector>
 
 #include "Eigen/Core"
@@ -52,27 +52,19 @@ constexpr double kRadianToDegree = 180.0 / M_PI;
 // HDMapInput
 HDMapInput::HDMapInput() {}
 
-bool HDMapInput::GetROI(const PointD& pointd, const double map_radius,
-                        HdmapStructPtr* mapptr) {
-  if (mapptr == nullptr) {
-    return false;
-  }
+bool HDMapInput::GetROI(const PointD& pointd, const double map_radius, HdmapStructPtr* mapptr) {
+  if (mapptr == nullptr) { return false; }
   auto* hdmap = HDMapUtil::BaseMapPtr();
-  if (hdmap == nullptr) {
-    return false;
-  }
-  if (*mapptr == nullptr) {
-    (*mapptr).reset(new HdmapStruct);
-  }
+  if (hdmap == nullptr) { return false; }
+  if (*mapptr == nullptr) { (*mapptr).reset(new HdmapStruct); }
   common::PointENU point;
   point.set_x(pointd.x);
   point.set_y(pointd.y);
   point.set_z(pointd.z);
-  std::vector<RoadROIBoundaryPtr> boundary_vec;
+  std::vector<RoadROIBoundaryPtr>  boundary_vec;
   std::vector<JunctionBoundaryPtr> junctions_vec;
 
-  int status = hdmap->GetRoadBoundaries(point, map_radius, &boundary_vec,
-                                        &junctions_vec);
+  int status = hdmap->GetRoadBoundaries(point, map_radius, &boundary_vec, &junctions_vec);
   if (status != 0) {
     AERROR << "Failed to get road boundaries for point " << point.DebugString();
     return false;
@@ -88,37 +80,33 @@ bool HDMapInput::GetROI(const PointD& pointd, const double map_radius,
 }
 
 bool HDMapInput::GetNearestLaneDirection(const pcl_util::PointD& pointd,
-                                         Eigen::Vector3d* lane_direction) {
+                                         Eigen::Vector3d*        lane_direction) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
-  if (hdmap == nullptr) {
-    return false;
-  }
+  if (hdmap == nullptr) { return false; }
   common::PointENU point;
   point.set_x(pointd.x);
   point.set_y(pointd.y);
   point.set_z(pointd.z);
   hdmap::LaneInfoConstPtr nearest_lane;
-  double nearest_s;
-  double nearest_l;
+  double                  nearest_s;
+  double                  nearest_l;
 
-  int status =
-      hdmap->GetNearestLane(point, &nearest_lane, &nearest_s, &nearest_l);
+  int status = hdmap->GetNearestLane(point, &nearest_lane, &nearest_s, &nearest_l);
   if (status != 0) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
     return false;
   }
   double lane_heading = nearest_lane->Heading(nearest_s);
-  (*lane_direction) = Eigen::Vector3d(cos(lane_heading), sin(lane_heading), 0);
+  (*lane_direction)   = Eigen::Vector3d(cos(lane_heading), sin(lane_heading), 0);
   return true;
 }
 
-Status HDMapInput::MergeBoundaryJunction(
-    const std::vector<RoadROIBoundaryPtr>& boundaries,
-    const std::vector<JunctionBoundaryPtr>& junctions, HdmapStructPtr* mapptr) {
+Status HDMapInput::MergeBoundaryJunction(const std::vector<RoadROIBoundaryPtr>&  boundaries,
+                                         const std::vector<JunctionBoundaryPtr>& junctions,
+                                         HdmapStructPtr*                         mapptr) {
   if (*mapptr == nullptr) {
     AERROR << "the HdmapStructPtr mapptr is null";
-    return Status(ErrorCode::PERCEPTION_ERROR,
-                  "HdmapStructPtr mapptr is null.");
+    return Status(ErrorCode::PERCEPTION_ERROR, "HdmapStructPtr mapptr is null.");
   }
   (*mapptr)->road_boundary.resize(boundaries.size());
   (*mapptr)->junction.resize(junctions.size());
@@ -136,18 +124,16 @@ Status HDMapInput::MergeBoundaryJunction(
           continue;
         }
         for (const auto& segment : edge.curve().segment()) {
-          if (segment.has_line_segment()) {
-            DownSampleBoundary(segment.line_segment(), edge_side);
-          }
+          if (segment.has_line_segment()) { DownSampleBoundary(segment.line_segment(), edge_side); }
         }
       }
     }
   }
 
   for (size_t i = 0; i < junctions.size(); i++) {
-    const Polygon2d& polygon = junctions[i]->junction_info->polygon();
-    const vector<Vec2d>& points = polygon.points();
-    auto& junction = (*mapptr)->junction[i];
+    const Polygon2d&     polygon  = junctions[i]->junction_info->polygon();
+    const vector<Vec2d>& points   = polygon.points();
+    auto&                junction = (*mapptr)->junction[i];
     junction.reserve(points.size());
     for (const auto& point : points) {
       PointD pointd;
@@ -162,7 +148,7 @@ Status HDMapInput::MergeBoundaryJunction(
 }
 
 void HDMapInput::DownSampleBoundary(const hdmap::LineSegment& line,
-                                    PolygonDType* out_boundary_line) const {
+                                    PolygonDType*             out_boundary_line) const {
   PointDCloudPtr raw_cloud(new PointDCloud);
   for (int i = 0; i < line.point_size(); ++i) {
     if (i % FLAGS_map_sample_step == 0) {
@@ -175,9 +161,9 @@ void HDMapInput::DownSampleBoundary(const hdmap::LineSegment& line,
   }
 
   const double kCumulateThetaError = 5.0;
-  size_t spt = 0;
-  double acos_theta = 0.0;
-  size_t raw_cloud_size = raw_cloud->points.size();
+  size_t       spt                 = 0;
+  double       acos_theta          = 0.0;
+  size_t       raw_cloud_size      = raw_cloud->points.size();
   if (raw_cloud_size <= 3) {
     for (const auto& point : raw_cloud->points) {
       out_boundary_line->push_back(point);
@@ -185,22 +171,18 @@ void HDMapInput::DownSampleBoundary(const hdmap::LineSegment& line,
     ADEBUG << "Points num < 3, so no need to downsample.";
     return;
   }
-  out_boundary_line->points.reserve(out_boundary_line->points.size() +
-                                    raw_cloud_size);
+  out_boundary_line->points.reserve(out_boundary_line->points.size() + raw_cloud_size);
   // the first point
   out_boundary_line->push_back(raw_cloud->points[0]);
   for (size_t i = 2; i < raw_cloud_size; ++i) {
-    const PointD& point_0 = raw_cloud->points[spt];
-    const PointD& point_1 = raw_cloud->points[i - 1];
-    const PointD& point_2 = raw_cloud->points[i];
+    const PointD&   point_0 = raw_cloud->points[spt];
+    const PointD&   point_1 = raw_cloud->points[i - 1];
+    const PointD&   point_2 = raw_cloud->points[i];
     Eigen::Vector2d v1(point_1.x - point_0.x, point_1.y - point_0.y);
     Eigen::Vector2d v2(point_2.x - point_1.x, point_2.y - point_1.y);
-    double vector_dist =
-        sqrt(v1.cwiseProduct(v1).sum()) * sqrt(v2.cwiseProduct(v2).sum());
+    double          vector_dist = sqrt(v1.cwiseProduct(v1).sum()) * sqrt(v2.cwiseProduct(v2).sum());
     // judge duplicate points
-    if (vector_dist < DBL_EPSILON) {
-      continue;
-    }
+    if (vector_dist < DBL_EPSILON) { continue; }
     double cos_theta = (v1.cwiseProduct(v2)).sum() / vector_dist;
     if (cos_theta > 1.0) {
       cos_theta = 1.0;
@@ -211,7 +193,7 @@ void HDMapInput::DownSampleBoundary(const hdmap::LineSegment& line,
     acos_theta += angle;
     if ((acos_theta - kCumulateThetaError) > DBL_EPSILON) {
       out_boundary_line->push_back(point_1);
-      spt = i - 1;
+      spt        = i - 1;
       acos_theta = 0.0;
     }
   }

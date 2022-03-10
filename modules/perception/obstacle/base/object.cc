@@ -89,7 +89,7 @@ std::string Object::ToString() const {
 
 // Add 4 corners in the polygon
 void Object::AddFourCorners(PerceptionObstacle* pb_obj) const {
-  Box2d object_bounding_box = {{center(0), center(1)}, theta, length, width};
+  Box2d              object_bounding_box = {{center(0), center(1)}, theta, length, width};
   std::vector<Vec2d> corners;
   object_bounding_box.GetAllCorners(&corners);
 
@@ -99,8 +99,7 @@ void Object::AddFourCorners(PerceptionObstacle* pb_obj) const {
     p->set_y(corner.y());
     p->set_z(0.0);
   }
-  ADEBUG << "PerceptionObstacle bounding box is : "
-         << object_bounding_box.DebugString();
+  ADEBUG << "PerceptionObstacle bounding box is : " << object_bounding_box.DebugString();
 }
 
 void Object::Serialize(PerceptionObstacle* pb_obj) const {
@@ -152,7 +151,7 @@ void Object::Serialize(PerceptionObstacle* pb_obj) const {
 
 void Object::Deserialize(const PerceptionObstacle& pb_obs) {
   track_id = pb_obs.id();
-  theta = pb_obs.theta();
+  theta    = pb_obs.theta();
 
   center(0) = pb_obs.position().x();
   center(1) = pb_obs.position().y();
@@ -163,12 +162,12 @@ void Object::Deserialize(const PerceptionObstacle& pb_obs) {
   velocity(2) = pb_obs.velocity().z();
 
   length = pb_obs.length();
-  width = pb_obs.width();
+  width  = pb_obs.width();
   height = pb_obs.height();
 
   polygon.clear();
   for (int idx = 0; idx < pb_obs.polygon_point_size(); ++idx) {
-    const auto& p = pb_obs.polygon_point(idx);
+    const auto&      p = pb_obs.polygon_point(idx);
     pcl_util::PointD point;
     point.x = p.x();
     point.y = p.y();
@@ -176,18 +175,17 @@ void Object::Deserialize(const PerceptionObstacle& pb_obs) {
     polygon.push_back(point);
   }
 
-  score = pb_obs.confidence();
-  score_type = pb_obs.confidence_type();
-  tracking_time = pb_obs.tracking_time();
+  score               = pb_obs.confidence();
+  score_type          = pb_obs.confidence_type();
+  tracking_time       = pb_obs.tracking_time();
   latest_tracked_time = pb_obs.timestamp();
-  type = static_cast<ObjectType>(pb_obs.type());
+  type                = static_cast<ObjectType>(pb_obs.type());
 }
 
 std::string SensorObjects::ToString() const {
   std::ostringstream oss;
   oss << "sensor_type: " << GetSensorType(sensor_type)
-      << ", timestamp:" << GLOG_TIMESTAMP(timestamp)
-      << ", sensor2world_pose:\n";
+      << ", timestamp:" << GLOG_TIMESTAMP(timestamp) << ", sensor2world_pose:\n";
   oss << sensor2world_pose << "\n, objects: " << objects.size() << " < ";
   for (auto obj : objects) {
     oss << "\n" << obj->ToString();

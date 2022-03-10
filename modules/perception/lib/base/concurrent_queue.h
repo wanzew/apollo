@@ -49,9 +49,7 @@ class ConcurrentQueue {
   bool try_pop(Data* data) {
     MutexLock lock(&mutex_);
 
-    if (queue_.empty()) {
-      return false;
-    }
+    if (queue_.empty()) { return false; }
 
     *data = queue_.front();
     queue_.pop();
@@ -77,8 +75,8 @@ class ConcurrentQueue {
 
  protected:
   std::queue<Data> queue_;
-  Mutex mutex_;
-  CondVar condition_variable_;
+  Mutex            mutex_;
+  CondVar          condition_variable_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ConcurrentQueue);
@@ -88,7 +86,8 @@ template <typename Data>
 class FixedSizeConQueue : public ConcurrentQueue<Data> {
  public:
   explicit FixedSizeConQueue(size_t max_count)
-      : ConcurrentQueue<Data>(), max_count_(max_count) {}
+      : ConcurrentQueue<Data>()
+      , max_count_(max_count) {}
 
   virtual ~FixedSizeConQueue() {}
 
@@ -103,9 +102,7 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
 
   virtual bool try_push(const Data& data) {
     MutexLock lock(&this->mutex_);
-    if (this->queue_.size() >= max_count_) {
-      return false;
-    }
+    if (this->queue_.size() >= max_count_) { return false; }
     this->queue_.push(data);
     this->condition_variable_.Signal();
     return true;
@@ -125,9 +122,7 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
   virtual bool try_pop(Data* data) {
     MutexLock lock(&this->mutex_);
 
-    if (this->queue_.empty()) {
-      return false;
-    }
+    if (this->queue_.empty()) { return false; }
 
     *data = this->queue_.front();
     this->queue_.pop();
@@ -135,12 +130,10 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
     return true;
   }
 
-  bool full() const {
-    return this->queue_.size() >= max_count_;
-  }
+  bool full() const { return this->queue_.size() >= max_count_; }
 
  private:
-  CondVar condition_full_;
+  CondVar      condition_full_;
   const size_t max_count_;
   DISALLOW_COPY_AND_ASSIGN(FixedSizeConQueue);
 };

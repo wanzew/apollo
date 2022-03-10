@@ -66,8 +66,7 @@ class Obstacle {
    * @param perception_obstacle The obstacle from perception.
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
-  void Insert(const perception::PerceptionObstacle& perception_obstacle,
-              const double timestamp);
+  void Insert(const perception::PerceptionObstacle& perception_obstacle, const double timestamp);
 
   /**
    * @brief Get the type of perception obstacle's type.
@@ -129,8 +128,7 @@ class Obstacle {
    * @brief Get the pedestrian Kalman filter.
    * @return The pedestrian Kalman filter.
    */
-  const common::math::KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker()
-      const;
+  const common::math::KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker() const;
 
   /**
    * @brief Check if the obstacle is still.
@@ -175,39 +173,37 @@ class Obstacle {
 
  private:
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
-                 double timestamp, Feature* feature);
+                 double                                timestamp,
+                 Feature*                              feature);
 
   void UpdateStatus(Feature* feature);
 
-  common::ErrorCode SetId(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  common::ErrorCode SetId(const perception::PerceptionObstacle& perception_obstacle,
+                          Feature*                              feature);
 
-  common::ErrorCode SetType(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  common::ErrorCode SetType(const perception::PerceptionObstacle& perception_obstacle,
+                            Feature*                              feature);
 
   void SetTimestamp(const perception::PerceptionObstacle& perception_obstacle,
-                    const double timestamp, Feature* feature);
+                    const double                          timestamp,
+                    Feature*                              feature);
 
-  void SetPosition(const perception::PerceptionObstacle& perception_obstacle,
-                   Feature* feature);
+  void SetPosition(const perception::PerceptionObstacle& perception_obstacle, Feature* feature);
 
-  void SetVelocity(const perception::PerceptionObstacle& perception_obstacle,
-                   Feature* feature);
+  void SetVelocity(const perception::PerceptionObstacle& perception_obstacle, Feature* feature);
 
-  void UpdateVelocity(const double theta, double* velocity_x,
-                      double* velocity_y, double* velocity_heading,
-                      double* speed);
+  void UpdateVelocity(const double theta,
+                      double*      velocity_x,
+                      double*      velocity_y,
+                      double*      velocity_heading,
+                      double*      speed);
 
   void SetAcceleration(Feature* feature);
 
-  void SetTheta(const perception::PerceptionObstacle& perception_obstacle,
-                Feature* feature);
+  void SetTheta(const perception::PerceptionObstacle& perception_obstacle, Feature* feature);
 
-  void SetLengthWidthHeight(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  void SetLengthWidthHeight(const perception::PerceptionObstacle& perception_obstacle,
+                            Feature*                              feature);
 
   void InitKFMotionTracker(const Feature& feature);
 
@@ -238,16 +234,15 @@ class Obstacle {
   void Trim();
 
  private:
-  int id_ = -1;
-  perception::PerceptionObstacle::Type type_ =
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
-  std::deque<Feature> feature_history_;
-  common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
-  common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
-  common::DigitalFilter heading_filter_;
+  int                                  id_   = -1;
+  perception::PerceptionObstacle::Type type_ = perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
+  std::deque<Feature>                  feature_history_;
+  common::math::KalmanFilter<double, 6, 2, 0>         kf_motion_tracker_;
+  common::math::KalmanFilter<double, 2, 2, 4>         kf_pedestrian_tracker_;
+  common::DigitalFilter                               heading_filter_;
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
-  std::vector<Eigen::MatrixXf> rnn_states_;
-  bool rnn_enabled_ = false;
+  std::vector<Eigen::MatrixXf>                        rnn_states_;
+  bool                                                rnn_enabled_ = false;
 };
 
 }  // namespace prediction

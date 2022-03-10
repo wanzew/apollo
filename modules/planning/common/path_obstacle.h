@@ -92,11 +92,9 @@ class PathObstacle {
 
   const std::vector<ObjectDecisionType>& decisions() const;
 
-  void AddLongitudinalDecision(const std::string& decider_tag,
-                               const ObjectDecisionType& decision);
+  void AddLongitudinalDecision(const std::string& decider_tag, const ObjectDecisionType& decision);
 
-  void AddLateralDecision(const std::string& decider_tag,
-                          const ObjectDecisionType& decision);
+  void AddLateralDecision(const std::string& decider_tag, const ObjectDecisionType& decision);
   bool HasLateralDecision() const;
 
   void SetStBoundary(const StBoundary& boundary);
@@ -131,8 +129,7 @@ class PathObstacle {
   bool IsLongitudinalIgnore() const;
   bool IsLateralIgnore() const;
 
-  void BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
-                                    const double adc_start_s);
+  void BuildReferenceLineStBoundary(const ReferenceLine& reference_line, const double adc_start_s);
 
   void SetPerceptionSlBoundary(const SLBoundary& sl_boundary);
 
@@ -151,22 +148,21 @@ class PathObstacle {
 
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
-  static ObjectDecisionType MergeLongitudinalDecision(
-      const ObjectDecisionType& lhs, const ObjectDecisionType& rhs);
+  static ObjectDecisionType MergeLongitudinalDecision(const ObjectDecisionType& lhs,
+                                                      const ObjectDecisionType& rhs);
   FRIEND_TEST(MergeLateralDecision, AllDecisions);
   static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
                                                  const ObjectDecisionType& rhs);
 
-  bool BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
-                                 const double adc_start_s,
-                                 StBoundary* const st_boundary);
-  bool IsValidObstacle(
-      const perception::PerceptionObstacle& perception_obstacle);
-  std::string id_;
+  bool            BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
+                                            const double         adc_start_s,
+                                            StBoundary* const    st_boundary);
+  bool            IsValidObstacle(const perception::PerceptionObstacle& perception_obstacle);
+  std::string     id_;
   const Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
-  std::vector<std::string> decider_tags_;
-  SLBoundary perception_sl_boundary_;
+  std::vector<std::string>        decider_tags_;
+  SLBoundary                      perception_sl_boundary_;
 
   StBoundary reference_line_st_boundary_;
   StBoundary st_boundary_;
@@ -179,17 +175,14 @@ class PathObstacle {
   double min_radius_stop_distance_ = -1.0;
 
   struct ObjectTagCaseHash {
-    std::size_t operator()(
-        const planning::ObjectDecisionType::ObjectTagCase tag) const {
+    std::size_t operator()(const planning::ObjectDecisionType::ObjectTagCase tag) const {
       return static_cast<std::size_t>(tag);
     }
   };
 
-  static const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
-                                  ObjectTagCaseHash>
+  static const std::unordered_map<ObjectDecisionType::ObjectTagCase, int, ObjectTagCaseHash>
       s_lateral_decision_safety_sorter_;
-  static const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
-                                  ObjectTagCaseHash>
+  static const std::unordered_map<ObjectDecisionType::ObjectTagCase, int, ObjectTagCaseHash>
       s_longitudinal_decision_safety_sorter_;
 };
 

@@ -27,7 +27,7 @@ namespace dreamview {
 namespace util {
 
 TEST(TrajectoryPointCollectorTest, ThreePoints) {
-  SimulationWorld world;
+  SimulationWorld          world;
   TrajectoryPointCollector collector(&world);
 
   const double base_time = 1000.0;
@@ -42,7 +42,7 @@ TEST(TrajectoryPointCollectorTest, ThreePoints) {
   EXPECT_EQ(world.planning_trajectory_size(), 3);
 
   {
-    const Object &point = world.planning_trajectory(0);
+    const Object& point = world.planning_trajectory(0);
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(100.0, point.position_y());
     EXPECT_DOUBLE_EQ(1000.0, point.timestamp_sec());
@@ -50,7 +50,7 @@ TEST(TrajectoryPointCollectorTest, ThreePoints) {
   }
 
   {
-    const Object &point = world.planning_trajectory(1);
+    const Object& point = world.planning_trajectory(1);
     EXPECT_DOUBLE_EQ(100.0, point.position_x());
     EXPECT_DOUBLE_EQ(200.0, point.position_y());
     EXPECT_DOUBLE_EQ(2000.0, point.timestamp_sec());
@@ -58,7 +58,7 @@ TEST(TrajectoryPointCollectorTest, ThreePoints) {
   }
 
   {
-    const Object &point = world.planning_trajectory(2);
+    const Object& point = world.planning_trajectory(2);
     EXPECT_DOUBLE_EQ(200.0, point.position_x());
     EXPECT_DOUBLE_EQ(300.0, point.position_y());
     EXPECT_DOUBLE_EQ(3000.0, point.timestamp_sec());

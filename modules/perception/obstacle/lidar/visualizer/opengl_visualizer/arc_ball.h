@@ -24,31 +24,34 @@ namespace perception {
 
 class ArcBall {
  public:
-  ArcBall() = default;
+  ArcBall()  = default;
   ~ArcBall() = default;
 
   template <typename T>
-  static Eigen::Quaterniond RotateByMouse(T pre_x, T pre_y, T cur_x, T cur_y,
-                                          T obj_cen_x, T obj_cen_y,
-                                          T screen_width, T screen_height) {
-    double px = static_cast<double>(pre_x - obj_cen_x) / screen_width;
-    double py = static_cast<double>(obj_cen_y - pre_y) / screen_height;
-    double dx = static_cast<double>(cur_x - obj_cen_x) / screen_width;
-    double dy = static_cast<double>(obj_cen_y - cur_y) / screen_height;
+  static Eigen::Quaterniond RotateByMouse(T pre_x,
+                                          T pre_y,
+                                          T cur_x,
+                                          T cur_y,
+                                          T obj_cen_x,
+                                          T obj_cen_y,
+                                          T screen_width,
+                                          T screen_height) {
+    double                px = static_cast<double>(pre_x - obj_cen_x) / screen_width;
+    double                py = static_cast<double>(obj_cen_y - pre_y) / screen_height;
+    double                dx = static_cast<double>(cur_x - obj_cen_x) / screen_width;
+    double                dy = static_cast<double>(obj_cen_y - cur_y) / screen_height;
     const Eigen::Vector3d p1(px, py, ProjectToBall(px, py));
     const Eigen::Vector3d p2(dx, dy, ProjectToBall(dx, dy));
-    Eigen::Vector3d axis = p2.cross(p1);
-    const double angle =
-        2.0 *
-        asin(sqrt(axis.squaredNorm() / p1.squaredNorm() / p2.squaredNorm()));
+    Eigen::Vector3d       axis = p2.cross(p1);
+    const double angle = 2.0 * asin(sqrt(axis.squaredNorm() / p1.squaredNorm() / p2.squaredNorm()));
     axis.normalize();
     Eigen::AngleAxisd angleAxis(angle, axis);
     return Eigen::Quaterniond(angleAxis);
   }
 
   static double ProjectToBall(double x, double y) {
-    const double rad = 1.0;
-    const double rad2 = rad * rad;
+    const double rad   = 1.0;
+    const double rad2  = rad * rad;
     const double limit = rad2 * 0.5;
 
     const double d = x * x + y * y;

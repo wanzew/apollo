@@ -27,7 +27,7 @@ namespace perception {
 
 class LaneSharedData : public CommonSharedData<LaneObjects> {
  public:
-  LaneSharedData() = default;
+  LaneSharedData()          = default;
   virtual ~LaneSharedData() = default;
 
   std::string name() const override { return "LaneSharedData"; }

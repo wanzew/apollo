@@ -22,8 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GPS_6D_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GPS_6D_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -38,8 +38,7 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Gps6d : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Gps6d : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -50,8 +49,8 @@ class Gps6d : public ::apollo::drivers::canbus::ProtocolData<
    * @param timestamp the timestamp of input data
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const;
+  virtual void
+  Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const;
 
   /**
    * @brief get latitude from byte array
@@ -63,7 +62,7 @@ class Gps6d : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of latitude
    */
-  double latitude(const std::uint8_t *bytes, int32_t length) const;
+  double latitude(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get longitude from byte array
@@ -75,7 +74,7 @@ class Gps6d : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of longitude
    */
-  double longitude(const std::uint8_t *bytes, int32_t length) const;
+  double longitude(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief check is_valid from byte array
@@ -86,7 +85,7 @@ class Gps6d : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the boolean value of is_valid bit
    */
-  bool is_valid(const std::uint8_t *bytes, int32_t length) const;
+  bool is_valid(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

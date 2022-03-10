@@ -18,8 +18,8 @@
 
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -28,17 +28,17 @@ using std::vector;
 
 TEST(ObjectTest, test_Object) {
   Object obj;
-  obj.id = 1;
+  obj.id       = 1;
   obj.track_id = 2;
   obj.direction << 1.0, 2.0, 3.0;
   obj.center << 4.0, 5.0, 6.0;
   obj.velocity << 7.0, 8.0, 9.0;
-  obj.theta = 0.0;
-  obj.length = 0.1;
-  obj.width = 0.2;
-  obj.height = 0.3;
-  obj.type = ObjectType::BICYCLE;
-  obj.tracking_time = 10.0;
+  obj.theta               = 0.0;
+  obj.length              = 0.1;
+  obj.width               = 0.2;
+  obj.height              = 0.3;
+  obj.type                = ObjectType::BICYCLE;
+  obj.tracking_time       = 10.0;
   obj.latest_tracked_time = 123456.7;
   Object obj2(obj);
   EXPECT_EQ(obj.id, obj2.id);
@@ -53,17 +53,17 @@ TEST(ObjectTest, test_Object) {
 
 TEST(ObjectTest, test_operator_eq) {
   Object obj;
-  obj.id = 1;
+  obj.id       = 1;
   obj.track_id = 2;
   obj.direction << 1.0, 2.0, 3.0;
   obj.center << 4.0, 5.0, 6.0;
   obj.velocity << 7.0, 8.0, 9.0;
-  obj.theta = 0.0;
-  obj.length = 0.1;
-  obj.width = 0.2;
-  obj.height = 0.3;
-  obj.type = ObjectType::BICYCLE;
-  obj.tracking_time = 10.0;
+  obj.theta               = 0.0;
+  obj.length              = 0.1;
+  obj.width               = 0.2;
+  obj.height              = 0.3;
+  obj.type                = ObjectType::BICYCLE;
+  obj.tracking_time       = 10.0;
   obj.latest_tracked_time = 123456.7;
   Object obj2;
   obj2 = obj;
@@ -79,17 +79,17 @@ TEST(ObjectTest, test_operator_eq) {
 
 TEST(ObjectTest, test_clone) {
   Object obj;
-  obj.id = 1;
+  obj.id       = 1;
   obj.track_id = 2;
   obj.direction << 1.0, 2.0, 3.0;
   obj.center << 4.0, 5.0, 6.0;
   obj.velocity << 7.0, 8.0, 9.0;
-  obj.theta = 0.0;
-  obj.length = 0.1;
-  obj.width = 0.2;
-  obj.height = 0.3;
-  obj.type = ObjectType::BICYCLE;
-  obj.tracking_time = 10.0;
+  obj.theta               = 0.0;
+  obj.length              = 0.1;
+  obj.width               = 0.2;
+  obj.height              = 0.3;
+  obj.type                = ObjectType::BICYCLE;
+  obj.tracking_time       = 10.0;
   obj.latest_tracked_time = 123456.7;
   Object obj2;
   obj2.clone(obj);
@@ -110,19 +110,19 @@ TEST(ObjectTest, test_ToString) {
 
 TEST(ObjectTest, test_Serialize) {
   Object obj;
-  obj.id = 1;
+  obj.id       = 1;
   obj.track_id = 2;
   obj.direction << 1.0, 2.0, 3.0;
   obj.center << 4.0, 5.0, 6.0;
   obj.velocity << 7.0, 8.0, 9.0;
-  obj.theta = 0.0;
-  obj.length = 0.1;
-  obj.width = 0.2;
-  obj.height = 0.3;
-  obj.type = ObjectType::BICYCLE;
-  obj.tracking_time = 10.0;
+  obj.theta               = 0.0;
+  obj.length              = 0.1;
+  obj.width               = 0.2;
+  obj.height              = 0.3;
+  obj.type                = ObjectType::BICYCLE;
+  obj.tracking_time       = 10.0;
   obj.latest_tracked_time = 123456.7;
-  obj.cloud = pcl_util::PointCloudPtr(new pcl_util::PointCloud);
+  obj.cloud               = pcl_util::PointCloudPtr(new pcl_util::PointCloud);
   pcl_util::Point temp;
   temp.x = 1;
   temp.y = 2;
@@ -148,7 +148,7 @@ TEST(ObjectTest, test_Serialize) {
 }
 
 TEST(ObjectTest, test_Deserialize) {
-  Object obj;
+  Object             obj;
   PerceptionObstacle pb_obj;
   pb_obj.set_id(1);
   pb_obj.set_theta(0.1);

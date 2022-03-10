@@ -55,7 +55,7 @@ class SequenceTypeFuser : public BaseTypeFuser {
    * @param objects The objects with initial object type
    * @return True if fuse type successfully, false otherwise
    */
-  bool FuseType(const TypeFuserOptions& options,
+  bool FuseType(const TypeFuserOptions&               options,
                 std::vector<std::shared_ptr<Object>>* objects) override;
 
   /**
@@ -77,8 +77,7 @@ class SequenceTypeFuser : public BaseTypeFuser {
    * @param tracked_objects The tracked objects as a sequence
    * @return True if fuse successfully, false otherwise
    */
-  bool FuseWithCCRF(
-      std::map<int64_t, std::shared_ptr<Object>>* tracked_objects);
+  bool FuseWithCCRF(std::map<int64_t, std::shared_ptr<Object>>* tracked_objects);
 
   /**
    * @brief Rectify the initial object type based on smooth matrices
@@ -86,8 +85,7 @@ class SequenceTypeFuser : public BaseTypeFuser {
    * @param log_prob The output rectified type probabilities
    * @return True if rectify successfully, false otherwise
    */
-  bool RectifyObjectType(const std::shared_ptr<Object>& object,
-                         Vectord* log_prob);
+  bool RectifyObjectType(const std::shared_ptr<Object>& object, Vectord* log_prob);
 
   /**
    * @brief Recover type probabilities and object type from the input
@@ -97,14 +95,13 @@ class SequenceTypeFuser : public BaseTypeFuser {
    * @param type The output object type with the max probability
    * @return True if recover successfully, false otherwise
    */
-  bool RecoverFromLogProb(Vectord* prob, std::vector<float>* dst,
-                          ObjectType* type);
+  bool RecoverFromLogProb(Vectord* prob, std::vector<float>* dst, ObjectType* type);
 
  protected:
   ObjectSequence sequence_;
 
-  Matrixd transition_matrix_;
-  Matrixd confidence_smooth_matrix_;
+  Matrixd                                  transition_matrix_;
+  Matrixd                                  confidence_smooth_matrix_;
   std::unordered_map<std::string, Matrixd> smooth_matrices_;
 
   // Note all probabilities are in the log space

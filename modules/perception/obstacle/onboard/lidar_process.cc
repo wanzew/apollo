@@ -76,7 +76,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
   PERF_FUNCTION("LidarProcess");
   objects_.clear();
   const double kTimeStamp = message.header.stamp.toSec();
-  timestamp_ = kTimeStamp;
+  timestamp_              = kTimeStamp;
 
   PERF_BLOCK_START();
   /// get velodyne2world transfrom
@@ -91,8 +91,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
 
   PointCloudPtr point_cloud(new PointCloud);
   TransPointCloudToPCL(message, &point_cloud);
-  ADEBUG << "transform pointcloud success. points num is: "
-         << point_cloud->points.size();
+  ADEBUG << "transform pointcloud success. points num is: " << point_cloud->points.size();
   PERF_BLOCK_END("lidar_transform_poindcloud");
 
   if (!Process(timestamp_, point_cloud, velodyne_trans)) {
@@ -103,15 +102,16 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
   return true;
 }
 
-bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
+bool LidarProcess::Process(const double              timestamp,
+                           PointCloudPtr             point_cloud,
                            std::shared_ptr<Matrix4d> velodyne_trans) {
   PERF_BLOCK_START();
   /// call hdmap to get ROI
   HdmapStructPtr hdmap = nullptr;
   if (hdmap_input_) {
-    PointD velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
+    PointD   velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
     Affine3d temp_trans(*velodyne_trans);
-    PointD velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
+    PointD   velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
     hdmap.reset(new HdmapStruct);
     hdmap_input_->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap);
     PERF_BLOCK_END("lidar_get_roi_from_hdmap");
@@ -120,12 +120,11 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
   /// call roi_filter
   PointCloudPtr roi_cloud(new PointCloud);
   if (roi_filter_ != nullptr) {
-    PointIndicesPtr roi_indices(new PointIndices);
+    PointIndicesPtr  roi_indices(new PointIndices);
     ROIFilterOptions roi_filter_options;
     roi_filter_options.velodyne_trans = velodyne_trans;
-    roi_filter_options.hdmap = hdmap;
-    if (roi_filter_->Filter(point_cloud, roi_filter_options,
-                            roi_indices.get())) {
+    roi_filter_options.hdmap          = hdmap;
+    if (roi_filter_->Filter(point_cloud, roi_filter_options, roi_indices.get())) {
       pcl::copyPointCloud(*point_cloud, *roi_indices, *roi_cloud);
       roi_indices_ = roi_indices;
     } else {
@@ -134,8 +133,7 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
       return false;
     }
   }
-  ADEBUG << "call roi_filter succ. The num of roi_cloud is: "
-         << roi_cloud->points.size();
+  ADEBUG << "call roi_filter succ. The num of roi_cloud is: " << roi_cloud->points.size();
   PERF_BLOCK_END("lidar_roi_filter");
 
   /// call segmentor
@@ -147,10 +145,8 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
     non_ground_indices.indices.resize(roi_cloud->points.size());
     // non_ground_indices.indices.resize(point_cloud->points.size());
 
-    std::iota(non_ground_indices.indices.begin(),
-              non_ground_indices.indices.end(), 0);
-    if (!segmentor_->Segment(roi_cloud, non_ground_indices,
-                             segmentation_options, &objects)) {
+    std::iota(non_ground_indices.indices.begin(), non_ground_indices.indices.end(), 0);
+    if (!segmentor_->Segment(roi_cloud, non_ground_indices, segmentation_options, &objects)) {
       AERROR << "failed to call segmention.";
       error_code_ = common::PERCEPTION_ERROR_PROCESS;
       return false;
@@ -172,8 +168,7 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
       return false;
     }
   }
-  ADEBUG << "call object filter succ. The num of objects is: "
-         << objects.size();
+  ADEBUG << "call object filter succ. The num of objects is: " << objects.size();
   PERF_BLOCK_END("lidar_object_filter");
 
   /// call object builder
@@ -192,16 +187,15 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
   if (tracker_ != nullptr) {
     TrackerOptions tracker_options;
     tracker_options.velodyne_trans = velodyne_trans;
-    tracker_options.hdmap = hdmap;
-    tracker_options.hdmap_input = hdmap_input_;
+    tracker_options.hdmap          = hdmap;
+    tracker_options.hdmap_input    = hdmap_input_;
     if (!tracker_->Track(objects, timestamp, tracker_options, &objects_)) {
       AERROR << "failed to call tracker.";
       error_code_ = common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
-  ADEBUG << "call tracker succ, there are " << objects_.size()
-         << " tracked objects.";
+  ADEBUG << "call tracker succ, there are " << objects_.size() << " tracked objects.";
   PERF_BLOCK_END("lidar_tracker");
 
   /// call type fuser
@@ -255,8 +249,7 @@ bool LidarProcess::InitFrameDependence() {
 
 bool LidarProcess::InitAlgorithmPlugin() {
   /// init roi filter
-  roi_filter_.reset(
-      BaseROIFilterRegisterer::GetInstanceByName(FLAGS_onboard_roi_filter));
+  roi_filter_.reset(BaseROIFilterRegisterer::GetInstanceByName(FLAGS_onboard_roi_filter));
   if (!roi_filter_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_roi_filter;
     return false;
@@ -265,12 +258,10 @@ bool LidarProcess::InitAlgorithmPlugin() {
     AERROR << "Failed to Init roi filter: " << roi_filter_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, roi_filter_: "
-        << roi_filter_->name();
+  AINFO << "Init algorithm plugin successfully, roi_filter_: " << roi_filter_->name();
 
   /// init segmentation
-  segmentor_.reset(
-      BaseSegmentationRegisterer::GetInstanceByName(FLAGS_onboard_segmentor));
+  segmentor_.reset(BaseSegmentationRegisterer::GetInstanceByName(FLAGS_onboard_segmentor));
   if (!segmentor_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_segmentor;
     return false;
@@ -279,12 +270,11 @@ bool LidarProcess::InitAlgorithmPlugin() {
     AERROR << "Failed to Init segmentor: " << segmentor_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, segmentor: "
-        << segmentor_->name();
+  AINFO << "Init algorithm plugin successfully, segmentor: " << segmentor_->name();
 
   /// init object build
-  object_builder_.reset(BaseObjectBuilderRegisterer::GetInstanceByName(
-      FLAGS_onboard_object_builder));
+  object_builder_.reset(
+      BaseObjectBuilderRegisterer::GetInstanceByName(FLAGS_onboard_object_builder));
   if (!object_builder_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_object_builder;
     return false;
@@ -293,12 +283,10 @@ bool LidarProcess::InitAlgorithmPlugin() {
     AERROR << "Failed to Init object builder: " << object_builder_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, object builder: "
-        << object_builder_->name();
+  AINFO << "Init algorithm plugin successfully, object builder: " << object_builder_->name();
 
   /// init pre object filter
-  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
-      FLAGS_onboard_object_filter));
+  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(FLAGS_onboard_object_filter));
   if (!object_filter_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_object_filter;
     return false;
@@ -307,12 +295,10 @@ bool LidarProcess::InitAlgorithmPlugin() {
     AERROR << "Failed to Init object filter: " << object_filter_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, object filter: "
-        << object_filter_->name();
+  AINFO << "Init algorithm plugin successfully, object filter: " << object_filter_->name();
 
   /// init tracker
-  tracker_.reset(
-      BaseTrackerRegisterer::GetInstanceByName(FLAGS_onboard_tracker));
+  tracker_.reset(BaseTrackerRegisterer::GetInstanceByName(FLAGS_onboard_tracker));
   if (!tracker_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_tracker;
     return false;
@@ -324,8 +310,7 @@ bool LidarProcess::InitAlgorithmPlugin() {
   AINFO << "Init algorithm plugin successfully, tracker: " << tracker_->name();
 
   /// init type fuser
-  type_fuser_.reset(
-      BaseTypeFuserRegisterer::GetInstanceByName(FLAGS_onboard_type_fuser));
+  type_fuser_.reset(BaseTypeFuserRegisterer::GetInstanceByName(FLAGS_onboard_type_fuser));
   if (!type_fuser_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_type_fuser;
     return false;
@@ -334,34 +319,32 @@ bool LidarProcess::InitAlgorithmPlugin() {
     AERROR << "Failed to Init type_fuser: " << type_fuser_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, type_fuser: "
-        << type_fuser_->name();
+  AINFO << "Init algorithm plugin successfully, type_fuser: " << type_fuser_->name();
 
   return true;
 }
 
 void LidarProcess::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
-                                        PointCloudPtr* out_cloud) {
+                                        PointCloudPtr*                  out_cloud) {
   // transform from ros to pcl
   pcl::PointCloud<pcl_util::PointXYZIT> in_cloud;
   pcl::fromROSMsg(in_msg, in_cloud);
   // transform from xyzit to xyzi
-  PointCloudPtr& cloud = *out_cloud;
-  cloud->header = in_cloud.header;
-  cloud->width = in_cloud.width;
-  cloud->height = in_cloud.height;
-  cloud->is_dense = in_cloud.is_dense;
-  cloud->sensor_origin_ = in_cloud.sensor_origin_;
+  PointCloudPtr& cloud       = *out_cloud;
+  cloud->header              = in_cloud.header;
+  cloud->width               = in_cloud.width;
+  cloud->height              = in_cloud.height;
+  cloud->is_dense            = in_cloud.is_dense;
+  cloud->sensor_origin_      = in_cloud.sensor_origin_;
   cloud->sensor_orientation_ = in_cloud.sensor_orientation_;
   cloud->points.resize(in_cloud.points.size());
   size_t points_num = 0;
   for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
     pcl_util::PointXYZIT& pt = in_cloud.points[idx];
-    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) &&
-        !std::isnan(pt.intensity)) {
-      cloud->points[points_num].x = pt.x;
-      cloud->points[points_num].y = pt.y;
-      cloud->points[points_num].z = pt.z;
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) && !std::isnan(pt.intensity)) {
+      cloud->points[points_num].x         = pt.x;
+      cloud->points[points_num].y         = pt.y;
+      cloud->points[points_num].z         = pt.z;
       cloud->points[points_num].intensity = pt.intensity;
       ++points_num;
     }
@@ -375,25 +358,23 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
     return false;
   }
 
-  ros::Time query_stamp(query_time);
+  ros::Time   query_stamp(query_time);
   const auto& tf2_buffer = AdapterManager::Tf2Buffer();
 
   const double kTf2BuffSize = FLAGS_tf2_buff_in_ms / 1000.0;
-  std::string err_msg;
-  if (!tf2_buffer.canTransform(FLAGS_lidar_tf2_frame_id,
-                               FLAGS_lidar_tf2_child_frame_id, query_stamp,
-                               ros::Duration(kTf2BuffSize), &err_msg)) {
-    AERROR << "Cannot transform frame: " << FLAGS_lidar_tf2_frame_id
-           << " to frame " << FLAGS_lidar_tf2_child_frame_id
-           << " , err: " << err_msg
+  std::string  err_msg;
+  if (!tf2_buffer.canTransform(FLAGS_lidar_tf2_frame_id, FLAGS_lidar_tf2_child_frame_id,
+                               query_stamp, ros::Duration(kTf2BuffSize), &err_msg)) {
+    AERROR << "Cannot transform frame: " << FLAGS_lidar_tf2_frame_id << " to frame "
+           << FLAGS_lidar_tf2_child_frame_id << " , err: " << err_msg
            << ". Frames: " << tf2_buffer.allFramesAsString();
     return false;
   }
 
   geometry_msgs::TransformStamped transform_stamped;
   try {
-    transform_stamped = tf2_buffer.lookupTransform(
-        FLAGS_lidar_tf2_frame_id, FLAGS_lidar_tf2_child_frame_id, query_stamp);
+    transform_stamped = tf2_buffer.lookupTransform(FLAGS_lidar_tf2_frame_id,
+                                                   FLAGS_lidar_tf2_child_frame_id, query_stamp);
   } catch (tf2::TransformException& ex) {
     AERROR << "Exception: " << ex.what();
     return false;
@@ -402,8 +383,8 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   tf::transformMsgToEigen(transform_stamped.transform, affine_3d);
   *trans = affine_3d.matrix();
 
-  ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
-         << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
+  ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to " << FLAGS_lidar_tf2_child_frame_id
+         << " trans: " << *trans;
   return true;
 }
 

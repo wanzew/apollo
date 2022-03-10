@@ -28,18 +28,16 @@ namespace planning {
 
 using apollo::common::math::Vec2d;
 
-LocalPath::LocalPath(const std::vector<common::PathPoint> &path_points)
+LocalPath::LocalPath(const std::vector<common::PathPoint>& path_points)
     : path_points_(path_points) {
   for (size_t i = 0; i < path_points_.size(); ++i) {
     points_.emplace_back(path_points_[i].x(), path_points_[i].y());
   }
 }
 
-bool LocalPath::GetInitY(double *y_val) {
+bool LocalPath::GetInitY(double* y_val) {
   // DCHECK_NOTNULL(y_val);
-  if (points_.empty()) {
-    return false;
-  }
+  if (points_.empty()) { return false; }
   *y_val = points_[0].y();
   return true;
 }
@@ -52,15 +50,11 @@ void LocalPath::Shift(const double dist) {
   }
 }
 
-void LocalPath::Cut(const double dist) {
-  return;
-}
+void LocalPath::Cut(const double dist) { return; }
 
-void LocalPath::Resample() {
-  return;
-}
+void LocalPath::Resample() { return; }
 
-void LocalPath::Merge(const common::Path &local_path, const double weight) {
+void LocalPath::Merge(const common::Path& local_path, const double weight) {
   points_.clear();
   for (size_t i = 0; i < path_points_.size(); ++i) {
     auto y = path_points_[i].y();

@@ -83,28 +83,25 @@ class Frame {
 
   const std::vector<const Obstacle*> obstacles() const;
 
-  const Obstacle*
-  CreateStopObstacle(ReferenceLineInfo* const reference_line_info,
-                     const std::string&       obstacle_id,
-                     const double             obstacle_s);
+  const Obstacle* CreateStopObstacle(ReferenceLineInfo* const reference_line_info,
+                                     const std::string&       obstacle_id,
+                                     const double             obstacle_s);
 
   const Obstacle* CreateStopObstacle(const std::string& obstacle_id,
                                      const std::string& lane_id,
                                      const double       lane_s);
 
-  const Obstacle*
-  CreateStaticObstacle(ReferenceLineInfo* const reference_line_info,
-                       const std::string&       obstacle_id,
-                       const double             obstacle_start_s,
-                       const double             obstacle_end_s);
+  const Obstacle* CreateStaticObstacle(ReferenceLineInfo* const reference_line_info,
+                                       const std::string&       obstacle_id,
+                                       const double             obstacle_start_s,
+                                       const double             obstacle_end_s);
 
   bool Rerouting();
 
   const common::VehicleState& vehicle_state() const;
 
-  static void
-  AlignPredictionTime(const double                     planning_start_time,
-                      prediction::PredictionObstacles* prediction_obstacles);
+  static void AlignPredictionTime(const double                     planning_start_time,
+                                  prediction::PredictionObstacles* prediction_obstacles);
 
   ADCTrajectory* mutable_trajectory() { return &trajectory_; }
 
@@ -133,20 +130,20 @@ class Frame {
   void AddObstacle(const Obstacle& obstacle);
 
  private:
-  uint32_t                        sequence_num_ = 0;
-  const hdmap::HDMap*             hdmap_        = nullptr;
-  common::TrajectoryPoint         planning_start_point_;
-  const double                    start_time_;
-  common::VehicleState            vehicle_state_;
-  std::list<ReferenceLineInfo>    reference_line_info_;
-  bool                            is_near_destination_       = false;
-  const ReferenceLineInfo*        drive_reference_line_info_ = nullptr;
-  prediction::PredictionObstacles prediction_;
-  ThreadSafeIndexedObstacles      obstacles_;
-  ChangeLaneDecider               change_lane_decider_;
-  ADCTrajectory                   trajectory_;  // last published trajectory
-  std::unique_ptr<LagPrediction>  lag_predictor_;
-  ReferenceLineProvider*          reference_line_provider_ = nullptr;
+  uint32_t                               sequence_num_ = 0;
+  const hdmap::HDMap*                    hdmap_        = nullptr;
+  common::TrajectoryPoint                planning_start_point_;
+  const double                           start_time_;
+  common::VehicleState                   vehicle_state_;
+  std::list<ReferenceLineInfo>           reference_line_info_;
+  bool                                   is_near_destination_       = false;
+  const ReferenceLineInfo*               drive_reference_line_info_ = nullptr;
+  prediction::PredictionObstacles        prediction_;
+  ThreadSafeIndexedObstacles             obstacles_;
+  ChangeLaneDecider                      change_lane_decider_;
+  ADCTrajectory                          trajectory_;  // last published trajectory
+  std::unique_ptr<LagPrediction>         lag_predictor_;
+  ReferenceLineProvider*                 reference_line_provider_ = nullptr;
   apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 

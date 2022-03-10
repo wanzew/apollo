@@ -24,13 +24,12 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Steeringmotorrpt173 : public ::apollo::drivers::canbus::ProtocolData<
-                                ::apollo::canbus::ChassisDetail> {
+class Steeringmotorrpt173
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Steeringmotorrpt173();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'MOTOR_CURRENT', 'offset': 0.0, 'precision': 0.001,

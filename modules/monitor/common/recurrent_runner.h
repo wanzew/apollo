@@ -32,7 +32,7 @@ namespace monitor {
 
 class RecurrentRunner {
  public:
-  RecurrentRunner(const std::string &name, const double interval);
+  RecurrentRunner(const std::string& name, const double interval);
   virtual ~RecurrentRunner() = default;
 
   // Tick once, which may or may not execute the RunOnce() function, based on
@@ -62,11 +62,11 @@ class RecurrentRunnerThread {
   void Stop();
 
  private:
-  int64_t interval_ms_;
+  int64_t                                       interval_ms_;
   std::vector<std::unique_ptr<RecurrentRunner>> runners_;
-  std::unique_ptr<std::thread> thread_ = nullptr;
+  std::unique_ptr<std::thread>                  thread_ = nullptr;
 
-  bool stop_ = false;
+  bool       stop_ = false;
   std::mutex stop_mutex_;
 };
 

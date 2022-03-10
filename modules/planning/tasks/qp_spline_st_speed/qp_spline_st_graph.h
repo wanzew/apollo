@@ -43,55 +43,56 @@ namespace planning {
 
 class QpSplineStGraph {
  public:
-  QpSplineStGraph(Spline1dGenerator* spline_generator,
-                  const QpStSpeedConfig& qp_st_speed_config,
+  QpSplineStGraph(Spline1dGenerator*                  spline_generator,
+                  const QpStSpeedConfig&              qp_st_speed_config,
                   const apollo::common::VehicleParam& veh_param,
-                  const bool is_change_lane);
+                  const bool                          is_change_lane);
 
   void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
 
-  common::Status Search(const StGraphData& st_graph_data,
+  common::Status Search(const StGraphData&               st_graph_data,
                         const std::pair<double, double>& accel_bound,
-                        const SpeedData& reference_speed_data,
-                        SpeedData* const speed_data);
+                        const SpeedData&                 reference_speed_data,
+                        SpeedData* const                 speed_data);
 
  private:
   void Init();
 
   // Add st graph constraint
-  common::Status AddConstraint(const common::TrajectoryPoint& init_point,
-                               const SpeedLimit& speed_limit,
+  common::Status AddConstraint(const common::TrajectoryPoint&        init_point,
+                               const SpeedLimit&                     speed_limit,
                                const std::vector<const StBoundary*>& boundaries,
-                               const std::pair<double, double>& accel_bound);
+                               const std::pair<double, double>&      accel_bound);
 
   // Add objective function
   common::Status AddKernel(const std::vector<const StBoundary*>& boundaries,
-                           const SpeedLimit& speed_limit);
+                           const SpeedLimit&                     speed_limit);
 
   // solve
   common::Status Solve();
 
   // extract upper lower bound for constraint;
-  common::Status GetSConstraintByTime(
-      const std::vector<const StBoundary*>& boundaries, const double time,
-      const double total_path_s, double* const s_upper_bound,
-      double* const s_lower_bound) const;
+  common::Status GetSConstraintByTime(const std::vector<const StBoundary*>& boundaries,
+                                      const double                          time,
+                                      const double                          total_path_s,
+                                      double* const                         s_upper_bound,
+                                      double* const                         s_lower_bound) const;
 
   // reference line kernel is a constant s line at s = 250m
   common::Status AddCruiseReferenceLineKernel(const double weight);
 
   // follow line kernel
-  common::Status AddFollowReferenceLineKernel(
-      const std::vector<const StBoundary*>& boundaries, const double weight);
+  common::Status AddFollowReferenceLineKernel(const std::vector<const StBoundary*>& boundaries,
+                                              const double                          weight);
 
   // yield line kernel
-  common::Status AddYieldReferenceLineKernel(
-      const std::vector<const StBoundary*>& boundaries, const double weight);
+  common::Status AddYieldReferenceLineKernel(const std::vector<const StBoundary*>& boundaries,
+                                             const double                          weight);
 
   const SpeedData GetHistorySpeed() const;
-  common::Status EstimateSpeedUpperBound(
-      const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-      std::vector<double>* speed_upper_bound) const;
+  common::Status  EstimateSpeedUpperBound(const common::TrajectoryPoint& init_point,
+                                          const SpeedLimit&              speed_limit,
+                                          std::vector<double>*           speed_upper_bound) const;
 
   bool AddDpStReferenceKernel(const double weight) const;
 

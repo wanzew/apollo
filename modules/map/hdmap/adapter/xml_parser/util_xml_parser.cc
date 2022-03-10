@@ -28,8 +28,7 @@ namespace apollo {
 namespace hdmap {
 namespace adapter {
 
-Status UtilXmlParser::ParseCurve(const tinyxml2::XMLElement& xml_node,
-                                 PbCurve* curve) {
+Status UtilXmlParser::ParseCurve(const tinyxml2::XMLElement& xml_node, PbCurve* curve) {
   CHECK_NOTNULL(curve);
 
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("geometry");
@@ -43,14 +42,14 @@ Status UtilXmlParser::ParseCurve(const tinyxml2::XMLElement& xml_node,
 }
 
 Status UtilXmlParser::ParseGeometry(const tinyxml2::XMLElement& xml_node,
-                                    PbCurveSegment* curve_segment) {
+                                    PbCurveSegment*             curve_segment) {
   CHECK_NOTNULL(curve_segment);
 
   // Read geometry attributes
-  double s = 0.0;
-  double ptx = 0.0;
-  double pty = 0.0;
-  double ptz = 0.0;
+  double s      = 0.0;
+  double ptx    = 0.0;
+  double pty    = 0.0;
+  double ptz    = 0.0;
   double length = 0.0;
 
   int checker = tinyxml2::XML_SUCCESS;
@@ -86,13 +85,13 @@ Status UtilXmlParser::ParseGeometry(const tinyxml2::XMLElement& xml_node,
 }
 
 Status UtilXmlParser::ParsePointSet(const tinyxml2::XMLElement& xml_node,
-                                    PbLineSegment* line_segment) {
+                                    PbLineSegment*              line_segment) {
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("point");
   while (sub_node) {
-    double ptx = 0.0;
-    double pty = 0.0;
-    double ptz = 0.0;
-    int checker = tinyxml2::XML_SUCCESS;
+    double ptx     = 0.0;
+    double pty     = 0.0;
+    double ptz     = 0.0;
+    int    checker = tinyxml2::XML_SUCCESS;
     checker += sub_node->QueryDoubleAttribute("x", &ptx);
     checker += sub_node->QueryDoubleAttribute("y", &pty);
 
@@ -101,10 +100,10 @@ Status UtilXmlParser::ParsePointSet(const tinyxml2::XMLElement& xml_node,
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
-    PbPoint3D* pt = line_segment->add_point();
-    double output_x = 0.0;
-    double output_y = 0.0;
-    double output_z = 0.0;
+    PbPoint3D* pt       = line_segment->add_point();
+    double     output_x = 0.0;
+    double     output_y = 0.0;
+    double     output_z = 0.0;
     WGS84ToUTM(ptx, pty, ptz, &output_x, &output_y, &output_z);
     pt->set_x(output_x);
     pt->set_y(output_y);
@@ -115,15 +114,13 @@ Status UtilXmlParser::ParsePointSet(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node,
-                                   PbPolygon* polygon) {
-  const tinyxml2::XMLElement* sub_node =
-      xml_node.FirstChildElement("cornerGlobal");
+Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node, PbPolygon* polygon) {
+  const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("cornerGlobal");
   while (sub_node) {
-    double ptx = 0.0;
-    double pty = 0.0;
-    double ptz = 0.0;
-    int checker = tinyxml2::XML_SUCCESS;
+    double ptx     = 0.0;
+    double pty     = 0.0;
+    double ptz     = 0.0;
+    int    checker = tinyxml2::XML_SUCCESS;
     checker += sub_node->QueryDoubleAttribute("x", &ptx);
     checker += sub_node->QueryDoubleAttribute("y", &pty);
     checker += sub_node->QueryDoubleAttribute("z", &ptz);
@@ -133,10 +130,10 @@ Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node,
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
-    PbPoint3D* pt = polygon->add_point();
-    double output_x = 0.0;
-    double output_y = 0.0;
-    double output_z = 0.0;
+    PbPoint3D* pt       = polygon->add_point();
+    double     output_x = 0.0;
+    double     output_y = 0.0;
+    double     output_z = 0.0;
     WGS84ToUTM(ptx, pty, ptz, &output_x, &output_y, &output_z);
     pt->set_x(output_x);
     pt->set_y(output_y);
@@ -148,16 +145,15 @@ Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-Status UtilXmlParser::ParsePoint(const tinyxml2::XMLElement& xml_node,
-                                 PbPoint3D* pt) {
+Status UtilXmlParser::ParsePoint(const tinyxml2::XMLElement& xml_node, PbPoint3D* pt) {
   CHECK_NOTNULL(pt);
 
   const auto sub_node = xml_node.FirstChildElement("centerPoint");
   CHECK(sub_node != nullptr);
-  int checker = tinyxml2::XML_SUCCESS;
-  double ptx = 0.0;
-  double pty = 0.0;
-  double ptz = 0.0;
+  int    checker = tinyxml2::XML_SUCCESS;
+  double ptx     = 0.0;
+  double pty     = 0.0;
+  double ptz     = 0.0;
   checker += sub_node->QueryDoubleAttribute("x", &ptx);
   checker += sub_node->QueryDoubleAttribute("y", &pty);
   checker += sub_node->QueryDoubleAttribute("z", &ptz);
@@ -186,11 +182,13 @@ std::string UtilXmlParser::ToUpper(const std::string& s) {
   return value;
 }
 
-void UtilXmlParser::WGS84ToUTM(const double x, const double y, const double z,
-                               double* output_x, double* output_y,
-                               double* output_z) {
-  CoordinateConvertTool::GetInstance()->CoordiateConvert(x, y, z, output_x,
-                                                         output_y, output_z);
+void UtilXmlParser::WGS84ToUTM(const double x,
+                               const double y,
+                               const double z,
+                               double*      output_x,
+                               double*      output_y,
+                               double*      output_z) {
+  CoordinateConvertTool::GetInstance()->CoordiateConvert(x, y, z, output_x, output_y, output_z);
 }
 
 double UtilXmlParser::CurveLength(const PbCurve& curve) {
@@ -202,14 +200,12 @@ double UtilXmlParser::CurveLength(const PbCurve& curve) {
   return length;
 }
 
-tinyxml2::XMLError UtilXmlParser::QueryStringAttribute(
-    const tinyxml2::XMLElement& xml_node, const std::string& name,
-    std::string* value) {
+tinyxml2::XMLError UtilXmlParser::QueryStringAttribute(const tinyxml2::XMLElement& xml_node,
+                                                       const std::string&          name,
+                                                       std::string*                value) {
   CHECK_NOTNULL(value);
   const char* val = xml_node.Attribute(name.c_str());
-  if (val == nullptr) {
-    return tinyxml2::XML_NO_ATTRIBUTE;
-  }
+  if (val == nullptr) { return tinyxml2::XML_NO_ATTRIBUTE; }
 
   *value = val;
   return tinyxml2::XML_SUCCESS;

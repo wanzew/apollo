@@ -20,8 +20,8 @@
 #include <vector>
 
 #include "caffe/caffe.hpp"
-#include "gtest/gtest.h"
 #include "opencv2/opencv.hpp"
+#include "gtest/gtest.h"
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
@@ -48,22 +48,21 @@ using apollo::perception::obstacle::yolo::YoloParam;
 class YoloCameraDetectorTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    FLAGS_config_manager_path = FLAGS_test_dir + "config_manager.config",
+    FLAGS_config_manager_path  = FLAGS_test_dir + "config_manager.config",
     FLAGS_yolo_config_filename = "config.pt";
     RegisterFactoryYoloCameraDetector();
   }
 };
 
 TEST_F(YoloCameraDetectorTest, model_init_test) {
-  const std::string yolo_config =
-      "/apollo/modules/perception/model/yolo_camera_detector/config.pt";
+  const std::string yolo_config = "/apollo/modules/perception/model/yolo_camera_detector/config.pt";
 
   YoloParam yolo_param;
   CHECK(GetProtoFromASCIIFile(yolo_config, &yolo_param));
   YoloParam origin_yolo_param = yolo_param;
 
   CHECK(SetProtoToASCIIFile(yolo_param, yolo_config));
-  BaseCameraDetector *camera_detector =
+  BaseCameraDetector* camera_detector =
       BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector");
   CHECK_NOTNULL(camera_detector);
   CHECK(camera_detector->Init());
@@ -73,7 +72,7 @@ TEST_F(YoloCameraDetectorTest, model_init_test) {
 }
 
 TEST_F(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
-  BaseCameraDetector *camera_detector =
+  BaseCameraDetector* camera_detector =
       BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector");
   CHECK(camera_detector->Init());
   CHECK_EQ(camera_detector->Name(), "YoloCameraDetector");
@@ -94,12 +93,12 @@ TEST_F(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
   CHECK_EQ(objects.size(), 1);  // Related to current model and threshold
 
   int obj_idx = 0;
-  for (const auto &obj : objects) {
+  for (const auto& obj : objects) {
     ADEBUG << "Obj-" << obj_idx++ << ": " << GetObjectName(obj->type)
            << " (feat: " << obj->object_feature.size() << "-D)";
     if (obj->object_feature.size() > 0) {
       float sum_of_squares = 0.0;
-      for (const auto &f : obj->object_feature) {
+      for (const auto& f : obj->object_feature) {
         sum_of_squares += f * f;
       }
     }
@@ -107,7 +106,7 @@ TEST_F(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
 }
 
 TEST_F(YoloCameraDetectorTest, multi_task_test) {
-  BaseCameraDetector *camera_detector =
+  BaseCameraDetector* camera_detector =
       BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector");
   CHECK(camera_detector->Init());
   CHECK_EQ(camera_detector->Name(), "YoloCameraDetector");
@@ -122,7 +121,7 @@ TEST_F(YoloCameraDetectorTest, multi_task_test) {
   CHECK_EQ(camera_detector->Multitask(frame, options, NULL, NULL), false);
 
   std::vector<std::shared_ptr<VisualObject>> objects;
-  cv::Mat lane_map(frame.rows, frame.cols, CV_32FC1);
+  cv::Mat                                    lane_map(frame.rows, frame.cols, CV_32FC1);
   CHECK(camera_detector->Multitask(frame, options, &objects, &lane_map));
   ADEBUG << "#objects detected = " << objects.size();
 

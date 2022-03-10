@@ -22,8 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_VERSION_7F_H_
 #define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_VERSION_7F_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -38,8 +38,7 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Version7f : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Version7f : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -49,8 +48,8 @@ class Version7f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the input bytes
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const;
+  virtual void
+  Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const;
 
   /**
    * @brief get module name based on byte array.
@@ -58,7 +57,7 @@ class Version7f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of byte input
    */
-  int32_t module_name(const std::uint8_t *bytes, int32_t length) const;
+  int32_t module_name(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get major version based on byte array.
@@ -66,7 +65,7 @@ class Version7f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of major version
    */
-  int32_t major_version(const std::uint8_t *bytes, int32_t length) const;
+  int32_t major_version(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get minor version based on byte array.
@@ -74,7 +73,7 @@ class Version7f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of minor version
    */
-  int32_t minor_version(const std::uint8_t *bytes, int32_t length) const;
+  int32_t minor_version(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get build number based on byte array.
@@ -82,7 +81,7 @@ class Version7f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of build number
    */
-  int32_t build_number(const std::uint8_t *bytes, int32_t length) const;
+  int32_t build_number(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

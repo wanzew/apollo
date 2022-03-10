@@ -20,46 +20,43 @@ namespace apollo {
 namespace perception {
 
 PbfSensorObject::PbfSensorObject()
-    : sensor_type(SensorType::UNKNOWN_SENSOR_TYPE),
-      timestamp(0.0),
-      invisible_period(0.0) {
+    : sensor_type(SensorType::UNKNOWN_SENSOR_TYPE)
+    , timestamp(0.0)
+    , invisible_period(0.0) {
   object.reset(new Object());
 }
 
-PbfSensorObject::PbfSensorObject(std::shared_ptr<Object> obj3d, SensorType type,
-                                 double time)
-    : sensor_type(type),
-      timestamp(time),
-      object(obj3d),
-      invisible_period(0.0) {}
+PbfSensorObject::PbfSensorObject(std::shared_ptr<Object> obj3d, SensorType type, double time)
+    : sensor_type(type)
+    , timestamp(time)
+    , object(obj3d)
+    , invisible_period(0.0) {}
 
 PbfSensorObject::~PbfSensorObject() {}
 
-PbfSensorObject::PbfSensorObject(const PbfSensorObject &rhs) {
-  sensor_type = rhs.sensor_type;
-  sensor_id = rhs.sensor_id;
-  timestamp = rhs.timestamp;
-  object = rhs.object;
+PbfSensorObject::PbfSensorObject(const PbfSensorObject& rhs) {
+  sensor_type      = rhs.sensor_type;
+  sensor_id        = rhs.sensor_id;
+  timestamp        = rhs.timestamp;
+  object           = rhs.object;
   invisible_period = rhs.invisible_period;
 }
 
-PbfSensorObject &PbfSensorObject::operator=(const PbfSensorObject &rhs) {
-  sensor_type = rhs.sensor_type;
-  sensor_id = rhs.sensor_id;
-  timestamp = rhs.timestamp;
-  object = rhs.object;
+PbfSensorObject& PbfSensorObject::operator=(const PbfSensorObject& rhs) {
+  sensor_type      = rhs.sensor_type;
+  sensor_id        = rhs.sensor_id;
+  timestamp        = rhs.timestamp;
+  object           = rhs.object;
   invisible_period = rhs.invisible_period;
   return (*this);
 }
 
-void PbfSensorObject::clone(const PbfSensorObject &rhs) {
-  sensor_type = rhs.sensor_type;
-  sensor_id = rhs.sensor_id;
-  timestamp = rhs.timestamp;
+void PbfSensorObject::clone(const PbfSensorObject& rhs) {
+  sensor_type      = rhs.sensor_type;
+  sensor_id        = rhs.sensor_id;
+  timestamp        = rhs.timestamp;
   invisible_period = rhs.invisible_period;
-  if (object == nullptr) {
-    object.reset(new Object());
-  }
+  if (object == nullptr) { object.reset(new Object()); }
   object->clone(*(rhs.object));
 }
 

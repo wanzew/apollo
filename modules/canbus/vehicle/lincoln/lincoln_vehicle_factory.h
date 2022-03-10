@@ -44,8 +44,8 @@ namespace canbus {
 class LincolnVehicleFactory : public AbstractVehicleFactory {
  public:
   /**
-  * @brief destructor
-  */
+   * @brief destructor
+   */
   virtual ~LincolnVehicleFactory() = default;
 
   /**
@@ -58,8 +58,7 @@ class LincolnVehicleFactory : public AbstractVehicleFactory {
    * @brief create lincoln message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
-  CreateMessageManager() override;
+  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>> CreateMessageManager() override;
 };
 
 }  // namespace canbus

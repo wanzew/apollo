@@ -36,8 +36,7 @@ namespace prediction {
 class SequencePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    std::string file =
-        "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+    std::string file = "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
   }
 
@@ -46,12 +45,11 @@ class SequencePredictorTest : public KMLMapBasedTest {
 };
 
 TEST_F(SequencePredictorTest, General) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
-  MLPEvaluator mlp_evaluator;
+  MLPEvaluator       mlp_evaluator;
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);
@@ -61,14 +59,13 @@ TEST_F(SequencePredictorTest, General) {
   predictor.Predict(obstacle_ptr);
   EXPECT_EQ(predictor.NumOfTrajectories(), 0);
   LaneSequence* lane_seq = obstacle_ptr->mutable_latest_feature()
-                                       ->mutable_lane()
-                                       ->mutable_lane_graph()
-                                       ->mutable_lane_sequence(0);
+                               ->mutable_lane()
+                               ->mutable_lane_graph()
+                               ->mutable_lane_sequence(0);
   std::string sequence_str = predictor.ToString(*lane_seq);
   EXPECT_GT(sequence_str.size(), 0);
   SequencePredictor::LaneChangeType lane_change_type =
-      predictor.GetLaneChangeType(lane_seq->mutable_lane_segment(0)->lane_id(),
-                                  *lane_seq);
+      predictor.GetLaneChangeType(lane_seq->mutable_lane_segment(0)->lane_id(), *lane_seq);
   EXPECT_EQ(lane_change_type, SequencePredictor::LaneChangeType::STRAIGHT);
 
   EXPECT_TRUE(predictor.LaneSequenceWithMaxProb(lane_change_type, 0.5, 0.5));

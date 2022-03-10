@@ -26,11 +26,11 @@ namespace monitor {
 
 class MonitorTest : public MonitorLogger {
  public:
-  explicit MonitorTest(const MonitorMessageItem::MessageSource &source)
+  explicit MonitorTest(const MonitorMessageItem::MessageSource& source)
       : MonitorLogger(source) {}
 
  private:
-  void DoPublish(MonitorMessage *) const override {}
+  void DoPublish(MonitorMessage*) const override {}
 };
 
 TEST(MonitorTest, Publish) {

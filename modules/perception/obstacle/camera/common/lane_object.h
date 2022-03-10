@@ -25,9 +25,9 @@
 namespace apollo {
 namespace perception {
 
-const float MAX_FLOAT = std::numeric_limits<float>::max();
-const float LOWEST_FLOAT = -std::numeric_limits<float>::max();
-const float MIN_ANGLE = LOWEST_FLOAT / 180.0f;
+const float MAX_FLOAT     = std::numeric_limits<float>::max();
+const float LOWEST_FLOAT  = -std::numeric_limits<float>::max();
+const float MIN_ANGLE     = LOWEST_FLOAT / 180.0f;
 const float B_FLT_EPSILON = 0.000001f;  // should be changed
 
 const float FOURTY_FIVE_DEGREE = 45.0f * M_PI / 180.0f;
@@ -68,7 +68,7 @@ struct LineSegment2Df {
 
 struct VanishingPoint {
   Point2Df vanishing_point;
-  float distance_traveled;
+  float    distance_traveled;
 };
 
 // two lane lines used for camera calibration

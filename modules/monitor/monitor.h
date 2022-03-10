@@ -38,7 +38,7 @@ class Monitor : public apollo::common::ApolloApp {
 
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
  private:
   RecurrentRunnerThread monitor_thread_;

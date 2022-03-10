@@ -29,31 +29,31 @@ namespace perception {
 
 class MinBoxObjectBuilder : public BaseObjectBuilder {
  public:
-  MinBoxObjectBuilder() : BaseObjectBuilder() {}
+  MinBoxObjectBuilder()
+      : BaseObjectBuilder() {}
   virtual ~MinBoxObjectBuilder() {}
 
   bool Init() override { return true; }
 
-  bool Build(const ObjectBuilderOptions& options,
-             std::vector<std::shared_ptr<Object>>* objects) override;
+  bool        Build(const ObjectBuilderOptions&           options,
+                    std::vector<std::shared_ptr<Object>>* objects) override;
   std::string name() const override { return "MinBoxObjectBuilder"; }
 
  protected:
-  void BuildObject(ObjectBuilderOptions options,
-                   std::shared_ptr<Object> object);
+  void BuildObject(ObjectBuilderOptions options, std::shared_ptr<Object> object);
 
   void ComputePolygon2dxy(std::shared_ptr<Object> obj);
 
   double ComputeAreaAlongOneEdge(std::shared_ptr<Object> obj,
-                                 size_t first_in_point, Eigen::Vector3d* center,
-                                 double* lenth, double* width,
-                                 Eigen::Vector3d* dir);
+                                 size_t                  first_in_point,
+                                 Eigen::Vector3d*        center,
+                                 double*                 lenth,
+                                 double*                 width,
+                                 Eigen::Vector3d*        dir);
 
-  void ReconstructPolygon(const Eigen::Vector3d& ref_ct,
-                          std::shared_ptr<Object> obj);
+  void ReconstructPolygon(const Eigen::Vector3d& ref_ct, std::shared_ptr<Object> obj);
 
-  void ComputeGeometricFeature(const Eigen::Vector3d& ref_ct,
-                               std::shared_ptr<Object> obj);
+  void ComputeGeometricFeature(const Eigen::Vector3d& ref_ct, std::shared_ptr<Object> obj);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(MinBoxObjectBuilder);

@@ -16,11 +16,11 @@
 
 #include "modules/perception/obstacle/camera/common/util.h"
 
+#include <algorithm>
 #include <fcntl.h>
+#include <iomanip>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <algorithm>
-#include <iomanip>
 
 #include "gflags/gflags.h"
 
@@ -30,53 +30,44 @@ namespace apollo {
 namespace perception {
 
 std::vector<cv::Scalar> color_table = {
-    cv::Scalar(0, 0, 0),       cv::Scalar(128, 0, 0),
-    cv::Scalar(255, 0, 0),     cv::Scalar(0, 128, 0),
-    cv::Scalar(128, 128, 0),   cv::Scalar(255, 128, 0),
-    cv::Scalar(0, 255, 0),     cv::Scalar(128, 255, 0),
-    cv::Scalar(255, 255, 0),   cv::Scalar(0, 0, 128),
-    cv::Scalar(128, 0, 128),   cv::Scalar(255, 0, 128),
-    cv::Scalar(0, 128, 128),   cv::Scalar(128, 128, 128),
-    cv::Scalar(255, 128, 128), cv::Scalar(0, 255, 128),
-    cv::Scalar(128, 255, 128), cv::Scalar(255, 255, 128),
-    cv::Scalar(0, 0, 255),     cv::Scalar(128, 0, 255),
-    cv::Scalar(255, 0, 255),   cv::Scalar(0, 128, 255),
-    cv::Scalar(128, 128, 255), cv::Scalar(255, 128, 255),
-    cv::Scalar(0, 255, 255),   cv::Scalar(128, 255, 255),
-    cv::Scalar(255, 255, 255),
+    cv::Scalar(0, 0, 0),     cv::Scalar(128, 0, 0),     cv::Scalar(255, 0, 0),
+    cv::Scalar(0, 128, 0),   cv::Scalar(128, 128, 0),   cv::Scalar(255, 128, 0),
+    cv::Scalar(0, 255, 0),   cv::Scalar(128, 255, 0),   cv::Scalar(255, 255, 0),
+    cv::Scalar(0, 0, 128),   cv::Scalar(128, 0, 128),   cv::Scalar(255, 0, 128),
+    cv::Scalar(0, 128, 128), cv::Scalar(128, 128, 128), cv::Scalar(255, 128, 128),
+    cv::Scalar(0, 255, 128), cv::Scalar(128, 255, 128), cv::Scalar(255, 255, 128),
+    cv::Scalar(0, 0, 255),   cv::Scalar(128, 0, 255),   cv::Scalar(255, 0, 255),
+    cv::Scalar(0, 128, 255), cv::Scalar(128, 128, 255), cv::Scalar(255, 128, 255),
+    cv::Scalar(0, 255, 255), cv::Scalar(128, 255, 255), cv::Scalar(255, 255, 255),
 };
 
-bool LoadVisualObjectFromFile(
-    const std::string &file_name,
-    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
+bool LoadVisualObjectFromFile(const std::string&                          file_name,
+                              std::vector<std::shared_ptr<VisualObject>>* visual_objects) {
   std::fstream fs(file_name, std::fstream::out);
 
   while (!fs.eof()) {
     std::shared_ptr<VisualObject> obj(new VisualObject());
-    std::fill(
-        obj->type_probs.begin(),
-        obj->type_probs.begin() + static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
-        0);
+    std::fill(obj->type_probs.begin(),
+              obj->type_probs.begin() + static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
 
     double trash = 0.0;
-    char type[255];
+    char   type[255];
     double x1 = 0.0;
     double y1 = 0.0;
     double x2 = 0.0;
     double y2 = 0.0;
 
-    if (fs.get(type, 255) && fs >> trash && fs >> trash && fs >> obj->alpha &&
-        fs >> x1 && fs >> y1 && fs >> x2 && fs >> y2 && fs >> obj->height &&
-        fs >> obj->width && fs >> obj->length && fs >> obj->center.x() &&
-        fs >> obj->center.y() && fs >> obj->center.z() && fs >> obj->theta &&
-        fs >> obj->score && fs >> obj->trunc_height && fs >> obj->trunc_width) {
-      obj->upper_left[0] = x1 > 0 ? x1 : 0;
-      obj->upper_left[1] = y1 > 0 ? y1 : 0;
-      obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
-      obj->lower_right[1] = y2 < 1080 ? y2 : 1080;
-      obj->type = GetObjectType(std::string(type));
-      obj->type_probs[static_cast<int>(obj->type)] =
-          static_cast<float>(obj->score);
+    if (fs.get(type, 255) && fs >> trash && fs >> trash && fs >> obj->alpha && fs >> x1 &&
+        fs >> y1 && fs >> x2 && fs >> y2 && fs >> obj->height && fs >> obj->width &&
+        fs >> obj->length && fs >> obj->center.x() && fs >> obj->center.y() &&
+        fs >> obj->center.z() && fs >> obj->theta && fs >> obj->score && fs >> obj->trunc_height &&
+        fs >> obj->trunc_width) {
+      obj->upper_left[0]                           = x1 > 0 ? x1 : 0;
+      obj->upper_left[1]                           = y1 > 0 ? y1 : 0;
+      obj->lower_right[0]                          = x2 < 1920 ? x2 : 1920;
+      obj->lower_right[1]                          = y2 < 1080 ? y2 : 1080;
+      obj->type                                    = GetObjectType(std::string(type));
+      obj->type_probs[static_cast<int>(obj->type)] = static_cast<float>(obj->score);
     } else {
       visual_objects->push_back(obj);
     }
@@ -85,44 +76,41 @@ bool LoadVisualObjectFromFile(
   return true;
 }
 
-bool WriteVisualObjectToFile(
-    const std::string &file_name,
-    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
-  FILE *fp = fopen(file_name.c_str(), "w");
+bool WriteVisualObjectToFile(const std::string&                          file_name,
+                             std::vector<std::shared_ptr<VisualObject>>* visual_objects) {
+  FILE* fp = fopen(file_name.c_str(), "w");
   if (!fp) {
     AERROR << "write file: " << file_name << " error!";
     return false;
   }
 
-  for (auto &obj : *visual_objects) {
+  for (auto& obj : *visual_objects) {
     std::string type = GetTypeText(obj->type);
 
     fprintf(fp,
             "%s %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f "
             "%.2f %.2f %.2f\n",
-            type.c_str(), 0.0, 0.0, obj->alpha, obj->upper_left[0],
-            obj->upper_left[1], obj->lower_right[0], obj->lower_right[1],
-            obj->height, obj->width, obj->length, obj->center.x(),
-            obj->center.y(), obj->center.z(), obj->theta, obj->score);
+            type.c_str(), 0.0, 0.0, obj->alpha, obj->upper_left[0], obj->upper_left[1],
+            obj->lower_right[0], obj->lower_right[1], obj->height, obj->width, obj->length,
+            obj->center.x(), obj->center.y(), obj->center.z(), obj->theta, obj->score);
   }
 
   fclose(fp);
   return true;
 }
 
-bool LoadGTfromFile(
-    const std::string &gt_path,
-    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
+bool LoadGTfromFile(const std::string&                          gt_path,
+                    std::vector<std::shared_ptr<VisualObject>>* visual_objects) {
   std::ifstream gt_file(gt_path);
 
   std::string line;
-  int detected_id = 0;
+  int         detected_id = 0;
   while (std::getline(gt_file, line)) {
     std::istringstream iss(line);
 
     std::vector<std::string> tokens;
-    std::copy(std::istream_iterator<std::string>(iss),
-              std::istream_iterator<std::string>(), back_inserter(tokens));
+    std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+              back_inserter(tokens));
 
     // TODO(All) Decide where to Eliminate -99 2D only cases, since they don't
     // have 3d (2409 test)
@@ -138,22 +126,22 @@ bool LoadGTfromFile(
       //            obj->alpha = std::stod(tokens[3]);
       obj->alpha = std::stod(tokens[14]);
 
-      obj->upper_left[0] = std::stod(tokens[4]);
-      obj->upper_left[1] = std::stod(tokens[5]);
+      obj->upper_left[0]  = std::stod(tokens[4]);
+      obj->upper_left[1]  = std::stod(tokens[5]);
       obj->lower_right[0] = std::stod(tokens[6]);
       obj->lower_right[1] = std::stod(tokens[7]);
-      obj->height = std::stod(tokens[8]);
-      obj->width = std::stod(tokens[9]);
-      obj->length = std::stod(tokens[10]);
-      obj->center.x() = std::stod(tokens[11]);
-      obj->center.y() = std::stod(tokens[12]);
-      obj->center.z() = std::stod(tokens[13]);
+      obj->height         = std::stod(tokens[8]);
+      obj->width          = std::stod(tokens[9]);
+      obj->length         = std::stod(tokens[10]);
+      obj->center.x()     = std::stod(tokens[11]);
+      obj->center.y()     = std::stod(tokens[12]);
+      obj->center.z()     = std::stod(tokens[13]);
 
       //            obj->theta = std::stod(tokens[14]);
       obj->theta = std::stod(tokens[3]);
 
       obj->score = std::stod(tokens[15]);
-      obj->id = detected_id++;
+      obj->id    = detected_id++;
 
       // Set binary truncation estimation from gt box position
       // (Only possible to do this with this kind of gt, not detection)
@@ -176,10 +164,9 @@ bool LoadGTfromFile(
   return true;
 }
 
-void DrawVisualObejcts(
-    const std::vector<std::shared_ptr<VisualObject>> &visual_objects,
-    cv::Mat *img) {
-  for (const auto &obj : visual_objects) {
+void DrawVisualObejcts(const std::vector<std::shared_ptr<VisualObject>>& visual_objects,
+                       cv::Mat*                                          img) {
+  for (const auto& obj : visual_objects) {
 // 3D BBox
 #if 0
         if (obj->pts8.size() >= 17) {
@@ -235,8 +222,7 @@ void DrawVisualObejcts(
     stream.str("");
     stream.clear();
     stream << std::fixed << std::setprecision(2)
-           << std::sqrt(obj->center.x() * obj->center.x() +
-                        obj->center.y() * obj->center.y() +
+           << std::sqrt(obj->center.x() * obj->center.x() + obj->center.y() * obj->center.y() +
                         obj->center.z() * obj->center.z());
     stream << " m, alpha:";
     stream << std::fixed << std::setprecision(2) << obj->alpha * 180.0 / M_PI;
@@ -244,15 +230,14 @@ void DrawVisualObejcts(
     stream << std::fixed << std::setprecision(2) << obj->theta * 180.0 / M_PI;
     stream << " deg, D:";
     stream << obj->id;
-    cv::putText(*img, stream.str(), cv::Point(x1, y1 - 5),
-                cv::FONT_HERSHEY_PLAIN, 0.8, COLOR_WHITE);
+    cv::putText(*img, stream.str(), cv::Point(x1, y1 - 5), cv::FONT_HERSHEY_PLAIN, 0.8,
+                COLOR_WHITE);
   }
 }
 
-void DrawGTObjectsText(
-    const std::vector<std::shared_ptr<VisualObject>> &visual_objects,
-    cv::Mat *img) {
-  for (const auto &obj : visual_objects) {
+void DrawGTObjectsText(const std::vector<std::shared_ptr<VisualObject>>& visual_objects,
+                       cv::Mat*                                          img) {
+  for (const auto& obj : visual_objects) {
     // 2D BBox
     int x1 = static_cast<int>(obj->upper_left[0]);
     // int y1 = static_cast<int>(obj->upper_left[1]);
@@ -264,8 +249,7 @@ void DrawGTObjectsText(
     stream.str("");
     stream.clear();
     stream << std::fixed << std::setprecision(2)
-           << std::sqrt(obj->center.x() * obj->center.x() +
-                        obj->center.y() * obj->center.y() +
+           << std::sqrt(obj->center.x() * obj->center.x() + obj->center.y() * obj->center.y() +
                         obj->center.z() * obj->center.z());
     stream << " m, alpha:";
     stream << std::fixed << std::setprecision(2) << obj->alpha * 180.0 / M_PI;
@@ -273,29 +257,22 @@ void DrawGTObjectsText(
     stream << std::fixed << std::setprecision(2) << obj->theta * 180.0 / M_PI;
     stream << " deg, D:";
     stream << obj->id;
-    cv::putText(*img, stream.str(), cv::Point(x1, y2 + 10),
-                cv::FONT_HERSHEY_PLAIN, 0.8, COLOR_BLACK);
+    cv::putText(*img, stream.str(), cv::Point(x1, y2 + 10), cv::FONT_HERSHEY_PLAIN, 0.8,
+                COLOR_BLACK);
   }
 }
 
 std::string GetTypeText(ObjectType type) {
-  if (type == ObjectType::VEHICLE) {
-    return "car";
-  }
-  if (type == ObjectType::PEDESTRIAN) {
-    return "pedestrian";
-  }
-  if (type == ObjectType::BICYCLE) {
-    return "bicycle";
-  }
+  if (type == ObjectType::VEHICLE) { return "car"; }
+  if (type == ObjectType::PEDESTRIAN) { return "pedestrian"; }
+  if (type == ObjectType::BICYCLE) { return "bicycle"; }
 
   return "unknown";
 }
 
-ObjectType GetObjectType(const std::string &type) {
+ObjectType GetObjectType(const std::string& type) {
   std::string temp_type = type;
-  std::transform(temp_type.begin(), temp_type.end(), temp_type.begin(),
-                 (int (*)(int))std::tolower);
+  std::transform(temp_type.begin(), temp_type.end(), temp_type.begin(), (int (*)(int))std::tolower);
   if (temp_type == "unknown") {
     return ObjectType::UNKNOWN;
   } else if (temp_type == "unknown_movable") {

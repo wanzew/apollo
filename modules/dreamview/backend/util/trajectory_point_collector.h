@@ -51,7 +51,8 @@ class TrajectoryPointCollector {
    * @param world The SimulationWorld object in which the trajectory points will
    * be updated.
    */
-  explicit TrajectoryPointCollector(SimulationWorld *world) : world_(world) {
+  explicit TrajectoryPointCollector(SimulationWorld* world)
+      : world_(world) {
     world_->clear_planning_trajectory();
   }
 
@@ -61,12 +62,12 @@ class TrajectoryPointCollector {
    * @param point The trajectory point to be added.
    * @param base_time The timestampe of the first trajectory point
    */
-  void Collect(const common::TrajectoryPoint &point, const double base_time);
+  void Collect(const common::TrajectoryPoint& point, const double base_time);
 
  private:
   // Does not own the SimulationWorld instance. This is stored as the
   // handle to access and mutate the SimulationWorld object.
-  SimulationWorld *world_ = nullptr;
+  SimulationWorld* world_ = nullptr;
 
   // Cache (copied) of the previously collected trajectory point. See
   // class documentation for the reason of caching it.

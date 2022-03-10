@@ -20,19 +20,18 @@
 #include <string>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "modules/common/macro.h"
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 #include "modules/third_party_perception/third_party_perception.h"
+#include "gtest/gtest.h"
 
-#define RUN_GOLDEN_TEST                                          \
-  {                                                              \
-    const ::testing::TestInfo *const test_info =                 \
-        ::testing::UnitTest::GetInstance()->current_test_info(); \
-    bool run_third_party_perception_success =                    \
-        test_third_party_perception(test_info->name(), 0);       \
-    EXPECT_TRUE(run_third_party_perception_success);             \
+#define RUN_GOLDEN_TEST                                                                            \
+  {                                                                                                \
+    const ::testing::TestInfo* const test_info =                                                   \
+        ::testing::UnitTest::GetInstance()->current_test_info();                                   \
+    bool run_third_party_perception_success = test_third_party_perception(test_info->name(), 0);   \
+    EXPECT_TRUE(run_third_party_perception_success);                                               \
   }
 
 DECLARE_string(test_localization_file);

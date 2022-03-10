@@ -27,19 +27,19 @@ DEFINE_bool(enable_frame_ratio_control, true, "enable frame ratio control");
 using boost::algorithm::is_any_of;
 using boost::algorithm::split;
 using boost::algorithm::trim;
-using std::unordered_map;
 using std::string;
+using std::unordered_map;
 using std::vector;
 
-bool SubnodeHelper::ParseReserveField(
-    const string &reserve, unordered_map<string, string> *result_map) {
+bool SubnodeHelper::ParseReserveField(const string&                  reserve,
+                                      unordered_map<string, string>* result_map) {
   int str_len = static_cast<int>(reserve.size());
   if (str_len == 0) {
     AERROR << "reserve is empty";
     return false;
   }
-  int start = -1;
-  int pos = 0;
+  int    start = -1;
+  int    pos   = 0;
   string key;
   do {
     if (reserve[pos] == ':') {
@@ -55,11 +55,11 @@ bool SubnodeHelper::ParseReserveField(
         AERROR << "Invalid reserve field: " << reserve;
         return false;
       }
-      int len = reserve[pos] == ';' ? pos - start - 1 : pos - start;
+      int    len   = reserve[pos] == ';' ? pos - start - 1 : pos - start;
       string value = reserve.substr(start + 1, len);
       trim(value);
       (*result_map)[key] = value;
-      start = pos;
+      start              = pos;
     } else {
       // just pass
     }
@@ -68,12 +68,11 @@ bool SubnodeHelper::ParseReserveField(
   return true;
 }
 
-bool SubnodeHelper::ProduceSharedDataKey(double stamp, const string &device_id,
-                                         string *key) {
+bool SubnodeHelper::ProduceSharedDataKey(double stamp, const string& device_id, string* key) {
   char temp[64];
   memset(temp, '\0', sizeof(temp));
-  int ret = snprintf(temp, sizeof(temp), "%ld",
-                     static_cast<int64_t>(stamp * FLAGS_stamp_enlarge_factor));
+  int ret =
+      snprintf(temp, sizeof(temp), "%ld", static_cast<int64_t>(stamp * FLAGS_stamp_enlarge_factor));
   if (ret < 0) {
     AERROR << "Encounter an output error.";
     return false;
@@ -86,29 +85,26 @@ bool SubnodeHelper::ProduceSharedDataKey(double stamp, const string &device_id,
   return true;
 }
 
-bool SubnodeHelper::ProduceSharedDataKey(double stamp, const string &device_id,
-                                         int64_t *key) {
+bool SubnodeHelper::ProduceSharedDataKey(double stamp, const string& device_id, int64_t* key) {
   int64_t temp = static_cast<int64_t>(stamp * FLAGS_stamp_enlarge_factor);
-  *key = temp * FLAGS_stamp_enlarge_factor + atoi(device_id.c_str());
+  *key         = temp * FLAGS_stamp_enlarge_factor + atoi(device_id.c_str());
   return true;
 }
 
-bool SubnodeHelper::ExtractParams(const string &conf_str,
-                                  const vector<string> &param_names,
-                                  vector<string> *param_values) {
+bool SubnodeHelper::ExtractParams(const string&         conf_str,
+                                  const vector<string>& param_names,
+                                  vector<string>*       param_values) {
   for (auto key : param_names) {
     string val;
-    if (!ExtractParam(conf_str, key, &val)) {
-      return false;
-    }
+    if (!ExtractParam(conf_str, key, &val)) { return false; }
     param_values->push_back(val);
   }
   return true;
 }
 
-bool SubnodeHelper::ExtractParam(const string &conf_str,
-                                 const string &param_name,
-                                 string *param_value) {
+bool SubnodeHelper::ExtractParam(const string& conf_str,
+                                 const string& param_name,
+                                 string*       param_value) {
   vector<string> fields;
   split(fields, conf_str, is_any_of("&"));
   for (auto field : fields) {
@@ -141,9 +137,7 @@ bool FrameSkiper::Init(const double max_ratio) {
 }
 
 bool FrameSkiper::Skip(const double ts) {
-  if (!FLAGS_enable_frame_ratio_control) {
-    return false;
-  }
+  if (!FLAGS_enable_frame_ratio_control) { return false; }
 
   if (ts - ts_ > min_interval_) {
     ts_ = ts;

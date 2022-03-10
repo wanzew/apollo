@@ -32,17 +32,17 @@ class CarPose {
 
   virtual ~CarPose() = default;
 
-  bool set_pose(const Eigen::Matrix4d &pose);
+  bool set_pose(const Eigen::Matrix4d& pose);
 
   const Eigen::Matrix4d pose() const;
 
  private:
   Eigen::Matrix4d pose_;
 
-  friend std::ostream &operator<<(std::ostream &os, const CarPose &);
+  friend std::ostream& operator<<(std::ostream& os, const CarPose&);
 };
 
-std::ostream &operator<<(std::ostream &os, const CarPose &pose);
+std::ostream& operator<<(std::ostream& os, const CarPose& pose);
 
 }  // namespace traffic_light
 }  // namespace perception

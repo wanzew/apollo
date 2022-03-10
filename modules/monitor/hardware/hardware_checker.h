@@ -36,9 +36,9 @@ static const int HW_CLASS_UNDEF = 0;
 
 class HwCheckResultDetails {
  public:
-  virtual ~HwCheckResultDetails() = default;
-  virtual void print_summary(std::ostream &os) = 0;
-  virtual void print_test_result(std::ostream &os) = 0;
+  virtual ~HwCheckResultDetails()                  = default;
+  virtual void print_summary(std::ostream& os)     = 0;
+  virtual void print_test_result(std::ostream& os) = 0;
 };
 
 struct HwCheckResult {
@@ -54,16 +54,24 @@ struct HwCheckResult {
   /// HW-specific details, may or may not be present.
   std::shared_ptr<HwCheckResultDetails> details;
 
-  HwCheckResult() : status(HardwareStatus::UNDEF), details(nullptr) {}
+  HwCheckResult()
+      : status(HardwareStatus::UNDEF)
+      , details(nullptr) {}
 
-  HwCheckResult(const std::string &_name, int _status,
-                const std::string &_mssg = std::string("OK"))
-      : name(_name), status(_status), mssg(_mssg), details(nullptr) {}
+  HwCheckResult(const std::string& _name, int _status, const std::string& _mssg = std::string("OK"))
+      : name(_name)
+      , status(_status)
+      , mssg(_mssg)
+      , details(nullptr) {}
 
-  HwCheckResult(const std::string &_name, int _status,
-                HwCheckResultDetails *_details PTR_OWNER_XFR,
-                const std::string &_mssg = std::string("OK"))
-      : name(_name), status(_status), mssg(_mssg), details(_details) {}
+  HwCheckResult(const std::string&             _name,
+                int                            _status,
+                HwCheckResultDetails* _details PTR_OWNER_XFR,
+                const std::string&             _mssg = std::string("OK"))
+      : name(_name)
+      , status(_status)
+      , mssg(_mssg)
+      , details(_details) {}
 };
 
 class HwCheckerInterface {
@@ -74,12 +82,12 @@ class HwCheckerInterface {
   virtual const int get_class() const { return HW_CLASS_UNDEF; }
 
   /// Returns the name of the HW this checker will check (e.g., ESD_CAN).
-  virtual const std::string &get_name() const = 0;
+  virtual const std::string& get_name() const = 0;
 
   /// Runs HW status check, stores results in results. We use a vector
   /// here because there may be multiple instances of a certain type
   /// of hw (e.g., cameras).
-  virtual void run_check(std::vector<HwCheckResult> *results) = 0;
+  virtual void run_check(std::vector<HwCheckResult>* results) = 0;
 };
 
 }  // namespace monitor

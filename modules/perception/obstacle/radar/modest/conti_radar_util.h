@@ -25,14 +25,15 @@ namespace perception {
 
 class ContiRadarUtil {
  public:
-  static bool IsFp(const ContiRadarObs& contiobs, const ContiParams& params,
-                   const int delay_frames, const int tracking_times);
+  static bool IsFp(const ContiRadarObs& contiobs,
+                   const ContiParams&   params,
+                   const int            delay_frames,
+                   const int            tracking_times);
 
-  static bool IsConflict(const Eigen::Vector3f& main_velocity,
-                         const Eigen::Vector3f& velocity) {
-    Eigen::Vector3f vector_temp1 = main_velocity;
-    Eigen::Vector3f vector_temp2 = velocity;
-    const float velocity_threshold = 1e-1;
+  static bool IsConflict(const Eigen::Vector3f& main_velocity, const Eigen::Vector3f& velocity) {
+    Eigen::Vector3f vector_temp1       = main_velocity;
+    Eigen::Vector3f vector_temp2       = velocity;
+    const float     velocity_threshold = 1e-1;
     if (vector_temp1.head(2).norm() > velocity_threshold &&
         vector_temp2.head(2).norm() > velocity_threshold) {
       double theta = VectorTheta2dXy(vector_temp1, vector_temp2);

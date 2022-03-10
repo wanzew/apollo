@@ -31,8 +31,7 @@ TEST(TestSuite, curvature_math_test) {
   double curvature = CurveMath::ComputeCurvature(1.0, 0.0, 1.0, 0.0);
   EXPECT_NEAR(curvature, 0.0, 1e-6);
 
-  double curvature_derivative =
-      CurveMath::ComputeCurvatureDerivative(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+  double curvature_derivative = CurveMath::ComputeCurvatureDerivative(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
   EXPECT_NEAR(curvature_derivative, 0.0, 1e-6);
 
   // Unit circle X = (cos(t), sin(t)), at t = 0.0
@@ -42,12 +41,11 @@ TEST(TestSuite, curvature_math_test) {
   // Unit circle X = (cos(t), sin(t)), at t = PI/4,
   double cos_angle = cos(M_PI / 4);
   double sin_angle = sin(M_PI / 4);
-  curvature = CurveMath::ComputeCurvature(-sin_angle, -cos_angle, cos_angle,
-                                          -sin_angle);
+  curvature        = CurveMath::ComputeCurvature(-sin_angle, -cos_angle, cos_angle, -sin_angle);
   EXPECT_NEAR(curvature, 1.0, 1e-6);
 
-  curvature_derivative = CurveMath::ComputeCurvatureDerivative(
-      -sin_angle, -cos_angle, sin_angle, cos_angle, -sin_angle, -cos_angle);
+  curvature_derivative = CurveMath::ComputeCurvatureDerivative(-sin_angle, -cos_angle, sin_angle,
+                                                               cos_angle, -sin_angle, -cos_angle);
   EXPECT_NEAR(curvature_derivative, 0.0, 1e-6);
 }
 

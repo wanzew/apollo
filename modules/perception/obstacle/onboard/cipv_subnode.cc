@@ -16,15 +16,15 @@
 
 #include "modules/perception/obstacle/onboard/cipv_subnode.h"
 
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <vector>
 #include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/onboard/dag_streaming.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace apollo {
 namespace perception {
@@ -32,9 +32,9 @@ namespace perception {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-using std::vector;
 using std::string;
 using std::unordered_map;
+using std::vector;
 // using Event;
 // using EventID;
 // using EventMeta;
@@ -49,22 +49,22 @@ bool CIPVSubnode::InitInternal() {
   CHECK(shared_data_manager_ != nullptr);
   // init camera object data
   RegisterFactoryCIPVSubnode();
-  camera_object_data_ = dynamic_cast<CameraObjectData *>(
-      shared_data_manager_->GetSharedData("CameraObjectData"));
+  camera_object_data_ =
+      dynamic_cast<CameraObjectData*>(shared_data_manager_->GetSharedData("CameraObjectData"));
   if (camera_object_data_ == nullptr) {
     AERROR << "Failed to get CameraObjectData.";
     return false;
   }
   // init camera object data
-  lane_shared_data_ = dynamic_cast<LaneSharedData *>(
-      shared_data_manager_->GetSharedData("LaneSharedData"));
+  lane_shared_data_ =
+      dynamic_cast<LaneSharedData*>(shared_data_manager_->GetSharedData("LaneSharedData"));
   if (lane_shared_data_ == nullptr) {
     AERROR << "Failed to get LaneSharedData.";
     return false;
   }
 
-  cipv_object_data_ = dynamic_cast<CIPVObjectData *>(
-      shared_data_manager_->GetSharedData("CIPVObjectData"));
+  cipv_object_data_ =
+      dynamic_cast<CIPVObjectData*>(shared_data_manager_->GetSharedData("CIPVObjectData"));
   if (cipv_object_data_ == nullptr) {
     AERROR << "Failed to get CIPVObjectData";
     return false;
@@ -115,29 +115,25 @@ apollo::common::Status CIPVSubnode::ProcEvents() {
   // cipv_options.yaw_angle =
   //     vehicle_information.yaw_rate * vehicle_information.time_diff;
   cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
-  cipv_options.velocity = 5.0f;  // ***** fill in the value *****
-  cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
+  cipv_options.velocity  = 5.0f;  // ***** fill in the value *****
+  cipv_options.yaw_rate  = 0.0f;  // ***** fill in the value *****
   AINFO << "[CIPVSubnode] velocity " << cipv_options.velocity
-        << ", yaw rate: " << cipv_options.yaw_rate
-        << ", yaw angle: " << cipv_options.yaw_angle;
+        << ", yaw rate: " << cipv_options.yaw_rate << ", yaw angle: " << cipv_options.yaw_angle;
 
   // call cipv module
-  if (cipv_.DetermineCipv(sensor_objs->lane_objects, cipv_options,
-                          &sensor_objs->objects)) {
+  if (cipv_.DetermineCipv(sensor_objs->lane_objects, cipv_options, &sensor_objs->objects)) {
     PublishDataAndEvent(event.timestamp, sensor_objs, cipv_object_data_);
   }
   return Status::OK();
 }
 
-bool CIPVSubnode::InitOutputStream(
-    const unordered_map<string, string> &fields) {
+bool CIPVSubnode::InitOutputStream(const unordered_map<string, string>& fields) {
   auto camera_iter = fields.find("camera_event_id");
   if (camera_iter == fields.end()) {
     AERROR << "Failed to find camera_event_id";
     camera_event_id_ = -1;
   } else {
-    camera_event_id_ =
-        static_cast<EventID>(atoi((camera_iter->second).c_str()));
+    camera_event_id_ = static_cast<EventID>(atoi((camera_iter->second).c_str()));
     AINFO << "camera event id is " << camera_event_id_;
   }
 
@@ -154,7 +150,7 @@ bool CIPVSubnode::InitOutputStream(
   return true;
 }
 
-bool CIPVSubnode::SubscribeEvents(Event *event) const {
+bool CIPVSubnode::SubscribeEvents(Event* event) const {
   if (!event_manager_->Subscribe(camera_event_id_, event)) {
     AERROR << "Failed to subscribe event: " << camera_event_id_;
     return false;
@@ -167,10 +163,9 @@ bool CIPVSubnode::SubscribeEvents(Event *event) const {
   return true;
 }
 
-bool CIPVSubnode::GetSharedData(const Event &event,
-                                std::shared_ptr<SensorObjects> *objs) {
+bool CIPVSubnode::GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs) {
   double timestamp = event.timestamp;
-  device_id_ = event.reserve;
+  device_id_       = event.reserve;
   string data_key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &data_key)) {
     AERROR << "Failed to produce shared data key. EventID:" << event.event_id
@@ -180,7 +175,7 @@ bool CIPVSubnode::GetSharedData(const Event &event,
   camera_object_data_->Get(data_key, objs);
   std::shared_ptr<LaneObjects> lane_objects;
 
-  bool get_data_succ = lane_shared_data_->Get(data_key, &lane_objects);
+  bool get_data_succ    = lane_shared_data_->Get(data_key, &lane_objects);
   (*objs)->lane_objects = lane_objects;
 
   if (!get_data_succ) {
@@ -190,20 +185,20 @@ bool CIPVSubnode::GetSharedData(const Event &event,
   return true;
 }
 
-void CIPVSubnode::PublishDataAndEvent(
-    const float timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
-    CIPVObjectData *cipv_object_data) {
+void CIPVSubnode::PublishDataAndEvent(const float                         timestamp,
+                                      const SharedDataPtr<SensorObjects>& sensor_objects,
+                                      CIPVObjectData*                     cipv_object_data) {
   std::string key = "";
   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
 
   cipv_object_data->Add(key, sensor_objects);
 
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
-    const EventMeta &event_meta = pub_meta_events_[idx];
-    Event event;
-    event.event_id = event_meta.event_id;
+    const EventMeta& event_meta = pub_meta_events_[idx];
+    Event            event;
+    event.event_id  = event_meta.event_id;
     event.timestamp = timestamp;
-    event.reserve = device_id_;
+    event.reserve   = device_id_;
     event_manager_->Publish(event);
   }
 }

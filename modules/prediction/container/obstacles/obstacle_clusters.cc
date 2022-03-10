@@ -29,21 +29,17 @@ void ObstacleClusters::Clear() { lane_graphs_.clear(); }
 
 void ObstacleClusters::Init() { Clear(); }
 
-const LaneGraph& ObstacleClusters::GetLaneGraph(
-    const double start_s, const double length,
-    std::shared_ptr<const LaneInfo> lane_info_ptr) {
+const LaneGraph& ObstacleClusters::GetLaneGraph(const double                    start_s,
+                                                const double                    length,
+                                                std::shared_ptr<const LaneInfo> lane_info_ptr) {
   std::string lane_id = lane_info_ptr->id().id();
   if (lane_graphs_.find(lane_id) != lane_graphs_.end()) {
     LaneGraph* lane_graph = &lane_graphs_[lane_id];
     for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
       LaneSequence* lane_seq_ptr = lane_graph->mutable_lane_sequence(i);
-      if (lane_seq_ptr->lane_segment_size() == 0) {
-        continue;
-      }
+      if (lane_seq_ptr->lane_segment_size() == 0) { continue; }
       LaneSegment* first_lane_seg_ptr = lane_seq_ptr->mutable_lane_segment(0);
-      if (first_lane_seg_ptr->lane_id() != lane_id) {
-        continue;
-      }
+      if (first_lane_seg_ptr->lane_id() != lane_id) { continue; }
       first_lane_seg_ptr->set_start_s(start_s);
     }
     return lane_graphs_[lane_id];

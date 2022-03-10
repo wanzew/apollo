@@ -39,13 +39,13 @@ namespace apollo {
 namespace planning {
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
-  PathDecision path_decision;
-  SLBoundary obstacle_boundary;
-  ReferenceLine reference_line;
+  PerceptionObstacle             perception_obstacle;
+  PathDecision                   path_decision;
+  SLBoundary                     obstacle_boundary;
+  ReferenceLine                  reference_line;
 
   perception_obstacle.set_width(1.0);
   perception_obstacle.set_length(1.0);
@@ -65,22 +65,21 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
   path_obstacles.SetPerceptionSlBoundary(obstacle_boundary);
   path_decision.AddPathObstacle(path_obstacles);
 
-  int lane_obstacles_num = 0;
-  double nudge_dist = obstacle_decider.GetNudgeDistance(
-      vec_obstacle, reference_line, path_decision, vec_points,
-      &lane_obstacles_num);
+  int    lane_obstacles_num = 0;
+  double nudge_dist = obstacle_decider.GetNudgeDistance(vec_obstacle, reference_line, path_decision,
+                                                        vec_points, &lane_obstacles_num);
   EXPECT_FLOAT_EQ(nudge_dist, 0.455);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 1);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
-  PathDecision path_decision;
-  SLBoundary obstacle_boundary;
-  ReferenceLine reference_line;
+  PerceptionObstacle             perception_obstacle;
+  PathDecision                   path_decision;
+  SLBoundary                     obstacle_boundary;
+  ReferenceLine                  reference_line;
 
   perception_obstacle.set_width(1.0);
   perception_obstacle.set_length(1.0);
@@ -100,22 +99,21 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
   vec_points.emplace_back(p2);
   vec_obstacle.emplace_back(&b1);
 
-  int lane_obstacles_num = 0;
-  double nudge_dist = obstacle_decider.GetNudgeDistance(
-      vec_obstacle, reference_line, path_decision, vec_points,
-      &lane_obstacles_num);
+  int    lane_obstacles_num = 0;
+  double nudge_dist = obstacle_decider.GetNudgeDistance(vec_obstacle, reference_line, path_decision,
+                                                        vec_points, &lane_obstacles_num);
   EXPECT_FLOAT_EQ(nudge_dist, -0.455);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 1);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
-  PathDecision path_decision;
-  SLBoundary obstacle_boundary;
-  ReferenceLine reference_line;
+  PerceptionObstacle             perception_obstacle;
+  PathDecision                   path_decision;
+  SLBoundary                     obstacle_boundary;
+  ReferenceLine                  reference_line;
 
   // obstacle 1
   perception_obstacle.set_width(1.0);
@@ -157,19 +155,18 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   vec_obstacle.emplace_back(&b1);
   vec_obstacle.emplace_back(&b2);
 
-  int lane_obstacles_num = 0;
-  double nudge_dist = obstacle_decider.GetNudgeDistance(
-      vec_obstacle, reference_line, path_decision, vec_points,
-      &lane_obstacles_num);
+  int    lane_obstacles_num = 0;
+  double nudge_dist = obstacle_decider.GetNudgeDistance(vec_obstacle, reference_line, path_decision,
+                                                        vec_points, &lane_obstacles_num);
   EXPECT_FLOAT_EQ(nudge_dist, 0.42657289);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 2);
 }
 
 TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
+  PerceptionObstacle             perception_obstacle;
 
   // obstacle 1
   perception_obstacle.set_width(1.0);

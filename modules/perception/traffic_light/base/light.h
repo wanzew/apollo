@@ -34,18 +34,18 @@ namespace perception {
 namespace traffic_light {
 
 typedef apollo::perception::TrafficLight::Color TLColor;
-const TLColor UNKNOWN_COLOR = TrafficLight::UNKNOWN;
-const TLColor GREEN = TrafficLight::GREEN;
-const TLColor RED = TrafficLight::RED;
-const TLColor YELLOW = TrafficLight::YELLOW;
-const TLColor BLACK = TrafficLight::BLACK;
+const TLColor                                   UNKNOWN_COLOR = TrafficLight::UNKNOWN;
+const TLColor                                   GREEN         = TrafficLight::GREEN;
+const TLColor                                   RED           = TrafficLight::RED;
+const TLColor                                   YELLOW        = TrafficLight::YELLOW;
+const TLColor                                   BLACK         = TrafficLight::BLACK;
 // When the light has been covered by some objected, the color returned.
 const TLColor DEFAULT_UNKNOWN_COLOR = TrafficLight::UNKNOWN;
 
 enum DetectionClassId {
-  UNKNOWN_CLASS = -1,
-  VERTICAL_CLASS = 0,
-  QUADRATE_CLASS = 1,
+  UNKNOWN_CLASS    = -1,
+  VERTICAL_CLASS   = 0,
+  QUADRATE_CLASS   = 1,
   HORIZONTAL_CLASS = 2
 };
 
@@ -58,12 +58,12 @@ struct LightRegion {
   cv::Rect projection_roi;
 
   std::vector<cv::Rect> debug_roi;
-  std::vector<float> debug_roi_detect_scores;
+  std::vector<float>    debug_roi_detect_scores;
 
   // rectified_roi is the region marked by Rectifier, it should be accuracy
   cv::Rect rectified_roi;
-  bool is_detected = false;
-  bool is_selected = false;
+  bool     is_detected = false;
+  bool     is_selected = false;
   // detection 输出结果，实际取值 -1、0 或 1
   // 为 0 则 UnityRecognize 中使用白天模型
   // 为 1 则使用夜晚模型
@@ -75,8 +75,8 @@ struct LightRegion {
   std::string to_string() const {
     std::ostringstream oss;
     oss << "LightRegion: [projection_roi:<(" << projection_roi.tl().x << ","
-        << projection_roi.tl().y << "),(" << projection_roi.br().x << ","
-        << projection_roi.br().y << "] ";
+        << projection_roi.tl().y << "),(" << projection_roi.br().x << "," << projection_roi.br().y
+        << "] ";
     return oss.str();
   }
 };
@@ -93,16 +93,13 @@ struct LightStatus {
 
   std::string to_string() const {
     std::string light_color =
-        (color == UNKNOWN_COLOR
-             ? "unknown color"
-             : (color == RED ? "red"
-                             : (color == GREEN
-                                    ? "green"
-                                    : (color == YELLOW ? "yellow" : "black"))));
+        (color == UNKNOWN_COLOR ?
+             "unknown color" :
+             (color == RED ? "red" :
+                             (color == GREEN ? "green" : (color == YELLOW ? "yellow" : "black"))));
     // std::string light_color;
     std::ostringstream oss;
-    oss << "Status: [color:" << light_color << " confidence:" << confidence
-        << "]";
+    oss << "Status: [color:" << light_color << " confidence:" << confidence << "]";
     return oss.str();
   }
 };
@@ -114,23 +111,24 @@ struct LightStatus {
 struct Light {
   Light() = default;
 
-  explicit Light(const apollo::hdmap::Signal &signal) : info(signal) {}
-  apollo::hdmap::Signal info;  //  Light info in the map.
-  LightRegion region;          //  Light region on the image.
-  LightStatus status;          //  Light Status.
+  explicit Light(const apollo::hdmap::Signal& signal)
+      : info(signal) {}
+  apollo::hdmap::Signal info;    //  Light info in the map.
+  LightRegion           region;  //  Light region on the image.
+  LightStatus           status;  //  Light Status.
 
   std::string to_string() const {
     std::ostringstream oss;
-    oss << "Light: {" << status.to_string() << region.to_string()
-        << "Signal Info: [" << info.ShortDebugString() << "]}";
+    oss << "Light: {" << status.to_string() << region.to_string() << "Signal Info: ["
+        << info.ShortDebugString() << "]}";
     return oss.str();
   }
 };
 
-std::ostream &operator<<(std::ostream &os, const Light &light);
+std::ostream& operator<<(std::ostream& os, const Light& light);
 
 typedef std::shared_ptr<Light> LightPtr;
-typedef std::vector<LightPtr> LightPtrs;
+typedef std::vector<LightPtr>  LightPtrs;
 
 /**
  * @brief compute stopline to car's distance
@@ -138,9 +136,8 @@ typedef std::vector<LightPtr> LightPtrs;
  * @param stoplines
  * @return distance
  */
-double Distance2Stopline(
-    const Eigen::Matrix4d &car_pose,
-    const google::protobuf::RepeatedPtrField<apollo::hdmap::Curve> &stoplines);
+double Distance2Stopline(const Eigen::Matrix4d&                                          car_pose,
+                         const google::protobuf::RepeatedPtrField<apollo::hdmap::Curve>& stoplines);
 
 }  //  namespace traffic_light
 }  //  namespace perception

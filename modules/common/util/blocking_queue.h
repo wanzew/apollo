@@ -34,7 +34,8 @@ template <typename T>
 class BlockingQueue {
  public:
   BlockingQueue(uint size, const std::string& name)
-      : size_(size), name_(name) {}
+      : size_(size)
+      , name_(name) {}
   BlockingQueue() {}
 
   void init(uint size, const std::string& name) {
@@ -62,14 +63,11 @@ class BlockingQueue {
 
   bool take(T* x, int timeout_sec) {
     boost::mutex::scoped_lock lock(mutex_);
-    bool recv_data = false;
+    bool                      recv_data = false;
     while (queue_.empty()) {
-      recv_data = not_empty_.timed_wait(
-          lock,
-          boost::get_system_time() + boost::posix_time::seconds(timeout_sec));
-      if (!recv_data) {
-        return false;
-      }
+      recv_data = not_empty_.timed_wait(lock, boost::get_system_time() +
+                                                  boost::posix_time::seconds(timeout_sec));
+      if (!recv_data) { return false; }
     }
 
     *x = queue_.front();
@@ -106,11 +104,11 @@ class BlockingQueue {
   }
 
  private:
-  mutable boost::mutex mutex_;
+  mutable boost::mutex      mutex_;
   boost::condition_variable not_empty_;
-  std::deque<T> queue_;
-  uint size_ = 0;
-  std::string name_;
+  std::deque<T>             queue_;
+  uint                      size_ = 0;
+  std::string               name_;
 };
 
 }  // namespace util

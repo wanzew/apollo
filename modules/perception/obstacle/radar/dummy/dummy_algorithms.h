@@ -27,21 +27,22 @@ namespace perception {
 
 class DummyRadarDetector : public BaseRadarDetector {
  public:
-  DummyRadarDetector() : BaseRadarDetector() {}
+  DummyRadarDetector()
+      : BaseRadarDetector() {}
   ~DummyRadarDetector() = default;
 
   bool Init() override { return result_init_; }
 
-  bool Detect(const ContiRadar &raw_obstacles,
-              const std::vector<PolygonDType> &map_polygons,
-              const RadarDetectorOptions &options,
-              std::vector<std::shared_ptr<Object>> *objects) override;
+  bool Detect(const ContiRadar&                     raw_obstacles,
+              const std::vector<PolygonDType>&      map_polygons,
+              const RadarDetectorOptions&           options,
+              std::vector<std::shared_ptr<Object>>* objects) override;
 
   std::string name() const override { return "DummyRadarDetector"; }
 
  private:
   // for unit test
-  bool result_init_ = true;
+  bool result_init_   = true;
   bool result_detect_ = true;
 
   DISALLOW_COPY_AND_ASSIGN(DummyRadarDetector);

@@ -21,13 +21,7 @@
 
 #pragma once
 
-#include <cmath>
-#include <iostream>
-#include <limits>
-#include <memory>
-#include <vector>
 #include "modules/common/log.h"
-#include "ros/include/ros/ros.h"
 #include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"
@@ -38,6 +32,12 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/gnss/util/time_conversion.h"
+#include "ros/include/ros/ros.h"
+#include <cmath>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <vector>
 
 namespace apollo {
 namespace drivers {
@@ -83,21 +83,18 @@ inline uint32_t crc32_block(const uint8_t* buffer, size_t length) {
   while (length--) {
     uint32_t t1 = (word >> 8) & 0xFFFFFF;
     uint32_t t2 = crc32_word((word ^ *buffer++) & 0xFF);
-    word = t1 ^ t2;
+    word        = t1 ^ t2;
   }
   return word;
 }
 
 // Converts NewtonM2's azimuth (north = 0, east = 90) to FLU yaw (east = 0,
 // north = pi/2).
-constexpr double azimuth_deg_to_yaw_rad(double azimuth) {
-  return (90.0 - azimuth) * DEG_TO_RAD_M2;
-}
+constexpr double azimuth_deg_to_yaw_rad(double azimuth) { return (90.0 - azimuth) * DEG_TO_RAD_M2; }
 
 // A helper that fills an Point3D object (which uses the FLU frame) using RFU
 // measurements.
-inline void rfu_to_flu(double r, double f, double u,
-                       ::apollo::common::Point3D* flu) {
+inline void rfu_to_flu(double r, double f, double u, ::apollo::common::Point3D* flu) {
   flu->set_x(f);
   flu->set_y(-r);
   flu->set_z(u);
@@ -118,14 +115,11 @@ class NewtonM2Parser : public Parser {
   Parser::MessageType PrepareMessage(MessagePtr* message_ptr);
 
   // The handle_xxx functions return whether a message is ready.
-  bool HandleBestPos(const novatel::BestPos* pos, uint16_t gps_week,
-                     uint32_t gps_millisecs);
+  bool HandleBestPos(const novatel::BestPos* pos, uint16_t gps_week, uint32_t gps_millisecs);
 
-  bool HandleGnssBestpos(const novatel::BestPos* pos, uint16_t gps_week,
-                         uint32_t gps_millisecs);
+  bool HandleGnssBestpos(const novatel::BestPos* pos, uint16_t gps_week, uint32_t gps_millisecs);
 
-  bool HandleBestVel(const novatel::BestVel* vel, uint16_t gps_week,
-                     uint32_t gps_millisecs);
+  bool HandleBestVel(const novatel::BestVel* vel, uint16_t gps_week, uint32_t gps_millisecs);
 
   bool HandleCorrImuData(const novatel::CorrImuData* imu);
 
@@ -133,8 +127,7 @@ class NewtonM2Parser : public Parser {
 
   bool HandleInsPva(const novatel::InsPva* pva);
 
-  bool HandleInsPvax(const novatel::InsPvaX* pvax, uint16_t gps_week,
-                     uint32_t gps_millisecs);
+  bool HandleInsPvax(const novatel::InsPvaX* pvax, uint16_t gps_week, uint32_t gps_millisecs);
 
   bool HandleRawImuX(const novatel::RawImuX* imu);
 
@@ -148,17 +141,15 @@ class NewtonM2Parser : public Parser {
 
   void SetObservationTime();
 
-  bool DecodeGnssObservation(const uint8_t* obs_data,
-                             const uint8_t* obs_data_end);
+  bool DecodeGnssObservation(const uint8_t* obs_data, const uint8_t* obs_data_end);
 
-  bool HandleHeading(const novatel::Heading* heading, uint16_t gps_week,
-                     uint32_t gps_millisecs);
+  bool   HandleHeading(const novatel::Heading* heading, uint16_t gps_week, uint32_t gps_millisecs);
   double gyro_scale_ = 0.0;
 
   double accel_scale_ = 0.0;
 
   float imu_measurement_span_ = 1.0 / 200.0;
-  float imu_measurement_hz_ = 200.0;
+  float imu_measurement_hz_   = 200.0;
 
   int imu_frame_mapping_ = 5;
 
@@ -173,22 +164,21 @@ class NewtonM2Parser : public Parser {
   config::ImuType imu_type_ = config::ImuType::CPT_XW5651;
 
   // -1 is an unused value.
-  novatel::SolutionStatus solution_status_ =
-      static_cast<novatel::SolutionStatus>(-1);
-  novatel::SolutionType position_type_ = static_cast<novatel::SolutionType>(-1);
-  novatel::SolutionType velocity_type_ = static_cast<novatel::SolutionType>(-1);
-  novatel::InsStatus ins_status_ = static_cast<novatel::InsStatus>(-1);
+  novatel::SolutionStatus solution_status_ = static_cast<novatel::SolutionStatus>(-1);
+  novatel::SolutionType   position_type_   = static_cast<novatel::SolutionType>(-1);
+  novatel::SolutionType   velocity_type_   = static_cast<novatel::SolutionType>(-1);
+  novatel::InsStatus      ins_status_      = static_cast<novatel::InsStatus>(-1);
 
   raw_t raw_;  // used for observation data
 
-  ::apollo::drivers::gnss::Gnss gnss_;
-  ::apollo::drivers::gnss::GnssBestPose bestpos_;
-  ::apollo::drivers::gnss::Imu imu_;
-  ::apollo::drivers::gnss::Ins ins_;
-  ::apollo::drivers::gnss::InsStat ins_stat_;
-  ::apollo::drivers::gnss::GnssEphemeris gnss_ephemeris_;
+  ::apollo::drivers::gnss::Gnss             gnss_;
+  ::apollo::drivers::gnss::GnssBestPose     bestpos_;
+  ::apollo::drivers::gnss::Imu              imu_;
+  ::apollo::drivers::gnss::Ins              ins_;
+  ::apollo::drivers::gnss::InsStat          ins_stat_;
+  ::apollo::drivers::gnss::GnssEphemeris    gnss_ephemeris_;
   ::apollo::drivers::gnss::EpochObservation gnss_observation_;
-  ::apollo::drivers::gnss::Heading heading_;
+  ::apollo::drivers::gnss::Heading          heading_;
 };
 
 }  // namespace gnss

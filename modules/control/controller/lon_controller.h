@@ -65,7 +65,7 @@ class LonController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  common::Status Init(const ControlConf *control_conf) override;
+  common::Status Init(const ControlConf* control_conf) override;
 
   /**
    * @brief compute brake / throttle values based on current vehicle status
@@ -76,10 +76,10 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      control::ControlCommand *cmd) override;
+  common::Status ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                                       const canbus::Chassis*                    chassis,
+                                       const planning::ADCTrajectory*            trajectory,
+                                       control::ControlCommand*                  cmd) override;
 
   /**
    * @brief reset longitudinal controller
@@ -99,41 +99,39 @@ class LonController : public Controller {
   std::string Name() const override;
 
  protected:
-  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
-                                 const double preview_time,
-                                 SimpleLongitudinalDebug *debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer* trajectory,
+                                 const double              preview_time,
+                                 SimpleLongitudinalDebug*  debug);
 
-  void GetPathRemain(SimpleLongitudinalDebug *debug);
+  void GetPathRemain(SimpleLongitudinalDebug* debug);
 
  private:
-  void SetDigitalFilterPitchAngle(const LonControllerConf &lon_controller_conf);
+  void SetDigitalFilterPitchAngle(const LonControllerConf& lon_controller_conf);
 
-  void LoadControlCalibrationTable(
-      const LonControllerConf &lon_controller_conf);
+  void LoadControlCalibrationTable(const LonControllerConf& lon_controller_conf);
 
-  void SetDigitalFilter(double ts, double cutoff_freq,
-                        common::DigitalFilter *digital_filter);
+  void SetDigitalFilter(double ts, double cutoff_freq, common::DigitalFilter* digital_filter);
 
   void CloseLogFile();
 
-  const localization::LocalizationEstimate *localization_ = nullptr;
-  const canbus::Chassis *chassis_ = nullptr;
+  const localization::LocalizationEstimate* localization_ = nullptr;
+  const canbus::Chassis*                    chassis_      = nullptr;
 
-  std::unique_ptr<Interpolation2D> control_interpolation_;
-  const planning::ADCTrajectory *trajectory_message_ = nullptr;
+  std::unique_ptr<Interpolation2D>    control_interpolation_;
+  const planning::ADCTrajectory*      trajectory_message_ = nullptr;
   std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
 
   std::string name_;
-  bool controller_initialized_ = false;
+  bool        controller_initialized_ = false;
 
   PIDController speed_pid_controller_;
   PIDController station_pid_controller_;
 
-  FILE *speed_log_file_ = nullptr;
+  FILE* speed_log_file_ = nullptr;
 
   common::DigitalFilter digital_filter_pitch_angle_;
 
-  const ControlConf *control_conf_ = nullptr;
+  const ControlConf* control_conf_ = nullptr;
 
   // vehicle parameter
   common::VehicleParam vehicle_param_;

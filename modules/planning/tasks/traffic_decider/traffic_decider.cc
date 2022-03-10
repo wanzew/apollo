@@ -42,79 +42,63 @@ namespace planning {
 using common::Status;
 using common::VehicleConfigHelper;
 
-apollo::common::util::Factory<TrafficRuleConfig::RuleId, TrafficRule,
-                              TrafficRule *(*)(const TrafficRuleConfig &config)>
+apollo::common::util::Factory<TrafficRuleConfig::RuleId,
+                              TrafficRule,
+                              TrafficRule* (*)(const TrafficRuleConfig& config)>
     TrafficDecider::s_rule_factory;
 
 void TrafficDecider::RegisterRules() {
-  s_rule_factory.Register(TrafficRuleConfig::BACKSIDE_VEHICLE,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new BacksideVehicle(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::CHANGE_LANE,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new ChangeLane(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::CROSSWALK,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new Crosswalk(config);
-                          });
+  s_rule_factory.Register(
+      TrafficRuleConfig::BACKSIDE_VEHICLE,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new BacksideVehicle(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::CHANGE_LANE,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new ChangeLane(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::CROSSWALK,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new Crosswalk(config); });
 
-  s_rule_factory.Register(TrafficRuleConfig::DESTINATION,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new Destination(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::FRONT_VEHICLE,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new FrontVehicle(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::KEEP_CLEAR,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new KeepClear(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::PULL_OVER,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new PullOver(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::REFERENCE_LINE_END,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new ReferenceLineEnd(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::REROUTING,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new Rerouting(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::SIGNAL_LIGHT,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new SignalLight(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::STOP_SIGN,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new StopSign(config);
-                          });
+  s_rule_factory.Register(
+      TrafficRuleConfig::DESTINATION,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new Destination(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::FRONT_VEHICLE,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new FrontVehicle(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::KEEP_CLEAR,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new KeepClear(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::PULL_OVER,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new PullOver(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::REFERENCE_LINE_END,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new ReferenceLineEnd(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::REROUTING,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new Rerouting(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::SIGNAL_LIGHT,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new SignalLight(config); });
+  s_rule_factory.Register(
+      TrafficRuleConfig::STOP_SIGN,
+      [](const TrafficRuleConfig& config) -> TrafficRule* { return new StopSign(config); });
 }
 
-bool TrafficDecider::Init(const TrafficRuleConfigs &config) {
-  if (s_rule_factory.Empty()) {
-    RegisterRules();
-  }
+bool TrafficDecider::Init(const TrafficRuleConfigs& config) {
+  if (s_rule_factory.Empty()) { RegisterRules(); }
   rule_configs_ = config;
   return true;
 }
 
-void TrafficDecider::BuildPlanningTarget(
-    ReferenceLineInfo *reference_line_info) {
-  double min_s = std::numeric_limits<double>::infinity();
+void TrafficDecider::BuildPlanningTarget(ReferenceLineInfo* reference_line_info) {
+  double    min_s = std::numeric_limits<double>::infinity();
   StopPoint stop_point;
-  for (const auto *obstacle :
-       reference_line_info->path_decision()->path_obstacles().Items()) {
-    if (obstacle->obstacle()->IsVirtual() &&
-        obstacle->HasLongitudinalDecision() &&
+  for (const auto* obstacle : reference_line_info->path_decision()->path_obstacles().Items()) {
+    if (obstacle->obstacle()->IsVirtual() && obstacle->HasLongitudinalDecision() &&
         obstacle->LongitudinalDecision().has_stop() &&
         obstacle->PerceptionSLBoundary().start_s() < min_s) {
-      min_s = obstacle->PerceptionSLBoundary().start_s();
-      const auto &stop_code =
-          obstacle->LongitudinalDecision().stop().reason_code();
+      min_s                 = obstacle->PerceptionSLBoundary().start_s();
+      const auto& stop_code = obstacle->LongitudinalDecision().stop().reason_code();
       if (stop_code == StopReasonCode::STOP_REASON_DESTINATION ||
           stop_code == StopReasonCode::STOP_REASON_CROSSWALK ||
           stop_code == StopReasonCode::STOP_REASON_STOP_SIGN ||
@@ -123,8 +107,7 @@ void TrafficDecider::BuildPlanningTarget(
           stop_code == StopReasonCode::STOP_REASON_REFERENCE_END ||
           stop_code == StopReasonCode::STOP_REASON_SIGNAL) {
         stop_point.set_type(StopPoint::HARD);
-        ADEBUG << "Hard stop at: " << min_s
-               << "REASON: " << StopReasonCode_Name(stop_code);
+        ADEBUG << "Hard stop at: " << min_s << "REASON: " << StopReasonCode_Name(stop_code);
       } else if (stop_code == StopReasonCode::STOP_REASON_YELLOW_SIGNAL) {
         stop_point.set_type(StopPoint::SOFT);
         ADEBUG << "Soft stop at: " << min_s << "  STOP_REASON_YELLOW_SIGNAL";
@@ -134,22 +117,18 @@ void TrafficDecider::BuildPlanningTarget(
     }
   }
   if (min_s != std::numeric_limits<double>::infinity()) {
-    const auto &vehicle_config =
-        common::VehicleConfigHelper::instance()->GetConfig();
-    double front_edge_to_center =
-        vehicle_config.vehicle_param().front_edge_to_center();
-    stop_point.set_s(min_s - front_edge_to_center +
-                     FLAGS_virtual_stop_wall_length / 2.0);
+    const auto& vehicle_config       = common::VehicleConfigHelper::instance()->GetConfig();
+    double      front_edge_to_center = vehicle_config.vehicle_param().front_edge_to_center();
+    stop_point.set_s(min_s - front_edge_to_center + FLAGS_virtual_stop_wall_length / 2.0);
     reference_line_info->SetStopPoint(stop_point);
   }
 }
 
-Status TrafficDecider::Execute(Frame *frame,
-                               ReferenceLineInfo *reference_line_info) {
+Status TrafficDecider::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  for (const auto &rule_config : rule_configs_.config()) {
+  for (const auto& rule_config : rule_configs_.config()) {
     if (!rule_config.enabled()) {
       ADEBUG << "Rule " << rule_config.rule_id() << " not enabled";
       continue;
@@ -160,8 +139,7 @@ Status TrafficDecider::Execute(Frame *frame,
       continue;
     }
     rule->ApplyRule(frame, reference_line_info);
-    ADEBUG << "Applied rule "
-           << TrafficRuleConfig::RuleId_Name(rule_config.rule_id());
+    ADEBUG << "Applied rule " << TrafficRuleConfig::RuleId_Name(rule_config.rule_id());
   }
 
   // Creeper::instance()->Run(frame, reference_line_info);

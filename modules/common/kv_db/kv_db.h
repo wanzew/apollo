@@ -41,21 +41,18 @@ class KVDB {
    * @param sync Whether flush right after writing.
    * @return Success or not.
    */
-  static bool Put(const std::string &key, const std::string &value,
-                  const bool sync = false);
+  static bool Put(const std::string& key, const std::string& value, const bool sync = false);
 
   /**
    * @brief Delete a key.
    * @param sync Whether flush right after writing.
    * @return Success or not.
    */
-  static bool Delete(const std::string &key,
-                     const bool sync = false);
+  static bool Delete(const std::string& key, const bool sync = false);
 
-  static bool Has(const std::string &key);
+  static bool Has(const std::string& key);
 
-  static std::string Get(const std::string &key,
-                         const std::string &default_value = "");
+  static std::string Get(const std::string& key, const std::string& default_value = "");
 
  private:
   static std::unique_ptr<leveldb::DB> GetDB();

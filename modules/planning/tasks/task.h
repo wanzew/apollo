@@ -38,14 +38,13 @@ class Task {
   virtual ~Task() = default;
   virtual const std::string& Name() const;
 
-  virtual apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info);
+  virtual apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info);
 
   virtual bool Init(const PlanningConfig& config);
 
  protected:
-  bool is_init_ = false;
-  Frame* frame_ = nullptr;
+  bool               is_init_             = false;
+  Frame*             frame_               = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;
 
  private:

@@ -61,7 +61,7 @@ class Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  virtual common::Status Init(const ControlConf *control_conf) = 0;
+  virtual common::Status Init(const ControlConf* control_conf) = 0;
 
   /**
    * @brief compute control command based on current vehicle status
@@ -72,10 +72,11 @@ class Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  virtual common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      control::ControlCommand *cmd) = 0;
+  virtual common::Status
+  ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                        const canbus::Chassis*                    chassis,
+                        const planning::ADCTrajectory*            trajectory,
+                        control::ControlCommand*                  cmd) = 0;
 
   /**
    * @brief reset Controller

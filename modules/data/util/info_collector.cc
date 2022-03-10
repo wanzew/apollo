@@ -29,8 +29,7 @@ DEFINE_string(static_info_conf_file,
               "modules/data/conf/static_info_conf.pb.txt",
               "Path of the StaticInfo config file.");
 
-DEFINE_string(container_meta_ini, "/apollo/meta.ini",
-              "Container meta info file.");
+DEFINE_string(container_meta_ini, "/apollo/meta.ini", "Container meta info file.");
 
 namespace apollo {
 namespace data {
@@ -44,11 +43,10 @@ using google::protobuf::Map;
 using google::protobuf::RepeatedPtrField;
 
 // Load files list to {file_path: file_content} map.
-Map<std::string, std::string> LoadFiles(
-    const RepeatedPtrField<std::string> &files) {
+Map<std::string, std::string> LoadFiles(const RepeatedPtrField<std::string>& files) {
   Map<std::string, std::string> result;
-  std::string content;
-  for (const auto &file : files) {
+  std::string                   content;
+  for (const auto& file : files) {
     if (apollo::common::util::GetContent(file, &content)) {
       result.insert({file, content});
     } else {
@@ -72,7 +70,7 @@ InfoCollector::InfoCollector() {
   }
 }
 
-const StaticInfo &InfoCollector::GetStaticInfo() {
+const StaticInfo& InfoCollector::GetStaticInfo() {
   // Use MergeFrom to override the template.
   GetVehicleInfo();
   GetEnvironmentInfo();
@@ -82,63 +80,50 @@ const StaticInfo &InfoCollector::GetStaticInfo() {
   return instance()->static_info_;
 }
 
-const VehicleInfo &InfoCollector::GetVehicleInfo() {
-  VehicleInfo *vehicle = instance()->static_info_.mutable_vehicle();
+const VehicleInfo& InfoCollector::GetVehicleInfo() {
+  VehicleInfo* vehicle = instance()->static_info_.mutable_vehicle();
 
   const std::string vehicle_name = KVDB::Get("apollo:dreamview:vehicle");
-  if (!vehicle_name.empty()) {
-    vehicle->set_name(vehicle_name);
-  }
+  if (!vehicle_name.empty()) { vehicle->set_name(vehicle_name); }
 
   const std::string vehicle_vin = KVDB::Get("apollo:canbus:vin");
-  if (!vehicle_vin.empty()) {
-    vehicle->mutable_license()->set_vin(vehicle_vin);
-  }
+  if (!vehicle_vin.empty()) { vehicle->mutable_license()->set_vin(vehicle_vin); }
 
   return *vehicle;
 }
 
-const EnvironmentInfo &InfoCollector::GetEnvironmentInfo() {
-  EnvironmentInfo *environment = instance()->static_info_.mutable_environment();
+const EnvironmentInfo& InfoCollector::GetEnvironmentInfo() {
+  EnvironmentInfo* environment = instance()->static_info_.mutable_environment();
 
   const std::string map_name = KVDB::Get("apollo:dreamview:map");
-  if (!map_name.empty()) {
-    environment->set_map_name(map_name);
-  }
+  if (!map_name.empty()) { environment->set_map_name(map_name); }
   return *environment;
 }
 
-const HardwareInfo &InfoCollector::GetHardwareInfo() {
-  HardwareInfo *hardware = instance()->static_info_.mutable_hardware();
-  *hardware->mutable_configs() =
-      LoadFiles(instance()->config_.hardware_configs());
+const HardwareInfo& InfoCollector::GetHardwareInfo() {
+  HardwareInfo* hardware       = instance()->static_info_.mutable_hardware();
+  *hardware->mutable_configs() = LoadFiles(instance()->config_.hardware_configs());
   return *hardware;
 }
 
-const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
-  SoftwareInfo *software = instance()->static_info_.mutable_software();
+const SoftwareInfo& InfoCollector::GetSoftwareInfo() {
+  SoftwareInfo* software = instance()->static_info_.mutable_software();
   software->set_docker_image(GetDockerImage());
 
   const std::string commit_id = KVDB::Get("apollo:data:commit_id");
-  if (!commit_id.empty()) {
-    software->set_commit_id(commit_id);
-  }
+  if (!commit_id.empty()) { software->set_commit_id(commit_id); }
 
   const std::string mode_name = KVDB::Get("apollo:dreamview:mode");
-  if (!mode_name.empty()) {
-    software->set_mode(mode_name);
-  }
+  if (!mode_name.empty()) { software->set_mode(mode_name); }
 
-  *software->mutable_configs() =
-      LoadFiles(instance()->config_.software_configs());
+  *software->mutable_configs() = LoadFiles(instance()->config_.software_configs());
 
   // Store latest routing request.
   auto* routing_request_adapter = AdapterManager::GetRoutingRequest();
   if (routing_request_adapter) {
     routing_request_adapter->Observe();
     if (!routing_request_adapter->Empty()) {
-      *software->mutable_latest_routing_request() =
-          routing_request_adapter->GetLatestObserved();
+      *software->mutable_latest_routing_request() = routing_request_adapter->GetLatestObserved();
     }
   } else {
     AERROR << "RoutingRequest is not registered in AdapterManager config.";
@@ -147,21 +132,15 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
   return *software;
 }
 
-const UserInfo &InfoCollector::GetUserInfo() {
-  return instance()->static_info_.user();
-}
+const UserInfo& InfoCollector::GetUserInfo() { return instance()->static_info_.user(); }
 
 std::string InfoCollector::GetDockerImage() {
   // In release docker container, the actual image name is in meta.ini.
   if (apollo::common::util::PathExists(FLAGS_container_meta_ini)) {
     YAML::Node meta = YAML::LoadFile(FLAGS_container_meta_ini);
-    if (meta["tag"]) {
-      return meta["tag"].as<std::string>();
-    }
+    if (meta["tag"]) { return meta["tag"].as<std::string>(); }
   }
-  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
-    return docker_image;
-  }
+  if (const char* docker_image = std::getenv("DOCKER_IMG")) { return docker_image; }
   return "";
 }
 

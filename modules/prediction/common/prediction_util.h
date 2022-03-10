@@ -17,9 +17,9 @@
 #ifndef MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 #define MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 
+#include <array>
 #include <utility>
 #include <vector>
-#include <array>
 
 #include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -66,10 +66,11 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
  * @param parameter of the quintic polynomial.
  * @return order of derivative to evaluate.
  */
-double EvaluateQuinticPolynomial(
-    const std::array<double, 6>& coeffs,
-    const double t, const uint32_t order,
-    const double end_t, const double end_v);
+double EvaluateQuinticPolynomial(const std::array<double, 6>& coeffs,
+                                 const double                 t,
+                                 const uint32_t               order,
+                                 const double                 end_t,
+                                 const double                 end_v);
 
 /**
  * @brief Evaluate quartic polynomial.
@@ -77,10 +78,11 @@ double EvaluateQuinticPolynomial(
  * @param parameter of the quartic polynomial.
  * @return order of derivative to evaluate.
  */
-double EvaluateQuarticPolynomial(
-    const std::array<double, 5>& coeffs,
-    const double t, const uint32_t order,
-    const double end_t, const double end_v);
+double EvaluateQuarticPolynomial(const std::array<double, 5>& coeffs,
+                                 const double                 t,
+                                 const uint32_t               order,
+                                 const double                 end_t,
+                                 const double                 end_v);
 
 }  // namespace math_util
 
@@ -91,7 +93,8 @@ namespace predictor_util {
  * @param translate_y The translation along y-axis.
  * @param point The point to be translated.
  */
-void TranslatePoint(const double translate_x, const double translate_y,
+void TranslatePoint(const double                       translate_x,
+                    const double                       translate_y,
                     ::apollo::common::TrajectoryPoint* point);
 
 /**
@@ -103,11 +106,12 @@ void TranslatePoint(const double translate_x, const double translate_y,
  * @param trajectory point interval period
  * @param generated trajectory points
  */
-void GenerateFreeMoveTrajectoryPoints(
-    Eigen::Matrix<double, 6, 1>* state,
-    const Eigen::Matrix<double, 6, 6>& transition, double theta,
-    const size_t num, const double period,
-    std::vector<apollo::common::TrajectoryPoint>* points);
+void GenerateFreeMoveTrajectoryPoints(Eigen::Matrix<double, 6, 1>*                  state,
+                                      const Eigen::Matrix<double, 6, 6>&            transition,
+                                      double                                        theta,
+                                      const size_t                                  num,
+                                      const double                                  period,
+                                      std::vector<apollo::common::TrajectoryPoint>* points);
 
 /**
  * @brief Adjust a speed value according to a curvature. If the input speed

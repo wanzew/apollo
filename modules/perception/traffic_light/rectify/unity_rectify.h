@@ -49,14 +49,14 @@ class UnityRectify : public BaseRectifier {
    * @param  Lights
    * @return  bool
    */
-  bool Rectify(const Image &image, const RectifyOption &option,
-               std::vector<LightPtr> *lights) override;
+  bool
+  Rectify(const Image& image, const RectifyOption& option, std::vector<LightPtr>* lights) override;
 
   std::string name() const override;
 
  private:
-  std::shared_ptr<IRefine> detect_;
-  std::shared_ptr<IGetBox> crop_;
+  std::shared_ptr<IRefine>      detect_;
+  std::shared_ptr<IGetBox>      crop_;
   std::shared_ptr<ISelectLight> select_;
 
   traffic_light::rectifier_config::ModelConfigs config_;

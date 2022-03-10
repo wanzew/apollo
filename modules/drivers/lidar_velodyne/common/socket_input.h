@@ -36,12 +36,12 @@ class SocketInput : public Input {
   SocketInput();
   virtual ~SocketInput();
   bool init(int port) override;
-  int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) override;
-  int get_positioning_data_packtet(const NMEATimePtr &nmea_time) override;
+  int  get_firing_data_packet(velodyne_msgs::VelodynePacket* pkt) override;
+  int  get_positioning_data_packtet(const NMEATimePtr& nmea_time) override;
 
  private:
-  int sockfd_;
-  int port_;
+  int  sockfd_;
+  int  port_;
   bool input_available(int timeout);
 };
 

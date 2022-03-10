@@ -27,13 +27,12 @@ DEFINE_int32(can_id, 0, "can device id, default is 0");
 using apollo::monitor::hw::EsdCanDetails;
 namespace _hw = apollo::monitor::hw;
 
-int main(int argc, char *argv[]) {
-  google::SetUsageMessage(
-      std::string(argv[0]) +
-      std::string(" [--can_id=#id] [--details=true|false]\n"
-                  "    can_id: CAN channel 0, 1, ...; default to use 0\n"
-                  "    details: prints detailed stats if true, "
-                  "default is false\n"));
+int main(int argc, char* argv[]) {
+  google::SetUsageMessage(std::string(argv[0]) +
+                          std::string(" [--can_id=#id] [--details=true|false]\n"
+                                      "    can_id: CAN channel 0, 1, ...; default to use 0\n"
+                                      "    details: prints detailed stats if true, "
+                                      "default is false\n"));
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   EsdCanDetails can_details;

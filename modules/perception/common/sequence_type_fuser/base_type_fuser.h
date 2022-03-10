@@ -89,7 +89,7 @@ class BaseTypeFuser {
    * @param objects The objects with initial object type
    * @return True if fuse type successfully, false otherwise
    */
-  virtual bool FuseType(const TypeFuserOptions& options,
+  virtual bool FuseType(const TypeFuserOptions&               options,
                         std::vector<std::shared_ptr<Object>>* objects) = 0;
 
   /**

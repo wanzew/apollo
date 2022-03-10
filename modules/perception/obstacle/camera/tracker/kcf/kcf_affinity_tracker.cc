@@ -24,18 +24,18 @@ bool KCFAffinityTracker::Init() {
   return kcf_component_.Init();
 }
 
-bool KCFAffinityTracker::GetAffinityMatrix(
-    const cv::Mat &img, const std::vector<Tracked> &tracked,
-    const std::vector<Detected> &detected,
-    std::vector<std::vector<float>> *affinity_matrix) {
+bool KCFAffinityTracker::GetAffinityMatrix(const cv::Mat&                   img,
+                                           const std::vector<Tracked>&      tracked,
+                                           const std::vector<Detected>&     detected,
+                                           std::vector<std::vector<float>>* affinity_matrix) {
   affinity_matrix->clear();
 
   // Return if empty
   if (tracked.empty() || detected.empty()) return true;
 
   // Construct output. Default as 0.0 for not selected entries
-  *affinity_matrix = std::vector<std::vector<float>>(
-      tracked.size(), std::vector<float>(detected.size(), 0.0f));
+  *affinity_matrix =
+      std::vector<std::vector<float>>(tracked.size(), std::vector<float>(detected.size(), 0.0f));
 
   // Get features for detected boxes when needed
   detected_features_.clear();
@@ -48,7 +48,7 @@ bool KCFAffinityTracker::GetAffinityMatrix(
         if (!detected_features_.count(j)) {
           // Enlarge detected search window
           cv::Rect box = detected[j].box_;
-          box = EnlargeBox(img.size(), kScale_, box);
+          box          = EnlargeBox(img.size(), kScale_, box);
 
           std::vector<cv::Mat> z_f;
           kcf_component_.GetFeatures(img, box, &z_f);
@@ -67,11 +67,11 @@ bool KCFAffinityTracker::GetAffinityMatrix(
   return true;
 }
 
-bool KCFAffinityTracker::UpdateTracked(const cv::Mat &img,
-                                       const std::vector<Detected> &detected,
-                                       std::vector<Tracked> *tracked) {
+bool KCFAffinityTracker::UpdateTracked(const cv::Mat&               img,
+                                       const std::vector<Detected>& detected,
+                                       std::vector<Tracked>*        tracked) {
   // Get x_f features and alpha_f for tracked objects
-  for (auto &tracked_obj : *tracked) {
+  for (auto& tracked_obj : *tracked) {
     // Reuse detected features if they match
     int det_id = tracked_obj.detect_id_;
 
@@ -84,7 +84,7 @@ bool KCFAffinityTracker::UpdateTracked(const cv::Mat &img,
     } else if (!tracked_obj.kcf_set_) {
       // Enlarge detected search window
       cv::Rect box = tracked_obj.box_;
-      box = EnlargeBox(img.size(), kScale_, box);
+      box          = EnlargeBox(img.size(), kScale_, box);
 
       std::vector<cv::Mat> x_f;
       kcf_component_.GetFeatures(img, box, &x_f);

@@ -59,10 +59,11 @@ class LaneSequencePredictor : public SequencePredictor {
    * @param Prediction period
    * @param A vector of generated trajectory points
    */
-  void DrawLaneSequenceTrajectoryPoints(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* points);
+  void DrawLaneSequenceTrajectoryPoints(const Obstacle&                               obstacle,
+                                        const LaneSequence&                           lane_sequence,
+                                        const double                                  total_time,
+                                        const double                                  period,
+                                        std::vector<apollo::common::TrajectoryPoint>* points);
 };
 
 }  // namespace prediction

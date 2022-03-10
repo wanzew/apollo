@@ -40,17 +40,17 @@ class Fusion {
  public:
   Fusion() {}
   ~Fusion() {}
-  bool fusion(const sensor_msgs::PointCloud2Ptr& major_point_cloud,
+  bool fusion(const sensor_msgs::PointCloud2Ptr&       major_point_cloud,
               std::vector<sensor_msgs::PointCloud2Ptr> slave_point_cloud_vec,
-              sensor_msgs::PointCloud2Ptr point_cloud_fusion);
+              sensor_msgs::PointCloud2Ptr              point_cloud_fusion);
 
  private:
   bool query_pose_affine_from_tf2(const std::string& target_frame_id,
                                   const std::string& child_frame_id,
-                                  Eigen::Affine3d* pose);
+                                  Eigen::Affine3d*   pose);
   void append_point_cloud(pcl::PointCloud<PointXYZIT>* point_cloud,
                           pcl::PointCloud<PointXYZIT>* point_cloud_add,
-                          const Eigen::Affine3d& pose);
+                          const Eigen::Affine3d&       pose);
 };
 }  // namespace lidar_velodyne
 }  // namespace drivers

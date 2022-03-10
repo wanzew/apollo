@@ -11,12 +11,11 @@
 
 */
 
-#include <ros/ros.h>
 #include "convert.h"
+#include <ros/ros.h>
 
 /** Main node entry point. */
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
   ros::init(argc, argv, "cloud_node");
   ros::NodeHandle node;
   ros::NodeHandle priv_nh("~");

@@ -36,32 +36,30 @@ using Json = nlohmann::json;
 using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
-SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
-                                               WebSocketHandler *map_ws,
-                                               SimControl *sim_control,
-                                               const MapService *map_service,
-                                               bool routing_from_file)
-    : sim_world_service_(map_service, routing_from_file),
-      map_service_(map_service),
-      websocket_(websocket),
-      map_ws_(map_ws),
-      sim_control_(sim_control) {
+SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler* websocket,
+                                               WebSocketHandler* map_ws,
+                                               SimControl*       sim_control,
+                                               const MapService* map_service,
+                                               bool              routing_from_file)
+    : sim_world_service_(map_service, routing_from_file)
+    , map_service_(map_service)
+    , websocket_(websocket)
+    , map_ws_(map_ws)
+    , sim_control_(sim_control) {
   RegisterMessageHandlers();
 }
 
 void SimulationWorldUpdater::RegisterMessageHandlers() {
   // Send current sim_control status to the new client.
-  websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection *conn) {
-        Json response;
-        response["type"] = "SimControlStatus";
-        response["enabled"] = sim_control_->IsEnabled();
-        websocket_->SendData(conn, response.dump());
-      });
+  websocket_->RegisterConnectionReadyHandler([this](WebSocketHandler::Connection* conn) {
+    Json response;
+    response["type"]    = "SimControlStatus";
+    response["enabled"] = sim_control_->IsEnabled();
+    websocket_->SendData(conn, response.dump());
+  });
 
   map_ws_->RegisterMessageHandler(
-      "RetrieveMapData",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "RetrieveMapData", [this](const Json& json, WebSocketHandler::Connection* conn) {
         auto iter = json.find("elements");
         if (iter != json.end()) {
           MapElementIds map_element_ids;
@@ -78,69 +76,63 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         }
       });
 
-  map_ws_->RegisterMessageHandler(
-      "RetrieveRelativeMapData",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        std::string to_send;
-        {
-          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-          to_send = relative_map_string_;
-        }
-        map_ws_->SendBinaryData(conn, to_send, true);
-      });
+  map_ws_->RegisterMessageHandler("RetrieveRelativeMapData",
+                                  [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                    std::string to_send;
+                                    {
+                                      boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+                                      to_send = relative_map_string_;
+                                    }
+                                    map_ws_->SendBinaryData(conn, to_send, true);
+                                  });
 
   websocket_->RegisterMessageHandler(
-      "Binary",
-      [this](const std::string &data, WebSocketHandler::Connection *conn) {
+      "Binary", [this](const std::string& data, WebSocketHandler::Connection* conn) {
         // Navigation info in binary format
         apollo::relative_map::NavigationInfo navigation_info;
         if (navigation_info.ParseFromString(data)) {
-          AdapterManager::FillNavigationHeader(FLAGS_dreamview_module_name,
-                                               &navigation_info);
+          AdapterManager::FillNavigationHeader(FLAGS_dreamview_module_name, &navigation_info);
           AdapterManager::PublishNavigation(navigation_info);
         } else {
-          AERROR << "Failed to parse navigation info from string. String size: "
-                 << data.size();
+          AERROR << "Failed to parse navigation info from string. String size: " << data.size();
         }
       });
 
+  websocket_->RegisterMessageHandler("RetrieveMapElementIdsByRadius",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       auto radius = json.find("radius");
+                                       if (radius == json.end()) {
+                                         AERROR
+                                             << "Cannot retrieve map elements with unknown radius.";
+                                         return;
+                                       }
+
+                                       if (!radius->is_number()) {
+                                         AERROR << "Expect radius with type 'number', but was "
+                                                << radius->type_name();
+                                         return;
+                                       }
+
+                                       Json response;
+                                       response["type"]      = "MapElementIds";
+                                       response["mapRadius"] = *radius;
+
+                                       MapElementIds ids;
+                                       sim_world_service_.GetMapElementIds(*radius, &ids);
+                                       std::string elementIds;
+                                       MessageToJsonString(ids, &elementIds);
+                                       response["mapElementIds"] = Json::parse(elementIds);
+
+                                       websocket_->SendData(conn, response.dump());
+                                     });
+
   websocket_->RegisterMessageHandler(
-      "RetrieveMapElementIdsByRadius",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto radius = json.find("radius");
-        if (radius == json.end()) {
-          AERROR << "Cannot retrieve map elements with unknown radius.";
-          return;
-        }
-
-        if (!radius->is_number()) {
-          AERROR << "Expect radius with type 'number', but was "
-                 << radius->type_name();
-          return;
-        }
-
-        Json response;
-        response["type"] = "MapElementIds";
-        response["mapRadius"] = *radius;
-
-        MapElementIds ids;
-        sim_world_service_.GetMapElementIds(*radius, &ids);
-        std::string elementIds;
-        MessageToJsonString(ids, &elementIds);
-        response["mapElementIds"] = Json::parse(elementIds);
-
-        websocket_->SendData(conn, response.dump());
-      });
-
-  websocket_->RegisterMessageHandler(
-      "SendRoutingRequest",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "SendRoutingRequest", [this](const Json& json, WebSocketHandler::Connection* conn) {
         RoutingRequest routing_request;
 
         bool succeed = ConstructRoutingRequest(json, &routing_request);
         if (succeed) {
-          AdapterManager::FillRoutingRequestHeader(FLAGS_dreamview_module_name,
-                                                   &routing_request);
+          AdapterManager::FillRoutingRequestHeader(FLAGS_dreamview_module_name, &routing_request);
           AdapterManager::PublishRoutingRequest(routing_request);
         }
 
@@ -149,22 +141,20 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
                                                    "Routing request sent.");
         } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR, "Failed to send a routing request.");
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::ERROR,
+                                                   "Failed to send a routing request.");
         }
       });
 
   websocket_->RegisterMessageHandler(
-      "RequestSimulationWorld",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "RequestSimulationWorld", [this](const Json& json, WebSocketHandler::Connection* conn) {
         if (!sim_world_service_.ReadyToPush()) {
-          AWARN_EVERY(100)
-              << "Not sending simulation world as the data is not ready!";
+          AWARN_EVERY(100) << "Not sending simulation world as the data is not ready!";
           return;
         }
 
         bool enable_pnc_monitor = false;
-        auto planning = json.find("planning");
+        auto planning           = json.find("planning");
         if (planning != json.end() && planning->is_boolean()) {
           enable_pnc_monitor = json["planning"];
         }
@@ -173,8 +163,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           // Pay the price to copy the data instead of sending data over the
           // wire while holding the lock.
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-          to_send = enable_pnc_monitor ? simulation_world_with_planning_data_
-                                       : simulation_world_;
+          to_send = enable_pnc_monitor ? simulation_world_with_planning_data_ : simulation_world_;
         }
         if (FLAGS_enable_update_size_check && !enable_pnc_monitor &&
             to_send.size() > FLAGS_max_update_size) {
@@ -184,54 +173,52 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         websocket_->SendBinaryData(conn, to_send, true);
       });
 
-  websocket_->RegisterMessageHandler(
-      "RequestRoutePath",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response = sim_world_service_.GetRoutePathAsJson();
-        response["type"] = "RoutePath";
-        websocket_->SendData(conn, response.dump());
-      });
+  websocket_->RegisterMessageHandler("RequestRoutePath",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       Json response    = sim_world_service_.GetRoutePathAsJson();
+                                       response["type"] = "RoutePath";
+                                       websocket_->SendData(conn, response.dump());
+                                     });
+
+  websocket_->RegisterMessageHandler("GetDefaultEndPoint",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       Json response;
+                                       response["type"] = "DefaultEndPoint";
+
+                                       Json poi_list = Json::array();
+                                       if (LoadPOI()) {
+                                         for (const auto& landmark : poi_.landmark()) {
+                                           Json place;
+                                           place["name"] = landmark.name();
+                                           Json waypoint_list;
+                                           for (const auto& waypoint : landmark.waypoint()) {
+                                             Json point;
+                                             point["x"] = waypoint.pose().x();
+                                             point["y"] = waypoint.pose().y();
+                                             waypoint_list.push_back(point);
+                                           }
+                                           place["waypoint"] = waypoint_list;
+                                           poi_list.push_back(place);
+                                         }
+                                       } else {
+                                         sim_world_service_.PublishMonitorMessage(
+                                             MonitorMessageItem::ERROR, "Failed to load default "
+                                                                        "POI. Please make sure the "
+                                                                        "file exists at " +
+                                                                            EndWayPointFile());
+                                       }
+                                       response["poi"] = poi_list;
+                                       websocket_->SendData(conn, response.dump());
+                                     });
+
+  websocket_->RegisterMessageHandler("Reset",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       sim_world_service_.SetToClear();
+                                       sim_control_->Reset();
+                                     });
 
   websocket_->RegisterMessageHandler(
-      "GetDefaultEndPoint",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response;
-        response["type"] = "DefaultEndPoint";
-
-        Json poi_list = Json::array();
-        if (LoadPOI()) {
-          for (const auto &landmark : poi_.landmark()) {
-            Json place;
-            place["name"] = landmark.name();
-            Json waypoint_list;
-            for (const auto &waypoint : landmark.waypoint()) {
-              Json point;
-              point["x"] = waypoint.pose().x();
-              point["y"] = waypoint.pose().y();
-              waypoint_list.push_back(point);
-            }
-            place["waypoint"] = waypoint_list;
-            poi_list.push_back(place);
-          }
-        } else {
-          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::ERROR,
-                                                   "Failed to load default "
-                                                   "POI. Please make sure the "
-                                                   "file exists at " +
-                                                       EndWayPointFile());
-        }
-        response["poi"] = poi_list;
-        websocket_->SendData(conn, response.dump());
-      });
-
-  websocket_->RegisterMessageHandler(
-      "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        sim_world_service_.SetToClear();
-        sim_control_->Reset();
-      });
-
-  websocket_->RegisterMessageHandler(
-      "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "Dump", [this](const Json& json, WebSocketHandler::Connection* conn) {
         DumpMessage(AdapterManager::GetChassis(), "Chassis");
         DumpMessage(AdapterManager::GetPrediction(), "Prediction");
         DumpMessage(AdapterManager::GetRoutingRequest(), "RoutingRequest");
@@ -247,22 +234,21 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         DumpMessage(AdapterManager::GetMobileye(), "Mobileye");
       });
 
-  websocket_->RegisterMessageHandler(
-      "ToggleSimControl",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto enable = json.find("enable");
-        if (enable != json.end() && enable->is_boolean()) {
-          if (*enable) {
-            sim_control_->Start();
-          } else {
-            sim_control_->Stop();
-          }
-        }
-      });
+  websocket_->RegisterMessageHandler("ToggleSimControl",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       auto enable = json.find("enable");
+                                       if (enable != json.end() && enable->is_boolean()) {
+                                         if (*enable) {
+                                           sim_control_->Start();
+                                         } else {
+                                           sim_control_->Stop();
+                                         }
+                                       }
+                                     });
 }
 
-bool SimulationWorldUpdater::ConstructRoutingRequest(
-    const Json &json, RoutingRequest *routing_request) {
+bool SimulationWorldUpdater::ConstructRoutingRequest(const Json&     json,
+                                                     RoutingRequest* routing_request) {
   routing_request->clear_waypoint();
   // set start point
   if (!ContainsKey(json, "start")) {
@@ -285,16 +271,15 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
   // set way point(s) if any
   auto iter = json.find("waypoint");
   if (iter != json.end() && iter->is_array()) {
-    auto *waypoint = routing_request->mutable_waypoint();
+    auto* waypoint = routing_request->mutable_waypoint();
     for (size_t i = 0; i < iter->size(); ++i) {
-      auto &point = (*iter)[i];
+      auto& point = (*iter)[i];
       if (!ValidateCoordinate(point)) {
         AERROR << "Failed to prepare a routing request: invalid waypoint.";
         return false;
       }
 
-      if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
-                                               waypoint->Add())) {
+      if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"], waypoint->Add())) {
         waypoint->RemoveLast();
       }
     }
@@ -311,55 +296,46 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     AERROR << "Failed to prepare a routing request: invalid end point.";
     return false;
   }
-  if (!map_service_->ConstructLaneWayPoint(end["x"], end["y"],
-                                           routing_request->add_waypoint())) {
+  if (!map_service_->ConstructLaneWayPoint(end["x"], end["y"], routing_request->add_waypoint())) {
     AERROR << "Failed to prepare a routing request:"
            << " cannot locate end point on map.";
     return false;
   }
 
-  AINFO << "Constructed RoutingRequest to be sent:\n"
-        << routing_request->DebugString();
+  AINFO << "Constructed RoutingRequest to be sent:\n" << routing_request->DebugString();
 
   return true;
 }
 
-bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {
+bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json& json) {
   if (!ContainsKey(json, "x") || !ContainsKey(json, "y")) {
     AERROR << "Failed to find x or y coordinate.";
     return false;
   }
-  if (json.find("x")->is_number() && json.find("y")->is_number()) {
-    return true;
-  }
+  if (json.find("x")->is_number() && json.find("y")->is_number()) { return true; }
   AERROR << "Both x and y coordinate should be a number.";
   return false;
 }
 
 void SimulationWorldUpdater::Start() {
   // start ROS timer, one-shot = false, auto-start = true
-  timer_ =
-      AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeIntervalMs / 1000),
-                                  &SimulationWorldUpdater::OnTimer, this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeIntervalMs / 1000),
+                                       &SimulationWorldUpdater::OnTimer, this);
 }
 
-void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
+void SimulationWorldUpdater::OnTimer(const ros::TimerEvent& event) {
   sim_world_service_.Update();
 
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    sim_world_service_.GetWireFormatString(
-        FLAGS_sim_map_radius, &simulation_world_,
-        &simulation_world_with_planning_data_);
-    sim_world_service_.GetRelativeMap().SerializeToString(
-        &relative_map_string_);
+    sim_world_service_.GetWireFormatString(FLAGS_sim_map_radius, &simulation_world_,
+                                           &simulation_world_with_planning_data_);
+    sim_world_service_.GetRelativeMap().SerializeToString(&relative_map_string_);
   }
 }
 
 bool SimulationWorldUpdater::LoadPOI() {
-  if (GetProtoFromASCIIFile(EndWayPointFile(), &poi_)) {
-    return true;
-  }
+  if (GetProtoFromASCIIFile(EndWayPointFile(), &poi_)) { return true; }
 
   AWARN << "Failed to load default list of POI from " << EndWayPointFile();
   return false;

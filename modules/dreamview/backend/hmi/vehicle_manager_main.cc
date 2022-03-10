@@ -19,16 +19,14 @@
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 
-DEFINE_string(vehicle_data_path, "modules/calibration/data/mkz_example",
-              "Vehicle data path.");
+DEFINE_string(vehicle_data_path, "modules/calibration/data/mkz_example", "Vehicle data path.");
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   FLAGS_logtostderr = true;
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  apollo::dreamview::VehicleManager::instance()->UseVehicle(
-      FLAGS_vehicle_data_path);
+  apollo::dreamview::VehicleManager::instance()->UseVehicle(FLAGS_vehicle_data_path);
   AINFO << "Switched to vehicle with data from " << FLAGS_vehicle_data_path;
 
   return 0;

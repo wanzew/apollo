@@ -35,12 +35,11 @@ class CropBox : public IGetBox {
 
   void Init(float crop_scale, float min_crop_size);
 
-  virtual void GetCropBox(const cv::Size &size,
-                          const std::vector<LightPtr> &lights,
-                          cv::Rect *cropbox);
+  virtual void
+  GetCropBox(const cv::Size& size, const std::vector<LightPtr>& lights, cv::Rect* cropbox);
 
  private:
-  float crop_scale_ = 0.0;
+  float crop_scale_    = 0.0;
   float min_crop_size_ = 0.0;
 };
 
@@ -50,9 +49,8 @@ class CropBox : public IGetBox {
  */
 class CropBoxWholeImage : public IGetBox {
  public:
-  virtual void GetCropBox(const cv::Size &size,
-                          const std::vector<LightPtr> &lights,
-                          cv::Rect *cropbox);
+  virtual void
+  GetCropBox(const cv::Size& size, const std::vector<LightPtr>& lights, cv::Rect* cropbox);
 };
 
 }  // namespace traffic_light

@@ -64,8 +64,7 @@ class NaviSpeedDecider : public Task {
    * @param reference_line_info Currently available reference line information.
    * @return Status::OK() if a suitable path is created; error otherwise.
    */
-  apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
   /**
@@ -80,13 +79,15 @@ class NaviSpeedDecider : public Task {
    * @param speed_data Output.
    * @return Status::OK() if a suitable speed-data is created; error otherwise.
    */
-  apollo::common::Status MakeSpeedDecision(
-      double start_v, double start_a, double start_da, double planning_length,
-      const std::vector<common::PathPoint>& path_data_points,
-      const std::vector<const Obstacle*>& obstacles,
-      const std::function<const Obstacle*(const std::string& id)>&
-          find_obstacle,
-      SpeedData* const speed_data);
+  apollo::common::Status
+  MakeSpeedDecision(double                                                       start_v,
+                    double                                                       start_a,
+                    double                                                       start_da,
+                    double                                                       planning_length,
+                    const std::vector<common::PathPoint>&                        path_data_points,
+                    const std::vector<const Obstacle*>&                          obstacles,
+                    const std::function<const Obstacle*(const std::string& id)>& find_obstacle,
+                    SpeedData* const                                             speed_data);
 
   /**
    * @brief Add t-s constraints base on range of perception.
@@ -102,11 +103,10 @@ class NaviSpeedDecider : public Task {
    * @return Status::OK() if success; error otherwise.
    */
   apollo::common::Status AddObstaclesConstraints(
-      double vehicle_speed,
-      const std::vector<common::PathPoint>& path_data_points,
-      const std::vector<const Obstacle*>& obstacles,
-      const std::function<const Obstacle*(const std::string& id)>&
-          find_obstacle);
+      double                                                       vehicle_speed,
+      const std::vector<common::PathPoint>&                        path_data_points,
+      const std::vector<const Obstacle*>&                          obstacles,
+      const std::function<const Obstacle*(const std::string& id)>& find_obstacle);
 
   /**
    * @brief Add t-s constraints base on bends.
@@ -134,7 +134,7 @@ class NaviSpeedDecider : public Task {
   double safe_distance_ratio_;
 
   NaviObstacleDecider obstacle_decider_;
-  NaviSpeedTsGraph ts_graph_;
+  NaviSpeedTsGraph    ts_graph_;
 
   FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedData);
   FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle);

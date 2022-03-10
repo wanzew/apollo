@@ -27,9 +27,7 @@ class MinBoxObjectBuilderTest : public testing::Test {
  protected:
   MinBoxObjectBuilderTest() {}
   ~MinBoxObjectBuilderTest() {}
-  void SetUp() {
-    min_box_object_builder_ = new MinBoxObjectBuilder();
-  }
+  void SetUp() { min_box_object_builder_ = new MinBoxObjectBuilder(); }
   void TearDown() {
     delete min_box_object_builder_;
     min_box_object_builder_ = nullptr;
@@ -40,21 +38,18 @@ class MinBoxObjectBuilderTest : public testing::Test {
 };
 
 bool ConstructPointCloud(std::vector<std::shared_ptr<Object>>* objects) {
-  std::string pcd_data(
-      "modules/perception/data/min_box_object_builder_test/"
-      "QB9178_3_1461381834_1461382134_30651.pcd");
+  std::string   pcd_data("modules/perception/data/min_box_object_builder_test/"
+                       "QB9178_3_1461381834_1461382134_30651.pcd");
   std::ifstream cluster_ifs(pcd_data.c_str(), std::ifstream::in);
-  std::string point_buf;
+  std::string   point_buf;
   while (cluster_ifs.good()) {
     getline(cluster_ifs, point_buf);
     std::stringstream ss;
     ss << point_buf;
     int point_num = 0;
     ss >> point_num;
-    if (point_num <= 0) {
-      continue;
-    }
-    uint64_t intensity;
+    if (point_num <= 0) { continue; }
+    uint64_t                intensity;
     pcl_util::PointCloudPtr cluster_cloud(new pcl_util::PointCloud);
     for (int i = 0; i < point_num; ++i) {
       pcl_util::Point p;

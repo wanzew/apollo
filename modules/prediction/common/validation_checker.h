@@ -37,8 +37,8 @@ class ValidationChecker {
    * @param current speed of obstacle
    * @return probability
    */
-  static double ProbabilityByCentripedalAcceleration(
-      const LaneSequence& lane_sequence, const double speed);
+  static double ProbabilityByCentripedalAcceleration(const LaneSequence& lane_sequence,
+                                                     const double        speed);
 
   /**
    * @brief Check the validity of trajectory's centripedal acceleration
@@ -53,8 +53,7 @@ class ValidationChecker {
    * @param A trajectory point
    * @return True if the trajectory point is valid
    */
-  static bool ValidTrajectoryPoint(
-      const ::apollo::common::TrajectoryPoint& trajectory_point);
+  static bool ValidTrajectoryPoint(const ::apollo::common::TrajectoryPoint& trajectory_point);
 
  private:
   ValidationChecker() = delete;

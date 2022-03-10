@@ -22,22 +22,22 @@ namespace apollo {
 namespace perception {
 
 FrameContent::FrameContent()
-    : pose_v2w_(Eigen::Matrix4d::Identity()),
-      cloud_(new pcl_util::PointCloud),
-      roi_cloud_(new pcl_util::PointCloud),
-      global_offset_initialized_(false) {}
+    : pose_v2w_(Eigen::Matrix4d::Identity())
+    , cloud_(new pcl_util::PointCloud)
+    , roi_cloud_(new pcl_util::PointCloud)
+    , global_offset_initialized_(false) {}
 
 FrameContent::~FrameContent() {}
 
-void FrameContent::SetLidarPose(const Eigen::Matrix4d &pose) {
+void FrameContent::SetLidarPose(const Eigen::Matrix4d& pose) {
   if (!global_offset_initialized_) {
-    global_offset_[0] = -pose(0, 3);
-    global_offset_[1] = -pose(1, 3);
-    global_offset_[2] = -pose(2, 3);
+    global_offset_[0]          = -pose(0, 3);
+    global_offset_[1]          = -pose(1, 3);
+    global_offset_[2]          = -pose(2, 3);
     global_offset_initialized_ = true;
     AINFO << "initial pose " << pose;
-    AINFO << "offset = " << global_offset_[0] << "  " << global_offset_[1]
-          << "  " << global_offset_[2] << "\n";
+    AINFO << "offset = " << global_offset_[0] << "  " << global_offset_[1] << "  "
+          << global_offset_[2] << "\n";
   }
   pose_v2w_ = pose;
   pose_v2w_(0, 3) += global_offset_[0];
@@ -60,14 +60,11 @@ pcl_util::PointCloudPtr FrameContent::GetCloud() { return cloud_; }
 pcl_util::PointCloudPtr FrameContent::GetRoiCloud() { return roi_cloud_; }
 
 bool FrameContent::HasCloud() {
-  if ((cloud_ == nullptr || cloud_->size() == 0)) {
-    return false;
-  }
+  if ((cloud_ == nullptr || cloud_->size() == 0)) { return false; }
   return true;
 }
 
-void FrameContent::OffsetPointcloud(pcl_util::PointCloud *cloud,
-                                    const Eigen::Vector3d &offset) {
+void FrameContent::OffsetPointcloud(pcl_util::PointCloud* cloud, const Eigen::Vector3d& offset) {
   for (size_t i = 0; i < cloud->size(); ++i) {
     cloud->points[i].x += offset[0];
     cloud->points[i].y += offset[1];
@@ -75,8 +72,7 @@ void FrameContent::OffsetPointcloud(pcl_util::PointCloud *cloud,
   }
 }
 
-void FrameContent::OffsetPointcloud(pcl_util::PointDCloud *cloud,
-                                    const Eigen::Vector3d &offset) {
+void FrameContent::OffsetPointcloud(pcl_util::PointDCloud* cloud, const Eigen::Vector3d& offset) {
   for (size_t i = 0; i < cloud->size(); ++i) {
     cloud->points[i].x += offset[0];
     cloud->points[i].y += offset[1];
@@ -84,8 +80,7 @@ void FrameContent::OffsetPointcloud(pcl_util::PointDCloud *cloud,
   }
 }
 
-void FrameContent::OffsetObject(std::shared_ptr<Object> object,
-                                const Eigen::Vector3d &offset) {
+void FrameContent::OffsetObject(std::shared_ptr<Object> object, const Eigen::Vector3d& offset) {
   OffsetPointcloud(object->cloud.get(), offset);
   OffsetPointcloud(&(object->polygon), offset);
 
@@ -94,8 +89,7 @@ void FrameContent::OffsetObject(std::shared_ptr<Object> object,
   object->center[2] += offset[2];
 }
 
-void FrameContent::SetTrackedObjects(
-    const std::vector<std::shared_ptr<Object>> &objects) {
+void FrameContent::SetTrackedObjects(const std::vector<std::shared_ptr<Object>>& objects) {
   tracked_objects_.resize(objects.size());
   for (size_t i = 0; i < objects.size(); ++i) {
     tracked_objects_[i].reset(new Object);
@@ -104,9 +98,7 @@ void FrameContent::SetTrackedObjects(
   }
 }
 
-std::vector<std::shared_ptr<Object>> FrameContent::GetTrackedObjects() {
-  return tracked_objects_;
-}
+std::vector<std::shared_ptr<Object>> FrameContent::GetTrackedObjects() { return tracked_objects_; }
 
 }  // namespace perception
 }  // namespace apollo

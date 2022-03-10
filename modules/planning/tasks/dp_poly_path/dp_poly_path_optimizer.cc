@@ -37,16 +37,16 @@ using apollo::common::Status;
 DpPolyPathOptimizer::DpPolyPathOptimizer()
     : PathOptimizer("DpPolyPathOptimizer") {}
 
-bool DpPolyPathOptimizer::Init(const PlanningConfig &config) {
-  config_ = config.em_planner_config().dp_poly_path_config();
+bool DpPolyPathOptimizer::Init(const PlanningConfig& config) {
+  config_  = config.em_planner_config().dp_poly_path_config();
   is_init_ = true;
   return true;
 }
 
-Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
-                                    const ReferenceLine &,
-                                    const common::TrajectoryPoint &init_point,
-                                    PathData *const path_data) {
+Status DpPolyPathOptimizer::Process(const SpeedData& speed_data,
+                                    const ReferenceLine&,
+                                    const common::TrajectoryPoint& init_point,
+                                    PathData* const                path_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process().";
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
@@ -56,9 +56,7 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
   dp_road_graph.SetDebugLogger(reference_line_info_->mutable_debug());
 
   if (!dp_road_graph.FindPathTunnel(
-          init_point,
-          reference_line_info_->path_decision()->path_obstacles().Items(),
-          path_data)) {
+          init_point, reference_line_info_->path_decision()->path_obstacles().Items(), path_data)) {
     AERROR << "Failed to find tunnel in road graph";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph path generation");
   }

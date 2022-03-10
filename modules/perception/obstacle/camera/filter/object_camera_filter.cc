@@ -23,9 +23,8 @@ using KalmanFilter1D = common::math::KalmanFilter<float, 2, 1, 1>;
 
 bool ObjectCameraFilter::Init() { return true; }
 
-bool ObjectCameraFilter::Filter(
-    const double timestamp,
-    std::vector<std::shared_ptr<VisualObject>> *objects) {
+bool ObjectCameraFilter::Filter(const double                                timestamp,
+                                std::vector<std::shared_ptr<VisualObject>>* objects) {
   if (!objects) return false;
 
   // update lost_frame_count
@@ -51,7 +50,7 @@ bool ObjectCameraFilter::Filter(
 
 std::string ObjectCameraFilter::Name() const { return "ObjectCameraFilter"; }
 
-void ObjectCameraFilter::InitFilter(const float x, KalmanFilter1D *filter) {
+void ObjectCameraFilter::InitFilter(const float x, KalmanFilter1D* filter) {
   CHECK_NOTNULL(filter);
 
   Eigen::Matrix<float, 2, 1> state_x;
@@ -86,10 +85,11 @@ void ObjectCameraFilter::InitFilter(const float x, KalmanFilter1D *filter) {
   filter->SetControlMatrix(b);
 }
 
-void ObjectCameraFilter::Create(const int track_id, const double timestamp,
-                                const std::shared_ptr<VisualObject> &obj_ptr) {
-  tracked_filters_[track_id] = ObjectFilter();
-  tracked_filters_[track_id].track_id_ = track_id;
+void ObjectCameraFilter::Create(const int                            track_id,
+                                const double                         timestamp,
+                                const std::shared_ptr<VisualObject>& obj_ptr) {
+  tracked_filters_[track_id]                 = ObjectFilter();
+  tracked_filters_[track_id].track_id_       = track_id;
   tracked_filters_[track_id].last_timestamp_ = timestamp;
 
   InitFilter(obj_ptr->center.x(), &(tracked_filters_[track_id].x_));
@@ -98,33 +98,26 @@ void ObjectCameraFilter::Create(const int track_id, const double timestamp,
 
   auto x_state_cov = tracked_filters_[track_id].x_.GetStateCovariance();
   auto y_state_cov = tracked_filters_[track_id].y_.GetStateCovariance();
-  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << x_state_cov(0, 0), 0, 0,
-      y_state_cov(0, 0);
-  obj_ptr->state_uncertainty.block(2, 2, 2, 2) << x_state_cov(1, 1), 0, 0,
-      y_state_cov(1, 1);
-  obj_ptr->state_uncertainty.block(0, 2, 2, 2) << x_state_cov(0, 1), 0, 0,
-      y_state_cov(0, 1);
-  obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0,
-      y_state_cov(1, 0);
+  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << x_state_cov(0, 0), 0, 0, y_state_cov(0, 0);
+  obj_ptr->state_uncertainty.block(2, 2, 2, 2) << x_state_cov(1, 1), 0, 0, y_state_cov(1, 1);
+  obj_ptr->state_uncertainty.block(0, 2, 2, 2) << x_state_cov(0, 1), 0, 0, y_state_cov(0, 1);
+  obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0, y_state_cov(1, 0);
 }
 
 void ObjectCameraFilter::Predict(const int track_id, const double timestamp) {
   double time_diff = timestamp - tracked_filters_[track_id].last_timestamp_;
-  float diff = static_cast<float>(time_diff);
+  float  diff      = static_cast<float>(time_diff);
 
-  Eigen::Matrix<float, 2, 2> fx =
-      tracked_filters_[track_id].x_.GetTransitionMatrix();
-  fx(0, 1) = diff;
+  Eigen::Matrix<float, 2, 2> fx = tracked_filters_[track_id].x_.GetTransitionMatrix();
+  fx(0, 1)                      = diff;
   tracked_filters_[track_id].x_.SetTransitionMatrix(fx);
 
-  Eigen::Matrix<float, 2, 2> fy =
-      tracked_filters_[track_id].y_.GetTransitionMatrix();
-  fy(0, 1) = diff;
+  Eigen::Matrix<float, 2, 2> fy = tracked_filters_[track_id].y_.GetTransitionMatrix();
+  fy(0, 1)                      = diff;
   tracked_filters_[track_id].y_.SetTransitionMatrix(fy);
 
-  Eigen::Matrix<float, 2, 2> ft =
-      tracked_filters_[track_id].theta_.GetTransitionMatrix();
-  ft(0, 1) = diff;
+  Eigen::Matrix<float, 2, 2> ft = tracked_filters_[track_id].theta_.GetTransitionMatrix();
+  ft(0, 1)                      = diff;
   tracked_filters_[track_id].theta_.SetTransitionMatrix(ft);
 
   tracked_filters_[track_id].x_.Predict();
@@ -135,8 +128,7 @@ void ObjectCameraFilter::Predict(const int track_id, const double timestamp) {
   tracked_filters_[track_id].last_timestamp_ = timestamp;
 }
 
-void ObjectCameraFilter::Update(const int track_id,
-                                const std::shared_ptr<VisualObject> &obj_ptr) {
+void ObjectCameraFilter::Update(const int track_id, const std::shared_ptr<VisualObject>& obj_ptr) {
   Eigen::Matrix<float, 1, 1> z_x;
   z_x << obj_ptr->center.x();
   tracked_filters_[track_id].x_.Correct(z_x);
@@ -150,45 +142,37 @@ void ObjectCameraFilter::Update(const int track_id,
   tracked_filters_[track_id].theta_.Correct(z_theta);
 }
 
-void ObjectCameraFilter::GetState(const int track_id,
-                                  std::shared_ptr<VisualObject> obj_ptr) {
-  auto x_state = tracked_filters_[track_id].x_.GetStateEstimate();
-  auto y_state = tracked_filters_[track_id].y_.GetStateEstimate();
+void ObjectCameraFilter::GetState(const int track_id, std::shared_ptr<VisualObject> obj_ptr) {
+  auto x_state     = tracked_filters_[track_id].x_.GetStateEstimate();
+  auto y_state     = tracked_filters_[track_id].y_.GetStateEstimate();
   auto x_state_cov = tracked_filters_[track_id].x_.GetStateCovariance();
   auto y_state_cov = tracked_filters_[track_id].y_.GetStateCovariance();
 
-  obj_ptr->center.x() = x_state.x();
+  obj_ptr->center.x()   = x_state.x();
   obj_ptr->velocity.x() = x_state.y();
 
-  obj_ptr->center.y() = y_state.x();
+  obj_ptr->center.y()   = y_state.x();
   obj_ptr->velocity.y() = y_state.y();
 
-  obj_ptr->center.z() = 0.0f;
+  obj_ptr->center.z()   = 0.0f;
   obj_ptr->velocity.z() = 0.0f;
 
-  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << x_state_cov(0, 0), 0, 0,
-      y_state_cov(0, 0);
-  obj_ptr->state_uncertainty.block(2, 2, 2, 2) << x_state_cov(1, 1), 0, 0,
-      y_state_cov(1, 1);
-  obj_ptr->state_uncertainty.block(0, 2, 2, 2) << x_state_cov(0, 1), 0, 0,
-      y_state_cov(0, 1);
-  obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0,
-      y_state_cov(1, 0);
+  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << x_state_cov(0, 0), 0, 0, y_state_cov(0, 0);
+  obj_ptr->state_uncertainty.block(2, 2, 2, 2) << x_state_cov(1, 1), 0, 0, y_state_cov(1, 1);
+  obj_ptr->state_uncertainty.block(0, 2, 2, 2) << x_state_cov(0, 1), 0, 0, y_state_cov(0, 1);
+  obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0, y_state_cov(1, 0);
 
-  obj_ptr->theta = tracked_filters_[track_id].theta_.GetStateEstimate().x();
-  obj_ptr->direction =
-      Eigen::Vector3f(cos(obj_ptr->theta), 0.0f, -sin(obj_ptr->theta));
+  obj_ptr->theta     = tracked_filters_[track_id].theta_.GetStateEstimate().x();
+  obj_ptr->direction = Eigen::Vector3f(cos(obj_ptr->theta), 0.0f, -sin(obj_ptr->theta));
 }
 
 void ObjectCameraFilter::Destroy() {
   std::vector<int> id_to_destroy;
-  for (const auto &p : tracked_filters_) {
-    if (p.second.lost_frame_cnt_ > kMaxKeptFrameCnt) {
-      id_to_destroy.emplace_back(p.first);
-    }
+  for (const auto& p : tracked_filters_) {
+    if (p.second.lost_frame_cnt_ > kMaxKeptFrameCnt) { id_to_destroy.emplace_back(p.first); }
   }
 
-  for (const auto &id : id_to_destroy) {
+  for (const auto& id : id_to_destroy) {
     tracked_filters_.erase(id);
   }
 }

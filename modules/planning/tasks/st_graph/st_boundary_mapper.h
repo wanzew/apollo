@@ -39,57 +39,56 @@ namespace planning {
 
 class StBoundaryMapper {
  public:
-  StBoundaryMapper(const SLBoundary& adc_sl_boundary,
+  StBoundaryMapper(const SLBoundary&       adc_sl_boundary,
                    const StBoundaryConfig& config,
-                   const ReferenceLine& reference_line,
-                   const PathData& path_data, const double planning_distance,
-                   const double planning_time, const bool is_change_lane);
+                   const ReferenceLine&    reference_line,
+                   const PathData&         path_data,
+                   const double            planning_distance,
+                   const double            planning_time,
+                   const bool              is_change_lane);
 
   virtual ~StBoundaryMapper() = default;
 
   apollo::common::Status CreateStBoundary(PathDecision* path_decision) const;
 
-  apollo::common::Status CreateStBoundaryWithHistory(
-      const ObjectDecisions& history_decisions,
-      PathDecision* path_decision) const;
+  apollo::common::Status CreateStBoundaryWithHistory(const ObjectDecisions& history_decisions,
+                                                     PathDecision*          path_decision) const;
 
-  apollo::common::Status CreateStBoundary(
-      PathObstacle* path_obstacle,
-      const ObjectDecisionType& external_decision) const;
+  apollo::common::Status CreateStBoundary(PathObstacle*             path_obstacle,
+                                          const ObjectDecisionType& external_decision) const;
 
  private:
   FRIEND_TEST(StBoundaryMapperTest, check_overlap_test);
-  bool CheckOverlap(const apollo::common::PathPoint& path_point,
+  bool CheckOverlap(const apollo::common::PathPoint&   path_point,
                     const apollo::common::math::Box2d& obs_box,
-                    const double buffer) const;
+                    const double                       buffer) const;
 
   /**
    * Creates valid st boundary upper_points and lower_points
    * If return true, upper_points.size() > 1 and
    * upper_points.size() = lower_points.size()
    */
-  bool GetOverlapBoundaryPoints(
-      const std::vector<apollo::common::PathPoint>& path_points,
-      const Obstacle& obstacle, std::vector<STPoint>* upper_points,
-      std::vector<STPoint>* lower_points) const;
+  bool GetOverlapBoundaryPoints(const std::vector<apollo::common::PathPoint>& path_points,
+                                const Obstacle&                               obstacle,
+                                std::vector<STPoint>*                         upper_points,
+                                std::vector<STPoint>*                         lower_points) const;
 
   apollo::common::Status MapWithoutDecision(PathObstacle* path_obstacle) const;
 
-  bool MapStopDecision(PathObstacle* stop_obstacle,
-                       const ObjectDecisionType& decision) const;
+  bool MapStopDecision(PathObstacle* stop_obstacle, const ObjectDecisionType& decision) const;
 
-  apollo::common::Status MapWithDecision(
-      PathObstacle* path_obstacle, const ObjectDecisionType& decision) const;
+  apollo::common::Status MapWithDecision(PathObstacle*             path_obstacle,
+                                         const ObjectDecisionType& decision) const;
 
  private:
-  const SLBoundary& adc_sl_boundary_;
-  const StBoundaryConfig& st_boundary_config_;
-  const ReferenceLine& reference_line_;
-  const PathData& path_data_;
+  const SLBoundary&                   adc_sl_boundary_;
+  const StBoundaryConfig&             st_boundary_config_;
+  const ReferenceLine&                reference_line_;
+  const PathData&                     path_data_;
   const apollo::common::VehicleParam& vehicle_param_;
-  const double planning_distance_;
-  const double planning_time_;
-  bool is_change_lane_ = false;
+  const double                        planning_distance_;
+  const double                        planning_time_;
+  bool                                is_change_lane_ = false;
 };
 
 }  // namespace planning

@@ -18,8 +18,8 @@
 
 #include <cmath>
 
-#include "gtest/gtest.h"
 #include "modules/common/math/sin_table.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {

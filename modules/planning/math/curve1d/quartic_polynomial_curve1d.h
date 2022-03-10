@@ -36,10 +36,13 @@ class QuarticPolynomialCurve1d : public PolynomialCurve1d {
 
   QuarticPolynomialCurve1d(const std::array<double, 3>& start,
                            const std::array<double, 2>& end,
-                           const double param);
+                           const double                 param);
 
-  QuarticPolynomialCurve1d(const double x0, const double dx0, const double ddx0,
-                           const double dx1, const double ddx1,
+  QuarticPolynomialCurve1d(const double x0,
+                           const double dx0,
+                           const double ddx0,
+                           const double dx1,
+                           const double ddx1,
                            const double param);
 
   QuarticPolynomialCurve1d(const QuarticPolynomialCurve1d& other);
@@ -48,17 +51,20 @@ class QuarticPolynomialCurve1d : public PolynomialCurve1d {
 
   double Evaluate(const std::uint32_t order, const double p) const override;
 
-  double ParamLength() const override { return param_; }
+  double      ParamLength() const override { return param_; }
   std::string ToString() const override;
 
  private:
-  void ComputeCoefficients(const double x0, const double dx0, const double ddx0,
-                           const double dx1, const double ddx1,
+  void ComputeCoefficients(const double x0,
+                           const double dx0,
+                           const double ddx0,
+                           const double dx1,
+                           const double ddx1,
                            const double param);
 
-  std::array<double, 5> coef_ = {{0.0, 0.0, 0.0, 0.0, 0.0}};
+  std::array<double, 5> coef_            = {{0.0, 0.0, 0.0, 0.0, 0.0}};
   std::array<double, 3> start_condition_ = {{0.0, 0.0, 0.0}};
-  std::array<double, 2> end_condition_ = {{0.0, 0.0}};
+  std::array<double, 2> end_condition_   = {{0.0, 0.0}};
 };
 
 }  // namespace planning

@@ -55,8 +55,8 @@ class ActiveSetQpSolver : public QpSolver {
   double qp_eps_num() const;
   double qp_eps_den() const;
   double qp_eps_iter_ref() const;
-  bool debug_info() const;
-  int max_iteration() const;
+  bool   debug_info() const;
+  int    max_iteration() const;
 
   double l_lower_bound() const;
   double l_upper_bound() const;
@@ -67,9 +67,7 @@ class ActiveSetQpSolver : public QpSolver {
     // is switched on at no additional computational cost
     hessian_type_ = ::qpOASES::HST_SEMIDEF;
   }
-  void set_pos_definite_hessian() override {
-    hessian_type_ = ::qpOASES::HST_POSDEF;
-  }
+  void set_pos_definite_hessian() override { hessian_type_ = ::qpOASES::HST_POSDEF; }
 
   void EnableCholeskyRefactorisation(const int num) override {
     // Specifies the frequency of full factorisation refactorisations of the
@@ -90,10 +88,10 @@ class ActiveSetQpSolver : public QpSolver {
   // number of parameters
   int num_param_ = 0;
 
-  double qp_eps_num_ = 0.0;
-  double qp_eps_den_ = 0.0;
+  double qp_eps_num_      = 0.0;
+  double qp_eps_den_      = 0.0;
   double qp_eps_iter_ref_ = 0.0;
-  bool debug_info_ = false;
+  bool   debug_info_      = false;
 
   // parameter search bound
   double l_lower_bound_ = -1e10;
@@ -101,11 +99,11 @@ class ActiveSetQpSolver : public QpSolver {
 
   // constraint search upper bound
   double constraint_upper_bound_ = 1e10;
-  int max_iteration_ = 1000;
+  int    max_iteration_          = 1000;
 
-  ::qpOASES::HessianType hessian_type_ = ::qpOASES::HST_UNKNOWN;
-  int cholesky_refactorisation_freq_ = 0;
-  double termination_tolerance_ = 1.0e-9;
+  ::qpOASES::HessianType hessian_type_                  = ::qpOASES::HST_UNKNOWN;
+  int                    cholesky_refactorisation_freq_ = 0;
+  double                 termination_tolerance_         = 1.0e-9;
 };
 
 }  // namespace math

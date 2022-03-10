@@ -36,8 +36,10 @@ using apollo::localization::LocalizationEstimate;
 using sensor_msgs::PointCloud2;
 using Json = nlohmann::json;
 
-PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
-    : websocket_(websocket), point_cloud_str_(""), future_ready_(true) {
+PointCloudUpdater::PointCloudUpdater(WebSocketHandler* websocket)
+    : websocket_(websocket)
+    , point_cloud_str_("")
+    , future_ready_(true) {
   RegisterMessageHandlers();
 }
 
@@ -45,16 +47,14 @@ PointCloudUpdater::~PointCloudUpdater() { Stop(); }
 
 void PointCloudUpdater::RegisterMessageHandlers() {
   // Send current point_cloud status to the new client.
-  websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection *conn) {
-        Json response;
-        response["type"] = "PointCloudStatus";
-        response["enabled"] = enabled_;
-        websocket_->SendData(conn, response.dump());
-      });
+  websocket_->RegisterConnectionReadyHandler([this](WebSocketHandler::Connection* conn) {
+    Json response;
+    response["type"]    = "PointCloudStatus";
+    response["enabled"] = enabled_;
+    websocket_->SendData(conn, response.dump());
+  });
   websocket_->RegisterMessageHandler(
-      "RequestPointCloud",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "RequestPointCloud", [this](const Json& json, WebSocketHandler::Connection* conn) {
         std::string to_send;
         // If there is no point_cloud data for more than 2 seconds, reset.
         if (point_cloud_str_ != "" &&
@@ -68,62 +68,52 @@ void PointCloudUpdater::RegisterMessageHandlers() {
         }
         websocket_->SendBinaryData(conn, to_send, true);
       });
-  websocket_->RegisterMessageHandler(
-      "TogglePointCloud",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto enable = json.find("enable");
-        if (enable != json.end() && enable->is_boolean()) {
-          if (*enable) {
-            enabled_ = true;
-          } else {
-            enabled_ = false;
-          }
-          if (websocket_) {
-            Json response;
-            response["type"] = "PointCloudStatus";
-            response["enabled"] = enabled_;
-            // Sync the point_cloud status across all the clients.
-            websocket_->BroadcastData(response.dump());
-          }
-        }
-      });
+  websocket_->RegisterMessageHandler("TogglePointCloud",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       auto enable = json.find("enable");
+                                       if (enable != json.end() && enable->is_boolean()) {
+                                         if (*enable) {
+                                           enabled_ = true;
+                                         } else {
+                                           enabled_ = false;
+                                         }
+                                         if (websocket_) {
+                                           Json response;
+                                           response["type"]    = "PointCloudStatus";
+                                           response["enabled"] = enabled_;
+                                           // Sync the point_cloud status across all the clients.
+                                           websocket_->BroadcastData(response.dump());
+                                         }
+                                       }
+                                     });
 }
 
 void PointCloudUpdater::Start() {
-  AdapterManager::AddPointCloudCallback(&PointCloudUpdater::UpdatePointCloud,
-                                        this);
-  AdapterManager::AddLocalizationCallback(
-      &PointCloudUpdater::UpdateLocalizationTime, this);
+  AdapterManager::AddPointCloudCallback(&PointCloudUpdater::UpdatePointCloud, this);
+  AdapterManager::AddLocalizationCallback(&PointCloudUpdater::UpdateLocalizationTime, this);
 }
 
 void PointCloudUpdater::Stop() {
-  if (enabled_) {
-    async_future_.wait();
-  }
+  if (enabled_) { async_future_.wait(); }
 }
 
-void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
-  if (!enabled_) {
-    return;
-  }
+void PointCloudUpdater::UpdatePointCloud(const PointCloud2& point_cloud) {
+  if (!enabled_) { return; }
 
   last_point_cloud_time_ = point_cloud.header.stamp.toSec();
   // Check if last filter process has finished before processing new data.
   if (future_ready_) {
     future_ready_ = false;
     // transform from ros to pcl
-    pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(
-        new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromROSMsg(point_cloud, *pcl_ptr);
     std::future<void> f =
-        std::async(std::launch::async, &PointCloudUpdater::FilterPointCloud,
-                   this, pcl_ptr);
+        std::async(std::launch::async, &PointCloudUpdater::FilterPointCloud, this, pcl_ptr);
     async_future_ = std::move(f);
   }
 }
 
-void PointCloudUpdater::FilterPointCloud(
-    pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr) {
+void PointCloudUpdater::FilterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr) {
   pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
   voxel_grid.setInputCloud(pcl_ptr);
   voxel_grid.setLeafSize(FLAGS_voxel_filter_size, FLAGS_voxel_filter_size,
@@ -133,7 +123,7 @@ void PointCloudUpdater::FilterPointCloud(
 
   PointCloud point_cloud_pb;
   for (size_t idx = 0; idx < pcl_ptr->size(); ++idx) {
-    pcl::PointXYZ &pt = pcl_ptr->points[idx];
+    pcl::PointXYZ& pt = pcl_ptr->points[idx];
     if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z)) {
       point_cloud_pb.add_num(pt.x);
       point_cloud_pb.add_num(pt.y);
@@ -149,8 +139,7 @@ void PointCloudUpdater::FilterPointCloud(
   }
 }
 
-void PointCloudUpdater::UpdateLocalizationTime(
-    const LocalizationEstimate &localization) {
+void PointCloudUpdater::UpdateLocalizationTime(const LocalizationEstimate& localization) {
   last_localization_time_ = localization.header().timestamp_sec();
 }
 

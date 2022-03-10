@@ -36,10 +36,9 @@ namespace hdmap {
 DEFINE_string(test_map_file,
               "modules/map/data/sunnyvale_loop/base_map_test.bin",
               "The test map file");
-DEFINE_string(
-    test_routing_file,
-    "modules/map/pnc_map/testdata/sample_sunnyvale_loop_routing.pb.txt",
-    "The test map file");
+DEFINE_string(test_routing_file,
+              "modules/map/pnc_map/testdata/sample_sunnyvale_loop_routing.pb.txt",
+              "The test map file");
 
 class PncMapTest : public ::testing::Test {
  public:
@@ -66,12 +65,12 @@ class PncMapTest : public ::testing::Test {
   }
 
   static routing::RoutingResponse routing_;
-  static std::unique_ptr<PncMap> pnc_map_;
-  static hdmap::HDMap hdmap_;
+  static std::unique_ptr<PncMap>  pnc_map_;
+  static hdmap::HDMap             hdmap_;
 };
 
-std::unique_ptr<PncMap> PncMapTest::pnc_map_;
-hdmap::HDMap PncMapTest::hdmap_;
+std::unique_ptr<PncMap>  PncMapTest::pnc_map_;
+hdmap::HDMap             PncMapTest::hdmap_;
 routing::RoutingResponse PncMapTest::routing_;
 
 TEST_F(PncMapTest, UpdateRouting) {
@@ -82,7 +81,7 @@ TEST_F(PncMapTest, UpdateRouting) {
 }
 
 TEST_F(PncMapTest, GetNearestPointFromRouting) {
-  LaneWaypoint waypoint;
+  LaneWaypoint         waypoint;
   common::VehicleState state;
   state.set_x(587174.662136);
   state.set_y(4140933.06302);  // the lane heading at this spot is about 0.9 PI
@@ -98,14 +97,14 @@ TEST_F(PncMapTest, UpdateWaypointIndex) {
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
   ASSERT_TRUE(lane);
   LaneWaypoint waypoint(lane, 60.757099);
-  auto result = pnc_map_->GetWaypointIndex(waypoint);
+  auto         result = pnc_map_->GetWaypointIndex(waypoint);
   EXPECT_EQ(14, result);
 }
 
 TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   ASSERT_TRUE(lane);
-  auto point = lane->GetSmoothPoint(0);
+  auto                 point = lane->GetSmoothPoint(0);
   common::VehicleState state;
   state.set_x(point.x());
   state.set_y(point.y());
@@ -125,7 +124,7 @@ TEST_F(PncMapTest, GetRouteSegments_NoChangeLane) {
 
 TEST_F(PncMapTest, UpdateNextRoutingWaypointIndex) {
   pnc_map_->next_routing_waypoint_index_ = 0;
-  pnc_map_->adc_waypoint_.s = 0;
+  pnc_map_->adc_waypoint_.s              = 0;
   pnc_map_->UpdateNextRoutingWaypointIndex(0);
   EXPECT_EQ(0, pnc_map_->next_routing_waypoint_index_);
 
@@ -133,12 +132,10 @@ TEST_F(PncMapTest, UpdateNextRoutingWaypointIndex) {
   pnc_map_->UpdateNextRoutingWaypointIndex(0);
   EXPECT_EQ(1, pnc_map_->next_routing_waypoint_index_);
 
-  pnc_map_->adc_waypoint_.s = 63.6,
-  pnc_map_->UpdateNextRoutingWaypointIndex(18);
+  pnc_map_->adc_waypoint_.s = 63.6, pnc_map_->UpdateNextRoutingWaypointIndex(18);
   EXPECT_EQ(3, pnc_map_->next_routing_waypoint_index_);
 
-  pnc_map_->adc_waypoint_.s = 63.8,
-  pnc_map_->UpdateNextRoutingWaypointIndex(17);
+  pnc_map_->adc_waypoint_.s = 63.8, pnc_map_->UpdateNextRoutingWaypointIndex(17);
   EXPECT_EQ(3, pnc_map_->next_routing_waypoint_index_);
 
   pnc_map_->adc_waypoint_.s = 50;
@@ -158,16 +155,16 @@ TEST_F(PncMapTest, GetRouteSegments_ChangeLane) {
   auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   ASSERT_TRUE(lane);
   common::VehicleState state;
-  auto point = lane->GetSmoothPoint(35);  // larger than kMinLaneKeepingDistance
+  auto                 point = lane->GetSmoothPoint(35);  // larger than kMinLaneKeepingDistance
   state.set_x(point.x());
   state.set_y(point.y());
   state.set_z(point.y());
   state.set_heading(M_PI);
   std::list<RouteSegments> segments;
-  bool result = pnc_map_->GetRouteSegments(state, 10, 30, &segments);
+  bool                     result = pnc_map_->GetRouteSegments(state, 10, 30, &segments);
   ASSERT_TRUE(result);
   ASSERT_EQ(2, segments.size());
-  const auto& first = segments.front();
+  const auto& first  = segments.front();
   const auto& second = segments.back();
   EXPECT_NEAR(40, RouteLength(first), 1e-4);
   EXPECT_EQ(routing::LEFT, first.NextAction());
@@ -188,9 +185,9 @@ TEST_F(PncMapTest, NextWaypointIndex) {
 }
 
 TEST_F(PncMapTest, SearchForwardIndex_SearchBackwardIndex) {
-  auto lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
+  auto         lane = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-2"));
   LaneWaypoint waypoint(lane, 3.0);
-  auto result = pnc_map_->SearchForwardWaypointIndex(0, waypoint);
+  auto         result = pnc_map_->SearchForwardWaypointIndex(0, waypoint);
   EXPECT_EQ(11, result);
   result = pnc_map_->SearchBackwardWaypointIndex(0, waypoint);
   EXPECT_EQ(-1, result);

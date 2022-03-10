@@ -51,8 +51,7 @@ class BaseCameraConverter {
 };
 
 REGISTER_REGISTERER(BaseCameraConverter);
-#define REGISTER_CAMERA_CONVERTER(name) \
-  REGISTER_CLASS(BaseCameraConverter, name)
+#define REGISTER_CAMERA_CONVERTER(name) REGISTER_CLASS(BaseCameraConverter, name)
 
 }  // namespace perception
 }  // namespace apollo

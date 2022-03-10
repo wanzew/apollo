@@ -41,11 +41,15 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
   QuinticSpiralPath() = default;
 
   QuinticSpiralPath(const std::array<double, 3>& start,
-                    const std::array<double, 3>& end, const double delta_s);
+                    const std::array<double, 3>& end,
+                    const double                 delta_s);
 
-  QuinticSpiralPath(const double theta0, const double kappa0,
-                    const double dkappa0, const double theta1,
-                    const double kappa1, const double dkappa1,
+  QuinticSpiralPath(const double theta0,
+                    const double kappa0,
+                    const double dkappa0,
+                    const double theta1,
+                    const double kappa1,
+                    const double dkappa1,
                     const double delta_s);
 
   template <std::size_t N>
@@ -67,20 +71,18 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
   }
 
   template <std::size_t N>
-  std::pair<double, double> DeriveCartesianDeviation(
-      const std::size_t param_index) const {
-    auto gauss_points = common::math::GetGaussLegendrePoints<N>();
-    std::array<double, N> x = gauss_points.first;
-    std::array<double, N> w = gauss_points.second;
+  std::pair<double, double> DeriveCartesianDeviation(const std::size_t param_index) const {
+    auto                  gauss_points = common::math::GetGaussLegendrePoints<N>();
+    std::array<double, N> x            = gauss_points.first;
+    std::array<double, N> w            = gauss_points.second;
 
     std::pair<double, double> cartesian_deviation = {0.0, 0.0};
     for (std::size_t i = 0; i < N; ++i) {
-      double r = 0.5 * x[i] + 0.5;
-      auto curr_theta = Evaluate(0, r * param_);
+      double r             = 0.5 * x[i] + 0.5;
+      auto   curr_theta    = Evaluate(0, r * param_);
       double derived_theta = DeriveTheta(param_index, r);
 
-      cartesian_deviation.first +=
-          w[i] * (-std::sin(curr_theta)) * derived_theta;
+      cartesian_deviation.first += w[i] * (-std::sin(curr_theta)) * derived_theta;
       cartesian_deviation.second += w[i] * std::cos(curr_theta) * derived_theta;
     }
 
@@ -89,8 +91,8 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
 
     if (param_index == DELTA_S) {
       for (std::size_t i = 0; i < N; ++i) {
-        double r = 0.5 * x[i] + 0.5;
-        auto theta_angle = Evaluate(0, r * param_);
+        double r           = 0.5 * x[i] + 0.5;
+        auto   theta_angle = Evaluate(0, r * param_);
 
         cartesian_deviation.first += 0.5 * w[i] * std::cos(theta_angle);
         cartesian_deviation.second += 0.5 * w[i] * std::sin(theta_angle);
@@ -99,26 +101,22 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     return cartesian_deviation;
   }
 
-  double DeriveKappaDerivative(const std::size_t param_index,
-                               const double ratio) const;
+  double DeriveKappaDerivative(const std::size_t param_index, const double ratio) const;
 
-  double DeriveDKappaDerivative(const std::size_t param_index,
-                                const double ratio) const;
+  double DeriveDKappaDerivative(const std::size_t param_index, const double ratio) const;
 
-  double DeriveD2KappaDerivative(const std::size_t param_index,
-                                 const double r) const;
+  double DeriveD2KappaDerivative(const std::size_t param_index, const double r) const;
 
-  static const std::size_t THETA0 = 0;
-  static const std::size_t KAPPA0 = 1;
+  static const std::size_t THETA0  = 0;
+  static const std::size_t KAPPA0  = 1;
   static const std::size_t DKAPPA0 = 2;
-  static const std::size_t THETA1 = 3;
-  static const std::size_t KAPPA1 = 4;
+  static const std::size_t THETA1  = 3;
+  static const std::size_t KAPPA1  = 4;
   static const std::size_t DKAPPA1 = 5;
   static const std::size_t DELTA_S = 6;
 
  private:
-  double DeriveTheta(const std::size_t param_index,
-                     const double delta_s_ratio) const;
+  double DeriveTheta(const std::size_t param_index, const double delta_s_ratio) const;
 
   std::array<std::array<double, 7>, 6> coef_deriv_;
 };

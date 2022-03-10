@@ -40,20 +40,19 @@ class PlaneMotion {
 
  private:
   std::list<VehicleStatus> raw_motion_queue_;
-  MotionBufferPtr mot_buffer_;
-  Mutex mutex_;
-  int buffer_size_;
-  int time_increment_;     // the time increment units in motion input
-  float time_difference_;  // the time difference for each buffer input
-  MotionType mat_motion_sensor_ = MotionType::Identity();
+  MotionBufferPtr          mot_buffer_;
+  Mutex                    mutex_;
+  int                      buffer_size_;
+  int                      time_increment_;   // the time increment units in motion input
+  float                    time_difference_;  // the time difference for each buffer input
+  MotionType               mat_motion_sensor_ = MotionType::Identity();
   // motion matrix of accumulation through high sampling CAN+IMU input sequence
   bool is_3d_motion_;
-  void generate_motion_matrix(
-      VehicleStatus *vehicledata);  // generate inverse motion
+  void generate_motion_matrix(VehicleStatus* vehicledata);  // generate inverse motion
   void accumulate_motion(double start_time, double end_time);
-  void update_motion_buffer(const VehicleStatus &vehicledata,
-                            const double pre_image_timestamp,
-                            const double image_timestamp);
+  void update_motion_buffer(const VehicleStatus& vehicledata,
+                            const double         pre_image_timestamp,
+                            const double         image_timestamp);
 
  public:
   void cleanbuffer() {
@@ -81,12 +80,14 @@ class PlaneMotion {
   //   void add_new_motion(VehicleStatus *vehicledata, float motion_time_dif,
   //                      int motion_operation_flag);
 
-  void add_new_motion(double pre_image_timestamp, double image_timestamp,
-                      int motion_operation_flag, VehicleStatus *vehicledata);
+  void add_new_motion(double         pre_image_timestamp,
+                      double         image_timestamp,
+                      int            motion_operation_flag,
+                      VehicleStatus* vehicledata);
 
   MotionBuffer get_buffer();
-  bool find_motion_with_timestamp(double timestamp, VehicleStatus *vs);
-  bool is_3d_motion() const { return is_3d_motion_; }
+  bool         find_motion_with_timestamp(double timestamp, VehicleStatus* vs);
+  bool         is_3d_motion() const { return is_3d_motion_; }
 };
 
 }  // namespace perception

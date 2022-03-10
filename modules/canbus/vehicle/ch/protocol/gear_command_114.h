@@ -23,8 +23,8 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Gearcommand114 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Gearcommand114
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

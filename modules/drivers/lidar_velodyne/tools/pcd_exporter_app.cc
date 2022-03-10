@@ -16,25 +16,23 @@
 
 #include <string>
 
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/apollo_app.h"
+#include "modules/common/log.h"
 #include "modules/drivers/lidar_velodyne/tools/pcd_exporter.h"
 #include "modules/drivers/lidar_velodyne/tools/pcd_exporter_app.h"
 #include "modules/drivers/lidar_velodyne/tools/tools_gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
-#include "modules/common/apollo_app.h"
 
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::GetProtoFromFile;
 
-std::string PcdApp::Name() const {
-  return FLAGS_tools_module_name;
-}
+std::string PcdApp::Name() const { return FLAGS_tools_module_name; }
 
 Status PcdApp::Init() {
   VelodyneToolsConf conf;
@@ -72,10 +70,9 @@ void PcdApp::Stop() {
 }
 
 void PcdApp::OnPointCloud(const sensor_msgs::PointCloud2& message) {
-    exporter_->pcd_writer_callback(message);
+  exporter_->pcd_writer_callback(message);
 }
 
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
-

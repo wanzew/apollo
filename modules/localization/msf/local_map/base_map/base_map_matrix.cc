@@ -28,8 +28,7 @@ BaseMapMatrix::BaseMapMatrix(const BaseMapMatrix& cells) {}
 
 unsigned int BaseMapMatrix::LoadBinary(unsigned char* buf) { return 0; }
 
-unsigned int BaseMapMatrix::CreateBinary(unsigned char* buf,
-                                         unsigned int buf_size) const {
+unsigned int BaseMapMatrix::CreateBinary(unsigned char* buf, unsigned int buf_size) const {
   return 0;
 }
 

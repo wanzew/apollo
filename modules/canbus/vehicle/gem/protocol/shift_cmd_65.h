@@ -24,8 +24,7 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Shiftcmd65 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+class Shiftcmd65 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

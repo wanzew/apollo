@@ -90,8 +90,7 @@ namespace common {
 namespace util {
 template <typename ProtoA, typename ProtoB>
 bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
-  return a.GetTypeName() == b.GetTypeName() &&
-         a.SerializeAsString() == b.SerializeAsString();
+  return a.GetTypeName() == b.GetTypeName() && a.SerializeAsString() == b.SerializeAsString();
   // Test shows that the above method is 5 times faster than the
   // API: google::protobuf::util::MessageDifferencer::Equals(a, b);
 }
@@ -127,15 +126,18 @@ PointENU operator+(const PointENU enu, const math::Vec2d& xy);
 
 PointENU MakePointENU(const math::Vec2d& xy);
 
-apollo::perception::Point MakePerceptionPoint(const double x, const double y,
-                                              const double z);
+apollo::perception::Point MakePerceptionPoint(const double x, const double y, const double z);
 
-SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
-                          const double a, const double da);
+SpeedPoint
+MakeSpeedPoint(const double s, const double t, const double v, const double a, const double da);
 
-PathPoint MakePathPoint(const double x, const double y, const double z,
-                        const double theta, const double kappa,
-                        const double dkappa, const double ddkappa);
+PathPoint MakePathPoint(const double x,
+                        const double y,
+                        const double z,
+                        const double theta,
+                        const double kappa,
+                        const double dkappa,
+                        const double ddkappa);
 
 /**
  * uniformly slice a segment [start, end] to num + 1 pieces
@@ -143,11 +145,8 @@ PathPoint MakePathPoint(const double x, const double y, const double z,
  * segment. `start` and `end` will be the first and last element in `sliced`.
  */
 template <typename T>
-void uniform_slice(const T start, const T end, uint32_t num,
-                   std::vector<T>* sliced) {
-  if (!sliced || num == 0) {
-    return;
-  }
+void uniform_slice(const T start, const T end, uint32_t num, std::vector<T>* sliced) {
+  if (!sliced || num == 0) { return; }
   const T delta = (end - start) / num;
   sliced->resize(num + 1);
   T s = start;
@@ -173,9 +172,7 @@ std::unordered_set<T> Intersection(const std::unordered_set<T>& s1,
   if (s1.size() < s2.size()) {
     std::unordered_set<T> result;
     for (const auto& v : s1) {
-      if (s2.count(v) > 0) {
-        result.insert(v);
-      }
+      if (s2.count(v) > 0) { result.insert(v); }
     }
     return result;
   } else {
@@ -212,7 +209,8 @@ bool SamePointXY(const U& u, const V& v) {
 
 PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
                                             const PathPoint& p2,
-                                            const double w1, const double w2);
+                                            const double     w1,
+                                            const double     w2);
 
 // a wrapper template function for remove_if (notice that remove_if cannot
 // change the Container size)

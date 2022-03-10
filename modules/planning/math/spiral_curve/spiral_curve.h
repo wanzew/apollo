@@ -35,8 +35,7 @@ namespace planning {
 
 class SpiralCurve {
  public:
-  SpiralCurve(const common::PathPoint& s, const common::PathPoint& e,
-              const std::uint32_t order);
+  SpiralCurve(const common::PathPoint& s, const common::PathPoint& e, const std::uint32_t order);
   virtual ~SpiralCurve() = default;
 
   /**
@@ -54,34 +53,32 @@ class SpiralCurve {
    * @brief Output methods
    **/
   const std::vector<double>& p_params() const;
-  const SpiralCurveConfig& spiral_config() const;
-  const common::PathPoint& start_point() const;
-  const common::PathPoint& end_point() const;
-  double sg() const;
-  double error() const;
+  const SpiralCurveConfig&   spiral_config() const;
+  const common::PathPoint&   start_point() const;
+  const common::PathPoint&   end_point() const;
+  double                     sg() const;
+  double                     error() const;
 
   /**
    * @brief Get path vector with sampling size n
    * @return sequence of sampling points
    **/
-  virtual common::Status GetPathVec(
-      const std::uint32_t n,
-      std::vector<common::PathPoint>* path_points) const = 0;
+  virtual common::Status GetPathVec(const std::uint32_t             n,
+                                    std::vector<common::PathPoint>* path_points) const = 0;
   /**
    * @brief Calculate quintic path point at s locations along the whole path.
    * @return vector of path points
    **/
-  virtual common::Status GetPathVecWithS(
-      const std::vector<double>& vec_s,
-      std::vector<common::PathPoint>* path_points) const = 0;
+  virtual common::Status GetPathVecWithS(const std::vector<double>&      vec_s,
+                                         std::vector<common::PathPoint>* path_points) const = 0;
 
  private:
   const common::PathPoint* start_point_;
   const common::PathPoint* end_point_;
-  std::vector<double> p_params_;
-  double sg_;
-  double error_;
-  SpiralCurveConfig spiral_config_;
+  std::vector<double>      p_params_;
+  double                   sg_;
+  double                   error_;
+  SpiralCurveConfig        spiral_config_;
 
  protected:
   void set_sg(const double sg);

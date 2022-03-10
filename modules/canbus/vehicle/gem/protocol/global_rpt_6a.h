@@ -24,13 +24,12 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Globalrpt6a : public ::apollo::drivers::canbus::ProtocolData<
-                        ::apollo::canbus::ChassisDetail> {
+class Globalrpt6a
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Globalrpt6a();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'PACMOD_STATUS', 'enum': {0:
@@ -39,15 +38,15 @@ class Globalrpt6a : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
   Global_rpt_6a::Pacmod_statusType pacmod_status(const std::uint8_t* bytes,
-                                                 const int32_t length) const;
+                                                 const int32_t       length) const;
 
   // config detail: {'name': 'OVERRIDE_STATUS', 'enum': {0:
   // 'OVERRIDE_STATUS_NOT_OVERRIDDEN', 1: 'OVERRIDE_STATUS_OVERRIDDEN'},
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Global_rpt_6a::Override_statusType override_status(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Global_rpt_6a::Override_statusType override_status(const std::uint8_t* bytes,
+                                                     const int32_t       length) const;
 
   // config detail: {'name': 'VEH_CAN_TIMEOUT', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 2,
@@ -64,8 +63,8 @@ class Globalrpt6a : public ::apollo::drivers::canbus::ProtocolData<
   // 'BRK_CAN_TIMEOUT_ACTIVE_CAN_TIMEOUT'}, 'precision': 1.0, 'len': 1,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 4,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Global_rpt_6a::Brk_can_timeoutType brk_can_timeout(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Global_rpt_6a::Brk_can_timeoutType brk_can_timeout(const std::uint8_t* bytes,
+                                                     const int32_t       length) const;
 
   // config detail: {'name': 'USR_CAN_TIMEOUT', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 5,
@@ -76,8 +75,7 @@ class Globalrpt6a : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 16, 'is_signed_var': False, 'physical_range':
   // '[0|65535]', 'bit': 55, 'type': 'int', 'order': 'motorola',
   // 'physical_unit': ''}
-  int usr_can_read_errors(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  int usr_can_read_errors(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace gem

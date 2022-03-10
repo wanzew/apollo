@@ -28,7 +28,7 @@ namespace monitor {
 namespace hw {
 
 /// Returns an error meesage string for the given status code.
-const char *esdcan_err_to_str(NTCAN_RESULT ntstatus);
+const char* esdcan_err_to_str(NTCAN_RESULT ntstatus);
 
 }  // namespace hw
 }  // namespace monitor

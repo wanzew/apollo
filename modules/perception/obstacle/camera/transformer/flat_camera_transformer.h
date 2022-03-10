@@ -51,16 +51,17 @@ namespace perception {
 
 class FlatCameraTransformer : public BaseCameraTransformer {
  public:
-  FlatCameraTransformer() : BaseCameraTransformer() {}
+  FlatCameraTransformer()
+      : BaseCameraTransformer() {}
 
   virtual ~FlatCameraTransformer() = default;
 
   bool Init() override;
 
-  bool Transform(std::vector<std::shared_ptr<VisualObject>> *objects) override;
+  bool Transform(std::vector<std::shared_ptr<VisualObject>>* objects) override;
 
   // @brief Set static extrinsic matrix for camera space to car space
-  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4> &extrinsics) override;
+  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) override;
 
   // @brief Get Adjusted camera-to-car extrinsics
   // Return false if no valid objects in scene
@@ -74,19 +75,18 @@ class FlatCameraTransformer : public BaseCameraTransformer {
   Eigen::Matrix<float, 3, 1> camera2car_flat_offset_;
 
   // Pitch-angle Adjusted Extrinsics
-  bool adjust_pitch_ = false;
+  bool                       adjust_pitch_ = false;
   Eigen::Matrix<float, 4, 4> camera2car_adj_;
-  float pitch_diff_ = 0.0f;  // degree
+  float                      pitch_diff_ = 0.0f;  // degree
 
-  Eigen::Matrix<float, 3, 1> MakeUnit(
-      const Eigen::Matrix<float, 3, 1> &v) const;
+  Eigen::Matrix<float, 3, 1> MakeUnit(const Eigen::Matrix<float, 3, 1>& v) const;
 
   bool HaveHighConfidence(std::shared_ptr<VisualObject> obj_ptr);
 
   // Real-time (Per-frame) Pitch angle adjustment between camera and ground
   // Assume objects are on ground, and ground is a simple flat plane
-  void GetDynamicExtrinsics(
-    const std::vector<std::pair<Eigen::Vector3f, Eigen::Vector3f>> &centers);
+  void
+  GetDynamicExtrinsics(const std::vector<std::pair<Eigen::Vector3f, Eigen::Vector3f>>& centers);
 
   DISALLOW_COPY_AND_ASSIGN(FlatCameraTransformer);
 };

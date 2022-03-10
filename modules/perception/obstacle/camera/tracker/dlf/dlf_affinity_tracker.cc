@@ -19,21 +19,19 @@
 namespace apollo {
 namespace perception {
 
-bool DLFAffinityTracker::Init() {
-  return true;
-}
+bool DLFAffinityTracker::Init() { return true; }
 
-bool DLFAffinityTracker::GetAffinityMatrix(
-    const cv::Mat &img, const std::vector<Tracked> &tracked,
-    const std::vector<Detected> &detected,
-    std::vector<std::vector<float>> *affinity_matrix) {
+bool DLFAffinityTracker::GetAffinityMatrix(const cv::Mat&                   img,
+                                           const std::vector<Tracked>&      tracked,
+                                           const std::vector<Detected>&     detected,
+                                           std::vector<std::vector<float>>* affinity_matrix) {
   affinity_matrix->clear();
 
   if (tracked.empty() || detected.empty()) return true;
 
   // Output. Default as 0.0 for not selected entries
-  *affinity_matrix = std::vector<std::vector<float>>(
-      tracked.size(), std::vector<float>(detected.size(), 0.0f));
+  *affinity_matrix =
+      std::vector<std::vector<float>>(tracked.size(), std::vector<float>(detected.size(), 0.0f));
 
   size_t dim = tracked[0].features_.size();
   for (size_t i = 0; i < selected_entry_matrix_.size(); ++i) {
@@ -57,11 +55,11 @@ bool DLFAffinityTracker::GetAffinityMatrix(
   return true;
 }
 
-bool DLFAffinityTracker::UpdateTracked(const cv::Mat &img,
-                                       const std::vector<Detected> &detected,
-                                       std::vector<Tracked> *tracked) {
+bool DLFAffinityTracker::UpdateTracked(const cv::Mat&               img,
+                                       const std::vector<Detected>& detected,
+                                       std::vector<Tracked>*        tracked) {
   int d_cnt = detected.size();
-  for (auto &obj : *tracked) {
+  for (auto& obj : *tracked) {
     int d_id = obj.detect_id_;
     if (0 <= d_id && d_id < d_cnt) obj.features_ = detected[d_id].features_;
   }

@@ -19,9 +19,9 @@
  **/
 #include "modules/planning/math/spiral_curve/cubic_spiral_curve.h"
 
-#include <algorithm>
 #include "Eigen/Core"
 #include "Eigen/LU"
+#include <algorithm>
 
 #include "modules/common/log.h"
 #include "modules/common/math/integral.h"
@@ -41,20 +41,18 @@ CubicSpiralCurve::CubicSpiralCurve(const PathPoint& s, const PathPoint& e)
 
 bool CubicSpiralCurve::CalculatePath() {
   // calculate path with initialize table
-  double x_s = start_point().x();
-  double y_s = start_point().y();
+  double x_s     = start_point().x();
+  double y_s     = start_point().y();
   double theta_s = std::fmod(start_point().theta(), s_two_pi_);
 
-  if (theta_s < 0) {
-    theta_s += s_two_pi_;
-  }
+  if (theta_s < 0) { theta_s += s_two_pi_; }
 
   double x_t = end_point().x() - x_s;
   double y_t = end_point().y() - y_s;
 
   // with position and rotation transformation
-  double x_g = std::cos(theta_s) * x_t + std::sin(theta_s) * y_t;
-  double y_g = -std::sin(theta_s) * x_t + std::cos(theta_s) * y_t;
+  double x_g     = std::cos(theta_s) * x_t + std::sin(theta_s) * y_t;
+  double y_g     = -std::sin(theta_s) * x_t + std::cos(theta_s) * y_t;
   double theta_g = std::fmod(end_point().theta(), s_two_pi_);
   theta_g -= theta_s;
 
@@ -66,12 +64,11 @@ bool CubicSpiralCurve::CalculatePath() {
     theta_g -= s_two_pi_;
   }
   std::array<double, 4> p_shoot;
-  double sg =
-      (theta_g * theta_g / 5.0 + 1.0) * std::sqrt(x_g * x_g + y_g * y_g);
-  p_shoot[0] = start_point().kappa();
-  p_shoot[1] = 0.0;
-  p_shoot[2] = 0.0;
-  p_shoot[3] = end_point().kappa();
+  double                sg = (theta_g * theta_g / 5.0 + 1.0) * std::sqrt(x_g * x_g + y_g * y_g);
+  p_shoot[0]               = start_point().kappa();
+  p_shoot[1]               = 0.0;
+  p_shoot[2]               = 0.0;
+  p_shoot[3]               = end_point().kappa();
 
   // intermediate params
   Eigen::Matrix<double, 3, 1> q_g;
@@ -80,8 +77,7 @@ bool CubicSpiralCurve::CalculatePath() {
 
   // simpson integrations func values in Jacobian
   // integration point initialization:
-  double ds =
-      sg / (spiral_config().simpson_size() - 1);  // bandwidth for integration
+  double ds = sg / (spiral_config().simpson_size() - 1);  // bandwidth for integration
   // basic theta value vectors:
   std::vector<double> theta(spiral_config().simpson_size(), 0.0);
   std::vector<double> cos_theta(spiral_config().simpson_size(), 0.0);
@@ -98,11 +94,10 @@ bool CubicSpiralCurve::CalculatePath() {
   std::vector<double> cos_ptp_sg(spiral_config().simpson_size(), 0.0);
 
   // newton iteration difference (col) vectors
-  Eigen::Matrix<double, 3, 1> delta_q;  // goal difference
-  Eigen::Matrix<double, 3, 1> delta_p;  // parameter difference
-  Eigen::Matrix<double, 3, 1>
-      q_guess;        // q with current parameter, delta_q = q_g - q_guess
-  double diff = 0.0;  // absolute error for q iteration stop
+  Eigen::Matrix<double, 3, 1> delta_q;     // goal difference
+  Eigen::Matrix<double, 3, 1> delta_p;     // parameter difference
+  Eigen::Matrix<double, 3, 1> q_guess;     // q with current parameter, delta_q = q_g - q_guess
+  double                      diff = 0.0;  // absolute error for q iteration stop
 
   for (int32_t nt = 0; nt < spiral_config().newton_raphson_max_iter(); ++nt) {
     // calculate parameters for simpson integration
@@ -129,40 +124,37 @@ bool CubicSpiralCurve::CalculatePath() {
     }
 
     // update Jacobian and delta q
-    jacobi(0, 0) = -apollo::common::math::IntegrateBySimpson(
-        sin_ptp_p1, ds, spiral_config().simpson_size());
-    jacobi(0, 1) = -apollo::common::math::IntegrateBySimpson(
-        sin_ptp_p2, ds, spiral_config().simpson_size());
-    jacobi(0, 2) = cos_theta[spiral_config().simpson_size() - 1] -
-                   apollo::common::math::IntegrateBySimpson(
-                       sin_ptp_sg, ds, spiral_config().simpson_size());
+    jacobi(0, 0) =
+        -apollo::common::math::IntegrateBySimpson(sin_ptp_p1, ds, spiral_config().simpson_size());
+    jacobi(0, 1) =
+        -apollo::common::math::IntegrateBySimpson(sin_ptp_p2, ds, spiral_config().simpson_size());
+    jacobi(0, 2) =
+        cos_theta[spiral_config().simpson_size() - 1] -
+        apollo::common::math::IntegrateBySimpson(sin_ptp_sg, ds, spiral_config().simpson_size());
 
-    jacobi(1, 0) = apollo::common::math::IntegrateBySimpson(
-        cos_ptp_p1, ds, spiral_config().simpson_size());
-    jacobi(1, 1) = apollo::common::math::IntegrateBySimpson(
-        cos_ptp_p2, ds, spiral_config().simpson_size());
-    jacobi(1, 2) = sin_theta[spiral_config().simpson_size() - 1] +
-                   apollo::common::math::IntegrateBySimpson(
-                       cos_ptp_sg, ds, spiral_config().simpson_size());
+    jacobi(1, 0) =
+        apollo::common::math::IntegrateBySimpson(cos_ptp_p1, ds, spiral_config().simpson_size());
+    jacobi(1, 1) =
+        apollo::common::math::IntegrateBySimpson(cos_ptp_p2, ds, spiral_config().simpson_size());
+    jacobi(1, 2) =
+        sin_theta[spiral_config().simpson_size() - 1] +
+        apollo::common::math::IntegrateBySimpson(cos_ptp_sg, ds, spiral_config().simpson_size());
 
     jacobi(2, 0) = ptp_p1[spiral_config().simpson_size() - 1];
     jacobi(2, 1) = ptp_p2[spiral_config().simpson_size() - 1];
     jacobi(2, 2) = ptp_sg[spiral_config().simpson_size() - 1];
 
-    q_guess(0) = apollo::common::math::IntegrateBySimpson(
-        cos_theta, ds, spiral_config().simpson_size());
-    q_guess(1) = apollo::common::math::IntegrateBySimpson(
-        sin_theta, ds, spiral_config().simpson_size());
+    q_guess(0) =
+        apollo::common::math::IntegrateBySimpson(cos_theta, ds, spiral_config().simpson_size());
+    q_guess(1) =
+        apollo::common::math::IntegrateBySimpson(sin_theta, ds, spiral_config().simpson_size());
     q_guess(2) = theta[spiral_config().simpson_size() - 1];
 
     delta_q = q_g - q_guess;
 
-    diff =
-        std::fabs(delta_q(0)) + std::fabs(delta_q(1)) + std::fabs(delta_q(2));
+    diff = std::fabs(delta_q(0)) + std::fabs(delta_q(1)) + std::fabs(delta_q(2));
 
-    if (diff < spiral_config().newton_raphson_tol()) {
-      break;
-    }
+    if (diff < spiral_config().newton_raphson_tol()) { break; }
 
     // solve by lu decomposition
     delta_p = jacobi.lu().solve(delta_q);
@@ -180,7 +172,7 @@ bool CubicSpiralCurve::CalculatePath() {
   return diff < spiral_config().newton_raphson_tol() && ResultSanityCheck();
 }
 
-Status CubicSpiralCurve::GetPathVec(const std::uint32_t n,
+Status CubicSpiralCurve::GetPathVec(const std::uint32_t     n,
                                     std::vector<PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
@@ -192,7 +184,7 @@ Status CubicSpiralCurve::GetPathVec(const std::uint32_t n,
   path_points->resize(n);
 
   std::vector<PathPoint>& result = *path_points;
-  const double ds = sg() / (n - 1);
+  const double            ds     = sg() / (n - 1);
 
   std::array<double, 4> p_value;
   std::copy_n(p_params().begin(), 4, p_value.begin());
@@ -211,8 +203,7 @@ Status CubicSpiralCurve::GetPathVec(const std::uint32_t n,
 
   for (std::uint32_t i = 1; i < n; ++i) {
     result[i].set_s(s);
-    result[i].set_theta(SpiralFormula::theta_func_k3_a(s, a_params) +
-                        result[0].theta());
+    result[i].set_theta(SpiralFormula::theta_func_k3_a(s, a_params) + result[0].theta());
     result[i].set_kappa(SpiralFormula::kappa_func_k3_a(s, a_params));
     result[i].set_dkappa(SpiralFormula::dkappa_func_k3_a(s, a_params));
     s += ds;
@@ -223,14 +214,12 @@ Status CubicSpiralCurve::GetPathVec(const std::uint32_t n,
   double dy = 0;
 
   for (std::uint32_t k = 1; k < n; ++k) {
-    dx = (dx / k) * (k - 1) +
-         (std::cos(std::fmod(result[k].theta(), s_two_pi_)) +
-          std::cos(std::fmod(result[k - 1].theta(), s_two_pi_))) /
-             (2 * k);
-    dy = (dy / k) * (k - 1) +
-         (std::sin(std::fmod(result[k].theta(), s_two_pi_)) +
-          std::sin(std::fmod(result[k - 1].theta(), s_two_pi_))) /
-             (2 * k);
+    dx = (dx / k) * (k - 1) + (std::cos(std::fmod(result[k].theta(), s_two_pi_)) +
+                               std::cos(std::fmod(result[k - 1].theta(), s_two_pi_))) /
+                                  (2 * k);
+    dy = (dy / k) * (k - 1) + (std::sin(std::fmod(result[k].theta(), s_two_pi_)) +
+                               std::sin(std::fmod(result[k - 1].theta(), s_two_pi_))) /
+                                  (2 * k);
     result[k].set_x(result[k].s() * dx + result[0].x());
     result[k].set_y(result[k].s() * dy + result[0].y());
   }
@@ -238,17 +227,15 @@ Status CubicSpiralCurve::GetPathVec(const std::uint32_t n,
   return Status::OK();
 }
 
-Status CubicSpiralCurve::GetPathVecWithS(
-    const std::vector<double>& vec_s,
-    std::vector<PathPoint>* path_points) const {
+Status CubicSpiralCurve::GetPathVecWithS(const std::vector<double>& vec_s,
+                                         std::vector<PathPoint>*    path_points) const {
   CHECK_NOTNULL(path_points);
 
   if (vec_s.empty() || error() > spiral_config().newton_raphson_tol()) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "CubicSpiralCurve::get_path_vec_with_s");
+    return Status(ErrorCode::PLANNING_ERROR, "CubicSpiralCurve::get_path_vec_with_s");
   }
 
-  const std::uint32_t n = vec_s.size();
+  const std::uint32_t     n      = vec_s.size();
   std::vector<PathPoint>& result = *path_points;
   result.resize(n);
 
@@ -262,13 +249,10 @@ Status CubicSpiralCurve::GetPathVecWithS(
 
   for (std::uint32_t i = 0; i < n; ++i) {
     result[i].set_s(vec_s[i]);
-    result[i].set_theta(
-        planning::SpiralFormula::theta_func_k3_a(vec_s[i], a_params) +
-        ref_point.theta());
-    result[i].set_kappa(
-        planning::SpiralFormula::kappa_func_k3_a(vec_s[i], a_params));
-    result[i].set_dkappa(
-        planning::SpiralFormula::dkappa_func_k3_a(vec_s[i], a_params));
+    result[i].set_theta(planning::SpiralFormula::theta_func_k3_a(vec_s[i], a_params) +
+                        ref_point.theta());
+    result[i].set_kappa(planning::SpiralFormula::kappa_func_k3_a(vec_s[i], a_params));
+    result[i].set_dkappa(planning::SpiralFormula::dkappa_func_k3_a(vec_s[i], a_params));
   }
 
   double dx = 0.0;

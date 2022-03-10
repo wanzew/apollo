@@ -43,25 +43,23 @@ bool Creeper::Run(Frame* frame, ReferenceLineInfo* reference_line_info) {
   }
 
   // find next overlap
-  auto* next_overlap =
-      reference_line_info->reference_line().map_path().NextLaneOverlap(
-          reference_line_info->AdcSlBoundary().end_s());
+  auto* next_overlap = reference_line_info->reference_line().map_path().NextLaneOverlap(
+      reference_line_info->AdcSlBoundary().end_s());
   if (next_overlap == nullptr) {
     ADEBUG << "No next lane overlap.";
     return true;
   }
 
   constexpr double kMaxCreepTargetDistance = 5.0;
-  constexpr double kCreepStopDistance = 0.5;  // TODO(all): move to config
-  return BuildStopDecision(*const_cast<PathOverlap*>(next_overlap),
-                           kCreepStopDistance, kMaxCreepTargetDistance, frame,
-                           reference_line_info);
+  constexpr double kCreepStopDistance      = 0.5;  // TODO(all): move to config
+  return BuildStopDecision(*const_cast<PathOverlap*>(next_overlap), kCreepStopDistance,
+                           kMaxCreepTargetDistance, frame, reference_line_info);
 }
 
 bool Creeper::BuildStopDecision(const PathOverlap& overlap,
-                                const double stop_buffer,
-                                const double max_creeping_target_distance,
-                                Frame* frame,
+                                const double       stop_buffer,
+                                const double       max_creeping_target_distance,
+                                Frame*             frame,
                                 ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
 
@@ -74,8 +72,8 @@ bool Creeper::BuildStopDecision(const PathOverlap& overlap,
 
   // create virtual stop wall
   std::string virtual_obstacle_id = "CREEPER_" + overlap.object_id;
-  auto* obstacle = frame->CreateStopObstacle(
-      reference_line_info, virtual_obstacle_id, overlap.start_s);
+  auto*       obstacle =
+      frame->CreateStopObstacle(reference_line_info, virtual_obstacle_id, overlap.start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;
@@ -87,12 +85,12 @@ bool Creeper::BuildStopDecision(const PathOverlap& overlap,
   }
 
   // build stop decision
-  const double stop_s = overlap.start_s - stop_buffer;
-  auto stop_point = reference_line.GetReferencePoint(stop_s);
-  double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
+  const double stop_s       = overlap.start_s - stop_buffer;
+  auto         stop_point   = reference_line.GetReferencePoint(stop_s);
+  double       stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
-  auto stop_decision = stop.mutable_stop();
+  auto               stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_CREEPER);
   stop_decision->set_distance_s(-stop_buffer);
   stop_decision->set_stop_heading(stop_heading);

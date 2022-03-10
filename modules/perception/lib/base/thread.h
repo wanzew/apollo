@@ -28,14 +28,13 @@ namespace perception {
 class Thread {
  public:
   explicit Thread(bool joinable = false, const std::string& name = "Thread")
-      : joinable_(joinable), thread_name_(name) {}
+      : joinable_(joinable)
+      , thread_name_(name) {}
 
   pthread_t Tid() const { return tid_; }
 
   void SetJoinable(bool joinable) {
-    if (!started_) {
-      joinable_ = joinable;
-    }
+    if (!started_) { joinable_ = joinable; }
   }
 
   void Start();
@@ -45,7 +44,7 @@ class Thread {
   bool IsAlive();
 
   std::string thread_name() const { return thread_name_; }
-  void set_thread_name(const std::string& name) { thread_name_ = name; }
+  void        set_thread_name(const std::string& name) { thread_name_ = name; }
 
  protected:
   virtual void Run() = 0;
@@ -56,9 +55,9 @@ class Thread {
     return nullptr;
   }
 
-  pthread_t tid_ = 0;
-  bool started_ = false;
-  bool joinable_ = false;
+  pthread_t   tid_      = 0;
+  bool        started_  = false;
+  bool        joinable_ = false;
   std::string thread_name_;
 
  private:

@@ -39,28 +39,22 @@ const double EPSILON = 1e-6;
 }
 
 static bool ConstructPointCloud(std::vector<pcl_util::PointCloudPtr>* clouds) {
-  std::string pcd_data(
-      "modules/perception/data/obstacle_common_test/"
-      "QB9178_3_1461381834_1461382134_30651.pcd");
+  std::string   pcd_data("modules/perception/data/obstacle_common_test/"
+                       "QB9178_3_1461381834_1461382134_30651.pcd");
   std::ifstream cluster_ifs(pcd_data.c_str(), std::ifstream::in);
-  std::string point_buf;
+  std::string   point_buf;
   while (cluster_ifs.good()) {
     getline(cluster_ifs, point_buf);
     std::vector<std::string> point_strs;
-    boost::algorithm::split(point_strs, point_buf,
-                            boost::algorithm::is_any_of(" "));
-    if (point_strs.size() <= 1 || (point_strs.size() - 1) % 4 != 0) {
-      continue;
-    }
+    boost::algorithm::split(point_strs, point_buf, boost::algorithm::is_any_of(" "));
+    if (point_strs.size() <= 1 || (point_strs.size() - 1) % 4 != 0) { continue; }
     std::stringstream ss;
     ss << point_buf;
     int point_num = 0;
     ss >> point_num;
     int exact_point_num = (point_strs.size() - 1) / 4;
-    if (point_num != exact_point_num) {
-      continue;
-    }
-    uint64_t intensity;
+    if (point_num != exact_point_num) { continue; }
+    uint64_t                intensity;
     pcl_util::PointCloudPtr cluster_cloud(new pcl_util::PointCloud);
     for (int i = 0; i < exact_point_num; ++i) {
       pcl_util::Point p;
@@ -88,7 +82,7 @@ class GeometryUtilTest : public testing::Test {
 
  protected:
   std::vector<pcl_util::PointCloudPtr> clouds_;
-  Eigen::Matrix4d trans_matrix_;
+  Eigen::Matrix4d                      trans_matrix_;
 };
 
 TEST_F(GeometryUtilTest, TransformPointCloud1) {
@@ -128,15 +122,15 @@ TEST_F(GeometryUtilTest, TransformPointCloud3) {
   pcl_util::PointCloudPtr in_cloud(new pcl_util::PointCloud);
   for (int i = 0; i < 10; ++i) {
     pcl_util::Point pt;
-    pt.x = static_cast<float>(i);
-    pt.y = static_cast<float>(i);
-    pt.z = static_cast<float>(i);
+    pt.x         = static_cast<float>(i);
+    pt.y         = static_cast<float>(i);
+    pt.z         = static_cast<float>(i);
     pt.intensity = 123.0f;
     in_cloud->push_back(pt);
   }
 
   pcl_util::PointDCloud out_cloud;
-  std::vector<int> indices{0, 2, 5, 9};
+  std::vector<int>      indices{0, 2, 5, 9};
   TransformPointCloud(in_cloud, indices, &out_cloud);
 
   EXPECT_EQ(out_cloud.points.size(), 4);
@@ -159,9 +153,9 @@ TEST_F(GeometryUtilTest, GetCloudMinMax3D) {
   in_cloud->is_dense = true;
   for (int i = 0; i < 10; ++i) {
     pcl_util::Point pt;
-    pt.x = static_cast<float>(i);
-    pt.y = static_cast<float>(i);
-    pt.z = static_cast<float>(i);
+    pt.x         = static_cast<float>(i);
+    pt.y         = static_cast<float>(i);
+    pt.z         = static_cast<float>(i);
     pt.intensity = 123.0f;
     in_cloud->push_back(pt);
   }
@@ -199,16 +193,15 @@ TEST_F(GeometryUtilTest, ComputeBboxSizeCenter) {
   }
   EXPECT_EQ(5, objects.size());
   ObjectBuilderOptions options;
-  MinBoxObjectBuilder min_box_object_builder;
+  MinBoxObjectBuilder  min_box_object_builder;
   EXPECT_TRUE(min_box_object_builder.Build(options, &objects));
   Eigen::Vector3d old_dir = objects[0]->direction;
-  Eigen::Vector3d old_size = Eigen::Vector3d(
-      objects[0]->length, objects[0]->width, objects[0]->height);
+  Eigen::Vector3d old_size =
+      Eigen::Vector3d(objects[0]->length, objects[0]->width, objects[0]->height);
   Eigen::Vector3d old_center = objects[0]->center;
-  Eigen::Vector3d new_size = old_size;
+  Eigen::Vector3d new_size   = old_size;
   Eigen::Vector3d new_center = old_center;
-  ComputeBboxSizeCenter<pcl_util::Point>(objects[0]->cloud, old_dir, &new_size,
-                                         &new_center);
+  ComputeBboxSizeCenter<pcl_util::Point>(objects[0]->cloud, old_dir, &new_size, &new_center);
   EXPECT_NEAR(0.149998, new_size[0], EPSILON);
   EXPECT_NEAR(0.056100, new_size[1], EPSILON);
   EXPECT_NEAR(0.732072, new_size[2], EPSILON);
@@ -220,29 +213,19 @@ TEST_F(GeometryUtilTest, ComputeBboxSizeCenter) {
 TEST_F(GeometryUtilTest, GetCloudBarycenter) {
   Eigen::Vector3f barycenter;
   // case 1
-  barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[0])
-          .cast<float>();
+  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[0]).cast<float>();
   EXPECT_NEAR(14.188400, barycenter[0], EPSILON);
   // case 2
-  barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[1])
-          .cast<float>();
+  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[1]).cast<float>();
   EXPECT_NEAR(15.661365, barycenter[0], EPSILON);
   // case 3
-  barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[2])
-          .cast<float>();
+  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[2]).cast<float>();
   EXPECT_NEAR(29.376224, barycenter[0], EPSILON);
   // case 4
-  barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[3])
-          .cast<float>();
+  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[3]).cast<float>();
   EXPECT_NEAR(13.144600, barycenter[0], EPSILON);
   // case 5
-  barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[4])
-          .cast<float>();
+  barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[4]).cast<float>();
   EXPECT_NEAR(14.668054, barycenter[0], EPSILON);
 }
 
@@ -269,8 +252,7 @@ TEST_F(GeometryUtilTest, VectorCosTheta2dXy) {
   Eigen::Vector3f anchor_point_shift_dir(1.0, 1.0, 0.0);
   track_motion_dir.normalize();
   anchor_point_shift_dir.normalize();
-  double cos_theta =
-      VectorCosTheta2dXy(track_motion_dir, anchor_point_shift_dir);
+  double cos_theta = VectorCosTheta2dXy(track_motion_dir, anchor_point_shift_dir);
   EXPECT_NEAR(1.0, cos_theta, EPSILON);
   // case 2
   track_motion_dir << 2.0, 2.2, 3.1;
@@ -292,7 +274,7 @@ TEST_F(GeometryUtilTest, VectorTheta2dXy) {
   // case 1
   Eigen::Vector3f coord_dir(0, 1.0, 0);
   Eigen::Vector3f dir_velo3(1.0, 0.0, 0.0);
-  double theta = VectorCosTheta2dXy(coord_dir, dir_velo3);
+  double          theta = VectorCosTheta2dXy(coord_dir, dir_velo3);
   EXPECT_NEAR(0.0, theta, EPSILON);
   // case 2
   coord_dir << 1.0, 0.0, 0.0;

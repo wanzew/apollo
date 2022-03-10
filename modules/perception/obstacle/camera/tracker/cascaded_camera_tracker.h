@@ -47,31 +47,33 @@ namespace perception {
 
 class CascadedCameraTracker : public BaseCameraTracker {
  public:
-  CascadedCameraTracker() : BaseCameraTracker() {}
+  CascadedCameraTracker()
+      : BaseCameraTracker() {}
 
   virtual ~CascadedCameraTracker() {}
 
   bool Init() override;
 
-  bool Associate(const cv::Mat& img, const double timestamp,
+  bool Associate(const cv::Mat&                              img,
+                 const double                                timestamp,
                  std::vector<std::shared_ptr<VisualObject>>* objects) override;
 
   std::string Name() const override;
 
  private:
   bool dl_feature_ = true;
-  bool use_kcf_ = false;
+  bool use_kcf_    = false;
 
   // Trackers for different stages
   CS2DAffinityTracker cs2d_tracker_;
-  DLFAffinityTracker dlf_tracker_;
-  KCFAffinityTracker kcf_tracker_;
+  DLFAffinityTracker  dlf_tracker_;
+  KCFAffinityTracker  kcf_tracker_;
 
   // Tracking and ID management
   std::vector<Tracked> tracks_;
-  int frame_idx_ = 0;
-  int next_track_id_ = 0;
-  const int kKeptFrameCnt = 10;  // Latent space of potential tracks
+  int                  frame_idx_     = 0;
+  int                  next_track_id_ = 0;
+  const int            kKeptFrameCnt  = 10;  // Latent space of potential tracks
 
   DISALLOW_COPY_AND_ASSIGN(CascadedCameraTracker);
 };

@@ -45,7 +45,7 @@ class RawStream {
   bool Init();
 
   struct Status {
-    bool filter[Stream::NUM_STATUS] = {false};
+    bool           filter[Stream::NUM_STATUS] = {false};
     Stream::Status status;
   };
 
@@ -65,10 +65,10 @@ class RawStream {
   void GpsbinCallback(const std_msgs::String& raw_data);
   void OnWheelVelocityTimer(const ros::TimerEvent&);
 
-  ros::Timer wheel_velocity_timer_;
-  static constexpr size_t BUFFER_SIZE = 2048;
-  uint8_t buffer_[BUFFER_SIZE] = {0};
-  uint8_t buffer_rtk_[BUFFER_SIZE] = {0};
+  ros::Timer              wheel_velocity_timer_;
+  static constexpr size_t BUFFER_SIZE              = 2048;
+  uint8_t                 buffer_[BUFFER_SIZE]     = {0};
+  uint8_t                 buffer_rtk_[BUFFER_SIZE] = {0};
 
   std::shared_ptr<Stream> data_stream_;
   std::shared_ptr<Stream> command_stream_;
@@ -80,20 +80,20 @@ class RawStream {
   std::shared_ptr<Status> in_rtk_stream_status_;
   std::shared_ptr<Status> out_rtk_stream_status_;
 
-  bool rtk_software_solution_ = false;
-  bool push_location_ = false;
-  bool is_healthy_ = true;
+  bool           rtk_software_solution_ = false;
+  bool           push_location_         = false;
+  bool           is_healthy_            = true;
   config::Config config_;
 
   const std::string raw_data_topic_;
   const std::string rtcm_data_topic_;
 
-  StreamStatus stream_status_;
-  std::unique_ptr<std::thread> data_thread_ptr_;
-  std::unique_ptr<std::thread> rtk_thread_ptr_;
-  std::unique_ptr<DataParser> data_parser_ptr_;
-  std::unique_ptr<RtcmParser> rtcm_parser_ptr_;
-  std::unique_ptr<std::thread> gpsbin_thread_ptr_;
+  StreamStatus                   stream_status_;
+  std::unique_ptr<std::thread>   data_thread_ptr_;
+  std::unique_ptr<std::thread>   rtk_thread_ptr_;
+  std::unique_ptr<DataParser>    data_parser_ptr_;
+  std::unique_ptr<RtcmParser>    rtcm_parser_ptr_;
+  std::unique_ptr<std::thread>   gpsbin_thread_ptr_;
   std::unique_ptr<std::ofstream> gpsbin_stream_ = nullptr;
 };
 

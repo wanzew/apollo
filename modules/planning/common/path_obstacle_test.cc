@@ -24,11 +24,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
@@ -116,84 +116,50 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
   decision_sidepass.mutable_sidepass();
 
   // vertical decision comparison
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_stop, decision_ignore).has_stop());
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_stop, decision_overtake).has_stop());
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_stop, decision_follow).has_stop());
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_stop, decision_yield).has_stop());
+
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_yield, decision_ignore).has_yield());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_ignore)
-          .has_stop());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_overtake)
-          .has_stop());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_follow)
-          .has_stop());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_yield)
-          .has_stop());
+      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_overtake).has_yield());
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_yield, decision_follow).has_yield());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_ignore)
-          .has_yield());
+      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_ignore).has_follow());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_overtake)
-          .has_yield());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_follow)
-          .has_yield());
+      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_overtake).has_follow());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_ignore)
-          .has_follow());
-  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_follow,
-                                                      decision_overtake)
-                  .has_follow());
-
-  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_overtake,
-                                                      decision_ignore)
-                  .has_overtake());
-
-  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_ignore,
-                                                      decision_overtake)
-                  .has_overtake());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_follow)
-          .has_follow());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_yield)
-          .has_yield());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_stop)
-          .has_stop());
-
-  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_overtake,
-                                                      decision_follow)
-                  .has_follow());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_overtake, decision_yield)
-          .has_yield());
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_overtake, decision_stop)
-          .has_stop());
+      PathObstacle::MergeLongitudinalDecision(decision_overtake, decision_ignore).has_overtake());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_yield)
-          .has_yield());
+      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_overtake).has_overtake());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_stop)
-          .has_stop());
+      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_follow).has_follow());
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_yield).has_yield());
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_stop).has_stop());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_stop)
-          .has_stop());
+      PathObstacle::MergeLongitudinalDecision(decision_overtake, decision_follow).has_follow());
+  EXPECT_TRUE(
+      PathObstacle::MergeLongitudinalDecision(decision_overtake, decision_yield).has_yield());
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_overtake, decision_stop).has_stop());
+
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_follow, decision_yield).has_yield());
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_follow, decision_stop).has_stop());
+
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_yield, decision_stop).has_stop());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_ignore)
-          .has_ignore());
+      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_ignore).has_ignore());
 
   ObjectDecisionType decision_overtake1;
   decision_overtake1.mutable_overtake()->set_distance_s(1);
   ObjectDecisionType decision_overtake2;
   decision_overtake2.mutable_overtake()->set_distance_s(2);
-  EXPECT_EQ(2, PathObstacle::MergeLongitudinalDecision(decision_overtake1,
-                                                       decision_overtake2)
+  EXPECT_EQ(2, PathObstacle::MergeLongitudinalDecision(decision_overtake1, decision_overtake2)
                    .overtake()
                    .distance_s());
 
@@ -201,8 +167,7 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
   decision_follow1.mutable_follow()->set_distance_s(-1);
   ObjectDecisionType decision_follow2;
   decision_follow2.mutable_follow()->set_distance_s(-2);
-  EXPECT_EQ(-2, PathObstacle::MergeLongitudinalDecision(decision_follow1,
-                                                        decision_follow2)
+  EXPECT_EQ(-2, PathObstacle::MergeLongitudinalDecision(decision_follow1, decision_follow2)
                     .follow()
                     .distance_s());
 
@@ -210,8 +175,7 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
   decision_yield1.mutable_yield()->set_distance_s(-1);
   ObjectDecisionType decision_yield2;
   decision_yield2.mutable_yield()->set_distance_s(-2);
-  EXPECT_EQ(-2, PathObstacle::MergeLongitudinalDecision(decision_yield1,
-                                                        decision_yield2)
+  EXPECT_EQ(-2, PathObstacle::MergeLongitudinalDecision(decision_yield1, decision_yield2)
                     .yield()
                     .distance_s());
 
@@ -219,10 +183,9 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
   decision_stop1.mutable_stop()->set_distance_s(-1);
   ObjectDecisionType decision_stop2;
   decision_stop2.mutable_stop()->set_distance_s(-2);
-  EXPECT_EQ(-2, PathObstacle::MergeLongitudinalDecision(decision_stop1,
-                                                        decision_stop2)
-                    .stop()
-                    .distance_s());
+  EXPECT_EQ(
+      -2,
+      PathObstacle::MergeLongitudinalDecision(decision_stop1, decision_stop2).stop().distance_s());
 }
 
 TEST(MergeLateralDecision, AllDecisions) {
@@ -247,19 +210,13 @@ TEST(MergeLateralDecision, AllDecisions) {
   ObjectDecisionType decision_sidepass;
   decision_sidepass.mutable_sidepass();
 
-  EXPECT_TRUE(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_ignore)
-          .has_nudge());
+  EXPECT_TRUE(PathObstacle::MergeLateralDecision(decision_nudge, decision_ignore).has_nudge());
 
-  EXPECT_TRUE(
-      PathObstacle::MergeLateralDecision(decision_ignore, decision_nudge)
-          .has_nudge());
+  EXPECT_TRUE(PathObstacle::MergeLateralDecision(decision_ignore, decision_nudge).has_nudge());
 
   ObjectDecisionType decision_nudge2;
   decision_nudge2.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
-  EXPECT_TRUE(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_nudge2)
-          .has_nudge());
+  EXPECT_TRUE(PathObstacle::MergeLateralDecision(decision_nudge, decision_nudge2).has_nudge());
   decision_nudge2.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
 }
 
@@ -273,7 +230,7 @@ TEST(PathObstacleTest, add_decision_test) {
 
   // Ignore
   {
-    PathObstacle path_obstacle;
+    PathObstacle       path_obstacle;
     ObjectDecisionType decision;
     decision.mutable_ignore();
     path_obstacle.AddLongitudinalDecision("test_ignore", decision);
@@ -285,7 +242,7 @@ TEST(PathObstacleTest, add_decision_test) {
 
   // stop and ignore
   {
-    PathObstacle path_obstacle;
+    PathObstacle       path_obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_stop();
@@ -305,7 +262,7 @@ TEST(PathObstacleTest, add_decision_test) {
 
   // left nudge and ignore
   {
-    PathObstacle path_obstacle;
+    PathObstacle       path_obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
@@ -325,7 +282,7 @@ TEST(PathObstacleTest, add_decision_test) {
 
   // right nudge and ignore
   {
-    PathObstacle path_obstacle;
+    PathObstacle       path_obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
@@ -345,7 +302,7 @@ TEST(PathObstacleTest, add_decision_test) {
 
   // left nudge and right nudge
   {
-    PathObstacle path_obstacle;
+    PathObstacle       path_obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
@@ -358,7 +315,7 @@ TEST(PathObstacleTest, add_decision_test) {
 
   // overtake and ignore
   {
-    PathObstacle path_obstacle;
+    PathObstacle       path_obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_overtake();
@@ -378,7 +335,7 @@ TEST(PathObstacleTest, add_decision_test) {
 
   // yield and ignore
   {
-    PathObstacle path_obstacle;
+    PathObstacle       path_obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_yield();
@@ -398,7 +355,7 @@ TEST(PathObstacleTest, add_decision_test) {
 
   // stop and nudge
   {
-    PathObstacle path_obstacle;
+    PathObstacle       path_obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_stop();

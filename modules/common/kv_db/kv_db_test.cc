@@ -50,7 +50,7 @@ TEST(KVDBTest, MultiThreads) {
   static const int N_THREADS = 3;
 
   std::vector<std::unique_ptr<std::thread>> threads(N_THREADS);
-  for (auto &th : threads) {
+  for (auto& th : threads) {
     th.reset(new std::thread([]() {
       KVDB::Delete("test_key");
       KVDB::Has("test_key");
@@ -59,7 +59,7 @@ TEST(KVDBTest, MultiThreads) {
     }));
   }
 
-  for (auto &th : threads) {
+  for (auto& th : threads) {
     th->join();
   }
 }

@@ -21,8 +21,8 @@ DEFINE_string(tools_adapter_config_filename,
               "modules/drivers/lidar_velodyne/tools/conf/adapter.conf",
               "The tools adapter config file");
 DEFINE_string(tools_conf_file,
-    "modules/drivers/lidar_velodyne/tools/conf/velodyne_tools_conf.pb.txt",
-    "Velodyne tools conf file");
+              "modules/drivers/lidar_velodyne/tools/conf/velodyne_tools_conf.pb.txt",
+              "Velodyne tools conf file");
 
 DEFINE_bool(open_pointcloud_dump, true, "pointcloud dump");
 DEFINE_bool(open_pointcloud_convert, false, "raw data 2 pointcloud");

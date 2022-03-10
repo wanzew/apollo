@@ -31,7 +31,7 @@ class MatchTest : public ::testing::Test {
 };
 
 TEST_F(MatchTest, nvn1) {
-  cv::Mat img;
+  cv::Mat               img;
   std::vector<LightPtr> hdmap_bboxes;
   std::vector<LightPtr> detect_bboxes;
   std::vector<LightPtr> selected_bboxes;
@@ -51,32 +51,32 @@ TEST_F(MatchTest, nvn1) {
 }
 
 TEST_F(MatchTest, nvn2) {
-  cv::Mat img;
+  cv::Mat               img;
   std::vector<LightPtr> hdmap_bboxes;
   std::vector<LightPtr> detect_bboxes;
   std::vector<LightPtr> selected_bboxes;
   {
     LightPtr light(new Light);
     light->region.rectified_roi = cv::Rect(100, 100, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     hdmap_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
     light->region.rectified_roi = cv::Rect(160, 100, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     hdmap_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
     light->region.rectified_roi = cv::Rect(220, 240, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     detect_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
     light->region.rectified_roi = cv::Rect(240, 240, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     detect_bboxes.push_back(light);
   }
 
@@ -84,32 +84,30 @@ TEST_F(MatchTest, nvn2) {
   ASSERT_EQ(selected_bboxes.size(), 2);
   ASSERT_TRUE(selected_bboxes[0]->region.is_selected);
   ASSERT_TRUE(selected_bboxes[1]->region.is_selected);
-  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi,
-            detect_bboxes[0]->region.rectified_roi);
-  ASSERT_EQ(selected_bboxes[1]->region.rectified_roi,
-            detect_bboxes[1]->region.rectified_roi);
+  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi, detect_bboxes[0]->region.rectified_roi);
+  ASSERT_EQ(selected_bboxes[1]->region.rectified_roi, detect_bboxes[1]->region.rectified_roi);
 }
 
 TEST_F(MatchTest, nvm12) {
-  cv::Mat img;
+  cv::Mat               img;
   std::vector<LightPtr> hdmap_bboxes;
   std::vector<LightPtr> detect_bboxes;
   std::vector<LightPtr> selected_bboxes;
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(100, 100, 10, 30);
     hdmap_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(220, 240, 10, 30);
     detect_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(170, 240, 10, 30);
     detect_bboxes.push_back(light);
   }
@@ -120,8 +118,7 @@ TEST_F(MatchTest, nvm12) {
   ASSERT_TRUE(selected_bboxes[0]->region.is_selected);
   std::cout << selected_bboxes[0]->region.rectified_roi << std::endl;
   std::cout << detect_bboxes[1]->region.rectified_roi << std::endl;
-  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi,
-            detect_bboxes[1]->region.rectified_roi);
+  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi, detect_bboxes[1]->region.rectified_roi);
 
   hdmap_bboxes[0]->region.rectified_roi.x = 220;
   selected_bboxes.clear();
@@ -129,30 +126,29 @@ TEST_F(MatchTest, nvm12) {
 
   ASSERT_EQ(selected_bboxes.size(), 1);
   ASSERT_TRUE(selected_bboxes[0]->region.is_selected);
-  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi,
-            detect_bboxes[0]->region.rectified_roi);
+  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi, detect_bboxes[0]->region.rectified_roi);
 }
 
 TEST_F(MatchTest, nvm21) {
-  cv::Mat img;
+  cv::Mat               img;
   std::vector<LightPtr> hdmap_bboxes;
   std::vector<LightPtr> detect_bboxes;
   std::vector<LightPtr> selected_bboxes;
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(100, 100, 10, 30);
     hdmap_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(160, 100, 10, 30);
     hdmap_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(120, 140, 10, 30);
     detect_bboxes.push_back(light);
   }
@@ -161,51 +157,49 @@ TEST_F(MatchTest, nvm21) {
   ASSERT_EQ(selected_bboxes.size(), 2);
   ASSERT_TRUE(selected_bboxes[0]->region.is_selected);
   ASSERT_FALSE(selected_bboxes[1]->region.is_selected);
-  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi,
-            detect_bboxes[0]->region.rectified_roi);
-  ASSERT_EQ(selected_bboxes[1]->region.rectified_roi,
-            hdmap_bboxes[1]->region.rectified_roi);
+  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi, detect_bboxes[0]->region.rectified_roi);
+  ASSERT_EQ(selected_bboxes[1]->region.rectified_roi, hdmap_bboxes[1]->region.rectified_roi);
 }
 
 TEST_F(MatchTest, nvm24) {
-  cv::Mat img;
+  cv::Mat               img;
   std::vector<LightPtr> hdmap_bboxes;
   std::vector<LightPtr> detect_bboxes;
   std::vector<LightPtr> selected_bboxes;
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(100, 100, 10, 30);
     hdmap_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(160, 100, 10, 30);
     hdmap_bboxes.push_back(light);
   }
 
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(120, 140, 10, 40);
     detect_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(160, 140, 10, 40);
     detect_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(130, 150, 20, 20);
     detect_bboxes.push_back(light);
   }
   {
     LightPtr light(new Light);
-    light->region.detect_score = 0.9;
+    light->region.detect_score  = 0.9;
     light->region.rectified_roi = cv::Rect(170, 150, 20, 20);
     detect_bboxes.push_back(light);
   }
@@ -214,10 +208,8 @@ TEST_F(MatchTest, nvm24) {
   ASSERT_EQ(selected_bboxes.size(), 2);
   ASSERT_TRUE(selected_bboxes[0]->region.is_selected);
   ASSERT_TRUE(selected_bboxes[1]->region.is_selected);
-  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi,
-            detect_bboxes[0]->region.rectified_roi);
-  ASSERT_EQ(selected_bboxes[1]->region.rectified_roi,
-            detect_bboxes[1]->region.rectified_roi);
+  ASSERT_EQ(selected_bboxes[0]->region.rectified_roi, detect_bboxes[0]->region.rectified_roi);
+  ASSERT_EQ(selected_bboxes[1]->region.rectified_roi, detect_bboxes[1]->region.rectified_roi);
 }
 
 }  // namespace traffic_light

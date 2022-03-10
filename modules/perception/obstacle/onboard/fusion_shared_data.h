@@ -29,15 +29,15 @@ namespace perception {
 
 struct FusionItem {
   std::vector<std::shared_ptr<Object>> obstacles;
-  SeqId seq_num = 0u;
-  double timestamp = 0.0;
-  std::string fused_sensor_device_id;  // used for async imf fusion only
-  double fused_sensor_ts;              // used for async imf fusion only
+  SeqId                                seq_num   = 0u;
+  double                               timestamp = 0.0;
+  std::string                          fused_sensor_device_id;  // used for async imf fusion only
+  double                               fused_sensor_ts;         // used for async imf fusion only
 };
 
 class FusionSharedData : public CommonSharedData<FusionItem> {
  public:
-  FusionSharedData() = default;
+  FusionSharedData()          = default;
   virtual ~FusionSharedData() = default;
 
   std::string name() const override { return "FusionSharedData"; }

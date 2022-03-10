@@ -19,36 +19,38 @@
 #include <string>
 #include <vector>
 
+#include "include/lidar_locator.h"
 #include "modules/common/log.h"
+#include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_matrix_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_node_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_pool_2d.h"
-#include "modules/localization/msf/local_integ/localization_params.h"
-#include "include/lidar_locator.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
 struct LidarFrame {
-  LidarFrame() : measurement_time(0.0) {}
-  double measurement_time;  // unix time
-  std::vector<double> pt_xs;
-  std::vector<double> pt_ys;
-  std::vector<double> pt_zs;
+  LidarFrame()
+      : measurement_time(0.0) {}
+  double                     measurement_time;  // unix time
+  std::vector<double>        pt_xs;
+  std::vector<double>        pt_ys;
+  std::vector<double>        pt_zs;
   std::vector<unsigned char> intensities;
 };
 
 struct MapNodeData {
   MapNodeData(const int w, const int h)
-      : width(w), height(h),
-        intensities(new float[width * height]),
-        intensities_var(new float[width * height]),
-        altitudes(new float[width * height]),
-        count(new unsigned int[width * height]) {}
+      : width(w)
+      , height(h)
+      , intensities(new float[width * height])
+      , intensities_var(new float[width * height])
+      , altitudes(new float[width * height])
+      , count(new unsigned int[width * height]) {}
   ~MapNodeData() {
     delete[] intensities;
     intensities = nullptr;
@@ -59,23 +61,23 @@ struct MapNodeData {
     delete[] count;
     count = nullptr;
   }
-  int width;
-  int height;
-  float* intensities;
-  float* intensities_var;
-  float* altitudes;
+  int           width;
+  int           height;
+  float*        intensities;
+  float*        intensities_var;
+  float*        altitudes;
   unsigned int* count;
 };
 
 class LocalizationLidar {
  public:
-typedef apollo::localization::msf::LossyMap2D LossyMap;
-typedef apollo::localization::msf::MapNodeIndex MapNodeIndex;
-typedef apollo::localization::msf::LossyMapNode2D LossyMapNode;
-typedef apollo::localization::msf::LossyMapNodePool2D LossyMapNodePool;
-typedef apollo::localization::msf::LossyMapMatrix2D LossyMapMatrix;
-typedef apollo::localization::msf::LossyMapCell2D LossyMapCell;
-typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
+  typedef apollo::localization::msf::LossyMap2D         LossyMap;
+  typedef apollo::localization::msf::MapNodeIndex       MapNodeIndex;
+  typedef apollo::localization::msf::LossyMapNode2D     LossyMapNode;
+  typedef apollo::localization::msf::LossyMapNodePool2D LossyMapNodePool;
+  typedef apollo::localization::msf::LossyMapMatrix2D   LossyMapMatrix;
+  typedef apollo::localization::msf::LossyMapCell2D     LossyMapCell;
+  typedef apollo::localization::msf::LossyMapConfig2D   LossyMapConfig;
 
  public:
   /**@brief The constructor. */
@@ -86,7 +88,8 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
   bool Init(const std::string& map_path,
             const unsigned int search_range_x,
             const unsigned int search_range_y,
-            const int zone_id, const unsigned int resolution_id = 0);
+            const int          zone_id,
+            const unsigned int resolution_id = 0);
 
   void SetVelodyneExtrinsic(const Eigen::Affine3d& pose);
   void SetVehicleHeight(double height);
@@ -101,38 +104,40 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
 
   void SetDeltaPitchRollLimit(double limit);
 
-  int Update(const unsigned int frame_idx, const Eigen::Affine3d& pose,
-             const Eigen::Vector3d velocity, const LidarFrame& lidar_frame);
+  int Update(const unsigned int     frame_idx,
+             const Eigen::Affine3d& pose,
+             const Eigen::Vector3d  velocity,
+             const LidarFrame&      lidar_frame);
 
-  void GetResult(Eigen::Affine3d *location, Eigen::Matrix3d *covariance);
+  void GetResult(Eigen::Affine3d* location, Eigen::Matrix3d* covariance);
 
-  void GetLocalizationDistribution(Eigen::MatrixXd *distribution);
+  void GetLocalizationDistribution(Eigen::MatrixXd* distribution);
 
  protected:
   void ComposeMapNode(const Eigen::Vector3d& trans);
 
-  void RefineAltitudeFromMap(Eigen::Affine3d *pose);
+  void RefineAltitudeFromMap(Eigen::Affine3d* pose);
 
  protected:
-  LidarLocator *lidar_locator_;
-  int search_range_x_;
-  int search_range_y_;
-  int node_size_x_;
-  int node_size_y_;
-  double resolution_;
-  MapNodeData* lidar_map_node_;
+  LidarLocator* lidar_locator_;
+  int           search_range_x_;
+  int           search_range_y_;
+  int           node_size_x_;
+  int           node_size_y_;
+  double        resolution_;
+  MapNodeData*  lidar_map_node_;
 
-  LossyMapConfig config_;
-  LossyMap map_;
+  LossyMapConfig   config_;
+  LossyMap         map_;
   LossyMapNodePool map_node_pool_;
-  Eigen::Vector2d map_left_top_corner_;
-  unsigned int resolution_id_;
-  int zone_id_;
-  bool is_map_loaded_;
+  Eigen::Vector2d  map_left_top_corner_;
+  unsigned int     resolution_id_;
+  int              zone_id_;
+  bool             is_map_loaded_;
 
-  double vehicle_lidar_height_;
-  double pre_vehicle_ground_height_;
-  bool is_pre_ground_height_valid_;
+  double          vehicle_lidar_height_;
+  double          pre_vehicle_ground_height_;
+  bool            is_pre_ground_height_valid_;
   Eigen::Affine3d velodyne_extrinsic_;
 };
 

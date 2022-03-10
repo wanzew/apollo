@@ -36,27 +36,31 @@ namespace traffic_light {
  */
 class ClassifyBySimple : public IRefine {
  public:
-  ClassifyBySimple(const std::string &class_net_,
-                   const std::string &class_model_, float threshold,
-                   unsigned int resize_width, unsigned int resize_height);
+  ClassifyBySimple(const std::string& class_net_,
+                   const std::string& class_model_,
+                   float              threshold,
+                   unsigned int       resize_width,
+                   unsigned int       resize_height);
 
-  void Init(const std::string &class_net_, const std::string &class_model_,
-            float threshold, unsigned int resize_width,
-            unsigned int resize_height);
+  void Init(const std::string& class_net_,
+            const std::string& class_model_,
+            float              threshold,
+            unsigned int       resize_width,
+            unsigned int       resize_height);
 
-  virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights);
+  virtual void Perform(const cv::Mat& ros_image, std::vector<LightPtr>* lights);
 
-  void SetCropBox(const cv::Rect &box) override;
+  void SetCropBox(const cv::Rect& box) override;
 
   ~ClassifyBySimple() = default;
 
  private:
-  void ProbToColor(const float *out_put_data, float threshold, LightPtr light);
+  void ProbToColor(const float* out_put_data, float threshold, LightPtr light);
   std::unique_ptr<caffe::Net<float>> classify_net_ptr_;
-  cv::Rect crop_box_;
-  int resize_width_ = 0;
-  int resize_height_ = 0;
-  float unknown_threshold_ = 0.0;
+  cv::Rect                           crop_box_;
+  int                                resize_width_      = 0;
+  int                                resize_height_     = 0;
+  float                              unknown_threshold_ = 0.0;
 };
 
 }  // namespace traffic_light

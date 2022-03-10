@@ -113,15 +113,15 @@ void apollo_app_sigint_handler(int signal_num);
 }  // namespace common
 }  // namespace apollo
 
-#define APOLLO_MAIN(APP)                                       \
-  int main(int argc, char **argv) {                            \
-    google::InitGoogleLogging(argv[0]);                        \
-    google::ParseCommandLineFlags(&argc, &argv, true);         \
-    signal(SIGINT, apollo::common::apollo_app_sigint_handler); \
-    APP apollo_app_;                                           \
-    ros::init(argc, argv, apollo_app_.Name());                 \
-    apollo_app_.Spin();                                        \
-    return 0;                                                  \
+#define APOLLO_MAIN(APP)                                                                           \
+  int main(int argc, char** argv) {                                                                \
+    google::InitGoogleLogging(argv[0]);                                                            \
+    google::ParseCommandLineFlags(&argc, &argv, true);                                             \
+    signal(SIGINT, apollo::common::apollo_app_sigint_handler);                                     \
+    APP apollo_app_;                                                                               \
+    ros::init(argc, argv, apollo_app_.Name());                                                     \
+    apollo_app_.Spin();                                                                            \
+    return 0;                                                                                      \
   }
 
 #endif  // MODULES_COMMON_APOLLO_APP_H_

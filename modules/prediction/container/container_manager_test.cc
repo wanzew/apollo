@@ -31,22 +31,20 @@ class ContainerManagerTest : public ::testing::Test {
   virtual void SetUp() { manager_ = ContainerManager::instance(); }
 
  protected:
-  ContainerManager *manager_ = nullptr;
+  ContainerManager*                     manager_ = nullptr;
   common::adapter::AdapterManagerConfig conf_;
 };
 
 TEST_F(ContainerManagerTest, GetContainer) {
-  std::string conf_file = "modules/prediction/testdata/adapter_conf.pb.txt";
-  bool ret_load_conf = common::util::GetProtoFromFile(conf_file, &conf_);
+  std::string conf_file     = "modules/prediction/testdata/adapter_conf.pb.txt";
+  bool        ret_load_conf = common::util::GetProtoFromFile(conf_file, &conf_);
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(conf_.IsInitialized());
 
   manager_->Init(conf_);
-  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::PERCEPTION_OBSTACLES) !=
-              nullptr);
+  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::PERCEPTION_OBSTACLES) != nullptr);
   EXPECT_TRUE(manager_->GetContainer(AdapterConfig::LOCALIZATION) != nullptr);
-  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::CONTROL_COMMAND) ==
-              nullptr);
+  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::CONTROL_COMMAND) == nullptr);
 }
 
 }  // namespace prediction

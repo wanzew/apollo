@@ -46,14 +46,14 @@ bool PbfSensorManager::Init() {
   sensors_.clear();
 
   std::string sensor_id = GetSensorType(SensorType::VELODYNE_64);
-  SensorType type = SensorType::VELODYNE_64;
+  SensorType  type      = SensorType::VELODYNE_64;
 
-  PbfSensor *velodyne_64 = new PbfSensor(sensor_id, type);
-  sensors_[sensor_id] = velodyne_64;
+  PbfSensor* velodyne_64 = new PbfSensor(sensor_id, type);
+  sensors_[sensor_id]    = velodyne_64;
 
-  sensor_id = GetSensorType(SensorType::RADAR);
-  type = SensorType::RADAR;
-  PbfSensor *radar = new PbfSensor(sensor_id, type);
+  sensor_id        = GetSensorType(SensorType::RADAR);
+  type             = SensorType::RADAR;
+  PbfSensor* radar = new PbfSensor(sensor_id, type);
   if (radar == nullptr) {
     AERROR << "Fail to create PbfSensor. sensor_id = " << sensor_id;
     return false;
@@ -68,15 +68,14 @@ bool PbfSensorManager::Init() {
   return true;
 }
 
-void PbfSensorManager::AddSensorMeasurements(const SensorObjects &objects) {
+void PbfSensorManager::AddSensorMeasurements(const SensorObjects& objects) {
   std::string sensor_id = GetSensorType(objects.sensor_type);
-  SensorType type = objects.sensor_type;
+  SensorType  type      = objects.sensor_type;
 
-  auto it = sensors_.find(sensor_id);
-  PbfSensor *sensor = nullptr;
+  auto       it     = sensors_.find(sensor_id);
+  PbfSensor* sensor = nullptr;
   if (it == sensors_.end()) {
-    AWARN << "Cannot find sensor " << sensor_id
-          << " and create one in SensorManager";
+    AWARN << "Cannot find sensor " << sensor_id << " and create one in SensorManager";
     sensor = new PbfSensor(sensor_id, type);
     if (sensor == nullptr) {
       AERROR << "Fail to create PbfSensor. sensor_id = " << sensor_id;
@@ -89,61 +88,52 @@ void PbfSensorManager::AddSensorMeasurements(const SensorObjects &objects) {
   sensor->AddFrame(objects);
 }
 
-void PbfSensorManager::GetLatestSensorFrames(
-    const double time_stamp, const std::string &sensor_id,
-    std::vector<PbfSensorFramePtr> *frames) {
-  if (frames == nullptr) {
-    return;
-  }
+void PbfSensorManager::GetLatestSensorFrames(const double                    time_stamp,
+                                             const std::string&              sensor_id,
+                                             std::vector<PbfSensorFramePtr>* frames) {
+  if (frames == nullptr) { return; }
   auto it = sensors_.find(sensor_id);
-  if (it == sensors_.end()) {
-    return;
-  }
+  if (it == sensors_.end()) { return; }
   return it->second->QueryLatestFrames(time_stamp, frames);
 }
 
-void PbfSensorManager::GetLatestFrames(const double time_stamp,
-                                       std::vector<PbfSensorFramePtr> *frames) {
-  if (frames == nullptr) {
-    return;
-  }
+void PbfSensorManager::GetLatestFrames(const double                    time_stamp,
+                                       std::vector<PbfSensorFramePtr>* frames) {
+  if (frames == nullptr) { return; }
   frames->clear();
   for (auto it = sensors_.begin(); it != sensors_.end(); ++it) {
-    PbfSensor *sensor = it->second;
-    PbfSensorFramePtr frame = sensor->QueryLatestFrame(time_stamp);
-    if (frame != nullptr) {
-      frames->push_back(frame);
-    }
+    PbfSensor*        sensor = it->second;
+    PbfSensorFramePtr frame  = sensor->QueryLatestFrame(time_stamp);
+    if (frame != nullptr) { frames->push_back(frame); }
   }
-  std::sort(frames->begin(), frames->end(),
-            [](PbfSensorFramePtr p1, PbfSensorFramePtr p2) {
-              return p1->timestamp < p2->timestamp;
-            });
+  std::sort(frames->begin(), frames->end(), [](PbfSensorFramePtr p1, PbfSensorFramePtr p2) {
+    return p1->timestamp < p2->timestamp;
+  });
 }
 
-PbfSensor *PbfSensorManager::GetSensor(const std::string &sensor_id) {
-  std::map<std::string, PbfSensor *>::iterator it = sensors_.find(sensor_id);
-  PbfSensor *sensor = nullptr;
-  if (it != sensors_.end()) {
-    sensor = it->second;
-  }
+PbfSensor* PbfSensorManager::GetSensor(const std::string& sensor_id) {
+  std::map<std::string, PbfSensor*>::iterator it     = sensors_.find(sensor_id);
+  PbfSensor*                                  sensor = nullptr;
+  if (it != sensors_.end()) { sensor = it->second; }
   return sensor;
 }
 
-bool PbfSensorManager::GetPose(const std::string &sensor_id, double time_stamp,
-                               const double time_range, Eigen::Matrix4d *pose) {
+bool PbfSensorManager::GetPose(const std::string& sensor_id,
+                               double             time_stamp,
+                               const double       time_range,
+                               Eigen::Matrix4d*   pose) {
   if (pose == nullptr) {
     AERROR << "output parameter pose is nullptr";
     return false;
   }
 
-  std::map<std::string, PbfSensor *>::iterator it = sensors_.find(sensor_id);
+  std::map<std::string, PbfSensor*>::iterator it = sensors_.find(sensor_id);
   if (it == sensors_.end()) {
     AERROR << "Failed to find sensor for " << sensor_id;
     return false;
   }
 
-  PbfSensor *sensor = it->second;
+  PbfSensor* sensor = it->second;
   return sensor->GetPose(time_stamp, time_range, pose);
 }
 

@@ -18,31 +18,29 @@
 namespace apollo {
 namespace perception {
 ContiRadarIDExpansion::ContiRadarIDExpansion() {
-  current_idx_ = 0;
-  need_restart_ = true;
+  current_idx_        = 0;
+  need_restart_       = true;
   need_inner_restart_ = false;
-  timestamp_ = 0.0;
+  timestamp_          = 0.0;
 }
 
 ContiRadarIDExpansion::~ContiRadarIDExpansion() {}
 
-void ContiRadarIDExpansion::ExpandIds(ContiRadar *radar_obs) {
-  if (radar_obs == nullptr) {
-    return;
-  }
+void ContiRadarIDExpansion::ExpandIds(ContiRadar* radar_obs) {
+  if (radar_obs == nullptr) { return; }
   // SkipOutdatedObjects(radar_obs);
   for (int i = 0; i < radar_obs->contiobs_size(); ++i) {
-    ContiRadarObs &contiobs = *(radar_obs->mutable_contiobs(i));
-    int id = contiobs.obstacle_id();
-    int meas_state = contiobs.meas_state();
+    ContiRadarObs& contiobs   = *(radar_obs->mutable_contiobs(i));
+    int            id         = contiobs.obstacle_id();
+    int            meas_state = contiobs.meas_state();
     if (/*need_restart_ || */ need_inner_restart_ ||
         meas_state == static_cast<int>(ContiMeasState::CONTI_NEW)) {
-      int next_id = GetNextId();
+      int next_id       = GetNextId();
       local2global_[id] = next_id;
     } else {
       auto it = local2global_.find(id);
       if (it == local2global_.end()) {
-        int next_id = GetNextId();
+        int next_id       = GetNextId();
         local2global_[id] = next_id;
       }
     }
@@ -50,17 +48,16 @@ void ContiRadarIDExpansion::ExpandIds(ContiRadar *radar_obs) {
   }
 }
 
-void ContiRadarIDExpansion::SkipOutdatedObjects(ContiRadar *radar_obs) {
+void ContiRadarIDExpansion::SkipOutdatedObjects(ContiRadar* radar_obs) {
   ContiRadar out_obs;
-  double timestamp = radar_obs->header().timestamp_sec() - 1e-6;
-  need_inner_restart_ = false;
+  double     timestamp = radar_obs->header().timestamp_sec() - 1e-6;
+  need_inner_restart_  = false;
   for (int i = 0; i < radar_obs->contiobs_size(); ++i) {
-    ContiRadarObs &contiobs = *(radar_obs->mutable_contiobs(i));
-    double object_timestamp =
-        static_cast<double>(contiobs.header().timestamp_sec());
+    ContiRadarObs& contiobs         = *(radar_obs->mutable_contiobs(i));
+    double         object_timestamp = static_cast<double>(contiobs.header().timestamp_sec());
     if (object_timestamp > timestamp) {
-      ContiRadarObs *obs = out_obs.add_contiobs();
-      *obs = contiobs;
+      ContiRadarObs* obs = out_obs.add_contiobs();
+      *obs               = contiobs;
     } else {
       need_inner_restart_ = true;
     }
@@ -78,9 +75,7 @@ void ContiRadarIDExpansion::SetNeedRestart(const bool need_restart) {
 
 void ContiRadarIDExpansion::UpdateTimestamp(const double timestamp) {
   need_restart_ = false;
-  if (timestamp - timestamp_ > 0.1) {
-    need_restart_ = true;
-  }
+  if (timestamp - timestamp_ > 0.1) { need_restart_ = true; }
   timestamp_ = timestamp;
 }
 

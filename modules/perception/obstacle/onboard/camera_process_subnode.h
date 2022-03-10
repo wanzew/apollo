@@ -33,8 +33,8 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/common/time/timer.h"
 #include "modules/common/time/time_util.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/cuda_util/util.h"
 #include "modules/perception/lib/base/singleton.h"
@@ -64,12 +64,10 @@ namespace perception {
 
 class CameraProcessSubnode : public Subnode {
  public:
-  CameraProcessSubnode() = default;
+  CameraProcessSubnode()  = default;
   ~CameraProcessSubnode() = default;
 
-  apollo::common::Status ProcEvents() override {
-    return apollo::common::Status::OK();
-  }
+  apollo::common::Status ProcEvents() override { return apollo::common::Status::OK(); }
 
  private:
   bool InitInternal() override;
@@ -80,53 +78,50 @@ class CameraProcessSubnode : public Subnode {
   void ChassisCallback(const apollo::canbus::Chassis& message);
 
   bool MessageToMat(const sensor_msgs::Image& msg, cv::Mat* img);
-  bool MatToMessage(const cv::Mat& img, sensor_msgs::Image *msg);
+  bool MatToMessage(const cv::Mat& img, sensor_msgs::Image* msg);
 
-  void VisualObjToSensorObj(
-      const std::vector<std::shared_ptr<VisualObject>>& objects,
-      SharedDataPtr<SensorObjects>* sensor_objects);
+  void VisualObjToSensorObj(const std::vector<std::shared_ptr<VisualObject>>& objects,
+                            SharedDataPtr<SensorObjects>*                     sensor_objects);
 
-  void PublishDataAndEvent(const double timestamp,
+  void PublishDataAndEvent(const double                        timestamp,
                            const SharedDataPtr<SensorObjects>& sensor_objects,
-                           const SharedDataPtr<CameraItem>& camera_item);
+                           const SharedDataPtr<CameraItem>&    camera_item);
 
-  void PublishPerceptionPbObj(const SharedDataPtr<SensorObjects>&
-                              sensor_objects);
-  void PublishPerceptionPbLnMsk(const cv::Mat& mask,
-                                const sensor_msgs::Image &message);
+  void PublishPerceptionPbObj(const SharedDataPtr<SensorObjects>& sensor_objects);
+  void PublishPerceptionPbLnMsk(const cv::Mat& mask, const sensor_msgs::Image& message);
 
   // General
-  std::string device_id_ = "camera";
-  SeqId seq_num_ = 0;
-  double timestamp_ns_ = 0.0;
+  std::string device_id_    = "camera";
+  SeqId       seq_num_      = 0;
+  double      timestamp_ns_ = 0.0;
 
   // Shared Data
   CameraObjectData* cam_obj_data_;
   CameraSharedData* cam_shared_data_;
 
   // Calibration
-  int32_t image_height_ = 1080;
-  int32_t image_width_ = 1920;
-  Eigen::Matrix4d camera_to_car_;
+  int32_t                     image_height_ = 1080;
+  int32_t                     image_width_  = 1920;
+  Eigen::Matrix4d             camera_to_car_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
 
   // Dynamic calibration based on objects
   // Always available, but retreat to static one if flag is false
-  bool adjusted_extrinsics_ = false;
+  bool            adjusted_extrinsics_ = false;
   Eigen::Matrix4d camera_to_car_adj_;
 
   // Publish to Peception Protobuf and ROS topic
-  bool pb_obj_ = false;  // Objects
+  bool                    pb_obj_ = false;  // Objects
   apollo::canbus::Chassis chassis_;
-  bool pb_ln_msk_ = false;  // Lane marking mask
-  const float ln_msk_threshold_ = 0.95f;
+  bool                    pb_ln_msk_        = false;  // Lane marking mask
+  const float             ln_msk_threshold_ = 0.95f;
 
   // Modules
-  std::unique_ptr<BaseCameraDetector> detector_;
-  std::unique_ptr<BaseCameraConverter> converter_;
-  std::unique_ptr<BaseCameraTracker> tracker_;
+  std::unique_ptr<BaseCameraDetector>    detector_;
+  std::unique_ptr<BaseCameraConverter>   converter_;
+  std::unique_ptr<BaseCameraTracker>     tracker_;
   std::unique_ptr<BaseCameraTransformer> transformer_;
-  std::unique_ptr<BaseCameraFilter> filter_;
+  std::unique_ptr<BaseCameraFilter>      filter_;
 };
 
 REGISTER_SUBNODE(CameraProcessSubnode);

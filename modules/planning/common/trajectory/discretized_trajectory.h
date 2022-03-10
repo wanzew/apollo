@@ -40,11 +40,9 @@ class DiscretizedTrajectory : public Trajectory {
    */
   explicit DiscretizedTrajectory(const ADCTrajectory& trajectory);
 
-  explicit DiscretizedTrajectory(
-      const std::vector<common::TrajectoryPoint>& trajectory_points);
+  explicit DiscretizedTrajectory(const std::vector<common::TrajectoryPoint>& trajectory_points);
 
-  void SetTrajectoryPoints(
-      const std::vector<common::TrajectoryPoint>& trajectory_points);
+  void SetTrajectoryPoints(const std::vector<common::TrajectoryPoint>& trajectory_points);
 
   virtual ~DiscretizedTrajectory() = default;
 
@@ -60,25 +58,22 @@ class DiscretizedTrajectory : public Trajectory {
 
   virtual uint32_t QueryNearestPoint(const common::math::Vec2d& position) const;
 
-  virtual void AppendTrajectoryPoint(
-      const common::TrajectoryPoint& trajectory_point);
+  virtual void AppendTrajectoryPoint(const common::TrajectoryPoint& trajectory_point);
 
   template <typename Iter>
   void PrependTrajectoryPoints(Iter begin, Iter end) {
     if (!trajectory_points_.empty() && begin != end) {
-      CHECK((end - 1)->relative_time() <
-            trajectory_points_.front().relative_time());
+      CHECK((end - 1)->relative_time() < trajectory_points_.front().relative_time());
     }
     trajectory_points_.insert(trajectory_points_.begin(), begin, end);
   }
 
-  const common::TrajectoryPoint& TrajectoryPointAt(
-      const std::uint32_t index) const;
+  const common::TrajectoryPoint& TrajectoryPointAt(const std::uint32_t index) const;
 
   uint32_t NumOfPoints() const;
 
   const std::vector<common::TrajectoryPoint>& trajectory_points() const;
-  std::vector<common::TrajectoryPoint>& trajectory_points();
+  std::vector<common::TrajectoryPoint>&       trajectory_points();
 
   virtual void Clear();
 
@@ -95,8 +90,7 @@ DiscretizedTrajectory::trajectory_points() const {
   return trajectory_points_;
 }
 
-inline std::vector<common::TrajectoryPoint>&
-DiscretizedTrajectory::trajectory_points() {
+inline std::vector<common::TrajectoryPoint>& DiscretizedTrajectory::trajectory_points() {
   return trajectory_points_;
 }
 

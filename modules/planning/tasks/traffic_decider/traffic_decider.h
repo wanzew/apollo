@@ -48,19 +48,18 @@ namespace planning {
 class TrafficDecider {
  public:
   TrafficDecider() = default;
-  bool Init(const TrafficRuleConfigs &config);
+  bool Init(const TrafficRuleConfigs& config);
   virtual ~TrafficDecider() = default;
-  apollo::common::Status Execute(Frame *frame,
-                                 ReferenceLineInfo *reference_line_info);
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info);
 
  private:
-  static apollo::common::util::Factory<
-      TrafficRuleConfig::RuleId, TrafficRule,
-      TrafficRule *(*)(const TrafficRuleConfig &config)>
+  static apollo::common::util::Factory<TrafficRuleConfig::RuleId,
+                                       TrafficRule,
+                                       TrafficRule* (*)(const TrafficRuleConfig& config)>
       s_rule_factory;
 
   void RegisterRules();
-  void BuildPlanningTarget(ReferenceLineInfo *reference_line_info);
+  void BuildPlanningTarget(ReferenceLineInfo* reference_line_info);
 
   TrafficRuleConfigs rule_configs_;
 };

@@ -22,7 +22,7 @@
 #include "modules/prediction/network/net_model.h"
 
 #ifndef MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
-#define MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
+#  define MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
 
 /**
  * @namespace apollo::prediction::network
@@ -45,8 +45,7 @@ class RnnModel : public NetModel {
    * @param Inputs to the network
    * @param Output of the network will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) const override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) const override;
 
   /**
    * @brief Set the internal state of a network model

@@ -42,22 +42,22 @@ namespace perception {
 
 class ObjectCameraFilter : public BaseCameraFilter {
  public:
-  ObjectCameraFilter() : BaseCameraFilter() {}
+  ObjectCameraFilter()
+      : BaseCameraFilter() {}
 
   virtual ~ObjectCameraFilter() {}
 
   bool Init() override;
 
-  bool Filter(const double timestamp,
-              std::vector<std::shared_ptr<VisualObject>> *objects) override;
+  bool Filter(const double timestamp, std::vector<std::shared_ptr<VisualObject>>* objects) override;
 
   std::string Name() const override;
 
  private:
   class ObjectFilter {
    public:
-    int track_id_ = -1;
-    int lost_frame_cnt_ = 0;
+    int    track_id_       = -1;
+    int    lost_frame_cnt_ = 0;
     double last_timestamp_ = 0.0f;
 
     common::math::KalmanFilter<float, 2, 1, 1> x_;
@@ -65,21 +65,20 @@ class ObjectCameraFilter : public BaseCameraFilter {
     common::math::KalmanFilter<float, 2, 1, 1> theta_;
   };
 
-  void InitFilter(const float x,
-                  common::math::KalmanFilter<float, 2, 1, 1> *filter);
+  void InitFilter(const float x, common::math::KalmanFilter<float, 2, 1, 1>* filter);
 
   std::unordered_map<int, ObjectFilter> tracked_filters_;
-  const int kMaxKeptFrameCnt = 5;
+  const int                             kMaxKeptFrameCnt = 5;
 
   // @brief Create filters for new track ids
-  void Create(const int track_id, const double timestamp,
-              const std::shared_ptr<VisualObject> &obj_ptr);
+  void
+  Create(const int track_id, const double timestamp, const std::shared_ptr<VisualObject>& obj_ptr);
 
   // @brief Predict step
   void Predict(const int track_id, const double timestamp);
 
   // @brief Update step
-  void Update(const int track_id, const std::shared_ptr<VisualObject> &obj_ptr);
+  void Update(const int track_id, const std::shared_ptr<VisualObject>& obj_ptr);
 
   // @brief Get output of estimated state
   void GetState(const int track_id, std::shared_ptr<VisualObject> obj_ptr);

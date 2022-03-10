@@ -19,18 +19,17 @@
 namespace apollo {
 namespace perception {
 
-void FeatureDescriptor::ComputeHistogram(const int bin_size,
-                                         std::vector<float>* feature) {
+void FeatureDescriptor::ComputeHistogram(const int bin_size, std::vector<float>* feature) {
   GetMinMaxCenter();
 
-  int xstep = bin_size;
-  int ystep = bin_size;
-  int zstep = bin_size;
-  int stat_len = xstep + ystep + zstep;
+  int              xstep    = bin_size;
+  int              ystep    = bin_size;
+  int              zstep    = bin_size;
+  int              stat_len = xstep + ystep + zstep;
   std::vector<int> stat_feat(stat_len, 0);
-  float xsize = (max_pt_.x - min_pt_.x) / xstep + 0.000001;
-  float ysize = (max_pt_.y - min_pt_.y) / ystep + 0.000001;
-  float zsize = (max_pt_.z - min_pt_.z) / zstep + 0.000001;
+  float            xsize = (max_pt_.x - min_pt_.x) / xstep + 0.000001;
+  float            ysize = (max_pt_.y - min_pt_.y) / ystep + 0.000001;
+  float            zsize = (max_pt_.z - min_pt_.z) / zstep + 0.000001;
 
   int pt_num = cloud_->points.size();
   for (int i = 0; i < pt_num; ++i) {
@@ -42,8 +41,7 @@ void FeatureDescriptor::ComputeHistogram(const int bin_size,
   // update feature
   (*feature).resize(stat_len);
   for (size_t i = 0; i < stat_feat.size(); ++i) {
-    (*feature)[i] =
-        static_cast<float>(stat_feat[i]) / static_cast<float>(pt_num);
+    (*feature)[i] = static_cast<float>(stat_feat[i]) / static_cast<float>(pt_num);
   }
 }
 

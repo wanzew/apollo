@@ -67,7 +67,7 @@ class MPCController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  common::Status Init(const ControlConf *control_conf) override;
+  common::Status Init(const ControlConf* control_conf) override;
 
   /**
    * @brief compute steering target and throttle/ brake based on current vehicle
@@ -78,10 +78,10 @@ class MPCController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      ControlCommand *cmd) override;
+  common::Status ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                                       const canbus::Chassis*                    chassis,
+                                       const planning::ADCTrajectory*            trajectory,
+                                       ControlCommand*                           cmd) override;
 
   /**
    * @brief reset MPC Controller
@@ -101,27 +101,29 @@ class MPCController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleMPCDebug *debug);
+  void UpdateState(SimpleMPCDebug* debug);
 
-  void UpdateMatrix(SimpleMPCDebug *debug);
+  void UpdateMatrix(SimpleMPCDebug* debug);
 
-  void FeedforwardUpdate(SimpleMPCDebug *debug);
+  void FeedforwardUpdate(SimpleMPCDebug* debug);
 
-  void ComputeLateralErrors(const double x, const double y, const double theta,
-                            const double linear_v, const double angular_v,
-                            const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleMPCDebug *debug);
+  void ComputeLateralErrors(const double              x,
+                            const double              y,
+                            const double              theta,
+                            const double              linear_v,
+                            const double              angular_v,
+                            const TrajectoryAnalyzer& trajectory_analyzer,
+                            SimpleMPCDebug*           debug);
 
-  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
-                                 SimpleMPCDebug *debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer* trajectory, SimpleMPCDebug* debug);
 
-  bool LoadControlConf(const ControlConf *control_conf);
+  bool LoadControlConf(const ControlConf* control_conf);
 
-  void InitializeFilters(const ControlConf *control_conf);
+  void InitializeFilters(const ControlConf* control_conf);
 
   void LogInitParameters();
 
-  void ProcessLogs(const SimpleMPCDebug *debug, const canbus::Chassis *chassis);
+  void ProcessLogs(const SimpleMPCDebug* debug, const canbus::Chassis* chassis);
 
   void CloseLogFile();
 
@@ -131,10 +133,9 @@ class MPCController : public Controller {
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
 
-  void LoadControlCalibrationTable(
-      const MPCControllerConf &mpc_controller_conf);
+  void LoadControlCalibrationTable(const MPCControllerConf& mpc_controller_conf);
 
-  void LoadMPCGainScheduler(const MPCControllerConf &mpc_controller_conf);
+  void LoadMPCGainScheduler(const MPCControllerConf& mpc_controller_conf);
 
   std::unique_ptr<Interpolation2D> control_interpolation_;
 

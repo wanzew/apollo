@@ -46,7 +46,7 @@ typedef std::vector<std::shared_ptr<LightPtrs>> LightsArray;
  */
 class TLPreprocessor : public BasePreprocessor {
  public:
-  TLPreprocessor() = default;
+  TLPreprocessor()          = default;
   virtual ~TLPreprocessor() = default;
 
   virtual bool Init();
@@ -60,9 +60,8 @@ class TLPreprocessor : public BasePreprocessor {
    * @param timestamp
    * @return success?
    */
-  bool CacheLightsProjections(const CarPose &pose,
-                              const std::vector<Signal> &signals,
-                              const double ts);
+  bool
+  CacheLightsProjections(const CarPose& pose, const std::vector<Signal>& signals, const double ts);
 
   /**
    * @brief when image arrives, sync image with cached lights
@@ -71,10 +70,9 @@ class TLPreprocessor : public BasePreprocessor {
    * @param should_pub tells whether publish this image to proc
    * @return success?
    */
-  bool SyncImage(ImageSharedPtr image, ImageLightsPtr *image_lights,
-                 bool *should_pub);
+  bool SyncImage(ImageSharedPtr image, ImageLightsPtr* image_lights, bool* should_pub);
 
-  void set_last_pub_camera_id(CameraId camera_id);
+  void     set_last_pub_camera_id(CameraId camera_id);
   CameraId last_pub_camera_id() const;
 
   int max_cached_lights_size() const;
@@ -88,9 +86,11 @@ class TLPreprocessor : public BasePreprocessor {
    * @param lights_outside_image
    * @return
    */
-  bool ProjectLights(const CarPose &pose, const std::vector<Signal> &signals,
-                     const CameraId &camera_id, LightPtrs *lights_on_image,
-                     LightPtrs *lights_outside_image);
+  bool ProjectLights(const CarPose&             pose,
+                     const std::vector<Signal>& signals,
+                     const CameraId&            camera_id,
+                     LightPtrs*                 lights_on_image,
+                     LightPtrs*                 lights_outside_image);
 
   /**
    * @brief given projected lights, select which camera to use
@@ -99,10 +99,10 @@ class TLPreprocessor : public BasePreprocessor {
    * @param lights_outside_image_array
    * @param selectted camera
    */
-  void SelectImage(const CarPose &pose,
-                   const LightsArray &lights_on_image_array,
-                   const LightsArray &lights_outside_image_array,
-                   CameraId *selection);
+  void SelectImage(const CarPose&     pose,
+                   const LightsArray& lights_on_image_array,
+                   const LightsArray& lights_outside_image_array,
+                   CameraId*          selection);
 
   /**
    * @brief given image border size, judge whether roi is on border
@@ -111,8 +111,7 @@ class TLPreprocessor : public BasePreprocessor {
    * @param border_size
    * @return
    */
-  bool IsOnBorder(const cv::Size size, const cv::Rect &roi,
-                  const int border_size) const;
+  bool IsOnBorder(const cv::Size size, const cv::Rect& roi, const int border_size) const;
 
   int GetMinFocalLenCameraId();
   int GetMaxFocalLenCameraId();

@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_SUBNODE_H_
 #define MODULES_PERCEPTION_ONBOARD_SUBNODE_H_
 
-#include <unistd.h>
 #include <cstdio>
 #include <string>
+#include <unistd.h>
 #include <vector>
 
 #include "modules/perception/onboard/proto/dag_config.pb.h"
@@ -42,7 +42,8 @@ class SharedDataManager;
 //        SubnodeOut, are derived this one.
 class Subnode : public Thread {
  public:
-  Subnode() : Thread(true) {}
+  Subnode()
+      : Thread(true) {}
 
   virtual ~Subnode() {}
 
@@ -50,11 +51,11 @@ class Subnode : public Thread {
   //        It is same for all the subnodes in one stream;
   // @return  bool
   // @retval
-  virtual bool Init(const DAGConfig::Subnode &config,
-                    const std::vector<EventID> &sub_events,
-                    const std::vector<EventID> &pub_events,
-                    EventManager *event_manager,
-                    SharedDataManager *shared_data_manager);
+  virtual bool Init(const DAGConfig::Subnode&   config,
+                    const std::vector<EventID>& sub_events,
+                    const std::vector<EventID>& pub_events,
+                    EventManager*               event_manager,
+                    SharedDataManager*          shared_data_manager);
 
   void Stop() { stop_ = true; }
 
@@ -82,21 +83,21 @@ class Subnode : public Thread {
   void Run() override;
 
   // following variable can be accessed by Derived Class.
-  SubnodeID id_ = 0;
-  std::string name_;
-  std::string reserve_;
-  DAGConfig::SubnodeType type_ = DAGConfig::SUBNODE_NORMAL;
-  EventManager *event_manager_ = nullptr;
-  SharedDataManager *shared_data_manager_ = nullptr;
+  SubnodeID              id_ = 0;
+  std::string            name_;
+  std::string            reserve_;
+  DAGConfig::SubnodeType type_                = DAGConfig::SUBNODE_NORMAL;
+  EventManager*          event_manager_       = nullptr;
+  SharedDataManager*     shared_data_manager_ = nullptr;
 
   std::vector<EventMeta> sub_meta_events_;
   std::vector<EventMeta> pub_meta_events_;
 
  private:
-  volatile bool stop_ = false;
-  bool inited_ = false;
-  int total_count_ = 0;
-  int failed_count_ = 0;
+  volatile bool stop_         = false;
+  bool          inited_       = false;
+  int           total_count_  = 0;
+  int           failed_count_ = 0;
   DISALLOW_COPY_AND_ASSIGN(Subnode);
 };
 
@@ -109,14 +110,15 @@ REGISTER_REGISTERER(Subnode);
 // implement the handle_event().
 class CommonSubnode : public Subnode {
  public:
-  CommonSubnode() : Subnode() {}
+  CommonSubnode()
+      : Subnode() {}
   virtual ~CommonSubnode() {}
 
   virtual apollo::common::Status ProcEvents();
 
  protected:
   // Derive class implement this api.
-  virtual bool HandleEvent(const Event &sub_event, Event *pub_event) = 0;
+  virtual bool HandleEvent(const Event& sub_event, Event* pub_event) = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CommonSubnode);

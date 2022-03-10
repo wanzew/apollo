@@ -29,22 +29,20 @@
 #include "modules/common/log.h"
 #include "modules/control/common/control_gflags.h"
 
-DEFINE_string(
-    chassis_test_file, "modules/control/testdata/control_tester/chassis.pb.txt",
-    "Used for sending simulated Chassis content to the control node.");
+DEFINE_string(chassis_test_file,
+              "modules/control/testdata/control_tester/chassis.pb.txt",
+              "Used for sending simulated Chassis content to the control node.");
 DEFINE_string(l10n_test_file,
               "modules/control/testdata/control_tester/localization.pb.txt",
               "Used for sending simulated localization to the control node.");
 DEFINE_string(pad_msg_test_file,
               "modules/control/testdata/control_tester/pad_msg.pb.txt",
               "Used for sending simulated PadMsg content to the control node.");
-DEFINE_string(
-    planning_test_file,
-    "modules/control/testdata/control_tester/planning.pb.txt",
-    "Used for sending simulated Planning content to the control node.");
+DEFINE_string(planning_test_file,
+              "modules/control/testdata/control_tester/planning.pb.txt",
+              "Used for sending simulated Planning content to the control node.");
 DEFINE_int32(num_seconds, 10, "Length of execution.");
-DEFINE_int32(feed_frequency, 10,
-             "Frequency with which protos are fed to control.");
+DEFINE_int32(feed_frequency, 10, "Frequency with which protos are fed to control.");
 
 int main(int argc, char** argv) {
   using std::this_thread::sleep_for;
@@ -57,9 +55,8 @@ int main(int argc, char** argv) {
 
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
-  FLAGS_alsologtostderr = true;
-  const std::string& config_file =
-      "modules/control/testdata/control_tester/adapter.conf";
+  FLAGS_alsologtostderr          = true;
+  const std::string& config_file = "modules/control/testdata/control_tester/adapter.conf";
   ros::init(argc, argv, "control_tester");
   AdapterManager::Init(config_file);
   AINFO << "AdapterManager is initialized.";

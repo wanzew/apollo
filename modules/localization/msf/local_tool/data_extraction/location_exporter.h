@@ -17,9 +17,9 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_LOCATION_EXPORTER_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_LOCATION_EXPORTER_H
 
+#include "modules/localization/msf/local_tool/data_extraction/base_exporter.h"
 #include <memory>
 #include <string>
-#include "modules/localization/msf/local_tool/data_extraction/base_exporter.h"
 
 namespace apollo {
 namespace localization {
@@ -31,16 +31,16 @@ namespace msf {
  */
 class LocationExporter : public BaseExporter {
  public:
-  typedef std::shared_ptr<LocationExporter> Ptr;
+  typedef std::shared_ptr<LocationExporter>       Ptr;
   typedef std::shared_ptr<LocationExporter const> ConstPtr;
 
-  explicit LocationExporter(const std::string &loc_file_folder);
+  explicit LocationExporter(const std::string& loc_file_folder);
   ~LocationExporter();
 
-  void GnssLocCallback(const rosbag::MessageInstance &msg);
-  void LidarLocCallback(const rosbag::MessageInstance &msg);
-  void FusionLocCallback(const rosbag::MessageInstance &msg);
-  void OdometryLocCallback(const rosbag::MessageInstance &msg);
+  void GnssLocCallback(const rosbag::MessageInstance& msg);
+  void LidarLocCallback(const rosbag::MessageInstance& msg);
+  void FusionLocCallback(const rosbag::MessageInstance& msg);
+  void OdometryLocCallback(const rosbag::MessageInstance& msg);
 
  private:
   std::string gnss_loc_file_;
@@ -48,10 +48,10 @@ class LocationExporter : public BaseExporter {
   std::string fusion_loc_file_;
   std::string odometry_loc_file_;
 
-  FILE *gnss_loc_file_handle_;
-  FILE *lidar_loc_file_handle_;
-  FILE *fusion_loc_file_handle_;
-  FILE *odometry_loc_file_handle_;
+  FILE* gnss_loc_file_handle_;
+  FILE* lidar_loc_file_handle_;
+  FILE* fusion_loc_file_handle_;
+  FILE* odometry_loc_file_handle_;
 };
 
 }  // namespace msf

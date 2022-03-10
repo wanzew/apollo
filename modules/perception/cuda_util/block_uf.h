@@ -43,19 +43,19 @@
 #include <cuda_runtime.h>
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_BLOCK_UF_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_BLOCK_UF_H_
+#  define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_BLOCK_UF_H_
 
 namespace apollo {
 namespace perception {
 namespace block_uf {
 
-#ifndef UF_BLOCK_WIDTH
-#define UF_BLOCK_WIDTH 32
-#endif
+#  ifndef UF_BLOCK_WIDTH
+#    define UF_BLOCK_WIDTH 32
+#  endif
 
-#ifndef UF_BLOCK_HEIGHT
-#define UF_BLOCK_HEIGHT 16
-#endif
+#  ifndef UF_BLOCK_HEIGHT
+#    define UF_BLOCK_HEIGHT 16
+#  endif
 
 __device__ int Find(int* parent, int i);
 

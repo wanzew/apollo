@@ -39,11 +39,10 @@ class HmObjectTrackerTest : public testing::Test {
   virtual ~HmObjectTrackerTest() {}
   void SetUp() {
     RegisterFactoryHmObjectTracker();
-    hm_tracker_ = new HmObjectTracker();
+    hm_tracker_     = new HmObjectTracker();
     object_builder_ = new MinBoxObjectBuilder();
     object_builder_->Init();
-    object_builder_options_.ref_center =
-        Eigen::Vector3d(0, 0, -1.7);  // velodyne height
+    object_builder_options_.ref_center = Eigen::Vector3d(0, 0, -1.7);  // velodyne height
     tracker_options_.velodyne_trans.reset(new Eigen::Matrix4d);
   }
   void TearDown() {
@@ -54,29 +53,28 @@ class HmObjectTrackerTest : public testing::Test {
   }
 
  protected:
-  HmObjectTracker* hm_tracker_ = nullptr;
+  HmObjectTracker*     hm_tracker_     = nullptr;
   MinBoxObjectBuilder* object_builder_ = nullptr;
   ObjectBuilderOptions object_builder_options_;
-  TrackerOptions tracker_options_;
+  TrackerOptions       tracker_options_;
 };
 
-bool ConstructObjects(const std::string& filename,
-                      std::vector<std::shared_ptr<Object>>* objects) {
+bool ConstructObjects(const std::string& filename, std::vector<std::shared_ptr<Object>>* objects) {
   std::ifstream ifs(filename);
   if (!ifs.is_open()) {
     AERROR << "failed to open file" << filename;
     return false;
   }
   std::string type;
-  int no_point = 0;
-  float tmp = 0;
+  int         no_point = 0;
+  float       tmp      = 0;
   while (ifs >> type) {
     ifs >> tmp >> tmp >> tmp >> no_point;
     std::shared_ptr<Object> obj(new Object());
     obj->cloud->resize(no_point);
     for (int j = 0; j < no_point; ++j) {
-      ifs >> obj->cloud->points[j].x >> obj->cloud->points[j].y >>
-          obj->cloud->points[j].z >> obj->cloud->points[j].intensity;
+      ifs >> obj->cloud->points[j].x >> obj->cloud->points[j].y >> obj->cloud->points[j].z >>
+          obj->cloud->points[j].intensity;
     }
     (*objects).push_back(obj);
   }
@@ -87,12 +85,12 @@ TEST_F(HmObjectTrackerTest, Track) {
   // test initialization of hm tracker
   EXPECT_TRUE(hm_tracker_->Init());
   // test tracking via hm tracker
-  std::string data_path = "modules/perception/data/hm_tracker_test/";
+  std::string              data_path = "modules/perception/data/hm_tracker_test/";
   std::vector<std::string> seg_filenames;
   common::util::GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
   std::vector<std::string> pose_filenames;
   common::util::GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
-  int frame_id = -1;
+  int    frame_id   = -1;
   double time_stamp = 0.0;
   EXPECT_GT(seg_filenames.size(), 0);
   EXPECT_EQ(seg_filenames.size(), pose_filenames.size());
@@ -100,8 +98,7 @@ TEST_F(HmObjectTrackerTest, Track) {
   for (size_t i = 0; i < seg_filenames.size(); ++i) {
     // read pose
     Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
-    if (!ReadPoseFile(data_path + pose_filenames[i], &pose, &frame_id,
-                      &time_stamp)) {
+    if (!ReadPoseFile(data_path + pose_filenames[i], &pose, &frame_id, &time_stamp)) {
       AERROR << "failed to read pose";
       return;
     }
@@ -125,8 +122,7 @@ TEST_F(HmObjectTrackerTest, Track) {
     *(tracker_options_.velodyne_trans) = pose;
     std::vector<std::shared_ptr<Object>> result_objects;
     // assert tracking successfully
-    EXPECT_TRUE(hm_tracker_->Track(objects, time_stamp, tracker_options_,
-                                   &result_objects));
+    EXPECT_TRUE(hm_tracker_->Track(objects, time_stamp, tracker_options_, &result_objects));
     // assert reports completely
     EXPECT_TRUE(result_objects.size() >= objects.size());
     std::map<int, int> id_pool;

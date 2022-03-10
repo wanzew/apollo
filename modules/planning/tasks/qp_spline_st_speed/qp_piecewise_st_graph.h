@@ -47,43 +47,43 @@ class QpPiecewiseStGraph {
 
   void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
 
-  common::Status Search(const StGraphData& st_graph_data,
-                        SpeedData* const speed_data,
+  common::Status Search(const StGraphData&               st_graph_data,
+                        SpeedData* const                 speed_data,
                         const std::pair<double, double>& accel_bound);
 
  private:
   void Init();
 
   // Add st graph constraint
-  common::Status AddConstraint(const common::TrajectoryPoint& init_point,
-                               const SpeedLimit& speed_limit,
+  common::Status AddConstraint(const common::TrajectoryPoint&        init_point,
+                               const SpeedLimit&                     speed_limit,
                                const std::vector<const StBoundary*>& boundaries,
-                               const std::pair<double, double>& accel_bound);
+                               const std::pair<double, double>&      accel_bound);
 
   // Add objective function
   common::Status AddKernel(const std::vector<const StBoundary*>& boundaries,
-                           const SpeedLimit& speed_limit);
+                           const SpeedLimit&                     speed_limit);
 
   // solve
   common::Status Solve();
 
   // extract upper lower bound for constraint;
-  common::Status GetSConstraintByTime(
-      const std::vector<const StBoundary*>& boundaries, const double time,
-      const double total_path_s, double* const s_upper_bound,
-      double* const s_lower_bound) const;
+  common::Status GetSConstraintByTime(const std::vector<const StBoundary*>& boundaries,
+                                      const double                          time,
+                                      const double                          total_path_s,
+                                      double* const                         s_upper_bound,
+                                      double* const                         s_lower_bound) const;
 
   // generate reference speed profile
   // common::Status ApplyReferenceSpeedProfile();
-  common::Status AddCruiseReferenceLineKernel(const SpeedLimit& speed_limit,
-                                              const double weight);
+  common::Status AddCruiseReferenceLineKernel(const SpeedLimit& speed_limit, const double weight);
 
-  common::Status AddFollowReferenceLineKernel(
-      const std::vector<const StBoundary*>& boundaries, const double weight);
+  common::Status AddFollowReferenceLineKernel(const std::vector<const StBoundary*>& boundaries,
+                                              const double                          weight);
 
-  common::Status EstimateSpeedUpperBound(
-      const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-      std::vector<double>* speed_upper_bound) const;
+  common::Status EstimateSpeedUpperBound(const common::TrajectoryPoint& init_point,
+                                         const SpeedLimit&              speed_limit,
+                                         std::vector<double>*           speed_upper_bound) const;
 
  private:
   // qp st configuration

@@ -28,10 +28,10 @@ class Wiperrpt91Test : public ::testing::Test {
 };
 
 TEST_F(Wiperrpt91Test, reset) {
-  Wiperrpt91 wiper;
-  int32_t length = 8;
+  Wiperrpt91    wiper;
+  int32_t       length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[3] = {0x01, 0x02, 0x03};
+  uint8_t       bytes[3] = {0x01, 0x02, 0x03};
   wiper.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.gem().wiper_rpt_91().manual_input(), 1);
   EXPECT_DOUBLE_EQ(chassis_detail.gem().wiper_rpt_91().commanded_value(), 2);
@@ -41,4 +41,3 @@ TEST_F(Wiperrpt91Test, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

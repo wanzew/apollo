@@ -35,8 +35,7 @@ namespace prediction {
 class RNNEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    std::string file =
-        "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+    std::string file = "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
   }
 
@@ -45,18 +44,17 @@ class RNNEvaluatorTest : public KMLMapBasedTest {
 };
 
 TEST_F(RNNEvaluatorTest, OnLaneCase) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
-  RNNEvaluator rnn_evaluator;
+  RNNEvaluator       rnn_evaluator;
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   rnn_evaluator.Evaluate(obstacle_ptr);
-  const Feature& feature = obstacle_ptr->latest_feature();
+  const Feature&   feature    = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {
     EXPECT_TRUE(lane_sequence.has_probability());

@@ -20,8 +20,8 @@
 
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
@@ -35,45 +35,43 @@ namespace control {
 
 class SimpleControlTest : public ControlTestBase {
  public:
-  virtual void SetUp() {
-    FLAGS_test_data_dir = "modules/control/testdata/simple_control_test/";
-  }
+  virtual void SetUp() { FLAGS_test_data_dir = "modules/control/testdata/simple_control_test/"; }
 };
 
 TEST_F(SimpleControlTest, simple_test) {
-  FLAGS_enable_csv_debug = true;
+  FLAGS_enable_csv_debug       = true;
   FLAGS_test_localization_file = "1_localization.pb.txt";
-  FLAGS_test_pad_file = "1_pad.pb.txt";
-  FLAGS_test_planning_file = "1_planning.pb.txt";
-  FLAGS_test_chassis_file = "1_chassis.pb.txt";
+  FLAGS_test_pad_file          = "1_pad.pb.txt";
+  FLAGS_test_planning_file     = "1_planning.pb.txt";
+  FLAGS_test_chassis_file      = "1_chassis.pb.txt";
   ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
 
 TEST_F(SimpleControlTest, state_exact_match) {
   FLAGS_test_localization_file = "1_localization.pb.txt";
-  FLAGS_test_pad_file = "1_pad.pb.txt";
-  FLAGS_test_planning_file = "1_planning.pb.txt";
-  FLAGS_test_chassis_file = "1_chassis.pb.txt";
+  FLAGS_test_pad_file          = "1_pad.pb.txt";
+  FLAGS_test_planning_file     = "1_planning.pb.txt";
+  FLAGS_test_chassis_file      = "1_chassis.pb.txt";
   ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
 
 TEST_F(SimpleControlTest, pad_reset) {
   FLAGS_test_localization_file = "1_localization.pb.txt";
-  FLAGS_test_pad_file = "2_pad.pb.txt";
-  FLAGS_test_planning_file = "1_planning.pb.txt";
-  FLAGS_test_chassis_file = "1_chassis.pb.txt";
+  FLAGS_test_pad_file          = "2_pad.pb.txt";
+  FLAGS_test_planning_file     = "1_planning.pb.txt";
+  FLAGS_test_chassis_file      = "1_chassis.pb.txt";
   ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
 
 TEST_F(SimpleControlTest, monitor_fatal) {
   FLAGS_test_localization_file = "1_localization.pb.txt";
-  FLAGS_test_pad_file = "1_pad.pb.txt";
-  FLAGS_test_planning_file = "1_planning.pb.txt";
-  FLAGS_test_chassis_file = "1_chassis.pb.txt";
-  FLAGS_test_monitor_file = "1_monitor.pb.txt";
+  FLAGS_test_pad_file          = "1_pad.pb.txt";
+  FLAGS_test_planning_file     = "1_planning.pb.txt";
+  FLAGS_test_chassis_file      = "1_chassis.pb.txt";
+  FLAGS_test_monitor_file      = "1_monitor.pb.txt";
   ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }

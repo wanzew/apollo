@@ -39,9 +39,9 @@ struct CameraDetectorInitOptions {
 };
 
 struct CameraDetectorOptions {
-  cv::Mat gray_frame;
-  cv::Mat range_frame;
-  std::shared_ptr<CameraDistortD> intrinsic;
+  cv::Mat                          gray_frame;
+  cv::Mat                          range_frame;
+  std::shared_ptr<CameraDistortD>  intrinsic;
   std::shared_ptr<Eigen::Matrix4d> extrinsic_ground2camera;
   std::shared_ptr<Eigen::Matrix4d> extrinsic_stereo;
 };
@@ -51,24 +51,23 @@ class BaseCameraDetector {
   BaseCameraDetector() {}
   virtual ~BaseCameraDetector() {}
 
-  virtual bool Init(const CameraDetectorInitOptions& options =
-                        CameraDetectorInitOptions()) = 0;
+  virtual bool Init(const CameraDetectorInitOptions& options = CameraDetectorInitOptions()) = 0;
 
   // @brief: Object detection on image from camera
   // @param [in]: image frame from camera
   // @param [in/out]: detected objects
-  virtual bool Detect(const cv::Mat& frame,
-                      const CameraDetectorOptions& options,
+  virtual bool Detect(const cv::Mat&                              frame,
+                      const CameraDetectorOptions&                options,
                       std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
 
-  virtual bool Multitask(const cv::Mat& frame,
-                         const CameraDetectorOptions& options,
+  virtual bool Multitask(const cv::Mat&                              frame,
+                         const CameraDetectorOptions&                options,
                          std::vector<std::shared_ptr<VisualObject>>* objects,
-                         cv::Mat* mask) {
+                         cv::Mat*                                    mask) {
     return true;
   }
 
-  virtual bool Lanetask(const cv::Mat &frame, cv::Mat *mask) { return true; }
+  virtual bool Lanetask(const cv::Mat& frame, cv::Mat* mask) { return true; }
   // @brief: Extract deep learning ROI features for each object
   // @param [in/out]: detected objects, with 2D bbox and its features
   virtual bool Extract(std::vector<std::shared_ptr<VisualObject>>* objects) = 0;

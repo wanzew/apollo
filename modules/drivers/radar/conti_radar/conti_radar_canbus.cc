@@ -19,8 +19,8 @@
  */
 
 #include "modules/drivers/radar/conti_radar/conti_radar_canbus.h"
-#include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 
 /**
  * @namespace apollo::drivers::conti_radar
@@ -30,44 +30,34 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-std::string ContiRadarCanbus::Name() const {
-  return FLAGS_canbus_driver_name;
-}
+std::string ContiRadarCanbus::Name() const { return FLAGS_canbus_driver_name; }
 
 apollo::common::Status ContiRadarCanbus::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
   AINFO << "The adapter manager is successfully initialized.";
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file,
-                                                &conti_radar_conf_)) {
-    return OnError("Unable to load canbus conf file: " +
-                   FLAGS_sensor_conf_file);
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file, &conti_radar_conf_)) {
+    return OnError("Unable to load canbus conf file: " + FLAGS_sensor_conf_file);
   }
 
   AINFO << "The canbus conf file is loaded: " << FLAGS_sensor_conf_file;
   ADEBUG << "Canbus_conf:" << conti_radar_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::instance();
+  auto* can_factory = CanClientFactory::instance();
   can_factory->RegisterCanClients();
-  can_client_ = can_factory->CreateCANClient(
-      conti_radar_conf_.can_conf().can_card_parameter());
-  if (!can_client_) {
-    return OnError("Failed to create can client.");
-  }
+  can_client_ = can_factory->CreateCANClient(conti_radar_conf_.can_conf().can_card_parameter());
+  if (!can_client_) { return OnError("Failed to create can client."); }
   AINFO << "Can client is successfully created.";
 
   sensor_message_manager_ =
       std::unique_ptr<ContiRadarMessageManager>(new ContiRadarMessageManager());
-  if (sensor_message_manager_ == nullptr) {
-    return OnError("Failed to create message manager.");
-  }
+  if (sensor_message_manager_ == nullptr) { return OnError("Failed to create message manager."); }
   sensor_message_manager_->set_radar_conf(conti_radar_conf_.radar_conf());
   sensor_message_manager_->set_can_client(can_client_);
   AINFO << "Sensor message manager is successfully created.";
 
   if (can_receiver_.Init(can_client_.get(), sensor_message_manager_.get(),
-                         conti_radar_conf_.can_conf().enable_receiver_log()) !=
-      ErrorCode::OK) {
+                         conti_radar_conf_.can_conf().enable_receiver_log()) != ErrorCode::OK) {
     return OnError("Failed to init can receiver.");
   }
   AINFO << "The can receiver is successfully initialized.";
@@ -85,18 +75,12 @@ apollo::common::ErrorCode ContiRadarCanbus::ConfigureRadar() {
 
 apollo::common::Status ContiRadarCanbus::Start() {
   // 1. init and start the can card hardware
-  if (can_client_->Start() != ErrorCode::OK) {
-    return OnError("Failed to start can client");
-  }
+  if (can_client_->Start() != ErrorCode::OK) { return OnError("Failed to start can client"); }
   AINFO << "Can client is started.";
-  if (ConfigureRadar() != ErrorCode::OK) {
-    return OnError("Failed to configure radar.");
-  }
+  if (ConfigureRadar() != ErrorCode::OK) { return OnError("Failed to configure radar."); }
   AINFO << "The radar is successfully configured.";
   // 2. start receive first then send
-  if (can_receiver_.Start() != ErrorCode::OK) {
-    return OnError("Failed to start can receiver.");
-  }
+  if (can_receiver_.Start() != ErrorCode::OK) { return OnError("Failed to start can receiver."); }
   AINFO << "Can receiver is started.";
 
   // last step: publish monitor messages
@@ -121,7 +105,7 @@ void ContiRadarCanbus::PublishSensorData() {
 }
 
 // Send the error to monitor and return it
-Status ContiRadarCanbus::OnError(const std::string &error_msg) {
+Status ContiRadarCanbus::OnError(const std::string& error_msg) {
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.ERROR(error_msg);
   return Status(ErrorCode::CANBUS_ERROR, error_msg);

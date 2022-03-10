@@ -21,15 +21,15 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_MANAGER_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_MANAGER_H
 
+#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 #include <Eigen/Geometry>
+#include <atomic>
 #include <list>
 #include <map>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <atomic>
-#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
 namespace localization {
@@ -59,8 +59,7 @@ struct LocalizationMsg {
   double std_y = 0;
   double std_z = 0;
 
-  LocalizationMsg interpolate(const double scale,
-                              const LocalizationMsg &loc_msg) {
+  LocalizationMsg interpolate(const double scale, const LocalizationMsg& loc_msg) {
     LocalizationMsg res;
     res.x = this->x * (1 - scale) + loc_msg.x * scale;
     res.y = this->y * (1 - scale) + loc_msg.y * scale;
@@ -69,10 +68,10 @@ struct LocalizationMsg {
     Eigen::Quaterniond quatd1(this->qw, this->qx, this->qy, this->qz);
     Eigen::Quaterniond quatd2(loc_msg.qw, loc_msg.qx, loc_msg.qy, loc_msg.qz);
     Eigen::Quaterniond res_quatd = quatd1.slerp(scale, quatd2);
-    res.qx = res_quatd.x();
-    res.qy = res_quatd.y();
-    res.qz = res_quatd.z();
-    res.qw = res_quatd.w();
+    res.qx                       = res_quatd.x();
+    res.qy                       = res_quatd.y();
+    res.qz                       = res_quatd.z();
+    res.qw                       = res_quatd.w();
 
     res.std_x = this->std_x * (1 - scale) + loc_msg.std_x * scale;
     res.std_y = this->std_y * (1 - scale) + loc_msg.std_y * scale;
@@ -85,64 +84,61 @@ struct LocalizationMsg {
 template <class MessageType>
 class MessageBuffer {
  public:
-  typedef
-      typename std::list<std::pair<double, MessageType>>::iterator ListIterator;
+  typedef typename std::list<std::pair<double, MessageType>>::iterator ListIterator;
 
  public:
   explicit MessageBuffer(int capacity);
   ~MessageBuffer();
 
-  bool PushNewMessage(const double timestamp, const MessageType &msg);
-  bool PopOldestMessage(MessageType *msg);
-  bool GetMessageBefore(const double timestamp, MessageType *msg);
-  bool GetMessage(const double timestamp, MessageType *msg);
+  bool PushNewMessage(const double timestamp, const MessageType& msg);
+  bool PopOldestMessage(MessageType* msg);
+  bool GetMessageBefore(const double timestamp, MessageType* msg);
+  bool GetMessage(const double timestamp, MessageType* msg);
 
   void Clear();
 
   void SetCapacity(const unsigned int capacity);
-  void GetAllMessages(std::list<std::pair<double, MessageType>> *msg_list);
+  void GetAllMessages(std::list<std::pair<double, MessageType>>* msg_list);
 
-  bool IsEmpty();
+  bool         IsEmpty();
   unsigned int BufferSize();
 
  protected:
-  std::map<double, ListIterator> msg_map_;
+  std::map<double, ListIterator>            msg_map_;
   std::list<std::pair<double, MessageType>> msg_list_;
 
  protected:
   pthread_mutex_t buffer_mutex_;
-  unsigned int capacity_;
+  unsigned int    capacity_;
 };
 
 template <class MessageType>
 class IntepolationMessageBuffer : public MessageBuffer<MessageType> {
  public:
-  typedef
-      typename std::list<std::pair<double, MessageType>>::iterator ListIterator;
+  typedef typename std::list<std::pair<double, MessageType>>::iterator ListIterator;
 
  public:
   explicit IntepolationMessageBuffer(int capacity);
   ~IntepolationMessageBuffer();
 
-  bool QueryMessage(const double timestamp, MessageType *msg,
-                    double timeout_s = 0.01);
+  bool QueryMessage(const double timestamp, MessageType* msg, double timeout_s = 0.01);
 
  private:
-  bool WaitMessageBufferOk(const double timestamp,
-                           std::map<double, ListIterator> *msg_map,
-                           std::list<std::pair<double, MessageType>> *msg_list,
-                           double timeout_ms);
+  bool WaitMessageBufferOk(const double                               timestamp,
+                           std::map<double, ListIterator>*            msg_map,
+                           std::list<std::pair<double, MessageType>>* msg_list,
+                           double                                     timeout_ms);
 };
 
 struct VisualizationManagerParams {
-  std::string map_folder;
-  std::string map_visual_folder;
+  std::string     map_folder;
+  std::string     map_visual_folder;
   Eigen::Affine3d velodyne_extrinsic;
-  VisualMapParam map_param;
-  unsigned int lidar_frame_buffer_capacity;
-  unsigned int gnss_loc_info_buffer_capacity;
-  unsigned int lidar_loc_info_buffer_capacity;
-  unsigned int fusion_loc_info_buffer_capacity;
+  VisualMapParam  map_param;
+  unsigned int    lidar_frame_buffer_capacity;
+  unsigned int    gnss_loc_info_buffer_capacity;
+  unsigned int    lidar_loc_info_buffer_capacity;
+  unsigned int    fusion_loc_info_buffer_capacity;
 };
 
 class VisualizationManager {
@@ -152,36 +148,37 @@ class VisualizationManager {
   VisualizationManager();
   ~VisualizationManager();
 
-  static VisualizationManager &GetInstance() {
+  static VisualizationManager& GetInstance() {
     static VisualizationManager visual_manage;
     return visual_manage;
   }
 
-  bool Init(const std::string &map_folder,
-            const std::string &map_visual_folder,
-            const Eigen::Affine3d &velodyne_extrinsic,
-            const VisualMapParam &map_param);
-  bool Init(const VisualizationManagerParams &params);
+  bool Init(const std::string&     map_folder,
+            const std::string&     map_visual_folder,
+            const Eigen::Affine3d& velodyne_extrinsic,
+            const VisualMapParam&  map_param);
+  bool Init(const VisualizationManagerParams& params);
 
-  void AddLidarFrame(const LidarVisFrame &lidar_frame);
-  void AddGNSSLocMessage(const LocalizationMsg &gnss_loc_msg);
-  void AddLidarLocMessage(const LocalizationMsg &lidar_loc_msg);
-  void AddFusionLocMessage(const LocalizationMsg &fusion_loc_msg);
+  void AddLidarFrame(const LidarVisFrame& lidar_frame);
+  void AddGNSSLocMessage(const LocalizationMsg& gnss_loc_msg);
+  void AddLidarLocMessage(const LocalizationMsg& lidar_loc_msg);
+  void AddFusionLocMessage(const LocalizationMsg& fusion_loc_msg);
   void StartVisualization();
   void StopVisualization();
 
  private:
   void DoVisualize();
-  bool GetZoneIdFromMapFolder(const std::string &map_folder,
-                              const unsigned int resolution_id, int *zone_id);
+  bool GetZoneIdFromMapFolder(const std::string& map_folder,
+                              const unsigned int resolution_id,
+                              int*               zone_id);
 
  private:
   VisualizationEngine visual_engine_;
   // Visualization Thread
-  std::thread visual_thread_;
+  std::thread       visual_thread_;
   std::atomic<bool> stop_visualization_;
 
-  MessageBuffer<LidarVisFrame> lidar_frame_buffer_;
+  MessageBuffer<LidarVisFrame>               lidar_frame_buffer_;
   IntepolationMessageBuffer<LocalizationMsg> gnss_loc_info_buffer_;
   IntepolationMessageBuffer<LocalizationMsg> lidar_loc_info_buffer_;
   IntepolationMessageBuffer<LocalizationMsg> fusion_loc_info_buffer_;

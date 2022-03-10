@@ -41,26 +41,23 @@ typedef enum {
 typedef struct TcpCommandHeader_s {
   unsigned char cmd;
   unsigned char ret_code;
-  unsigned int len;
+  unsigned int  len;
 } TcpCommandHeader;
 
 typedef struct TC_Command_s {
   TcpCommandHeader header;
-  unsigned char* data;
+  unsigned char*   data;
 
   unsigned char* ret_data;
-  unsigned int ret_size;
+  unsigned int   ret_size;
 } TC_Command;
 
-void* TcpCommandClientNew(const char* ip, const unsigned short port);
-PTC_ErrCode TcpCommandSetCalibration(const void* handle, const char* buffer,
-                                     unsigned int len);
-PTC_ErrCode TcpCommandGetCalibration(const void* handle, char** buffer,
-                                     unsigned int* len);
-PTC_ErrCode TcpCommandGetLidarCalibration(const void* handle, char** buffer,
-                                          unsigned int* len);
+void*       TcpCommandClientNew(const char* ip, const unsigned short port);
+PTC_ErrCode TcpCommandSetCalibration(const void* handle, const char* buffer, unsigned int len);
+PTC_ErrCode TcpCommandGetCalibration(const void* handle, char** buffer, unsigned int* len);
+PTC_ErrCode TcpCommandGetLidarCalibration(const void* handle, char** buffer, unsigned int* len);
 PTC_ErrCode TcpCommandResetCalibration(const void* handle);
-void TcpCommandClientDestroy(const void* handle);
+void        TcpCommandClientDestroy(const void* handle);
 
 #ifdef __cplusplus
 }

@@ -28,10 +28,10 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
+#include "include/gnss_solver.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "include/gnss_solver.h"
 
 /**
  * @namespace apollo::localization::msf
@@ -52,54 +52,44 @@ union LeverArm {
 
 struct EphKey {
   apollo::drivers::gnss::GnssType gnss_type;
-  unsigned int sat_prn;
+  unsigned int                    sat_prn;
   // toe = eph.toe + eph.week_num * sec_per_week
-  double eph_toe;
+  double           eph_toe;
   static const int second_per_week = 604800;
-  EphKey(const apollo::drivers::gnss::GnssType type,
-         const unsigned int prn,
-         double toe) {
+  EphKey(const apollo::drivers::gnss::GnssType type, const unsigned int prn, double toe) {
     gnss_type = type;
-    sat_prn = prn;
-    eph_toe = toe;
+    sat_prn   = prn;
+    eph_toe   = toe;
   }
   EphKey(const apollo::drivers::gnss::GnssType type,
-         const unsigned int prn,
-         const unsigned int week_num,
-         double toe) {
+         const unsigned int                    prn,
+         const unsigned int                    week_num,
+         double                                toe) {
     gnss_type = type;
-    sat_prn = prn;
-    eph_toe = toe + week_num * second_per_week;
+    sat_prn   = prn;
+    eph_toe   = toe + week_num * second_per_week;
   }
   EphKey() {
     gnss_type = apollo::drivers::gnss::SYS_UNKNOWN;
-    sat_prn = 0;
-    eph_toe = -0.1;
+    sat_prn   = 0;
+    eph_toe   = -0.1;
   }
-  bool operator < (const EphKey& key2) const {
-    if (gnss_type < key2.gnss_type) {
-      return true;
-    }
+  bool operator<(const EphKey& key2) const {
+    if (gnss_type < key2.gnss_type) { return true; }
     if (gnss_type == key2.gnss_type) {
-      if (sat_prn < key2.sat_prn) {
-        return true;
-      }
-      if (sat_prn == key2.sat_prn) {
-        return eph_toe < key2.eph_toe;
-      }
+      if (sat_prn < key2.sat_prn) { return true; }
+      if (sat_prn == key2.sat_prn) { return eph_toe < key2.eph_toe; }
       return false;
     }
     return false;
   }
-  bool operator == (const EphKey& key2) const {
-    return (gnss_type == key2.gnss_type)
-           && (sat_prn == key2.sat_prn)
-           && (eph_toe == key2.eph_toe);
+  bool operator==(const EphKey& key2) const {
+    return (gnss_type == key2.gnss_type) && (sat_prn == key2.sat_prn) && (eph_toe == key2.eph_toe);
   }
-  EphKey& operator = (const EphKey& key2) {
+  EphKey& operator=(const EphKey& key2) {
     gnss_type = key2.gnss_type;
-    sat_prn = key2.sat_prn;
-    eph_toe = key2.eph_toe;
+    sat_prn   = key2.sat_prn;
+    eph_toe   = key2.eph_toe;
     return *this;
   }
 };
@@ -108,25 +98,24 @@ class LocalizationGnssProcess {
  public:
   LocalizationGnssProcess();
   ~LocalizationGnssProcess();
-  apollo::common::Status Init(const LocalizationIntegParam &param);
+  apollo::common::Status Init(const LocalizationIntegParam& param);
   // callback function for rostopic
   // raw data' field "receiver_id" differs rover (= 0) from baser (= 1)
-  void RawObservationProcess(const drivers::gnss::EpochObservation &raw_obs);
-  void RawEphemerisProcess(const drivers::gnss::GnssEphemeris &gnss_orbit);
-  void IntegSinsPvaProcess(const InsPva &sins_pva,
-                           const double variance[9][9]);
-  LocalizationMeasureState GetResult(MeasureData *gnss_measure);
+  void                     RawObservationProcess(const drivers::gnss::EpochObservation& raw_obs);
+  void                     RawEphemerisProcess(const drivers::gnss::GnssEphemeris& gnss_orbit);
+  void                     IntegSinsPvaProcess(const InsPva& sins_pva, const double variance[9][9]);
+  LocalizationMeasureState GetResult(MeasureData* gnss_measure);
 
  private:
   void SetDefaultOption();
   // bool LoadHistoryEph(const std::string &nav_file);
-  bool DuplicateEph(const drivers::gnss::GnssEphemeris &raw_eph);
+  bool DuplicateEph(const drivers::gnss::GnssEphemeris& raw_eph);
 
-  inline void LogPnt(const GnssPntResultMsg &rover_pnt, double ratio);
-  bool GnssPosition(EpochObservationMsg *raw_rover_obs);
+  inline void LogPnt(const GnssPntResultMsg& rover_pnt, double ratio);
+  bool        GnssPosition(EpochObservationMsg* raw_rover_obs);
 
  private:
-  GnssSolver *gnss_solver_;
+  GnssSolver*      gnss_solver_;
   GnssPntResultMsg gnss_pnt_result_;
 
   bool enable_ins_aid_rtk_;
@@ -139,7 +128,7 @@ class LocalizationGnssProcess {
   bool sins_align_finish_;
 
   // deploy simple short-baseline to resolve heading
-  GnssSolver *double_antenna_solver_;
+  GnssSolver* double_antenna_solver_;
 
   // newest obs time
   double current_obs_time_;

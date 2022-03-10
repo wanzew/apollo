@@ -29,15 +29,15 @@ namespace adapter {
 class ObjectsXmlParser {
  public:
   static Status ParseCrosswalks(const tinyxml2::XMLElement& xml_node,
-                                std::vector<PbCrosswalk>* crosswalks);
+                                std::vector<PbCrosswalk>*   crosswalks);
   static Status ParseClearAreas(const tinyxml2::XMLElement& xml_node,
-                                std::vector<PbClearArea>* clear_areas);
+                                std::vector<PbClearArea>*   clear_areas);
   static Status ParseSpeedBumps(const tinyxml2::XMLElement& xml_node,
-                                std::vector<PbSpeedBump>* speed_bumps);
-  static Status ParseStopLines(const tinyxml2::XMLElement& xml_node,
+                                std::vector<PbSpeedBump>*   speed_bumps);
+  static Status ParseStopLines(const tinyxml2::XMLElement&    xml_node,
                                std::vector<StopLineInternal>* stop_lines);
-  static Status ParseParkingSpaces(const tinyxml2::XMLElement& xml_node,
-                            std::vector<PbParkingSpace>* parking_spaces);
+  static Status ParseParkingSpaces(const tinyxml2::XMLElement&  xml_node,
+                                   std::vector<PbParkingSpace>* parking_spaces);
 };
 
 }  // namespace adapter

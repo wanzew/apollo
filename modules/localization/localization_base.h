@@ -58,7 +58,7 @@ class LocalizationBase {
    */
   virtual apollo::common::Status Stop() = 0;
 
-  void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
+  void PublishPoseBroadcastTF(const LocalizationEstimate& localization);
 
  protected:
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf2_broadcaster_;

@@ -21,16 +21,15 @@
 #ifndef MODULES_PLANNING_LATTICE_CONSTANT_DECELERATION_TRAJECTORY1D_H_
 #define MODULES_PLANNING_LATTICE_CONSTANT_DECELERATION_TRAJECTORY1D_H_
 
-#include <string>
 #include "modules/planning/math/curve1d/curve1d.h"
+#include <string>
 
 namespace apollo {
 namespace planning {
 
 class ConstantDecelerationTrajectory1d : public Curve1d {
  public:
-  ConstantDecelerationTrajectory1d(const double init_s, const double init_v,
-                                   const double a);
+  ConstantDecelerationTrajectory1d(const double init_s, const double init_v, const double a);
 
   virtual ~ConstantDecelerationTrajectory1d() = default;
 

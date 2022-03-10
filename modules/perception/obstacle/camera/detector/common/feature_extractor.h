@@ -38,15 +38,16 @@ namespace perception {
 
 class BaseFeatureExtractor {
  public:
-  BaseFeatureExtractor() = default;
-  virtual ~BaseFeatureExtractor() = default;
-  virtual bool init(const ExtractorParam &param,
+  BaseFeatureExtractor()                  = default;
+  virtual ~BaseFeatureExtractor()         = default;
+  virtual bool init(const ExtractorParam&                       param,
                     const boost::shared_ptr<caffe::Blob<float>> feat_blob,
-                    int input_width = 0, int input_height = 0) = 0;
+                    int                                         input_width  = 0,
+                    int                                         input_height = 0) = 0;
 
   // @brief: extract feature for each detected object
   // @param [in/out]: objects with bounding boxes and feature vector.
-  virtual bool extract(std::vector<std::shared_ptr<VisualObject>> *objects) = 0;
+  virtual bool extract(std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
 
  protected:
   boost::shared_ptr<caffe::Blob<float>> feat_blob_ = nullptr;
@@ -57,36 +58,38 @@ class BaseFeatureExtractor {
 
 class ReorgFeatureExtractor : public BaseFeatureExtractor {
  public:
-  bool init(const ExtractorParam &param,
-            const boost::shared_ptr<caffe::Blob<float>> feat_blob,
-            int input_width = 0, int input_height = 0) override;
-  virtual bool extract(std::vector<std::shared_ptr<VisualObject>> *objects);
+  bool         init(const ExtractorParam&                       param,
+                    const boost::shared_ptr<caffe::Blob<float>> feat_blob,
+                    int                                         input_width  = 0,
+                    int                                         input_height = 0) override;
+  virtual bool extract(std::vector<std::shared_ptr<VisualObject>>* objects);
 
  protected:
-  std::vector<caffe::Blob<float> *> bottom_vec_;
-  std::vector<caffe::Blob<float> *> top_vec_;
-  boost::shared_ptr<caffe::Blob<float>> reorg_feat_blob_;
+  std::vector<caffe::Blob<float>*>       bottom_vec_;
+  std::vector<caffe::Blob<float>*>       top_vec_;
+  boost::shared_ptr<caffe::Blob<float>>  reorg_feat_blob_;
   boost::shared_ptr<caffe::Layer<float>> reorg_layer_ = nullptr;
-  bool skip_reorg_ = false;
-  int ref_height_ = 0;
-  int ref_width_ = 0;
+  bool                                   skip_reorg_  = false;
+  int                                    ref_height_  = 0;
+  int                                    ref_width_   = 0;
 };
 
 class ROIPoolingFeatureExtractor : public BaseFeatureExtractor {
  public:
-  bool init(const ExtractorParam &param,
-            const boost::shared_ptr<caffe::Blob<float>> feat_blob,
-            int input_width = 0, int input_height = 0) override;
-  virtual bool extract(std::vector<std::shared_ptr<VisualObject>> *objects);
+  bool         init(const ExtractorParam&                       param,
+                    const boost::shared_ptr<caffe::Blob<float>> feat_blob,
+                    int                                         input_width  = 0,
+                    int                                         input_height = 0) override;
+  virtual bool extract(std::vector<std::shared_ptr<VisualObject>>* objects);
 
  protected:
-  std::vector<caffe::Blob<float> *> bottom_vec_;
-  std::vector<caffe::Blob<float> *> top_vec_;
-  caffe::Blob<float> rois_blob_;
-  caffe::Blob<float> roi_feat_blob_;
+  std::vector<caffe::Blob<float>*>       bottom_vec_;
+  std::vector<caffe::Blob<float>*>       top_vec_;
+  caffe::Blob<float>                     rois_blob_;
+  caffe::Blob<float>                     roi_feat_blob_;
   boost::shared_ptr<caffe::Layer<float>> roi_pooling_layer_ = nullptr;
-  int input_height_ = 0;
-  int input_width_ = 0;
+  int                                    input_height_      = 0;
+  int                                    input_width_       = 0;
 };
 
 }  // namespace perception

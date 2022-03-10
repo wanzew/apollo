@@ -54,23 +54,17 @@ Status Prediction::Init() {
 
   // Load prediction conf
   prediction_conf_.Clear();
-  if (!common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
-                                      &prediction_conf_)) {
-    return OnError("Unable to load prediction conf file: " +
-                   FLAGS_prediction_conf_file);
+  if (!common::util::GetProtoFromFile(FLAGS_prediction_conf_file, &prediction_conf_)) {
+    return OnError("Unable to load prediction conf file: " + FLAGS_prediction_conf_file);
   } else {
-    ADEBUG << "Prediction config file is loaded into: "
-           << prediction_conf_.ShortDebugString();
+    ADEBUG << "Prediction config file is loaded into: " << prediction_conf_.ShortDebugString();
   }
 
   adapter_conf_.Clear();
-  if (!common::util::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
-                                      &adapter_conf_)) {
-    return OnError("Unable to load adapter conf file: " +
-                   FLAGS_prediction_adapter_config_filename);
+  if (!common::util::GetProtoFromFile(FLAGS_prediction_adapter_config_filename, &adapter_conf_)) {
+    return OnError("Unable to load adapter conf file: " + FLAGS_prediction_adapter_config_filename);
   } else {
-    ADEBUG << "Adapter config file is loaded into: "
-           << adapter_conf_.ShortDebugString();
+    ADEBUG << "Adapter config file is loaded into: " << adapter_conf_.ShortDebugString();
   }
 
   // Initialization of all managers
@@ -80,8 +74,7 @@ Status Prediction::Init() {
   PredictorManager::instance()->Init(prediction_conf_);
 
   CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
-  CHECK(AdapterManager::GetPerceptionObstacles())
-      << "Perception is not registered.";
+  CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not registered.";
 
   // Set localization callback function
   AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
@@ -95,9 +88,7 @@ Status Prediction::Init() {
   }
 
   if (FLAGS_prediction_offline_mode) {
-    if (!FeatureOutput::Ready()) {
-      return OnError("Feature output is not ready.");
-    }
+    if (!FeatureOutput::Ready()) { return OnError("Feature output is not ready."); }
   }
 
   return Status::OK();
@@ -106,9 +97,7 @@ Status Prediction::Init() {
 Status Prediction::Start() { return Status::OK(); }
 
 void Prediction::Stop() {
-  if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::Close();
-  }
+  if (FLAGS_prediction_offline_mode) { FeatureOutput::Close(); }
 }
 
 void Prediction::OnLocalization(const LocalizationEstimate& localization) {
@@ -117,20 +106,16 @@ void Prediction::OnLocalization(const LocalizationEstimate& localization) {
   CHECK_NOTNULL(pose_container);
   pose_container->Insert(localization);
 
-  ADEBUG << "Received a localization message ["
-         << localization.ShortDebugString() << "].";
+  ADEBUG << "Received a localization message [" << localization.ShortDebugString() << "].";
 }
 
 void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
-  ADCTrajectoryContainer* adc_trajectory_container =
-      dynamic_cast<ADCTrajectoryContainer*>(
-          ContainerManager::instance()->GetContainer(
-              AdapterConfig::PLANNING_TRAJECTORY));
+  ADCTrajectoryContainer* adc_trajectory_container = dynamic_cast<ADCTrajectoryContainer*>(
+      ContainerManager::instance()->GetContainer(AdapterConfig::PLANNING_TRAJECTORY));
   CHECK_NOTNULL(adc_trajectory_container);
   adc_trajectory_container->Insert(adc_trajectory);
 
-  ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
-         << "].";
+  ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString() << "].";
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
@@ -151,20 +136,17 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
 
   // Insert obstacle
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
+      ContainerManager::instance()->GetContainer(AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles);
 
-  ADEBUG << "Received a perception message ["
-         << perception_obstacles.ShortDebugString() << "].";
+  ADEBUG << "Received a perception message [" << perception_obstacles.ShortDebugString() << "].";
 
   // Update ADC status
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
   ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
-      ContainerManager::instance()->GetContainer(
-          AdapterConfig::PLANNING_TRAJECTORY));
+      ContainerManager::instance()->GetContainer(AdapterConfig::PLANNING_TRAJECTORY));
   CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
 
@@ -173,8 +155,8 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
     obstacles_container->InsertPerceptionObstacle(*adc, adc->timestamp());
     double x = adc->position().x();
     double y = adc->position().y();
-    ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x
-           << ", " << std::fixed << std::setprecision(6) << y << "].";
+    ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x << ", " << std::fixed
+           << std::setprecision(6) << y << "].";
     Vec2d adc_position(x, y);
     adc_container->SetPosition(adc_position);
   }
@@ -183,26 +165,21 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   EvaluatorManager::instance()->Run(perception_obstacles);
 
   // No prediction for offline mode
-  if (FLAGS_prediction_offline_mode) {
-    return;
-  }
+  if (FLAGS_prediction_offline_mode) { return; }
 
   // Make predictions
   PredictorManager::instance()->Run(perception_obstacles);
 
-  auto prediction_obstacles =
-      PredictorManager::instance()->prediction_obstacles();
+  auto prediction_obstacles = PredictorManager::instance()->prediction_obstacles();
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
 
   if (FLAGS_prediction_test_mode) {
-    for (auto const& prediction_obstacle :
-         prediction_obstacles.prediction_obstacle()) {
+    for (auto const& prediction_obstacle : prediction_obstacles.prediction_obstacle()) {
       for (auto const& trajectory : prediction_obstacle.trajectory()) {
         for (auto const& trajectory_point : trajectory.trajectory_point()) {
           if (!ValidationChecker::ValidTrajectoryPoint(trajectory_point)) {
-            AERROR << "Invalid trajectory point ["
-                   << trajectory_point.ShortDebugString() << "]";
+            AERROR << "Invalid trajectory point [" << trajectory_point.ShortDebugString() << "]";
             return;
           }
         }

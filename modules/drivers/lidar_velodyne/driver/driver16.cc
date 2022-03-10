@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <time.h>
 #include <cmath>
 #include <string>
 #include <thread>
+#include <time.h>
 
 #include "ros/ros.h"
 
@@ -33,8 +33,8 @@ static const int POLL_LOG_INTERVAL = 100000;
 Velodyne16Driver::Velodyne16Driver(const VelodyneConf& conf) { config_ = conf; }
 
 bool Velodyne16Driver::init() {
-  double packet_rate = 754;                   // packet frequency (Hz)
-  double frequency = (config_.rpm() / 60.0);  // expected Hz rate
+  double packet_rate = 754;                     // packet frequency (Hz)
+  double frequency   = (config_.rpm() / 60.0);  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
@@ -84,12 +84,11 @@ bool Velodyne16Driver::poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) {
 
   // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
-  scan->header.stamp = ros::Time().now();
+  scan->header.stamp    = ros::Time().now();
   scan->header.frame_id = config_.frame_id();
   // we use fisrt packet gps time update gps base hour
   // in cloud nodelet, will update base time packet by packet
-  uint32_t current_secs =
-      *(reinterpret_cast<uint32_t*>(&scan->packets.front().data[0] + 1200));
+  uint32_t current_secs = *(reinterpret_cast<uint32_t*>(&scan->packets.front().data[0] + 1200));
   update_gps_top_hour(current_secs);
   scan->basetime = basetime_;
 
@@ -103,7 +102,7 @@ bool Velodyne16Driver::poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) {
 void Velodyne16Driver::poll_positioning_packet(void) {
   while (true) {
     NMEATimePtr nmea_time(new NMEATime);
-    bool ret = true;
+    bool        ret = true;
     while (true) {
       int rc = positioning_input_->get_positioning_data_packtet(nmea_time);
       if (rc == 0) {
@@ -114,9 +113,7 @@ void Velodyne16Driver::poll_positioning_packet(void) {
       }
     }
 
-    if (basetime_ == 0 && ret) {
-      set_base_time_from_nmea_time(nmea_time, &basetime_);
-    }
+    if (basetime_ == 0 && ret) { set_base_time_from_nmea_time(nmea_time, &basetime_); }
   }
 }
 

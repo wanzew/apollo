@@ -27,9 +27,8 @@ namespace math {
 
 namespace {
 
-Eigen::Quaterniond GoldenEulerZXYToQuaternion(const double roll,
-                                              const double pitch,
-                                              const double yaw) {
+Eigen::Quaterniond
+GoldenEulerZXYToQuaternion(const double roll, const double pitch, const double yaw) {
   return Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) *
          Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitX()) *
          Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitY());
@@ -52,8 +51,8 @@ TEST(EulerAnglesZXYTest, SingleConstruct) {
 
 TEST(EulerAnglesZXYTest, FullConstructDouble) {
   EulerAnglesZXYd a(0.35, 0.24, -1.0);
-  auto q_golden = GoldenEulerZXYToQuaternion(0.35, 0.24, -1.0);
-  auto q = a.ToQuaternion();
+  auto            q_golden = GoldenEulerZXYToQuaternion(0.35, 0.24, -1.0);
+  auto            q        = a.ToQuaternion();
   EXPECT_DOUBLE_EQ(q_golden.w(), q.w());
   EXPECT_DOUBLE_EQ(q_golden.x(), q.x());
   EXPECT_DOUBLE_EQ(q_golden.y(), q.y());
@@ -69,7 +68,7 @@ TEST(EulerAnglesZXYTest, FullConstructFloat) {
   Eigen::Quaternionf q(1.0f, 2.0f, -3.0f, 4.0f);
   q.normalize();
   EulerAnglesZXYf a(q);
-  auto q2 = a.ToQuaternion();
+  auto            q2 = a.ToQuaternion();
   EXPECT_NEAR(q.w(), q2.w(), 5e-7);
   EXPECT_NEAR(q.x(), q2.x(), 5e-7);
   EXPECT_NEAR(q.y(), q2.y(), 5e-7);

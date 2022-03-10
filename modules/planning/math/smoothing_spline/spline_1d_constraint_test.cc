@@ -26,18 +26,17 @@ namespace apollo {
 namespace planning {
 
 TEST(Spline1dConstraint, add_boundary) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 5;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 5;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
-  std::vector<double> x_coord = {0.0, 0.5, 1.0};
+  std::vector<double> x_coord     = {0.0, 0.5, 1.0};
   std::vector<double> lower_bound = {1.0, 1.0, 1.0};
   std::vector<double> upper_bound = {5.0, 5.0, 5.0};
 
   constraint.AddBoundary(x_coord, lower_bound, upper_bound);
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(6, 6);
@@ -65,18 +64,17 @@ TEST(Spline1dConstraint, add_boundary) {
 }
 
 TEST(Spline1dConstraint, add_derivative_boundary) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 5;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 5;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
-  std::vector<double> x_coord = {0.0, 0.5, 1.0};
+  std::vector<double> x_coord     = {0.0, 0.5, 1.0};
   std::vector<double> lower_bound = {1.0, 1.0, 1.0};
   std::vector<double> upper_bound = {5.0, 5.0, 5.0};
 
   constraint.AddDerivativeBoundary(x_coord, lower_bound, upper_bound);
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(6, 6);
@@ -104,18 +102,17 @@ TEST(Spline1dConstraint, add_derivative_boundary) {
 }
 
 TEST(Spline1dConstraint, add_second_derivative_boundary) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 5;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 5;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
-  std::vector<double> x_coord = {0.0, 0.5, 1.0};
+  std::vector<double> x_coord     = {0.0, 0.5, 1.0};
   std::vector<double> lower_bound = {1.0, 1.0, 1.0};
   std::vector<double> upper_bound = {5.0, 5.0, 5.0};
 
   constraint.AddSecondDerivativeBoundary(x_coord, lower_bound, upper_bound);
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(6, 6);
@@ -143,12 +140,12 @@ TEST(Spline1dConstraint, add_second_derivative_boundary) {
 }
 
 TEST(Spline1dConstraint, add_smooth_constraint_01) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0};
-  int32_t spline_order = 5;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0};
+  int32_t             spline_order = 5;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddSmoothConstraint();
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -168,12 +165,12 @@ TEST(Spline1dConstraint, add_smooth_constraint_01) {
 }
 
 TEST(Spline1dConstraint, add_smooth_constraint_02) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 5;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 5;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddSmoothConstraint();
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(2, 18);
@@ -195,12 +192,12 @@ TEST(Spline1dConstraint, add_smooth_constraint_02) {
 }
 
 TEST(Spline1dConstraint, add_derivative_smooth_constraint) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 3;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 3;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddDerivativeSmoothConstraint();
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -224,12 +221,12 @@ TEST(Spline1dConstraint, add_derivative_smooth_constraint) {
 }
 
 TEST(Spline1dConstraint, add_second_derivative_smooth_constraint) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 3;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 3;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddSecondDerivativeSmoothConstraint();
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -255,12 +252,12 @@ TEST(Spline1dConstraint, add_second_derivative_smooth_constraint) {
 }
 
 TEST(Spline1dConstraint, add_third_derivative_smooth_constraint) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 4;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddThirdDerivativeSmoothConstraint();
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -288,15 +285,14 @@ TEST(Spline1dConstraint, add_third_derivative_smooth_constraint) {
 }
 
 TEST(Spline1dConstraint, add_monotone_inequality_constraint) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 4;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   std::vector<double> x_coord = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
   constraint.AddMonotoneInequalityConstraint(x_coord);
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(6, 15);
@@ -321,14 +317,13 @@ TEST(Spline1dConstraint, add_monotone_inequality_constraint) {
 }
 
 TEST(Spline1dConstraint, add_monotone_inequality_constraint_at_knots) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 4;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddMonotoneInequalityConstraintAtKnots();
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(3, 15);
   // clang-format off
@@ -350,12 +345,12 @@ TEST(Spline1dConstraint, add_monotone_inequality_constraint_at_knots) {
 }
 
 TEST(Spline1dConstraint, add_point_constraint) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 4;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddPointConstraint(2.5, 12.3);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 15);
@@ -372,12 +367,12 @@ TEST(Spline1dConstraint, add_point_constraint) {
 }
 
 TEST(Spline1dConstraint, add_point_derivative_constraint) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 4;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddPointDerivativeConstraint(2.5, 1.23);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 15);
@@ -394,12 +389,12 @@ TEST(Spline1dConstraint, add_point_derivative_constraint) {
 }
 
 TEST(Spline1dConstraint, add_point_second_derivative_constraint) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 4;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddPointSecondDerivativeConstraint(2.5, 1.23);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 15);
@@ -416,12 +411,12 @@ TEST(Spline1dConstraint, add_point_second_derivative_constraint) {
 }
 
 TEST(Spline1dConstraint, add_point_third_derivative_constraint) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0, 3.0};
-  int32_t spline_order = 4;
-  Spline1dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0, 3.0};
+  int32_t             spline_order = 4;
+  Spline1dConstraint  constraint(x_knots, spline_order);
 
   constraint.AddPointThirdDerivativeConstraint(2.5, 1.23);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(1, 15);

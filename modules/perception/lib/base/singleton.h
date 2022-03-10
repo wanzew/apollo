@@ -49,8 +49,8 @@ class Singleton {
     delete instance_;
   }
 
-  static pthread_once_t p_once_;  // Initialization once control
-  static T* instance_;            // The singleton instance
+  static pthread_once_t p_once_;    // Initialization once control
+  static T*             instance_;  // The singleton instance
 };
 
 template <typename T>

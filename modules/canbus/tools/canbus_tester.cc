@@ -24,7 +24,7 @@
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-int main(int32_t argc, char **argv) {
+int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_alsologtostderr = true;
@@ -32,12 +32,10 @@ int main(int32_t argc, char **argv) {
   ros::init(argc, argv, "canbus_tester");
 
   ros::NodeHandle nh;
-  ros::Publisher pub =
-      nh.advertise<std_msgs::String>(FLAGS_control_command_topic, 100);
+  ros::Publisher  pub = nh.advertise<std_msgs::String>(FLAGS_control_command_topic, 100);
 
   apollo::control::ControlCommand control_cmd;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_canbus_test_file,
-                                              &control_cmd)) {
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_canbus_test_file, &control_cmd)) {
     AERROR << "failed to load file: " << FLAGS_canbus_test_file;
     return -1;
   }

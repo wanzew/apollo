@@ -70,11 +70,12 @@ namespace perception {
 
 struct TrackerOptions {
   TrackerOptions() = default;
-  explicit TrackerOptions(Eigen::Matrix4d *pose) : velodyne_trans(pose) {}
+  explicit TrackerOptions(Eigen::Matrix4d* pose)
+      : velodyne_trans(pose) {}
 
   std::shared_ptr<Eigen::Matrix4d> velodyne_trans;
-  HdmapStructPtr hdmap = nullptr;
-  HDMapInput *hdmap_input = NULL;
+  HdmapStructPtr                   hdmap       = nullptr;
+  HDMapInput*                      hdmap_input = NULL;
 };
 
 class BaseTracker {
@@ -89,9 +90,10 @@ class BaseTracker {
   // @param [in]: timestamp.
   // @param [in]: options.
   // @param [out]: current tracked objects.
-  virtual bool Track(const std::vector<std::shared_ptr<Object>> &objects,
-                     double timestamp, const TrackerOptions &options,
-                     std::vector<std::shared_ptr<Object>> *tracked_objects) = 0;
+  virtual bool Track(const std::vector<std::shared_ptr<Object>>& objects,
+                     double                                      timestamp,
+                     const TrackerOptions&                       options,
+                     std::vector<std::shared_ptr<Object>>*       tracked_objects) = 0;
 
   virtual std::string name() const = 0;
 

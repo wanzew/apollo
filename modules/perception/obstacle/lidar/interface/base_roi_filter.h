@@ -71,10 +71,10 @@ namespace perception {
 struct ROIFilterOptions {
   ROIFilterOptions() {
     velodyne_trans = nullptr;
-    hdmap = nullptr;
+    hdmap          = nullptr;
   }
 
-  HdmapStructConstPtr hdmap;
+  HdmapStructConstPtr                    hdmap;
   std::shared_ptr<const Eigen::Matrix4d> velodyne_trans;
 };
 
@@ -86,8 +86,8 @@ class BaseROIFilter {
   virtual bool Init() = 0;
 
   virtual bool Filter(pcl_util::PointCloudPtr cloud,
-                      const ROIFilterOptions &roi_filter_options,
-                      pcl_util::PointIndices *roi_indices) = 0;
+                      const ROIFilterOptions& roi_filter_options,
+                      pcl_util::PointIndices* roi_indices) = 0;
 
   virtual std::string name() const = 0;
 

@@ -21,13 +21,13 @@
 #ifndef MODULES_DRIVERS_CANBUS_CAN_COMM_MESSAGE_MANAGER_H_
 #define MODULES_DRIVERS_CANBUS_CAN_COMM_MESSAGE_MANAGER_H_
 
+#include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <condition_variable>
 
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
@@ -53,9 +53,9 @@ using micros = std::chrono::microseconds;
  * @brief this struct include data for check ids.
  */
 struct CheckIdArg {
-  int64_t period = 0;
+  int64_t period      = 0;
   int64_t real_period = 0;
-  int64_t last_time = 0;
+  int64_t last_time   = 0;
   int32_t error_count = 0;
 };
 
@@ -69,8 +69,8 @@ template <typename SensorType>
 class MessageManager {
  public:
   /*
-  * @brief constructor function
-  */
+   * @brief constructor function
+   */
   MessageManager() {}
   /*
    * @brief destructor function
@@ -83,8 +83,7 @@ class MessageManager {
    * @param data a pointer to the data array to be parsed
    * @param length the length of data array
    */
-  virtual void Parse(const uint32_t message_id, const uint8_t *data,
-                     int32_t length);
+  virtual void Parse(const uint32_t message_id, const uint8_t* data, int32_t length);
 
   void ClearSensorData();
 
@@ -95,15 +94,14 @@ class MessageManager {
    * @param message_id the id of the message
    * @return a pointer to the protocol data
    */
-  ProtocolData<SensorType> *GetMutableProtocolDataById(
-      const uint32_t message_id);
+  ProtocolData<SensorType>* GetMutableProtocolDataById(const uint32_t message_id);
 
   /**
    * @brief get chassis detail. used lock_guard in this function to avoid
    * concurrent read/write issue.
    * @param chassis_detail chassis_detail to be filled.
    */
-  common::ErrorCode GetSensorData(SensorType *const sensor_data);
+  common::ErrorCode GetSensorData(SensorType* const sensor_data);
 
   /*
    * @brief reset send messages
@@ -120,13 +118,13 @@ class MessageManager {
   std::vector<std::unique_ptr<ProtocolData<SensorType>>> send_protocol_data_;
   std::vector<std::unique_ptr<ProtocolData<SensorType>>> recv_protocol_data_;
 
-  std::unordered_map<uint32_t, ProtocolData<SensorType> *> protocol_data_map_;
-  std::unordered_map<uint32_t, CheckIdArg> check_ids_;
-  std::set<uint32_t> received_ids_;
+  std::unordered_map<uint32_t, ProtocolData<SensorType>*> protocol_data_map_;
+  std::unordered_map<uint32_t, CheckIdArg>                check_ids_;
+  std::set<uint32_t>                                      received_ids_;
 
   std::mutex sensor_data_mutex_;
   SensorType sensor_data_;
-  bool is_received_on_time_ = false;
+  bool       is_received_on_time_ = false;
 
   std::condition_variable cvar_;
 };
@@ -135,15 +133,13 @@ template <typename SensorType>
 template <class T, bool need_check>
 void MessageManager<SensorType>::AddRecvProtocolData() {
   recv_protocol_data_.emplace_back(new T());
-  auto *dt = recv_protocol_data_.back().get();
-  if (dt == nullptr) {
-    return;
-  }
+  auto* dt = recv_protocol_data_.back().get();
+  if (dt == nullptr) { return; }
   protocol_data_map_[T::ID] = dt;
   if (need_check) {
-    check_ids_[T::ID].period = dt->GetPeriod();
+    check_ids_[T::ID].period      = dt->GetPeriod();
     check_ids_[T::ID].real_period = 0;
-    check_ids_[T::ID].last_time = 0;
+    check_ids_[T::ID].last_time   = 0;
     check_ids_[T::ID].error_count = 0;
   }
 }
@@ -152,23 +148,20 @@ template <typename SensorType>
 template <class T, bool need_check>
 void MessageManager<SensorType>::AddSendProtocolData() {
   send_protocol_data_.emplace_back(new T());
-  auto *dt = send_protocol_data_.back().get();
-  if (dt == nullptr) {
-    return;
-  }
+  auto* dt = send_protocol_data_.back().get();
+  if (dt == nullptr) { return; }
   protocol_data_map_[T::ID] = dt;
   if (need_check) {
-    check_ids_[T::ID].period = dt->GetPeriod();
+    check_ids_[T::ID].period      = dt->GetPeriod();
     check_ids_[T::ID].real_period = 0;
-    check_ids_[T::ID].last_time = 0;
+    check_ids_[T::ID].last_time   = 0;
     check_ids_[T::ID].error_count = 0;
   }
 }
 
 template <typename SensorType>
-ProtocolData<SensorType>
-    *MessageManager<SensorType>::GetMutableProtocolDataById(
-        const uint32_t message_id) {
+ProtocolData<SensorType>*
+MessageManager<SensorType>::GetMutableProtocolDataById(const uint32_t message_id) {
   if (protocol_data_map_.find(message_id) == protocol_data_map_.end()) {
     ADEBUG << "Unable to get protocol data because of invalid message_id:"
            << Byte::byte_to_hex(message_id);
@@ -179,12 +172,10 @@ ProtocolData<SensorType>
 
 template <typename SensorType>
 void MessageManager<SensorType>::Parse(const uint32_t message_id,
-                                       const uint8_t *data, int32_t length) {
-  ProtocolData<SensorType> *protocol_data =
-      GetMutableProtocolDataById(message_id);
-  if (protocol_data == nullptr) {
-    return;
-  }
+                                       const uint8_t* data,
+                                       int32_t        length) {
+  ProtocolData<SensorType>* protocol_data = GetMutableProtocolDataById(message_id);
+  if (protocol_data == nullptr) { return; }
   {
     std::lock_guard<std::mutex> lock(sensor_data_mutex_);
     protocol_data->Parse(data, length, &sensor_data_);
@@ -193,7 +184,7 @@ void MessageManager<SensorType>::Parse(const uint32_t message_id,
   // check if need to check period
   const auto it = check_ids_.find(message_id);
   if (it != check_ids_.end()) {
-    const int64_t time = apollo::common::time::AsInt64<micros>(Clock::Now());
+    const int64_t time     = apollo::common::time::AsInt64<micros>(Clock::Now());
     it->second.real_period = time - it->second.last_time;
     // if period 1.5 large than base period, inc error_count
     const double period_multiplier = 1.5;
@@ -218,8 +209,7 @@ std::condition_variable* MessageManager<SensorType>::GetMutableCVar() {
 }
 
 template <typename SensorType>
-ErrorCode MessageManager<SensorType>::GetSensorData(
-    SensorType *const sensor_data) {
+ErrorCode MessageManager<SensorType>::GetSensorData(SensorType* const sensor_data) {
   if (sensor_data == nullptr) {
     AERROR << "Failed to get sensor_data due to nullptr.";
     return ErrorCode::CANBUS_ERROR;
@@ -231,7 +221,7 @@ ErrorCode MessageManager<SensorType>::GetSensorData(
 
 template <typename SensorType>
 void MessageManager<SensorType>::ResetSendMessages() {
-  for (auto &protocol_data : send_protocol_data_) {
+  for (auto& protocol_data : send_protocol_data_) {
     if (protocol_data == nullptr) {
       AERROR << "Invalid protocol data.";
     } else {

@@ -47,8 +47,7 @@ TEST(MathUtilsTest, WrapAngle) {
   EXPECT_NEAR(WrapAngle(5.6), 5.6, 1e-6);
   EXPECT_NEAR(WrapAngle(7.8), 7.8 - M_PI * 2.0, 1e-6);
   EXPECT_NEAR(WrapAngle(12.4), std::fmod(12.4, M_PI * 2.0), 1e-6);
-  EXPECT_NEAR(WrapAngle(-12.4), std::fmod(-12.4, M_PI * 2.0) + M_PI * 2.0,
-              1e-6);
+  EXPECT_NEAR(WrapAngle(-12.4), std::fmod(-12.4, M_PI * 2.0) + M_PI * 2.0, 1e-6);
 }
 
 TEST(MathUtilsTest, NormalizeAngle) {

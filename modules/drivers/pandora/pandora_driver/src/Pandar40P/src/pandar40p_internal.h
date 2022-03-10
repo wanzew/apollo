@@ -41,9 +41,7 @@
 #define ECHO_SIZE (1)
 #define RESERVE_SIZE (8)
 #define REVOLUTION_SIZE (2)
-#define INFO_SIZE                                                  \
-  (TIMESTAMP_SIZE + FACTORY_INFO_SIZE + ECHO_SIZE + RESERVE_SIZE + \
-  REVOLUTION_SIZE)
+#define INFO_SIZE (TIMESTAMP_SIZE + FACTORY_INFO_SIZE + ECHO_SIZE + RESERVE_SIZE + REVOLUTION_SIZE)
 #define UTC_TIME (6)
 #define PACKET_SIZE (BLOCK_SIZE * BLOCKS_PER_PACKET + INFO_SIZE + UTC_TIME)
 #define LASER_RETURN_TO_DISTANCE_RATE (0.004)
@@ -63,22 +61,22 @@
 
 struct Pandar40PUnit_s {
   uint8_t intensity;
-  double distance;
+  double  distance;
 };
 typedef struct Pandar40PUnit_s Pandar40PUnit;
 
 struct Pandar40PBlock_s {
-  uint16_t azimuth;
-  uint16_t sob;
+  uint16_t      azimuth;
+  uint16_t      sob;
   Pandar40PUnit units[LASER_COUNT];
 };
 typedef struct Pandar40PBlock_s Pandar40PBlock;
 
 struct Pandar40PPacket_s {
   Pandar40PBlock blocks[BLOCKS_PER_PACKET];
-  struct tm t;
-  uint32_t usec;
-  int echo;
+  struct tm      t;
+  uint32_t       usec;
+  int            echo;
 };
 typedef struct Pandar40PPacket_s Pandar40PPacket;
 
@@ -111,18 +109,20 @@ class Pandar40P_Internal {
    *        gps_callback      The callback of GPS structure
    *        type       				The device type
    */
-  Pandar40P_Internal(
-      const std::string &device_ip, uint16_t lidar_port, uint16_t gps_port,
-      boost::function<void(boost::shared_ptr<PPointCloud>, double)>
-          pcl_callback,
-      boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
-      std::string frame_id);
+  Pandar40P_Internal(const std::string&                                            device_ip,
+                     uint16_t                                                      lidar_port,
+                     uint16_t                                                      gps_port,
+                     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
+                     boost::function<void(double)>                                 gps_callback,
+                     uint16_t                                                      start_angle,
+                     int                                                           tz,
+                     std::string                                                   frame_id);
 
   /**
    * @brief load the correction file
    * @param correction The path of correction file
    */
-  int LoadCorrectionFile(const std::string &correction);
+  int LoadCorrectionFile(const std::string& correction);
 
   /**
    * @brief reset the start angle.
@@ -132,34 +132,32 @@ class Pandar40P_Internal {
 
   ~Pandar40P_Internal();
 
-  int Start();
+  int  Start();
   void Stop();
 
  private:
   void RecvTask();
-  void ProcessGps(const PandarGPS &gpsMsg);
+  void ProcessGps(const PandarGPS& gpsMsg);
   void ProcessLiarPacket();
   void PushLiDARData(PandarPacket packet);
-  int ParseRawData(Pandar40PPacket *packet, const uint8_t *buf, const int len);
-  int ParseGPS(PandarGPS *packet, const uint8_t *recvbuf, const int size);
-  void CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
-                      boost::shared_ptr<PPointCloud> cld);
+  int  ParseRawData(Pandar40PPacket* packet, const uint8_t* buf, const int len);
+  int  ParseGPS(PandarGPS* packet, const uint8_t* recvbuf, const int size);
+  void CalcPointXYZIT(Pandar40PPacket* pkt, int blockid, boost::shared_ptr<PPointCloud> cld);
 
   pthread_mutex_t lidar_lock_;
-  sem_t lidar_sem_;
-  boost::thread *lidar_recv_thr_;
-  boost::thread *lidar_process_thr_;
-  bool enable_lidar_recv_thr_;
-  bool enable_lidar_process_thr_;
-  int start_angle_ = 0;
-  double timestamp_ = 0;
+  sem_t           lidar_sem_;
+  boost::thread*  lidar_recv_thr_;
+  boost::thread*  lidar_process_thr_;
+  bool            enable_lidar_recv_thr_;
+  bool            enable_lidar_process_thr_;
+  int             start_angle_ = 0;
+  double          timestamp_   = 0;
 
   std::list<struct PandarPacket_s> lidar_packets_;
 
-  boost::shared_ptr<Input> input_;
-  boost::function<void(boost::shared_ptr<PPointCloud> cld, double timestamp)>
-      pcl_callback_;
-  boost::function<void(double timestamp)> gps_callback_;
+  boost::shared_ptr<Input>                                                    input_;
+  boost::function<void(boost::shared_ptr<PPointCloud> cld, double timestamp)> pcl_callback_;
+  boost::function<void(double timestamp)>                                     gps_callback_;
 
   float sin_lookup_table_[ROTATION_MAX_UNITS];
   float cos_lookup_table_[ROTATION_MAX_UNITS];
@@ -170,7 +168,7 @@ class Pandar40P_Internal {
   float blockOffset_[BLOCKS_PER_PACKET];
   float laserOffset_[LASER_COUNT];
 
-  int tz_second_;
+  int         tz_second_;
   std::string frame_id_;
 };
 

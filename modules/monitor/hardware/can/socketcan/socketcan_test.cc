@@ -24,7 +24,7 @@ namespace hw {
 
 int socketcan_do_test(int id) {
   struct sockaddr_can addr;
-  struct ifreq ifr;
+  struct ifreq        ifr;
 
   // Check open device
 
@@ -42,11 +42,10 @@ int socketcan_do_test(int id) {
   // init config and state
   // 1. set receive message_id filter, ie white list
   struct can_filter filter[1];
-  filter[0].can_id = 0x000;
+  filter[0].can_id   = 0x000;
   filter[0].can_mask = CAN_SFF_MASK;
 
-  int ret = setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
-                       sizeof(filter));
+  int ret = setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FILTER, &filter, sizeof(filter));
   if (ret < 0) {
     AERROR << "set message filter failed";
     return -1;
@@ -54,8 +53,7 @@ int socketcan_do_test(int id) {
 
   // 2. enable reception of can frames.
   int enable = 1;
-  ret = ::setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable,
-                     sizeof(enable));
+  ret        = ::setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable, sizeof(enable));
   if (ret < 0) {
     AERROR << "enable reception of can frames failed";
     return -1;
@@ -69,10 +67,9 @@ int socketcan_do_test(int id) {
   }
 
   // bind socket to network interface
-  addr.can_family = AF_CAN;
+  addr.can_family  = AF_CAN;
   addr.can_ifindex = ifr.ifr_ifindex;
-  ret = ::bind(dev_handler, reinterpret_cast<struct sockaddr *>(&addr),
-               sizeof(addr));
+  ret              = ::bind(dev_handler, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr));
 
   if (ret < 0) {
     AERROR << "bind socket can failed";

@@ -40,8 +40,7 @@ using ::apollo::drivers::canbus::MessageManager;
  *
  * @brief implementation of MessageManager for lincoln vehicle
  */
-class LincolnMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+class LincolnMessageManager : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   /**
    * @brief construct a lincoln message manager. protocol data for send and

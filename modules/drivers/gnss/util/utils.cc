@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 #include <fcntl.h>
-#include <unistd.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
 #include <string>
+#include <unistd.h>
 
 #include "modules/drivers/gnss/util/utils.h"
 
@@ -27,8 +27,7 @@ namespace drivers {
 namespace gnss {
 namespace {
 
-const char TABLE[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const char TABLE[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 const char* triplet_base64(int triplet) {
   static char result[4];
@@ -43,9 +42,7 @@ const char* triplet_base64(int triplet) {
 
 bool parse_config_text(const std::string& filename, config::Config* config) {
   int fd = open(filename.c_str(), O_RDONLY);
-  if (-1 == fd) {
-    return false;
-  }
+  if (-1 == fd) { return false; }
 
   google::protobuf::io::FileInputStream fs(fd);
   if (!::google::protobuf::TextFormat::Parse(&fs, config)) {
@@ -59,9 +56,7 @@ bool parse_config_text(const std::string& filename, config::Config* config) {
 
 std::string encode_base64(const std::string& in) {
   std::string out;
-  if (in.empty()) {
-    return out;
-  }
+  if (in.empty()) { return out; }
 
   int in_size = in.size();
 

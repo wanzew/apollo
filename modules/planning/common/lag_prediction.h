@@ -35,18 +35,18 @@ class LagPrediction {
   void GetLaggedPrediction(prediction::PredictionObstacles* obstacles) const;
 
   struct LagInfo {
-    uint32_t last_observed_seq = 0;
-    double last_observed_time = 0.0;
-    uint32_t count = 0;
-    const prediction::PredictionObstacle* obstacle_ptr = nullptr;
+    uint32_t                              last_observed_seq  = 0;
+    double                                last_observed_time = 0.0;
+    uint32_t                              count              = 0;
+    const prediction::PredictionObstacle* obstacle_ptr       = nullptr;
   };
 
  private:
-  void AddObstacleToPrediction(
-      double delay_sec, const prediction::PredictionObstacle& obstacle,
-      prediction::PredictionObstacles* obstacles) const;
+  void AddObstacleToPrediction(double                                delay_sec,
+                               const prediction::PredictionObstacle& obstacle,
+                               prediction::PredictionObstacles*      obstacles) const;
 
-  uint32_t min_appear_num_ = 0;
+  uint32_t min_appear_num_    = 0;
   uint32_t max_disappear_num_ = 0;
 };
 

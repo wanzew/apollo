@@ -42,7 +42,7 @@ void Brakecommand111::UpdateData(uint8_t* data) {
 void Brakecommand111::Reset() {
   // you should check this manually
   brake_pedal_en_ctrl_ = Brake_command_111::BRAKE_PEDAL_EN_CTRL_DISABLE;
-  brake_pedal_cmd_ = 0;
+  brake_pedal_cmd_     = 0;
 }
 
 Brakecommand111* Brakecommand111::set_brake_pedal_en_ctrl(
@@ -57,8 +57,7 @@ Brakecommand111* Brakecommand111::set_brake_pedal_en_ctrl(
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
 // 'order': 'intel', 'physical_unit': ''}
 void Brakecommand111::set_p_brake_pedal_en_ctrl(
-    uint8_t* data,
-    Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl) {
+    uint8_t* data, Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl) {
   int x = brake_pedal_en_ctrl;
 
   Byte to_set(data + 0);
@@ -74,10 +73,9 @@ Brakecommand111* Brakecommand111::set_brake_pedal_cmd(int brake_pedal_cmd) {
 // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_CMD',
 // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type': 'int',
 // 'order': 'intel', 'physical_unit': '%'}
-void Brakecommand111::set_p_brake_pedal_cmd(uint8_t* data,
-                                            int brake_pedal_cmd) {
+void Brakecommand111::set_p_brake_pedal_cmd(uint8_t* data, int brake_pedal_cmd) {
   brake_pedal_cmd = ProtocolData::BoundedValue(0, 100, brake_pedal_cmd);
-  int x = brake_pedal_cmd;
+  int x           = brake_pedal_cmd;
 
   Byte to_set(data + 1);
   to_set.set_value(static_cast<uint8_t>(x), 0, 8);

@@ -19,14 +19,13 @@
 // System gflags
 DEFINE_string(node_name, "gnss", "The gnss driver module name");
 
-DEFINE_string(adapter_config_filename, "modules/drivers/gnss/conf/adapter.conf",
+DEFINE_string(adapter_config_filename,
+              "modules/drivers/gnss/conf/adapter.conf",
               "The adapter config file");
 // Config file
-DEFINE_string(sensor_conf_file, "modules/drivers/gnss/conf/gnss_conf.pb.txt",
-              "Sensor conf file");
+DEFINE_string(sensor_conf_file, "modules/drivers/gnss/conf/gnss_conf.pb.txt", "Sensor conf file");
 
 // System gflags
 DEFINE_string(sensor_node_name, "gnss", "Sensor node name.");
 
-DEFINE_string(gpsbin_folder, "/apollo/data/gpsbin",
-              "gpsbin rawdata folder name.");
+DEFINE_string(gpsbin_folder, "/apollo/data/gpsbin", "gpsbin rawdata folder name.");

@@ -43,8 +43,7 @@ class SpiralFormula {
    *                      p3 = kappa at s = sg
    * @return a Parameter vec of cubic kappa spiral
    **/
-  static std::array<double, 4> p_to_a_k3(const double sg,
-                                         const std::array<double, 4>& p);
+  static std::array<double, 4> p_to_a_k3(const double sg, const std::array<double, 4>& p);
 
   /**
    * @brief Convert p parameters to a parameters for quintic spiral
@@ -58,8 +57,7 @@ class SpiralFormula {
    *
    * @return a Parameter vec of quintic kappa spiral
    **/
-  static std::array<double, 6> p_to_a_k5(const double sg,
-                                         const std::array<double, 6>& p);
+  static std::array<double, 6> p_to_a_k5(const double sg, const std::array<double, 6>& p);
 
   /* -------------------  kappa, theta, dkappa functions -------------------- */
 
@@ -88,8 +86,7 @@ class SpiralFormula {
    * @param a Cubic polynomial params for cubic kappa spiral
    * @return dkappa Value with respect to s, dkappa(s) given params vec = a
    **/
-  static double dkappa_func_k3_a(const double s,
-                                 const std::array<double, 4>& a);
+  static double dkappa_func_k3_a(const double s, const std::array<double, 4>& a);
 
   /**
    * @brief Quintic kappa function with regular parameter
@@ -114,8 +111,7 @@ class SpiralFormula {
    * @param a Quintic polynomial params for quintic kappa spiral
    * @return dkappa Value with respect to s, dkappa(s) given params vec = a
    **/
-  static double dkappa_func_k5_a(const double s,
-                                 const std::array<double, 6>& a);
+  static double dkappa_func_k5_a(const double s, const std::array<double, 6>& a);
 
   // set 2 - kappa, theta dkappa funcs with p parameter
 
@@ -126,8 +122,7 @@ class SpiralFormula {
    * @param p P params for cubic kappa spiral
    * @return theta Value with respect to s, theta(s) given params vec = a
    **/
-  static double kappa_func_k3(const double s, const double sg,
-                              const std::array<double, 4>& p);
+  static double kappa_func_k3(const double s, const double sg, const std::array<double, 4>& p);
 
   /**
    * @brief Cubic theta function with p parameter
@@ -136,8 +131,7 @@ class SpiralFormula {
    * @param p P params for cubic kappa spiral
    * @return theta Value with respect to s, theta(s) given p
    **/
-  static double theta_func_k3(const double s, const double sg,
-                              const std::array<double, 4>& p);
+  static double theta_func_k3(const double s, const double sg, const std::array<double, 4>& p);
 
   /**
    * @brief Derivative of cubic kappa function (dkappa) with p parameter
@@ -145,8 +139,7 @@ class SpiralFormula {
    * @param p P params for cubic kappa spiral
    * @return dkappa Value with respect to s, dkappa(s) given p
    **/
-  static double dkappa_func_k3(const double s, const double sg,
-                               const std::array<double, 4>& p);
+  static double dkappa_func_k3(const double s, const double sg, const std::array<double, 4>& p);
 
   /**
    * @brief Quintic kappa function with p parameter
@@ -154,8 +147,7 @@ class SpiralFormula {
    * @param p Quintic polynomial params for quintic kappa spiral
    * @return kappa Value with respect to s, kappa(s) given p
    **/
-  static double kappa_func_k5(const double s, const double sg,
-                              const std::array<double, 6>& p);
+  static double kappa_func_k5(const double s, const double sg, const std::array<double, 6>& p);
 
   /**
    * @brief Quintic theta function with p parameter
@@ -164,8 +156,7 @@ class SpiralFormula {
    * @param p Quintic polynomial params for quintic kappa spiral
    * @return theta Value with respect to s, theta(s) given p
    **/
-  static double theta_func_k5(const double s, const double sg,
-                              const std::array<double, 6>& p);
+  static double theta_func_k5(const double s, const double sg, const std::array<double, 6>& p);
 
   /**
    * @brief Derivative of quintic kappa function (dkappa) with regular parameter
@@ -173,8 +164,7 @@ class SpiralFormula {
    * @param p Quintic polynomial params for quintic kappa spiral
    * @return dkappa Value with respect to s, dkappa(s) given p params
    **/
-  static double dkappa_func_k5(const double s, const double sg,
-                               const std::array<double, 6>& p);
+  static double dkappa_func_k5(const double s, const double sg, const std::array<double, 6>& p);
 
   /* -------------------------- Partial Derivatives ------------------------- */
   // Partial derivatives of theta with respect to p1, p2, sg (p3, p4 sg for
@@ -204,8 +194,8 @@ class SpiralFormula {
   /**
    * @brief: partial derivative theta with respect to sg
    **/
-  static double partial_theta_sg_k3(const double s, const double sg,
-                                    const std::array<double, 4>& p);
+  static double
+  partial_theta_sg_k3(const double s, const double sg, const std::array<double, 4>& p);
 
   /* --------------------------- Quintic Version ---------------------------- */
 
@@ -222,8 +212,8 @@ class SpiralFormula {
   /**
    * @brief: partial derivative theta with respect to sg
    **/
-  static double partial_theta_sg_k5(const double s, const double sg,
-                                    const std::array<double, 6>& p);
+  static double
+  partial_theta_sg_k5(const double s, const double sg, const std::array<double, 6>& p);
 
  private:
   SpiralFormula() = default;

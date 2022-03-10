@@ -28,8 +28,7 @@ TEST(UtilTest, StringTokenizer) {
   std::string str("aa,bbb,c");
   std::string delim(",");
 
-  EXPECT_THAT(StringTokenizer::Split(str, delim),
-              ElementsAre("aa", "bbb", "c"));
+  EXPECT_THAT(StringTokenizer::Split(str, delim), ElementsAre("aa", "bbb", "c"));
 }
 
 TEST(UtilTest, StringTokenizerNext) {
@@ -37,11 +36,11 @@ TEST(UtilTest, StringTokenizerNext) {
   std::string delim(", ");
 
   StringTokenizer stn(str, delim);
-  auto t0 = stn.Next();
-  auto t1 = stn.Next();
-  auto t2 = stn.Next();
-  auto t3 = stn.Next();
-  auto t4 = stn.Next();
+  auto            t0 = stn.Next();
+  auto            t1 = stn.Next();
+  auto            t2 = stn.Next();
+  auto            t3 = stn.Next();
+  auto            t4 = stn.Next();
 
   EXPECT_EQ(t0, "aa");
   EXPECT_EQ(t1, "bbb");
@@ -55,8 +54,8 @@ TEST(UtilTest, StringTokenizerEmptyString) {
   std::string delim(", ");
 
   StringTokenizer stn(str, delim);
-  auto t0 = stn.Next();
-  auto t1 = stn.Next();
+  auto            t0 = stn.Next();
+  auto            t1 = stn.Next();
 
   EXPECT_EQ(t0, "");
   EXPECT_EQ(t1, "");
@@ -67,8 +66,8 @@ TEST(UtilTest, StringTokenizerEmptyDelim) {
   std::string delim("");
 
   StringTokenizer stn(str, delim);
-  auto t0 = stn.Next();
-  auto t1 = stn.Next();
+  auto            t0 = stn.Next();
+  auto            t1 = stn.Next();
 
   EXPECT_EQ(t0, str);
   EXPECT_EQ(t1, "");
@@ -79,8 +78,8 @@ TEST(UtilTest, StringTokenizerBothEmpty) {
   std::string delim("");
 
   StringTokenizer stn(str, delim);
-  auto t0 = stn.Next();
-  auto t1 = stn.Next();
+  auto            t0 = stn.Next();
+  auto            t1 = stn.Next();
 
   EXPECT_EQ(t0, "");
   EXPECT_EQ(t1, "");

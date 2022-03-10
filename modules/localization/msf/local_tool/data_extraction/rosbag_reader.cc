@@ -15,9 +15,9 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/data_extraction/rosbag_reader.h"
+#include <boost/foreach.hpp>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
-#include <boost/foreach.hpp>
 #include <utility>
 
 #define foreach BOOST_FOREACH
@@ -30,29 +30,28 @@ RosbagReader::RosbagReader() {}
 
 RosbagReader::~RosbagReader() {}
 
-void RosbagReader::Subscribe(const std::string &topic,
+void RosbagReader::Subscribe(const std::string&             topic,
                              BaseExporter::OnRosmsgCallback call_back,
-                             BaseExporter::Ptr exporter) {
+                             BaseExporter::Ptr              exporter) {
   call_back_map_[topic] = std::make_pair(exporter, call_back);
   topics_.push_back(topic);
 }
 
-void RosbagReader::Read(const std::string &file_name) {
+void RosbagReader::Read(const std::string& file_name) {
   rosbag::Bag bag;
   bag.open(file_name, rosbag::bagmode::Read);
 
   rosbag::View view(bag, rosbag::TopicQuery(topics_));
 
-  foreach(rosbag::MessageInstance const m, view) {
+  foreach (rosbag::MessageInstance const m, view) {
     const std::string tp = m.getTopic();
     std::cout << "Read topic: " << tp << std::endl;
 
     std::unordered_map<std::string,
-                       std::pair<BaseExporter::Ptr,
-                                 BaseExporter::OnRosmsgCallback>>::iterator it =
+                       std::pair<BaseExporter::Ptr, BaseExporter::OnRosmsgCallback>>::iterator it =
         call_back_map_.find(tp);
     if (it != call_back_map_.end()) {
-      BaseExporter &exporter = *(it->second.first);
+      BaseExporter&                  exporter  = *(it->second.first);
       BaseExporter::OnRosmsgCallback call_back = it->second.second;
 
       (exporter.*call_back)(m);

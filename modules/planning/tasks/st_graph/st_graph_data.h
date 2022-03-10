@@ -34,9 +34,10 @@ namespace planning {
 
 class StGraphData {
  public:
-  StGraphData(const std::vector<const StBoundary*>& st_boundaries,
+  StGraphData(const std::vector<const StBoundary*>&  st_boundaries,
               const apollo::common::TrajectoryPoint& init_point,
-              const SpeedLimit& speed_limit, const double path_data_length);
+              const SpeedLimit&                      speed_limit,
+              const double                           path_data_length);
   StGraphData() = default;
 
   const std::vector<const StBoundary*>& st_boundaries() const;
@@ -48,11 +49,11 @@ class StGraphData {
   double path_data_length() const;
 
  private:
-  std::vector<const StBoundary*> st_boundaries_;
+  std::vector<const StBoundary*>  st_boundaries_;
   apollo::common::TrajectoryPoint init_point_;
 
   SpeedLimit speed_limit_;
-  double path_data_length_ = 0.0;
+  double     path_data_length_ = 0.0;
 };
 
 }  // namespace planning

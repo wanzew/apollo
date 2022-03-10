@@ -1,18 +1,18 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/routing/routing.h"
 
@@ -24,9 +24,9 @@
 namespace apollo {
 namespace routing {
 
+using apollo::common::ErrorCode;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::ErrorCode;
 
 std::string Routing::Name() const { return FLAGS_routing_node_name; }
 
@@ -53,8 +53,7 @@ apollo::common::Status Routing::Init() {
 apollo::common::Status Routing::Start() {
   if (!navigator_ptr_->IsReady()) {
     AERROR << "Navigator is not ready!";
-    return apollo::common::Status(ErrorCode::ROUTING_ERROR,
-                                  "Navigator not ready");
+    return apollo::common::Status(ErrorCode::ROUTING_ERROR, "Navigator not ready");
   }
   AINFO << "Routing service is ready.";
 
@@ -63,26 +62,21 @@ apollo::common::Status Routing::Start() {
   return apollo::common::Status::OK();
 }
 
-RoutingRequest Routing::FillLaneInfoIfMissing(
-    const RoutingRequest& routing_request) {
+RoutingRequest Routing::FillLaneInfoIfMissing(const RoutingRequest& routing_request) {
   RoutingRequest fixed_request(routing_request);
   for (int i = 0; i < routing_request.waypoint_size(); ++i) {
     const auto& lane_waypoint = routing_request.waypoint(i);
-    if (lane_waypoint.has_id()) {
-      continue;
-    }
-    auto point = common::util::MakePointENU(lane_waypoint.pose().x(),
-                                            lane_waypoint.pose().y(),
+    if (lane_waypoint.has_id()) { continue; }
+    auto point = common::util::MakePointENU(lane_waypoint.pose().x(), lane_waypoint.pose().y(),
                                             lane_waypoint.pose().z());
 
-    double s = 0.0;
-    double l = 0.0;
+    double                  s = 0.0;
+    double                  l = 0.0;
     hdmap::LaneInfoConstPtr lane;
     // FIXME(all): select one reasonable lane candidate for point=>lane
     // is one to many relationship.
     if (hdmap_->GetNearestLane(point, &lane, &s, &l) != 0) {
-      AERROR << "Failed to find nearest lane from map at position: "
-             << point.DebugString();
+      AERROR << "Failed to find nearest lane from map at position: " << point.DebugString();
       return routing_request;
     }
     auto waypoint_info = fixed_request.mutable_waypoint(i);
@@ -95,9 +89,9 @@ RoutingRequest Routing::FillLaneInfoIfMissing(
 
 void Routing::OnRoutingRequest(const RoutingRequest& routing_request) {
   AINFO << "Get new routing request:" << routing_request.DebugString();
-  RoutingResponse routing_response;
+  RoutingResponse                           routing_response;
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  const auto& fixed_request = FillLaneInfoIfMissing(routing_request);
+  const auto&                               fixed_request = FillLaneInfoIfMissing(routing_request);
   if (!navigator_ptr_->SearchRoute(fixed_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";
 

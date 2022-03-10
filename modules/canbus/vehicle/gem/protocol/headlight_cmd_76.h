@@ -24,8 +24,8 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Headlightcmd76 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Headlightcmd76
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -42,8 +42,7 @@ class Headlightcmd76 : public ::apollo::drivers::canbus::ProtocolData<
   // 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Headlightcmd76* set_headlight_cmd(
-      Headlight_cmd_76::Headlight_cmdType headlight_cmd);
+  Headlightcmd76* set_headlight_cmd(Headlight_cmd_76::Headlight_cmdType headlight_cmd);
 
  private:
   // config detail: {'name': 'HEADLIGHT_CMD', 'enum': {0:
@@ -51,8 +50,7 @@ class Headlightcmd76 : public ::apollo::drivers::canbus::ProtocolData<
   // 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  void set_p_headlight_cmd(uint8_t* data,
-                           Headlight_cmd_76::Headlight_cmdType headlight_cmd);
+  void set_p_headlight_cmd(uint8_t* data, Headlight_cmd_76::Headlight_cmdType headlight_cmd);
 
  private:
   Headlight_cmd_76::Headlight_cmdType headlight_cmd_;

@@ -44,20 +44,22 @@ class OfflineLocalVisualizer {
   ~OfflineLocalVisualizer();
 
  public:
-  bool Init(const std::string &map_folder, const std::string &map_visual_folder,
-            const std::string &pcd_folder,
-            const std::string &pcd_timestamp_file,
-            const std::string &gnss_loc_file, const std::string &lidar_loc_file,
-            const std::string &fusion_loc_file,
-            const std::string &extrinsic_file);
+  bool Init(const std::string& map_folder,
+            const std::string& map_visual_folder,
+            const std::string& pcd_folder,
+            const std::string& pcd_timestamp_file,
+            const std::string& gnss_loc_file,
+            const std::string& lidar_loc_file,
+            const std::string& fusion_loc_file,
+            const std::string& extrinsic_file);
 
   void Visualize();
 
  private:
   bool PCDTimestampFileHandler();
-  bool LidarLocFileHandler(const std::vector<double> &pcd_timestamps);
-  bool GnssLocFileHandler(const std::vector<double> &pcd_timestamps);
-  bool FusionLocFileHandler(const std::vector<double> &pcd_timestamps);
+  bool LidarLocFileHandler(const std::vector<double>& pcd_timestamps);
+  bool GnssLocFileHandler(const std::vector<double>& pcd_timestamps);
+  bool FusionLocFileHandler(const std::vector<double>& pcd_timestamps);
 
   //   void PoseInterpolationByTime(
   //       const std::vector<Eigen::Affine3d> &in_poses,
@@ -65,16 +67,16 @@ class OfflineLocalVisualizer {
   //       const std::vector<double> &ref_timestamps,
   //       std::map<unsigned int, Eigen::Affine3d> &out_poses);
  public:
-  static void PoseAndStdInterpolationByTime(
-      const std::vector<Eigen::Affine3d> &in_poses,
-      const std::vector<Eigen::Vector3d> &in_stds,
-      const std::vector<double> &in_timestamps,
-      const std::vector<double> &ref_timestamps,
-      std::map<unsigned int, Eigen::Affine3d> *out_poses,
-      std::map<unsigned int, Eigen::Vector3d> *out_stds);
+  static void PoseAndStdInterpolationByTime(const std::vector<Eigen::Affine3d>&      in_poses,
+                                            const std::vector<Eigen::Vector3d>&      in_stds,
+                                            const std::vector<double>&               in_timestamps,
+                                            const std::vector<double>&               ref_timestamps,
+                                            std::map<unsigned int, Eigen::Affine3d>* out_poses,
+                                            std::map<unsigned int, Eigen::Vector3d>* out_stds);
 
-  bool GetZoneIdFromMapFolder(const std::string &map_folder,
-                              const unsigned int resolution_id, int *zone_id);
+  bool GetZoneIdFromMapFolder(const std::string& map_folder,
+                              const unsigned int resolution_id,
+                              int*               zone_id);
 
  private:
   std::string map_folder_;
@@ -86,7 +88,7 @@ class OfflineLocalVisualizer {
   std::string fusion_loc_file_;
   std::string extrinsic_file_;
 
-  std::vector<double> pcd_timestamps_;
+  std::vector<double>                     pcd_timestamps_;
   std::map<unsigned int, Eigen::Affine3d> gnss_poses_;
   std::map<unsigned int, Eigen::Vector3d> gnss_stds_;
   std::map<unsigned int, Eigen::Affine3d> lidar_poses_;
@@ -95,10 +97,10 @@ class OfflineLocalVisualizer {
   std::map<unsigned int, Eigen::Vector3d> fusion_stds_;
 
   BaseMapConfig map_config_;
-  unsigned int resolution_id_;
-  int zone_id_;
+  unsigned int  resolution_id_;
+  int           zone_id_;
 
-  Eigen::Affine3d velodyne_extrinsic_;
+  Eigen::Affine3d     velodyne_extrinsic_;
   VisualizationEngine visual_engine_;
 };
 

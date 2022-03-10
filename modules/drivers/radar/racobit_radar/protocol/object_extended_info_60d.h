@@ -26,13 +26,11 @@ namespace racobit_radar {
 
 using apollo::drivers::RacobitRadar;
 
-class ObjectExtendedInfo60D
-    : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
+class ObjectExtendedInfo60D : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
  public:
   static const uint32_t ID;
   ObjectExtendedInfo60D();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             RacobitRadar* racobit_radar) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, RacobitRadar* racobit_radar) const override;
 
  private:
   int object_id(const std::uint8_t* bytes, int32_t length) const;

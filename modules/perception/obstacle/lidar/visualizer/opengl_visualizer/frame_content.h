@@ -36,37 +36,34 @@ class FrameContent {
   FrameContent();
   ~FrameContent();
 
-  void SetLidarPose(const Eigen::Matrix4d &pose);
+  void            SetLidarPose(const Eigen::Matrix4d& pose);
   Eigen::Matrix4d GetPoseV2w();
 
-  void SetLidarCloud(pcl_util::PointCloudPtr cloud);
-  void SetLidarRoiCloud(pcl_util::PointCloudPtr cloud);
+  void                    SetLidarCloud(pcl_util::PointCloudPtr cloud);
+  void                    SetLidarRoiCloud(pcl_util::PointCloudPtr cloud);
   pcl_util::PointCloudPtr GetCloud();
   pcl_util::PointCloudPtr GetRoiCloud();
 
   bool HasCloud();
 
-  void SetTrackedObjects(const std::vector<std::shared_ptr<Object>> &objects);
+  void SetTrackedObjects(const std::vector<std::shared_ptr<Object>>& objects);
   std::vector<std::shared_ptr<Object>> GetTrackedObjects();
 
  protected:
   // coordinate transform utilities
-  void OffsetPointcloud(pcl_util::PointCloud *cloud,
-                        const Eigen::Vector3d &offset);
-  void OffsetPointcloud(pcl_util::PointDCloud *cloud,
-                        const Eigen::Vector3d &offset);
-  void OffsetObject(std::shared_ptr<Object> object,
-                    const Eigen::Vector3d &offset);
+  void OffsetPointcloud(pcl_util::PointCloud* cloud, const Eigen::Vector3d& offset);
+  void OffsetPointcloud(pcl_util::PointDCloud* cloud, const Eigen::Vector3d& offset);
+  void OffsetObject(std::shared_ptr<Object> object, const Eigen::Vector3d& offset);
 
  private:
   // input
   // 1.lidar
-  Eigen::Matrix4d pose_v2w_;
+  Eigen::Matrix4d         pose_v2w_;
   pcl_util::PointCloudPtr cloud_;
   pcl_util::PointCloudPtr roi_cloud_;
 
-  Eigen::Vector3d global_offset_;
-  bool global_offset_initialized_;
+  Eigen::Vector3d                      global_offset_;
+  bool                                 global_offset_initialized_;
   std::vector<std::shared_ptr<Object>> tracked_objects_;  // after tracking
 };
 

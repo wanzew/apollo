@@ -23,8 +23,8 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Brakecommand111 : public ::apollo::drivers::canbus::ProtocolData<
-                            ::apollo::canbus::ChassisDetail> {
+class Brakecommand111
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -41,8 +41,8 @@ class Brakecommand111 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_EN_CTRL', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
   // 'order': 'intel', 'physical_unit': ''}
-  Brakecommand111* set_brake_pedal_en_ctrl(
-      Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl);
+  Brakecommand111*
+  set_brake_pedal_en_ctrl(Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl);
 
   // config detail: {'description': 'Percentage of brake pedal(Command)',
   // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_CMD',
@@ -56,9 +56,8 @@ class Brakecommand111 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_EN_CTRL', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
   // 'order': 'intel', 'physical_unit': ''}
-  void set_p_brake_pedal_en_ctrl(
-      uint8_t* data,
-      Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl);
+  void set_p_brake_pedal_en_ctrl(uint8_t*                                   data,
+                                 Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl);
 
   // config detail: {'description': 'Percentage of brake pedal(Command)',
   // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_CMD',
@@ -68,7 +67,7 @@ class Brakecommand111 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl_;
-  int brake_pedal_cmd_;
+  int                                        brake_pedal_cmd_;
 };
 
 }  // namespace ch

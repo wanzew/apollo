@@ -26,31 +26,24 @@
 namespace apollo {
 namespace planning {
 
-PiecewiseLinearKernel::PiecewiseLinearKernel(const uint32_t dimension,
-                                             const double unit_segment)
-    : dimension_(dimension),
-      unit_segment_(unit_segment),
-      kernel_matrix_(Eigen::MatrixXd::Zero(dimension_, dimension_)),
-      offset_matrix_(Eigen::MatrixXd::Zero(dimension_, 1)) {}
+PiecewiseLinearKernel::PiecewiseLinearKernel(const uint32_t dimension, const double unit_segment)
+    : dimension_(dimension)
+    , unit_segment_(unit_segment)
+    , kernel_matrix_(Eigen::MatrixXd::Zero(dimension_, dimension_))
+    , offset_matrix_(Eigen::MatrixXd::Zero(dimension_, 1)) {}
 
 void PiecewiseLinearKernel::AddRegularization(const double param) {
   Eigen::MatrixXd identity_matrix = kernel_matrix_ +=
-      Eigen::MatrixXd::Identity(kernel_matrix_.rows(), kernel_matrix_.cols()) *
-      param;
+      Eigen::MatrixXd::Identity(kernel_matrix_.rows(), kernel_matrix_.cols()) * param;
 }
 
-const Eigen::MatrixXd& PiecewiseLinearKernel::kernel_matrix() const {
-  return kernel_matrix_;
-}
+const Eigen::MatrixXd& PiecewiseLinearKernel::kernel_matrix() const { return kernel_matrix_; }
 
-const Eigen::MatrixXd& PiecewiseLinearKernel::offset_matrix() const {
-  return offset_matrix_;
-}
+const Eigen::MatrixXd& PiecewiseLinearKernel::offset_matrix() const { return offset_matrix_; }
 
-void PiecewiseLinearKernel::AddSecondOrderDerivativeMatrix(
-    const double init_derivative, const double weight) {
-  Eigen::MatrixXd second_derivative_matrix =
-      Eigen::MatrixXd::Zero(dimension_, dimension_);
+void PiecewiseLinearKernel::AddSecondOrderDerivativeMatrix(const double init_derivative,
+                                                           const double weight) {
+  Eigen::MatrixXd second_derivative_matrix = Eigen::MatrixXd::Zero(dimension_, dimension_);
   for (std::size_t i = 0; i < dimension_; ++i) {
     if (i == 0) {
       second_derivative_matrix(0, 0) += 1.0;
@@ -74,13 +67,12 @@ void PiecewiseLinearKernel::AddSecondOrderDerivativeMatrix(
   second_derivative_matrix *= 2.0 * weight / std::pow(unit_segment_, 4);
   kernel_matrix_ += second_derivative_matrix;
 
-  offset_matrix_(0, 0) +=
-      -2.0 * weight * init_derivative / std::pow(unit_segment_, 3);
+  offset_matrix_(0, 0) += -2.0 * weight * init_derivative / std::pow(unit_segment_, 3);
 }
 
-void PiecewiseLinearKernel::AddThirdOrderDerivativeMatrix(
-    const double init_derivative, const double init_second_derivative,
-    const double weight) {
+void PiecewiseLinearKernel::AddThirdOrderDerivativeMatrix(const double init_derivative,
+                                                          const double init_second_derivative,
+                                                          const double weight) {
   Eigen::MatrixXd jerk_matrix = Eigen::MatrixXd::Zero(dimension_, dimension_);
   for (std::size_t i = 0; i < dimension_; ++i) {
     if (i == 0) {
@@ -131,20 +123,18 @@ void PiecewiseLinearKernel::AddThirdOrderDerivativeMatrix(
 
   const double quintic = std::pow(unit_segment_, 5);
   offset_matrix_(0, 0) +=
-      -2.0 * weight *
-      (init_derivative + init_second_derivative * unit_segment_) / quintic;
+      -2.0 * weight * (init_derivative + init_second_derivative * unit_segment_) / quintic;
   offset_matrix_(0, 0) += -6.0 * weight * init_derivative / quintic;
   offset_matrix_(1, 0) += 2.0 * weight * init_derivative / quintic;
 }
 
 // reference line kernel
-bool PiecewiseLinearKernel::AddReferenceLineKernelMatrix(
-    const std::vector<uint32_t>& index_list,
-    const std::vector<double>& pos_list, const double weight) {
+bool PiecewiseLinearKernel::AddReferenceLineKernelMatrix(const std::vector<uint32_t>& index_list,
+                                                         const std::vector<double>&   pos_list,
+                                                         const double                 weight) {
   if (index_list.size() != pos_list.size()) {
-    AERROR
-        << "index_list and pos_list must have equal size. index_list.size() = "
-        << index_list.size() << ", pos_list.size() = " << pos_list.size();
+    AERROR << "index_list and pos_list must have equal size. index_list.size() = "
+           << index_list.size() << ", pos_list.size() = " << pos_list.size();
     return false;
   }
   Eigen::MatrixXd ref_kernel = Eigen::MatrixXd::Zero(dimension_, dimension_);

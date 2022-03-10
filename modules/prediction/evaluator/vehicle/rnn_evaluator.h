@@ -56,9 +56,9 @@ class RNNEvaluator : public Evaluator {
    * @param obstacle_feature_mat feature matrix
    * @param lane_feature_mats lane feature matrices
    */
-  int ExtractFeatureValues(
-      Obstacle* obstacle, Eigen::MatrixXf* const obstacle_feature_mat,
-      std::unordered_map<int, Eigen::MatrixXf>* const lane_feature_mats);
+  int ExtractFeatureValues(Obstacle*                                       obstacle,
+                           Eigen::MatrixXf* const                          obstacle_feature_mat,
+                           std::unordered_map<int, Eigen::MatrixXf>* const lane_feature_mats);
 
   /**
    * @brief Clear
@@ -72,20 +72,18 @@ class RNNEvaluator : public Evaluator {
    */
   void LoadModel(const std::string& model_file);
 
-  int SetupObstacleFeature(Obstacle* obstacle,
-                           std::vector<float>* const feature_values);
+  int SetupObstacleFeature(Obstacle* obstacle, std::vector<float>* const feature_values);
 
-  int SetupLaneFeature(const Feature& feature,
-                       const LaneSequence& lane_sequence,
+  int SetupLaneFeature(const Feature&            feature,
+                       const LaneSequence&       lane_sequence,
                        std::vector<float>* const feature_values);
 
-  bool IsCutinInHistory(const std::string& curr_lane_id,
-                        const std::string& prev_lane_id);
+  bool IsCutinInHistory(const std::string& curr_lane_id, const std::string& prev_lane_id);
 
  private:
-  static const int DIM_OBSTACLE_FEATURE = 6;
-  static const int DIM_LANE_POINT_FEATURE = 4;
-  static const int LENGTH_LANE_POINT_SEQUENCE = 20;
+  static const int   DIM_OBSTACLE_FEATURE       = 6;
+  static const int   DIM_LANE_POINT_FEATURE     = 4;
+  static const int   LENGTH_LANE_POINT_SEQUENCE = 20;
   network::RnnModel* model_ptr_;
 };
 

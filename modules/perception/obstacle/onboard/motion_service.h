@@ -17,9 +17,6 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_
 
-#include <Eigen/Core>
-#include <list>
-#include <string>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -28,6 +25,9 @@
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
+#include <Eigen/Core>
+#include <list>
+#include <string>
 namespace apollo {
 namespace perception {
 
@@ -45,32 +45,31 @@ class MotionService : public Subnode {
 
   common::Status ProcEvents() override { return common::Status::OK(); }
 
-  void GetVehicleInformation(float timestamp,
-                             VehicleInformation *vehicle_information);
-  bool GetMotionInformation(double timestamp, VehicleStatus *vs);
+  void         GetVehicleInformation(float timestamp, VehicleInformation* vehicle_information);
+  bool         GetMotionInformation(double timestamp, VehicleStatus* vs);
   MotionBuffer GetMotionBuffer();
-  double GetLatestTimestamp();
+  double       GetLatestTimestamp();
 
  protected:
   bool InitInternal() override;
 
  private:
-  void OnLocalization(const localization::LocalizationEstimate &localization);
-  void ImageCallback(const sensor_msgs::Image &message);
-  void PublishEvent(double timestamp);
-  PlaneMotion *vehicle_planemotion_ = nullptr;
-  std::string device_id_;
-  double pre_azimuth = 0;  // a invalid value
-  double pre_timestamp_ = 0;
-  double pre_camera_timestamp_ = 0;
-  double camera_timestamp_ = 0;
-  bool start_flag_ = false;
-  const int motion_buffer_size_ = 100;
-  Mutex mutex_;
-  Mutex image_mutex_;
-  Mutex motion_mutex_;
+  void         OnLocalization(const localization::LocalizationEstimate& localization);
+  void         ImageCallback(const sensor_msgs::Image& message);
+  void         PublishEvent(double timestamp);
+  PlaneMotion* vehicle_planemotion_ = nullptr;
+  std::string  device_id_;
+  double       pre_azimuth           = 0;  // a invalid value
+  double       pre_timestamp_        = 0;
+  double       pre_camera_timestamp_ = 0;
+  double       camera_timestamp_     = 0;
+  bool         start_flag_           = false;
+  const int    motion_buffer_size_   = 100;
+  Mutex        mutex_;
+  Mutex        image_mutex_;
+  Mutex        motion_mutex_;
   std::list<VehicleInformation> vehicle_information_buffer_;
-  CameraSharedData *camera_shared_data_ = nullptr;
+  CameraSharedData*             camera_shared_data_ = nullptr;
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
 

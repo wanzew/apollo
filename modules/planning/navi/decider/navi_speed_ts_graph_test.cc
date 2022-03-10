@@ -35,11 +35,11 @@ TEST(NaviSpeedTsGraph, Solve1) {
   graph.Reset(0.1, 100.0, [](double v) { return 1.0 * v + 2.0; });
 
   NaviSpeedTsConstraints constraints;
-  constraints.v_max = 20.0;
+  constraints.v_max       = 20.0;
   constraints.v_preffered = 10.0;
-  constraints.a_max = 4.0;
+  constraints.a_max       = 4.0;
   constraints.a_preffered = 2.0;
-  constraints.b_max = 5.0;
+  constraints.b_max       = 5.0;
   constraints.b_preffered = 2.0;
   graph.UpdateConstraints(constraints);
 
@@ -59,11 +59,11 @@ TEST(NaviSpeedTsGraph, Solve2) {
   graph.Reset(0.1, 100.0, [](double v) { return 1.0 * v + 2.0; });
 
   NaviSpeedTsConstraints constraints;
-  constraints.v_max = 20.0;
+  constraints.v_max       = 20.0;
   constraints.v_preffered = 10.0;
-  constraints.a_max = 4.0;
+  constraints.a_max       = 4.0;
   constraints.a_preffered = 2.0;
-  constraints.b_max = 5.0;
+  constraints.b_max       = 5.0;
   constraints.b_preffered = 2.0;
   graph.UpdateConstraints(constraints);
 
@@ -87,11 +87,11 @@ TEST(NaviSpeedTsGraph, Solve3) {
   graph.Reset(0.1, 100.0, [](double v) { return 0.5 * v + 2.0; });
 
   NaviSpeedTsConstraints constraints;
-  constraints.v_max = 20.0;
+  constraints.v_max       = 20.0;
   constraints.v_preffered = 10.0;
-  constraints.a_max = 4.0;
+  constraints.a_max       = 4.0;
   constraints.a_preffered = 2.0;
-  constraints.b_max = 5.0;
+  constraints.b_max       = 5.0;
   constraints.b_preffered = 2.0;
   graph.UpdateConstraints(constraints);
 

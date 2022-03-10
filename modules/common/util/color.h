@@ -28,13 +28,13 @@ namespace apollo {
 namespace common {
 namespace color {
 
-constexpr char ANSI_RED[] = "\x1b[31m";
-constexpr char ANSI_GREEN[] = "\x1b[32m";
-constexpr char ANSI_YELLOW[] = "\x1b[33m";
-constexpr char ANSI_BLUE[] = "\x1b[34m";
+constexpr char ANSI_RED[]     = "\x1b[31m";
+constexpr char ANSI_GREEN[]   = "\x1b[32m";
+constexpr char ANSI_YELLOW[]  = "\x1b[33m";
+constexpr char ANSI_BLUE[]    = "\x1b[34m";
 constexpr char ANSI_MAGENTA[] = "\x1b[35m";
-constexpr char ANSI_CYAN[] = "\x1b[36m";
-constexpr char ANSI_RESET[] = "\x1b[0m";
+constexpr char ANSI_CYAN[]    = "\x1b[36m";
+constexpr char ANSI_RESET[]   = "\x1b[0m";
 
 }  // namespace color
 }  // namespace common

@@ -53,8 +53,7 @@ class DiscretizedPath {
   virtual void Clear();
 
  protected:
-  std::vector<common::PathPoint>::const_iterator QueryLowerBound(
-      const double path_s) const;
+  std::vector<common::PathPoint>::const_iterator QueryLowerBound(const double path_s) const;
 
   std::vector<common::PathPoint> path_points_;
 };

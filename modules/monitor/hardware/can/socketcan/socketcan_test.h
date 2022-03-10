@@ -17,6 +17,7 @@
 #ifndef MODULES_MONITOR_HARDWARE_CAN_SOCKETCAN_SOCKETCAN_TEST_H_
 #define MODULES_MONITOR_HARDWARE_CAN_SOCKETCAN_SOCKETCAN_TEST_H_
 
+#include <cstring>
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <net/if.h>
@@ -24,7 +25,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <cstring>
 
 /**
  * @namespace apollo::monitor::hw

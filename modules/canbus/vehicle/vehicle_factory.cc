@@ -23,27 +23,22 @@ namespace apollo {
 namespace canbus {
 
 void VehicleFactory::RegisterVehicleFactory() {
-  Register(VehicleParameter::LINCOLN_MKZ, []() -> AbstractVehicleFactory * {
-    return new LincolnVehicleFactory();
-  });
-  Register(VehicleParameter::GEM, []() -> AbstractVehicleFactory * {
-    return new GemVehicleFactory();
-  });
-  Register(VehicleParameter::CH, []() -> AbstractVehicleFactory * {
-    return new ChVehicleFactory();
-  });
+  Register(VehicleParameter::LINCOLN_MKZ,
+           []() -> AbstractVehicleFactory* { return new LincolnVehicleFactory(); });
+  Register(VehicleParameter::GEM,
+           []() -> AbstractVehicleFactory* { return new GemVehicleFactory(); });
+  Register(VehicleParameter::CH,
+           []() -> AbstractVehicleFactory* { return new ChVehicleFactory(); });
 }
 
-std::unique_ptr<AbstractVehicleFactory> VehicleFactory::CreateVehicle(
-    const VehicleParameter &vehicle_parameter) {
+std::unique_ptr<AbstractVehicleFactory>
+VehicleFactory::CreateVehicle(const VehicleParameter& vehicle_parameter) {
   auto abstract_factory = CreateObject(vehicle_parameter.brand());
   if (!abstract_factory) {
-    AERROR << "failed to create vehicle factory with "
-           << vehicle_parameter.DebugString();
+    AERROR << "failed to create vehicle factory with " << vehicle_parameter.DebugString();
   } else {
     abstract_factory->SetVehicleParameter(vehicle_parameter);
-    AINFO << "successfully created vehicle factory with "
-          << vehicle_parameter.DebugString();
+    AINFO << "successfully created vehicle factory with " << vehicle_parameter.DebugString();
   }
   return abstract_factory;
 }

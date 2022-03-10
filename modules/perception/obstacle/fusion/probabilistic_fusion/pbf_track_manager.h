@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_  // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_  // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_    // NOLINT
+#  define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_  // NOLINT
 
-#include <vector>
+#  include <vector>
 
-#include "modules/common/macro.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
+#  include "modules/common/macro.h"
+#  include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
 namespace apollo {
 namespace perception {
@@ -29,9 +29,9 @@ class PbfTrackManager {
  public:
   ~PbfTrackManager() = default;
 
-  std::vector<PbfTrackPtr> &GetTracks() { return tracks_; }
+  std::vector<PbfTrackPtr>& GetTracks() { return tracks_; }
 
-  const std::vector<PbfTrackPtr> &GetTracks() const { return tracks_; }
+  const std::vector<PbfTrackPtr>& GetTracks() const { return tracks_; }
 
   void AddTrack(PbfTrackPtr track) { tracks_.push_back(track); }
 

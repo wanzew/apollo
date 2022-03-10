@@ -40,14 +40,12 @@ class KalmanFilter : public BaseFilter {
   // @brief set association score maximum for computing update qaulity
   // @params[IN] association_score_maximum: association score maximum
   // @return true if set successfully, otherwise return false
-  static bool SetAssociationScoreMaximum(
-      const double association_score_maximum);
+  static bool SetAssociationScoreMaximum(const double association_score_maximum);
 
   // @brief set breakdown threshold maximum for computing breakdown ratio
   // @params[IN] breakdown_threshold_maximum: breakdown threshold maximum
   // @return true if set successfully, otherwise return false
-  static bool SetBreakdownThresholdMaximum(
-      const double breakdown_threshold_maximum);
+  static bool SetBreakdownThresholdMaximum(const double breakdown_threshold_maximum);
 
   // @brief init initialize parameters for kalman filter
   // @params[IN] measurement_noise: noise of measurement
@@ -64,8 +62,7 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] anchor_point: initial anchor point for filtering
   // @params[IN] velocity: initial velocity for filtering
   // @return nothing
-  void Initialize(const Eigen::Vector3f& anchor_point,
-                  const Eigen::Vector3f& velocity);
+  void Initialize(const Eigen::Vector3f& anchor_point, const Eigen::Vector3f& velocity);
 
   // @brief predict the state of filter
   // @params[IN] time_diff: time interval for predicting
@@ -79,7 +76,7 @@ class KalmanFilter : public BaseFilter {
   // @return nothing
   void UpdateWithObject(const std::shared_ptr<TrackedObject>& new_object,
                         const std::shared_ptr<TrackedObject>& old_object,
-                        const double time_diff);
+                        const double                          time_diff);
 
   // @brief update filter without object
   // @params[IN] time_diff: time interval from last updating
@@ -97,8 +94,8 @@ class KalmanFilter : public BaseFilter {
   // @params[OUT] velocity: velocity of current state
   // @params[OUT] velocity_accelaration: accelaration of current state
   // @return nothing
-  void GetState(Eigen::Vector3f* anchor_point, Eigen::Vector3f* velocity,
-                Eigen::Vector3f* accelaration);
+  void
+  GetState(Eigen::Vector3f* anchor_point, Eigen::Vector3f* velocity, Eigen::Vector3f* accelaration);
 
   void GetAccelerationGain(Eigen::Vector3f* acceleration_gain);
 
@@ -113,53 +110,51 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return measured velocity
-  Eigen::VectorXf ComputeMeasuredVelocity(
-      const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object,
-      const double time_diff);
+  Eigen::VectorXf ComputeMeasuredVelocity(const std::shared_ptr<TrackedObject>& new_object,
+                                          const std::shared_ptr<TrackedObject>& old_object,
+                                          const double                          time_diff);
 
   // @brief compute measured anchor point velocity
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return measured anchor point elocity
-  Eigen::VectorXf ComputeMeasuredAnchorPointVelocity(
-      const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object,
-      const double time_diff);
+  Eigen::VectorXf
+  ComputeMeasuredAnchorPointVelocity(const std::shared_ptr<TrackedObject>& new_object,
+                                     const std::shared_ptr<TrackedObject>& old_object,
+                                     const double                          time_diff);
 
   // @brief compute measured bbox center velocity
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return measured bbox center velocity
-  Eigen::VectorXf ComputeMeasuredBboxCenterVelocity(
-      const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object,
-      const double time_diff);
+  Eigen::VectorXf
+  ComputeMeasuredBboxCenterVelocity(const std::shared_ptr<TrackedObject>& new_object,
+                                    const std::shared_ptr<TrackedObject>& old_object,
+                                    const double                          time_diff);
 
   // @brief compute measured bbox corner velocity
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return measured bbox corner velocity
-  Eigen::VectorXf ComputeMeasuredBboxCornerVelocity(
-      const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object,
-      const double time_diff);
+  Eigen::VectorXf
+  ComputeMeasuredBboxCornerVelocity(const std::shared_ptr<TrackedObject>& new_object,
+                                    const std::shared_ptr<TrackedObject>& old_object,
+                                    const double                          time_diff);
 
   // @brief select measured velocity among candidates
   // @params[IN] candidates: candidates of measured velocity
   // @return selected measurement of velocity
-  Eigen::Vector3f SelectMeasuredVelocity(
-      const std::vector<Eigen::Vector3f>& candidates);
+  Eigen::Vector3f SelectMeasuredVelocity(const std::vector<Eigen::Vector3f>& candidates);
 
   // @brief select measured velocity among candidates according motion
   // consistency
   // @params[IN] candidates: candidates of measured velocity
   // @return selected measurement of velocity
-  Eigen::Vector3f SelectMeasuredVelocityAccordingMotionConsistency(
-      const std::vector<Eigen::Vector3f>& candidates);
+  Eigen::Vector3f
+  SelectMeasuredVelocityAccordingMotionConsistency(const std::vector<Eigen::Vector3f>& candidates);
 
   // @brief update filter
   // @params[IN] measured_anchor_point: anchor point of given measurement
@@ -168,7 +163,7 @@ class KalmanFilter : public BaseFilter {
   // @return nothing
   void UpdateVelocity(const Eigen::VectorXf& measured_anchor_point,
                       const Eigen::VectorXf& measured_velocity,
-                      const double time_diff);
+                      const double           time_diff);
 
   // @brief compute update quality for adaptive filtering
   // @params[IN] new_object: new object for current updating
@@ -180,16 +175,16 @@ class KalmanFilter : public BaseFilter {
   // @brief compute update quality by using association score
   // @params[IN] new_object: new object for current updating
   // @return upate quality according association score
-  float ComputeUpdateQualityAccordingAssociationScore(
-      const std::shared_ptr<TrackedObject>& new_object);
+  float
+  ComputeUpdateQualityAccordingAssociationScore(const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute update quality by using association score
   // @params[IN] old_object: old object for last updaitng
   // @params[IN] new_object: new object for current updating
   // @return update quality according point number change
-  float ComputeUpdateQualityAccordingPointNumChange(
-      const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object);
+  float
+  ComputeUpdateQualityAccordingPointNumChange(const std::shared_ptr<TrackedObject>& new_object,
+                                              const std::shared_ptr<TrackedObject>& old_object);
 
   // @brief compute breakdown threshold
   // @return nothing
@@ -201,30 +196,30 @@ class KalmanFilter : public BaseFilter {
   void GetOnlineCovariance(Eigen::Matrix3f* online_covariance);
 
  protected:
-  void EvaluateOnlineCovariance();
-  Eigen::Vector3f ComputeMeasuredAcceleration(
-      const Eigen::Vector3f& measured_velocity, const double time_diff);
-  void UpdateAcceleration(const Eigen::VectorXf& measured_acceleration);
+  void            EvaluateOnlineCovariance();
+  Eigen::Vector3f ComputeMeasuredAcceleration(const Eigen::Vector3f& measured_velocity,
+                                              const double           time_diff);
+  void            UpdateAcceleration(const Eigen::VectorXf& measured_acceleration);
 
   // adaptive
-  static bool s_use_adaptive_;
+  static bool   s_use_adaptive_;
   static double s_association_score_maximum_;
 
   // parameters
   static Eigen::Matrix3d s_propagation_noise_;
-  static double s_measurement_noise_;
-  static double s_initial_velocity_noise_;
-  static double s_breakdown_threshold_maximum_;
+  static double          s_measurement_noise_;
+  static double          s_initial_velocity_noise_;
+  static double          s_breakdown_threshold_maximum_;
 
   static size_t s_measurement_cached_history_size_minimum_;
   static size_t s_measurement_cached_history_size_maximum_;
-  size_t measurement_cached_history_size_;
+  size_t        measurement_cached_history_size_;
 
   // filter history
   int age_;
 
   std::deque<Eigen::Vector3f> history_measured_velocity_;
-  std::deque<double> history_time_diff_;
+  std::deque<double>          history_time_diff_;
 
   // filter covariances
   Eigen::Matrix3d velocity_covariance_;
@@ -235,8 +230,8 @@ class KalmanFilter : public BaseFilter {
   Eigen::Vector3d belief_velocity_;
   Eigen::Vector3d belief_acceleration_;
   Eigen::Vector3d belief_acceleration_gain_;
-  double update_quality_;
-  double breakdown_threshold_;
+  double          update_quality_;
+  double          breakdown_threshold_;
 };  // class KalmanFilter
 
 }  // namespace perception

@@ -23,8 +23,8 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Steercommand112 : public ::apollo::drivers::canbus::ProtocolData<
-                            ::apollo::canbus::ChassisDetail> {
+class Steercommand112
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -42,8 +42,8 @@ class Steercommand112 : public ::apollo::drivers::canbus::ProtocolData<
   // 'STEER_ANGLE_EN_CTRL', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  Steercommand112* set_steer_angle_en_ctrl(
-      Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl);
+  Steercommand112*
+  set_steer_angle_en_ctrl(Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl);
 
   // config detail: {'description': 'Current steering angle(Command)', 'offset':
   // 0.0, 'precision': 0.001, 'len': 16, 'name': 'STEER_ANGLE_CMD',
@@ -58,9 +58,8 @@ class Steercommand112 : public ::apollo::drivers::canbus::ProtocolData<
   // 'STEER_ANGLE_EN_CTRL', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  void set_p_steer_angle_en_ctrl(
-      uint8_t* data,
-      Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl);
+  void set_p_steer_angle_en_ctrl(uint8_t*                                   data,
+                                 Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl);
 
   // config detail: {'description': 'Current steering angle(Command)', 'offset':
   // 0.0, 'precision': 0.001, 'len': 16, 'name': 'STEER_ANGLE_CMD',
@@ -70,7 +69,7 @@ class Steercommand112 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl_;
-  double steer_angle_cmd_;
+  double                                     steer_angle_cmd_;
 };
 
 }  // namespace ch

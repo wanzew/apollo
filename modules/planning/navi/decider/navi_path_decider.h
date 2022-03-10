@@ -57,7 +57,7 @@ class NaviPathDecider : public Task {
   NaviPathDecider();
   virtual ~NaviPathDecider() = default;
 
-  bool Init(const PlanningConfig &config) override;
+  bool Init(const PlanningConfig& config) override;
 
   /**
    * @brief Overrided implementation of the virtual function "Execute" in the
@@ -66,8 +66,7 @@ class NaviPathDecider : public Task {
    * @param reference_line_info Currently available reference line information.
    * @return Status::OK() if a suitable path is created; error otherwise.
    */
-  apollo::common::Status Execute(
-      Frame *frame, ReferenceLineInfo *reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
   /**
@@ -80,11 +79,11 @@ class NaviPathDecider : public Task {
    * system
    * @return Status::OK() if a suitable path is created; error otherwise.
    */
-  apollo::common::Status Process(const ReferenceLine &reference_line,
-                                 const common::TrajectoryPoint &init_point,
-                                 const std::vector<const Obstacle *> &obstacles,
-                                 PathDecision *const path_decision,
-                                 PathData *const path_data);
+  apollo::common::Status Process(const ReferenceLine&                reference_line,
+                                 const common::TrajectoryPoint&      init_point,
+                                 const std::vector<const Obstacle*>& obstacles,
+                                 PathDecision* const                 path_decision,
+                                 PathData* const                     path_data);
 
   /**
    * @brief take a section of the reference line as the initial path trajectory.
@@ -92,8 +91,8 @@ class NaviPathDecider : public Task {
    * @param path_points output points intercepted from the reference line
    * @return if success return true or return false.
    */
-  bool GetBasicPathData(const ReferenceLine &reference_line,
-                        std::vector<common::PathPoint> *const path_points);
+  bool GetBasicPathData(const ReferenceLine&                  reference_line,
+                        std::vector<common::PathPoint>* const path_points);
 
   /**
    * @brief shift the path points on the y-axis
@@ -101,8 +100,7 @@ class NaviPathDecider : public Task {
    * @param init_point both input and output path points.
    * @return if success return true or return false.
    */
-  void ShiftY(const double shift_distance,
-              std::vector<common::PathPoint> *const path_points);
+  void ShiftY(const double shift_distance, std::vector<common::PathPoint>* const path_points);
 
   /**
    * @brief calculate the y-coordinate of the starting point of the path plan
@@ -111,10 +109,9 @@ class NaviPathDecider : public Task {
    * @param target_path_init_y the y-coordinate of the start point that desired
    * @return the y-coordinate of the starting point in FLU coordinate.
    */
-  double SmoothInitY(const double actual_ref_init_y,
-                     const double target_path_init_y);
+  double SmoothInitY(const double actual_ref_init_y, const double target_path_init_y);
 
-  void RecordDebugInfo(const PathData &path_data);
+  void RecordDebugInfo(const PathData& path_data);
 
   /**
    * @brief check whether it is safe to change lanes
@@ -122,8 +119,7 @@ class NaviPathDecider : public Task {
    * @param path_decision input all abstacles info
    * @return true if safe to change lane or return false.
    */
-  bool IsSafeChangeLane(const ReferenceLine &reference_line,
-                        const PathDecision &path_decision);
+  bool IsSafeChangeLane(const ReferenceLine& reference_line, const PathDecision& path_decision);
 
   /**
    * @brief calculate the lateral target position with slight avoidance
@@ -133,27 +129,26 @@ class NaviPathDecider : public Task {
    * @param path_decision path decision information provided by perception.
    * @return the y coordinate value of nudging target position
    */
-  double NudgeProcess(const ReferenceLine &reference_line,
-                      const std::vector<common::PathPoint> &path_data_points,
-                      const std::vector<const Obstacle *> &obstacles,
-                      const PathDecision &path_decision);
+  double NudgeProcess(const ReferenceLine&                  reference_line,
+                      const std::vector<common::PathPoint>& path_data_points,
+                      const std::vector<const Obstacle*>&   obstacles,
+                      const PathDecision&                   path_decision);
   /**
    * @brief calculate latreal shift param by vehicle state and config
    */
   void CalculateShiftParam();
 
  private:
-  common::VehicleState vehicle_state_;
-  NaviPathDeciderConfig config_;
-  std::string cur_reference_line_lane_id_;
-  std::map<std::string, double> last_lane_id_to_adc_project_y_;
-  std::map<std::string, bool> last_lane_id_to_nudge_flag_;
-  std::map<double, std::tuple<double, double, double>>
-      speed_to_shift_param_table_;
-  std::vector<double> max_speed_levels_;
-  double theta_change_ratio_ = 0.0;
-  double min_init_y_ = 0.0;
-  double max_init_y_ = 0.0;
+  common::VehicleState                                 vehicle_state_;
+  NaviPathDeciderConfig                                config_;
+  std::string                                          cur_reference_line_lane_id_;
+  std::map<std::string, double>                        last_lane_id_to_adc_project_y_;
+  std::map<std::string, bool>                          last_lane_id_to_nudge_flag_;
+  std::map<double, std::tuple<double, double, double>> speed_to_shift_param_table_;
+  std::vector<double>                                  max_speed_levels_;
+  double                                               theta_change_ratio_ = 0.0;
+  double                                               min_init_y_         = 0.0;
+  double                                               max_init_y_         = 0.0;
 
   FRIEND_TEST(NaviPathDeciderTest, SmoothInitY);
 };

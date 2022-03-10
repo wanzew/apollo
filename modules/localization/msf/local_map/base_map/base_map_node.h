@@ -17,13 +17,13 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_NODE_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_NODE_H
 
-#include <Eigen/Core>
-#include <string>
-#include <vector>
 #include "modules/localization/msf/common/util/compression.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
+#include <Eigen/Core>
+#include <string>
+#include <vector>
 
 namespace apollo {
 namespace localization {
@@ -38,8 +38,8 @@ class BaseMapNode {
   virtual ~BaseMapNode();
 
   /**@brief Initialize the map node. Call this function first before use it! */
-  virtual void Init(const BaseMapConfig* map_config, const MapNodeIndex& index,
-                    bool create_map_cells = true);
+  virtual void
+  Init(const BaseMapConfig* map_config, const MapNodeIndex& index, bool create_map_cells = true);
   /**@brief Initialize the map matrix. */
   virtual void InitMapMatrix(const BaseMapConfig* map_config);
   /**@brief call before deconstruction or reset. */
@@ -84,9 +84,7 @@ class BaseMapNode {
   //     return left_top_corner_;
   // }
 
-  inline const Eigen::Vector2d& GetLeftTopCorner() const {
-    return left_top_corner_;
-  }
+  inline const Eigen::Vector2d& GetLeftTopCorner() const { return left_top_corner_; }
 
   inline void SetLeftTopCorner(double x, double y) {
     // left_top_corner_[0] = x;
@@ -113,10 +111,8 @@ class BaseMapNode {
   /**@brief Given the global coordinate, get the local 2D coordinate of the map
    * cell matrix. <return> If global coordinate (x, y) belongs to this map node,
    * eigen version. */
-  bool GetCoordinate(const Eigen::Vector2d& coordinate, unsigned int* x,
-                     unsigned int* y) const;
-  bool GetCoordinate(const Eigen::Vector3d& coordinate, unsigned int* x,
-                     unsigned int* y) const;
+  bool GetCoordinate(const Eigen::Vector2d& coordinate, unsigned int* x, unsigned int* y) const;
+  bool GetCoordinate(const Eigen::Vector3d& coordinate, unsigned int* x, unsigned int* y) const;
   /**@brief Given the local 2D coordinate, return the global coordinate, eigen
    * version. */
   Eigen::Vector2d GetCoordinate(unsigned int x, unsigned int y) const;
@@ -125,8 +121,7 @@ class BaseMapNode {
   // BaseMapConfig& option,
   //                                                      const MapNodeIndex&
   //                                                      index);
-  static Eigen::Vector2d GetLeftTopCorner(const BaseMapConfig& option,
-                                          const MapNodeIndex& index);
+  static Eigen::Vector2d GetLeftTopCorner(const BaseMapConfig& option, const MapNodeIndex& index);
 
  protected:
   /**@brief Load the map cell from a binary chunk.
@@ -147,8 +142,7 @@ class BaseMapNode {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int CreateHeaderBinary(unsigned char* buf,
-                                          unsigned int buf_size) const;
+  virtual unsigned int CreateHeaderBinary(unsigned char* buf, unsigned int buf_size) const;
   /**@brief Get the size of the header in bytes. */
   virtual unsigned int GetHeaderBinarySize() const;
   /**@brief Load the map node body from a binary chunk.

@@ -39,25 +39,25 @@ namespace perception {
 
 class CNNSegmentation : public BaseSegmentation {
  public:
-  CNNSegmentation() : BaseSegmentation() {}
+  CNNSegmentation()
+      : BaseSegmentation() {}
   ~CNNSegmentation() {}
 
   bool Init() override;
 
-  bool Segment(pcl_util::PointCloudPtr pc_ptr,
-               const pcl_util::PointIndices& valid_indices,
-               const SegmentationOptions& options,
+  bool Segment(pcl_util::PointCloudPtr               pc_ptr,
+               const pcl_util::PointIndices&         valid_indices,
+               const SegmentationOptions&            options,
                std::vector<std::shared_ptr<Object>>* objects) override;
 
   std::string name() const override { return "CNNSegmentation"; }
 
   float range() const { return range_; }
-  int width() const { return width_; }
-  int height() const { return height_; }
+  int   width() const { return width_; }
+  int   height() const { return height_; }
 
  private:
-  bool GetConfigs(std::string* config_file, std::string* proto_file,
-                  std::string* weight_file);
+  bool GetConfigs(std::string* config_file, std::string* proto_file, std::string* weight_file);
   // range of bird-view field (for each side)
   float range_ = 0.0;
   // number of cells in bird-view width

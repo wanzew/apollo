@@ -39,8 +39,7 @@ std::string Guardian::Name() const { return FLAGS_module_name; }
 Status Guardian::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
-  CHECK(AdapterManager::GetSystemStatus())
-      << "SystemStatus is not initialized.";
+  CHECK(AdapterManager::GetSystemStatus()) << "SystemStatus is not initialized.";
   CHECK(AdapterManager::GetControlCommand()) << "Control is not initialized.";
   return Status::OK();
 }
@@ -50,8 +49,7 @@ Status Guardian::Start() {
   AdapterManager::AddSystemStatusCallback(&Guardian::OnSystemStatus, this);
   AdapterManager::AddControlCommandCallback(&Guardian::OnControl, this);
   const double duration = 1.0 / FLAGS_guardian_cmd_freq;
-  timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
-                                       &Guardian::OnTimer, this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(duration), &Guardian::OnTimer, this);
 
   return Status::OK();
 }
@@ -105,17 +103,15 @@ void Guardian::TriggerSafetyMode() {
   AINFO << "Safety state triggered, with system safety mode trigger time : "
         << system_status_.safety_mode_trigger_time();
   std::lock_guard<std::mutex> lock(mutex_);
-  bool sensor_malfunction = false, obstacle_detected = false;
-  if (!chassis_.surround().sonar_enabled() ||
-      chassis_.surround().sonar_fault()) {
+  bool                        sensor_malfunction = false, obstacle_detected = false;
+  if (!chassis_.surround().sonar_enabled() || chassis_.surround().sonar_fault()) {
     AINFO << "Ultrasonic sensor not enabled for faulted, will do emergency "
              "stop!";
     sensor_malfunction = true;
   } else {
     // TODO(QiL) : Load for config
     for (int i = 0; i < chassis_.surround().sonar_range_size(); ++i) {
-      if ((chassis_.surround().sonar_range(i) > 0.0 &&
-           chassis_.surround().sonar_range(i) < 2.5) ||
+      if ((chassis_.surround().sonar_range(i) > 0.0 && chassis_.surround().sonar_range(i) < 2.5) ||
           chassis_.surround().sonar_range(i) > 30) {
         AINFO << "Object detected or ultrasonic sensor fault output, will do "
                  "emergency stop!";
@@ -131,12 +127,11 @@ void Guardian::TriggerSafetyMode() {
 
   // TODO(QiL) : Remove this one once hardware re-alignment is done.
   sensor_malfunction = false;
-  obstacle_detected = false;
+  obstacle_detected  = false;
   AINFO << "Temporarily ignore the ultrasonic sensor output during hardware "
            "re-alignment!";
 
-  if (system_status_.require_emergency_stop() || sensor_malfunction ||
-      obstacle_detected) {
+  if (system_status_.require_emergency_stop() || sensor_malfunction || obstacle_detected) {
     AINFO << "Emergency stop triggered! with system status from monitor as : "
           << system_status_.require_emergency_stop();
     guardian_cmd_.mutable_control_command()->set_brake(
@@ -144,8 +139,7 @@ void Guardian::TriggerSafetyMode() {
   } else {
     AINFO << "Soft stop triggered! with system status from monitor as : "
           << system_status_.require_emergency_stop();
-    guardian_cmd_.mutable_control_command()->set_brake(
-        FLAGS_guardian_cmd_soft_stop_percentage);
+    guardian_cmd_.mutable_control_command()->set_brake(FLAGS_guardian_cmd_soft_stop_percentage);
   }
 }
 

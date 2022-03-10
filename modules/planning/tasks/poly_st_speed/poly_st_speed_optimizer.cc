@@ -52,21 +52,19 @@ bool PolyStSpeedOptimizer::Init(const PlanningConfig& config) {
     return false;
   }
   poly_st_speed_config_ = config.em_planner_config().poly_st_speed_config();
-  st_boundary_config_ = poly_st_speed_config_.st_boundary_config();
-  is_init_ = true;
+  st_boundary_config_   = poly_st_speed_config_.st_boundary_config();
+  is_init_              = true;
   return true;
 }
 
-Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
-                                     const PathData& path_data,
+Status PolyStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
+                                     const PathData&        path_data,
                                      const TrajectoryPoint& init_point,
-                                     const ReferenceLine& reference_line,
-                                     const SpeedData& reference_speed_data,
-                                     PathDecision* const path_decision,
-                                     SpeedData* const speed_data) {
-  if (reference_line_info_->ReachedDestination()) {
-    return Status::OK();
-  }
+                                     const ReferenceLine&   reference_line,
+                                     const SpeedData&       reference_speed_data,
+                                     PathDecision* const    path_decision,
+                                     SpeedData* const       speed_data) {
+  if (reference_line_info_->ReachedDestination()) { return Status::OK(); }
   if (!is_init_) {
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
@@ -78,8 +76,7 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_,
-                                   reference_line, path_data,
+  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_, reference_line, path_data,
                                    poly_st_speed_config_.total_path_length(),
                                    poly_st_speed_config_.total_time(),
                                    reference_line_info_->IsChangeLanePath());
@@ -89,45 +86,35 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   }
   // step 1 get boundaries
   path_decision->EraseStBoundaries();
-  if (boundary_mapper.CreateStBoundary(path_decision).code() ==
-      ErrorCode::PLANNING_ERROR) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Mapping obstacle for qp st speed optimizer failed!");
+  if (boundary_mapper.CreateStBoundary(path_decision).code() == ErrorCode::PLANNING_ERROR) {
+    return Status(ErrorCode::PLANNING_ERROR, "Mapping obstacle for qp st speed optimizer failed!");
   }
 
   for (const auto* obstacle : path_decision->path_obstacles().Items()) {
-    auto id = obstacle->Id();
+    auto  id               = obstacle->Id();
     auto* mutable_obstacle = path_decision->Find(id);
 
     if (!obstacle->st_boundary().IsEmpty()) {
       mutable_obstacle->SetBlockingObstacle(true);
     } else {
-      path_decision->SetStBoundary(
-          id, path_decision->Find(id)->reference_line_st_boundary());
+      path_decision->SetStBoundary(id, path_decision->Find(id)->reference_line_st_boundary());
     }
   }
 
-  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_,
-                                        reference_line, path_data);
-  SpeedLimit speed_limits;
-  if (speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(),
-                                         &speed_limits) != Status::OK()) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "GetSpeedLimits for qp st speed optimizer failed!");
+  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_, reference_line,
+                                        path_data);
+  SpeedLimit        speed_limits;
+  if (speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(), &speed_limits) !=
+      Status::OK()) {
+    return Status(ErrorCode::PLANNING_ERROR, "GetSpeedLimits for qp st speed optimizer failed!");
   }
 
   // step 2 perform graph search
   // make a poly_st_graph and perform search here.
-  PolyStGraph poly_st_graph(poly_st_speed_config_, reference_line_info_,
-                            speed_limits);
-  auto ret = poly_st_graph.FindStTunnel(
-      init_point,
-      reference_line_info_->path_decision()->path_obstacles().Items(),
-      speed_data);
-  if (!ret) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Fail to find st tunnel in PolyStGraph.");
-  }
+  PolyStGraph poly_st_graph(poly_st_speed_config_, reference_line_info_, speed_limits);
+  auto        ret = poly_st_graph.FindStTunnel(
+      init_point, reference_line_info_->path_decision()->path_obstacles().Items(), speed_data);
+  if (!ret) { return Status(ErrorCode::PLANNING_ERROR, "Fail to find st tunnel in PolyStGraph."); }
   return Status::OK();
 }
 

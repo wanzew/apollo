@@ -28,40 +28,38 @@
 namespace apollo {
 namespace planning {
 
-QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(
-    const std::array<double, 3>& start, const std::array<double, 2>& end,
-    const double param)
-    : QuarticPolynomialCurve1d(start[0], start[1], start[2], end[0], end[1],
-                               param) {}
+QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(const std::array<double, 3>& start,
+                                                   const std::array<double, 2>& end,
+                                                   const double                 param)
+    : QuarticPolynomialCurve1d(start[0], start[1], start[2], end[0], end[1], param) {}
 
-QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(
-    const double x0, const double dx0, const double ddx0, const double dx1,
-    const double ddx1, const double param) {
-  param_ = param;
+QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(const double x0,
+                                                   const double dx0,
+                                                   const double ddx0,
+                                                   const double dx1,
+                                                   const double ddx1,
+                                                   const double param) {
+  param_              = param;
   start_condition_[0] = x0;
   start_condition_[1] = dx0;
   start_condition_[2] = ddx0;
-  end_condition_[0] = dx1;
-  end_condition_[1] = ddx1;
+  end_condition_[0]   = dx1;
+  end_condition_[1]   = ddx1;
   ComputeCoefficients(x0, dx0, ddx0, dx1, ddx1, param);
 }
 
-QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(
-    const QuarticPolynomialCurve1d& other) {
+QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(const QuarticPolynomialCurve1d& other) {
   param_ = other.param_;
-  coef_ = other.coef_;
+  coef_  = other.coef_;
 }
 
-double QuarticPolynomialCurve1d::Evaluate(const std::uint32_t order,
-                                          const double p) const {
+double QuarticPolynomialCurve1d::Evaluate(const std::uint32_t order, const double p) const {
   switch (order) {
     case 0: {
-      return (((coef_[4] * p + coef_[3]) * p + coef_[2]) * p + coef_[1]) * p +
-             coef_[0];
+      return (((coef_[4] * p + coef_[3]) * p + coef_[2]) * p + coef_[1]) * p + coef_[0];
     }
     case 1: {
-      return ((4.0 * coef_[4] * p + 3.0 * coef_[3]) * p + 2.0 * coef_[2]) * p +
-             coef_[1];
+      return ((4.0 * coef_[4] * p + 3.0 * coef_[3]) * p + 2.0 * coef_[2]) * p + coef_[1];
     }
     case 2: {
       return (12.0 * coef_[4] * p + 6.0 * coef_[3]) * p + 2.0 * coef_[2];
@@ -72,14 +70,16 @@ double QuarticPolynomialCurve1d::Evaluate(const std::uint32_t order,
     case 4: {
       return 24.0 * coef_[4];
     }
-    default:
-      return 0.0;
+    default: return 0.0;
   }
 }
 
-void QuarticPolynomialCurve1d::ComputeCoefficients(
-    const double x0, const double dx0, const double ddx0, const double dx1,
-    const double ddx1, const double p) {
+void QuarticPolynomialCurve1d::ComputeCoefficients(const double x0,
+                                                   const double dx0,
+                                                   const double ddx0,
+                                                   const double dx1,
+                                                   const double ddx1,
+                                                   const double p) {
   CHECK_GT(p, 0.0);
 
   coef_[0] = x0;
@@ -97,8 +97,7 @@ void QuarticPolynomialCurve1d::ComputeCoefficients(
 }
 
 std::string QuarticPolynomialCurve1d::ToString() const {
-  return apollo::common::util::StrCat(
-      apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
+  return apollo::common::util::StrCat(apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
 }
 
 }  // namespace planning

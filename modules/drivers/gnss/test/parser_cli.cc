@@ -18,10 +18,10 @@
 // It is supposed to be
 // used for verifying if the parser works properly.
 
-#include <ros/ros.h>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <ros/ros.h>
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/file.h"
@@ -41,7 +41,7 @@ constexpr size_t BUFFER_SIZE = 128;
 void ParseBin(const char* filename, DataParser* parser) {
   std::ios::sync_with_stdio(false);
   std::ifstream f(filename, std::ifstream::binary);
-  char b[BUFFER_SIZE];
+  char          b[BUFFER_SIZE];
   while (f) {
     f.read(b, BUFFER_SIZE);
     std_msgs::StringPtr msg(new std_msgs::String);
@@ -55,22 +55,19 @@ void ParseBag(const char* filename, DataParser* parser) {
   bag.open(filename, rosbag::bagmode::Read);
 
   std::vector<std::string> topics = {"/apollo/sensor/gnss/raw_data"};
-  rosbag::View view(bag, rosbag::TopicQuery(topics));
+  rosbag::View             view(bag, rosbag::TopicQuery(topics));
   for (auto const m : view) {
     std_msgs::String::ConstPtr msg = m.instantiate<std_msgs::String>();
-    if (msg != nullptr) {
-      parser->ParseRawData(msg);
-    }
+    if (msg != nullptr) { parser->ParseRawData(msg); }
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 }
 
 void Parse(const char* filename, const char* file_type) {
-  std::string type = std::string(file_type);
+  std::string    type = std::string(file_type);
   config::Config config;
   if (!common::util::GetProtoFromFile(
-          std::string("/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"),
-          &config)) {
+          std::string("/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"), &config)) {
     std::cout << "Unable to load gnss conf file";
   }
   DataParser* parser = new DataParser(config);

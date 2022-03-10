@@ -44,9 +44,9 @@
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
-#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
-#include "modules/drivers/radar/ultrasonic_radar/proto/ultrasonic_radar_conf.pb.h"
 #include "modules/drivers/proto/ultrasonic_radar.pb.h"
+#include "modules/drivers/radar/ultrasonic_radar/proto/ultrasonic_radar_conf.pb.h"
+#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
 
 /**
  * @namespace apollo::drivers
@@ -57,19 +57,19 @@ namespace drivers {
 namespace ultrasonic_radar {
 
 /**
-* @class UltrasonicRadarCanbus
-*
-* @brief template of canbus-based sensor module main class (e.g., ultrasonic_radar).
-*/
+ * @class UltrasonicRadarCanbus
+ *
+ * @brief template of canbus-based sensor module main class (e.g., ultrasonic_radar).
+ */
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
 using apollo::common::time::Clock;
-using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
@@ -82,39 +82,39 @@ class UltrasonicRadarCanbus : public apollo::common::ApolloApp {
       : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
-  * @brief obtain module name
-  * @return module name
-  */
+   * @brief obtain module name
+   * @return module name
+   */
   std::string Name() const override;
 
   /**
-  * @brief module initialization function
-  * @return initialization status
-  */
+   * @brief module initialization function
+   * @return initialization status
+   */
   apollo::common::Status Init() override;
 
   /**
-  * @brief module start function
-  * @return start status
-  */
+   * @brief module start function
+   * @return start status
+   */
   apollo::common::Status Start() override;
 
   /**
-  * @brief module stop function
-  */
+   * @brief module stop function
+   */
   void Stop() override;
 
  private:
-  void PublishSensorData();
-  Status OnError(const std::string &error_msg);
-  void RegisterCanClients();
+  void   PublishSensorData();
+  Status OnError(const std::string& error_msg);
+  void   RegisterCanClients();
 
-  UltrasonicRadarConf ultrasonic_radar_conf_;
-  std::shared_ptr<CanClient> can_client_;
-  CanReceiver<Ultrasonic> can_receiver_;
+  UltrasonicRadarConf                            ultrasonic_radar_conf_;
+  std::shared_ptr<CanClient>                     can_client_;
+  CanReceiver<Ultrasonic>                        can_receiver_;
   std::unique_ptr<UltrasonicRadarMessageManager> sensor_message_manager_;
 
-  int64_t last_timestamp_ = 0;
+  int64_t                                last_timestamp_ = 0;
   apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 

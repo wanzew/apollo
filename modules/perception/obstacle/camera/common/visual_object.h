@@ -53,7 +53,7 @@ struct alignas(16) VisualObject {
   std::vector<float> pts8;
 
   // 2D bounding box truncation ratio, for out-of-image objects
-  float trunc_width = 0.0f;
+  float trunc_width  = 0.0f;
   float trunc_height = 0.0f;
 
   // Object type from detection
@@ -72,7 +72,7 @@ struct alignas(16) VisualObject {
   // [meter] physical size of 3D oriented bounding box
   // length is the size in the main direction
   float length = 0.0f;
-  float width = 0.0f;
+  float width  = 0.0f;
   float height = 0.0f;
 
   // [radian] observation angle of object, ranging as [-pi, pi]
@@ -92,8 +92,7 @@ struct alignas(16) VisualObject {
   Eigen::Vector3f velocity = Eigen::Vector3f::Zero();
   // kalman filter state uncertainty set by different sensor type
   // each sensor need to model individually
-  Eigen::Matrix<double, 4, 4> state_uncertainty =
-      Eigen::Matrix<double, 4, 4>::Identity();
+  Eigen::Matrix<double, 4, 4> state_uncertainty = Eigen::Matrix<double, 4, 4>::Identity();
   // globally unique tracking id for camera visual objects
   int track_id = 0;
   // [second] age of the tracked object

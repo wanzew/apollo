@@ -48,48 +48,46 @@ class AsyncFusionSubnode : public Subnode {
   AsyncFusionSubnode() = default;
   virtual ~AsyncFusionSubnode() {}
   apollo::common::Status ProcEvents() override;
-  bool GeneratePbMsg(PerceptionObstacles *obstacles);
+  bool                   GeneratePbMsg(PerceptionObstacles* obstacles);
 
  protected:
   bool InitInternal() override;
 
  private:
   bool InitOutputStream();
-  bool SubscribeEvents(const EventMeta &event_meta,
-                       std::vector<Event> *events) const;
-  bool BuildSensorObjs(const std::vector<Event> &events,
-                       std::vector<SensorObjects> *multi_sensor_objs);
-  bool ProducePbMsg(double timestamp, SeqId seq_num,
-                    const std::vector<std::shared_ptr<Object>> &fused_objs,
-                    std::string *pb_msg) const;
-  bool GetSharedData(const Event &event,
-                     std::shared_ptr<SensorObjects> *sensor_objects);
-  apollo::common::Status Process(const EventMeta &event_meta,
-                                 const std::vector<Event> &events);
-  void RegistAllAlgorithm();
+  bool SubscribeEvents(const EventMeta& event_meta, std::vector<Event>* events) const;
+  bool BuildSensorObjs(const std::vector<Event>&   events,
+                       std::vector<SensorObjects>* multi_sensor_objs);
+  bool ProducePbMsg(double                                      timestamp,
+                    SeqId                                       seq_num,
+                    const std::vector<std::shared_ptr<Object>>& fused_objs,
+                    std::string*                                pb_msg) const;
+  bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* sensor_objects);
+  apollo::common::Status Process(const EventMeta& event_meta, const std::vector<Event>& events);
+  void                   RegistAllAlgorithm();
 
-  void OnChassis(const apollo::canbus::Chassis &message);
+  void OnChassis(const apollo::canbus::Chassis& message);
 
-  void PublishDataAndEvent(const double timestamp,
-                           const std::string &device_id,
-                           const SharedDataPtr<FusionItem> &data);
+  void PublishDataAndEvent(const double                     timestamp,
+                           const std::string&               device_id,
+                           const SharedDataPtr<FusionItem>& data);
 
-  void PublishPerceptionPb(const SensorObjects &sensor_objects);
+  void PublishPerceptionPb(const SensorObjects& sensor_objects);
 
-  double timestamp_;
+  double                               timestamp_;
   std::vector<std::shared_ptr<Object>> objects_;
-  common::ErrorCode error_code_ = common::OK;
-  std::unique_ptr<BaseFusion> fusion_;
-  RadarObjectData *radar_object_data_ = nullptr;
-  CameraObjectData *camera_object_data_ = nullptr;
-  FusionSharedData *fusion_data_ = nullptr;
-  LaneSharedData *lane_shared_data_ = nullptr;
-  SharedDataPtr<LaneObjects> lane_objects_;
-  EventID radar_event_id_;
-  EventID camera_event_id_;
-  EventID lane_event_id_;
-  volatile float chassis_speed_mps_;
-  apollo::canbus::Chassis chassis_;
+  common::ErrorCode                    error_code_ = common::OK;
+  std::unique_ptr<BaseFusion>          fusion_;
+  RadarObjectData*                     radar_object_data_  = nullptr;
+  CameraObjectData*                    camera_object_data_ = nullptr;
+  FusionSharedData*                    fusion_data_        = nullptr;
+  LaneSharedData*                      lane_shared_data_   = nullptr;
+  SharedDataPtr<LaneObjects>           lane_objects_;
+  EventID                              radar_event_id_;
+  EventID                              camera_event_id_;
+  EventID                              lane_event_id_;
+  volatile float                       chassis_speed_mps_;
+  apollo::canbus::Chassis              chassis_;
   DISALLOW_COPY_AND_ASSIGN(AsyncFusionSubnode);
 };
 

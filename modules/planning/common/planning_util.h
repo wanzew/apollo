@@ -39,7 +39,7 @@ namespace util {
  * This function returns the run-time state of the planning module.
  * @Warnning: this function is not thread safe.
  */
-PlanningStatus *GetPlanningStatus();
+PlanningStatus* GetPlanningStatus();
 
 void DumpPlanningContext();
 

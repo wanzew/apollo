@@ -19,22 +19,22 @@
 namespace apollo {
 namespace perception {
 
-bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
-                          const ContiParams &params, const int delay_frames,
-                          const int tracking_times) {
+bool ContiRadarUtil::IsFp(const ContiRadarObs& contiobs,
+                          const ContiParams&   params,
+                          const int            delay_frames,
+                          const int            tracking_times) {
   int cls = contiobs.obstacle_class();
   if (tracking_times < delay_frames * 2) {
-    const double lo_vel_rms = contiobs.longitude_vel_rms();
-    const double la_vel_rms = contiobs.lateral_vel_rms();
+    const double lo_vel_rms  = contiobs.longitude_vel_rms();
+    const double la_vel_rms  = contiobs.lateral_vel_rms();
     const double lo_dist_rms = contiobs.longitude_dist_rms();
     const double la_dist_rms = contiobs.lateral_dist_rms();
-    const double probexist = contiobs.probexist();
+    const double probexist   = contiobs.probexist();
     if (cls == static_cast<int>(ContiObjectType::CONTI_CAR) ||
         cls == static_cast<int>(ContiObjectType::CONTI_TRUCK)) {
       if (probexist < params.probexist_vehicle) {
         return true;
-      } else if (lo_vel_rms > params.lo_vel_rms_vehicle ||
-                 la_vel_rms > params.la_vel_rms_vehicle ||
+      } else if (lo_vel_rms > params.lo_vel_rms_vehicle || la_vel_rms > params.la_vel_rms_vehicle ||
                  lo_dist_rms > params.lo_dist_rms_vehicle ||
                  la_dist_rms > params.la_dist_rms_vehicle) {
         return true;
@@ -54,8 +54,7 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
                cls == static_cast<int>(ContiObjectType::CONTI_BICYCLE)) {
       if (probexist < params.probexist_bicycle) {
         return true;
-      } else if (lo_vel_rms > params.lo_vel_rms_bicycle ||
-                 la_vel_rms > params.la_vel_rms_bicycle ||
+      } else if (lo_vel_rms > params.lo_vel_rms_bicycle || la_vel_rms > params.la_vel_rms_bicycle ||
                  lo_dist_rms > params.lo_dist_rms_bicycle ||
                  la_dist_rms > params.la_dist_rms_bicycle) {
         return true;
@@ -65,8 +64,7 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
                cls == static_cast<int>(ContiObjectType::CONTI_UNKNOWN)) {
       if (probexist < params.probexist_unknown) {
         return true;
-      } else if (lo_vel_rms > params.lo_vel_rms_unknown ||
-                 la_vel_rms > params.la_vel_rms_unknown ||
+      } else if (lo_vel_rms > params.lo_vel_rms_unknown || la_vel_rms > params.la_vel_rms_unknown ||
                  lo_dist_rms > params.lo_dist_rms_unknown ||
                  la_dist_rms > params.la_dist_rms_unknown) {
         return true;

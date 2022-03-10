@@ -34,30 +34,16 @@ bool NetModel::LoadModel(const NetParameter& net_parameter) {
     ADEBUG << i << "-th layer name: " << layer_pb.name().c_str();
     std::unique_ptr<Layer> layer(nullptr);
     switch (layer_pb.oneof_layers_case()) {
-      case LayerParameter::kInput:
-        layer = std::unique_ptr<Layer>(new Input());
-        break;
-      case LayerParameter::kActivation:
-        layer = std::unique_ptr<Layer>(new Activation());
-        break;
-      case LayerParameter::kDense:
-        layer = std::unique_ptr<Layer>(new Dense());
-        break;
+      case LayerParameter::kInput: layer = std::unique_ptr<Layer>(new Input()); break;
+      case LayerParameter::kActivation: layer = std::unique_ptr<Layer>(new Activation()); break;
+      case LayerParameter::kDense: layer = std::unique_ptr<Layer>(new Dense()); break;
       case LayerParameter::kBatchNormalization:
         layer = std::unique_ptr<Layer>(new BatchNormalization());
         break;
-      case LayerParameter::kLstm:
-        layer = std::unique_ptr<Layer>(new LSTM());
-        break;
-      case LayerParameter::kFlatten:
-        layer = std::unique_ptr<Layer>(new Flatten());
-        break;
-      case LayerParameter::kConcatenate:
-        layer = std::unique_ptr<Layer>(new Concatenate());
-        break;
-      default:
-        AERROR << "Fail to load layer: " << layer_pb.type().c_str();
-        break;
+      case LayerParameter::kLstm: layer = std::unique_ptr<Layer>(new LSTM()); break;
+      case LayerParameter::kFlatten: layer = std::unique_ptr<Layer>(new Flatten()); break;
+      case LayerParameter::kConcatenate: layer = std::unique_ptr<Layer>(new Concatenate()); break;
+      default: AERROR << "Fail to load layer: " << layer_pb.type().c_str(); break;
     }
     if (!layer->Load(layer_pb)) {
       AERROR << "Fail to load " << i << "-layer: " << layer_pb.name().c_str();

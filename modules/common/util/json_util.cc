@@ -34,11 +34,11 @@ google::protobuf::util::JsonOptions JsonOption() {
 
 }  // namespace
 
-nlohmann::json JsonUtil::ProtoToTypedJson(
-    const std::string &json_type, const google::protobuf::Message &proto) {
+nlohmann::json JsonUtil::ProtoToTypedJson(const std::string&               json_type,
+                                          const google::protobuf::Message& proto) {
   static const auto kJsonOption = JsonOption();
-  std::string json_string;
-  const auto status = MessageToJsonString(proto, &json_string, kJsonOption);
+  std::string       json_string;
+  const auto        status = MessageToJsonString(proto, &json_string, kJsonOption);
   CHECK(status.ok()) << "Cannot convert proto to json:" << proto.DebugString();
 
   Json json_obj;
@@ -47,8 +47,7 @@ nlohmann::json JsonUtil::ProtoToTypedJson(
   return json_obj;
 }
 
-bool JsonUtil::GetStringFromJson(const Json &json, const std::string &key,
-                                 std::string *value) {
+bool JsonUtil::GetStringFromJson(const Json& json, const std::string& key, std::string* value) {
   const auto iter = json.find(key);
   if (iter == json.end()) {
     AERROR << "The json has no such key: " << key;
@@ -62,8 +61,9 @@ bool JsonUtil::GetStringFromJson(const Json &json, const std::string &key,
   return true;
 }
 
-bool JsonUtil::GetStringVectorFromJson(const Json &json, const std::string &key,
-                                       std::vector<std::string> *value) {
+bool JsonUtil::GetStringVectorFromJson(const Json&               json,
+                                       const std::string&        key,
+                                       std::vector<std::string>* value) {
   const auto iter = json.find(key);
   if (iter == json.end()) {
     AERROR << "The json has no such key: " << key;
@@ -77,7 +77,7 @@ bool JsonUtil::GetStringVectorFromJson(const Json &json, const std::string &key,
   bool ret = true;
   value->clear();
   value->reserve(iter->size());
-  for (const auto &elem : *iter) {
+  for (const auto& elem : *iter) {
     // Note that we still try to get all string values though there are invalid
     // elements.
     if (!elem.is_string()) {

@@ -34,7 +34,7 @@ namespace velodyne {
 // convert velodyne data to pointcloud and republish
 class Convert {
  public:
-  Convert() = default;
+  Convert()          = default;
   virtual ~Convert() = default;
 
   // init velodyne config struct from private_nh
@@ -42,14 +42,13 @@ class Convert {
 
  private:
   // convert velodyne data to pointcloud and public
-  void convert_packets_to_pointcloud(
-      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg);
+  void convert_packets_to_pointcloud(velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg);
 
   // RawData class for converting data to point cloud
   std::unique_ptr<VelodyneParser> parser_;
 
   ros::Subscriber velodyne_scan_;
-  ros::Publisher pointcloud_pub_;
+  ros::Publisher  pointcloud_pub_;
 
   std::string topic_packets_;
   std::string topic_pointcloud_;

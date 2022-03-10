@@ -35,17 +35,14 @@ class FrontVehicle : public TrafficRule {
   explicit FrontVehicle(const TrafficRuleConfig& config);
   ~FrontVehicle() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
+  void MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
-  bool MakeSidePassDecision(ReferenceLineInfo* const reference_line_info);
-  bool ProcessSidePass(ReferenceLineInfo* const reference_line_info);
-  std::string FindPassableObstacle(
-      ReferenceLineInfo* const reference_line_info);
+  bool        MakeSidePassDecision(ReferenceLineInfo* const reference_line_info);
+  bool        ProcessSidePass(ReferenceLineInfo* const reference_line_info);
+  std::string FindPassableObstacle(ReferenceLineInfo* const reference_line_info);
 
   void MakeStopDecision(ReferenceLineInfo* reference_line_info);
 };

@@ -19,14 +19,14 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-bool CarPose::set_pose(const Eigen::Matrix4d &pose) {
+bool CarPose::set_pose(const Eigen::Matrix4d& pose) {
   pose_ = pose;
   return true;
 }
 
 const Eigen::Matrix4d CarPose::pose() const { return pose_; }
 
-std::ostream &operator<<(std::ostream &os, const CarPose &pose) {
+std::ostream& operator<<(std::ostream& os, const CarPose& pose) {
   os << pose.pose_;
   return os;
 }

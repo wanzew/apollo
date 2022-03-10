@@ -32,20 +32,17 @@ namespace data_generator {
 
 class Sensor {
  public:
-  explicit Sensor(const SensorConfig& config) : config_(config) {}
+  explicit Sensor(const SensorConfig& config)
+      : config_(config) {}
   virtual ~Sensor() = default;
-  virtual SensorConfig::SensorId Id() const {
-    return config_.id();
-  }
-  virtual bool Process() = 0;
-  virtual const std::string& data() const {
-    return data_;
-  }
+  virtual SensorConfig::SensorId Id() const { return config_.id(); }
+  virtual bool                   Process() = 0;
+  virtual const std::string&     data() const { return data_; }
 
  protected:
-  SensorConfig config_;
+  SensorConfig      config_;
   std::stringstream ss_;
-  std::string data_;
+  std::string       data_;
 };
 
 }  // namespace data_generator

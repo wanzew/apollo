@@ -39,21 +39,18 @@ class HDMapInput {
  public:
   // @brief: get roi polygon
   //         all points are in the world frame
-  bool GetROI(const pcl_util::PointD& pointd, const double map_radius,
-              HdmapStructPtr* mapptr);
+  bool GetROI(const pcl_util::PointD& pointd, const double map_radius, HdmapStructPtr* mapptr);
 
   // @brief: get nearest lane direction
-  bool GetNearestLaneDirection(const pcl_util::PointD& pointd,
-                               Eigen::Vector3d* lane_direction);
+  bool GetNearestLaneDirection(const pcl_util::PointD& pointd, Eigen::Vector3d* lane_direction);
 
  private:
-  void DownSampleBoundary(const hdmap::LineSegment& line,
-                          PolygonDType* out_boundary_line) const;
+  void DownSampleBoundary(const hdmap::LineSegment& line, PolygonDType* out_boundary_line) const;
 
-  apollo::common::Status MergeBoundaryJunction(
-      const std::vector<hdmap::RoadROIBoundaryPtr>& boundaries,
-      const std::vector<hdmap::JunctionBoundaryPtr>& junctions,
-      HdmapStructPtr* mapptr);
+  apollo::common::Status
+  MergeBoundaryJunction(const std::vector<hdmap::RoadROIBoundaryPtr>&  boundaries,
+                        const std::vector<hdmap::JunctionBoundaryPtr>& junctions,
+                        HdmapStructPtr*                                mapptr);
 
   FRIEND_TEST(HDMapInputTest, test_Init);
   FRIEND_TEST(HDMapInputTest, test_GetROI);

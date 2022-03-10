@@ -22,8 +22,8 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-using apollo::drivers::canbus::Byte;
 using apollo::drivers::ContiRadar;
+using apollo::drivers::canbus::Byte;
 
 const uint32_t RadarConfig200::ID = 0x200;
 
@@ -90,9 +90,7 @@ void RadarConfig200::Reset() {
   radar_conf_.set_rcs_threshold(RCS_THRESHOLD_STANDARD);
 }
 
-RadarConf RadarConfig200::radar_conf() {
-  return radar_conf_;
-}
+RadarConf RadarConfig200::radar_conf() { return radar_conf_; }
 
 RadarConfig200* RadarConfig200::set_radar_conf(RadarConf radar_conf) {
   radar_conf_.CopyFrom(radar_conf);
@@ -292,7 +290,7 @@ void RadarConfig200::set_rcs_threshold_valid_p(uint8_t* data, bool valid) {
 void RadarConfig200::set_max_distance_p(uint8_t* data, uint16_t value) {
   value /= 2;
   uint8_t low = value >> 2;
-  Byte frame_low(data + 1);
+  Byte    frame_low(data + 1);
   frame_low.set_value(low, 0, 8);
 
   uint8_t high = value << 6;
@@ -307,7 +305,7 @@ void RadarConfig200::set_sensor_id_p(uint8_t* data, uint8_t value) {
 }
 
 void RadarConfig200::set_output_type_p(uint8_t* data, OutputType type) {
-  Byte frame(data + 4);
+  Byte    frame(data + 4);
   uint8_t value = static_cast<uint8_t>(type);
   frame.set_value(value, 3, 2);
 }
@@ -342,9 +340,8 @@ void RadarConfig200::set_store_in_nvm_p(uint8_t* data, uint8_t value) {
   frame.set_value(value, 7, 1);
 }
 
-void RadarConfig200::set_rcs_threshold_p(uint8_t* data,
-                                         RcsThreshold rcs_threshold) {
-  Byte frame(data + 6);
+void RadarConfig200::set_rcs_threshold_p(uint8_t* data, RcsThreshold rcs_threshold) {
+  Byte    frame(data + 6);
   uint8_t value = static_cast<uint8_t>(rcs_threshold);
   frame.set_value(value, 1, 3);
 }

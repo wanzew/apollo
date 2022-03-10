@@ -17,13 +17,13 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <iostream>
 #include <poll.h>
+#include <sstream>
 #include <string.h>
 #include <sys/file.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <iostream>
-#include <sstream>
 
 #include "src/input.h"
 
@@ -32,7 +32,7 @@ namespace drivers {
 namespace hesai {
 
 Input::Input(uint16_t port, uint16_t gpsPort) {
-  socketForGPS = -1;
+  socketForGPS   = -1;
   socketForLidar = -1;
 
   socketForLidar = socket(PF_INET, SOCK_DGRAM, 0);
@@ -43,12 +43,11 @@ Input::Input(uint16_t port, uint16_t gpsPort) {
 
   sockaddr_in myAddress;                     // my address information
   memset(&myAddress, 0, sizeof(myAddress));  // initialize to zeros
-  myAddress.sin_family = AF_INET;            // host byte order
-  myAddress.sin_port = htons(port);          // port in network byte order
+  myAddress.sin_family      = AF_INET;       // host byte order
+  myAddress.sin_port        = htons(port);   // port in network byte order
   myAddress.sin_addr.s_addr = INADDR_ANY;    // automatically fill in my IP
 
-  if (bind(socketForLidar, reinterpret_cast<sockaddr *>(&myAddress),
-           sizeof(sockaddr)) == -1) {
+  if (bind(socketForLidar, reinterpret_cast<sockaddr*>(&myAddress), sizeof(sockaddr)) == -1) {
     perror("bind");  // TODO(Philip.Pi): perror errno
     return;
   }
@@ -71,12 +70,11 @@ Input::Input(uint16_t port, uint16_t gpsPort) {
 
   sockaddr_in myAddressGPS;                        // my address information
   memset(&myAddressGPS, 0, sizeof(myAddressGPS));  // initialize to zeros
-  myAddressGPS.sin_family = AF_INET;               // host byte order
-  myAddressGPS.sin_port = htons(gpsPort);          // port in network byte order
-  myAddressGPS.sin_addr.s_addr = INADDR_ANY;  // automatically fill in my IP
+  myAddressGPS.sin_family      = AF_INET;          // host byte order
+  myAddressGPS.sin_port        = htons(gpsPort);   // port in network byte order
+  myAddressGPS.sin_addr.s_addr = INADDR_ANY;       // automatically fill in my IP
 
-  if (bind(socketForGPS, reinterpret_cast<sockaddr *>(&myAddressGPS),
-           sizeof(sockaddr)) == -1) {
+  if (bind(socketForGPS, reinterpret_cast<sockaddr*>(&myAddressGPS), sizeof(sockaddr)) == -1) {
     perror("bind");  // TODO(Philip.Pi): perror errno
     return;
   }
@@ -96,44 +94,40 @@ Input::~Input(void) {
 // return : 0 - lidar
 //          1 - gps
 //          -1 - error
-int Input::getPacket(PandarPacket *pkt) {
+int Input::getPacket(PandarPacket* pkt) {
   struct pollfd fds[socketNumber];
   if (socketNumber == 2) {
-    fds[0].fd = socketForGPS;
+    fds[0].fd     = socketForGPS;
     fds[0].events = POLLIN;
 
-    fds[1].fd = socketForLidar;
+    fds[1].fd     = socketForLidar;
     fds[1].events = POLLIN;
   } else if (socketNumber == 1) {
-    fds[0].fd = socketForLidar;
+    fds[0].fd     = socketForLidar;
     fds[0].events = POLLIN;
   }
   static const int POLL_TIMEOUT = 1000;  // one second (in msec)
 
   sockaddr_in senderAddress;
-  socklen_t senderAddressLen = sizeof(senderAddress);
-  int retval = poll(fds, socketNumber, POLL_TIMEOUT);
+  socklen_t   senderAddressLen = sizeof(senderAddress);
+  int         retval           = poll(fds, socketNumber, POLL_TIMEOUT);
   if (retval < 0) {  // poll() error?
     if (errno != EINTR) printf("poll() error: %s", strerror(errno));
     return -1;
   }
-  if (retval == 0) {
-    return -1;
-  }
-  if ((fds[0].revents & POLLERR) || (fds[0].revents & POLLHUP) ||
-      (fds[0].revents & POLLNVAL)) {
+  if (retval == 0) { return -1; }
+  if ((fds[0].revents & POLLERR) || (fds[0].revents & POLLHUP) || (fds[0].revents & POLLNVAL)) {
     // device error?
     perror("poll() reports Pandar error");
     return -1;
   }
 
   senderAddressLen = sizeof(senderAddress);
-  ssize_t nbytes = 0;
+  ssize_t nbytes   = 0;
   for (int i = 0; i != socketNumber; ++i) {
     if (fds[i].revents & POLLIN) {
       nbytes = recvfrom(fds[i].fd, &pkt->data[0], ETHERNET_MTU, 0,
-                        reinterpret_cast<sockaddr *>(&senderAddress),
-                        &senderAddressLen);
+                        reinterpret_cast<sockaddr*>(&senderAddress), &senderAddressLen);
       break;
     }
   }

@@ -82,8 +82,7 @@ class PredictorManager {
    * @param Predictor type
    * @return A unique pointer to the predictor
    */
-  std::unique_ptr<Predictor> CreatePredictor(
-      const ObstacleConf::PredictorType& type);
+  std::unique_ptr<Predictor> CreatePredictor(const ObstacleConf::PredictorType& type);
 
   /**
    * @brief Register all predictors
@@ -93,26 +92,19 @@ class PredictorManager {
  private:
   std::map<ObstacleConf::PredictorType, std::unique_ptr<Predictor>> predictors_;
 
-  ObstacleConf::PredictorType vehicle_on_lane_predictor_ =
-      ObstacleConf::LANE_SEQUENCE_PREDICTOR;
+  ObstacleConf::PredictorType vehicle_on_lane_predictor_ = ObstacleConf::LANE_SEQUENCE_PREDICTOR;
 
-  ObstacleConf::PredictorType vehicle_off_lane_predictor_ =
-      ObstacleConf::FREE_MOVE_PREDICTOR;
+  ObstacleConf::PredictorType vehicle_off_lane_predictor_ = ObstacleConf::FREE_MOVE_PREDICTOR;
 
-  ObstacleConf::PredictorType cyclist_on_lane_predictor_ =
-      ObstacleConf::LANE_SEQUENCE_PREDICTOR;
+  ObstacleConf::PredictorType cyclist_on_lane_predictor_ = ObstacleConf::LANE_SEQUENCE_PREDICTOR;
 
-  ObstacleConf::PredictorType cyclist_off_lane_predictor_ =
-      ObstacleConf::FREE_MOVE_PREDICTOR;
+  ObstacleConf::PredictorType cyclist_off_lane_predictor_ = ObstacleConf::FREE_MOVE_PREDICTOR;
 
-  ObstacleConf::PredictorType pedestrian_predictor_ =
-      ObstacleConf::REGIONAL_PREDICTOR;
+  ObstacleConf::PredictorType pedestrian_predictor_ = ObstacleConf::REGIONAL_PREDICTOR;
 
-  ObstacleConf::PredictorType default_on_lane_predictor_ =
-      ObstacleConf::LANE_SEQUENCE_PREDICTOR;
+  ObstacleConf::PredictorType default_on_lane_predictor_ = ObstacleConf::LANE_SEQUENCE_PREDICTOR;
 
-  ObstacleConf::PredictorType default_off_lane_predictor_ =
-      ObstacleConf::FREE_MOVE_PREDICTOR;
+  ObstacleConf::PredictorType default_off_lane_predictor_ = ObstacleConf::FREE_MOVE_PREDICTOR;
 
   PredictionObstacles prediction_obstacles_;
 

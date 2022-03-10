@@ -16,9 +16,9 @@
 
 #include "modules/drivers/gnss/parser/data_parser.h"
 
-#include <proj_api.h>
 #include <cmath>
 #include <memory>
+#include <proj_api.h>
 #include <string>
 
 #include "Eigen/Geometry"
@@ -58,15 +58,15 @@ using ::apollo::localization::Gps;
 namespace {
 
 constexpr double DEG_TO_RAD_LOCAL = M_PI / 180.0;
-const char *WGS84_TEXT = "+proj=latlong +ellps=WGS84";
+const char*      WGS84_TEXT       = "+proj=latlong +ellps=WGS84";
 
 // covariance data for pose if can not get from novatel inscov topic
-static const boost::array<double, 36> POSE_COVAR = {
-    2, 0, 0, 0,    0, 0, 0, 2, 0, 0, 0,    0, 0, 0, 2, 0, 0, 0,
-    0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0, 0.01};
+static const boost::array<double, 36> POSE_COVAR = {2, 0, 0, 0, 0,    0, 0, 2, 0, 0,    0, 0,
+                                                    0, 0, 2, 0, 0,    0, 0, 0, 0, 0.01, 0, 0,
+                                                    0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0,    0, 0.01};
 
 template <class T>
-void PublishMessageRaw(const ros::Publisher &pub, const T *pb) {
+void PublishMessageRaw(const ros::Publisher& pub, const T* pb) {
   std_msgs::String msg_pub;
 
   if (pb->SerializeToString(&msg_pub.data)) {
@@ -76,26 +76,24 @@ void PublishMessageRaw(const ros::Publisher &pub, const T *pb) {
   AERROR << "Failed to serialize message.";
 }
 
-Parser *CreateParser(config::Config config, bool is_base_station = false) {
+Parser* CreateParser(config::Config config, bool is_base_station = false) {
   switch (config.data().format()) {
-    case config::Stream::NOVATEL_BINARY:
-      return Parser::CreateNovatel(config);
+    case config::Stream::NOVATEL_BINARY: return Parser::CreateNovatel(config);
 
-    case config::Stream::NEWTONM2_BINARY:
-      return Parser::CreateNewtonM2(config);
+    case config::Stream::NEWTONM2_BINARY: return Parser::CreateNewtonM2(config);
 
-    default:
-      return nullptr;
+    default: return nullptr;
   }
 }
 
 }  // namespace
 
-DataParser::DataParser(const config::Config &config) : config_(config) {
+DataParser::DataParser(const config::Config& config)
+    : config_(config) {
   std::string utm_target_param;
 
   wgs84pj_source_ = pj_init_plus(WGS84_TEXT);
-  utm_target_ = pj_init_plus(config_.proj4_text().c_str());
+  utm_target_     = pj_init_plus(config_.proj4_text().c_str());
   gnss_status_.set_solution_status(0);
   gnss_status_.set_num_sats(0);
   gnss_status_.set_position_type(0);
@@ -123,7 +121,7 @@ bool DataParser::Init() {
   return true;
 }
 
-void DataParser::ParseRawData(const std_msgs::String::ConstPtr &msg) {
+void DataParser::ParseRawData(const std_msgs::String::ConstPtr& msg) {
   if (!inited_flag_) {
     AERROR << "Data parser not init.";
     return;
@@ -131,7 +129,7 @@ void DataParser::ParseRawData(const std_msgs::String::ConstPtr &msg) {
 
   data_parser_->Update(msg->data);
   Parser::MessageType type;
-  MessagePtr msg_ptr;
+  MessagePtr          msg_ptr;
 
   while (ros::ok()) {
     type = data_parser_->GetMessage(&msg_ptr);
@@ -140,7 +138,7 @@ void DataParser::ParseRawData(const std_msgs::String::ConstPtr &msg) {
   }
 }
 
-void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins *ins) {
+void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins* ins) {
   if (ins_status_record_ != static_cast<uint32_t>(ins->type())) {
     ins_status_record_ = static_cast<uint32_t>(ins->type());
     switch (ins->type()) {
@@ -149,23 +147,19 @@ void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins *ins) {
         break;
 
       case apollo::drivers::gnss::Ins::CONVERGING:
-        ins_status_.set_type(
-            apollo::drivers::gnss_status::InsStatus::CONVERGING);
+        ins_status_.set_type(apollo::drivers::gnss_status::InsStatus::CONVERGING);
         break;
 
       case apollo::drivers::gnss::Ins::INVALID:
-      default:
-        ins_status_.set_type(apollo::drivers::gnss_status::InsStatus::INVALID);
-        break;
+      default: ins_status_.set_type(apollo::drivers::gnss_status::InsStatus::INVALID); break;
     }
     AdapterManager::FillInsStatusHeader(FLAGS_sensor_node_name, &ins_status_);
     AdapterManager::PublishInsStatus(ins_status_);
   }
 }
 
-void DataParser::CheckGnssStatus(::apollo::drivers::gnss::Gnss *gnss) {
-  gnss_status_.set_solution_status(
-      static_cast<uint32_t>(gnss->solution_status()));
+void DataParser::CheckGnssStatus(::apollo::drivers::gnss::Gnss* gnss) {
+  gnss_status_.set_solution_status(static_cast<uint32_t>(gnss->solution_status()));
   gnss_status_.set_num_sats(static_cast<uint32_t>(gnss->num_sats()));
   gnss_status_.set_position_type(static_cast<uint32_t>(gnss->position_type()));
 
@@ -186,13 +180,9 @@ void DataParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
       CheckGnssStatus(As<::apollo::drivers::gnss::Gnss>(message));
       break;
 
-    case Parser::MessageType::BEST_GNSS_POS:
-      PublishBestpos(message);
-      break;
+    case Parser::MessageType::BEST_GNSS_POS: PublishBestpos(message); break;
 
-    case Parser::MessageType::IMU:
-      PublishImu(message);
-      break;
+    case Parser::MessageType::IMU: PublishImu(message); break;
 
     case Parser::MessageType::INS:
       CheckInsStatus(As<::apollo::drivers::gnss::Ins>(message));
@@ -200,26 +190,17 @@ void DataParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
       PublishOdometry(message);
       break;
 
-    case Parser::MessageType::INS_STAT:
-      PublishInsStat(message);
-      break;
+    case Parser::MessageType::INS_STAT: PublishInsStat(message); break;
 
     case Parser::MessageType::BDSEPHEMERIDES:
     case Parser::MessageType::GPSEPHEMERIDES:
-    case Parser::MessageType::GLOEPHEMERIDES:
-      PublishEphemeris(message);
-      break;
+    case Parser::MessageType::GLOEPHEMERIDES: PublishEphemeris(message); break;
 
-    case Parser::MessageType::OBSERVATION:
-      PublishObservation(message);
-      break;
+    case Parser::MessageType::OBSERVATION: PublishObservation(message); break;
 
-    case Parser::MessageType::HEADING:
-      PublishHeading(message);
-      break;
+    case Parser::MessageType::HEADING: PublishHeading(message); break;
 
-    default:
-      break;
+    default: break;
   }
 }
 
@@ -236,8 +217,8 @@ void DataParser::PublishBestpos(const MessagePtr message) {
 }
 
 void DataParser::PublishImu(const MessagePtr message) {
-  Imu raw_imu = Imu(*As<Imu>(message));
-  Imu *imu = As<Imu>(message);
+  Imu  raw_imu = Imu(*As<Imu>(message));
+  Imu* imu     = As<Imu>(message);
 
   raw_imu.mutable_linear_acceleration()->set_x(-imu->linear_acceleration().y());
   raw_imu.mutable_linear_acceleration()->set_y(imu->linear_acceleration().x());
@@ -252,12 +233,12 @@ void DataParser::PublishImu(const MessagePtr message) {
 }
 
 void DataParser::PublishOdometry(const MessagePtr message) {
-  Ins *ins = As<Ins>(message);
-  Gps gps;
+  Ins* ins = As<Ins>(message);
+  Gps  gps;
 
   double unix_sec = common::time::TimeUtil::Gps2unix(ins->measurement_time());
   gps.mutable_header()->set_timestamp_sec(unix_sec);
-  auto *gps_msg = gps.mutable_localization();
+  auto* gps_msg = gps.mutable_localization();
 
   // 1. pose xyz
   double x = ins->position().lon();
@@ -273,8 +254,7 @@ void DataParser::PublishOdometry(const MessagePtr message) {
 
   // 2. orientation
   Eigen::Quaterniond q =
-      Eigen::AngleAxisd(ins->euler_angles().z() - 90 * DEG_TO_RAD_LOCAL,
-                        Eigen::Vector3d::UnitZ()) *
+      Eigen::AngleAxisd(ins->euler_angles().z() - 90 * DEG_TO_RAD_LOCAL, Eigen::Vector3d::UnitZ()) *
       Eigen::AngleAxisd(-ins->euler_angles().y(), Eigen::Vector3d::UnitX()) *
       Eigen::AngleAxisd(ins->euler_angles().x(), Eigen::Vector3d::UnitY());
 
@@ -294,14 +274,13 @@ void DataParser::PublishOdometry(const MessagePtr message) {
 }
 
 void DataParser::PublishCorrimu(const MessagePtr message) {
-  Ins *ins = As<Ins>(message);
+  Ins*         ins = As<Ins>(message);
   CorrectedImu imu;
-  double unix_sec = common::time::TimeUtil::Gps2unix(ins->measurement_time());
+  double       unix_sec = common::time::TimeUtil::Gps2unix(ins->measurement_time());
   imu.mutable_header()->set_timestamp_sec(unix_sec);
 
-  auto *imu_msg = imu.mutable_imu();
-  imu_msg->mutable_linear_acceleration()->set_x(
-      -ins->linear_acceleration().y());
+  auto* imu_msg = imu.mutable_imu();
+  imu_msg->mutable_linear_acceleration()->set_x(-ins->linear_acceleration().y());
   imu_msg->mutable_linear_acceleration()->set_y(ins->linear_acceleration().x());
   imu_msg->mutable_linear_acceleration()->set_z(ins->linear_acceleration().z());
 
@@ -311,8 +290,7 @@ void DataParser::PublishCorrimu(const MessagePtr message) {
 
   imu_msg->mutable_euler_angles()->set_x(ins->euler_angles().x());
   imu_msg->mutable_euler_angles()->set_y(-ins->euler_angles().y());
-  imu_msg->mutable_euler_angles()->set_z(ins->euler_angles().z() -
-                                         90 * DEG_TO_RAD_LOCAL);
+  imu_msg->mutable_euler_angles()->set_z(ins->euler_angles().z() - 90 * DEG_TO_RAD_LOCAL);
 
   AdapterManager::PublishImu(imu);
 }
@@ -323,8 +301,7 @@ void DataParser::PublishEphemeris(const MessagePtr message) {
 }
 
 void DataParser::PublishObservation(const MessagePtr message) {
-  EpochObservation observation =
-      EpochObservation(*As<EpochObservation>(message));
+  EpochObservation observation = EpochObservation(*As<EpochObservation>(message));
   AdapterManager::PublishGnssRtkObs(observation);
 }
 
@@ -334,20 +311,19 @@ void DataParser::PublishHeading(const MessagePtr message) {
   AdapterManager::PublishGnssHeading(heading);
 }
 
-void DataParser::GpsToTransformStamped(
-    const ::apollo::localization::Gps &gps,
-    geometry_msgs::TransformStamped *transform) {
+void DataParser::GpsToTransformStamped(const ::apollo::localization::Gps& gps,
+                                       geometry_msgs::TransformStamped*   transform) {
   ros::Time time;
-  transform->header.stamp = time.fromSec(gps.header().timestamp_sec());
-  transform->header.frame_id = config_.tf().frame_id();
-  transform->child_frame_id = config_.tf().child_frame_id();
+  transform->header.stamp            = time.fromSec(gps.header().timestamp_sec());
+  transform->header.frame_id         = config_.tf().frame_id();
+  transform->child_frame_id          = config_.tf().child_frame_id();
   transform->transform.translation.x = gps.localization().position().x();
   transform->transform.translation.y = gps.localization().position().y();
   transform->transform.translation.z = gps.localization().position().z();
-  transform->transform.rotation.x = gps.localization().orientation().qx();
-  transform->transform.rotation.y = gps.localization().orientation().qy();
-  transform->transform.rotation.z = gps.localization().orientation().qz();
-  transform->transform.rotation.w = gps.localization().orientation().qw();
+  transform->transform.rotation.x    = gps.localization().orientation().qx();
+  transform->transform.rotation.y    = gps.localization().orientation().qy();
+  transform->transform.rotation.z    = gps.localization().orientation().qz();
+  transform->transform.rotation.w    = gps.localization().orientation().qw();
 }
 
 }  // namespace gnss

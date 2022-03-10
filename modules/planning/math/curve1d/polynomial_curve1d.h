@@ -28,7 +28,7 @@ namespace planning {
 
 class PolynomialCurve1d : public Curve1d {
  public:
-  PolynomialCurve1d() = default;
+  PolynomialCurve1d()          = default;
   virtual ~PolynomialCurve1d() = default;
 
  protected:

@@ -21,19 +21,15 @@
 #include "modules/common/log.h"
 #include "modules/data/util/info_collector.h"
 
-DEFINE_string(static_info_reporter_name, "StaticInfoReporter",
-              "Static info reporter name.");
+DEFINE_string(static_info_reporter_name, "StaticInfoReporter", "Static info reporter name.");
 
-DEFINE_double(static_info_report_interval, 40,
-              "Static info reporting interval (s).");
+DEFINE_double(static_info_report_interval, 40, "Static info reporting interval (s).");
 
 namespace apollo {
 namespace monitor {
 
 StaticInfoReporter::StaticInfoReporter()
-    : RecurrentRunner(FLAGS_static_info_reporter_name,
-                      FLAGS_static_info_report_interval) {
-}
+    : RecurrentRunner(FLAGS_static_info_reporter_name, FLAGS_static_info_report_interval) {}
 
 void StaticInfoReporter::RunOnce(const double current_time) {
   AINFO << "Reported static info.";

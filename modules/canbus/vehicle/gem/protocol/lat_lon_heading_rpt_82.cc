@@ -30,39 +30,32 @@ using ::apollo::drivers::canbus::Byte;
 Latlonheadingrpt82::Latlonheadingrpt82() {}
 const int32_t Latlonheadingrpt82::ID = 0x82;
 
-void Latlonheadingrpt82::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_lat_lon_heading_rpt_82()->set_heading(
-      heading(bytes, length));
-  chassis->mutable_gem()
-      ->mutable_lat_lon_heading_rpt_82()
-      ->set_longitude_seconds(longitude_seconds(bytes, length));
-  chassis->mutable_gem()
-      ->mutable_lat_lon_heading_rpt_82()
-      ->set_longitude_minutes(longitude_minutes(bytes, length));
-  chassis->mutable_gem()
-      ->mutable_lat_lon_heading_rpt_82()
-      ->set_longitude_degrees(longitude_degrees(bytes, length));
-  chassis->mutable_gem()
-      ->mutable_lat_lon_heading_rpt_82()
-      ->set_latitude_seconds(latitude_seconds(bytes, length));
-  chassis->mutable_gem()
-      ->mutable_lat_lon_heading_rpt_82()
-      ->set_latitude_minutes(latitude_minutes(bytes, length));
-  chassis->mutable_gem()
-      ->mutable_lat_lon_heading_rpt_82()
-      ->set_latitude_degrees(latitude_degrees(bytes, length));
+void Latlonheadingrpt82::Parse(const std::uint8_t* bytes,
+                               int32_t             length,
+                               ChassisDetail*      chassis) const {
+  chassis->mutable_gem()->mutable_lat_lon_heading_rpt_82()->set_heading(heading(bytes, length));
+  chassis->mutable_gem()->mutable_lat_lon_heading_rpt_82()->set_longitude_seconds(
+      longitude_seconds(bytes, length));
+  chassis->mutable_gem()->mutable_lat_lon_heading_rpt_82()->set_longitude_minutes(
+      longitude_minutes(bytes, length));
+  chassis->mutable_gem()->mutable_lat_lon_heading_rpt_82()->set_longitude_degrees(
+      longitude_degrees(bytes, length));
+  chassis->mutable_gem()->mutable_lat_lon_heading_rpt_82()->set_latitude_seconds(
+      latitude_seconds(bytes, length));
+  chassis->mutable_gem()->mutable_lat_lon_heading_rpt_82()->set_latitude_minutes(
+      latitude_minutes(bytes, length));
+  chassis->mutable_gem()->mutable_lat_lon_heading_rpt_82()->set_latitude_degrees(
+      latitude_degrees(bytes, length));
 }
 
 // config detail: {'name': 'heading', 'offset': 0.0, 'precision': 0.01, 'len':
 // 16, 'is_signed_var': True, 'physical_range': '[-327.68|327.67]', 'bit': 55,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
-double Latlonheadingrpt82::heading(const std::uint8_t* bytes,
-                                   int32_t length) const {
-  Byte t0(bytes + 6);
+double Latlonheadingrpt82::heading(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 7);
+  Byte    t1(bytes + 7);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -77,9 +70,8 @@ double Latlonheadingrpt82::heading(const std::uint8_t* bytes,
 // config detail: {'name': 'longitude_seconds', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': True, 'physical_range': '[-128|127]', 'bit': 47,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': 'sec'}
-int Latlonheadingrpt82::longitude_seconds(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 5);
+int Latlonheadingrpt82::longitude_seconds(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
   x <<= 24;
@@ -92,9 +84,8 @@ int Latlonheadingrpt82::longitude_seconds(const std::uint8_t* bytes,
 // config detail: {'name': 'longitude_minutes', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': True, 'physical_range': '[-128|127]', 'bit': 39,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': 'min'}
-int Latlonheadingrpt82::longitude_minutes(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 4);
+int Latlonheadingrpt82::longitude_minutes(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
   x <<= 24;
@@ -107,9 +98,8 @@ int Latlonheadingrpt82::longitude_minutes(const std::uint8_t* bytes,
 // config detail: {'name': 'longitude_degrees', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': True, 'physical_range': '[-128|127]', 'bit': 31,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg'}
-int Latlonheadingrpt82::longitude_degrees(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 3);
+int Latlonheadingrpt82::longitude_degrees(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
   x <<= 24;
@@ -122,9 +112,8 @@ int Latlonheadingrpt82::longitude_degrees(const std::uint8_t* bytes,
 // config detail: {'name': 'latitude_seconds', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': True, 'physical_range': '[-128|127]', 'bit': 23,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': 'sec'}
-int Latlonheadingrpt82::latitude_seconds(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 2);
+int Latlonheadingrpt82::latitude_seconds(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
   x <<= 24;
@@ -137,9 +126,8 @@ int Latlonheadingrpt82::latitude_seconds(const std::uint8_t* bytes,
 // config detail: {'name': 'latitude_minutes', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': True, 'physical_range': '[-128|127]', 'bit': 15,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': 'min'}
-int Latlonheadingrpt82::latitude_minutes(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 1);
+int Latlonheadingrpt82::latitude_minutes(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
   x <<= 24;
@@ -152,9 +140,8 @@ int Latlonheadingrpt82::latitude_minutes(const std::uint8_t* bytes,
 // config detail: {'name': 'latitude_degrees', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': True, 'physical_range': '[-128|127]', 'bit': 7,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg'}
-int Latlonheadingrpt82::latitude_degrees(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 0);
+int Latlonheadingrpt82::latitude_degrees(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
   x <<= 24;

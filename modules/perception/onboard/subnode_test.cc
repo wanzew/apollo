@@ -36,7 +36,8 @@ using google::protobuf::TextFormat;
 
 class MySubnode : public Subnode {
  public:
-  MySubnode() : Subnode() {}
+  MySubnode()
+      : Subnode() {}
   virtual ~MySubnode() {}
 
   Status ProcEvents() override {
@@ -46,12 +47,11 @@ class MySubnode : public Subnode {
 };
 
 TEST(SubnodeTest, test_init) {
-  FLAGS_work_root = "modules/perception";
-  FLAGS_config_manager_path = "./conf/config_manager.config";
-  std::string dag_config_path =
-      FLAGS_work_root + "/data/onboard_test/dag_streaming.config";
+  FLAGS_work_root             = "modules/perception";
+  FLAGS_config_manager_path   = "./conf/config_manager.config";
+  std::string dag_config_path = FLAGS_work_root + "/data/onboard_test/dag_streaming.config";
   std::string content;
-  DAGConfig dag_config;
+  DAGConfig   dag_config;
   ASSERT_TRUE(apollo::common::util::GetContent(dag_config_path, &content));
   ASSERT_TRUE(TextFormat::ParseFromString(content, &dag_config));
   EventManager event_manager;
@@ -69,9 +69,8 @@ TEST(SubnodeTest, test_init) {
 
   SharedDataManager shared_data_manager;
 
-  EXPECT_TRUE(my_subnode.Init(dag_config.subnode_config().subnodes(0),
-                              sub_events, pub_events, &event_manager,
-                              &shared_data_manager));
+  EXPECT_TRUE(my_subnode.Init(dag_config.subnode_config().subnodes(0), sub_events, pub_events,
+                              &event_manager, &shared_data_manager));
 
   AINFO << my_subnode.DebugString();
 

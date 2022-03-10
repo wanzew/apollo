@@ -30,45 +30,42 @@ using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
 
-static void extract_pointcloud_indices(PointCloudPtr cloud,
-                                       PointIndices *out_indices) {
+static void extract_pointcloud_indices(PointCloudPtr cloud, PointIndices* out_indices) {
   const size_t vec_size = cloud->size();
-  auto &indices = out_indices->indices;
+  auto&        indices  = out_indices->indices;
   indices.resize(vec_size);
 
   std::iota(indices.begin(), indices.end(), 0);
 }
 
 bool DummyROIFilter::Filter(pcl_util::PointCloudPtr cloud,
-                            const ROIFilterOptions &roi_filter_options,
-                            pcl_util::PointIndices *roi_indices) {
+                            const ROIFilterOptions& roi_filter_options,
+                            pcl_util::PointIndices* roi_indices) {
   extract_pointcloud_indices(cloud, roi_indices);
   return true;
 }
 
-bool DummyGroundDetector::Detect(const GroundDetectorOptions &options,
-                                 PointCloudPtr cloud,
-                                 PointIndicesPtr non_ground_indices) {
+bool DummyGroundDetector::Detect(const GroundDetectorOptions& options,
+                                 PointCloudPtr                cloud,
+                                 PointIndicesPtr              non_ground_indices) {
   extract_pointcloud_indices(cloud, non_ground_indices.get());
   return result_detect_;
 }
 
-bool DummySegmentation::Segment(PointCloudPtr cloud,
-                                const PointIndices &non_ground_indices,
-                                const SegmentationOptions &options,
-                                std::vector<std::shared_ptr<Object>> *objects) {
+bool DummySegmentation::Segment(PointCloudPtr                         cloud,
+                                const PointIndices&                   non_ground_indices,
+                                const SegmentationOptions&            options,
+                                std::vector<std::shared_ptr<Object>>* objects) {
   return result_segment_;
 }
 
-void DummyObjectBuilder::BuildObject(const ObjectBuilderOptions &options,
-                                     std::shared_ptr<Object> obj) {
+void DummyObjectBuilder::BuildObject(const ObjectBuilderOptions& options,
+                                     std::shared_ptr<Object>     obj) {
   Eigen::Vector4f min_pt;
   Eigen::Vector4f max_pt;
-  PointCloudPtr cloud = obj->cloud;
+  PointCloudPtr   cloud = obj->cloud;
   SetDefaultValue(cloud, obj, &min_pt, &max_pt);
-  if (cloud->points.size() < 4u) {
-    return;
-  }
+  if (cloud->points.size() < 4u) { return; }
   obj->polygon.points.resize(4);
   obj->polygon.points[0].x = static_cast<double>(min_pt[0]);
   obj->polygon.points[0].y = static_cast<double>(min_pt[1]);
@@ -85,14 +82,12 @@ void DummyObjectBuilder::BuildObject(const ObjectBuilderOptions &options,
   obj->polygon.points[3].x = static_cast<double>(max_pt[0]);
   obj->polygon.points[3].y = static_cast<double>(min_pt[1]);
   obj->polygon.points[3].z = static_cast<double>(min_pt[2]);
-  obj->anchor_point = obj->center;
+  obj->anchor_point        = obj->center;
 }
 
-bool DummyObjectBuilder::Build(const ObjectBuilderOptions &options,
-                               std::vector<std::shared_ptr<Object>> *objects) {
-  if (objects == NULL) {
-    return false;
-  }
+bool DummyObjectBuilder::Build(const ObjectBuilderOptions&           options,
+                               std::vector<std::shared_ptr<Object>>* objects) {
+  if (objects == NULL) { return false; }
 
   for (size_t i = 0; i < objects->size(); ++i) {
     if ((*objects)[i]) {
@@ -104,18 +99,16 @@ bool DummyObjectBuilder::Build(const ObjectBuilderOptions &options,
   return result_build_;
 }
 
-bool DummyObjectFilter::Filter(const ObjectFilterOptions &obj_filter_options,
-                               std::vector<std::shared_ptr<Object>> *objects) {
+bool DummyObjectFilter::Filter(const ObjectFilterOptions&            obj_filter_options,
+                               std::vector<std::shared_ptr<Object>>* objects) {
   return result_object_filter_;
 }
 
-bool DummyTracker::Track(
-    const std::vector<std::shared_ptr<Object>> &objects, double timestamp,
-    const TrackerOptions &options,
-    std::vector<std::shared_ptr<Object>> *tracked_objects) {
-  if (tracked_objects == nullptr || options.velodyne_trans == nullptr) {
-    return result_track_;
-  }
+bool DummyTracker::Track(const std::vector<std::shared_ptr<Object>>& objects,
+                         double                                      timestamp,
+                         const TrackerOptions&                       options,
+                         std::vector<std::shared_ptr<Object>>*       tracked_objects) {
+  if (tracked_objects == nullptr || options.velodyne_trans == nullptr) { return result_track_; }
 
   Eigen::Matrix4d pose = *(options.velodyne_trans);
   // transform objects
@@ -123,12 +116,10 @@ bool DummyTracker::Track(
   for (size_t i = 0; i < objects.size(); i++) {
     std::shared_ptr<Object> obj(new Object());
     obj->clone(*objects[i]);
-    const Eigen::Vector3d &dir = obj->direction;
-    obj->direction =
-        (pose * Eigen::Vector4d(dir[0], dir[1], dir[2], 0)).head(3);
-    const Eigen::Vector3d &center = obj->center;
-    obj->center =
-        (pose * Eigen::Vector4d(center[0], center[1], center[2], 1)).head(3);
+    const Eigen::Vector3d& dir    = obj->direction;
+    obj->direction                = (pose * Eigen::Vector4d(dir[0], dir[1], dir[2], 0)).head(3);
+    const Eigen::Vector3d& center = obj->center;
+    obj->center = (pose * Eigen::Vector4d(center[0], center[1], center[2], 1)).head(3);
     // obj->anchor_point = obj->center;
 
     TransformPointCloud<pcl_util::Point>(pose, obj->cloud);
@@ -148,8 +139,8 @@ bool DummyTracker::Track(
   return result_track_;
 }
 
-bool DummyTypeFuser::FuseType(const TypeFuserOptions &options,
-                              std::vector<std::shared_ptr<Object>> *objects) {
+bool DummyTypeFuser::FuseType(const TypeFuserOptions&               options,
+                              std::vector<std::shared_ptr<Object>>* objects) {
   return result_type_fuser_;
 }
 

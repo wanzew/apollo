@@ -49,7 +49,7 @@ class DAGStreaming : public Thread {
   DAGStreaming();
   virtual ~DAGStreaming();
 
-  bool Init(const std::string &dag_config_path);
+  bool Init(const std::string& dag_config_path);
 
   void Stop();
 
@@ -61,7 +61,7 @@ class DAGStreaming : public Thread {
 
   size_t CongestionValue() const;
 
-  static Subnode *GetSubnodeByName(const std::string &name);
+  static Subnode* GetSubnodeByName(const std::string& name);
 
  protected:
   void Run() override;
@@ -70,13 +70,13 @@ class DAGStreaming : public Thread {
   // start run and wait.
   void Schedule();
 
-  bool InitSubnodes(const DAGConfig &dag_config);
+  bool InitSubnodes(const DAGConfig& dag_config);
 
-  bool InitSharedData(const DAGConfig::SharedDataConfig &data_config);
+  bool InitSharedData(const DAGConfig::SharedDataConfig& data_config);
 
-  EventManager event_manager_;
-  SharedDataManager shared_data_manager_;
-  bool inited_ = false;
+  EventManager                         event_manager_;
+  SharedDataManager                    shared_data_manager_;
+  bool                                 inited_ = false;
   std::unique_ptr<DAGStreamingMonitor> monitor_;
   // NOTE(Yangguang Li): Guarantee Sunode should be firstly called destructor.
   // Subnode depends the EventManager and SharedDataManager.
@@ -90,10 +90,10 @@ class DAGStreaming : public Thread {
 
 class DAGStreamingMonitor : public Thread {
  public:
-  explicit DAGStreamingMonitor(DAGStreaming *dag_streaming)
-      : Thread(true, "DAGStreamingMonitor"),
-        dag_streaming_(dag_streaming),
-        stop_(false) {}
+  explicit DAGStreamingMonitor(DAGStreaming* dag_streaming)
+      : Thread(true, "DAGStreamingMonitor")
+      , dag_streaming_(dag_streaming)
+      , stop_(false) {}
 
   virtual ~DAGStreamingMonitor() {}
 
@@ -104,7 +104,7 @@ class DAGStreamingMonitor : public Thread {
 
  private:
   // Not own DAGStreaming instance.
-  DAGStreaming *dag_streaming_;
+  DAGStreaming* dag_streaming_;
   volatile bool stop_;
   DISALLOW_COPY_AND_ASSIGN(DAGStreamingMonitor);
 };

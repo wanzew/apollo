@@ -29,9 +29,11 @@ namespace planning {
 
 using apollo::common::util::StringPrintf;
 
-STPoint::STPoint(const double s, const double t) : Vec2d(t, s) {}
+STPoint::STPoint(const double s, const double t)
+    : Vec2d(t, s) {}
 
-STPoint::STPoint(const common::math::Vec2d& vec2d_point) : Vec2d(vec2d_point) {}
+STPoint::STPoint(const common::math::Vec2d& vec2d_point)
+    : Vec2d(vec2d_point) {}
 
 double STPoint::s() const { return y_; }
 

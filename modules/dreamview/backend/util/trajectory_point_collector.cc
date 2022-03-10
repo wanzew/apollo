@@ -24,21 +24,19 @@ namespace apollo {
 namespace dreamview {
 namespace util {
 
-void TrajectoryPointCollector::Collect(const TrajectoryPoint &point,
-                                       const double base_time) {
+void TrajectoryPointCollector::Collect(const TrajectoryPoint& point, const double base_time) {
   if (has_previous_) {
-    Object *trajectory_point = world_->add_planning_trajectory();
+    Object* trajectory_point = world_->add_planning_trajectory();
     trajectory_point->set_timestamp_sec(previous_.relative_time() + base_time);
     trajectory_point->set_position_x(previous_.path_point().x());
     trajectory_point->set_position_y(previous_.path_point().y());
     trajectory_point->set_speed(previous_.v());
     trajectory_point->set_speed_acceleration(previous_.a());
     trajectory_point->set_kappa(previous_.path_point().kappa());
-    trajectory_point->set_heading(
-        std::atan2(point.path_point().y() - previous_.path_point().y(),
-                   point.path_point().x() - previous_.path_point().x()));
+    trajectory_point->set_heading(std::atan2(point.path_point().y() - previous_.path_point().y(),
+                                             point.path_point().x() - previous_.path_point().x()));
   }
-  previous_ = point;
+  previous_     = point;
   has_previous_ = true;
 }
 

@@ -37,8 +37,7 @@ namespace prediction {
 class RegionalPredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    std::string file =
-        "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
+    std::string file = "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.01;
@@ -50,8 +49,7 @@ class RegionalPredictorTest : public KMLMapBasedTest {
 };
 
 TEST_F(RegionalPredictorTest, Predict) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 101);
@@ -66,8 +64,7 @@ TEST_F(RegionalPredictorTest, Predict) {
 }
 
 TEST_F(RegionalPredictorTest, MovingPedestrian) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 101);
@@ -79,27 +76,18 @@ TEST_F(RegionalPredictorTest, MovingPedestrian) {
   predictor.GenerateMovingTrajectory(obstacle_ptr, 1.0);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
   EXPECT_EQ(trajectories.size(), 2);
-  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().x(), -438.159,
-              0.001);
-  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().y(), -157.404,
-              0.001);
-  EXPECT_NEAR(trajectories[0].trajectory_point(19).path_point().x(), -436.642,
-              0.001);
-  EXPECT_NEAR(trajectories[0].trajectory_point(19).path_point().y(), -152.635,
-              0.001);
-  EXPECT_NEAR(trajectories[1].trajectory_point(9).path_point().x(), -436.521,
-              0.001);
-  EXPECT_NEAR(trajectories[1].trajectory_point(9).path_point().y(), -158.000,
-              0.001);
-  EXPECT_NEAR(trajectories[1].trajectory_point(19).path_point().x(), -434.618,
-              0.001);
-  EXPECT_NEAR(trajectories[1].trajectory_point(19).path_point().y(), -153.371,
-              0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().x(), -438.159, 0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().y(), -157.404, 0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(19).path_point().x(), -436.642, 0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(19).path_point().y(), -152.635, 0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(9).path_point().x(), -436.521, 0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(9).path_point().y(), -158.000, 0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(19).path_point().x(), -434.618, 0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(19).path_point().y(), -153.371, 0.001);
 }
 
 TEST_F(RegionalPredictorTest, StationaryPedestrian) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(1);
   EXPECT_EQ(perception_obstacle.id(), 102);

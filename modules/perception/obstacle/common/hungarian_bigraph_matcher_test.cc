@@ -17,8 +17,8 @@
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
 
 #include "Eigen/Core"
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -26,8 +26,7 @@ namespace perception {
 TEST(HungarianOptimizerTest, maximize) {
   // case 1
   Eigen::MatrixXf association_mat_1(3, 4);
-  association_mat_1 << 4.7, 3.8, 1.0, 2.0, 4.1, 3.0, 2.0, -3.0, 1.0, 2.0, 4.7,
-      4.9;
+  association_mat_1 << 4.7, 3.8, 1.0, 2.0, 4.1, 3.0, 2.0, -3.0, 1.0, 2.0, 4.7, 4.9;
   std::vector<std::vector<double>> cost(association_mat_1.rows());
   for (int i = 0; i < association_mat_1.rows(); i++) {
     cost[i].resize(association_mat_1.cols());
@@ -36,8 +35,8 @@ TEST(HungarianOptimizerTest, maximize) {
     }
   }
   HungarianOptimizer hungarian_optimizer_1(cost);
-  std::vector<int> agent;
-  std::vector<int> task;
+  std::vector<int>   agent;
+  std::vector<int>   task;
   hungarian_optimizer_1.maximize(&agent, &task);
   EXPECT_EQ(0, agent[0]);
   EXPECT_EQ(1, agent[1]);
@@ -108,8 +107,8 @@ TEST(HungarianOptimizerTest, minimize) {
     }
   }
   HungarianOptimizer* hungarian_optimizer = new HungarianOptimizer(cost);
-  std::vector<int> agent;
-  std::vector<int> task;
+  std::vector<int>    agent;
+  std::vector<int>    task;
   hungarian_optimizer->minimize(&agent, &task);
   EXPECT_EQ(0, agent[0]);
   EXPECT_EQ(1, agent[1]);

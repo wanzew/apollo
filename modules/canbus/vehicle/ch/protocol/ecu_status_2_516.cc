@@ -28,12 +28,9 @@ using ::apollo::drivers::canbus::Byte;
 Ecustatus2516::Ecustatus2516() {}
 const int32_t Ecustatus2516::ID = 0x516;
 
-void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length,
-                          ChassisDetail* chassis) const {
-  chassis->mutable_ch()
-      ->mutable_ecu_status_2_516()
-      ->set_battery_remaining_capacity(
-          battery_remaining_capacity(bytes, length));
+void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
+  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_remaining_capacity(
+      battery_remaining_capacity(bytes, length));
   chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_voltage(
       battery_voltage(bytes, length));
   chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_current(
@@ -46,12 +43,11 @@ void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length,
 // status)', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
 // 'battery_remaining_capacity', 'is_signed_var': False, 'physical_range':
 // '[0|100]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '%'}
-int Ecustatus2516::battery_remaining_capacity(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+int Ecustatus2516::battery_remaining_capacity(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 0);
+  Byte    t1(bytes + 0);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -64,12 +60,11 @@ int Ecustatus2516::battery_remaining_capacity(const std::uint8_t* bytes,
 // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'battery_voltage',
 // 'is_signed_var': False, 'physical_range': '[0|80]', 'bit': 16, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'V'}
-double Ecustatus2516::battery_voltage(const std::uint8_t* bytes,
-                                      int32_t length) const {
-  Byte t0(bytes + 3);
+double Ecustatus2516::battery_voltage(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -82,12 +77,11 @@ double Ecustatus2516::battery_voltage(const std::uint8_t* bytes,
 // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'battery_current',
 // 'is_signed_var': True, 'physical_range': '[-60|60]', 'bit': 32, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'A'}
-double Ecustatus2516::battery_current(const std::uint8_t* bytes,
-                                      int32_t length) const {
-  Byte t0(bytes + 5);
+double Ecustatus2516::battery_current(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 4);
+  Byte    t1(bytes + 4);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -103,12 +97,11 @@ double Ecustatus2516::battery_current(const std::uint8_t* bytes,
 // 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'battery_temperature',
 // 'is_signed_var': True, 'physical_range': '[-40|110]', 'bit': 48, 'type':
 // 'int', 'order': 'intel', 'physical_unit': '\xc2\xa1\xc3\x89'}
-int Ecustatus2516::battery_temperature(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes + 7);
+int Ecustatus2516::battery_temperature(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 6);
+  Byte    t1(bytes + 6);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

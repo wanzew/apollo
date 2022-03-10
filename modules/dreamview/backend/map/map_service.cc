@@ -50,10 +50,10 @@ using google::protobuf::RepeatedPtrField;
 namespace {
 
 template <typename MapElementInfoConstPtr>
-void ExtractIds(const std::vector<MapElementInfoConstPtr> &items,
-                RepeatedPtrField<std::string> *ids) {
+void ExtractIds(const std::vector<MapElementInfoConstPtr>& items,
+                RepeatedPtrField<std::string>*             ids) {
   ids->Reserve(items.size());
-  for (const auto &item : items) {
+  for (const auto& item : items) {
     ids->Add()->assign(item->id().id());
   }
   // The output is sorted so that the calculated hash will be
@@ -61,10 +61,10 @@ void ExtractIds(const std::vector<MapElementInfoConstPtr> &items,
   std::sort(ids->begin(), ids->end());
 }
 
-void ExtractOverlapIds(const std::vector<SignalInfoConstPtr> &items,
-                       RepeatedPtrField<std::string> *ids) {
-  for (const auto &item : items) {
-    for (auto &overlap_id : item->signal().overlap_id()) {
+void ExtractOverlapIds(const std::vector<SignalInfoConstPtr>& items,
+                       RepeatedPtrField<std::string>*         ids) {
+  for (const auto& item : items) {
+    for (auto& overlap_id : item->signal().overlap_id()) {
       ids->Add()->assign(overlap_id.id());
     }
   }
@@ -73,10 +73,10 @@ void ExtractOverlapIds(const std::vector<SignalInfoConstPtr> &items,
   std::sort(ids->begin(), ids->end());
 }
 
-void ExtractOverlapIds(const std::vector<StopSignInfoConstPtr> &items,
-                       RepeatedPtrField<std::string> *ids) {
-  for (const auto &item : items) {
-    for (auto &overlap_id : item->stop_sign().overlap_id()) {
+void ExtractOverlapIds(const std::vector<StopSignInfoConstPtr>& items,
+                       RepeatedPtrField<std::string>*           ids) {
+  for (const auto& item : items) {
+    for (auto& overlap_id : item->stop_sign().overlap_id()) {
       ids->Add()->assign(overlap_id.id());
     }
   }
@@ -85,17 +85,15 @@ void ExtractOverlapIds(const std::vector<StopSignInfoConstPtr> &items,
   std::sort(ids->begin(), ids->end());
 }
 
-void ExtractRoadAndLaneIds(const std::vector<LaneInfoConstPtr> &lanes,
-                           RepeatedPtrField<std::string> *lane_ids,
-                           RepeatedPtrField<std::string> *road_ids) {
+void ExtractRoadAndLaneIds(const std::vector<LaneInfoConstPtr>& lanes,
+                           RepeatedPtrField<std::string>*       lane_ids,
+                           RepeatedPtrField<std::string>*       road_ids) {
   lane_ids->Reserve(lanes.size());
   road_ids->Reserve(lanes.size());
 
-  for (const auto &lane : lanes) {
+  for (const auto& lane : lanes) {
     lane_ids->Add()->assign(lane->id().id());
-    if (!lane->road_id().id().empty()) {
-      road_ids->Add()->assign(lane->road_id().id());
-    }
+    if (!lane->road_id().id().empty()) { road_ids->Add()->assign(lane->road_id().id()); }
   }
   // The output is sorted so that the calculated hash will be
   // invariant to the order of elements.
@@ -107,16 +105,15 @@ void ExtractRoadAndLaneIds(const std::vector<LaneInfoConstPtr> &lanes,
 
 const char MapService::kMetaFileName[] = "/metaInfo.json";
 
-MapService::MapService(bool use_sim_map) : use_sim_map_(use_sim_map) {
+MapService::MapService(bool use_sim_map)
+    : use_sim_map_(use_sim_map) {
   ReloadMap(false);
 }
 
 bool MapService::ReloadMap(bool force_reload) {
   boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-  bool ret = true;
-  if (force_reload) {
-    ret = HDMapUtil::ReloadMaps();
-  }
+  bool                                    ret = true;
+  if (force_reload) { ret = HDMapUtil::ReloadMaps(); }
 
   // Update the x,y-offsets if present.
   UpdateOffsets();
@@ -144,8 +141,7 @@ void MapService::UpdateOffsets() {
         }
 
         if (!x_offset->is_number()) {
-          AWARN << "Expect x_offset with type 'number', but was "
-                << x_offset->type_name();
+          AWARN << "Expect x_offset with type 'number', but was " << x_offset->type_name();
           continue;
         }
         x_offset_ = x_offset.value();
@@ -157,33 +153,28 @@ void MapService::UpdateOffsets() {
         }
 
         if (!y_offset->is_number()) {
-          AWARN << "Expect y_offset with type 'number', but was "
-                << y_offset->type_name();
+          AWARN << "Expect y_offset with type 'number', but was " << y_offset->type_name();
           continue;
         }
         y_offset_ = y_offset.value();
       }
     }
   }
-  AINFO << "Updated with map: x_offset " << x_offset_ << ", y_offset "
-        << y_offset_;
+  AINFO << "Updated with map: x_offset " << x_offset_ << ", y_offset " << y_offset_;
 }
 
-const hdmap::HDMap *MapService::HDMap() const {
-  return HDMapUtil::BaseMapPtr();
-}
+const hdmap::HDMap* MapService::HDMap() const { return HDMapUtil::BaseMapPtr(); }
 
-const hdmap::HDMap *MapService::SimMap() const {
+const hdmap::HDMap* MapService::SimMap() const {
   return use_sim_map_ ? HDMapUtil::SimMapPtr() : HDMapUtil::BaseMapPtr();
 }
 
 bool MapService::MapReady() const { return HDMap() && SimMap(); }
 
-void MapService::CollectMapElementIds(const PointENU &point, double radius,
-                                      MapElementIds *ids) const {
-  if (!MapReady()) {
-    return;
-  }
+void MapService::CollectMapElementIds(const PointENU& point,
+                                      double          radius,
+                                      MapElementIds*  ids) const {
+  if (!MapReady()) { return; }
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   std::vector<LaneInfoConstPtr> lanes;
@@ -232,16 +223,14 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   ExtractIds(yield_signs, ids->mutable_yield());
 }
 
-Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
+Map MapService::RetrieveMapElements(const MapElementIds& ids) const {
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   Map result;
-  if (!MapReady()) {
-    return result;
-  }
+  if (!MapReady()) { return result; }
   Id map_id;
 
-  for (const auto &id : ids.lane()) {
+  for (const auto& id : ids.lane()) {
     map_id.set_id(id);
     auto element = SimMap()->GetLaneById(map_id);
     if (element) {
@@ -254,91 +243,76 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     }
   }
 
-  for (const auto &id : ids.clear_area()) {
+  for (const auto& id : ids.clear_area()) {
     map_id.set_id(id);
     auto element = SimMap()->GetClearAreaById(map_id);
-    if (element) {
-      *result.add_clear_area() = element->clear_area();
-    }
+    if (element) { *result.add_clear_area() = element->clear_area(); }
   }
 
-  for (const auto &id : ids.crosswalk()) {
+  for (const auto& id : ids.crosswalk()) {
     map_id.set_id(id);
     auto element = SimMap()->GetCrosswalkById(map_id);
-    if (element) {
-      *result.add_crosswalk() = element->crosswalk();
-    }
+    if (element) { *result.add_crosswalk() = element->crosswalk(); }
   }
 
-  for (const auto &id : ids.junction()) {
+  for (const auto& id : ids.junction()) {
     map_id.set_id(id);
     auto element = SimMap()->GetJunctionById(map_id);
-    if (element) {
-      *result.add_junction() = element->junction();
-    }
+    if (element) { *result.add_junction() = element->junction(); }
   }
 
-  for (const auto &id : ids.signal()) {
+  for (const auto& id : ids.signal()) {
     map_id.set_id(id);
     auto element = SimMap()->GetSignalById(map_id);
-    if (element) {
-      *result.add_signal() = element->signal();
-    }
+    if (element) { *result.add_signal() = element->signal(); }
   }
 
-  for (const auto &id : ids.stop_sign()) {
+  for (const auto& id : ids.stop_sign()) {
     map_id.set_id(id);
     auto element = SimMap()->GetStopSignById(map_id);
-    if (element) {
-      *result.add_stop_sign() = element->stop_sign();
-    }
+    if (element) { *result.add_stop_sign() = element->stop_sign(); }
   }
 
-  for (const auto &id : ids.yield()) {
+  for (const auto& id : ids.yield()) {
     map_id.set_id(id);
     auto element = SimMap()->GetYieldSignById(map_id);
-    if (element) {
-      *result.add_yield() = element->yield_sign();
-    }
+    if (element) { *result.add_yield() = element->yield_sign(); }
   }
 
-  for (const auto &id : ids.road()) {
+  for (const auto& id : ids.road()) {
     map_id.set_id(id);
     auto element = SimMap()->GetRoadById(map_id);
-    if (element) {
-      *result.add_road() = element->road();
-    }
+    if (element) { *result.add_road() = element->road(); }
   }
 
-  for (const auto &id : ids.overlap()) {
+  for (const auto& id : ids.overlap()) {
     map_id.set_id(id);
     auto element = SimMap()->GetOverlapById(map_id);
-    if (element) {
-      *result.add_overlap() = element->overlap();
-    }
+    if (element) { *result.add_overlap() = element->overlap(); }
   }
 
   return result;
 }
 
-bool MapService::GetNearestLane(const double x, const double y,
-                                LaneInfoConstPtr *nearest_lane,
-                                double *nearest_s, double *nearest_l) const {
+bool MapService::GetNearestLane(const double      x,
+                                const double      y,
+                                LaneInfoConstPtr* nearest_lane,
+                                double*           nearest_s,
+                                double*           nearest_l) const {
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   PointENU point;
   point.set_x(x);
   point.set_y(y);
-  if (!MapReady() ||
-      HDMap()->GetNearestLane(point, nearest_lane, nearest_s, nearest_l) < 0) {
+  if (!MapReady() || HDMap()->GetNearestLane(point, nearest_lane, nearest_s, nearest_l) < 0) {
     AERROR << "Failed to get nearest lane!";
     return false;
   }
   return true;
 }
 
-bool MapService::GetPathsFromRouting(const RoutingResponse &routing,
-                                     std::vector<Path> *paths) const {
+bool MapService::GetPathsFromRouting(const RoutingResponse& routing,
+                                     std::vector<Path>*     paths) const {
   if (!CreatePathsFromRouting(routing, paths)) {
     AERROR << "Unable to get paths from routing!";
     return false;
@@ -346,69 +320,62 @@ bool MapService::GetPathsFromRouting(const RoutingResponse &routing,
   return true;
 }
 
-bool MapService::GetPoseWithRegardToLane(const double x, const double y,
-                                         double *theta, double *s) const {
-  double l;
+bool MapService::GetPoseWithRegardToLane(const double x,
+                                         const double y,
+                                         double*      theta,
+                                         double*      s) const {
+  double           l;
   LaneInfoConstPtr nearest_lane;
-  if (!GetNearestLane(x, y, &nearest_lane, s, &l)) {
-    return false;
-  }
+  if (!GetNearestLane(x, y, &nearest_lane, s, &l)) { return false; }
 
   *theta = nearest_lane->Heading(*s);
   return true;
 }
 
-bool MapService::ConstructLaneWayPoint(
-    const double x, const double y, routing::LaneWaypoint *laneWayPoint) const {
-  double s, l;
+bool MapService::ConstructLaneWayPoint(const double           x,
+                                       const double           y,
+                                       routing::LaneWaypoint* laneWayPoint) const {
+  double           s, l;
   LaneInfoConstPtr lane;
-  if (!GetNearestLane(x, y, &lane, &s, &l)) {
-    return false;
-  }
+  if (!GetNearestLane(x, y, &lane, &s, &l)) { return false; }
 
   laneWayPoint->set_id(lane->id().id());
   laneWayPoint->set_s(s);
-  auto *pose = laneWayPoint->mutable_pose();
+  auto* pose = laneWayPoint->mutable_pose();
   pose->set_x(x);
   pose->set_y(y);
 
   return true;
 }
 
-bool MapService::GetStartPoint(apollo::common::PointENU *start_point) const {
+bool MapService::GetStartPoint(apollo::common::PointENU* start_point) const {
   // Start from origin to find a lane from the map.
-  double s, l;
+  double           s, l;
   LaneInfoConstPtr lane;
-  if (!GetNearestLane(0.0, 0.0, &lane, &s, &l)) {
-    return false;
-  }
+  if (!GetNearestLane(0.0, 0.0, &lane, &s, &l)) { return false; }
 
   *start_point = lane->GetSmoothPoint(0.0);
   return true;
 }
 
-bool MapService::CreatePathsFromRouting(const RoutingResponse &routing,
-                                        std::vector<Path> *paths) const {
-  for (const auto &road : routing.road()) {
-    for (const auto &passage_region : road.passage()) {
+bool MapService::CreatePathsFromRouting(const RoutingResponse& routing,
+                                        std::vector<Path>*     paths) const {
+  for (const auto& road : routing.road()) {
+    for (const auto& passage_region : road.passage()) {
       // Each passage region in a road forms a path
-      if (!AddPathFromPassageRegion(passage_region, paths)) {
-        return false;
-      }
+      if (!AddPathFromPassageRegion(passage_region, paths)) { return false; }
     }
   }
   return true;
 }
 
-bool MapService::AddPathFromPassageRegion(
-    const routing::Passage &passage_region, std::vector<Path> *paths) const {
-  if (!MapReady()) {
-    return false;
-  }
+bool MapService::AddPathFromPassageRegion(const routing::Passage& passage_region,
+                                          std::vector<Path>*      paths) const {
+  if (!MapReady()) { return false; }
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   RouteSegments segments;
-  for (const auto &segment : passage_region.segment()) {
+  for (const auto& segment : passage_region.segment()) {
     auto lane_ptr = HDMap()->GetLaneById(hdmap::MakeMapId(segment.id()));
     if (!lane_ptr) {
       AERROR << "Failed to find lane: " << segment.id();
@@ -418,14 +385,12 @@ bool MapService::AddPathFromPassageRegion(
   }
 
   paths->emplace_back();
-  if (!PncMap::CreatePathFromLaneSegments(segments, &paths->back())) {
-    return false;
-  }
+  if (!PncMap::CreatePathFromLaneSegments(segments, &paths->back())) { return false; }
 
   return true;
 }
 
-size_t MapService::CalculateMapHash(const MapElementIds &ids) const {
+size_t MapService::CalculateMapHash(const MapElementIds& ids) const {
   static std::hash<std::string> hash_function;
   return hash_function(ids.DebugString());
 }

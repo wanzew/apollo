@@ -37,9 +37,7 @@ class SharedData {
   // and would be called by SharedDataManager when reset DAGStreaming.
   virtual void Reset() { CHECK(false) << "reset() not implemented."; }
 
-  virtual void RemoveStaleData() {
-    CHECK(false) << "remove_stale_data() not implemented.";
-  }
+  virtual void RemoveStaleData() { CHECK(false) << "remove_stale_data() not implemented."; }
 
   virtual std::string name() const = 0;
 

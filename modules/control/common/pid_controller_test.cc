@@ -19,10 +19,10 @@
 #include <iostream>
 #include <string>
 
-#include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pid_conf.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace control {
@@ -30,20 +30,18 @@ namespace control {
 class PidControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string control_conf_file =
-        "modules/control/testdata/conf/lincoln.pb.txt";
-    CHECK(common::util::GetProtoFromFile(control_conf_file,
-                                                   &control_conf_));
+    std::string control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
+    CHECK(common::util::GetProtoFromFile(control_conf_file, &control_conf_));
     lon_controller_conf_ = control_conf_.lon_controller_conf();
   }
 
  protected:
-  ControlConf control_conf_;
+  ControlConf       control_conf_;
   LonControllerConf lon_controller_conf_;
 };
 
 TEST_F(PidControllerTest, StationPidController) {
-  PidConf pid_conf = lon_controller_conf_.station_pid_conf();
+  PidConf       pid_conf = lon_controller_conf_.station_pid_conf();
   PIDController pid_controller;
   pid_controller.Init(pid_conf);
   pid_controller.Reset();
@@ -60,7 +58,7 @@ TEST_F(PidControllerTest, StationPidController) {
 }
 
 TEST_F(PidControllerTest, SpeedPidController) {
-  PidConf pid_conf = lon_controller_conf_.low_speed_pid_conf();
+  PidConf       pid_conf = lon_controller_conf_.low_speed_pid_conf();
   PIDController pid_controller;
   pid_controller.Init(pid_conf);
   pid_controller.Reset();

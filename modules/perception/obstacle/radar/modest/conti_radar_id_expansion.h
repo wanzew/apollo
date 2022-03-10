@@ -42,10 +42,10 @@ class ContiRadarIDExpansion {
  private:
   int GetNextId();
 
-  int current_idx_;
-  bool need_restart_;
-  bool need_inner_restart_;
-  double timestamp_;
+  int                current_idx_;
+  bool               need_restart_;
+  bool               need_inner_restart_;
+  double             timestamp_;
   std::map<int, int> local2global_;
 };
 

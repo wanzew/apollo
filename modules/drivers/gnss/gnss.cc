@@ -41,17 +41,14 @@ apollo::common::Status GnssDriver::Init() {
 
   config::Config config;
   // load camera config
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file,
-                                                &config)) {
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file, &config)) {
     return OnError("Unable to load gnss conf file: " + FLAGS_sensor_conf_file);
   }
   AINFO << "Gnss config: " << config.DebugString();
 
   raw_stream_.reset(new RawStream(config));
 
-  if (!raw_stream_->Init()) {
-    return OnError("Init stream failed!");
-  }
+  if (!raw_stream_->Init()) { return OnError("Init stream failed!"); }
 
   AINFO << "The gnss driver successfully initialized.";
   return Status::OK();
@@ -69,7 +66,7 @@ apollo::common::Status GnssDriver::Start() {
 void GnssDriver::Stop() {}
 
 // Send the error to monitor and return it
-Status GnssDriver::OnError(const std::string &error_msg) {
+Status GnssDriver::OnError(const std::string& error_msg) {
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.ERROR(error_msg);
   return Status(ErrorCode::DRIVER_ERROR_GNSS, error_msg);

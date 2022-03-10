@@ -50,8 +50,7 @@ namespace relative_map {
 // the value is "default_right_width_". A negative value indicates illegal.
 //
 // fourth element : a shared pointer of the current navigation path.
-typedef std::tuple<int, double, double, std::shared_ptr<NavigationPath>>
-    NaviPathTuple;
+typedef std::tuple<int, double, double, std::shared_ptr<NavigationPath>> NaviPathTuple;
 
 // A projection index pair.
 // pair.first: projection index of the vehicle in the current navigation line.
@@ -68,14 +67,13 @@ class NavigationLane {
   void SetConfig(const NavigationLaneConfig& config);
 
   void SetDefaultWidth(const double left_width, const double right_width) {
-    default_left_width_ = left_width;
+    default_left_width_  = left_width;
     default_right_width_ = right_width;
   }
 
   bool GeneratePath();
 
-  void UpdatePerception(
-      const perception::PerceptionObstacles& perception_obstacles) {
+  void UpdatePerception(const perception::PerceptionObstacles& perception_obstacles) {
     perception_obstacles_ = perception_obstacles;
   }
 
@@ -88,31 +86,26 @@ class NavigationLane {
 
   const NavigationPath Path() {
     const auto& current_navi_path = std::get<3>(current_navi_path_tuple_);
-    if (current_navi_path) {
-      return *current_navi_path;
-    }
+    if (current_navi_path) { return *current_navi_path; }
     return NavigationPath();
   }
 
   bool CreateMap(const MapGenerationParam& map_config, MapMsg* map_msg) const;
 
  private:
-  double EvaluateCubicPolynomial(const double c0, const double c1,
-                                 const double c2, const double c3,
-                                 const double z) const;
+  double EvaluateCubicPolynomial(
+      const double c0, const double c1, const double c2, const double c3, const double z) const;
 
-  double GetKappa(const double c1, const double c2, const double c3,
-                  const double x);
+  double GetKappa(const double c1, const double c2, const double c3, const double x);
 
-  void MergeNavigationLineAndLaneMarker(const int line_index,
-                                        common::Path* path);
+  void MergeNavigationLineAndLaneMarker(const int line_index, common::Path* path);
 
   common::PathPoint GetPathPointByS(const common::Path& path,
-                                    const int start_index, const double s,
-                                    int* matched_index);
+                                    const int           start_index,
+                                    const double        s,
+                                    int*                matched_index);
 
-  void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker,
-                               common::Path* path);
+  void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker, common::Path* path);
 
   bool ConvertNavigationLineToPath(const int line_index, common::Path* path);
 
@@ -140,7 +133,7 @@ class NavigationLane {
   // when invalid, right_width_ < 0
   double perceived_right_width_ = -1.0;
 
-  double default_left_width_ = 1.75;
+  double default_left_width_  = 1.75;
   double default_right_width_ = 1.75;
 
   // key: line index,

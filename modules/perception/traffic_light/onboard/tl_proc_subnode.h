@@ -49,7 +49,7 @@ class TLProcSubnode : public Subnode {
 
  protected:
   bool InitInternal() override;
-  bool ProcEvent(const Event &event);
+  bool ProcEvent(const Event& event);
 
  private:
   bool InitSharedData();
@@ -58,26 +58,25 @@ class TLProcSubnode : public Subnode {
   bool InitReviser();
 
   // get mean distance from car to stopline.
-  double GetMeanDistance(const double ts, const Eigen::Matrix4d &car_location,
-                         const LightPtrs &lights) const;
+  double GetMeanDistance(const double           ts,
+                         const Eigen::Matrix4d& car_location,
+                         const LightPtrs&       lights) const;
 
-  bool VerifyImageLights(const ImageLights &image_lights,
-                         CameraId *selection) const;
+  bool VerifyImageLights(const ImageLights& image_lights, CameraId* selection) const;
 
   // @brief compute image border size based on projection box and detection box
-  bool ComputeImageBorder(const ImageLights &image_lights, int *image_border);
+  bool ComputeImageBorder(const ImageLights& image_lights, int* image_border);
 
   // @brief compute offset between two rectangles
-  void ComputeRectsOffset(const cv::Rect &rect1, const cv::Rect &rect2,
-                          int *offset);
-  bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights);
+  void ComputeRectsOffset(const cv::Rect& rect1, const cv::Rect& rect2, int* offset);
+  bool PublishMessage(const std::shared_ptr<ImageLights>& image_lights);
 
  private:
-  TLPreprocessingData *preprocessing_data_ = nullptr;  // up-stream data
-  std::unique_ptr<BaseRectifier> rectifier_ = nullptr;
-  std::unique_ptr<BaseRecognizer> recognizer_ = nullptr;
-  std::unique_ptr<BaseReviser> reviser_ = nullptr;
-  Mutex mutex_;
+  TLPreprocessingData*            preprocessing_data_ = nullptr;  // up-stream data
+  std::unique_ptr<BaseRectifier>  rectifier_          = nullptr;
+  std::unique_ptr<BaseRecognizer> recognizer_         = nullptr;
+  std::unique_ptr<BaseReviser>    reviser_            = nullptr;
+  Mutex                           mutex_;
 
   traffic_light::subnode_config::SubnodeConfig config_;
 

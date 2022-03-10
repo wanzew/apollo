@@ -31,29 +31,29 @@
 namespace apollo {
 namespace perception {
 
-#define BUFFER_OFFSET(offset) (reinterpret_cast<GLvoid *>(offset))
+#define BUFFER_OFFSET(offset) (reinterpret_cast<GLvoid*>(offset))
 
 GLFWViewer::GLFWViewer() {
-  init_ = false;
-  window_ = nullptr;
+  init_        = false;
+  window_      = nullptr;
   pers_camera_ = nullptr;
   forward_dir_ = Eigen::Vector3d::Zero();
-  scn_center_ = Eigen::Vector3d::Zero();
-  bg_color_ = Eigen::Vector3d::Zero();
+  scn_center_  = Eigen::Vector3d::Zero();
+  bg_color_    = Eigen::Vector3d::Zero();
 
   mode_mat_ = Eigen::Matrix4d::Identity();
   view_mat_ = Eigen::Matrix4d::Identity();
 
-  win_width_ = 800;
-  win_height_ = 600;
+  win_width_    = 800;
+  win_height_   = 600;
   mouse_prev_x_ = 0;
   mouse_prev_y_ = 0;
 
-  show_cloud_ = true;
+  show_cloud_       = true;
   show_cloud_state_ = 0;
-  show_velocity_ = true;
-  show_direction_ = false;
-  show_polygon_ = false;
+  show_velocity_    = true;
+  show_direction_   = false;
+  show_polygon_     = false;
 }
 
 GLFWViewer::~GLFWViewer() {
@@ -85,9 +85,9 @@ bool GLFWViewer::Initialize() {
 
   init_ = true;
 
-  show_cloud_ = 1;
+  show_cloud_    = 1;
   show_velocity_ = 1;
-  show_polygon_ = 0;
+  show_polygon_  = 0;
   return true;
 }
 
@@ -109,7 +109,7 @@ void GLFWViewer::SpinOnce() {
 void GLFWViewer::Close() { glfwTerminate(); }
 
 void GLFWViewer::SetSize(int w, int h) {
-  win_width_ = w;
+  win_width_  = w;
   win_height_ = h;
 }
 
@@ -119,7 +119,7 @@ void GLFWViewer::SetCameraPara(Eigen::Vector3d i_position,
   pers_camera_->SetPosition(i_position);
   pers_camera_->LookAt(i_scn_center);
   pers_camera_->SetUpDirection(i_up_vector);
-  view_mat_ = pers_camera_->GetViewMat();
+  view_mat_   = pers_camera_->GetViewMat();
   scn_center_ = i_scn_center;
 }
 
@@ -129,8 +129,7 @@ bool GLFWViewer::WindowInit() {
     return false;
   }
 
-  window_ = glfwCreateWindow(win_width_, win_height_, "opengl_visualizer",
-                             nullptr, nullptr);
+  window_ = glfwCreateWindow(win_width_, win_height_, "opengl_visualizer", nullptr, nullptr);
   if (window_ == nullptr) {
     AERROR << "Failed to create glfw window!\n";
     glfwTerminate();
@@ -169,7 +168,7 @@ bool GLFWViewer::OpenglInit() {
   glShadeModel(GL_SMOOTH);
   glDepthFunc(GL_LEQUAL);
   // lighting
-  GLfloat mat_shininess[] = {20.0};
+  GLfloat mat_shininess[]  = {20.0};
   GLfloat light_position[] = {1.0, -1.0, 1.0, 0.0};
   GLfloat lmodel_ambient[] = {.5, .5, .5, 1.0};
   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
@@ -193,92 +192,76 @@ bool GLFWViewer::OpenglInit() {
   // point cloud
   {
     GLfloat cloud_colors[kPoint_Num_Per_Cloud_VAO_][3];
-    GLuint cloud_indices[kPoint_Num_Per_Cloud_VAO_];
+    GLuint  cloud_indices[kPoint_Num_Per_Cloud_VAO_];
     for (int i = 0; i < kPoint_Num_Per_Cloud_VAO_; i++) {
       cloud_colors[i][0] = 0.7;
       cloud_colors[i][1] = 0.7;
       cloud_colors[i][2] = 0.7;
-      cloud_indices[i] = GLuint(i);
+      cloud_indices[i]   = GLuint(i);
     }
 
     glGenVertexArrays(kCloud_VAO_Num_, cloud_VAO_buf_ids_);
     for (int i = 0; i < kCloud_VAO_Num_; i++) {
       glBindVertexArray(cloud_VAO_buf_ids_[i]);
 
-      glGenBuffers(static_cast<int>(VBO_Type::NUM_VBO_TYPE),
-                   cloud_VBO_buf_ids_[i]);
-      glBindBuffer(
-          GL_ARRAY_BUFFER,
-          cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_VERTICES)]);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(cloud_verts_), cloud_verts_,
-                   GL_STREAM_DRAW);
+      glGenBuffers(static_cast<int>(VBO_Type::NUM_VBO_TYPE), cloud_VBO_buf_ids_[i]);
+      glBindBuffer(GL_ARRAY_BUFFER,
+                   cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_VERTICES)]);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(cloud_verts_), cloud_verts_, GL_STREAM_DRAW);
       glVertexPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
       glEnableClientState(GL_VERTEX_ARRAY);
 
-      glBindBuffer(
-          GL_ARRAY_BUFFER,
-          cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_COLORS)]);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(cloud_colors), cloud_colors,
-                   GL_STREAM_DRAW);
+      glBindBuffer(GL_ARRAY_BUFFER, cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_COLORS)]);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(cloud_colors), cloud_colors, GL_STREAM_DRAW);
       glColorPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
       glEnableClientState(GL_COLOR_ARRAY);
 
-      glBindBuffer(
-          GL_ELEMENT_ARRAY_BUFFER,
-          cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_ELEMENTS)]);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cloud_indices),
-                   cloud_indices, GL_STREAM_DRAW);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                   cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_ELEMENTS)]);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cloud_indices), cloud_indices, GL_STREAM_DRAW);
     }
   }
   // circle
   {
     GLfloat circle_verts[kPoint_Num_Per_Circle_VAO_][3];
     GLfloat circle_colors[kPoint_Num_Per_Circle_VAO_][3];
-    GLuint circle_indices[kPoint_Num_Per_Circle_VAO_];
+    GLuint  circle_indices[kPoint_Num_Per_Circle_VAO_];
 
     for (int i = 0; i < kPoint_Num_Per_Circle_VAO_; ++i) {
-      circle_verts[i][2] = -1.0;
+      circle_verts[i][2]  = -1.0;
       circle_colors[i][0] = 0.0;
       circle_colors[i][1] = 0.0;
       circle_colors[i][2] = 0.9;
-      circle_indices[i] = GLuint(i);
+      circle_indices[i]   = GLuint(i);
     }
 
-    float ang_interv =
-        2 * M_PI / static_cast<float>(kPoint_Num_Per_Circle_VAO_);
+    float ang_interv = 2 * M_PI / static_cast<float>(kPoint_Num_Per_Circle_VAO_);
     glGenVertexArrays(kCircle_VAO_Num_, circle_VAO_buf_ids_);
     for (int vao = 0; vao < kCircle_VAO_Num_; ++vao) {
       for (int i = 0; i < kPoint_Num_Per_Circle_VAO_; ++i) {
-        float theta = i * ang_interv;
+        float theta        = i * ang_interv;
         circle_verts[i][0] = 20 * (vao + 1) * cos(theta);
         circle_verts[i][1] = 20 * (vao + 1) * sin(theta);
       }
 
       glBindVertexArray(circle_VAO_buf_ids_[vao]);
 
-      glGenBuffers(static_cast<int>(VBO_Type::NUM_VBO_TYPE),
-                   circle_VBO_buf_ids_[vao]);
-      glBindBuffer(
-          GL_ARRAY_BUFFER,
-          circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_VERTICES)]);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(circle_verts), circle_verts,
-                   GL_STATIC_DRAW);
+      glGenBuffers(static_cast<int>(VBO_Type::NUM_VBO_TYPE), circle_VBO_buf_ids_[vao]);
+      glBindBuffer(GL_ARRAY_BUFFER,
+                   circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_VERTICES)]);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(circle_verts), circle_verts, GL_STATIC_DRAW);
       glVertexPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
       glEnableClientState(GL_VERTEX_ARRAY);
 
-      glBindBuffer(
-          GL_ARRAY_BUFFER,
-          circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_COLORS)]);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(circle_colors), circle_colors,
-                   GL_STATIC_DRAW);
+      glBindBuffer(GL_ARRAY_BUFFER,
+                   circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_COLORS)]);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(circle_colors), circle_colors, GL_STATIC_DRAW);
       glColorPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
       glEnableClientState(GL_COLOR_ARRAY);
 
-      glBindBuffer(
-          GL_ELEMENT_ARRAY_BUFFER,
-          circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_ELEMENTS)]);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(circle_indices),
-                   circle_indices, GL_STATIC_DRAW);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                   circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_ELEMENTS)]);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(circle_indices), circle_indices, GL_STATIC_DRAW);
     }
   }
 
@@ -289,21 +272,18 @@ void GLFWViewer::PreDraw() {
   Eigen::Matrix4d e_proj_mat = pers_camera_->GetProjectionMat();
 
   // column major
-  GLdouble proj_mat[16] = {
-      e_proj_mat(0, 0), e_proj_mat(1, 0), e_proj_mat(2, 0), e_proj_mat(3, 0),
-      e_proj_mat(0, 1), e_proj_mat(1, 1), e_proj_mat(2, 1), e_proj_mat(3, 1),
-      e_proj_mat(0, 2), e_proj_mat(1, 2), e_proj_mat(2, 2), e_proj_mat(3, 2),
-      e_proj_mat(0, 3), e_proj_mat(1, 3), e_proj_mat(2, 3), e_proj_mat(3, 3)};
-  GLdouble mode_mat[16] = {
-      mode_mat_(0, 0), mode_mat_(1, 0), mode_mat_(2, 0), mode_mat_(3, 0),
-      mode_mat_(0, 1), mode_mat_(1, 1), mode_mat_(2, 1), mode_mat_(3, 1),
-      mode_mat_(0, 2), mode_mat_(1, 2), mode_mat_(2, 2), mode_mat_(3, 2),
-      mode_mat_(0, 3), mode_mat_(1, 3), mode_mat_(2, 3), mode_mat_(3, 3)};
-  GLdouble view_mat[16] = {
-      view_mat_(0, 0), view_mat_(1, 0), view_mat_(2, 0), view_mat_(3, 0),
-      view_mat_(0, 1), view_mat_(1, 1), view_mat_(2, 1), view_mat_(3, 1),
-      view_mat_(0, 2), view_mat_(1, 2), view_mat_(2, 2), view_mat_(3, 2),
-      view_mat_(0, 3), view_mat_(1, 3), view_mat_(2, 3), view_mat_(3, 3)};
+  GLdouble proj_mat[16] = {e_proj_mat(0, 0), e_proj_mat(1, 0), e_proj_mat(2, 0), e_proj_mat(3, 0),
+                           e_proj_mat(0, 1), e_proj_mat(1, 1), e_proj_mat(2, 1), e_proj_mat(3, 1),
+                           e_proj_mat(0, 2), e_proj_mat(1, 2), e_proj_mat(2, 2), e_proj_mat(3, 2),
+                           e_proj_mat(0, 3), e_proj_mat(1, 3), e_proj_mat(2, 3), e_proj_mat(3, 3)};
+  GLdouble mode_mat[16] = {mode_mat_(0, 0), mode_mat_(1, 0), mode_mat_(2, 0), mode_mat_(3, 0),
+                           mode_mat_(0, 1), mode_mat_(1, 1), mode_mat_(2, 1), mode_mat_(3, 1),
+                           mode_mat_(0, 2), mode_mat_(1, 2), mode_mat_(2, 2), mode_mat_(3, 2),
+                           mode_mat_(0, 3), mode_mat_(1, 3), mode_mat_(2, 3), mode_mat_(3, 3)};
+  GLdouble view_mat[16] = {view_mat_(0, 0), view_mat_(1, 0), view_mat_(2, 0), view_mat_(3, 0),
+                           view_mat_(0, 1), view_mat_(1, 1), view_mat_(2, 1), view_mat_(3, 1),
+                           view_mat_(0, 2), view_mat_(1, 2), view_mat_(2, 2), view_mat_(3, 2),
+                           view_mat_(0, 3), view_mat_(1, 3), view_mat_(2, 3), view_mat_(3, 3)};
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_PROJECTION);
@@ -336,15 +316,15 @@ void GLFWViewer::DrawCloud() {
   } else if (show_cloud_state_ == 1) {  // show roi
     roi_cloud = frame_content_.GetRoiCloud();
   } else {  // show both
-    cloud = frame_content_.GetCloud();
+    cloud     = frame_content_.GetCloud();
     roi_cloud = frame_content_.GetRoiCloud();
   }
 
   // draw original point cloud
   if (cloud && !cloud->points.empty()) {
     glPointSize(1);
-    int count = 0;
-    int p_num = 0;
+    int count   = 0;
+    int p_num   = 0;
     int vao_num = (cloud->points.size() / kPoint_Num_Per_Cloud_VAO_) + 1;
     for (int vao = 0; vao < vao_num; vao++) {
       for (p_num = 0; p_num < kPoint_Num_Per_Cloud_VAO_; ++p_num) {
@@ -353,22 +333,17 @@ void GLFWViewer::DrawCloud() {
         cloud_verts_[p_num][2] = cloud->points[count].z;
         count++;
 
-        if (count >= static_cast<int>(cloud->points.size())) {
-          break;
-        }
+        if (count >= static_cast<int>(cloud->points.size())) { break; }
       }
 
       glBindVertexArray(cloud_VAO_buf_ids_[vao]);
-      glBindBuffer(
-          GL_ARRAY_BUFFER,
-          cloud_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_VERTICES)]);
+      glBindBuffer(GL_ARRAY_BUFFER,
+                   cloud_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_VERTICES)]);
       glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cloud_verts_), cloud_verts_);
       glDrawElements(GL_POINTS, p_num, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
       glBindVertexArray(0);
 
-      if (count >= static_cast<int>(cloud->points.size())) {
-        break;
-      }
+      if (count >= static_cast<int>(cloud->points.size())) { break; }
     }
 
     if (count < static_cast<int>(cloud->points.size())) {
@@ -381,7 +356,7 @@ void GLFWViewer::DrawCloud() {
     glPointSize(3);
     glColor3f(0, 0.8, 0);
     glBegin(GL_POINTS);
-    for (const auto &point : roi_cloud->points) {
+    for (const auto& point : roi_cloud->points) {
       glVertex3f(point.x, point.y, point.z);
     }
     glEnd();
@@ -390,11 +365,10 @@ void GLFWViewer::DrawCloud() {
 
 void GLFWViewer::DrawCircle() {
   Eigen::Matrix4d v2w_pose = frame_content_.GetPoseV2w();
-  GLdouble mat[16] = {
-      v2w_pose(0, 0), v2w_pose(1, 0), v2w_pose(2, 0), v2w_pose(3, 0),
-      v2w_pose(0, 1), v2w_pose(1, 1), v2w_pose(2, 1), v2w_pose(3, 1),
-      v2w_pose(0, 2), v2w_pose(1, 2), v2w_pose(2, 2), v2w_pose(3, 2),
-      v2w_pose(0, 3), v2w_pose(1, 3), v2w_pose(2, 3), v2w_pose(3, 3)};
+  GLdouble        mat[16]  = {v2w_pose(0, 0), v2w_pose(1, 0), v2w_pose(2, 0), v2w_pose(3, 0),
+                      v2w_pose(0, 1), v2w_pose(1, 1), v2w_pose(2, 1), v2w_pose(3, 1),
+                      v2w_pose(0, 2), v2w_pose(1, 2), v2w_pose(2, 2), v2w_pose(3, 2),
+                      v2w_pose(0, 3), v2w_pose(1, 3), v2w_pose(2, 3), v2w_pose(3, 3)};
 
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
@@ -402,8 +376,7 @@ void GLFWViewer::DrawCircle() {
   int vao = 0;
   for (vao = 0; vao < kCircle_VAO_Num_; vao++) {
     glBindVertexArray(circle_VAO_buf_ids_[vao]);
-    glDrawElements(GL_LINE_LOOP, kPoint_Num_Per_Circle_VAO_, GL_UNSIGNED_INT,
-                   BUFFER_OFFSET(0));
+    glDrawElements(GL_LINE_LOOP, kPoint_Num_Per_Circle_VAO_, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
     glBindVertexArray(0);
   }
   glPopMatrix();
@@ -421,8 +394,10 @@ void GLFWViewer::DrawCarForwardDir() {
 }
 
 void GLFWViewer::DrawObstacle(const std::shared_ptr<Object> obj,
-                              bool show_cloud, bool show_polygon,
-                              bool show_velocity, bool show_direction) {
+                              bool                          show_cloud,
+                              bool                          show_polygon,
+                              bool                          show_velocity,
+                              bool                          show_direction) {
   float type_color[3] = {0, 0, 0};
   // TODO(All): modify GetClassColor params
   GetClassColor(static_cast<int>(obj->type), type_color);
@@ -452,23 +427,23 @@ void GLFWViewer::DrawObstacle(const std::shared_ptr<Object> obj,
     Eigen::Vector3d dir(cos(obj->theta), sin(obj->theta), 0);
     Eigen::Vector3d odir(-dir[1], dir[0], 0);
     Eigen::Vector3d bottom_quad[4];
-    double half_l = obj->length / 2;
-    double half_w = obj->width / 2;
-    double h = obj->height;
-    bottom_quad[0] = obj->center - dir * half_l - odir * half_w;
-    bottom_quad[1] = obj->center + dir * half_l - odir * half_w;
-    bottom_quad[2] = obj->center + dir * half_l + odir * half_w;
-    bottom_quad[3] = obj->center - dir * half_l + odir * half_w;
+    double          half_l = obj->length / 2;
+    double          half_w = obj->width / 2;
+    double          h      = obj->height;
+    bottom_quad[0]         = obj->center - dir * half_l - odir * half_w;
+    bottom_quad[1]         = obj->center + dir * half_l - odir * half_w;
+    bottom_quad[2]         = obj->center + dir * half_l + odir * half_w;
+    bottom_quad[3]         = obj->center - dir * half_l + odir * half_w;
 
     DrawOffsetVolumn(bottom_quad, h, 4);
   }
 
   if (show_velocity) {
     glColor3f(1, 0, 0);
-    const Eigen::Vector3d &center = obj->center;
-    const Eigen::Vector3d &velocity = obj->velocity;
-    Eigen::Vector3d dir(cos(obj->theta), sin(obj->theta), 0);
-    Eigen::Vector3d start_point;
+    const Eigen::Vector3d& center   = obj->center;
+    const Eigen::Vector3d& velocity = obj->velocity;
+    Eigen::Vector3d        dir(cos(obj->theta), sin(obj->theta), 0);
+    Eigen::Vector3d        start_point;
     if (dir.dot(velocity) < 0) {
       start_point = center - dir * (obj->length / 2);
     } else {
@@ -483,12 +458,11 @@ void GLFWViewer::DrawObstacle(const std::shared_ptr<Object> obj,
 
   if (show_direction) {
     glColor3f(0, 0, 1);
-    const Eigen::Vector3d &center = obj->center;
-    Eigen::Vector3d dir(cos(obj->theta), sin(obj->theta), 0);
-    Eigen::Vector3d odir(-dir[1], dir[0], 0);
-    Eigen::Vector3d start_point =
-        center + dir * (obj->length / 2) + odir * (obj->width / 2);
-    Eigen::Vector3d end_point = start_point + dir * 3;
+    const Eigen::Vector3d& center = obj->center;
+    Eigen::Vector3d        dir(cos(obj->theta), sin(obj->theta), 0);
+    Eigen::Vector3d        odir(-dir[1], dir[0], 0);
+    Eigen::Vector3d        start_point = center + dir * (obj->length / 2) + odir * (obj->width / 2);
+    Eigen::Vector3d        end_point   = start_point + dir * 3;
     glBegin(GL_LINES);
     glVertex3f(start_point[0], start_point[1], start_point[2]);
     glVertex3f(end_point[0], end_point[1], end_point[2]);
@@ -497,40 +471,31 @@ void GLFWViewer::DrawObstacle(const std::shared_ptr<Object> obj,
 }
 
 void GLFWViewer::DrawObstacles() {
-  std::vector<std::shared_ptr<Object>> tracked_objects =
-      frame_content_.GetTrackedObjects();
+  std::vector<std::shared_ptr<Object>> tracked_objects = frame_content_.GetTrackedObjects();
   for (std::size_t i = 0; i < tracked_objects.size(); i++) {
-    DrawObstacle(tracked_objects[i], true, show_polygon_, show_velocity_,
-                 show_direction_);
+    DrawObstacle(tracked_objects[i], true, show_polygon_, show_velocity_, show_direction_);
   }
 }
 
-void GLFWViewer::DrawOffsetVolumn(Eigen::Vector3d *polygon_points, double h,
-                                  int polygon_size) {
-  if (polygon_points == nullptr) {
-    return;
-  }
+void GLFWViewer::DrawOffsetVolumn(Eigen::Vector3d* polygon_points, double h, int polygon_size) {
+  if (polygon_points == nullptr) { return; }
 
   glBegin(GL_LINE_LOOP);
   for (int i = 0; i < polygon_size; i++) {
-    glVertex3d(polygon_points[i][0], polygon_points[i][1],
-               polygon_points[i][2]);
+    glVertex3d(polygon_points[i][0], polygon_points[i][1], polygon_points[i][2]);
   }
   glEnd();
 
   glBegin(GL_LINE_LOOP);
   for (int i = 0; i < polygon_size; i++) {
-    glVertex3d(polygon_points[i][0], polygon_points[i][1],
-               polygon_points[i][2] + h);
+    glVertex3d(polygon_points[i][0], polygon_points[i][1], polygon_points[i][2] + h);
   }
   glEnd();
 
   glBegin(GL_LINES);
   for (int i = 0; i < polygon_size; i++) {
-    glVertex3d(polygon_points[i][0], polygon_points[i][1],
-               polygon_points[i][2]);
-    glVertex3d(polygon_points[i][0], polygon_points[i][1],
-               polygon_points[i][2] + h);
+    glVertex3d(polygon_points[i][0], polygon_points[i][1], polygon_points[i][2]);
+    glVertex3d(polygon_points[i][0], polygon_points[i][1], polygon_points[i][2] + h);
   }
   glEnd();
 }
@@ -587,48 +552,43 @@ void GLFWViewer::GetClassColor(int cls, float rgb[3]) {
 
 /************************callback functions************************/
 
-void GLFWViewer::FramebufferSizeCallback(GLFWwindow *window, int width,
-                                         int height) {
-  void *user_data = glfwGetWindowUserPointer(window);
+void GLFWViewer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+  void* user_data = glfwGetWindowUserPointer(window);
   if (user_data == nullptr) return;
 
-  GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
+  GLFWViewer* vis = static_cast<GLFWViewer*>(user_data);
   vis->ResizeFramebuffer(width, height);
 }
 
-void GLFWViewer::KeyCallback(GLFWwindow *window, int key, int scancode,
-                             int action, int mods) {
-  void *user_data = glfwGetWindowUserPointer(window);
+void GLFWViewer::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+  void* user_data = glfwGetWindowUserPointer(window);
   if (user_data == nullptr) return;
   if (action == GLFW_PRESS) {
-    GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
+    GLFWViewer* vis = static_cast<GLFWViewer*>(user_data);
     AINFO << "key_value: " << key;
     vis->Keyboard(key);
   }
 }
 
-void GLFWViewer::MouseButtonCallback(GLFWwindow *window, int button, int action,
-                                     int mods) {}
+void GLFWViewer::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {}
 
-void GLFWViewer::MouseCursorPositionCallback(GLFWwindow *window, double xpos,
-                                             double ypos) {
-  void *user_data = glfwGetWindowUserPointer(window);
+void GLFWViewer::MouseCursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
+  void* user_data = glfwGetWindowUserPointer(window);
   if (user_data == nullptr) return;
 
-  GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
+  GLFWViewer* vis = static_cast<GLFWViewer*>(user_data);
   vis->MouseMove(xpos, ypos);
 }
 
-void GLFWViewer::MouseScrollCallback(GLFWwindow *window, double xoffset,
-                                     double yoffset) {
-  void *user_data = glfwGetWindowUserPointer(window);
+void GLFWViewer::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+  void* user_data = glfwGetWindowUserPointer(window);
   if (user_data == nullptr) return;
 
-  GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
+  GLFWViewer* vis = static_cast<GLFWViewer*>(user_data);
   vis->MouseWheel(yoffset);
 }
 
-void GLFWViewer::ErrorCallback(int error, const char *description) {
+void GLFWViewer::ErrorCallback(int error, const char* description) {
   AINFO << "ERROR - " << error << "  " << description;
 }
 
@@ -638,34 +598,33 @@ void GLFWViewer::ErrorCallback(int error, const char *description) {
 
 void GLFWViewer::ResizeFramebuffer(int width, int height) {
   glViewport(0, 0, width, height);
-  win_width_ = width;
+  win_width_  = width;
   win_height_ = height;
 }
 
 void GLFWViewer::MouseMove(double xpos, double ypos) {
-  int state_left = glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_LEFT);
+  int state_left  = glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_LEFT);
   int state_right = glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_RIGHT);
-  int x_delta = xpos - mouse_prev_x_;
-  int y_delta = ypos - mouse_prev_y_;
+  int x_delta     = xpos - mouse_prev_x_;
+  int y_delta     = ypos - mouse_prev_y_;
   if (state_left == GLFW_PRESS) {
-    Eigen::Vector3d obj_cen_screen = pers_camera_->PointOnScreen(scn_center_);
-    Eigen::Quaterniond rot = ArcBall::RotateByMouse(
-        static_cast<double>(mouse_prev_x_), static_cast<double>(mouse_prev_y_),
-        xpos, ypos, obj_cen_screen(0), obj_cen_screen(1),
-        static_cast<double>(win_width_), static_cast<double>(win_height_));
+    Eigen::Vector3d    obj_cen_screen = pers_camera_->PointOnScreen(scn_center_);
+    Eigen::Quaterniond rot            = ArcBall::RotateByMouse(
+        static_cast<double>(mouse_prev_x_), static_cast<double>(mouse_prev_y_), xpos, ypos,
+        obj_cen_screen(0), obj_cen_screen(1), static_cast<double>(win_width_),
+        static_cast<double>(win_height_));
 
-    Eigen::Matrix3d rot_mat = rot.inverse().toRotationMatrix();
+    Eigen::Matrix3d rot_mat    = rot.inverse().toRotationMatrix();
     Eigen::Vector3d scn_center = scn_center_;
-    Eigen::Vector4d scn_center_tmp(scn_center(0), scn_center(1), scn_center(2),
-                                   1);
-    scn_center_tmp = mode_mat_ * view_mat_ * scn_center_tmp;
-    scn_center = scn_center_tmp.head(3);
+    Eigen::Vector4d scn_center_tmp(scn_center(0), scn_center(1), scn_center(2), 1);
+    scn_center_tmp                     = mode_mat_ * view_mat_ * scn_center_tmp;
+    scn_center                         = scn_center_tmp.head(3);
     Eigen::Vector3d r_multi_scn_center = rot_mat * scn_center;
-    Eigen::Vector3d t = scn_center - r_multi_scn_center;
-    Eigen::Matrix4d cur_mat = Eigen::Matrix4d::Identity();
-    cur_mat.topLeftCorner(3, 3) = rot_mat;
-    cur_mat.topRightCorner(3, 1) = t;
-    mode_mat_ = cur_mat * mode_mat_;
+    Eigen::Vector3d t                  = scn_center - r_multi_scn_center;
+    Eigen::Matrix4d cur_mat            = Eigen::Matrix4d::Identity();
+    cur_mat.topLeftCorner(3, 3)        = rot_mat;
+    cur_mat.topRightCorner(3, 1)       = t;
+    mode_mat_                          = cur_mat * mode_mat_;
   } else if (state_right == GLFW_PRESS) {
     mode_mat_(0, 3) += 0.1 * x_delta;
     mode_mat_(1, 3) -= 0.1 * y_delta;

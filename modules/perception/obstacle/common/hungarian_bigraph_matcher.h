@@ -220,7 +220,7 @@ class HungarianOptimizer {
   std::vector<int> image_;     // i.e. the tasks
 
   // The width_ and height_ of the initial (non-expanded) cost matrix.
-  int width_ = 0;
+  int width_  = 0;
   int height_ = 0;
 
   // The current state of the algorithm

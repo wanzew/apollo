@@ -69,7 +69,7 @@ class RouteSegments : public std::vector<LaneSegment> {
    * change_lane_type_ = routing::RIGHT;
    */
   routing::ChangeLaneType NextAction() const;
-  void SetNextAction(routing::ChangeLaneType action);
+  void                    SetNextAction(routing::ChangeLaneType action);
 
   /**
    * Get the previous change lane action need to take by the vehicle to reach
@@ -83,7 +83,7 @@ class RouteSegments : public std::vector<LaneSegment> {
    * change_lane_type_ = routing::RIGHT;
    */
   routing::ChangeLaneType PreviousAction() const;
-  void SetPreviousAction(routing::ChangeLaneType action);
+  void                    SetPreviousAction(routing::ChangeLaneType action);
 
   /**
    * Whether the passage region that generate this route segment can lead to
@@ -101,10 +101,12 @@ class RouteSegments : public std::vector<LaneSegment> {
    * route segment.
    * @return false if error happened or projected outside of the lane segments.
    */
-  bool GetProjection(const common::PointENU &point_enu,
-                     common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
-  bool GetProjection(const common::math::Vec2d &point,
-                     common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
+  bool GetProjection(const common::PointENU& point_enu,
+                     common::SLPoint*        sl_point,
+                     LaneWaypoint*           waypoint) const;
+  bool GetProjection(const common::math::Vec2d& point,
+                     common::SLPoint*           sl_point,
+                     LaneWaypoint*              waypoint) const;
   /**
    * Check whether the map allows a vehicle can reach current RouteSegment
    * from
@@ -114,7 +116,7 @@ class RouteSegments : public std::vector<LaneSegment> {
    * current
    * RouteSegment. Otherwise false.
    */
-  bool CanDriveFrom(const LaneWaypoint &waypoint) const;
+  bool CanDriveFrom(const LaneWaypoint& waypoint) const;
 
   /*
    * This is the point that is the end of the original passage in routing.
@@ -122,8 +124,8 @@ class RouteSegments : public std::vector<LaneSegment> {
    * The LaneWaypoint.lane is nullptr if the end of the passage is not on the
    * RouteSegment.
    */
-  const LaneWaypoint &RouteEndWaypoint() const;
-  void SetRouteEndWaypoint(const LaneWaypoint &waypoint);
+  const LaneWaypoint& RouteEndWaypoint() const;
+  void                SetRouteEndWaypoint(const LaneWaypoint& waypoint);
 
   /** Stitch current route segments with the other route segment.
    * Example 1
@@ -142,10 +144,10 @@ class RouteSegments : public std::vector<LaneSegment> {
    *
    * @return false if these two reference line cannot be stitched
    */
-  bool Stitch(const RouteSegments &other);
+  bool Stitch(const RouteSegments& other);
 
-  bool Shrink(const common::math::Vec2d &point, const double look_backward,
-              const double look_forward);
+  bool
+  Shrink(const common::math::Vec2d& point, const double look_backward, const double look_forward);
 
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
@@ -153,8 +155,8 @@ class RouteSegments : public std::vector<LaneSegment> {
   bool IsNeighborSegment() const;
   void SetIsNeighborSegment(bool is_neighbor);
 
-  void SetId(const std::string &id);
-  const std::string &Id() const;
+  void               SetId(const std::string& id);
+  const std::string& Id() const;
 
   /**
    * Get the first waypoint from the lane segments.
@@ -169,14 +171,14 @@ class RouteSegments : public std::vector<LaneSegment> {
   /**
    * @brief Check if a waypoint is on segment
    */
-  bool IsWaypointOnSegment(const LaneWaypoint &waypoint) const;
+  bool IsWaypointOnSegment(const LaneWaypoint& waypoint) const;
 
   /**
    * @brief Check if we can reach the other segment from current segment just
    * by following lane.
    * @param other Another route segment
    */
-  bool IsConnectedSegment(const RouteSegments &other) const;
+  bool IsConnectedSegment(const RouteSegments& other) const;
 
   bool StopForDestination() const;
   void SetStopForDestination(bool stop_for_destination);
@@ -184,21 +186,20 @@ class RouteSegments : public std::vector<LaneSegment> {
   /**
    * Copy the properties of other segments to current one
    */
-  void SetProperties(const RouteSegments &other);
+  void SetProperties(const RouteSegments& other);
 
-  static bool WithinLaneSegment(const LaneSegment &lane_segment,
-                                const LaneWaypoint &waypoint);
+  static bool WithinLaneSegment(const LaneSegment& lane_segment, const LaneWaypoint& waypoint);
 
-  static bool WithinLaneSegment(const LaneSegment &lane_segment,
-                                const routing::LaneWaypoint &waypoint);
+  static bool WithinLaneSegment(const LaneSegment&           lane_segment,
+                                const routing::LaneWaypoint& waypoint);
 
-  static bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
-                                const LaneWaypoint &waypoint);
+  static bool WithinLaneSegment(const routing::LaneSegment& lane_segment,
+                                const LaneWaypoint&         waypoint);
 
-  static bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
-                                const routing::LaneWaypoint &waypoint);
+  static bool WithinLaneSegment(const routing::LaneSegment&  lane_segment,
+                                const routing::LaneWaypoint& waypoint);
 
-  static double Length(const RouteSegments &segments);
+  static double Length(const RouteSegments& segments);
 
  private:
   LaneWaypoint route_end_waypoint_;

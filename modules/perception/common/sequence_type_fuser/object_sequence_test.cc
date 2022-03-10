@@ -29,9 +29,9 @@ class ObjectSequenceTest : public testing::Test {
   void BuildObjects();
 
  protected:
-  ObjectSequence sequence_;
+  ObjectSequence                                    sequence_;
   std::vector<std::vector<std::shared_ptr<Object>>> objects_;
-  std::vector<double> timestamps_;
+  std::vector<double>                               timestamps_;
 };
 
 void ObjectSequenceTest::BuildObjects() {
@@ -58,7 +58,7 @@ TEST_F(ObjectSequenceTest, TestAddAndGet) {
     sequence_.AddTrackedFrameObjects(objects_[i], timestamps_[i]);
   }
 
-  double window_time = 5.0;
+  double                                     window_time = 5.0;
   std::map<int64_t, std::shared_ptr<Object>> tracked_objects;
   sequence_.GetTrackInTemporalWindow(0, &tracked_objects, window_time);
   EXPECT_EQ(tracked_objects.size(), 9);
@@ -73,10 +73,8 @@ TEST_F(ObjectSequenceTest, TestAddAndGet) {
   EXPECT_EQ(tracked_objects.size(), 1);
   sequence_.GetTrackInTemporalWindow(9, &tracked_objects, window_time);
   EXPECT_EQ(tracked_objects.size(), 1);
-  EXPECT_FALSE(
-      sequence_.GetTrackInTemporalWindow(8, &tracked_objects, window_time));
-  EXPECT_FALSE(
-      sequence_.GetTrackInTemporalWindow(1, &tracked_objects, window_time));
+  EXPECT_FALSE(sequence_.GetTrackInTemporalWindow(8, &tracked_objects, window_time));
+  EXPECT_FALSE(sequence_.GetTrackInTemporalWindow(1, &tracked_objects, window_time));
 }
 
 }  // namespace perception

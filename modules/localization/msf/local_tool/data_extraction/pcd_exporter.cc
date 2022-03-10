@@ -23,8 +23,8 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-PCDExporter::PCDExporter(const std::string &pcd_folder) {
-  pcd_folder_ = pcd_folder;
+PCDExporter::PCDExporter(const std::string& pcd_folder) {
+  pcd_folder_            = pcd_folder;
   std::string stamp_file = pcd_folder_ + "/pcd_timestamp.txt";
 
   if ((stamp_file_handle_ = fopen(stamp_file.c_str(), "a")) == NULL) {
@@ -33,16 +33,12 @@ PCDExporter::PCDExporter(const std::string &pcd_folder) {
 }
 
 PCDExporter::~PCDExporter() {
-  if (stamp_file_handle_ != NULL) {
-    fclose(stamp_file_handle_);
-  }
+  if (stamp_file_handle_ != NULL) { fclose(stamp_file_handle_); }
 }
 
-void PCDExporter::CompensatedPcdCallback(
-    const rosbag::MessageInstance &msg_instance) {
+void PCDExporter::CompensatedPcdCallback(const rosbag::MessageInstance& msg_instance) {
   std::cout << "Compensated pcd callback." << std::endl;
-  sensor_msgs::PointCloud2::ConstPtr msg =
-      msg_instance.instantiate<sensor_msgs::PointCloud2>();
+  sensor_msgs::PointCloud2::ConstPtr msg = msg_instance.instantiate<sensor_msgs::PointCloud2>();
 
   static unsigned int index = 1;
 
@@ -56,7 +52,7 @@ void PCDExporter::CompensatedPcdCallback(
   ++index;
 }
 
-void PCDExporter::WritePcdFile(const std::string &filename,
+void PCDExporter::WritePcdFile(const std::string&                 filename,
                                sensor_msgs::PointCloud2::ConstPtr msg) {
   pcl::PCLPointCloud2 pcl_cloud;
   pcl_conversions::toPCL(*msg, pcl_cloud);

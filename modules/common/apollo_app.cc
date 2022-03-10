@@ -39,7 +39,7 @@ void ApolloApp::SetCallbackThreadNumber(uint32_t callback_thread_num) {
 }
 
 void ApolloApp::ExportFlags() const {
-  const auto export_file = util::StrCat(FLAGS_log_dir, "/", Name(), ".flags");
+  const auto    export_file = util::StrCat(FLAGS_log_dir, "/", Name(), ".flags");
   std::ofstream fout(export_file);
   CHECK(fout) << "Cannot open file " << export_file;
 
@@ -62,8 +62,7 @@ int ApolloApp::Spin() {
 
   std::unique_ptr<ros::AsyncSpinner> spinner;
   if (callback_thread_num_ > 1) {
-    spinner = std::unique_ptr<ros::AsyncSpinner>(
-        new ros::AsyncSpinner(callback_thread_num_));
+    spinner = std::unique_ptr<ros::AsyncSpinner>(new ros::AsyncSpinner(callback_thread_num_));
   }
 
   status = Start();
@@ -85,13 +84,9 @@ int ApolloApp::Spin() {
 
 void apollo_app_sigint_handler(int signal_num) {
   AINFO << "Received signal: " << signal_num;
-  if (signal_num != SIGINT) {
-    return;
-  }
+  if (signal_num != SIGINT) { return; }
   bool static is_stopping = false;
-  if (is_stopping) {
-    return;
-  }
+  if (is_stopping) { return; }
   is_stopping = true;
   ros::shutdown();
 }

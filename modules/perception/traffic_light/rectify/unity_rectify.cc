@@ -31,31 +31,22 @@ using apollo::common::util::GetProtoFromFile;
 
 bool UnityRectify::Init() {
   if (!GetProtoFromFile(FLAGS_traffic_light_rectifier_config, &config_)) {
-    AERROR << "Cannot get config proto from file: "
-           << FLAGS_traffic_light_rectifier_config;
+    AERROR << "Cannot get config proto from file: " << FLAGS_traffic_light_rectifier_config;
     return false;
   }
 
   switch (config_.crop_method()) {
     default:
-    case 0:
-      crop_ = std::make_shared<CropBox>(config_.crop_scale(),
-                                        config_.crop_min_size());
-      break;
-    case 1:
-      crop_ = std::make_shared<CropBoxWholeImage>();
-      break;
+    case 0: crop_ = std::make_shared<CropBox>(config_.crop_scale(), config_.crop_min_size()); break;
+    case 1: crop_ = std::make_shared<CropBoxWholeImage>(); break;
   }
   switch (config_.detect_method()) {
     default:
     case 0:
-      detect_ = std::make_shared<Detection>(config_.crop_min_size(),
-                                            config_.detection_net(),
+      detect_ = std::make_shared<Detection>(config_.crop_min_size(), config_.detection_net(),
                                             config_.detection_model());
       break;
-    case 1:
-      detect_ = std::make_shared<DummyRefine>();
-      break;
+    case 1: detect_ = std::make_shared<DummyRefine>(); break;
   }
 
   select_ = std::make_shared<GaussianSelect>();
@@ -63,14 +54,15 @@ bool UnityRectify::Init() {
   return true;
 }
 
-bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
-                           std::vector<LightPtr> *lights) {
-  cv::Mat ros_image = image.mat();
-  std::vector<LightPtr> &lights_ref = *lights;
-  std::vector<LightPtr> selected_bboxes;
-  std::vector<LightPtr> detected_bboxes;
+bool UnityRectify::Rectify(const Image&           image,
+                           const RectifyOption&   option,
+                           std::vector<LightPtr>* lights) {
+  cv::Mat                ros_image  = image.mat();
+  std::vector<LightPtr>& lights_ref = *lights;
+  std::vector<LightPtr>  selected_bboxes;
+  std::vector<LightPtr>  detected_bboxes;
 
-  for (auto &light : lights_ref) {
+  for (auto& light : lights_ref) {
     // By default, the first debug ros is crop roi. (Reserve a position here).
     light->region.rectified_roi = light->region.projection_roi;
     light->region.debug_roi.push_back(cv::Rect(0, 0, 0, 0));
@@ -90,8 +82,8 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
     AINFO << "detect " << detected_bboxes.size() << " lights";
     for (size_t j = 0; j < detected_bboxes.size(); ++j) {
       AINFO << detected_bboxes[j]->region.rectified_roi;
-      cv::Rect &region = detected_bboxes[j]->region.rectified_roi;
-      float score = detected_bboxes[j]->region.detect_score;
+      cv::Rect& region = detected_bboxes[j]->region.rectified_roi;
+      float     score  = detected_bboxes[j]->region.detect_score;
       region.x += cbox.x;
       region.y += cbox.y;
       lights_ref[0]->region.debug_roi.push_back(region);
@@ -101,25 +93,22 @@ bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
     select_->Select(ros_image, lights_ref, detected_bboxes, &selected_bboxes);
   } else {
     for (size_t h = 0; h < lights_ref.size(); ++h) {
-      LightPtr light = lights_ref[h];
+      LightPtr light            = lights_ref[h];
       light->region.is_detected = false;
       selected_bboxes.push_back(light);
     }
   }
 
   for (size_t i = 0; i < lights_ref.size(); ++i) {
-    if (!selected_bboxes[i]->region.is_detected ||
-        !selected_bboxes[i]->region.is_selected) {
+    if (!selected_bboxes[i]->region.is_detected || !selected_bboxes[i]->region.is_selected) {
       AWARN << "No detection box ,using project box";
     }
-    cv::Rect region = selected_bboxes[i]->region.rectified_roi;
-    lights_ref[i]->region.rectified_roi = region;
-    lights_ref[i]->region.detect_class_id =
-        selected_bboxes[i]->region.detect_class_id;
-    lights_ref[i]->region.detect_score =
-        selected_bboxes[i]->region.detect_score;
-    lights_ref[i]->region.is_detected = selected_bboxes[i]->region.is_detected;
-    lights_ref[i]->region.is_selected = selected_bboxes[i]->region.is_selected;
+    cv::Rect region                       = selected_bboxes[i]->region.rectified_roi;
+    lights_ref[i]->region.rectified_roi   = region;
+    lights_ref[i]->region.detect_class_id = selected_bboxes[i]->region.detect_class_id;
+    lights_ref[i]->region.detect_score    = selected_bboxes[i]->region.detect_score;
+    lights_ref[i]->region.is_detected     = selected_bboxes[i]->region.is_detected;
+    lights_ref[i]->region.is_selected     = selected_bboxes[i]->region.is_selected;
     AINFO << region;
   }
   return true;

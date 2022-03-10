@@ -70,27 +70,29 @@ class RTKLocalization : public LocalizationBase {
   apollo::common::Status Stop() override;
 
  private:
-  void OnTimer(const ros::TimerEvent &event);
+  void OnTimer(const ros::TimerEvent& event);
   void PublishLocalization();
   void RunWatchDog();
 
-  void PrepareLocalizationMsg(LocalizationEstimate *localization);
-  void ComposeLocalizationMsg(const localization::Gps &gps,
-                              const localization::CorrectedImu &imu,
-                              LocalizationEstimate *localization);
-  bool FindMatchingIMU(const double gps_timestamp_sec, CorrectedImu *imu_msg);
-  bool InterpolateIMU(const CorrectedImu &imu1, const CorrectedImu &imu2,
-                      const double timestamp_sec, CorrectedImu *msgbuf);
+  void PrepareLocalizationMsg(LocalizationEstimate* localization);
+  void ComposeLocalizationMsg(const localization::Gps&          gps,
+                              const localization::CorrectedImu& imu,
+                              LocalizationEstimate*             localization);
+  bool FindMatchingIMU(const double gps_timestamp_sec, CorrectedImu* imu_msg);
+  bool InterpolateIMU(const CorrectedImu& imu1,
+                      const CorrectedImu& imu2,
+                      const double        timestamp_sec,
+                      CorrectedImu*       msgbuf);
   template <class T>
-  T InterpolateXYZ(const T &p1, const T &p2, const double frac1);
+  T InterpolateXYZ(const T& p1, const T& p2, const double frac1);
 
  private:
-  ros::Timer timer_;
+  ros::Timer                             timer_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
-  const std::vector<double> map_offset_;
-  double last_received_timestamp_sec_ = 0.0;
-  double last_reported_timestamp_sec_ = 0.0;
-  bool service_started_ = false;
+  const std::vector<double>              map_offset_;
+  double                                 last_received_timestamp_sec_ = 0.0;
+  double                                 last_reported_timestamp_sec_ = 0.0;
+  bool                                   service_started_             = false;
 
   FRIEND_TEST(RTKLocalizationTest, InterpolateIMU);
   FRIEND_TEST(RTKLocalizationTest, ComposeLocalizationMsg);

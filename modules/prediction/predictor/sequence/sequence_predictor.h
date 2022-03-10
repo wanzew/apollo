@@ -26,12 +26,12 @@
 #include <unordered_set>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "Eigen/Dense"
+#include "gtest/gtest.h"
 
 #include "modules/common/macro.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 #include "modules/prediction/predictor/predictor.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -72,7 +72,8 @@ class SequencePredictor : public Predictor {
    * @param Current lane id
    * @param Vector of boolean indicating if a lane sequence is disqualified
    */
-  void FilterLaneSequences(const Feature& feature, const std::string& lane_id,
+  void FilterLaneSequences(const Feature&     feature,
+                           const std::string& lane_id,
                            std::vector<bool>* enable_lane_sequence);
 
   /**
@@ -81,8 +82,7 @@ class SequencePredictor : public Predictor {
    * @param Lane sequence
    * @return Integer indicating lane change type:
    */
-  LaneChangeType GetLaneChangeType(const std::string& lane_id,
-                                   const LaneSequence& lane_sequence);
+  LaneChangeType GetLaneChangeType(const std::string& lane_id, const LaneSequence& lane_sequence);
 
   /**
    * @brief Get lane change distance with ADC
@@ -113,8 +113,8 @@ class SequencePredictor : public Predictor {
    * @return Boolean if the lane sequence is enabled
    */
   bool LaneSequenceWithMaxProb(const LaneChangeType& type,
-                               const double probability,
-                               const double max_prob);
+                               const double          probability,
+                               const double          max_prob);
 
   /**
    * @brief Pick the lane change sequence with highest probability
@@ -125,7 +125,8 @@ class SequencePredictor : public Predictor {
    * @return Boolean if the lane sequence is enabled
    */
   bool LaneChangeWithMaxProb(const LaneChangeType& type,
-                             const double probability, const double max_prob);
+                             const double          probability,
+                             const double          max_prob);
 };
 
 }  // namespace prediction

@@ -34,21 +34,16 @@ class PathDecider : public Task {
   PathDecider();
   ~PathDecider() = default;
 
-  apollo::common::Status Execute(
-      Frame *frame, ReferenceLineInfo *reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
-  apollo::common::Status Process(const PathData &path_data,
-                                 PathDecision *const path_decision);
+  apollo::common::Status Process(const PathData& path_data, PathDecision* const path_decision);
 
-  bool MakeObjectDecision(const PathData &path_data,
-                          PathDecision *const path_decision);
+  bool MakeObjectDecision(const PathData& path_data, PathDecision* const path_decision);
 
-  bool MakeStaticObstacleDecision(const PathData &path_data,
-                                  PathDecision *const path_decision);
+  bool MakeStaticObstacleDecision(const PathData& path_data, PathDecision* const path_decision);
 
-  ObjectStop GenerateObjectStopDecision(
-      const PathObstacle &path_obstacle) const;
+  ObjectStop GenerateObjectStopDecision(const PathObstacle& path_obstacle) const;
 };
 
 }  // namespace planning

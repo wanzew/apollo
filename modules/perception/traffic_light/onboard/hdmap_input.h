@@ -39,8 +39,7 @@ class HDMapInput {
    * @brief: get roi polygon
    *         all points are in the world frame
    */
-  bool GetSignals(const Eigen::Matrix4d &pointd,
-                  std::vector<apollo::hdmap::Signal> *signals);
+  bool GetSignals(const Eigen::Matrix4d& pointd, std::vector<apollo::hdmap::Signal>* signals);
 
  private:
   DECLARE_SINGLETON(HDMapInput);

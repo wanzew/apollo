@@ -75,8 +75,7 @@ class EvaluatorManager {
    * @param Evaluator type
    * @return A unique pointer to the evaluator
    */
-  std::unique_ptr<Evaluator> CreateEvaluator(
-      const ObstacleConf::EvaluatorType& type);
+  std::unique_ptr<Evaluator> CreateEvaluator(const ObstacleConf::EvaluatorType& type);
 
   /**
    * @brief Register all evaluators
@@ -86,14 +85,11 @@ class EvaluatorManager {
  private:
   std::map<ObstacleConf::EvaluatorType, std::unique_ptr<Evaluator>> evaluators_;
 
-  ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ =
-      ObstacleConf::MLP_EVALUATOR;
+  ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ = ObstacleConf::MLP_EVALUATOR;
 
-  ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ =
-      ObstacleConf::MLP_EVALUATOR;
+  ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ = ObstacleConf::MLP_EVALUATOR;
 
-  ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
-      ObstacleConf::MLP_EVALUATOR;
+  ObstacleConf::EvaluatorType default_on_lane_evaluator_ = ObstacleConf::MLP_EVALUATOR;
 
   DECLARE_SINGLETON(EvaluatorManager)
 };

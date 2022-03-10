@@ -21,13 +21,12 @@
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_string(summary_monitor_name, "SummaryMonitor",
-              "Name of the summary monitor.");
+DEFINE_string(summary_monitor_name, "SummaryMonitor", "Name of the summary monitor.");
 
-DEFINE_double(broadcast_max_interval, 8,
-              "Max interval of broadcasting runtime status.");
+DEFINE_double(broadcast_max_interval, 8, "Max interval of broadcasting runtime status.");
 
-DEFINE_bool(enable_safety_mode, true,
+DEFINE_bool(enable_safety_mode,
+            true,
             "Whether to enable safety mode which may take over the vehicle on "
             "system failures.");
 
@@ -43,8 +42,7 @@ using apollo::common::util::StringPrintf;
 
 // Status has a *summary* field which is apollo::monitor::Summary.
 template <class Status>
-void UpdateStatusSummary(const Summary new_summary, const std::string &new_msg,
-                         Status *status) {
+void UpdateStatusSummary(const Summary new_summary, const std::string& new_msg, Status* status) {
   // Overwrite priority: FATAL > ERROR > WARN > OK > UNKNOWN.
   if (new_summary > status->summary()) {
     status->set_summary(new_summary);
@@ -57,7 +55,7 @@ void UpdateStatusSummary(const Summary new_summary, const std::string &new_msg,
 }
 
 template <class Status>
-void SummarizeOnTopicStatus(const TopicStatus &topic_status, Status *status) {
+void SummarizeOnTopicStatus(const TopicStatus& topic_status, Status* status) {
   if (!topic_status.has_message_delay()) {
     UpdateStatusSummary(Summary::OK, "", status);
     return;
@@ -75,25 +73,20 @@ void SummarizeOnTopicStatus(const TopicStatus &topic_status, Status *status) {
 // Set interval to 0, so it runs every time when ticking.
 SummaryMonitor::SummaryMonitor()
     : RecurrentRunner(FLAGS_summary_monitor_name, 0) {
-  CHECK(AdapterManager::GetSystemStatus())
-      << "SystemStatusAdapter is not initialized.";
-  if (FLAGS_enable_safety_mode) {
-    safety_manager_.reset(new SafetyManager());
-  }
+  CHECK(AdapterManager::GetSystemStatus()) << "SystemStatusAdapter is not initialized.";
+  if (FLAGS_enable_safety_mode) { safety_manager_.reset(new SafetyManager()); }
 }
 
 void SummaryMonitor::RunOnce(const double current_time) {
   SummarizeModules();
   SummarizeHardware();
-  if (safety_manager_ != nullptr) {
-    safety_manager_->CheckSafety(current_time);
-  }
+  if (safety_manager_ != nullptr) { safety_manager_->CheckSafety(current_time); }
   // Get fingerprint of current status.
   // Don't use DebugString() which has known bug on Map field. The string
   // doesn't change though the value has changed.
   static std::hash<std::string> hash_fn;
-  std::string proto_bytes;
-  auto *system_status = MonitorManager::GetStatus();
+  std::string                   proto_bytes;
+  auto*                         system_status = MonitorManager::GetStatus();
   system_status->clear_header();
   system_status->SerializeToString(&proto_bytes);
   const size_t new_fp = hash_fn(proto_bytes);
@@ -104,7 +97,7 @@ void SummaryMonitor::RunOnce(const double current_time) {
     AdapterManager::PublishSystemStatus(*system_status);
     ADEBUG << "Published system status: " << system_status->DebugString();
     system_status_fp_ = new_fp;
-    last_broadcast_ = current_time;
+    last_broadcast_   = current_time;
   }
 
   // Print and publish all monitor logs.
@@ -113,8 +106,8 @@ void SummaryMonitor::RunOnce(const double current_time) {
 }
 
 void SummaryMonitor::SummarizeModules() {
-  for (auto &module : *MonitorManager::GetStatus()->mutable_modules()) {
-    ModuleStatus *status = &(module.second);
+  for (auto& module : *MonitorManager::GetStatus()->mutable_modules()) {
+    ModuleStatus* status = &(module.second);
 
     if (status->has_process_status()) {
       if (status->process_status().running()) {
@@ -125,15 +118,13 @@ void SummaryMonitor::SummarizeModules() {
       }
     }
 
-    if (status->has_topic_status()) {
-      SummarizeOnTopicStatus(status->topic_status(), status);
-    }
+    if (status->has_topic_status()) { SummarizeOnTopicStatus(status->topic_status(), status); }
   }
 }
 
 void SummaryMonitor::SummarizeHardware() {
-  for (auto &hardware : *MonitorManager::GetStatus()->mutable_hardware()) {
-    HardwareStatus *status = &(hardware.second);
+  for (auto& hardware : *MonitorManager::GetStatus()->mutable_hardware()) {
+    HardwareStatus* status = &(hardware.second);
 
     // If we don't have the status, keeps as UNKNOWN.
     if (status->has_status()) {
@@ -141,8 +132,8 @@ void SummaryMonitor::SummarizeHardware() {
         case HardwareStatus::NOT_PRESENT:
           UpdateStatusSummary(Summary::FATAL, status->detailed_msg(), status);
           break;
-        case HardwareStatus::NOT_READY:  // Fall through.
-        case HardwareStatus::WARN:  // Fall through.
+        case HardwareStatus::NOT_READY:             // Fall through.
+        case HardwareStatus::WARN:                  // Fall through.
         case HardwareStatus::GPS_UNSTABLE_WARNING:  // Fall through.
         case HardwareStatus::GPS_UNSTABLE_ERROR:
           // GPS instability could be a fatal error if it's the only
@@ -156,15 +147,11 @@ void SummaryMonitor::SummarizeHardware() {
         case HardwareStatus::OK:
           UpdateStatusSummary(Summary::OK, status->detailed_msg(), status);
           break;
-        default:
-          UpdateStatusSummary(Summary::ERROR, status->detailed_msg(), status);
-          break;
+        default: UpdateStatusSummary(Summary::ERROR, status->detailed_msg(), status); break;
       }
     }
 
-    if (status->has_topic_status()) {
-      SummarizeOnTopicStatus(status->topic_status(), status);
-    }
+    if (status->has_topic_status()) { SummarizeOnTopicStatus(status->topic_status(), status); }
   }
 }
 

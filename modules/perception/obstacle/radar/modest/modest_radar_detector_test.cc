@@ -15,25 +15,25 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
 
 TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
-  FLAGS_work_root = "modules/perception";
-  FLAGS_config_manager_path = "./conf/config_manager.config";
-  const double time_diff = 0.074;
-  ModestRadarDetector *radar_detector = new ModestRadarDetector();
+  FLAGS_work_root                     = "modules/perception";
+  FLAGS_config_manager_path           = "./conf/config_manager.config";
+  const double         time_diff      = 0.074;
+  ModestRadarDetector* radar_detector = new ModestRadarDetector();
   EXPECT_TRUE(radar_detector != nullptr);
   radar_detector->Init();
   radar_detector->object_builder_.SetDelayFrame(0);
   ContiRadar raw_obstacles;
-  auto *header = raw_obstacles.mutable_header();
+  auto*      header = raw_obstacles.mutable_header();
   header->set_timestamp_sec(123456789.0);
-  ContiRadarObs *radar_obs = raw_obstacles.add_contiobs();
+  ContiRadarObs* radar_obs = raw_obstacles.add_contiobs();
   radar_obs->set_longitude_dist(0.0);
   radar_obs->set_lateral_dist(0.0);
   radar_obs->set_longitude_vel(3.0);
@@ -50,12 +50,12 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   radar_obs->set_probexist(1.0);
   radar_obs->set_meas_state(static_cast<int>(ContiMeasState::CONTI_NEW));
   RadarDetectorOptions options;
-  Eigen::Matrix4d radar2world_pose;
+  Eigen::Matrix4d      radar2world_pose;
   radar2world_pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   Eigen::Vector3f main_car_velocity;
-  main_car_velocity[0] = 0.3;
-  main_car_velocity[1] = 0.4;
-  main_car_velocity[2] = 0.0;
+  main_car_velocity[0]     = 0.3;
+  main_car_velocity[1]     = 0.4;
+  main_car_velocity[2]     = 0.0;
   options.radar2world_pose = &radar2world_pose;
   options.car_linear_speed = main_car_velocity;
   std::vector<PolygonDType> map_polygons;

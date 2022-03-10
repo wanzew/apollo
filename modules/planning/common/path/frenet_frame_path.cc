@@ -31,44 +31,33 @@ namespace planning {
 
 using apollo::common::FrenetFramePoint;
 
-FrenetFramePath::FrenetFramePath(
-    const std::vector<FrenetFramePoint>& sl_points) {
+FrenetFramePath::FrenetFramePath(const std::vector<FrenetFramePoint>& sl_points) {
   points_ = sl_points;
 }
 
-void FrenetFramePath::set_points(const std::vector<FrenetFramePoint>& points) {
-  points_ = points;
-}
+void FrenetFramePath::set_points(const std::vector<FrenetFramePoint>& points) { points_ = points; }
 
-const std::vector<FrenetFramePoint>& FrenetFramePath::points() const {
-  return points_;
-}
+const std::vector<FrenetFramePoint>& FrenetFramePath::points() const { return points_; }
 
 double FrenetFramePath::Length() const {
-  if (points_.empty()) {
-    return 0.0;
-  }
+  if (points_.empty()) { return 0.0; }
   return points_.back().s() - points_.front().s();
 }
 
 std::uint32_t FrenetFramePath::NumOfPoints() const { return points_.size(); }
 
-const FrenetFramePoint& FrenetFramePath::PointAt(
-    const std::uint32_t index) const {
+const FrenetFramePoint& FrenetFramePath::PointAt(const std::uint32_t index) const {
   CHECK_LT(index, points_.size());
   return points_[index];
 }
 
 FrenetFramePoint FrenetFramePath::GetNearestPoint(const SLBoundary& sl) const {
-  auto it_lower = std::lower_bound(points_.begin(), points_.end(), sl.start_s(),
-                                   LowerBoundComparator);
-  if (it_lower == points_.end()) {
-    return points_.back();
-  }
-  auto it_upper = std::upper_bound(it_lower, points_.end(), sl.end_s(),
-                                   UpperBoundComparator);
+  auto it_lower =
+      std::lower_bound(points_.begin(), points_.end(), sl.start_s(), LowerBoundComparator);
+  if (it_lower == points_.end()) { return points_.back(); }
+  auto   it_upper = std::upper_bound(it_lower, points_.end(), sl.end_s(), UpperBoundComparator);
   double min_dist = std::numeric_limits<double>::max();
-  auto min_it = it_upper;
+  auto   min_it   = it_upper;
   for (auto it = it_lower; it != it_upper; ++it) {
     if (it->l() >= sl.start_l() && it->l() <= sl.end_l()) {
       return *it;
@@ -76,13 +65,13 @@ FrenetFramePoint FrenetFramePath::GetNearestPoint(const SLBoundary& sl) const {
       double diff = it->l() - sl.end_l();
       if (diff < min_dist) {
         min_dist = diff;
-        min_it = it;
+        min_it   = it;
       }
     } else {
       double diff = sl.start_l() - it->l();
       if (diff < min_dist) {
         min_dist = diff;
-        min_it = it;
+        min_it   = it;
       }
     }
   }
@@ -91,17 +80,16 @@ FrenetFramePoint FrenetFramePath::GetNearestPoint(const SLBoundary& sl) const {
 
 FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
   CHECK_GT(points_.size(), 1);
-  auto it_lower =
-      std::lower_bound(points_.begin(), points_.end(), s, LowerBoundComparator);
+  auto it_lower = std::lower_bound(points_.begin(), points_.end(), s, LowerBoundComparator);
   if (it_lower == points_.begin()) {
     return points_.front();
   } else if (it_lower == points_.end()) {
     return points_.back();
   }
   const auto& p0 = *(it_lower - 1);
-  const auto s0 = p0.s();
+  const auto  s0 = p0.s();
   const auto& p1 = *it_lower;
-  const auto s1 = p1.s();
+  const auto  s1 = p1.s();
 
   FrenetFramePoint p;
   p.set_s(s);

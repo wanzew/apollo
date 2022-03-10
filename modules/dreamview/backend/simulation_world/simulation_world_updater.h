@@ -58,9 +58,11 @@ class SimulationWorldUpdater {
    * of hdmap.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
-                         SimControl *sim_control, const MapService *map_service,
-                         bool routing_from_file = false);
+  SimulationWorldUpdater(WebSocketHandler* websocket,
+                         WebSocketHandler* map_ws,
+                         SimControl*       sim_control,
+                         const MapService* map_service,
+                         bool              routing_from_file = false);
 
   /**
    * @brief Starts to push simulation_world to frontend.
@@ -77,7 +79,7 @@ class SimulationWorldUpdater {
    * and update simulation_world_json_.
    * @param event Timer event
    */
-  void OnTimer(const ros::TimerEvent &event);
+  void OnTimer(const ros::TimerEvent& event);
 
   /**
    * @brief The function to construct a routing request from the given json,
@@ -85,11 +87,10 @@ class SimulationWorldUpdater {
    * @param routing_request
    * @return True if routing request is constructed successfully
    */
-  bool ConstructRoutingRequest(
-      const nlohmann::json &json,
-      apollo::routing::RoutingRequest *routing_request);
+  bool ConstructRoutingRequest(const nlohmann::json&            json,
+                               apollo::routing::RoutingRequest* routing_request);
 
-  bool ValidateCoordinate(const nlohmann::json &json);
+  bool ValidateCoordinate(const nlohmann::json& json);
 
   /**
    * @brief Tries to load the points of interest from the file if it has
@@ -105,28 +106,27 @@ class SimulationWorldUpdater {
    * @param adapter_name the name of the adapter
    */
   template <typename AdapterType>
-  void DumpMessage(AdapterType *adapter, std::string adapter_name) {
+  void DumpMessage(AdapterType* adapter, std::string adapter_name) {
     if (adapter->DumpLatestMessage()) {
-      sim_world_service_.PublishMonitorMessage(
-          common::monitor::MonitorMessageItem::INFO,
-          common::util::StrCat("Dumped latest ", adapter_name,
-                               " message under /tmp/", adapter_name, "."));
+      sim_world_service_.PublishMonitorMessage(common::monitor::MonitorMessageItem::INFO,
+                                               common::util::StrCat("Dumped latest ", adapter_name,
+                                                                    " message under /tmp/",
+                                                                    adapter_name, "."));
     } else {
       sim_world_service_.PublishMonitorMessage(
           common::monitor::MonitorMessageItem::WARN,
-          common::util::StrCat("Failed to dump latest ", adapter_name,
-                               " message."));
+          common::util::StrCat("Failed to dump latest ", adapter_name, " message."));
     }
   }
 
   void RegisterMessageHandlers();
 
-  ros::Timer timer_;
+  ros::Timer             timer_;
   SimulationWorldService sim_world_service_;
-  const MapService *map_service_ = nullptr;
-  WebSocketHandler *websocket_ = nullptr;
-  WebSocketHandler *map_ws_ = nullptr;
-  SimControl *sim_control_ = nullptr;
+  const MapService*      map_service_ = nullptr;
+  WebSocketHandler*      websocket_   = nullptr;
+  WebSocketHandler*      map_ws_      = nullptr;
+  SimControl*            sim_control_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;

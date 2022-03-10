@@ -46,9 +46,9 @@
 #include <cuda_runtime.h>
 #include <opencv2/core/core.hpp>
 
+#include <iostream>
 #include <memory>
 #include <vector>
-#include <iostream>
 
 #include "modules/perception/obstacle/camera/lane_post_process/common/connected_component.h"
 
@@ -58,8 +58,7 @@ namespace perception {
 class ConnectedComponentGeneratorGPU {
  public:
   ConnectedComponentGeneratorGPU(int image_width, int image_height);
-  ConnectedComponentGeneratorGPU(int image_width, int image_height,
-                                 cv::Rect roi);
+  ConnectedComponentGeneratorGPU(int image_width, int image_height, cv::Rect roi);
 
   ~ConnectedComponentGeneratorGPU() {
     cudaFree(label_array_);
@@ -74,17 +73,16 @@ class ConnectedComponentGeneratorGPU {
     free(labels_);
   }
 
-  bool FindConnectedComponents(
-      const cv::Mat& lane_map,
-      std::vector<std::shared_ptr<ConnectedComponent>>* cc);
+  bool FindConnectedComponents(const cv::Mat&                                    lane_map,
+                               std::vector<std::shared_ptr<ConnectedComponent>>* cc);
 
  private:
   bool BlockUnionFind(const unsigned char* img);
 
  private:
   size_t total_pix_;
-  int image_width_;
-  int image_height_;
+  int    image_width_;
+  int    image_height_;
 
   int width_;
   int height_;
@@ -93,9 +91,9 @@ class ConnectedComponentGeneratorGPU {
   int roi_x_max_;
   int roi_y_max_;
 
-  int* labels_ = NULL;
-  cudaArray* img_array_ = NULL;
-  int* label_array_ = NULL;
+  int*             labels_      = NULL;
+  cudaArray*       img_array_   = NULL;
+  int*             label_array_ = NULL;
   std::vector<int> root_map_;
 };
 

@@ -23,10 +23,10 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Brake61Test, General) {
-  uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
-  int32_t length = 8;
+  uint8_t       data[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
+  int32_t       length  = 8;
   ChassisDetail cd;
-  Brake61 brake;
+  Brake61       brake;
   brake.Parse(data, length, &cd);
 
   EXPECT_EQ(data[0], 0b00000001);
@@ -38,7 +38,7 @@ TEST(Brake61Test, General) {
   EXPECT_EQ(data[6], 0b00010011);
   EXPECT_EQ(data[7], 0b00010100);
 
-  auto &brakeinfo = cd.brake();
+  auto& brakeinfo = cd.brake();
   EXPECT_DOUBLE_EQ(brakeinfo.brake_input(), 0.78278782330052543);
   EXPECT_DOUBLE_EQ(brakeinfo.brake_cmd(), 1.5671015487907205);
   EXPECT_DOUBLE_EQ(brakeinfo.brake_output(), 7.057297627222086);

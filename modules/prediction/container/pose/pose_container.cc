@@ -32,27 +32,20 @@ void PoseContainer::Insert(const ::google::protobuf::Message& message) {
   Update(localization);
 }
 
-void PoseContainer::Update(
-    const localization::LocalizationEstimate& localization) {
-  if (!localization.has_header() ||
-      !localization.header().has_timestamp_sec()) {
-    AERROR << "Localization message has no timestamp ["
-           << localization.ShortDebugString() << "].";
+void PoseContainer::Update(const localization::LocalizationEstimate& localization) {
+  if (!localization.has_header() || !localization.header().has_timestamp_sec()) {
+    AERROR << "Localization message has no timestamp [" << localization.ShortDebugString() << "].";
     return;
   } else if (!localization.has_pose()) {
-    AERROR << "Localization message has no pose ["
-           << localization.ShortDebugString() << "].";
+    AERROR << "Localization message has no pose [" << localization.ShortDebugString() << "].";
     return;
-  } else if (!localization.pose().has_position() ||
-             !localization.pose().has_linear_velocity()) {
+  } else if (!localization.pose().has_position() || !localization.pose().has_linear_velocity()) {
     AERROR << "Localization message has no position or linear velocity ["
            << localization.ShortDebugString() << "].";
     return;
   }
 
-  if (obstacle_ptr_.get() == nullptr) {
-    obstacle_ptr_.reset(new PerceptionObstacle());
-  }
+  if (obstacle_ptr_.get() == nullptr) { obstacle_ptr_.reset(new PerceptionObstacle()); }
   obstacle_ptr_->Clear();
 
   obstacle_ptr_->set_id(ID);
@@ -63,16 +56,14 @@ void PoseContainer::Update(
   obstacle_ptr_->mutable_position()->CopyFrom(position);
 
   double theta = 0.0;
-  if (localization.pose().has_orientation() &&
-      localization.pose().orientation().has_qx() &&
-      localization.pose().orientation().has_qy() &&
-      localization.pose().orientation().has_qz() &&
+  if (localization.pose().has_orientation() && localization.pose().orientation().has_qx() &&
+      localization.pose().orientation().has_qy() && localization.pose().orientation().has_qz() &&
       localization.pose().orientation().has_qw()) {
     double qw = localization.pose().orientation().qw();
     double qx = localization.pose().orientation().qx();
     double qy = localization.pose().orientation().qy();
     double qz = localization.pose().orientation().qz();
-    theta = ::apollo::common::math::QuaternionToHeading(qw, qx, qy, qz);
+    theta     = ::apollo::common::math::QuaternionToHeading(qw, qx, qy, qz);
   }
   obstacle_ptr_->set_theta(theta);
 
@@ -96,9 +87,7 @@ double PoseContainer::GetTimestamp() {
   }
 }
 
-PerceptionObstacle* PoseContainer::ToPerceptionObstacle() {
-  return obstacle_ptr_.get();
-}
+PerceptionObstacle* PoseContainer::ToPerceptionObstacle() { return obstacle_ptr_.get(); }
 
 }  // namespace prediction
 }  // namespace apollo

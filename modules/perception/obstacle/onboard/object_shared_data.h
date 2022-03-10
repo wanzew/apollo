@@ -25,17 +25,16 @@
 namespace apollo {
 namespace perception {
 
-#define OBJECT_SHARED_DATA(data_name)                        \
-  class data_name : public CommonSharedData<SensorObjects> { \
-   public:                                                   \
-    data_name() : CommonSharedData<SensorObjects>() {}       \
-    virtual ~data_name() {}                                  \
-    std::string name() const override {                      \
-      return #data_name;                                     \
-    }                                                        \
-                                                             \
-   private:                                                  \
-    DISALLOW_COPY_AND_ASSIGN(data_name);                     \
+#define OBJECT_SHARED_DATA(data_name)                                                              \
+  class data_name : public CommonSharedData<SensorObjects> {                                       \
+   public:                                                                                         \
+    data_name()                                                                                    \
+        : CommonSharedData<SensorObjects>() {}                                                     \
+    virtual ~data_name() {}                                                                        \
+    std::string name() const override { return #data_name; }                                       \
+                                                                                                   \
+   private:                                                                                        \
+    DISALLOW_COPY_AND_ASSIGN(data_name);                                                           \
   }
 
 OBJECT_SHARED_DATA(LidarObjectData);

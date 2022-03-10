@@ -54,9 +54,8 @@ class ObstaclesContainer : public Container {
    * @param Perception obstacle
    *        Timestamp
    */
-  void InsertPerceptionObstacle(
-      const perception::PerceptionObstacle& perception_obstacle,
-      const double timestamp);
+  void InsertPerceptionObstacle(const perception::PerceptionObstacle& perception_obstacle,
+                                const double                          timestamp);
 
   /**
    * @brief Get obstacle pointer
@@ -79,7 +78,7 @@ class ObstaclesContainer : public Container {
   bool IsPredictable(const perception::PerceptionObstacle& perception_obstacle);
 
  private:
-  double timestamp_ = -1.0;
+  double                                timestamp_ = -1.0;
   common::util::LRUCache<int, Obstacle> obstacles_;
 };
 

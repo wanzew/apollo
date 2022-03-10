@@ -17,9 +17,9 @@
 #ifndef MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
 #define MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
 
-#include <std_msgs/String.h>
-#include <memory>
 #include "ros/include/ros/ros.h"
+#include <memory>
+#include <std_msgs/String.h>
 
 #include "modules/drivers/gnss/parser/parser.h"
 
@@ -32,14 +32,14 @@ class RtcmParser {
   RtcmParser() {}
   ~RtcmParser() {}
   bool Init();
-  void ParseRtcmData(const std_msgs::String::ConstPtr &msg);
+  void ParseRtcmData(const std_msgs::String::ConstPtr& msg);
 
  private:
   void DispatchMessage(Parser::MessageType type, MessagePtr message);
   void PublishEphemeris(const MessagePtr message);
   void PublishObservation(const MessagePtr message);
 
-  bool inited_flag_ = false;
+  bool                    inited_flag_ = false;
   std::unique_ptr<Parser> rtcm_parser_;
 };
 

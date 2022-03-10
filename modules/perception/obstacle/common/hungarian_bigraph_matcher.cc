@@ -21,8 +21,7 @@
 namespace apollo {
 namespace perception {
 
-HungarianOptimizer::HungarianOptimizer(
-    const std::vector<std::vector<double>>& costs)
+HungarianOptimizer::HungarianOptimizer(const std::vector<std::vector<double>>& costs)
     : state_(nullptr) {
   width_ = costs.size();
 
@@ -33,7 +32,7 @@ HungarianOptimizer::HungarianOptimizer(
   }
 
   matrix_size_ = std::max(width_, height_);
-  max_cost_ = 0;
+  max_cost_    = 0;
 
   // Generate the expanded cost matrix by adding extra 0-valued elements in
   // order to make a square matrix.  At the same time, find the greatest cost
@@ -50,7 +49,7 @@ HungarianOptimizer::HungarianOptimizer(
         costs_[row][col] = 0;
       } else {
         costs_[row][col] = costs[row][col];
-        max_cost_ = std::max(max_cost_, costs_[row][col]);
+        max_cost_        = std::max(max_cost_, costs_[row][col]);
       }
     }
   }
@@ -79,8 +78,7 @@ HungarianOptimizer::HungarianOptimizer(
 // Find an assignment which maximizes the total cost.
 // Return an array of pairs of integers.  Each pair (i, j) corresponds to
 // assigning agent i to task j.
-void HungarianOptimizer::maximize(std::vector<int>* preimage,
-                                  std::vector<int>* image) {
+void HungarianOptimizer::maximize(std::vector<int>* preimage, std::vector<int>* image) {
   // Find a maximal assignment by subtracting each of the
   // original costs from max_cost_  and then minimizing.
   for (int row = 0; row < width_; ++row) {
@@ -94,8 +92,7 @@ void HungarianOptimizer::maximize(std::vector<int>* preimage,
 // Find an assignment which minimizes the total cost.
 // Return an array of pairs of integers.  Each pair (i, j) corresponds to
 // assigning agent i to task j.
-void HungarianOptimizer::minimize(std::vector<int>* preimage,
-                                  std::vector<int>* image) {
+void HungarianOptimizer::minimize(std::vector<int>* preimage, std::vector<int>* image) {
   do_munkres();
   find_assignments(preimage, image);
 }
@@ -103,8 +100,7 @@ void HungarianOptimizer::minimize(std::vector<int>* preimage,
 // Convert the final cost matrix into a set of assignments of agents -> tasks.
 // Return an array of pairs of integers, the same as the return values of
 // Minimize() and Maximize()
-void HungarianOptimizer::find_assignments(std::vector<int>* preimage,
-                                          std::vector<int>* image) {
+void HungarianOptimizer::find_assignments(std::vector<int>* preimage, std::vector<int>* image) {
   preimage->clear();
   image->clear();
   for (int row = 0; row < width_; ++row) {
@@ -126,9 +122,7 @@ void HungarianOptimizer::find_assignments(std::vector<int>* preimage,
 // kHungarianOptimizerColNotFound if no such column exists.
 int HungarianOptimizer::find_star_in_row(int row) const {
   for (int col = 0; col < matrix_size_; ++col) {
-    if (is_starred(row, col)) {
-      return col;
-    }
+    if (is_starred(row, col)) { return col; }
   }
 
   return kHungarianOptimizerColNotFound;
@@ -137,14 +131,10 @@ int HungarianOptimizer::find_star_in_row(int row) const {
 // Find a row in column 'col' containing a star, or return
 // kHungarianOptimizerRowNotFound if no such row exists.
 int HungarianOptimizer::find_star_in_col(int col) const {
-  if (!col_contains_star(col)) {
-    return kHungarianOptimizerRowNotFound;
-  }
+  if (!col_contains_star(col)) { return kHungarianOptimizerRowNotFound; }
 
   for (int row = 0; row < matrix_size_; ++row) {
-    if (is_starred(row, col)) {
-      return row;
-    }
+    if (is_starred(row, col)) { return row; }
   }
 
   // NOTREACHED
@@ -155,9 +145,7 @@ int HungarianOptimizer::find_star_in_col(int col) const {
 // kHungarianOptimizerColNotFound if no such column exists.
 int HungarianOptimizer::find_prime_in_row(int row) const {
   for (int col = 0; col < matrix_size_; ++col) {
-    if (is_primed(row, col)) {
-      return col;
-    }
+    if (is_primed(row, col)) { return col; }
   }
 
   return kHungarianOptimizerColNotFound;
@@ -167,9 +155,7 @@ int HungarianOptimizer::find_prime_in_row(int row) const {
 void HungarianOptimizer::clear_primes() {
   for (int row = 0; row < matrix_size_; ++row) {
     for (int col = 0; col < matrix_size_; ++col) {
-      if (is_primed(row, col)) {
-        marks_[row][col] = NONE;
-      }
+      if (is_primed(row, col)) { marks_[row][col] = NONE; }
     }
   }
 }
@@ -189,12 +175,8 @@ double HungarianOptimizer::find_smallest_uncovered() {
   uncov_row_.clear();
 
   for (int i = 0; i < matrix_size_; ++i) {
-    if (!row_covered(i)) {
-      uncov_row_.push_back(i);
-    }
-    if (!col_covered(i)) {
-      uncov_col_.push_back(i);
-    }
+    if (!row_covered(i)) { uncov_row_.push_back(i); }
+    if (!col_covered(i)) { uncov_col_.push_back(i); }
   }
 
   for (size_t row = 0; row < uncov_row_.size(); ++row) {
@@ -213,16 +195,10 @@ bool HungarianOptimizer::find_zero(int* zero_row, int* zero_col) {
   uncov_row_.clear();
 
   for (int i = 0; i < matrix_size_; ++i) {
-    if (!row_covered(i)) {
-      uncov_row_.push_back(i);
-    }
-    if (!col_covered(i)) {
-      uncov_col_.push_back(i);
-    }
+    if (!row_covered(i)) { uncov_row_.push_back(i); }
+    if (!col_covered(i)) { uncov_col_.push_back(i); }
   }
-  if (uncov_row_.empty() || uncov_col_.empty()) {
-    return false;
-  }
+  if (uncov_row_.empty() || uncov_col_.empty()) { return false; }
 
   for (size_t i = 0; i < uncov_row_.size(); ++i) {
     for (size_t j = 0; j < uncov_col_.size(); ++j) {
@@ -242,13 +218,9 @@ void HungarianOptimizer::print_matrix() {
     for (int col = 0; col < matrix_size_; ++col) {
       printf("%g ", costs_[row][col]);
 
-      if (is_starred(row, col)) {
-        printf("*");
-      }
+      if (is_starred(row, col)) { printf("*"); }
 
-      if (is_primed(row, col)) {
-        printf("'");
-      }
+      if (is_primed(row, col)) { printf("'"); }
     }
     printf("\n");
   }
@@ -258,20 +230,18 @@ void HungarianOptimizer::print_matrix() {
 void HungarianOptimizer::do_munkres() {
   int max_iter = 1000;
   int iter_num = 0;
-  state_ = &HungarianOptimizer::reduce_rows;
+  state_       = &HungarianOptimizer::reduce_rows;
   while (state_ != NULL && iter_num < max_iter) {
     // while (state_ != NULL) {
     (this->*state_)();
     ++iter_num;
   }
-  if (iter_num >= max_iter) {
-    check_star();
-  }
+  if (iter_num >= max_iter) { check_star(); }
 }
 
 void HungarianOptimizer::check_star() {
   for (int row = 0; row < width_; ++row) {
-    int star_col = -1;
+    int  star_col  = -1;
     bool is_single = true;
     for (int col = 0; col < height_; ++col) {
       if (is_starred(row, col)) {
@@ -315,14 +285,10 @@ void HungarianOptimizer::star_zeroes() {
   // Since no rows or columns are covered on entry to this step, we use the
   // covers as a quick way of marking which rows & columns have stars in them.
   for (int row = 0; row < matrix_size_; ++row) {
-    if (row_covered(row)) {
-      continue;
-    }
+    if (row_covered(row)) { continue; }
 
     for (int col = 0; col < matrix_size_; ++col) {
-      if (col_covered(col)) {
-        continue;
-      }
+      if (col_covered(col)) { continue; }
 
       if (costs_[row][col] == 0) {
         star(row, col);
@@ -388,8 +354,8 @@ void HungarianOptimizer::prime_zeroes() {
       uncover_col(star_col);
     } else {
       preimage_[0] = zero_row;
-      image_[0] = zero_col;
-      state_ = &HungarianOptimizer::make_augmenting_path;
+      image_[0]    = zero_col;
+      state_       = &HungarianOptimizer::make_augmenting_path;
       return;
     }
   }
@@ -405,8 +371,8 @@ void HungarianOptimizer::prime_zeroes() {
 // series, erase all primes and uncover every line in the matrix.  Return to
 // Step 3.
 void HungarianOptimizer::make_augmenting_path() {
-  bool done = false;
-  int count = 0;
+  bool done  = false;
+  int  count = 0;
 
   /* Note: this loop is guaranteed to terminate within matrix_size_ iterations
   // because:
@@ -438,7 +404,7 @@ void HungarianOptimizer::make_augmenting_path() {
     if (row != kHungarianOptimizerRowNotFound) {
       count++;
       preimage_[count] = row;
-      image_[count] = image_[count - 1];
+      image_[count]    = image_[count - 1];
     } else {
       done = true;
     }
@@ -447,7 +413,7 @@ void HungarianOptimizer::make_augmenting_path() {
       int col = find_prime_in_row(preimage_[count]);
       count++;
       preimage_[count] = preimage_[count - 1];
-      image_[count] = col;
+      image_[count]    = col;
     }
   }
 

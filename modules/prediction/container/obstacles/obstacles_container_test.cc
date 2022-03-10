@@ -33,8 +33,7 @@ namespace prediction {
 class ObstaclesContainerTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    std::string file =
-        "modules/prediction/testdata/perception_vehicles_pedestrians.pb.txt";
+    std::string file = "modules/prediction/testdata/perception_vehicles_pedestrians.pb.txt";
     perception::PerceptionObstacles perception_obstacles;
     common::util::GetProtoFromFile(file, &perception_obstacles);
     container_.Insert(perception_obstacles);
@@ -69,13 +68,11 @@ TEST_F(ObstaclesContainerTest, Pedestrian) {
   Obstacle* obstacle_ptr101 = container_.GetObstacle(101);
   EXPECT_TRUE(obstacle_ptr101 != nullptr);
   EXPECT_EQ(obstacle_ptr101->id(), 101);
-  EXPECT_EQ(obstacle_ptr101->type(),
-            perception::PerceptionObstacle::PEDESTRIAN);
+  EXPECT_EQ(obstacle_ptr101->type(), perception::PerceptionObstacle::PEDESTRIAN);
   Obstacle* obstacle_ptr102 = container_.GetObstacle(102);
   EXPECT_TRUE(obstacle_ptr102 != nullptr);
   EXPECT_EQ(obstacle_ptr102->id(), 102);
-  EXPECT_EQ(obstacle_ptr102->type(),
-            perception::PerceptionObstacle::PEDESTRIAN);
+  EXPECT_EQ(obstacle_ptr102->type(), perception::PerceptionObstacle::PEDESTRIAN);
   Obstacle* obstacle_ptr103 = container_.GetObstacle(103);
   EXPECT_TRUE(obstacle_ptr103 == nullptr);
 }

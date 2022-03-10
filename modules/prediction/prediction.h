@@ -72,19 +72,18 @@ class Prediction : public PredictionInterface {
    * @brief Data callback upon receiving a perception obstacle message.
    * @param perception_obstacles received message.
    */
-  void RunOnce(
-      const perception::PerceptionObstacles &perception_obstacles) override;
+  void RunOnce(const perception::PerceptionObstacles& perception_obstacles) override;
 
  private:
-  common::Status OnError(const std::string &error_msg);
+  common::Status OnError(const std::string& error_msg);
 
-  void OnLocalization(const localization::LocalizationEstimate &localization);
+  void OnLocalization(const localization::LocalizationEstimate& localization);
 
-  void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+  void OnPlanning(const planning::ADCTrajectory& adc_trajectory);
 
  private:
-  double start_time_ = 0.0;
-  PredictionConf prediction_conf_;
+  double                                start_time_ = 0.0;
+  PredictionConf                        prediction_conf_;
   common::adapter::AdapterManagerConfig adapter_conf_;
 };
 

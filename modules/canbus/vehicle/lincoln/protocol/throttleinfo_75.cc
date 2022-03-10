@@ -26,42 +26,36 @@ using ::apollo::drivers::canbus::Byte;
 
 const int32_t Throttleinfo75::ID = 0x75;
 
-void Throttleinfo75::Parse(const std::uint8_t *bytes, int32_t length,
-                           ChassisDetail *chassis_detail) const {
+void Throttleinfo75::Parse(const std::uint8_t* bytes,
+                           int32_t             length,
+                           ChassisDetail*      chassis_detail) const {
   chassis_detail->mutable_ems()->set_engine_rpm(engine_rpm(bytes, length));
-  chassis_detail->mutable_gas()->set_accelerator_pedal(
-      acc_pedal_percent(bytes, length));
-  chassis_detail->mutable_gas()->set_accelerator_pedal_rate(
-      acc_pedal_rate(bytes, length));
+  chassis_detail->mutable_gas()->set_accelerator_pedal(acc_pedal_percent(bytes, length));
+  chassis_detail->mutable_gas()->set_accelerator_pedal_rate(acc_pedal_rate(bytes, length));
 }
 
-double Throttleinfo75::engine_rpm(const std::uint8_t *bytes,
-                                  int32_t length) const {
-  Byte frame_high(bytes + 1);
+double Throttleinfo75::engine_rpm(const std::uint8_t* bytes, int32_t length) const {
+  Byte    frame_high(bytes + 1);
   int32_t high = frame_high.get_byte(0, 8);
-  Byte frame_low(bytes + 0);
-  int32_t low = frame_low.get_byte(0, 8);
+  Byte    frame_low(bytes + 0);
+  int32_t low   = frame_low.get_byte(0, 8);
   int32_t value = (high << 8) | low;
   return value * 0.25;
 }
 
-double Throttleinfo75::acc_pedal_percent(const std::uint8_t *bytes,
-                                         int32_t length) const {
-  Byte frame_high(bytes + 3);
+double Throttleinfo75::acc_pedal_percent(const std::uint8_t* bytes, int32_t length) const {
+  Byte    frame_high(bytes + 3);
   int32_t high = frame_high.get_byte(0, 2);
-  Byte frame_low(bytes + 2);
-  int32_t low = frame_low.get_byte(0, 8);
+  Byte    frame_low(bytes + 2);
+  int32_t low   = frame_low.get_byte(0, 8);
   int32_t value = (high << 8) | low;
   return value * 0.1;
 }
 
-double Throttleinfo75::acc_pedal_rate(const std::uint8_t *bytes,
-                                      int32_t length) const {
-  Byte frame(bytes + 4);
+double Throttleinfo75::acc_pedal_rate(const std::uint8_t* bytes, int32_t length) const {
+  Byte    frame(bytes + 4);
   int32_t x = frame.get_byte(0, 8);
-  if (x > 0x3F) {
-    x -= 0x100;
-  }
+  if (x > 0x3F) { x -= 0x100; }
   return x * 0.04;
 }
 

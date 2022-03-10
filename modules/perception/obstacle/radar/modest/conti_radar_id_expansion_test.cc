@@ -16,16 +16,16 @@
 
 #include "modules/perception/obstacle/radar/modest/conti_radar_id_expansion.h"
 
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
 
 TEST(ContiRadarIDExpansionTest, conti_radar_id_expansion_test) {
   ContiRadarIDExpansion id_expansion;
-  ContiRadar raw_obstacles;
-  ContiRadarObs *radar_obs = raw_obstacles.add_contiobs();
+  ContiRadar            raw_obstacles;
+  ContiRadarObs*        radar_obs = raw_obstacles.add_contiobs();
   radar_obs->set_obstacle_id(0);
   radar_obs->set_meas_state(static_cast<int>(ContiMeasState::CONTI_NEW));
   id_expansion.SetNeedRestart(true);
@@ -50,13 +50,13 @@ TEST(ContiRadarIDExpansionTest, conti_radar_id_expansion_test) {
 
 TEST(ContiRadarIDExpansionSkipOutdatedObjectsTest, skip_outdated_objects_test) {
   ContiRadarIDExpansion id_expansion;
-  ContiRadar raw_obstacles;
-  auto *sensor_header = raw_obstacles.mutable_header();
+  ContiRadar            raw_obstacles;
+  auto*                 sensor_header = raw_obstacles.mutable_header();
   sensor_header->set_timestamp_sec(0.0);
   sensor_header->set_radar_timestamp(0.0 * 1e9);
-  ContiRadarObs *radar_obs = raw_obstacles.add_contiobs();
+  ContiRadarObs* radar_obs = raw_obstacles.add_contiobs();
   radar_obs->set_meas_state(static_cast<int>(ContiMeasState::CONTI_NEW));
-  auto *header = radar_obs->mutable_header();
+  auto* header = radar_obs->mutable_header();
   header->set_timestamp_sec(0.0);
   header->set_radar_timestamp(0.0 * 1e9);
   id_expansion.SkipOutdatedObjects(&raw_obstacles);
@@ -64,10 +64,10 @@ TEST(ContiRadarIDExpansionSkipOutdatedObjectsTest, skip_outdated_objects_test) {
 
   sensor_header->set_timestamp_sec(0.7);
   sensor_header->set_radar_timestamp(0.7 * 1e9);
-  ContiRadarObs *radar_obs2 = raw_obstacles.add_contiobs();
+  ContiRadarObs* radar_obs2 = raw_obstacles.add_contiobs();
   radar_obs2->set_obstacle_id(0);
   radar_obs2->set_meas_state(static_cast<int>(ContiMeasState::CONTI_NEW));
-  auto *header2 = radar_obs->mutable_header();
+  auto* header2 = radar_obs->mutable_header();
   header2->set_timestamp_sec(0.7);
   header2->set_radar_timestamp(0.7 * 1e9);
   id_expansion.SkipOutdatedObjects(&raw_obstacles);

@@ -40,7 +40,7 @@ class MapNodeIndex {
   /**@brief Overload the equal operator. */
   bool operator==(const MapNodeIndex& index) const;
   /**@brief Overload the unequal operator. */
-  bool operator!=(const MapNodeIndex& index) const;
+  bool        operator!=(const MapNodeIndex& index) const;
   std::string ToString() const;
 
   // /**@brief Construct a map node index, given a global coordinate. */
@@ -57,24 +57,24 @@ class MapNodeIndex {
 
   /**@brief Construct a map node index, given a global coordinate, eigen
    * version. */
-  static MapNodeIndex GetMapNodeIndex(const BaseMapConfig& option,
+  static MapNodeIndex GetMapNodeIndex(const BaseMapConfig&   option,
                                       const Eigen::Vector3d& coordinate,
-                                      unsigned int resolution_id, int zone_id);
-  static MapNodeIndex GetMapNodeIndex(const BaseMapConfig& option,
+                                      unsigned int           resolution_id,
+                                      int                    zone_id);
+  static MapNodeIndex GetMapNodeIndex(const BaseMapConfig&   option,
                                       const Eigen::Vector2d& coordinate,
-                                      unsigned int resolution_id, int zone_id);
+                                      unsigned int           resolution_id,
+                                      int                    zone_id);
 
   /**@brief Get the index range (maximum possible index + 1) in the east
    * direction. */
-  static unsigned int GetMapIndexRangeEast(const BaseMapConfig& option,
-                                           unsigned int resolution_id);
+  static unsigned int GetMapIndexRangeEast(const BaseMapConfig& option, unsigned int resolution_id);
   /**@brief Get the index range (maximum possible index + 1) in the north
    * direction. */
   static unsigned int GetMapIndexRangeNorth(const BaseMapConfig& option,
-                                            unsigned int resolution_id);
+                                            unsigned int         resolution_id);
 
-  friend std::ostream& operator<<(std::ostream& cout,
-                                  const MapNodeIndex& index);
+  friend std::ostream& operator<<(std::ostream& cout, const MapNodeIndex& index);
 
   /**@brief The ID of the resolution.
    * Should be less than BaseMapConfig::map_resolutions_.size(). */

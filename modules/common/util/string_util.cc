@@ -41,7 +41,7 @@ std::vector<int> Base64CodeTable() {
 void split(const std::string& str, char ch, std::vector<std::string>* result) {
   result->clear();
   std::stringstream ss(str);
-  std::string segment;
+  std::string       segment;
   while (std::getline(ss, segment, ch)) {
     result->push_back(segment);
   }
@@ -53,25 +53,19 @@ void trim(std::string* str) {
 }
 
 void ltrim(std::string* str) {
-  if (!str) {
-    return;
-  }
-  str->erase(str->begin(), std::find_if(str->begin(), str->end(), [](int ch) {
-               return !std::isspace(ch);
-             }));
+  if (!str) { return; }
+  str->erase(str->begin(),
+             std::find_if(str->begin(), str->end(), [](int ch) { return !std::isspace(ch); }));
 }
 
 void rtrim(std::string* str) {
-  if (!str) {
-    return;
-  }
-  str->erase(std::find_if(str->rbegin(), str->rend(),
-                          [](int ch) { return !std::isspace(ch); })
-                 .base(),
-             str->end());
+  if (!str) { return; }
+  str->erase(
+      std::find_if(str->rbegin(), str->rend(), [](int ch) { return !std::isspace(ch); }).base(),
+      str->end());
 }
 
-std::string Base64Decode(const std::string &base64_str) {
+std::string Base64Decode(const std::string& base64_str) {
   static const std::vector<int> kBase64CodeTable = Base64CodeTable();
 
   std::string bytes;
@@ -79,9 +73,7 @@ std::string Base64Decode(const std::string &base64_str) {
   bytes.reserve(base64_str.length() * 3 / 4 + 3);
   unsigned int sum = 0, sum_bits = 0;
   for (const char c : base64_str) {
-    if (kBase64CodeTable[c] == -1) {
-      break;
-    }
+    if (kBase64CodeTable[c] == -1) { break; }
 
     // Convert 6-bits Base64 chars to 8-bits general bytes.
     sum = (sum << 6) + kBase64CodeTable[c];

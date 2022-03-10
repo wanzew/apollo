@@ -51,7 +51,7 @@ class SimControl : SimControlInterface {
    * @brief Constructor of SimControl.
    * @param map_service the pointer of MapService.
    */
-  explicit SimControl(const MapService *map_service);
+  explicit SimControl(const MapService* map_service);
 
   bool IsEnabled() const { return enabled_; }
 
@@ -59,8 +59,8 @@ class SimControl : SimControlInterface {
    * @brief setup callbacks and timer
    * @param set_start_point initialize localization.
    */
-  void Init(bool set_start_point, double start_velocity = 0.0,
-            double start_acceleration = 0.0) override;
+  void
+  Init(bool set_start_point, double start_velocity = 0.0, double start_acceleration = 0.0) override;
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
@@ -81,31 +81,30 @@ class SimControl : SimControlInterface {
   void RunOnce() override;
 
  private:
-  void OnPlanning(const apollo::planning::ADCTrajectory &trajectory);
-  void OnRoutingResponse(const apollo::routing::RoutingResponse &routing);
-  void OnReceiveNavigationInfo(
-      const relative_map::NavigationInfo &navigation_info);
+  void OnPlanning(const apollo::planning::ADCTrajectory& trajectory);
+  void OnRoutingResponse(const apollo::routing::RoutingResponse& routing);
+  void OnReceiveNavigationInfo(const relative_map::NavigationInfo& navigation_info);
 
   /**
    * @brief Predict the next trajectory point using perfect control model
    */
-  bool PerfectControlModel(apollo::common::TrajectoryPoint *point);
+  bool PerfectControlModel(apollo::common::TrajectoryPoint* point);
 
   void PublishChassis(double cur_speed);
 
-  void PublishLocalization(const apollo::common::TrajectoryPoint &point);
+  void PublishLocalization(const apollo::common::TrajectoryPoint& point);
 
   // Reset the start point, which can be a dummy point on the map or received
   // from the routing module.
-  void SetStartPoint(const apollo::common::TrajectoryPoint &point);
+  void SetStartPoint(const apollo::common::TrajectoryPoint& point);
 
   void Freeze();
 
-  void TimerCallback(const ros::TimerEvent &event);
+  void TimerCallback(const ros::TimerEvent& event);
 
   void ClearPlanning();
 
-  const MapService *map_service_ = nullptr;
+  const MapService* map_service_ = nullptr;
 
   // The timer to publish simulated localization and chassis messages.
   ros::Timer sim_control_timer_;
@@ -130,7 +129,7 @@ class SimControl : SimControlInterface {
 
   // Whether the sim control is enabled / initialized.
   bool enabled_ = false;
-  bool inited_ = false;
+  bool inited_  = false;
 
   // The header of the routing planning is following.
   apollo::common::Header current_routing_header_;
@@ -141,7 +140,7 @@ class SimControl : SimControlInterface {
   common::PathPoint adc_position_;
 
   // Initial velocity and acceleration of the main vehicle
-  double start_velocity_ = 0.0;
+  double start_velocity_     = 0.0;
   double start_acceleration_ = 0.0;
 
   static constexpr int kPlanningCountToStart = 5;

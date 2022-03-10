@@ -51,31 +51,26 @@ void SequencePredictor::Clear() { Predictor::Clear(); }
 
 std::string SequencePredictor::ToString(const LaneSequence& sequence) {
   std::string str_lane_sequence = "";
-  if (sequence.lane_segment_size() > 0) {
-    str_lane_sequence += sequence.lane_segment(0).lane_id();
-  }
+  if (sequence.lane_segment_size() > 0) { str_lane_sequence += sequence.lane_segment(0).lane_id(); }
   for (int i = 1; i < sequence.lane_segment_size(); ++i) {
     str_lane_sequence += ("->" + sequence.lane_segment(i).lane_id());
   }
   return str_lane_sequence;
 }
 
-void SequencePredictor::FilterLaneSequences(
-    const Feature& feature, const std::string& lane_id,
-    std::vector<bool>* enable_lane_sequence) {
-  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
-    return;
-  }
-  const LaneGraph& lane_graph = feature.lane().lane_graph();
-  int num_lane_sequence = lane_graph.lane_sequence_size();
-  std::vector<LaneChangeType> lane_change_type(num_lane_sequence,
-                                               LaneChangeType::INVALID);
-  std::pair<int, double> change(-1, -1.0);
-  std::pair<int, double> all(-1, -1.0);
+void SequencePredictor::FilterLaneSequences(const Feature&     feature,
+                                            const std::string& lane_id,
+                                            std::vector<bool>* enable_lane_sequence) {
+  if (!feature.has_lane() || !feature.lane().has_lane_graph()) { return; }
+  const LaneGraph&            lane_graph        = feature.lane().lane_graph();
+  int                         num_lane_sequence = lane_graph.lane_sequence_size();
+  std::vector<LaneChangeType> lane_change_type(num_lane_sequence, LaneChangeType::INVALID);
+  std::pair<int, double>      change(-1, -1.0);
+  std::pair<int, double>      all(-1, -1.0);
 
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
-    lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
+    lane_change_type[i]          = GetLaneChangeType(lane_id, sequence);
 
     if (lane_change_type[i] != LaneChangeType::LEFT &&
         lane_change_type[i] != LaneChangeType::RIGHT &&
@@ -86,12 +81,11 @@ void SequencePredictor::FilterLaneSequences(
 
     // The obstacle has interference with ADC within a small distance
     double distance = GetLaneChangeDistanceWithADC(sequence);
-    ADEBUG << "Distance to ADC " << std::fixed << std::setprecision(6)
-           << distance;
+    ADEBUG << "Distance to ADC " << std::fixed << std::setprecision(6) << distance;
     if (distance > 0.0 && distance < FLAGS_lane_change_dist) {
       (*enable_lane_sequence)[i] = false;
-      ADEBUG << "Filter trajectory [" << ToString(sequence)
-             << "] due to small distance " << distance << ".";
+      ADEBUG << "Filter trajectory [" << ToString(sequence) << "] due to small distance "
+             << distance << ".";
     }
   }
 
@@ -105,12 +99,11 @@ void SequencePredictor::FilterLaneSequences(
 
     double probability = sequence.probability();
     if (LaneSequenceWithMaxProb(lane_change_type[i], probability, all.second)) {
-      all.first = i;
+      all.first  = i;
       all.second = probability;
     }
-    if (LaneChangeWithMaxProb(lane_change_type[i], probability,
-                              change.second)) {
-      change.first = i;
+    if (LaneChangeWithMaxProb(lane_change_type[i], probability, change.second)) {
+      change.first  = i;
       change.second = probability;
     }
   }
@@ -135,42 +128,36 @@ void SequencePredictor::FilterLaneSequences(
   }
 }
 
-SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
-    const std::string& lane_id, const LaneSequence& lane_sequence) {
-  if (lane_id.empty()) {
-    return LaneChangeType::ONTO_LANE;
-  }
+SequencePredictor::LaneChangeType
+SequencePredictor::GetLaneChangeType(const std::string&  lane_id,
+                                     const LaneSequence& lane_sequence) {
+  if (lane_id.empty()) { return LaneChangeType::ONTO_LANE; }
 
   std::string lane_change_id = lane_sequence.lane_segment(0).lane_id();
   if (lane_id == lane_change_id) {
     return LaneChangeType::STRAIGHT;
   } else {
-    if (PredictionMap::IsLeftNeighborLane(
-            PredictionMap::LaneById(lane_change_id),
-            PredictionMap::LaneById(lane_id))) {
+    if (PredictionMap::IsLeftNeighborLane(PredictionMap::LaneById(lane_change_id),
+                                          PredictionMap::LaneById(lane_id))) {
       return LaneChangeType::LEFT;
-    } else if (PredictionMap::IsRightNeighborLane(
-                   PredictionMap::LaneById(lane_change_id),
-                   PredictionMap::LaneById(lane_id))) {
+    } else if (PredictionMap::IsRightNeighborLane(PredictionMap::LaneById(lane_change_id),
+                                                  PredictionMap::LaneById(lane_id))) {
       return LaneChangeType::RIGHT;
     }
   }
   return LaneChangeType::INVALID;
 }
 
-double SequencePredictor::GetLaneChangeDistanceWithADC(
-    const LaneSequence& lane_sequence) {
+double SequencePredictor::GetLaneChangeDistanceWithADC(const LaneSequence& lane_sequence) {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
   ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
-      ContainerManager::instance()->GetContainer(
-          AdapterConfig::PLANNING_TRAJECTORY));
+      ContainerManager::instance()->GetContainer(AdapterConfig::PLANNING_TRAJECTORY));
   CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
 
   if (!adc_container->HasOverlap(lane_sequence)) {
-    ADEBUG << "The sequence [" << ToString(lane_sequence)
-           << "] has no overlap with ADC.";
+    ADEBUG << "The sequence [" << ToString(lane_sequence) << "] has no overlap with ADC.";
     return std::numeric_limits<double>::max();
   }
 
@@ -180,11 +167,10 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
     adc_position[1] = pose_container->ToPerceptionObstacle()->position().y();
 
     std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
-    double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
-    double lane_s = 0.0;
-    double lane_l = 0.0;
-    if (PredictionMap::GetProjection(adc_position,
-                                     PredictionMap::LaneById(obstacle_lane_id),
+    double      obstacle_lane_s  = lane_sequence.lane_segment(0).start_s();
+    double      lane_s           = 0.0;
+    double      lane_l           = 0.0;
+    if (PredictionMap::GetProjection(adc_position, PredictionMap::LaneById(obstacle_lane_id),
                                      &lane_s, &lane_l)) {
       ADEBUG << "Distance with ADC is " << std::fabs(lane_s - obstacle_lane_s);
       return obstacle_lane_s - lane_s;
@@ -196,14 +182,13 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
 }
 
 bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
-                                                const double probability,
-                                                const double max_prob) {
+                                                const double          probability,
+                                                const double          max_prob) {
   if (probability > max_prob) {
     return true;
   } else {
     double prob_diff = std::fabs(probability - max_prob);
-    if (prob_diff <= std::numeric_limits<double>::epsilon() &&
-        type == LaneChangeType::STRAIGHT) {
+    if (prob_diff <= std::numeric_limits<double>::epsilon() && type == LaneChangeType::STRAIGHT) {
       return true;
     }
   }
@@ -211,12 +196,10 @@ bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
 }
 
 bool SequencePredictor::LaneChangeWithMaxProb(const LaneChangeType& type,
-                                              const double probability,
-                                              const double max_prob) {
+                                              const double          probability,
+                                              const double          max_prob) {
   if (type == LaneChangeType::LEFT || type == LaneChangeType::RIGHT) {
-    if (probability > max_prob) {
-      return true;
-    }
+    if (probability > max_prob) { return true; }
   }
   return false;
 }

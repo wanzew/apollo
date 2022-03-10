@@ -46,11 +46,9 @@ void CollectStatsGroup(bool has_val, double val, StatsGroup* stats_group) {
 }
 
 void OnPlanning(const ADCTrajectory& trajectory) {
-  CollectStatsGroup(trajectory.has_total_path_length(),
-                    trajectory.total_path_length(),
+  CollectStatsGroup(trajectory.has_total_path_length(), trajectory.total_path_length(),
                     g_stats.mutable_total_path_length());
-  CollectStatsGroup(trajectory.has_total_path_time(),
-                    trajectory.total_path_time(),
+  CollectStatsGroup(trajectory.has_total_path_time(), trajectory.total_path_time(),
                     g_stats.mutable_total_path_time());
   for (const auto& tp : trajectory.trajectory_point()) {
     CollectStatsGroup(tp.has_v(), tp.v(), g_stats.mutable_v());

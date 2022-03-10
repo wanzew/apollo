@@ -28,14 +28,11 @@ namespace apollo {
 namespace planning {
 
 void SpeedLimit::AppendSpeedLimit(const double s, const double v) {
-  if (!speed_limit_points_.empty()) {
-    DCHECK_GE(s, speed_limit_points_.back().first);
-  }
+  if (!speed_limit_points_.empty()) { DCHECK_GE(s, speed_limit_points_.back().first); }
   speed_limit_points_.emplace_back(s, v);
 }
 
-const std::vector<std::pair<double, double>>& SpeedLimit::speed_limit_points()
-    const {
+const std::vector<std::pair<double, double>>& SpeedLimit::speed_limit_points() const {
   return speed_limit_points_;
 }
 
@@ -47,12 +44,10 @@ double SpeedLimit::GetSpeedLimitByS(const double s) const {
     return point.first < s;
   };
 
-  auto it_lower = std::lower_bound(speed_limit_points_.begin(),
-                                   speed_limit_points_.end(), s, compare_s);
+  auto it_lower =
+      std::lower_bound(speed_limit_points_.begin(), speed_limit_points_.end(), s, compare_s);
 
-  if (it_lower == speed_limit_points_.end()) {
-    return (it_lower - 1)->second;
-  }
+  if (it_lower == speed_limit_points_.end()) { return (it_lower - 1)->second; }
   return it_lower->second;
 }
 

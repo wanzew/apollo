@@ -45,49 +45,49 @@ namespace planning {
 
 class PolyStGraph {
  public:
-  explicit PolyStGraph(const PolyStSpeedConfig &config,
-                       const ReferenceLineInfo *reference_line_info,
-                       const SpeedLimit &speed_limit);
+  explicit PolyStGraph(const PolyStSpeedConfig& config,
+                       const ReferenceLineInfo* reference_line_info,
+                       const SpeedLimit&        speed_limit);
 
   ~PolyStGraph() = default;
 
-  bool FindStTunnel(const common::TrajectoryPoint &init_point,
-                    const std::vector<const PathObstacle *> &obstacles,
-                    SpeedData *const speed_data);
+  bool FindStTunnel(const common::TrajectoryPoint&          init_point,
+                    const std::vector<const PathObstacle*>& obstacles,
+                    SpeedData* const                        speed_data);
 
  private:
   struct PolyStGraphNode {
    public:
     PolyStGraphNode() = default;
 
-    PolyStGraphNode(const STPoint &point_st, const double speed,
-                    const double accel)
-        : st_point(point_st), speed(speed), accel(accel) {}
+    PolyStGraphNode(const STPoint& point_st, const double speed, const double accel)
+        : st_point(point_st)
+        , speed(speed)
+        , accel(accel) {}
 
-    STPoint st_point;
-    double speed = 0.0;
-    double accel = 0.0;
+    STPoint                  st_point;
+    double                   speed = 0.0;
+    double                   accel = 0.0;
     QuarticPolynomialCurve1d speed_profile;
   };
 
-  bool GenerateMinCostSpeedProfile(
-      const std::vector<std::vector<STPoint>> &points,
-      const std::vector<const PathObstacle *> &obstacles,
-      PolyStGraphNode *const min_cost_node);
+  bool GenerateMinCostSpeedProfile(const std::vector<std::vector<STPoint>>& points,
+                                   const std::vector<const PathObstacle*>&  obstacles,
+                                   PolyStGraphNode* const                   min_cost_node);
 
-  bool SampleStPoints(std::vector<std::vector<STPoint>> *const points);
+  bool SampleStPoints(std::vector<std::vector<STPoint>>* const points);
 
  private:
-  PolyStSpeedConfig config_;
-  common::TrajectoryPoint init_point_;
-  const ReferenceLineInfo *reference_line_info_ = nullptr;
-  const ReferenceLine &reference_line_;
-  const SpeedLimit &speed_limit_;
+  PolyStSpeedConfig        config_;
+  common::TrajectoryPoint  init_point_;
+  const ReferenceLineInfo* reference_line_info_ = nullptr;
+  const ReferenceLine&     reference_line_;
+  const SpeedLimit&        speed_limit_;
 
-  double unit_t_ = 1.0;
-  double unit_s_ = 5.0;
+  double unit_t_            = 1.0;
+  double unit_s_            = 5.0;
   double planning_distance_ = 100.0;
-  double planning_time_ = 6.0;
+  double planning_time_     = 6.0;
 };
 
 }  // namespace planning

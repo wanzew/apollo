@@ -51,8 +51,7 @@ class ColorReviser : public BaseReviser {
    * @param rectifed_result
    * @return true/false
    */
-  bool Revise(const ReviseOption &option,
-              std::vector<LightPtr> *lights) override;
+  bool Revise(const ReviseOption& option, std::vector<LightPtr>* lights) override;
 
   /**
    * @brief Revise's name
@@ -61,7 +60,7 @@ class ColorReviser : public BaseReviser {
 
  private:
   std::unordered_map<std::string, TLColor> color_map_;
-  std::unordered_map<std::string, double> time_map_;
+  std::unordered_map<std::string, double>  time_map_;
 
   traffic_light::reviser_config::ModelConfigs config_;
 };

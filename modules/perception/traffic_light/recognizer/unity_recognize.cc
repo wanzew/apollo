@@ -28,8 +28,7 @@ using apollo::common::util::GetProtoFromFile;
 
 bool UnityRecognize::Init() {
   if (!GetProtoFromFile(FLAGS_traffic_light_recognizer_config, &config_)) {
-    AERROR << "Cannot get config proto from file: "
-           << FLAGS_traffic_light_recognizer_config;
+    AERROR << "Cannot get config proto from file: " << FLAGS_traffic_light_recognizer_config;
     return false;
   }
 
@@ -37,31 +36,29 @@ bool UnityRecognize::Init() {
     AERROR << "RecognizeConfig size should be 2.";
     return false;
   }
-  for (const auto &recognizer_config : config_.recognizer_config()) {
+  for (const auto& recognizer_config : config_.recognizer_config()) {
     if (recognizer_config.name() == "UnityRecognizeNight") {
       classify_night_ = std::make_shared<ClassifyBySimple>(
           recognizer_config.classify_net(), recognizer_config.classify_model(),
           recognizer_config.classify_threshold(),
           static_cast<unsigned int>(recognizer_config.classify_resize_width()),
-          static_cast<unsigned int>(
-              recognizer_config.classify_resize_height()));
+          static_cast<unsigned int>(recognizer_config.classify_resize_height()));
     }
     if (recognizer_config.name() == "UnityRecognize") {
       classify_day_ = std::make_shared<ClassifyBySimple>(
           recognizer_config.classify_net(), recognizer_config.classify_model(),
           recognizer_config.classify_threshold(),
           static_cast<unsigned int>(recognizer_config.classify_resize_width()),
-          static_cast<unsigned int>(
-              recognizer_config.classify_resize_height()));
+          static_cast<unsigned int>(recognizer_config.classify_resize_height()));
     }
   }
   return true;
 }
 
-bool UnityRecognize::RecognizeStatus(const Image &image,
-                                     const RecognizeOption &option,
-                                     std::vector<LightPtr> *lights) {
-  cv::Mat ros_image = image.mat();
+bool UnityRecognize::RecognizeStatus(const Image&           image,
+                                     const RecognizeOption& option,
+                                     std::vector<LightPtr>* lights) {
+  cv::Mat  ros_image = image.mat();
   cv::Rect cbox;
   cbox = cv::Rect(0, 0, ros_image.cols, ros_image.rows);
   classify_night_->SetCropBox(cbox);
@@ -80,7 +77,7 @@ bool UnityRecognize::RecognizeStatus(const Image &image,
         AINFO << "Not support yet!";
       }
     } else {
-      light->status.color = UNKNOWN_COLOR;
+      light->status.color      = UNKNOWN_COLOR;
       light->status.confidence = 0;
       AINFO << "Unknown Detection Class: " << light->region.detect_class_id
             << ". region.is_detected: " << light->region.is_detected

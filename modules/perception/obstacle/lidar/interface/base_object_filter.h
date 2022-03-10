@@ -66,7 +66,8 @@ namespace perception {
 
 struct ObjectFilterOptions {
   ObjectFilterOptions() = default;
-  explicit ObjectFilterOptions(Eigen::Matrix4d *pose) : velodyne_trans(pose) {}
+  explicit ObjectFilterOptions(Eigen::Matrix4d* pose)
+      : velodyne_trans(pose) {}
 
   std::shared_ptr<const Eigen::Matrix4d> velodyne_trans = nullptr;
 
@@ -80,8 +81,8 @@ class BaseObjectFilter {
 
   virtual bool Init() = 0;
 
-  virtual bool Filter(const ObjectFilterOptions &obj_filter_options,
-                      std::vector<std::shared_ptr<Object>> *objects) = 0;
+  virtual bool Filter(const ObjectFilterOptions&            obj_filter_options,
+                      std::vector<std::shared_ptr<Object>>* objects) = 0;
 
   virtual std::string name() const = 0;
 

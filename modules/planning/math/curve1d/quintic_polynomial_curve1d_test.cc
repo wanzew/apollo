@@ -22,23 +22,23 @@ namespace apollo {
 namespace planning {
 
 TEST(QuinticPolynomialCurve1dTest, basic_test) {
-  double x0 = 0.0;
-  double dx0 = 1.0;
+  double x0   = 0.0;
+  double dx0  = 1.0;
   double ddx0 = 0.8;
 
-  double x1 = 10.0;
-  double dx1 = 5.0;
+  double x1   = 10.0;
+  double dx1  = 5.0;
   double ddx1 = 0.0;
 
   double t = 8.0;
 
   QuinticPolynomialCurve1d curve(x0, dx0, ddx0, x1, dx1, ddx1, t);
-  auto e_x0 = curve.Evaluate(0, 0.0);
-  auto e_dx0 = curve.Evaluate(1, 0.0);
-  auto e_ddx0 = curve.Evaluate(2, 0.0);
+  auto                     e_x0   = curve.Evaluate(0, 0.0);
+  auto                     e_dx0  = curve.Evaluate(1, 0.0);
+  auto                     e_ddx0 = curve.Evaluate(2, 0.0);
 
-  auto e_x1 = curve.Evaluate(0, t);
-  auto e_dx1 = curve.Evaluate(1, t);
+  auto e_x1   = curve.Evaluate(0, t);
+  auto e_dx1  = curve.Evaluate(1, t);
   auto e_ddx1 = curve.Evaluate(2, t);
 
   auto e_t = curve.ParamLength();

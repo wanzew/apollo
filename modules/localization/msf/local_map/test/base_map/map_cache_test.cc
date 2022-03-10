@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
 #include "modules/localization/msf/local_map/base_map/base_map_cache.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
+#include <gtest/gtest.h>
 
 namespace apollo {
 namespace localization {
@@ -40,17 +40,17 @@ TEST_F(MapCacheTestSuite, LRUCacheTest) {
   unsigned int id3 = 3;
   unsigned int id4 = 4;
 
-  std::string *ch0 = new std::string("aaa");
-  std::string *ch1 = new std::string("bbb");
-  std::string *ch2 = new std::string("ccc");
-  std::string *ch3 = new std::string("ddd");
-  std::string *ch4 = new std::string("eee");
+  std::string* ch0 = new std::string("aaa");
+  std::string* ch1 = new std::string("bbb");
+  std::string* ch2 = new std::string("ccc");
+  std::string* ch3 = new std::string("ddd");
+  std::string* ch4 = new std::string("eee");
 
   lru_cache.Put(id0, ch0);
   lru_cache.Put(id1, ch1);
   lru_cache.Put(id2, ch2);
 
-  std::string *str = lru_cache.Put(id3, ch3);
+  std::string* str = lru_cache.Put(id3, ch3);
   ASSERT_EQ(strcmp(str->c_str(), "aaa"), 0);
 
   bool flag = lru_cache.Get(id3, &str);

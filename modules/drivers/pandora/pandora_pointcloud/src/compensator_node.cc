@@ -19,7 +19,7 @@
 #include <ros/ros.h>
 
 /** Main node entry point. */
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   ROS_INFO("Point cloud node init");
   ros::init(argc, argv, "pandora_compensator_node");
   ros::NodeHandle node;

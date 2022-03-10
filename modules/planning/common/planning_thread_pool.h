@@ -41,17 +41,15 @@ class PlanningThreadPool {
  public:
   void Init();
   void Stop() {
-    if (thread_pool_) {
-      thread_pool_->Stop(true);
-    }
+    if (thread_pool_) { thread_pool_->Stop(true); }
   }
   template <typename F, typename... Rest>
-  void Push(F &&f, Rest &&... rest) {
+  void Push(F&& f, Rest&&... rest) {
     futures_.push_back(std::move(thread_pool_->Push(f, rest...)));
   }
 
   template <typename F>
-  void Push(F &&f) {
+  void Push(F&& f) {
     futures_.push_back(std::move(thread_pool_->Push(f)));
   }
 
@@ -59,7 +57,7 @@ class PlanningThreadPool {
 
  private:
   std::unique_ptr<common::util::ThreadPool> thread_pool_;
-  bool is_initialized = false;
+  bool                                      is_initialized = false;
 
   std::vector<std::future<void>> futures_;
 

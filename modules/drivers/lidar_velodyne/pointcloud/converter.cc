@@ -29,11 +29,10 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-Converter::Converter() : parser_(nullptr) {}
+Converter::Converter()
+    : parser_(nullptr) {}
 Converter::~Converter() {
-  if (parser_ != nullptr) {
-    delete parser_;
-  }
+  if (parser_ != nullptr) { delete parser_; }
 }
 
 bool Converter::ready() { return (parser_ != nullptr && parser_->ready()); }
@@ -55,9 +54,7 @@ bool Converter::pack(sensor_msgs::PointCloud2Ptr pointcloud) {
     return false;
   }
 
-  if (config_.organized()) {
-    parser_->order(pcl_pointcloud);
-  }
+  if (config_.organized()) { parser_->order(pcl_pointcloud); }
   pcl::toROSMsg(*(pcl_pointcloud.get()), *(pointcloud.get()));
 
   return true;
@@ -81,9 +78,8 @@ bool Converter::init(const VelodyneConf& conf) {
   return true;
 }
 
-bool Converter::convert_packets_to_pointcloud(
-    const velodyne_msgs::VelodyneScanUnifiedPtr scan_msg,
-    sensor_msgs::PointCloud2Ptr pointcloud) {
+bool Converter::convert_packets_to_pointcloud(const velodyne_msgs::VelodyneScanUnifiedPtr scan_msg,
+                                              sensor_msgs::PointCloud2Ptr pointcloud) {
   if (!scan_msg || !pointcloud) {
     AERROR << "input data scan or pointcloud error";
     return false;

@@ -39,7 +39,7 @@ void simple_minus(int k) { n -= k; }
 }  // namespace
 
 TEST(ThreadPool, simple) {
-  ThreadPool p(5);
+  ThreadPool                     p(5);
   std::vector<std::future<void>> k;
   for (int i = 0; i < 1000; ++i) {
     auto f1 = std::bind(simple_add);

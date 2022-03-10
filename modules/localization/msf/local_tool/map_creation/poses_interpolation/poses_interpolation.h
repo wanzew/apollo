@@ -24,8 +24,8 @@
 
 #include <Eigen/Geometry>
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
 /**
  * @namespace apollo::localization
@@ -38,22 +38,22 @@ namespace msf {
 class PosesInterpolation {
  public:
   PosesInterpolation();
-  bool Init(const std::string &input_poses_path,
-            const std::string &ref_timestamps_path,
-            const std::string &out_poses_path,
-            const std::string &extrinsic_path);
+  bool Init(const std::string& input_poses_path,
+            const std::string& ref_timestamps_path,
+            const std::string& out_poses_path,
+            const std::string& extrinsic_path);
   void DoInterpolation();
 
  private:
   void LoadPCDTimestamp();
   void WritePCDPoses();
-  void PoseInterpolationByTime(const std::vector<Eigen::Affine3d> &in_poses,
-                               const std::vector<double> &in_timestamps,
-                               const std::vector<double> &ref_timestamps,
-                               const std::vector<unsigned int> &ref_indexes,
-                               std::vector<unsigned int> *out_indexes,
-                               std::vector<double> *out_timestamps,
-                               std::vector<Eigen::Affine3d> *out_poses);
+  void PoseInterpolationByTime(const std::vector<Eigen::Affine3d>& in_poses,
+                               const std::vector<double>&          in_timestamps,
+                               const std::vector<double>&          ref_timestamps,
+                               const std::vector<unsigned int>&    ref_indexes,
+                               std::vector<unsigned int>*          out_indexes,
+                               std::vector<double>*                out_timestamps,
+                               std::vector<Eigen::Affine3d>*       out_poses);
 
  private:
   std::string input_poses_path_;
@@ -64,13 +64,13 @@ class PosesInterpolation {
   Eigen::Affine3d velodyne_extrinsic_;
 
   std::vector<Eigen::Affine3d> input_poses_;
-  std::vector<double> input_poses_timestamps_;
+  std::vector<double>          input_poses_timestamps_;
 
-  std::vector<double> ref_timestamps_;
+  std::vector<double>       ref_timestamps_;
   std::vector<unsigned int> ref_ids_;
 
-  std::vector<unsigned int> out_indexes_;
-  std::vector<double> out_timestamps_;
+  std::vector<unsigned int>    out_indexes_;
+  std::vector<double>          out_timestamps_;
   std::vector<Eigen::Affine3d> out_poses_;
 };
 

@@ -33,23 +33,23 @@ DEFINE_string(adapter_config_filename,
 
 DEFINE_string(events_filename, "events.txt", "File to save event list.");
 
-DEFINE_string(events_related_bags_filename, "events_related_bags.txt",
+DEFINE_string(events_related_bags_filename,
+              "events_related_bags.txt",
               "File to save events related bags list.");
 
-DEFINE_double(event_time_backtrack_seconds, 20,
+DEFINE_double(event_time_backtrack_seconds,
+              20,
               "Backtrack from the event time to consider bags as related.");
 
 namespace apollo {
 namespace data {
 namespace {
-using apollo::common::adapter::AdapterManager;
 using apollo::canbus::Chassis;
+using apollo::common::adapter::AdapterManager;
 
 void OnSigInt(int32_t signal_num) {
   // only response for ctrl + c
-  if (signal_num != SIGINT) {
-    return;
-  }
+  if (signal_num != SIGINT) { return; }
   AINFO << "EventCollector got signal: " << signal_num;
 
   // Only stop once.
@@ -62,7 +62,7 @@ void OnSigInt(int32_t signal_num) {
 
 class EventCollector {
  public:
-  void Init(int32_t argc, char **argv) {
+  void Init(int32_t argc, char** argv) {
     signal(SIGINT, OnSigInt);
 
     ros::init(argc, argv, "EventCollector");
@@ -88,19 +88,15 @@ class EventCollector {
     fout << std::fixed << std::setprecision(1);
 
     sort(events_.begin(), events_.end());
-    for (const std::string& bag_filename :
-         apollo::common::util::ListSubPaths("./", DT_REG)) {
-      if (!apollo::common::util::EndWith(bag_filename, ".bag")) {
-        continue;
-      }
+    for (const std::string& bag_filename : apollo::common::util::ListSubPaths("./", DT_REG)) {
+      if (!apollo::common::util::EndWith(bag_filename, ".bag")) { continue; }
 
-      rosbag::Bag bag(bag_filename);
+      rosbag::Bag  bag(bag_filename);
       rosbag::View view(bag);
       const double begin_time = view.getBeginTime().toSec();
-      const double end_time =
-          view.getEndTime().toSec() + FLAGS_event_time_backtrack_seconds;
+      const double end_time   = view.getEndTime().toSec() + FLAGS_event_time_backtrack_seconds;
 
-      bool started_line = false;
+      bool                                  started_line = false;
       const std::tuple<double, std::string> key(begin_time, "");
       for (auto iter = std::lower_bound(events_.begin(), events_.end(), key);
            iter != events_.end() && std::get<0>(*iter) < end_time; ++iter) {
@@ -110,8 +106,8 @@ class EventCollector {
           started_line = true;
           fout << bag_filename << "\n";
         }
-        fout << "  Offset = " << std::get<0>(*iter) - begin_time << ", "
-             << std::get<1>(*iter) << "\n";
+        fout << "  Offset = " << std::get<0>(*iter) - begin_time << ", " << std::get<1>(*iter)
+             << "\n";
       }
     }
   }
@@ -119,7 +115,7 @@ class EventCollector {
  private:
   // Event time and message.
   std::vector<std::tuple<double, std::string>> events_;
-  Chassis::DrivingMode last_driving_mode_;
+  Chassis::DrivingMode                         last_driving_mode_;
 
   void OnDriveEvent(const apollo::common::DriveEvent& event) {
     // The header time is the real event time.
@@ -136,8 +132,7 @@ class EventCollector {
     last_driving_mode_ = chassis.driving_mode();
   }
 
-  void OnMonitorMessage(
-      const apollo::common::monitor::MonitorMessage& monitor_msg) {
+  void OnMonitorMessage(const apollo::common::monitor::MonitorMessage& monitor_msg) {
     using apollo::common::monitor::MonitorMessageItem;
     // Save all ERROR and FATAL monitor logs.
     const double time_sec = monitor_msg.header().timestamp_sec();
@@ -149,10 +144,10 @@ class EventCollector {
     }
   }
 
-  void SaveEvent(const double timestamp_sec, const std::string& type,
+  void SaveEvent(const double       timestamp_sec,
+                 const std::string& type,
                  const std::string& description = "") {
-    const auto msg = apollo::common::util::StrCat(
-        timestamp_sec, " [", type, "] ", description);
+    const auto msg = apollo::common::util::StrCat(timestamp_sec, " [", type, "] ", description);
 
     AINFO << "SaveEvent: " << msg;
     events_.emplace_back(timestamp_sec, msg);
@@ -171,7 +166,7 @@ class EventCollector {
 }  // namespace data
 }  // namespace apollo
 
-int main(int32_t argc, char **argv) {
+int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 

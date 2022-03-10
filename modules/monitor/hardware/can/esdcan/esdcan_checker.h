@@ -38,8 +38,7 @@ class EsdCanChecker : public HwCheckerInterface {
   static const char ESD_CAN_NAME[];
 
   /// Returns a HW status code from ntstatus.
-  static HardwareStatus::Status esdcan_result_to_hw_status(
-      NTCAN_RESULT ntstatus);
+  static HardwareStatus::Status esdcan_result_to_hw_status(NTCAN_RESULT ntstatus);
 
   /// Returns a HW status message from ntstatus.
   static std::string esdcan_result_to_message(NTCAN_RESULT ntstatus);
@@ -49,16 +48,16 @@ class EsdCanChecker : public HwCheckerInterface {
   virtual ~EsdCanChecker() {}
 
   /// Returns the name of the HW this checker checks.
-  const std::string &get_name() const override { return name_; }
+  const std::string& get_name() const override { return name_; }
 
   // Returns the can id
   const int get_id() const { return can_id_; }
 
   /// Runs HW status check, stores results in results.
-  void run_check(std::vector<HwCheckResult> *results) override;
+  void run_check(std::vector<HwCheckResult>* results) override;
 
  private:
-  int can_id_ = 0;
+  int         can_id_ = 0;
   std::string name_;
 
   DISALLOW_COPY_AND_ASSIGN(EsdCanChecker);

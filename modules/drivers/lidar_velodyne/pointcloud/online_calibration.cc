@@ -15,18 +15,15 @@
  *****************************************************************************/
 #include <string>
 
-#include "modules/drivers/lidar_velodyne/pointcloud/online_calibration.h"
 #include "modules/common/log.h"
+#include "modules/drivers/lidar_velodyne/pointcloud/online_calibration.h"
 
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-int OnlineCalibration::decode(
-    const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msgs) {
-  if (inited_) {
-    return 0;
-  }
+int OnlineCalibration::decode(const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msgs) {
+  if (inited_) { return 0; }
   for (auto& packet : scan_msgs->packets) {
     status_types_.emplace_back(packet.data[1204]);
     status_values_.emplace_back(packet.data[1205]);
@@ -44,8 +41,7 @@ int OnlineCalibration::decode(
     return -1;
   }
 
-  if (unit_indexs_[unit_size - 1] - unit_indexs_[unit_size - 2] !=
-      65 * 64) {  // 64 lasers
+  if (unit_indexs_[unit_size - 1] - unit_indexs_[unit_size - 2] != 65 * 64) {  // 64 lasers
     // lost packet
     AERROR << "two unit distance is wrong";
     return -1;
@@ -74,31 +70,25 @@ int OnlineCalibration::decode(
     laser_correction.vert_offset_correction =
         ToInt16(&status_values_[index_32 + 4]) / 10.0 / 100.0;  // to meter
     laser_correction.horiz_offset_correction =
-        (int16_t)((int16_t)status_values_[index_48] << 8 |
-                  status_values_[index_32 + 6]) /
-        10.0 / 100.0;  // to meter
+        (int16_t)((int16_t)status_values_[index_48] << 8 | status_values_[index_32 + 6]) / 10.0 /
+        100.0;  // to meter
     laser_correction.focal_distance =
-        ToInt16(&status_values_[index_48 + 1]) / 10.0 / 100.0;  // to meter
-    laser_correction.focal_slope =
-        ToInt16(&status_values_[index_48 + 3]) / 10.0;  // to meter
+        ToInt16(&status_values_[index_48 + 1]) / 10.0 / 100.0;                       // to meter
+    laser_correction.focal_slope   = ToInt16(&status_values_[index_48 + 3]) / 10.0;  // to meter
     laser_correction.max_intensity = status_values_[index_48 + 6];
     laser_correction.min_intensity = status_values_[index_48 + 5];
 
-    laser_correction.cos_rot_correction = cosf(laser_correction.rot_correction);
-    laser_correction.sin_rot_correction = sinf(laser_correction.rot_correction);
-    laser_correction.cos_vert_correction =
-        cosf(laser_correction.vert_correction);
-    laser_correction.sin_vert_correction =
-        sinf(laser_correction.vert_correction);
-    laser_correction.focal_offset =
-        256 * pow(1 - laser_correction.focal_distance / 13100, 2);
+    laser_correction.cos_rot_correction  = cosf(laser_correction.rot_correction);
+    laser_correction.sin_rot_correction  = sinf(laser_correction.rot_correction);
+    laser_correction.cos_vert_correction = cosf(laser_correction.vert_correction);
+    laser_correction.sin_vert_correction = sinf(laser_correction.vert_correction);
+    laser_correction.focal_offset = 256 * pow(1 - laser_correction.focal_distance / 13100, 2);
 
-    calibration_.laser_corrections_[laser_correction.laser_ring] =
-        laser_correction;
+    calibration_.laser_corrections_[laser_correction.laser_ring] = laser_correction;
   }
-  calibration_.num_lasers_ = 64;
+  calibration_.num_lasers_  = 64;
   calibration_.initialized_ = true;
-  inited_ = true;
+  inited_                   = true;
   return 0;
 }
 
@@ -106,9 +96,7 @@ void OnlineCalibration::get_unit_index() {
   int size = status_values_.size();
   // simple check only for value, maybe need more check fro status type
   int start_index = 0;
-  if (unit_indexs_.size() > 0) {
-    start_index = unit_indexs_.back() + 5;
-  }
+  if (unit_indexs_.size() > 0) { start_index = unit_indexs_.back() + 5; }
   for (; start_index < size - 5; ++start_index) {
     if (status_values_[start_index] == 85            // "U"
         && status_values_[start_index + 1] == 78     // "N"
@@ -134,15 +122,13 @@ void OnlineCalibration::dump(const std::string& file_path) {
     ofs << "dist_correction_y: " << correction.second.dist_correction_y << ", ";
     ofs << "focal_distance: " << correction.second.focal_distance << ", ";
     ofs << "focal_slope: " << correction.second.focal_slope << ", ";
-    ofs << "horiz_offset_correction: "
-        << correction.second.horiz_offset_correction << ", ";
+    ofs << "horiz_offset_correction: " << correction.second.horiz_offset_correction << ", ";
     ofs << "laser_id: " << correction.second.laser_ring << ", ";
     ofs << "max_intensity: " << correction.second.max_intensity << ", ";
     ofs << "min_intensity: " << correction.second.min_intensity << ", ";
     ofs << "rot_correction: " << correction.second.rot_correction << ", ";
     ofs << "vert_correction: " << correction.second.vert_correction << ", ";
-    ofs << "vert_offset_correction: "
-        << correction.second.vert_offset_correction;
+    ofs << "vert_offset_correction: " << correction.second.vert_offset_correction;
     ofs << "}" << std::endl;
   }
   ofs << "num_lasers: " << calibration_.num_lasers_ << std::endl;

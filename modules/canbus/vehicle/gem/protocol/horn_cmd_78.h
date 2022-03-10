@@ -24,8 +24,7 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Horncmd78 : public ::apollo::drivers::canbus::ProtocolData<
-                      ::apollo::canbus::ChassisDetail> {
+class Horncmd78 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

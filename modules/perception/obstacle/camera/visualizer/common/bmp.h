@@ -26,57 +26,59 @@ namespace apollo {
 namespace perception {
 
 struct BMPHeader {
-  char bf_type[2];         /* "BM" */
-  int bf_size;             /* Size of file in bytes */
-  int bf_reserved;         /* set to 0 */
-  int bf_off_bits;         /* Byte offset to actual bitmap data (= 54) */
-  int bi_size;             /* Size of BITMAPINFOHEADER, in bytes (= 40) */
-  int bi_width;            /* Width of image, in pixels */
-  int bi_height;           /* Height of images, in pixels */
-  int bi_planes;           /* Number of planes in target device (set to 1) */
-  int bi_bit_count;        /* Bits per pixel (24 in this case) */
-  int bi_compression;      /* Type of compression (0 if no compression) */
-  int bi_size_image;       /* Image size, in bytes (0 if no compression) */
-  int bi_x_pels_per_meter; /* Resolution in pixels/meter of display device */
-  int bi_y_pels_per_meter; /* Resolution in pixels/meter of display device */
-  int bi_clr_used;         /* Number of colors in the color table (if 0, use */
-                           /* maximum allowed by bi_bit_count) */
-  int bi_clr_important;    /* Number of important colors.  If 0, all colors */
-                           /* are important */
+  char bf_type[2];          /* "BM" */
+  int  bf_size;             /* Size of file in bytes */
+  int  bf_reserved;         /* set to 0 */
+  int  bf_off_bits;         /* Byte offset to actual bitmap data (= 54) */
+  int  bi_size;             /* Size of BITMAPINFOHEADER, in bytes (= 40) */
+  int  bi_width;            /* Width of image, in pixels */
+  int  bi_height;           /* Height of images, in pixels */
+  int  bi_planes;           /* Number of planes in target device (set to 1) */
+  int  bi_bit_count;        /* Bits per pixel (24 in this case) */
+  int  bi_compression;      /* Type of compression (0 if no compression) */
+  int  bi_size_image;       /* Image size, in bytes (0 if no compression) */
+  int  bi_x_pels_per_meter; /* Resolution in pixels/meter of display device */
+  int  bi_y_pels_per_meter; /* Resolution in pixels/meter of display device */
+  int  bi_clr_used;         /* Number of colors in the color table (if 0, use */
+                            /* maximum allowed by bi_bit_count) */
+  int bi_clr_important;     /* Number of important colors.  If 0, all colors */
+                            /* are important */
 };
 
-inline void save_rgba_image_to_bmp(const unsigned char* rgba_image, const int w,
-                                   const int h, const std::string& fileName) {
+inline void save_rgba_image_to_bmp(const unsigned char* rgba_image,
+                                   const int            w,
+                                   const int            h,
+                                   const std::string&   fileName) {
   int bytes_per_line = 0;
 
   struct BMPHeader bmph;
 
   /* The length of each line must be a multiple of 4 bytes */
-  int width = w;
+  int width  = w;
   int height = h;
-  int mod4 = (width * 3) % 4;
+  int mod4   = (width * 3) % 4;
   if (mod4 == 0) {
     bytes_per_line = 3 * width;
   } else {
     bytes_per_line = 3 * width + 4 - mod4;
   }
 
-  bmph.bf_type[0] = 'B';
-  bmph.bf_type[1] = 'M';
-  bmph.bf_off_bits = 54;
-  bmph.bf_size = bmph.bf_off_bits + bytes_per_line * height;
-  bmph.bf_reserved = 0;
-  bmph.bi_size = 40;
-  bmph.bi_width = width;
-  bmph.bi_height = height;
-  bmph.bi_planes = 1;
-  bmph.bi_bit_count = 24;
-  bmph.bi_compression = 0;
-  bmph.bi_size_image = bytes_per_line * height;
+  bmph.bf_type[0]          = 'B';
+  bmph.bf_type[1]          = 'M';
+  bmph.bf_off_bits         = 54;
+  bmph.bf_size             = bmph.bf_off_bits + bytes_per_line * height;
+  bmph.bf_reserved         = 0;
+  bmph.bi_size             = 40;
+  bmph.bi_width            = width;
+  bmph.bi_height           = height;
+  bmph.bi_planes           = 1;
+  bmph.bi_bit_count        = 24;
+  bmph.bi_compression      = 0;
+  bmph.bi_size_image       = bytes_per_line * height;
   bmph.bi_x_pels_per_meter = 0;
   bmph.bi_y_pels_per_meter = 0;
-  bmph.bi_clr_used = 0;
-  bmph.bi_clr_important = 0;
+  bmph.bi_clr_used         = 0;
+  bmph.bi_clr_important    = 0;
 
   std::fstream fs;
   fs.open(fileName, std::fstream::in | std::fstream::binary);

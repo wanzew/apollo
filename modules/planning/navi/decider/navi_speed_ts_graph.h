@@ -87,8 +87,7 @@ class NaviSpeedTsGraph {
    * @param s_max Max of s-axis.
    * @param get_safe_distance Callback for get safe distance base on v.
    */
-  void Reset(double s_step, double s_max,
-             const std::function<double(double v)>& get_safe_distance);
+  void Reset(double s_step, double s_max, const std::function<double(double v)>& get_safe_distance);
 
   /**
    * @brief Get the current s-step.
@@ -113,8 +112,7 @@ class NaviSpeedTsGraph {
    * @param s S fo the point.
    * @param constraints constraints for the point.
    */
-  void UpdatePointConstraints(double s,
-                              const NaviSpeedTsConstraints& constraints);
+  void UpdatePointConstraints(double s, const NaviSpeedTsConstraints& constraints);
 
   /**
    * @brief Assign constraints for an obstacle.
@@ -132,13 +130,13 @@ class NaviSpeedTsGraph {
    * @param points buffer of t-s points for output.
    * @return Status::OK() if success; error otherwise.
    */
-  apollo::common::Status Solve(double start_v, double start_a, double start_da,
-                               std::vector<NaviSpeedTsPoint>* points);
+  apollo::common::Status
+  Solve(double start_v, double start_a, double start_da, std::vector<NaviSpeedTsPoint>* points);
 
  private:
   std::vector<NaviSpeedTsConstraints> constraints_;
-  double s_step_;
-  std::function<double(double)> get_safe_distance_;
+  double                              s_step_;
+  std::function<double(double)>       get_safe_distance_;
 };
 
 }  // namespace planning

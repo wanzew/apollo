@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/camera/motion/plane_motion.h"
+#include "modules/common/log.h"
 #include <limits>
 #include <list>
-#include "modules/common/log.h"
-#include "modules/perception/obstacle/camera/motion/plane_motion.h"
 namespace apollo {
 namespace perception {
 
@@ -41,15 +41,15 @@ PlaneMotion::~PlaneMotion(void) {
 }
 
 // Generate the inverse motion for past trajectory
-void PlaneMotion::generate_motion_matrix(VehicleStatus *vehicledata) {
+void PlaneMotion::generate_motion_matrix(VehicleStatus* vehicledata) {
   if (!is_3d_motion_) {
-    MotionType motion_2d = MotionType::Identity();
-    float theta = vehicledata->time_d * vehicledata->yaw_rate;
+    MotionType         motion_2d = MotionType::Identity();
+    float              theta     = vehicledata->time_d * vehicledata->yaw_rate;
     Eigen::Rotation2Df rot2d(theta);
-    Eigen::Vector2f trans;
-    float displacement = vehicledata->time_d * vehicledata->velocity;
-    trans(0) = displacement * cos(theta);
-    trans(1) = displacement * sin(theta);
+    Eigen::Vector2f    trans;
+    float              displacement = vehicledata->time_d * vehicledata->velocity;
+    trans(0)                        = displacement * cos(theta);
+    trans(1)                        = displacement * sin(theta);
     // trans(0) = vehicledata->time_d * vehicledata->velocity_x;
     // trans(1) = vehicledata->time_d * vehicledata->velocity_y;
 
@@ -59,23 +59,22 @@ void PlaneMotion::generate_motion_matrix(VehicleStatus *vehicledata) {
     CHECK(vehicledata->motion.cols() == motion_2d.cols());
     vehicledata->motion = motion_2d;
   } else {
-    MotionType motion_3d = MotionType::Identity();
-    float roll_delta = vehicledata->time_d * vehicledata->roll_rate;
-    float pitch_delta = vehicledata->time_d * vehicledata->pitch_rate;
-    float yaw_delta = vehicledata->time_d * vehicledata->yaw_rate;
+    MotionType motion_3d   = MotionType::Identity();
+    float      roll_delta  = vehicledata->time_d * vehicledata->roll_rate;
+    float      pitch_delta = vehicledata->time_d * vehicledata->pitch_rate;
+    float      yaw_delta   = vehicledata->time_d * vehicledata->yaw_rate;
 
     Eigen::AngleAxisf roll_angle(roll_delta, Eigen::Vector3f::UnitX());
     Eigen::AngleAxisf pitch_angle(pitch_delta, Eigen::Vector3f::UnitY());
     Eigen::AngleAxisf yaw_angle(yaw_delta, Eigen::Vector3f::UnitZ());
 
-    Eigen::Quaternion<float> q = roll_angle * pitch_angle * yaw_angle;
-    Eigen::Matrix3f rot3d = q.matrix();
+    Eigen::Quaternion<float> q     = roll_angle * pitch_angle * yaw_angle;
+    Eigen::Matrix3f          rot3d = q.matrix();
 
-    float displacement = vehicledata->time_d * vehicledata->velocity;
+    float           displacement = vehicledata->time_d * vehicledata->velocity;
     Eigen::Vector3f trans;
     trans(0) = sqrt(displacement * displacement /
-                    (tan(yaw_delta) * tan(yaw_delta) +
-                     +tan(pitch_delta) * tan(pitch_delta) + 1));
+                    (tan(yaw_delta) * tan(yaw_delta) + +tan(pitch_delta) * tan(pitch_delta) + 1));
     trans(1) = tan(yaw_delta) * trans(0);
     trans(2) = tan(pitch_delta) * trans(0);
 
@@ -91,9 +90,7 @@ void PlaneMotion::accumulate_motion(double start_time, double end_time) {
   // accumulate CAN+IMU / Localization motion
   auto iter = raw_motion_queue_.begin();
   for (; iter != raw_motion_queue_.end() && iter->time_ts <= end_time; ++iter) {
-    if (iter->time_ts < start_time) {
-      continue;
-    }
+    if (iter->time_ts < start_time) { continue; }
     mat_motion_sensor_ *= iter->motion;
     time_difference_ += iter->time_d;
   }
@@ -103,9 +100,9 @@ void PlaneMotion::accumulate_motion(double start_time, double end_time) {
   }
 }
 
-void PlaneMotion::update_motion_buffer(const VehicleStatus &vehicledata,
-                                       const double pre_image_timestamp,
-                                       const double image_timestamp) {
+void PlaneMotion::update_motion_buffer(const VehicleStatus& vehicledata,
+                                       const double         pre_image_timestamp,
+                                       const double         image_timestamp) {
   MutexLock lock(&mutex_);
   for (size_t k = 0; k < mot_buffer_->size(); ++k) {
     mot_buffer_->at(k).motion *= mat_motion_sensor_;
@@ -118,22 +115,19 @@ void PlaneMotion::update_motion_buffer(const VehicleStatus &vehicledata,
   mot_buffer_->push_back(vehicledata);
   mot_buffer_->back().time_d = time_difference_;
   // update motion
-  mot_buffer_->back().motion = mat_motion_sensor_;
+  mot_buffer_->back().motion  = mat_motion_sensor_;
   mot_buffer_->back().time_ts = image_timestamp;
   // reset motion buffer
-  mat_motion_sensor_ =
-      MotionType::Identity();  // reset image accumulated motion
-  time_difference_ = 0.0f;     // reset the accumulated time difference
+  mat_motion_sensor_ = MotionType::Identity();  // reset image accumulated motion
+  time_difference_   = 0.0f;                    // reset the accumulated time difference
 }
 
-bool PlaneMotion::find_motion_with_timestamp(double timestamp,
-                                             VehicleStatus *vs) {
+bool PlaneMotion::find_motion_with_timestamp(double timestamp, VehicleStatus* vs) {
   MutexLock lock(&mutex_);
   ADEBUG << "mot_buffer_->size(): " << mot_buffer_->size();
 
   for (auto rit = mot_buffer_->rbegin(); rit != mot_buffer_->rend(); ++rit) {
-    if (std::abs(rit->time_ts - timestamp) <
-        std::numeric_limits<double>::epsilon()) {
+    if (std::abs(rit->time_ts - timestamp) < std::numeric_limits<double>::epsilon()) {
       *vs = *rit;
       return true;
     }
@@ -145,16 +139,14 @@ MotionBuffer PlaneMotion::get_buffer() {
   return *mot_buffer_;
 }
 
-void PlaneMotion::add_new_motion(double pre_image_timestamp,
-                                 double image_timestamp,
-                                 int motion_operation_flag,
-                                 VehicleStatus *vehicledata) {
-  while (!raw_motion_queue_.empty() &&
-         vehicledata->time_ts < raw_motion_queue_.back().time_ts) {
+void PlaneMotion::add_new_motion(double         pre_image_timestamp,
+                                 double         image_timestamp,
+                                 int            motion_operation_flag,
+                                 VehicleStatus* vehicledata) {
+  while (!raw_motion_queue_.empty() && vehicledata->time_ts < raw_motion_queue_.back().time_ts) {
     raw_motion_queue_.pop_back();
     ADEBUG << "pop ts : back ts" << std::to_string(vehicledata->time_ts) << " "
-           << std::to_string(raw_motion_queue_.back().time_ts) << " "
-           << raw_motion_queue_.size();
+           << std::to_string(raw_motion_queue_.back().time_ts) << " " << raw_motion_queue_.size();
   }
 
   if (motion_operation_flag != RESET) {
@@ -170,21 +162,17 @@ void PlaneMotion::add_new_motion(double pre_image_timestamp,
         break;
       case ACCUM_PUSH_MOTION:
         accumulate_motion(pre_image_timestamp, image_timestamp);
-        update_motion_buffer(*vehicledata, pre_image_timestamp,
-                             image_timestamp);
+        update_motion_buffer(*vehicledata, pre_image_timestamp, image_timestamp);
         break;
-      default:
-        AERROR << "motion operation flag:wrong type";
-        return;
+      default: AERROR << "motion operation flag:wrong type"; return;
     }
   } else {
     mot_buffer_->clear();
-    vehicledata->time_d = 0;
+    vehicledata->time_d  = 0;
     vehicledata->time_ts = image_timestamp;
-    vehicledata->motion = MotionType::Identity();
+    vehicledata->motion  = MotionType::Identity();
     mot_buffer_->push_back(*vehicledata);
-    ADEBUG << "pop and rest raw_buffer, mot_buffer: "
-           << raw_motion_queue_.size();
+    ADEBUG << "pop and rest raw_buffer, mot_buffer: " << raw_motion_queue_.size();
   }
 }
 }  // namespace perception

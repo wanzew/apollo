@@ -31,28 +31,23 @@ using Eigen::MatrixXd;
 
 TEST(constraint_test, test_suit_one) {
   std::vector<double> t_knots{0, 1, 2, 3, 4, 5};
-  std::size_t order = 5;
-  Spline2dSolver spline_solver(t_knots, order);
+  std::size_t         order = 5;
+  Spline2dSolver      spline_solver(t_knots, order);
 
   Spline2dConstraint* constraint = spline_solver.mutable_constraint();
-  Spline2dKernel* kernel = spline_solver.mutable_kernel();
+  Spline2dKernel*     kernel     = spline_solver.mutable_kernel();
 
-  std::vector<double> et{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
-  std::vector<double> bound(11, 0.2);
+  std::vector<double>              et{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
+  std::vector<double>              bound(11, 0.2);
   std::vector<std::vector<double>> constraint_data{
-      {-1.211566924, 434592.7844, 4437011.568},
-      {-1.211572116, 434594.6884, 4437006.498},
-      {-1.21157766, 434596.5923, 4437001.428},
-      {-1.211571616, 434598.4962, 4436996.358},
-      {-1.21155227, 434600.4002, 4436991.288},
-      {-1.211532017, 434602.3043, 4436986.218},
-      {-1.21155775, 434604.2083, 4436981.148},
-      {-1.211634014, 434606.1122, 4436976.077},
-      {-1.211698593, 434608.0156, 4436971.007},
-      {-1.211576177, 434609.9191, 4436965.937},
+      {-1.211566924, 434592.7844, 4437011.568}, {-1.211572116, 434594.6884, 4437006.498},
+      {-1.21157766, 434596.5923, 4437001.428},  {-1.211571616, 434598.4962, 4436996.358},
+      {-1.21155227, 434600.4002, 4436991.288},  {-1.211532017, 434602.3043, 4436986.218},
+      {-1.21155775, 434604.2083, 4436981.148},  {-1.211634014, 434606.1122, 4436976.077},
+      {-1.211698593, 434608.0156, 4436971.007}, {-1.211576177, 434609.9191, 4436965.937},
       {-1.211256197, 434611.8237, 4436960.867}};
   std::vector<double> angle;
-  std::vector<Vec2d> ref_point;
+  std::vector<Vec2d>  ref_point;
 
   for (std::size_t i = 0; i < 11; ++i) {
     angle.push_back(constraint_data[i][0]);
@@ -130,14 +125,12 @@ TEST(constraint_test, test_suit_one) {
 
   double t = 0;
   for (int i = 0; i < 51; ++i) {
-    auto xy = spline_solver.spline()(t);
-    const double heading = std::atan2(spline_solver.spline().DerivativeY(t),
-                                      spline_solver.spline().DerivativeX(t));
+    auto         xy = spline_solver.spline()(t);
+    const double heading =
+        std::atan2(spline_solver.spline().DerivativeY(t), spline_solver.spline().DerivativeX(t));
     const double kappa = CurveMath::ComputeCurvature(
-        spline_solver.spline().DerivativeX(t),
-        spline_solver.spline().SecondDerivativeX(t),
-        spline_solver.spline().DerivativeY(t),
-        spline_solver.spline().SecondDerivativeY(t));
+        spline_solver.spline().DerivativeX(t), spline_solver.spline().SecondDerivativeX(t),
+        spline_solver.spline().DerivativeY(t), spline_solver.spline().SecondDerivativeY(t));
     EXPECT_NEAR(heading, gold_res(i, 0), 1e-4);
     EXPECT_NEAR(xy.first, gold_res(i, 1), 1e-4);
     EXPECT_NEAR(xy.second, gold_res(i, 2), 1e-4);

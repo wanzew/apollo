@@ -29,12 +29,9 @@ namespace hw {
 
 const char EsdCanChecker::ESD_CAN_NAME[] = "ESD_CAN";
 
-EsdCanChecker::EsdCanChecker() {
-  name_ = apollo::common::util::StrCat(ESD_CAN_NAME, "-", can_id_);
-}
+EsdCanChecker::EsdCanChecker() { name_ = apollo::common::util::StrCat(ESD_CAN_NAME, "-", can_id_); }
 
-HardwareStatus::Status EsdCanChecker::esdcan_result_to_hw_status(
-    NTCAN_RESULT ntstatus) {
+HardwareStatus::Status EsdCanChecker::esdcan_result_to_hw_status(NTCAN_RESULT ntstatus) {
   // @todo: device not present detection in esd_can_test.
   return ntstatus == NTCAN_SUCCESS ? HardwareStatus::OK : HardwareStatus::ERR;
 }
@@ -43,11 +40,11 @@ std::string EsdCanChecker::esdcan_result_to_message(NTCAN_RESULT ntstatus) {
   return ntstatus == NTCAN_SUCCESS ? "OK" : esdcan_err_to_str(ntstatus);
 }
 
-void EsdCanChecker::run_check(std::vector<HwCheckResult> *results) {
+void EsdCanChecker::run_check(std::vector<HwCheckResult>* results) {
   AINFO << "To check ESD-CAN-" << can_id_;
 
-  EsdCanDetails *details = new EsdCanDetails();
-  NTCAN_RESULT result = details->esdcan_do_test(can_id_);
+  EsdCanDetails* details = new EsdCanDetails();
+  NTCAN_RESULT   result  = details->esdcan_do_test(can_id_);
 
   HwCheckResult rslt("CAN", esdcan_result_to_hw_status(result), details,
                      std::move(esdcan_result_to_message(result)));

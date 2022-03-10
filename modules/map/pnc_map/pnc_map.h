@@ -46,64 +46,65 @@ namespace hdmap {
 class PncMap {
  public:
   virtual ~PncMap() = default;
-  explicit PncMap(const HDMap *hdmap);
+  explicit PncMap(const HDMap* hdmap);
 
-  const hdmap::HDMap *hdmap() const;
+  const hdmap::HDMap* hdmap() const;
 
-  bool UpdateRoutingResponse(const routing::RoutingResponse &routing_response);
+  bool UpdateRoutingResponse(const routing::RoutingResponse& routing_response);
 
-  const routing::RoutingResponse &routing_response() const;
+  const routing::RoutingResponse& routing_response() const;
 
-  static bool CreatePathFromLaneSegments(const RouteSegments &segments,
-                                         Path *const path);
+  static bool CreatePathFromLaneSegments(const RouteSegments& segments, Path* const path);
 
-  bool GetRouteSegments(const common::VehicleState &vehicle_state,
-                        const double backward_length,
-                        const double forward_length,
-                        std::list<RouteSegments> *const route_segments);
+  bool GetRouteSegments(const common::VehicleState&     vehicle_state,
+                        const double                    backward_length,
+                        const double                    forward_length,
+                        std::list<RouteSegments>* const route_segments);
 
   /**
    * Check if the routing is the same as existing one in PncMap
    */
-  bool IsNewRouting(const routing::RoutingResponse &routing_response) const;
-  static bool IsNewRouting(const routing::RoutingResponse &prev,
-                           const routing::RoutingResponse &routing_response);
+  bool        IsNewRouting(const routing::RoutingResponse& routing_response) const;
+  static bool IsNewRouting(const routing::RoutingResponse& prev,
+                           const routing::RoutingResponse& routing_response);
 
-  bool ExtendSegments(const RouteSegments &segments,
-                      const common::PointENU &point, double look_forward,
-                      double look_backward, RouteSegments *extended_segments);
+  bool ExtendSegments(const RouteSegments&    segments,
+                      const common::PointENU& point,
+                      double                  look_forward,
+                      double                  look_backward,
+                      RouteSegments*          extended_segments);
 
-  bool ExtendSegments(const RouteSegments &segments, double start_s,
-                      double end_s,
-                      RouteSegments *const truncated_segments) const;
+  bool ExtendSegments(const RouteSegments& segments,
+                      double               start_s,
+                      double               end_s,
+                      RouteSegments* const truncated_segments) const;
 
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints() const;
 
  private:
-  bool UpdateVehicleState(const common::VehicleState &vehicle_state);
+  bool UpdateVehicleState(const common::VehicleState& vehicle_state);
   /**
    * @brief Find the waypoint index of a routing waypoint. It updates
    * adc_route_index_
    * @return index out of range if cannot find waypoint on routing, otherwise
    *   an index in range [0, route_indices.size());
    */
-  int GetWaypointIndex(const LaneWaypoint &waypoint) const;
+  int GetWaypointIndex(const LaneWaypoint& waypoint) const;
 
-  bool GetNearestPointFromRouting(const common::VehicleState &point,
-                                  LaneWaypoint *waypoint) const;
+  bool GetNearestPointFromRouting(const common::VehicleState& point, LaneWaypoint* waypoint) const;
 
-  bool PassageToSegments(routing::Passage passage,
-                         RouteSegments *segments) const;
+  bool PassageToSegments(routing::Passage passage, RouteSegments* segments) const;
 
-  bool ProjectToSegments(const common::PointENU &point_enu,
-                         const RouteSegments &segments,
-                         LaneWaypoint *waypoint) const;
+  bool ProjectToSegments(const common::PointENU& point_enu,
+                         const RouteSegments&    segments,
+                         LaneWaypoint*           waypoint) const;
 
-  static bool ValidateRouting(const routing::RoutingResponse &routing);
+  static bool ValidateRouting(const routing::RoutingResponse& routing);
 
-  static void AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
-                                 const double end_s,
-                                 std::vector<MapPathPoint> *const points);
+  static void AppendLaneToPoints(LaneInfoConstPtr                 lane,
+                                 const double                     start_s,
+                                 const double                     end_s,
+                                 std::vector<MapPathPoint>* const points);
 
   LaneInfoConstPtr GetRoutePredecessor(LaneInfoConstPtr lane) const;
   LaneInfoConstPtr GetRouteSuccessor(LaneInfoConstPtr lane) const;
@@ -115,22 +116,21 @@ class PncMap {
    * @return all the indices of the neighboring passages, including
    * start_passage.
    */
-  std::vector<int> GetNeighborPassages(const routing::RoadSegment &road,
-                                       int start_passage) const;
+  std::vector<int> GetNeighborPassages(const routing::RoadSegment& road, int start_passage) const;
 
   /**
    * @brief convert a routing waypoint to lane waypoint
    * @return empty LaneWaypoint if the lane id cannot be found on map, otherwise
    * return a valid LaneWaypoint with lane ptr and s.
    */
-  LaneWaypoint ToLaneWaypoint(const routing::LaneWaypoint &waypoint) const;
+  LaneWaypoint ToLaneWaypoint(const routing::LaneWaypoint& waypoint) const;
 
   /**
    * @brief convert a routing segment to lane segment
    * @return empty LaneSegmetn if the lane id cannot be found on map, otherwise
    * return a valid LaneSegment with lane ptr, start_s and end_s
    */
-  LaneSegment ToLaneSegment(const routing::LaneSegment &segment) const;
+  LaneSegment ToLaneSegment(const routing::LaneSegment& segment) const;
 
   /**
    * @brief Update routing waypoint index to the next waypoint that ADC need to
@@ -148,21 +148,20 @@ class PncMap {
    * @return empty vector if not found, otherwise return a vector { road_index,
    * passage_index, lane_index}
    */
-  int SearchForwardWaypointIndex(int start, const LaneWaypoint &waypoint) const;
-  int SearchBackwardWaypointIndex(int start,
-                                  const LaneWaypoint &waypoint) const;
+  int SearchForwardWaypointIndex(int start, const LaneWaypoint& waypoint) const;
+  int SearchBackwardWaypointIndex(int start, const LaneWaypoint& waypoint) const;
 
   void UpdateRoutingRange(int adc_index);
 
  private:
   routing::RoutingResponse routing_;
   struct RouteIndex {
-    LaneSegment segment;
+    LaneSegment        segment;
     std::array<int, 3> index;
   };
   std::vector<RouteIndex> route_indices_;
-  int range_start_ = 0;
-  int range_end_ = 0;
+  int                     range_start_ = 0;
+  int                     range_end_   = 0;
   // routing ids in range
   std::unordered_set<std::string> range_lane_ids_;
   std::unordered_set<std::string> all_lane_ids_;
@@ -172,9 +171,10 @@ class PncMap {
    */
   struct WaypointIndex {
     LaneWaypoint waypoint;
-    int index;
-    WaypointIndex(const LaneWaypoint &waypoint, int index)
-        : waypoint(waypoint), index(index) {}
+    int          index;
+    WaypointIndex(const LaneWaypoint& waypoint, int index)
+        : waypoint(waypoint)
+        , index(index) {}
   };
 
   // return the segment of an index
@@ -186,8 +186,8 @@ class PncMap {
    */
   std::size_t next_routing_waypoint_index_ = 0;
 
-  const hdmap::HDMap *hdmap_ = nullptr;
-  bool is_same_routing_ = false;
+  const hdmap::HDMap* hdmap_           = nullptr;
+  bool                is_same_routing_ = false;
 
   /**
    * The state of the adc

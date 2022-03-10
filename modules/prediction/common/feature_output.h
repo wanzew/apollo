@@ -70,7 +70,7 @@ class FeatureOutput {
 
  private:
   static Features features_;
-  static size_t index_;
+  static size_t   index_;
 };
 
 }  // namespace prediction

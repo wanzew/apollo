@@ -41,8 +41,7 @@ class FrameTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     ASSERT_TRUE(common::util::GetProtoFromFile(
-        "modules/planning/common/testdata/sample_prediction.pb.txt",
-        &prediction_obstacles_));
+        "modules/planning/common/testdata/sample_prediction.pb.txt", &prediction_obstacles_));
   }
 
  protected:
@@ -50,24 +49,19 @@ class FrameTest : public ::testing::Test {
 };
 
 TEST_F(FrameTest, AlignPredictionTime) {
-  int first_traj_size = prediction_obstacles_.prediction_obstacle(0)
-                            .trajectory(0)
-                            .trajectory_point_size();
+  int first_traj_size =
+      prediction_obstacles_.prediction_obstacle(0).trajectory(0).trajectory_point_size();
   double origin_pred_time = prediction_obstacles_.header().timestamp_sec();
   Frame::AlignPredictionTime(origin_pred_time + 0.1, &prediction_obstacles_);
-  ASSERT_EQ(first_traj_size - 1, prediction_obstacles_.prediction_obstacle(0)
-                                     .trajectory(0)
-                                     .trajectory_point_size());
+  ASSERT_EQ(first_traj_size - 1,
+            prediction_obstacles_.prediction_obstacle(0).trajectory(0).trajectory_point_size());
 
   Frame::AlignPredictionTime(origin_pred_time + 0.5, &prediction_obstacles_);
-  ASSERT_EQ(first_traj_size - 3, prediction_obstacles_.prediction_obstacle(0)
-                                     .trajectory(0)
-                                     .trajectory_point_size());
+  ASSERT_EQ(first_traj_size - 3,
+            prediction_obstacles_.prediction_obstacle(0).trajectory(0).trajectory_point_size());
 
   Frame::AlignPredictionTime(origin_pred_time + 12.0, &prediction_obstacles_);
-  ASSERT_EQ(0, prediction_obstacles_.prediction_obstacle(0)
-                   .trajectory(0)
-                   .trajectory_point_size());
+  ASSERT_EQ(0, prediction_obstacles_.prediction_obstacle(0).trajectory(0).trajectory_point_size());
 }
 
 }  // namespace planning

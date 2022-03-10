@@ -26,7 +26,7 @@ namespace velodyne {
 struct PointXYZIT {
   PCL_ADD_POINT4D
   uint8_t intensity;
-  double timestamp;
+  double  timestamp;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW  // make sure our new allocators are aligned
 } EIGEN_ALIGN16;
 // enforce SSE padding for correct memory alignment
@@ -37,6 +37,5 @@ struct PointXYZIT {
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::drivers::velodyne::PointXYZIT,
                                   (float, x, x)(float, y, y)(float, z, z)(
-                                      uint8_t, intensity,
-                                      intensity)(double, timestamp, timestamp))
+                                      uint8_t, intensity, intensity)(double, timestamp, timestamp))
 #endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_POINT_TYPES_H_

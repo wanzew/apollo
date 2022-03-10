@@ -28,9 +28,9 @@ namespace drivers {
 namespace canbus {
 
 TEST(CanReceiverTest, ReceiveOne) {
-  can::FakeCanClient can_client;
+  can::FakeCanClient                              can_client;
   MessageManager<::apollo::canbus::ChassisDetail> pm;
-  CanReceiver<::apollo::canbus::ChassisDetail> receiver;
+  CanReceiver<::apollo::canbus::ChassisDetail>    receiver;
 
   receiver.Init(&can_client, &pm, false);
   EXPECT_EQ(receiver.Start(), common::ErrorCode::OK);

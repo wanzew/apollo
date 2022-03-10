@@ -33,20 +33,20 @@ namespace perception {
 
 class EventManager {
  public:
-  EventManager() = default;
+  EventManager()  = default;
   ~EventManager() = default;
 
   // not thread-safe.
-  bool Init(const DAGConfig::EdgeConfig &edge_config);
+  bool Init(const DAGConfig::EdgeConfig& edge_config);
 
   // thread-safe.
-  bool Publish(const Event &event);
+  bool Publish(const Event& event);
 
   // if no event arrive, this api would be block.
   // thread-safe.
-  bool Subscribe(EventID event_id, Event *event);
+  bool Subscribe(EventID event_id, Event* event);
 
-  bool Subscribe(EventID event_id, Event *event, bool nonblocking);
+  bool Subscribe(EventID event_id, Event* event, bool nonblocking);
 
   // clear all the event queues.
   void Reset();
@@ -55,34 +55,32 @@ class EventManager {
 
   int MaxLenOfEventQueues() const;
 
-  bool GetEventMeta(EventID event_id, EventMeta *event_meta) const;
+  bool GetEventMeta(EventID event_id, EventMeta* event_meta) const;
 
-  bool GetEventMeta(const std::vector<EventID> &event_ids,
-                    std::vector<EventMeta> *event_metas) const;
+  bool GetEventMeta(const std::vector<EventID>& event_ids,
+                    std::vector<EventMeta>*     event_metas) const;
 
-  bool GetEventMeta(EventID event_id, std::string *str) const;
+  bool GetEventMeta(EventID event_id, std::string* str) const;
 
-  bool GetEventMeta(const std::vector<EventID> &event_id,
-                    std::vector<std::string> *str_list) const;
+  bool GetEventMeta(const std::vector<EventID>& event_id, std::vector<std::string>* str_list) const;
 
   int NumEvents() const { return event_queue_map_.size(); }
 
  private:
-  using EventQueue = FixedSizeConQueue<Event>;
-  using EventQueueMap =
-      std::unordered_map<EventID, std::unique_ptr<EventQueue>>;
-  using EventQueueMapIterator = EventQueueMap::iterator;
+  using EventQueue                 = FixedSizeConQueue<Event>;
+  using EventQueueMap              = std::unordered_map<EventID, std::unique_ptr<EventQueue>>;
+  using EventQueueMapIterator      = EventQueueMap::iterator;
   using EventQueueMapConstIterator = EventQueueMap::const_iterator;
-  using EventMetaMap = std::unordered_map<EventID, EventMeta>;
-  using EventMetaMapIterator = EventMetaMap::iterator;
-  using EventMetaMapConstIterator = EventMetaMap::const_iterator;
+  using EventMetaMap               = std::unordered_map<EventID, EventMeta>;
+  using EventMetaMapIterator       = EventMetaMap::iterator;
+  using EventMetaMapConstIterator  = EventMetaMap::const_iterator;
 
-  EventQueue *GetEventQueue(const EventID &event_id);
+  EventQueue* GetEventQueue(const EventID& event_id);
 
   EventQueueMap event_queue_map_;
   // for debug.
   EventMetaMap event_meta_map_;
-  bool inited_ = false;
+  bool         inited_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(EventManager);
 };

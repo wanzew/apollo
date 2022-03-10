@@ -34,7 +34,7 @@ struct alignas(16) HdmapStruct {
   std::vector<PolygonDType> junction;
 };
 
-typedef std::shared_ptr<HdmapStruct> HdmapStructPtr;
+typedef std::shared_ptr<HdmapStruct>       HdmapStructPtr;
 typedef std::shared_ptr<const HdmapStruct> HdmapStructConstPtr;
 
 }  // namespace perception

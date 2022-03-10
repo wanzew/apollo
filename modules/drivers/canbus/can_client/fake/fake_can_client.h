@@ -53,7 +53,7 @@ class FakeCanClient : public CanClient {
    * @param parameter CAN card parameters to initialize the CAN client.
    * @return If the initialization is successful.
    */
-  bool Init(const CANCardParameter &param) override;
+  bool Init(const CANCardParameter& param) override;
 
   /**
    * @brief Destructor
@@ -79,8 +79,8 @@ class FakeCanClient : public CanClient {
    * @return The status of the sending action which is defined by
    *         apollo::common::ErrorCode.
    */
-  apollo::common::ErrorCode Send(const std::vector<CanFrame> &frames,
-                                 int32_t *const frame_num) override;
+  apollo::common::ErrorCode Send(const std::vector<CanFrame>& frames,
+                                 int32_t* const               frame_num) override;
 
   /**
    * @brief Receive messages
@@ -89,8 +89,8 @@ class FakeCanClient : public CanClient {
    * @return The status of the receiving action which is defined by
    *         apollo::common::ErrorCode.
    */
-  apollo::common::ErrorCode Receive(std::vector<CanFrame> *frames,
-                                    int32_t *const frame_num) override;
+  apollo::common::ErrorCode Receive(std::vector<CanFrame>* frames,
+                                    int32_t* const         frame_num) override;
 
   /**
    * @brief Get the error string.
@@ -99,8 +99,8 @@ class FakeCanClient : public CanClient {
   std::string GetErrorString(const int32_t status) override;
 
  private:
-  int32_t send_counter_ = 0;
-  int32_t recv_counter_ = 0;
+  int32_t           send_counter_ = 0;
+  int32_t           recv_counter_ = 0;
   std::stringstream frame_info_;
 };
 

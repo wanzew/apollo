@@ -37,8 +37,7 @@ class SpeedDecider : public Task {
 
   bool Init(const PlanningConfig& config) override;
 
-  apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
   enum StPosition {
@@ -47,8 +46,7 @@ class SpeedDecider : public Task {
     CROSS = 3,
   };
 
-  StPosition GetStPosition(const SpeedData& speed_profile,
-                           const StBoundary& st_boundary) const;
+  StPosition GetStPosition(const SpeedData& speed_profile, const StBoundary& st_boundary) const;
   /**
    * @brief check if the ADC should follow an obstacle by examing the
    *StBoundary of the obstacle.
@@ -58,31 +56,30 @@ class SpeedDecider : public Task {
    **/
   bool CheckIsFollowByT(const StBoundary& boundary) const;
 
-  bool CreateStopDecision(const PathObstacle& path_obstacle,
+  bool CreateStopDecision(const PathObstacle&       path_obstacle,
                           ObjectDecisionType* const stop_decision,
-                          double stop_distance) const;
+                          double                    stop_distance) const;
 
   /**
    * @brief create follow decision based on the boundary
    **/
-  bool CreateFollowDecision(const PathObstacle& path_obstacle,
+  bool CreateFollowDecision(const PathObstacle&       path_obstacle,
                             ObjectDecisionType* const follow_decision) const;
 
   /**
    * @brief create yield decision based on the boundary
    **/
-  bool CreateYieldDecision(const PathObstacle& path_obstacle,
+  bool CreateYieldDecision(const PathObstacle&       path_obstacle,
                            ObjectDecisionType* const yield_decision) const;
 
   /**
    * @brief create overtake decision based on the boundary
    **/
-  bool CreateOvertakeDecision(
-      const PathObstacle& path_obstacle,
-      ObjectDecisionType* const overtake_decision) const;
+  bool CreateOvertakeDecision(const PathObstacle&       path_obstacle,
+                              ObjectDecisionType* const overtake_decision) const;
 
-  apollo::common::Status MakeObjectDecision(
-      const SpeedData& speed_profile, PathDecision* const path_decision) const;
+  apollo::common::Status MakeObjectDecision(const SpeedData&    speed_profile,
+                                            PathDecision* const path_decision) const;
 
   void AppendIgnoreDecision(PathObstacle* path_obstacle) const;
 
@@ -94,11 +91,11 @@ class SpeedDecider : public Task {
   bool IsFollowTooClose(const PathObstacle& path_obstacle) const;
 
  private:
-  DpStSpeedConfig dp_st_speed_config_;
-  StBoundaryConfig st_boundary_config_;
-  SLBoundary adc_sl_boundary_;
+  DpStSpeedConfig                 dp_st_speed_config_;
+  StBoundaryConfig                st_boundary_config_;
+  SLBoundary                      adc_sl_boundary_;
   apollo::common::TrajectoryPoint init_point_;
-  const ReferenceLine* reference_line_ = nullptr;
+  const ReferenceLine*            reference_line_ = nullptr;
 };
 
 }  // namespace planning

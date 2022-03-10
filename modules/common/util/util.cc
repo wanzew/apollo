@@ -54,8 +54,7 @@ PointENU MakePointENU(const math::Vec2d& xy) {
   return point_enu;
 }
 
-apollo::perception::Point MakePerceptionPoint(const double x, const double y,
-                                              const double z) {
+apollo::perception::Point MakePerceptionPoint(const double x, const double y, const double z) {
   perception::Point point3d;
   point3d.set_x(x);
   point3d.set_y(y);
@@ -63,8 +62,8 @@ apollo::perception::Point MakePerceptionPoint(const double x, const double y,
   return point3d;
 }
 
-SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
-                          const double a, const double da) {
+SpeedPoint
+MakeSpeedPoint(const double s, const double t, const double v, const double a, const double da) {
   SpeedPoint speed_point;
   speed_point.set_s(s);
   speed_point.set_t(t);
@@ -74,9 +73,13 @@ SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
   return speed_point;
 }
 
-PathPoint MakePathPoint(const double x, const double y, const double z,
-                        const double theta, const double kappa,
-                        const double dkappa, const double ddkappa) {
+PathPoint MakePathPoint(const double x,
+                        const double y,
+                        const double z,
+                        const double theta,
+                        const double kappa,
+                        const double dkappa,
+                        const double ddkappa) {
   PathPoint path_point;
   path_point.set_x(x);
   path_point.set_y(y);
@@ -90,7 +93,8 @@ PathPoint MakePathPoint(const double x, const double y, const double z,
 
 PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
                                             const PathPoint& p2,
-                                            const double w1, const double w2) {
+                                            const double     w1,
+                                            const double     w2) {
   PathPoint p;
   p.set_x(p1.x() * w1 + p2.x() * w2);
   p.set_y(p1.y() * w1 + p2.y() * w2);

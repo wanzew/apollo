@@ -48,13 +48,11 @@ using std::string;
 using std::unordered_map;
 
 const int MAX_MOTION_SERVICE_DELAY = 5;
-bool LanePostProcessingSubnode::InitInternal() {
+bool      LanePostProcessingSubnode::InitInternal() {
   // get Subnode config in DAG streaming
   unordered_map<string, string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
-  if (fields.count("publish") && stoi(fields["publish"]) != 0) {
-    publish_ = true;
-  }
+  if (fields.count("publish") && stoi(fields["publish"]) != 0) { publish_ = true; }
   auto iter = fields.find("motion_event_id");
   if (iter == fields.end()) {
     motion_event_id_ = -1;
@@ -62,8 +60,7 @@ bool LanePostProcessingSubnode::InitInternal() {
     AWARN << "Unable to project lane history information";
   } else {
     motion_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
-    motion_service_ = dynamic_cast<MotionService *>(
-        DAGStreaming::GetSubnodeByName("MotionService"));
+    motion_service_ = dynamic_cast<MotionService*>(DAGStreaming::GetSubnodeByName("MotionService"));
     if (motion_service_ == nullptr) {
       AWARN << "motion service should initialize before LanePostProcessing";
     }
@@ -95,41 +92,37 @@ bool LanePostProcessingSubnode::InitSharedData() {
   }
 
   // init preprocess_data
-  camera_object_data_ = dynamic_cast<CameraObjectData *>(
-      shared_data_manager_->GetSharedData("CameraObjectData"));
+  camera_object_data_ =
+      dynamic_cast<CameraObjectData*>(shared_data_manager_->GetSharedData("CameraObjectData"));
   if (camera_object_data_ == nullptr) {
     AERROR << "failed to get shared data instance: CameraObjectData ";
     return false;
   }
-  lane_shared_data_ = dynamic_cast<LaneSharedData *>(
-      shared_data_manager_->GetSharedData("LaneSharedData"));
+  lane_shared_data_ =
+      dynamic_cast<LaneSharedData*>(shared_data_manager_->GetSharedData("LaneSharedData"));
   if (lane_shared_data_ == nullptr) {
     AERROR << "failed to get shared data instance: LaneSharedData ";
     return false;
   }
 
-  AINFO << "init shared data successfully, data: "
-        << camera_object_data_->name() << " and " << lane_shared_data_->name();
+  AINFO << "init shared data successfully, data: " << camera_object_data_->name() << " and "
+        << lane_shared_data_->name();
 
   return true;
 }
 
-void LanePostProcessingSubnode::RegistAllAlgorithms() {
-  RegisterFactoryCCLanePostProcessor();
-}
+void LanePostProcessingSubnode::RegistAllAlgorithms() { RegisterFactoryCCLanePostProcessor(); }
 
 bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
   // init lane post-processer
   lane_post_processor_.reset(
-      BaseCameraLanePostProcessorRegisterer::GetInstanceByName(
-          FLAGS_onboard_lane_post_processor));
+      BaseCameraLanePostProcessorRegisterer::GetInstanceByName(FLAGS_onboard_lane_post_processor));
   if (!lane_post_processor_) {
     AERROR << "failed to get instance: " << FLAGS_onboard_lane_post_processor;
     return false;
   }
   if (!lane_post_processor_->Init()) {
-    AERROR << "failed to init lane post-processor: "
-           << lane_post_processor_->name();
+    AERROR << "failed to init lane post-processor: " << lane_post_processor_->name();
     return false;
   }
 
@@ -138,11 +131,10 @@ bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
   return true;
 }
 
-bool LanePostProcessingSubnode::GetSharedData(const Event &event,
-                                              shared_ptr<SensorObjects> *objs) {
+bool LanePostProcessingSubnode::GetSharedData(const Event& event, shared_ptr<SensorObjects>* objs) {
   double timestamp = event.timestamp;
   string device_id = event.reserve;
-  device_id_ = device_id;
+  device_id_       = device_id;
   string data_key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id, &data_key)) {
     AERROR << "failed to produce shared data key. EventID:" << event.event_id
@@ -158,11 +150,11 @@ bool LanePostProcessingSubnode::GetSharedData(const Event &event,
 }
 
 void LanePostProcessingSubnode::PublishDataAndEvent(
-    const double timestamp, const SharedDataPtr<LaneObjects> &lane_objects) {
+    const double timestamp, const SharedDataPtr<LaneObjects>& lane_objects) {
   string key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
-    AERROR << "failed to produce shared key. time: "
-           << GLOG_TIMESTAMP(timestamp) << ", device_id: " << device_id_;
+    AERROR << "failed to produce shared key. time: " << GLOG_TIMESTAMP(timestamp)
+           << ", device_id: " << device_id_;
     return;
   }
 
@@ -174,11 +166,11 @@ void LanePostProcessingSubnode::PublishDataAndEvent(
 
   // pub events
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
-    const EventMeta &event_meta = pub_meta_events_[idx];
-    Event event;
-    event.event_id = event_meta.event_id;
+    const EventMeta& event_meta = pub_meta_events_[idx];
+    Event            event;
+    event.event_id  = event_meta.event_id;
     event.timestamp = timestamp;
-    event.reserve = device_id_;
+    event.reserve   = device_id_;
     event_manager_->Publish(event);
   }
   ADEBUG << "succeed to publish data and event.";
@@ -187,8 +179,8 @@ void LanePostProcessingSubnode::PublishDataAndEvent(
 Status LanePostProcessingSubnode::ProcEvents() {
   // fusion output subnode only subcribe the fusion subnode
   CHECK_EQ(sub_meta_events_.size(), 1u) << "only subcribe one event.";
-  const EventMeta &event_meta = sub_meta_events_[0];
-  Event event;
+  const EventMeta& event_meta = sub_meta_events_[0];
+  Event            event;
   event_manager_->Subscribe(event_meta.event_id, &event);
   ++seq_num_;
   shared_ptr<SensorObjects> objs;
@@ -208,11 +200,11 @@ Status LanePostProcessingSubnode::ProcEvents() {
 
   LaneObjectsPtr lane_objects(new LaneObjects());
   options_.timestamp = event.timestamp;
-  timestamp_ns_ = event.timestamp * 1e9;
+  timestamp_ns_      = event.timestamp * 1e9;
   if (motion_event_id_ != -1) {
     if (motion_service_ == nullptr) {
-      motion_service_ = dynamic_cast<MotionService *>(
-          DAGStreaming::GetSubnodeByName("MotionService"));
+      motion_service_ =
+          dynamic_cast<MotionService*>(DAGStreaming::GetSubnodeByName("MotionService"));
       if (motion_service_ == nullptr) {
         AERROR << "motion service must initialize before LanePostProcessing";
         return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
@@ -220,12 +212,11 @@ Status LanePostProcessingSubnode::ProcEvents() {
     }
 
     double motion_timestamp = motion_service_->GetLatestTimestamp();
-    ADEBUG << "object ts : motion ts   " << std::to_string(event.timestamp)
-           << "  " << std::to_string(motion_timestamp);
+    ADEBUG << "object ts : motion ts   " << std::to_string(event.timestamp) << "  "
+           << std::to_string(motion_timestamp);
 
     if (motion_timestamp > event.timestamp) {
-      if (!motion_service_->GetMotionInformation(event.timestamp,
-                                                 &(options_.vehicle_status))) {
+      if (!motion_service_->GetMotionInformation(event.timestamp, &(options_.vehicle_status))) {
         AWARN << "cannot find desired motion in motion buffer at: "
               << std::to_string(event.timestamp);
         options_.vehicle_status.time_ts = 0.0;  // signal to reset history
@@ -237,13 +228,11 @@ Status LanePostProcessingSubnode::ProcEvents() {
         count++;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         ADEBUG << "delay in motion: " << count;
-        ADEBUG << "object ts : motion ts  " << std::to_string(event.timestamp)
-               << "  " << std::to_string(motion_timestamp);
+        ADEBUG << "object ts : motion ts  " << std::to_string(event.timestamp) << "  "
+               << std::to_string(motion_timestamp);
         motion_timestamp = motion_service_->GetLatestTimestamp();
         // exceed max waiting time
-        if (motion_timestamp > 0 && count > MAX_MOTION_SERVICE_DELAY) {
-          break;
-        }
+        if (motion_timestamp > 0 && count > MAX_MOTION_SERVICE_DELAY) { break; }
       }
       mutex_.lock();
       options_.SetMotion(motion_service_->GetMotionBuffer().back());
@@ -256,18 +245,16 @@ Status LanePostProcessingSubnode::ProcEvents() {
       options_.SetMotion(motion_service_->GetMotionBuffer().back());
       mutex_.unlock();
     }
-    ADEBUG << "options_.vehicle_status.motion:  "
-           << options_.vehicle_status.motion;
+    ADEBUG << "options_.vehicle_status.motion:  " << options_.vehicle_status.motion;
   }
   lane_post_processor_->Process(lane_map, options_, &lane_objects);
   for (size_t i = 0; i < lane_objects->size(); ++i) {
     (*lane_objects)[i].timestamp = event.timestamp;
-    (*lane_objects)[i].seq_num = seq_num_;
+    (*lane_objects)[i].seq_num   = seq_num_;
   }
-  ADEBUG << "Before publish lane objects, objects num: "
-         << lane_objects->size();
+  ADEBUG << "Before publish lane objects, objects num: " << lane_objects->size();
 
-  uint64_t t = timer.End("lane post-processing");
+  uint64_t t           = timer.End("lane post-processing");
   min_processing_time_ = std::min(min_processing_time_, t);
   max_processing_time_ = std::max(max_processing_time_, t);
   tot_processing_time_ += t;
@@ -278,30 +265,26 @@ Status LanePostProcessingSubnode::ProcEvents() {
 
   PublishDataAndEvent(event.timestamp, lane_objects);
 
-  if (publish_) {
-    PublishPerceptionPb(lane_objects);
-  }
+  if (publish_) { PublishPerceptionPb(lane_objects); }
 
   ADEBUG << "Successfully finished lane post processing";
   return Status::OK();
 }
 
-void LanePostProcessingSubnode::PublishPerceptionPb(
-    LaneObjectsPtr lane_objects) {
+void LanePostProcessingSubnode::PublishPerceptionPb(LaneObjectsPtr lane_objects) {
   ADEBUG << "Lane post-processor publish lane object pb data";
 
   PerceptionObstacles obstacles;
 
   // Header
-  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
-      "perception_obstacle", &obstacles);
-  common::Header *header = obstacles.mutable_header();
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader("perception_obstacle", &obstacles);
+  common::Header* header = obstacles.mutable_header();
   header->set_lidar_timestamp(0);
   header->set_camera_timestamp(timestamp_ns_);
   header->set_radar_timestamp(0);
 
   // generate lane marker protobuf messages
-  LaneMarkers *lane_markers = obstacles.mutable_lane_marker();
+  LaneMarkers* lane_markers = obstacles.mutable_lane_marker();
   LaneObjectsToLaneMarkerProto(*lane_objects, lane_markers);
 
   common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);

@@ -28,18 +28,12 @@ using ::apollo::drivers::canbus::Byte;
 Ecustatus1515::Ecustatus1515() {}
 const int32_t Ecustatus1515::ID = 0x515;
 
-void Ecustatus1515::Parse(const std::uint8_t* bytes, int32_t length,
-                          ChassisDetail* chassis) const {
-  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_speed(
-      speed(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_acc_speed(
-      acc_speed(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_ctrl_sts(
-      ctrl_sts(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_chassis_sts(
-      chassis_sts(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_chassis_err(
-      chassis_err(bytes, length));
+void Ecustatus1515::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
+  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_speed(speed(bytes, length));
+  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_acc_speed(acc_speed(bytes, length));
+  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_ctrl_sts(ctrl_sts(bytes, length));
+  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_chassis_sts(chassis_sts(bytes, length));
+  chassis->mutable_ch()->mutable_ecu_status_1_515()->set_chassis_err(chassis_err(bytes, length));
 }
 
 // config detail: {'description': 'Current speed (Steering status)', 'offset':
@@ -47,10 +41,10 @@ void Ecustatus1515::Parse(const std::uint8_t* bytes, int32_t length,
 // 'physical_range': '[0|0]', 'bit': 0, 'type': 'double', 'order': 'intel',
 // 'physical_unit': 'm/s'}
 double Ecustatus1515::speed(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 0);
+  Byte    t1(bytes + 0);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -66,12 +60,11 @@ double Ecustatus1515::speed(const std::uint8_t* bytes, int32_t length) const {
 // 'offset': 0.0, 'precision': 0.001, 'len': 16, 'name': 'acc_speed',
 // 'is_signed_var': True, 'physical_range': '[0|0]', 'bit': 16, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'm/s^2'}
-double Ecustatus1515::acc_speed(const std::uint8_t* bytes,
-                                int32_t length) const {
-  Byte t0(bytes + 3);
+double Ecustatus1515::acc_speed(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -88,13 +81,12 @@ double Ecustatus1515::acc_speed(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 8, 'name': 'ctrl_sts', 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 32, 'type': 'enum', 'order':
 // 'intel', 'physical_unit': ''}
-Ecu_status_1_515::Ctrl_stsType Ecustatus1515::ctrl_sts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+Ecu_status_1_515::Ctrl_stsType Ecustatus1515::ctrl_sts(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Ecu_status_1_515::Ctrl_stsType ret =
-      static_cast<Ecu_status_1_515::Ctrl_stsType>(x);
+  Ecu_status_1_515::Ctrl_stsType ret = static_cast<Ecu_status_1_515::Ctrl_stsType>(x);
   return ret;
 }
 
@@ -102,9 +94,8 @@ Ecu_status_1_515::Ctrl_stsType Ecustatus1515::ctrl_sts(
 // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'chassis_sts',
 // 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 40, 'type':
 // 'int', 'order': 'intel', 'physical_unit': ''}
-int Ecustatus1515::chassis_sts(const std::uint8_t* bytes,
-                               int32_t length) const {
-  Byte t0(bytes + 5);
+int Ecustatus1515::chassis_sts(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
@@ -115,12 +106,11 @@ int Ecustatus1515::chassis_sts(const std::uint8_t* bytes,
 // 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'chassis_err',
 // 'is_signed_var': False, 'physical_range': '[0|65535]', 'bit': 48, 'type':
 // 'int', 'order': 'intel', 'physical_unit': ''}
-int Ecustatus1515::chassis_err(const std::uint8_t* bytes,
-                               int32_t length) const {
-  Byte t0(bytes + 7);
+int Ecustatus1515::chassis_err(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 6);
+  Byte    t1(bytes + 6);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

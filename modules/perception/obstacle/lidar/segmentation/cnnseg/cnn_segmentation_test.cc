@@ -22,11 +22,11 @@
 #include <unordered_set>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "opencv2/opencv.hpp"
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/common/pcl_types.h"
@@ -49,13 +49,13 @@ namespace apollo {
 namespace perception {
 namespace test {
 
-DEFINE_string(test_dir, "/apollo/modules/perception/data/cnnseg_test/",
-              "test data directory");
-DEFINE_string(pcd_name, "uscar_12_1470770225_1470770492_1349",
-              "poind cloud data name");
+DEFINE_string(test_dir, "/apollo/modules/perception/data/cnnseg_test/", "test data directory");
+DEFINE_string(pcd_name, "uscar_12_1470770225_1470770492_1349", "poind cloud data name");
 
 struct CellStat {
-  CellStat() : point_num(0), valid_point_num(0) {}
+  CellStat()
+      : point_num(0)
+      , valid_point_num(0) {}
   int point_num;
   int valid_point_num;
 };
@@ -66,14 +66,10 @@ int F2I(float val, float ori, float scale) {
 
 cv::Vec3b GetTypeColor(ObjectType type) {
   switch (type) {
-    case ObjectType::PEDESTRIAN:
-      return cv::Vec3b(255, 128, 128);  // pink
-    case ObjectType::BICYCLE:
-      return cv::Vec3b(0, 0, 255);  // blue
-    case ObjectType::VEHICLE:
-      return cv::Vec3b(0, 255, 0);  // green
-    default:
-      return cv::Vec3b(0, 255, 255);  // yellow
+    case ObjectType::PEDESTRIAN: return cv::Vec3b(255, 128, 128);  // pink
+    case ObjectType::BICYCLE: return cv::Vec3b(0, 0, 255);         // blue
+    case ObjectType::VEHICLE: return cv::Vec3b(0, 255, 0);         // green
+    default: return cv::Vec3b(0, 255, 255);                        // yellow
   }
 }
 
@@ -97,7 +93,7 @@ bool IsValidRowCol(int row, int rows, int col, int cols) {
 
 int RowCol2Grid(int row, int col, int cols) { return row * cols + col; }
 
-bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
+bool GetPointCloudFromFile(const string& pcd_file, PointCloudPtr cloud) {
   pcl::PointCloud<PointXYZIT> ori_cloud;
   if (pcl::io::loadPCDFile(pcd_file, ori_cloud) < 0) {
     AERROR << "Failed to load pcd file: " << pcd_file;
@@ -107,33 +103,34 @@ bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
   cloud->points.reserve(ori_cloud.points.size());
   for (size_t i = 0; i < ori_cloud.points.size(); ++i) {
     apollo::perception::pcl_util::Point point;
-    point.x = ori_cloud.points[i].x;
-    point.y = ori_cloud.points[i].y;
-    point.z = ori_cloud.points[i].z;
+    point.x         = ori_cloud.points[i].x;
+    point.y         = ori_cloud.points[i].y;
+    point.z         = ori_cloud.points[i].z;
     point.intensity = ori_cloud.points[i].intensity;
-    if (std::isnan(ori_cloud.points[i].x)) {
-      continue;
-    }
+    if (std::isnan(ori_cloud.points[i].x)) { continue; }
     cloud->push_back(point);
   }
 
   return true;
 }
 
-void DrawDetection(PointCloudPtr pc_ptr, const PointIndices &valid_idx,
-                   int rows, int cols, float range,
-                   const vector<std::shared_ptr<Object>> &objects,
-                   const string &result_file) {
+void DrawDetection(PointCloudPtr                          pc_ptr,
+                   const PointIndices&                    valid_idx,
+                   int                                    rows,
+                   int                                    cols,
+                   float                                  range,
+                   const vector<std::shared_ptr<Object>>& objects,
+                   const string&                          result_file) {
   // create a new image for visualization
   cv::Mat img(rows, cols, CV_8UC3, cv::Scalar(0.0));
 
   // map points into bird-view grids
-  float inv_res_x = 0.5 * static_cast<float>(cols) / range;
-  float inv_res_y = 0.5 * static_cast<float>(rows) / range;
-  int grids = rows * cols;
+  float            inv_res_x = 0.5 * static_cast<float>(cols) / range;
+  float            inv_res_y = 0.5 * static_cast<float>(rows) / range;
+  int              grids     = rows * cols;
   vector<CellStat> view(grids);
 
-  const std::vector<int> *valid_indices_in_pc = &(valid_idx.indices);
+  const std::vector<int>* valid_indices_in_pc = &(valid_idx.indices);
   CHECK_LE(valid_indices_in_pc->size(), pc_ptr->size());
   unordered_set<int> unique_indices;
   for (size_t i = 0; i < valid_indices_in_pc->size(); ++i) {
@@ -143,7 +140,7 @@ void DrawDetection(PointCloudPtr pc_ptr, const PointIndices &valid_idx,
   }
 
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
-    const auto &point = pc_ptr->points[i];
+    const auto& point = pc_ptr->points[i];
     // * the coordinates of x and y have been exchanged in feature generation
     // step,
     // so they should be swapped back here.
@@ -153,9 +150,7 @@ void DrawDetection(PointCloudPtr pc_ptr, const PointIndices &valid_idx,
       // get grid index and count point number for corresponding node
       int grid = RowCol2Grid(row, col, cols);
       view[grid].point_num++;
-      if (unique_indices.find(i) != unique_indices.end()) {
-        view[grid].valid_point_num++;
-      }
+      if (unique_indices.find(i) != unique_indices.end()) { view[grid].valid_point_num++; }
     }
   }
 
@@ -175,43 +170,42 @@ void DrawDetection(PointCloudPtr pc_ptr, const PointIndices &valid_idx,
   const cv::Vec3b segm_color(0, 0, 255);  // red
 
   for (size_t i = 0; i < objects.size(); ++i) {
-    const std::shared_ptr<Object> &obj = objects[i];
+    const std::shared_ptr<Object>& obj = objects[i];
     CHECK_GT(obj->cloud->size(), 0);
 
-    int x_min = INT_MAX;
-    int y_min = INT_MAX;
-    int x_max = INT_MIN;
-    int y_max = INT_MIN;
+    int   x_min = INT_MAX;
+    int   y_min = INT_MAX;
+    int   x_max = INT_MIN;
+    int   y_max = INT_MIN;
     float score = obj->score;
     CHECK_GE(score, 0.0);
     CHECK_LE(score, 1.0);
     for (size_t j = 0; j < obj->cloud->size(); ++j) {
-      const auto &point = obj->cloud->points[j];
-      int col = F2I(point.y, range, inv_res_x);  // col
-      int row = F2I(point.x, range, inv_res_y);  // row
+      const auto& point = obj->cloud->points[j];
+      int         col   = F2I(point.y, range, inv_res_x);  // col
+      int         row   = F2I(point.x, range, inv_res_y);  // row
       CHECK(IsValidRowCol(row, rows, col, cols));
       img.at<cv::Vec3b>(row, col) = segm_color * score;
-      x_min = std::min(col, x_min);
-      y_min = std::min(row, y_min);
-      x_max = std::max(col, x_max);
-      y_max = std::max(row, y_max);
+      x_min                       = std::min(col, x_min);
+      y_min                       = std::min(row, y_min);
+      x_max                       = std::max(col, x_max);
+      y_max                       = std::max(row, y_max);
     }
 
     // fillConvexPoly(img, list.data(), list.size(), cv::Scalar(positive_prob *
     // segm_color));
     cv::Vec3b bbox_color = GetTypeColor(obj->type);
-    rectangle(img, cv::Point(x_min, y_min), cv::Point(x_max, y_max),
-              cv::Scalar(bbox_color));
+    rectangle(img, cv::Point(x_min, y_min), cv::Point(x_max, y_max), cv::Scalar(bbox_color));
   }
 
   // write image intensity values into file
-  FILE *f_res;
+  FILE* f_res;
   f_res = fopen(result_file.c_str(), "w");
   fprintf(f_res, "%d %d\n", rows, cols);
   for (int row = 0; row < rows; ++row) {
     for (int col = 0; col < cols; ++col) {
-      fprintf(f_res, "%u %u %u\n", img.at<cv::Vec3b>(row, col)[0],
-              img.at<cv::Vec3b>(row, col)[1], img.at<cv::Vec3b>(row, col)[2]);
+      fprintf(f_res, "%u %u %u\n", img.at<cv::Vec3b>(row, col)[0], img.at<cv::Vec3b>(row, col)[1],
+              img.at<cv::Vec3b>(row, col)[2]);
     }
   }
   fclose(f_res);
@@ -226,7 +220,7 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
   EXPECT_TRUE(GetPointCloudFromFile(in_pcd_file, in_pc));
 
   PointIndices valid_idx;
-  auto &indices = valid_idx.indices;
+  auto&        indices = valid_idx.indices;
   indices.resize(in_pc->size());
   std::iota(indices.begin(), indices.end(), 0);
 
@@ -240,8 +234,7 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
 
   // testing segment function
   for (int i = 0; i < 10; ++i) {
-    EXPECT_TRUE(
-        cnn_segmentor_->Segment(in_pc, valid_idx, options, &out_objects));
+    EXPECT_TRUE(cnn_segmentor_->Segment(in_pc, valid_idx, options, &out_objects));
     EXPECT_EQ(out_objects.size(), 15);
   }
 
@@ -249,9 +242,8 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
   // do visualization of segmentation results (output object detections)
   string result_file(FLAGS_test_dir);
   result_file = result_file + FLAGS_pcd_name + "-detection.txt";
-  DrawDetection(in_pc, valid_idx, cnn_segmentor_->height(),
-                cnn_segmentor_->width(), cnn_segmentor_->range(), out_objects,
-                result_file);
+  DrawDetection(in_pc, valid_idx, cnn_segmentor_->height(), cnn_segmentor_->width(),
+                cnn_segmentor_->range(), out_objects, result_file);
 #endif
 }
 

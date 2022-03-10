@@ -37,17 +37,17 @@ namespace apollo {
 namespace perception {
 
 struct CipvOptions {
-  float velocity = 5.0f;
-  float yaw_rate = 0.0f;
+  float velocity  = 5.0f;
+  float yaw_rate  = 0.0f;
   float yaw_angle = 0.0f;
 };
 
-const float MAX_DIST_OBJECT_TO_LANE_METER = 20.0f;
-const float MAX_VEHICLE_WIDTH_METER = 5.0f;
-const float EPSILON = 1.0e-6f;
-const std::size_t DROPS_HISTORY_SIZE = 100;
-const std::size_t MAX_OBJECT_NUM = 100;
-const std::size_t MAX_ALLOWED_SKIP_OBJECT = 10;
+const float       MAX_DIST_OBJECT_TO_LANE_METER = 20.0f;
+const float       MAX_VEHICLE_WIDTH_METER       = 5.0f;
+const float       EPSILON                       = 1.0e-6f;
+const std::size_t DROPS_HISTORY_SIZE            = 100;
+const std::size_t MAX_OBJECT_NUM                = 100;
+const std::size_t MAX_ALLOWED_SKIP_OBJECT       = 10;
 
 // TODO(All) averatge image frame rate should come from other header file.
 const float AVERAGE_FRATE_RATE = 0.1f;
@@ -59,45 +59,50 @@ class Cipv {
   Cipv(void);
   virtual ~Cipv(void);
 
-  virtual bool Init();
+  virtual bool        Init();
   virtual std::string Name() const;
 
   // Determine CIPV among multiple objects
-  bool DetermineCipv(const LaneObjectsPtr lane_objects,
-                     const CipvOptions &options,
-                     std::vector<std::shared_ptr<Object>> *objects);
+  bool DetermineCipv(const LaneObjectsPtr                  lane_objects,
+                     const CipvOptions&                    options,
+                     std::vector<std::shared_ptr<Object>>* objects);
 
   // Collect drops for tailgating
-  bool CollectDrops(const MotionBuffer &motion_buffer,
-                    std::vector<std::shared_ptr<Object>> *objects);
+  bool CollectDrops(const MotionBuffer&                   motion_buffer,
+                    std::vector<std::shared_ptr<Object>>* objects);
 
  private:
   // Distance from a point to a line segment
-  bool DistanceFromPointToLineSegment(const Point2Df &point,
-                                      const Point2Df &line_seg_start_point,
-                                      const Point2Df &line_seg_end_point,
-                                      float *distance);
+  bool DistanceFromPointToLineSegment(const Point2Df& point,
+                                      const Point2Df& line_seg_start_point,
+                                      const Point2Df& line_seg_end_point,
+                                      float*          distance);
 
   // Determine CIPV among multiple objects
-  bool GetEgoLane(const LaneObjectsPtr lane_objects, EgoLane *egolane_image,
-                  EgoLane *egolane_ground, bool *b_left_valid,
-                  bool *b_right_valid);
+  bool GetEgoLane(const LaneObjectsPtr lane_objects,
+                  EgoLane*             egolane_image,
+                  EgoLane*             egolane_ground,
+                  bool*                b_left_valid,
+                  bool*                b_right_valid);
 
   // Elongate lane line
   bool ElongateEgoLane(const LaneObjectsPtr lane_objects,
-                       const bool b_left_valid, const bool b_right_valid,
-                       const float yaw_rate, const float velocity,
-                       EgoLane *egolane_image, EgoLane *egolane_ground);
+                       const bool           b_left_valid,
+                       const bool           b_right_valid,
+                       const float          yaw_rate,
+                       const float          velocity,
+                       EgoLane*             egolane_image,
+                       EgoLane*             egolane_ground);
 
   // Get closest edge of an object in image cooridnate
-  bool FindClosestEdgeOfObjectImage(const std::shared_ptr<Object> &object,
-                                    const EgoLane &egolane_image,
-                                    LineSegment2Df *closted_object_edge);
+  bool FindClosestEdgeOfObjectImage(const std::shared_ptr<Object>& object,
+                                    const EgoLane&                 egolane_image,
+                                    LineSegment2Df*                closted_object_edge);
 
   // Get closest edge of an object in ground cooridnate
-  bool FindClosestEdgeOfObjectGround(const std::shared_ptr<Object> &object,
-                                     const EgoLane &egolane_ground,
-                                     LineSegment2Df *closted_object_edge);
+  bool FindClosestEdgeOfObjectGround(const std::shared_ptr<Object>& object,
+                                     const EgoLane&                 egolane_ground,
+                                     LineSegment2Df*                closted_object_edge);
 
   // Check if the distance between lane and object are OK
   bool AreDistancesSane(const float distance_start_point_to_right_lane,
@@ -106,8 +111,7 @@ class Cipv {
                         const float distance_end_point_to_left_lane);
 
   // Check if the object is in the lane in image space
-  bool IsObjectInTheLaneImage(const std::shared_ptr<Object> &object,
-                              const EgoLane &egolane_image);
+  bool IsObjectInTheLaneImage(const std::shared_ptr<Object>& object, const EgoLane& egolane_image);
   // Check if the object is in the lane in ego-ground space
   //  |           |
   //  | *------*  |
@@ -116,42 +120,46 @@ class Cipv {
   // *+------*    |
   //  |           |
   // l_lane     r_lane
-  bool IsObjectInTheLaneGround(const std::shared_ptr<Object> &object,
-                               const EgoLane &egolane_ground);
+  bool IsObjectInTheLaneGround(const std::shared_ptr<Object>& object,
+                               const EgoLane&                 egolane_ground);
 
   // Check if the object is in the lane in ego-ground space
-  bool IsObjectInTheLane(const std::shared_ptr<Object> &object,
-                         const EgoLane &egolane_image,
-                         const EgoLane &egolane_ground);
+  bool IsObjectInTheLane(const std::shared_ptr<Object>& object,
+                         const EgoLane&                 egolane_image,
+                         const EgoLane&                 egolane_ground);
 
   // Check if a point is left of a line segment
-  bool IsPointLeftOfLine(const Point2Df &point,
-                         const Point2Df &line_seg_start_point,
-                         const Point2Df &line_seg_end_point);
+  bool IsPointLeftOfLine(const Point2Df& point,
+                         const Point2Df& line_seg_start_point,
+                         const Point2Df& line_seg_end_point);
 
   // Make a virtual lane line using a reference lane line and its offset
   // distance
-  bool MakeVirtualLane(const LaneLine &ref_lane_line, const float yaw_rate,
-                       const float offset_distance,
-                       LaneLine *virtual_lane_line);
+  bool MakeVirtualLane(const LaneLine& ref_lane_line,
+                       const float     yaw_rate,
+                       const float     offset_distance,
+                       LaneLine*       virtual_lane_line);
 
-  float VehicleDynamics(const uint32_t tick, const float yaw_rate,
-                        const float velocity, const float time_unit, float *x,
-                        float *y);
+  float VehicleDynamics(const uint32_t tick,
+                        const float    yaw_rate,
+                        const float    velocity,
+                        const float    time_unit,
+                        float*         x,
+                        float*         y);
   // Make a virtual lane line using a yaw_rate
-  bool MakeVirtualEgoLaneFromYawRate(const float yaw_rate, const float velocity,
+  bool MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
+                                     const float velocity,
                                      const float offset_distance,
-                                     LaneLine *left_lane_line,
-                                     LaneLine *right_lane_line);
+                                     LaneLine*   left_lane_line,
+                                     LaneLine*   right_lane_line);
 
   // transform point to another using motion
-  bool TranformPoint(const Eigen::VectorXf& in,
-                     const MotionType& motion_matrix,
-                     Eigen::Vector3d* out);
+  bool
+  TranformPoint(const Eigen::VectorXf& in, const MotionType& motion_matrix, Eigen::Vector3d* out);
   // Member variables
-  bool b_image_based_cipv_ = false;
-  int32_t debug_level_ = 0;
-  float time_unit_ = 0.0f;
+  bool                 b_image_based_cipv_ = false;
+  int32_t              debug_level_        = 0;
+  float                time_unit_          = 0.0f;
   common::VehicleParam vehicle_param_;
 
   const float EGO_CAR_WIDTH_METER;
@@ -160,10 +168,9 @@ class Cipv {
   const float EGO_CAR_VIRTUAL_LANE;
   const float EGO_CAR_HALF_VIRTUAL_LANE;
 
-  std::map<int, size_t> object_id_skip_count_;
-  std::map<int, boost::circular_buffer<std::pair<float, float>>>
-    object_trackjectories_;
-  std::map<int, std::vector<double>> object_timestamps_;
+  std::map<int, size_t>                                          object_id_skip_count_;
+  std::map<int, boost::circular_buffer<std::pair<float, float>>> object_trackjectories_;
+  std::map<int, std::vector<double>>                             object_timestamps_;
 };
 
 }  // namespace perception

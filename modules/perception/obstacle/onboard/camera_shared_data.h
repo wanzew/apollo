@@ -17,30 +17,28 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_CAMERA_SHARED_DATA_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_CAMERA_SHARED_DATA_H_
 
-#include <boost/circular_buffer.hpp>
-#include <opencv2/opencv.hpp>
-#include <string>
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/onboard/common_shared_data.h"
+#include <boost/circular_buffer.hpp>
+#include <opencv2/opencv.hpp>
+#include <string>
 
 namespace apollo {
 namespace perception {
 
 struct CameraItem {
   cv::Mat image_src_mat;
-  SeqId seq_num = 0u;
-  double timestamp = 0.0;
+  SeqId   seq_num   = 0u;
+  double  timestamp = 0.0;
 };
 
 class CameraSharedData : public CommonSharedData<CameraItem> {
  public:
-  CameraSharedData() = default;
+  CameraSharedData()          = default;
   virtual ~CameraSharedData() = default;
 
-  std::string name() const override {
-    return "CameraSharedData";
-  }
+  std::string name() const override { return "CameraSharedData"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CameraSharedData);

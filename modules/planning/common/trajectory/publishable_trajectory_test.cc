@@ -34,12 +34,10 @@ TEST(basic_test, DiscretizedTrajectory) {
   const std::string path_of_standard_trajectory =
       "modules/planning/testdata/trajectory_data/standard_trajectory.pb.txt";
   ADCTrajectory trajectory;
-  EXPECT_TRUE(
-      common::util::GetProtoFromFile(path_of_standard_trajectory, &trajectory));
+  EXPECT_TRUE(common::util::GetProtoFromFile(path_of_standard_trajectory, &trajectory));
   DiscretizedTrajectory discretized_trajectory(trajectory);
 
-  PublishableTrajectory publishable_trajectory(12349834.26,
-                                               discretized_trajectory);
+  PublishableTrajectory publishable_trajectory(12349834.26, discretized_trajectory);
   EXPECT_EQ(publishable_trajectory.header_time(), 12349834.26);
 
   ADCTrajectory output_trajectory;
@@ -47,8 +45,8 @@ TEST(basic_test, DiscretizedTrajectory) {
 
   google::protobuf::util::MessageDifferencer differencer;
   for (int i = 0; i < output_trajectory.trajectory_point_size(); ++i) {
-    EXPECT_TRUE(differencer.Compare(output_trajectory.trajectory_point(i),
-                                    trajectory.trajectory_point(i)));
+    EXPECT_TRUE(
+        differencer.Compare(output_trajectory.trajectory_point(i), trajectory.trajectory_point(i)));
   }
 }
 

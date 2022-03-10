@@ -24,13 +24,11 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Wiperrpt91 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+class Wiperrpt91 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Wiperrpt91();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'OUTPUT_VALUE', 'enum': {0:
@@ -41,7 +39,7 @@ class Wiperrpt91 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit':
   // 23, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Wiper_rpt_91::Output_valueType output_value(const std::uint8_t* bytes,
-                                              const int32_t length) const;
+                                              const int32_t       length) const;
 
   // config detail: {'name': 'COMMANDED_VALUE', 'enum': {0:
   // 'COMMANDED_VALUE_WIPERS_OFF', 1: 'COMMANDED_VALUE_INTERMITTENT_1', 2:
@@ -51,7 +49,7 @@ class Wiperrpt91 : public ::apollo::drivers::canbus::ProtocolData<
   // 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit':
   // 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Wiper_rpt_91::Commanded_valueType commanded_value(const std::uint8_t* bytes,
-                                                    const int32_t length) const;
+                                                    const int32_t       length) const;
 
   // config detail: {'name': 'MANUAL_INPUT', 'enum': {0:
   // 'MANUAL_INPUT_WIPERS_OFF', 1: 'MANUAL_INPUT_INTERMITTENT_1', 2:
@@ -61,7 +59,7 @@ class Wiperrpt91 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 7,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Wiper_rpt_91::Manual_inputType manual_input(const std::uint8_t* bytes,
-                                              const int32_t length) const;
+                                              const int32_t       length) const;
 };
 
 }  // namespace gem

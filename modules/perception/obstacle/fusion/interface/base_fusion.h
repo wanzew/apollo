@@ -67,17 +67,17 @@ namespace perception {
 
 class BaseFusion {
  public:
-  BaseFusion() = default;
+  BaseFusion()          = default;
   virtual ~BaseFusion() = default;
-  virtual bool Init() = 0;
+  virtual bool Init()   = 0;
 
   // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
   // @param [in]: multi sensor objects.
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
-  virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<std::shared_ptr<Object>> *fused_objects) = 0;
-  virtual std::string name() const = 0;
+  virtual bool        Fuse(const std::vector<SensorObjects>&     multi_sensor_objects,
+                           std::vector<std::shared_ptr<Object>>* fused_objects) = 0;
+  virtual std::string name() const                                              = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseFusion);

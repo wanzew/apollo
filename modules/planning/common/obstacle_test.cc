@@ -73,8 +73,7 @@ class ObstacleTest : public ::testing::Test {
   virtual void SetUp() {
     prediction::PredictionObstacles prediction_obstacles;
     ASSERT_TRUE(common::util::GetProtoFromFile(
-        "modules/planning/common/testdata/sample_prediction.pb.txt",
-        &prediction_obstacles));
+        "modules/planning/common/testdata/sample_prediction.pb.txt", &prediction_obstacles));
     auto obstacles = Obstacle::CreateObstacles(prediction_obstacles);
     ASSERT_EQ(5, obstacles.size());
     for (auto& obstacle : obstacles) {
@@ -147,8 +146,8 @@ TEST_F(ObstacleTest, PerceptionBoundingBox) {
 TEST_F(ObstacleTest, GetBoundingBox) {
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
   ASSERT_TRUE(obstacle);
-  const auto& point = obstacle->Trajectory().trajectory_point(2);
-  const auto& box = obstacle->GetBoundingBox(point);
+  const auto&                      point = obstacle->Trajectory().trajectory_point(2);
+  const auto&                      box   = obstacle->GetBoundingBox(point);
   std::vector<common::math::Vec2d> corners;
   box.GetAllCorners(&corners);
   EXPECT_EQ(4, corners.size());
@@ -189,9 +188,8 @@ TEST_F(ObstacleTest, Perception) {
 }
 
 TEST(Obstacle, CreateStaticVirtualObstacle) {
-  common::math::Box2d box({0, 0}, 0.0, 4.0, 2.0);
-  std::unique_ptr<Obstacle> obstacle =
-      Obstacle::CreateStaticVirtualObstacles("abc", box);
+  common::math::Box2d       box({0, 0}, 0.0, 4.0, 2.0);
+  std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles("abc", box);
   EXPECT_EQ("abc", obstacle->Id());
   EXPECT_EQ(-314721735, obstacle->PerceptionId());
   EXPECT_TRUE(Obstacle::IsStaticObstacle(obstacle->Perception()));

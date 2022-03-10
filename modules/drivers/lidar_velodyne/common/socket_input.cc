@@ -1,18 +1,18 @@
 /******************************************************************************
-* Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 /* -*- mode: C++ -*-
  *
@@ -48,19 +48,19 @@ namespace lidar_velodyne {
  *  @param private_nh private node handle for driver
  *  @param udp_port UDP port number to connect
  */
-SocketInput::SocketInput() : sockfd_(-1), port_(0) {}
+SocketInput::SocketInput()
+    : sockfd_(-1)
+    , port_(0) {}
 
 /** @brief destructor */
 SocketInput::~SocketInput(void) { (void)close(sockfd_); }
 
 bool SocketInput::init(int port) {
-  if (sockfd_ != -1) {
-    (void)close(sockfd_);
-  }
+  if (sockfd_ != -1) { (void)close(sockfd_); }
 
   // connect to Velodyne UDP port
   AINFO << "Opening UDP socket: port " << uint16_t(port);
-  port_ = port;
+  port_   = port;
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
 
   if (sockfd_ == -1) {
@@ -68,15 +68,14 @@ bool SocketInput::init(int port) {
     return false;
   }
 
-  sockaddr_in my_addr;                       // my address information
-  memset(&my_addr, 0, sizeof(my_addr));      // initialize to zeros
-  my_addr.sin_family = AF_INET;              // host byte order
-  my_addr.sin_port = htons(uint16_t(port));  // short, in network byte order
-  my_addr.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
+  sockaddr_in my_addr;                              // my address information
+  memset(&my_addr, 0, sizeof(my_addr));             // initialize to zeros
+  my_addr.sin_family      = AF_INET;                // host byte order
+  my_addr.sin_port        = htons(uint16_t(port));  // short, in network byte order
+  my_addr.sin_addr.s_addr = INADDR_ANY;             // automatically fill in my IP
   //    my_addr.sin_addr.s_addr = inet_addr("192.168.1.100");
 
-  if (bind(sockfd_, reinterpret_cast<sockaddr *>(&my_addr), sizeof(sockaddr)) ==
-      -1) {
+  if (bind(sockfd_, reinterpret_cast<sockaddr*>(&my_addr), sizeof(sockaddr)) == -1) {
     AERROR << "Socket bind failed! Port " << port_;
     return false;
   }
@@ -91,7 +90,7 @@ bool SocketInput::init(int port) {
 }
 
 /** @brief Get one velodyne packet. */
-int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
+int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket* pkt) {
   double time1 = ros::Time::now().toSec();
   while (true) {
     if (!input_available(POLL_TIMEOUT)) {
@@ -100,8 +99,7 @@ int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
     }
     // Receive packets that should now be available from the
     // socket using a blocking read.
-    ssize_t nbytes = recvfrom(sockfd_, &(pkt->data[0]), FIRING_DATA_PACKET_SIZE,
-                              0, NULL, NULL);
+    ssize_t nbytes = recvfrom(sockfd_, &(pkt->data[0]), FIRING_DATA_PACKET_SIZE, 0, NULL, NULL);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
@@ -115,26 +113,23 @@ int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
       break;
     }
 
-    AERROR << "Incomplete Velodyne rising data packet read: " << nbytes
-           << " bytes from port " << port_;
+    AERROR << "Incomplete Velodyne rising data packet read: " << nbytes << " bytes from port "
+           << port_;
   }
   double time2 = ros::Time::now().toSec();
-  pkt->stamp = ros::Time((time2 + time1) / 2.0);
+  pkt->stamp   = ros::Time((time2 + time1) / 2.0);
 
   return 0;
 }
 
-int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
+int SocketInput::get_positioning_data_packtet(const NMEATimePtr& nmea_time) {
   while (true) {
-    if (!input_available(POLL_TIMEOUT)) {
-      return 1;
-    }
+    if (!input_available(POLL_TIMEOUT)) { return 1; }
     // Receive packets that should now be available from the
     // socket using a blocking read.
     // Last 234 bytes not use
     uint8_t bytes[POSITIONING_DATA_PACKET_SIZE];
-    ssize_t nbytes =
-        recvfrom(sockfd_, bytes, POSITIONING_DATA_PACKET_SIZE, 0, NULL, NULL);
+    ssize_t nbytes = recvfrom(sockfd_, bytes, POSITIONING_DATA_PACKET_SIZE, 0, NULL, NULL);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
@@ -152,8 +147,7 @@ int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
       }
     }
 
-    AINFO << "incomplete Velodyne packet read: " << nbytes
-          << " bytes from port " << port_;
+    AINFO << "incomplete Velodyne packet read: " << nbytes << " bytes from port " << port_;
   }
 
   return 0;
@@ -161,7 +155,7 @@ int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
 
 bool SocketInput::input_available(int timeout) {
   struct pollfd fds[1];
-  fds[0].fd = sockfd_;
+  fds[0].fd     = sockfd_;
   fds[0].events = POLLIN;
   // Unfortunately, the Linux kernel recvfrom() implementation
   // uses a non-interruptible sleep() when waiting for data,
@@ -186,8 +180,7 @@ bool SocketInput::input_available(int timeout) {
 
     if (retval < 0) {  // poll() error?
       if (errno != EINTR) {
-        ADEBUG << "Velodyne port " << port_
-               << "poll() error: " << strerror(errno);
+        ADEBUG << "Velodyne port " << port_ << "poll() error: " << strerror(errno);
       }
       return false;
     }

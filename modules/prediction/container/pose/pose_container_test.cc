@@ -16,8 +16,8 @@
 
 #include "modules/prediction/container/pose/pose_container.h"
 
-#include <array>
 #include "gtest/gtest.h"
+#include <array>
 
 #include "modules/localization/proto/localization.pb.h"
 
@@ -30,13 +30,13 @@ using apollo::perception::PerceptionObstacle;
 
 class PoseContainerTest : public ::testing::Test {
  public:
-  PoseContainerTest() = default;
+  PoseContainerTest()          = default;
   virtual ~PoseContainerTest() = default;
 
   void SetUp() override {}
 
  protected:
-  void InitPose(LocalizationEstimate *localization);
+  void InitPose(LocalizationEstimate* localization);
 
  protected:
   PoseContainer pose_;
@@ -44,10 +44,10 @@ class PoseContainerTest : public ::testing::Test {
  private:
   std::array<double, 2> position_{{1.0, 1.5}};
   std::array<double, 2> velocity_{{2.0, 2.5}};
-  double timestamp_ = 3.0;
+  double                timestamp_ = 3.0;
 };
 
-void PoseContainerTest::InitPose(LocalizationEstimate *localization) {
+void PoseContainerTest::InitPose(LocalizationEstimate* localization) {
   localization->mutable_pose()->mutable_position()->set_x(position_[0]);
   localization->mutable_pose()->mutable_position()->set_y(position_[1]);
   localization->mutable_pose()->mutable_linear_velocity()->set_x(velocity_[0]);
@@ -62,7 +62,7 @@ TEST_F(PoseContainerTest, Insertion) {
   pose_.Insert(localization);
   EXPECT_DOUBLE_EQ(pose_.GetTimestamp(), 3.0);
 
-  PerceptionObstacle *obstacle = pose_.ToPerceptionObstacle();
+  PerceptionObstacle* obstacle = pose_.ToPerceptionObstacle();
   EXPECT_TRUE(obstacle != nullptr);
   EXPECT_TRUE(obstacle->has_position());
   EXPECT_TRUE(obstacle->has_velocity());

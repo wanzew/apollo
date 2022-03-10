@@ -25,19 +25,20 @@
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_UTIL_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_UTIL_H_
+#  define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_UTIL_H_
 
 namespace apollo {
 namespace perception {
 
 // @brief: convert angle from the range of [-pi, pi] to [0, 2*pi]
-void RectAngle(ScalarType *theta);
+void RectAngle(ScalarType* theta);
 
 // @brief: fit polynomial function with QR decomposition (using Eigen 3)
 template <typename T = ScalarType>
-bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>> &pos_vec,
-             const int order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1> *coeff,
-             const bool &is_x_axis = true) {
+bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
+             const int                                  order,
+             Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>*   coeff,
+             const bool&                                is_x_axis = true) {
   if (coeff == NULL) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
@@ -50,17 +51,16 @@ bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>> &pos_vec,
 
   int n = static_cast<int>(pos_vec.size());
   if (n <= order) {
-    AERROR << "The number of points should be larger than the order. #points = "
-           << pos_vec.size();
+    AERROR << "The number of points should be larger than the order. #points = " << pos_vec.size();
     return false;
   }
 
   // create data matrix
   Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> A(n, order + 1);
-  Eigen::Matrix<T, Eigen::Dynamic, 1> y(n);
-  Eigen::Matrix<T, Eigen::Dynamic, 1> result;
+  Eigen::Matrix<T, Eigen::Dynamic, 1>              y(n);
+  Eigen::Matrix<T, Eigen::Dynamic, 1>              result;
   for (int i = 0; i < n; ++i) {
-    float base = is_x_axis ? pos_vec[i].x() : pos_vec[i].y();
+    float base  = is_x_axis ? pos_vec[i].x() : pos_vec[i].y();
     float p_b_j = 1.0;
     for (int j = 0; j <= order; ++j) {
       A(i, j) = p_b_j;
@@ -82,17 +82,15 @@ bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>> &pos_vec,
 
 // @brief: evaluate y value of given x for a polynomial function
 template <typename T = ScalarType>
-T PolyEval(const T &x, const int order,
-           const Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1> &coeff) {
+T PolyEval(const T& x, const int order, const Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>& coeff) {
   int poly_order = order;
   if (order > MAX_POLY_ORDER) {
-    AERROR << "the order of polynomial function must be smaller than "
-           << MAX_POLY_ORDER;
+    AERROR << "the order of polynomial function must be smaller than " << MAX_POLY_ORDER;
     AINFO << "forcing polynomial order to " << MAX_POLY_ORDER;
     poly_order = MAX_POLY_ORDER;
   }
 
-  T y = static_cast<T>(0);
+  T     y     = static_cast<T>(0);
   float p_x_j = 1.0;
   for (int j = 0; j <= poly_order; ++j) {
     y += coeff(j) * p_x_j;
@@ -122,18 +120,17 @@ class NonMask {
   NonMask() {}
   explicit NonMask(const size_t n) { polygon_.reserve(n); }
 
-  void AddPolygonPoint(const ScalarType &x, const ScalarType &y);
-  bool IsInsideMask(const Vector2D &p) const;
+  void AddPolygonPoint(const ScalarType& x, const ScalarType& y);
+  bool IsInsideMask(const Vector2D& p) const;
 
  protected:
-  int ComputeOrientation(const Vector2D &p1, const Vector2D &p2,
-                         const Vector2D &q) const;
-  bool IsColinear(const Vector2D &p1, const Vector2D &p2,
-                  const Vector2D &q) const;
-  bool IsOnLineSegmentWhenColinear(const Vector2D &p1, const Vector2D &p2,
-                                   const Vector2D &q) const;
-  bool IsLineSegmentIntersect(const Vector2D &p1, const Vector2D &p2,
-                              const Vector2D &p3, const Vector2D &p4) const;
+  int  ComputeOrientation(const Vector2D& p1, const Vector2D& p2, const Vector2D& q) const;
+  bool IsColinear(const Vector2D& p1, const Vector2D& p2, const Vector2D& q) const;
+  bool IsOnLineSegmentWhenColinear(const Vector2D& p1, const Vector2D& p2, const Vector2D& q) const;
+  bool IsLineSegmentIntersect(const Vector2D& p1,
+                              const Vector2D& p2,
+                              const Vector2D& p3,
+                              const Vector2D& p4) const;
 
  private:
   std::vector<Vector2D> polygon_;

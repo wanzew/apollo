@@ -30,11 +30,11 @@ using ::apollo::drivers::canbus::Byte;
 Parkingbrakestatusrpt80::Parkingbrakestatusrpt80() {}
 const int32_t Parkingbrakestatusrpt80::ID = 0x80;
 
-void Parkingbrakestatusrpt80::Parse(const std::uint8_t* bytes, int32_t length,
-                                    ChassisDetail* chassis) const {
-  chassis->mutable_gem()
-      ->mutable_parking_brake_status_rpt_80()
-      ->set_parking_brake_enabled(parking_brake_enabled(bytes, length));
+void Parkingbrakestatusrpt80::Parse(const std::uint8_t* bytes,
+                                    int32_t             length,
+                                    ChassisDetail*      chassis) const {
+  chassis->mutable_gem()->mutable_parking_brake_status_rpt_80()->set_parking_brake_enabled(
+      parking_brake_enabled(bytes, length));
 }
 
 // config detail: {'name': 'parking_brake_enabled', 'enum': {0:
@@ -43,9 +43,8 @@ void Parkingbrakestatusrpt80::Parse(const std::uint8_t* bytes, int32_t length,
 // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
 Parking_brake_status_rpt_80::Parking_brake_enabledType
-Parkingbrakestatusrpt80::parking_brake_enabled(const std::uint8_t* bytes,
-                                               int32_t length) const {
-  Byte t0(bytes + 0);
+Parkingbrakestatusrpt80::parking_brake_enabled(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
   Parking_brake_status_rpt_80::Parking_brake_enabledType ret =

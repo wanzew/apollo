@@ -23,13 +23,12 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Ecustatus3517 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+class Ecustatus3517
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Ecustatus3517();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Ultrasonic detection distance 1 (Ultrasound

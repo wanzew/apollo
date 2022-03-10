@@ -22,12 +22,12 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
 
-#include <array>
-#include <string>
-#include <vector>
-#include <utility>
 #include "Eigen/Dense"
 #include "gtest/gtest.h"
+#include <array>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/common/macro.h"
 #include "modules/common/math/kalman_filter.h"
@@ -60,27 +60,27 @@ class MoveSequencePredictor : public SequencePredictor {
   FRIEND_TEST(MoveSequencePredictorTest, Utils);
 
  private:
-  void DrawMoveSequenceTrajectoryPoints(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* points);
+  void DrawMoveSequenceTrajectoryPoints(const Obstacle&                               obstacle,
+                                        const LaneSequence&                           lane_sequence,
+                                        const double                                  total_time,
+                                        const double                                  period,
+                                        std::vector<apollo::common::TrajectoryPoint>* points);
 
-  bool GetLongitudinalPolynomial(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      std::pair<double, double>* lon_end_state,
-      std::array<double, 5>* coefficients);
+  bool GetLongitudinalPolynomial(const Obstacle&            obstacle,
+                                 const LaneSequence&        lane_sequence,
+                                 std::pair<double, double>* lon_end_state,
+                                 std::array<double, 5>*     coefficients);
 
-  bool GetLateralPolynomial(const Obstacle& obstacle,
-                            const LaneSequence& lane_sequence,
-                            const double time_to_end_state,
+  bool GetLateralPolynomial(const Obstacle&        obstacle,
+                            const LaneSequence&    lane_sequence,
+                            const double           time_to_end_state,
                             std::array<double, 6>* coefficients);
 
-  double ComputeTimeToLatEndConditionByVelocity(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence);
+  double ComputeTimeToLatEndConditionByVelocity(const Obstacle&     obstacle,
+                                                const LaneSequence& lane_sequence);
 
-  std::pair<double, double> ComputeLonEndState(
-      const std::array<double, 3>& init_s,
-      const LaneSequence& lane_sequence);
+  std::pair<double, double> ComputeLonEndState(const std::array<double, 3>& init_s,
+                                               const LaneSequence&          lane_sequence);
 
   void GenerateCandidateTimes(std::vector<double>* candidate_times);
 };

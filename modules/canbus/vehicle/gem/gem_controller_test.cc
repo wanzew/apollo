@@ -37,19 +37,18 @@ using ::apollo::control::ControlCommand;
 class GemControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string canbus_conf_file =
-        "modules/canbus/testdata/conf/gem_canbus_conf_test.pb.txt";
+    std::string canbus_conf_file = "modules/canbus/testdata/conf/gem_canbus_conf_test.pb.txt";
     ::apollo::common::util::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
   }
 
  protected:
-  GemController controller_;
+  GemController                              controller_;
   CanSender<::apollo::canbus::ChassisDetail> sender_;
-  CanbusConf canbus_conf_;
-  VehicleParameter params_;
-  GemMessageManager msg_manager_;
-  ControlCommand control_cmd_;
+  CanbusConf                                 canbus_conf_;
+  VehicleParameter                           params_;
+  GemMessageManager                          msg_manager_;
+  ControlCommand                             control_cmd_;
 };
 
 TEST_F(GemControllerTest, Init) {
@@ -84,8 +83,7 @@ TEST_F(GemControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
-            ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL), ErrorCode::OK);
 }
 
 }  // namespace gem

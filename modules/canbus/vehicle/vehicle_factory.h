@@ -39,8 +39,7 @@ namespace canbus {
  * vehicle factories based on the vehicle brand.
  */
 class VehicleFactory
-    : public common::util::Factory<VehicleParameter::VehicleBrand,
-                                   AbstractVehicleFactory> {
+    : public common::util::Factory<VehicleParameter::VehicleBrand, AbstractVehicleFactory> {
  public:
   /**
    * @brief register supported vehicle factories.
@@ -51,8 +50,7 @@ class VehicleFactory
    * @brief Creates an AbstractVehicleFactory object based on vehicle_parameter
    * @param vehicle_parameter is defined in vehicle_parameter.proto
    */
-  std::unique_ptr<AbstractVehicleFactory> CreateVehicle(
-      const VehicleParameter &vehicle_parameter);
+  std::unique_ptr<AbstractVehicleFactory> CreateVehicle(const VehicleParameter& vehicle_parameter);
 };
 
 }  // namespace canbus

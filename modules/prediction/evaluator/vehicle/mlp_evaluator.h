@@ -53,8 +53,8 @@ class MLPEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        Lane Sequence pointer
    */
-  void ExtractFeatureValues(Obstacle* obstacle_ptr,
-                            LaneSequence* lane_sequence_ptr,
+  void ExtractFeatureValues(Obstacle*            obstacle_ptr,
+                            LaneSequence*        lane_sequence_ptr,
                             std::vector<double>* feature_values);
 
   /**
@@ -68,8 +68,7 @@ class MLPEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        Feature container in a vector for receiving the feature values
    */
-  void SetObstacleFeatureValues(Obstacle* obstacle_ptr,
-                                std::vector<double>* feature_values);
+  void SetObstacleFeatureValues(Obstacle* obstacle_ptr, std::vector<double>* feature_values);
 
   /**
    * @brief Set lane feature vector
@@ -77,8 +76,8 @@ class MLPEvaluator : public Evaluator {
    *        Lane sequence pointer
    *        Feature container in a vector for receiving the feature values
    */
-  void SetLaneFeatureValues(Obstacle* obstacle_ptr,
-                            LaneSequence* lane_sequence_ptr,
+  void SetLaneFeatureValues(Obstacle*            obstacle_ptr,
+                            LaneSequence*        lane_sequence_ptr,
                             std::vector<double>* feature_values);
 
   /**
@@ -97,13 +96,12 @@ class MLPEvaluator : public Evaluator {
    * @param Lane sequence
    * @param Vector of feature values
    */
-  void SaveOfflineFeatures(LaneSequence* sequence,
-                           const std::vector<double>& feature_values);
+  void SaveOfflineFeatures(LaneSequence* sequence, const std::vector<double>& feature_values);
 
  private:
   std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
-  static const size_t OBSTACLE_FEATURE_SIZE = 22;
-  static const size_t LANE_FEATURE_SIZE = 40;
+  static const size_t                          OBSTACLE_FEATURE_SIZE = 22;
+  static const size_t                          LANE_FEATURE_SIZE     = 40;
 
   std::unique_ptr<FnnVehicleModel> model_ptr_;
 };

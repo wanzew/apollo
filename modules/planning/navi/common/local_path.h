@@ -42,7 +42,7 @@ class LocalPath {
  public:
   LocalPath() = default;
 
-  explicit LocalPath(const std::vector<common::PathPoint> &path_points);
+  explicit LocalPath(const std::vector<common::PathPoint>& path_points);
 
   virtual ~LocalPath() = default;
 
@@ -51,21 +51,21 @@ class LocalPath {
    * @param init_y the initial y coordinate are stored here.
    * @return bool true if the path is not empty, false otherwise..
    */
-  bool GetInitY(double *init_y);
+  bool GetInitY(double* init_y);
 
   /**
    * @brief get the xy coordinate vector.
    * @return const std::vector<common::math::Vec2d>& constant reference of
    * the (x,y) coordinates vector.
    */
-  const std::vector<common::math::Vec2d> &GetXYPoints();
+  const std::vector<common::math::Vec2d>& GetXYPoints();
 
   /**
    * @brief get the PathPoints vector.
    * @return const std::vector<common::math::PathPoint>& constant reference of
    * the PathPoints vector.
    */
-  const std::vector<common::PathPoint> &GetPathPoints();
+  const std::vector<common::PathPoint>& GetPathPoints();
 
   /**
    * @brief get points range.
@@ -99,24 +99,18 @@ class LocalPath {
    * @param weight the weight coefficient.
    * @return void.
    */
-  void Merge(const common::Path &local_path, const double weight);
+  void Merge(const common::Path& local_path, const double weight);
 
  private:
-  std::vector<common::PathPoint> path_points_;
+  std::vector<common::PathPoint>   path_points_;
   std::vector<common::math::Vec2d> points_;
 };
 
-inline const std::vector<common::math::Vec2d> &LocalPath::GetXYPoints() {
-  return points_;
-}
+inline const std::vector<common::math::Vec2d>& LocalPath::GetXYPoints() { return points_; }
 
-inline const std::vector<common::PathPoint> &LocalPath::GetPathPoints() {
-  return path_points_;
-}
+inline const std::vector<common::PathPoint>& LocalPath::GetPathPoints() { return path_points_; }
 
-inline int LocalPath::GetRange() {
-  return static_cast<int>(path_points_.size() - 1);
-}
+inline int LocalPath::GetRange() { return static_cast<int>(path_points_.size() - 1); }
 
 }  // namespace planning
 }  // namespace apollo

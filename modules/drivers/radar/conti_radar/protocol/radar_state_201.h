@@ -32,8 +32,7 @@ class RadarState201 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
   RadarState201();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ContiRadar* conti_radar) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ContiRadar* conti_radar) const override;
 
  private:
   int max_dist(const std::uint8_t* bytes, int32_t length) const;

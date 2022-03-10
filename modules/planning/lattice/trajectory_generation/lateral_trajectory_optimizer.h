@@ -39,12 +39,12 @@ class LateralTrajectoryOptimizer {
 
   virtual ~LateralTrajectoryOptimizer() = default;
 
-  bool optimize(
-      const std::array<double, 3>& d_state,
-      const double delta_s,
-      const std::vector<std::pair<double, double>>& d_bounds);
+  bool optimize(const std::array<double, 3>&                  d_state,
+                const double                                  delta_s,
+                const std::vector<std::pair<double, double>>& d_bounds);
 
   PiecewiseJerkTrajectory1d GetOptimalTrajectory() const;
+
  private:
   std::vector<double> opt_d_;
 

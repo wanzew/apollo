@@ -19,9 +19,9 @@
 #include "modules/common/log.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
-#include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -70,35 +70,30 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           default_on_lane_evaluator_ = obstacle_conf.evaluator_type();
           break;
         }
-        default: { break; }
+        default: {
+          break;
+        }
       }
     }
   }
 
-  AINFO << "Defined vehicle on lane obstacle evaluator ["
-        << vehicle_on_lane_evaluator_ << "]";
-  AINFO << "Defined cyclist on lane obstacle evaluator ["
-        << cyclist_on_lane_evaluator_ << "]";
-  AINFO << "Defined default on lane obstacle evaluator ["
-        << default_on_lane_evaluator_ << "]";
+  AINFO << "Defined vehicle on lane obstacle evaluator [" << vehicle_on_lane_evaluator_ << "]";
+  AINFO << "Defined cyclist on lane obstacle evaluator [" << cyclist_on_lane_evaluator_ << "]";
+  AINFO << "Defined default on lane obstacle evaluator [" << default_on_lane_evaluator_ << "]";
 }
 
-Evaluator* EvaluatorManager::GetEvaluator(
-    const ObstacleConf::EvaluatorType& type) {
+Evaluator* EvaluatorManager::GetEvaluator(const ObstacleConf::EvaluatorType& type) {
   auto it = evaluators_.find(type);
   return it != evaluators_.end() ? it->second.get() : nullptr;
 }
 
-void EvaluatorManager::Run(
-    const perception::PerceptionObstacles& perception_obstacles) {
+void EvaluatorManager::Run(const perception::PerceptionObstacles& perception_obstacles) {
   ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
+      ContainerManager::instance()->GetContainer(AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(container);
 
   Evaluator* evaluator = nullptr;
-  for (const auto& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
+  for (const auto& perception_obstacle : perception_obstacles.perception_obstacle()) {
     if (!perception_obstacle.has_id()) {
       AERROR << "A perception obstacle has no id.";
       continue;
@@ -111,9 +106,7 @@ void EvaluatorManager::Run(
     }
     Obstacle* obstacle = container->GetObstacle(id);
 
-    if (obstacle == nullptr) {
-      continue;
-    }
+    if (obstacle == nullptr) { continue; }
 
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
@@ -141,14 +134,12 @@ void EvaluatorManager::Run(
         break;
       }
     }
-    if (evaluator != nullptr) {
-      evaluator->Evaluate(obstacle);
-    }
+    if (evaluator != nullptr) { evaluator->Evaluate(obstacle); }
   }
 }
 
-std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
-    const ObstacleConf::EvaluatorType& type) {
+std::unique_ptr<Evaluator>
+EvaluatorManager::CreateEvaluator(const ObstacleConf::EvaluatorType& type) {
   std::unique_ptr<Evaluator> evaluator_ptr(nullptr);
   switch (type) {
     case ObstacleConf::MLP_EVALUATOR: {
@@ -163,13 +154,14 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
       evaluator_ptr.reset(new CostEvaluator());
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
   return evaluator_ptr;
 }
 
-void EvaluatorManager::RegisterEvaluator(
-    const ObstacleConf::EvaluatorType& type) {
+void EvaluatorManager::RegisterEvaluator(const ObstacleConf::EvaluatorType& type) {
   evaluators_[type] = CreateEvaluator(type);
   AINFO << "Evaluator [" << type << "] is registered.";
 }

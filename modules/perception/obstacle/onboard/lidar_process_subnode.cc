@@ -50,9 +50,7 @@ using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
 
 bool LidarProcessSubnode::InitInternal() {
-  if (inited_) {
-    return true;
-  }
+  if (inited_) { return true; }
 
   RegistAllAlgorithm();
 
@@ -84,8 +82,7 @@ bool LidarProcessSubnode::InitInternal() {
   return true;
 }
 
-void LidarProcessSubnode::OnPointCloud(
-    const sensor_msgs::PointCloud2& message) {
+void LidarProcessSubnode::OnPointCloud(const sensor_msgs::PointCloud2& message) {
   AINFO << "process OnPointCloud.";
   PERF_FUNCTION("LidarProcessSubnode");
   if (!inited_) {
@@ -93,21 +90,20 @@ void LidarProcessSubnode::OnPointCloud(
     return;
   }
   const double kTimeStamp = message.header.stamp.toSec();
-  timestamp_ = kTimeStamp;
+  timestamp_              = kTimeStamp;
   ++seq_num_;
 
   std::shared_ptr<SensorObjects> out_sensor_objects(new SensorObjects);
-  out_sensor_objects->timestamp = timestamp_;
+  out_sensor_objects->timestamp   = timestamp_;
   out_sensor_objects->sensor_type = GetSensorType();
-  out_sensor_objects->sensor_id = device_id_;
-  out_sensor_objects->seq_num = seq_num_;
+  out_sensor_objects->sensor_id   = device_id_;
+  out_sensor_objects->seq_num     = seq_num_;
 
   PERF_BLOCK_START();
   /// get velodyne2world transfrom
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
-    AERROR << "failed to get trans at timestamp: "
-           << GLOG_TIMESTAMP(kTimeStamp);
+    AERROR << "failed to get trans at timestamp: " << GLOG_TIMESTAMP(kTimeStamp);
     out_sensor_objects->error_code = common::PERCEPTION_ERROR_TF;
     PublishDataAndEvent(timestamp_, out_sensor_objects);
     return;
@@ -118,21 +114,18 @@ void LidarProcessSubnode::OnPointCloud(
 
   PointCloudPtr point_cloud(new PointCloud);
   TransPointCloudToPCL(message, &point_cloud);
-  ADEBUG << "transform pointcloud success. points num is: "
-         << point_cloud->points.size();
+  ADEBUG << "transform pointcloud success. points num is: " << point_cloud->points.size();
   PERF_BLOCK_END("lidar_transform_poindcloud");
 
   // error_code_ = common::OK;
 
   /// call hdmap to get ROI
-  if (FLAGS_use_navigation_mode) {
-    AdapterManager::Observe();
-  }
+  if (FLAGS_use_navigation_mode) { AdapterManager::Observe(); }
   HdmapStructPtr hdmap = nullptr;
   if (hdmap_input_) {
-    PointD velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
+    PointD   velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
     Affine3d temp_trans(*velodyne_trans);
-    PointD velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
+    PointD   velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
     hdmap.reset(new HdmapStruct);
     hdmap_input_->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap);
     PERF_BLOCK_END("lidar_get_roi_from_hdmap");
@@ -141,12 +134,11 @@ void LidarProcessSubnode::OnPointCloud(
   /// call roi_filter
   PointCloudPtr roi_cloud(new PointCloud);
   if (roi_filter_ != nullptr) {
-    PointIndicesPtr roi_indices(new PointIndices);
+    PointIndicesPtr  roi_indices(new PointIndices);
     ROIFilterOptions roi_filter_options;
     roi_filter_options.velodyne_trans = velodyne_trans;
-    roi_filter_options.hdmap = hdmap;
-    if (roi_filter_->Filter(point_cloud, roi_filter_options,
-                            roi_indices.get())) {
+    roi_filter_options.hdmap          = hdmap;
+    if (roi_filter_->Filter(point_cloud, roi_filter_options, roi_indices.get())) {
       pcl::copyPointCloud(*point_cloud, *roi_indices, *roi_cloud);
       roi_indices_ = roi_indices;
     } else {
@@ -156,8 +148,7 @@ void LidarProcessSubnode::OnPointCloud(
       return;
     }
   }
-  ADEBUG << "call roi_filter succ. The num of roi_cloud is: "
-         << roi_cloud->points.size();
+  ADEBUG << "call roi_filter succ. The num of roi_cloud is: " << roi_cloud->points.size();
   PERF_BLOCK_END("lidar_roi_filter");
 
   /// call segmentor
@@ -169,10 +160,8 @@ void LidarProcessSubnode::OnPointCloud(
     non_ground_indices.indices.resize(roi_cloud->points.size());
     // non_ground_indices.indices.resize(point_cloud->points.size());
 
-    std::iota(non_ground_indices.indices.begin(),
-              non_ground_indices.indices.end(), 0);
-    if (!segmentor_->Segment(roi_cloud, non_ground_indices,
-                             segmentation_options, &objects)) {
+    std::iota(non_ground_indices.indices.begin(), non_ground_indices.indices.end(), 0);
+    if (!segmentor_->Segment(roi_cloud, non_ground_indices, segmentation_options, &objects)) {
       AERROR << "failed to call segmention.";
       out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
       PublishDataAndEvent(timestamp_, out_sensor_objects);
@@ -196,8 +185,7 @@ void LidarProcessSubnode::OnPointCloud(
       return;
     }
   }
-  ADEBUG << "call object filter succ. The num of objects is: "
-         << objects.size();
+  ADEBUG << "call object filter succ. The num of objects is: " << objects.size();
   PERF_BLOCK_END("lidar_object_filter");
 
   /// call object builder
@@ -217,26 +205,24 @@ void LidarProcessSubnode::OnPointCloud(
   if (tracker_ != nullptr) {
     TrackerOptions tracker_options;
     tracker_options.velodyne_trans = velodyne_trans;
-    tracker_options.hdmap = hdmap;
-    tracker_options.hdmap_input = hdmap_input_;
-    if (!tracker_->Track(objects, timestamp_, tracker_options,
-                         &(out_sensor_objects->objects))) {
+    tracker_options.hdmap          = hdmap;
+    tracker_options.hdmap_input    = hdmap_input_;
+    if (!tracker_->Track(objects, timestamp_, tracker_options, &(out_sensor_objects->objects))) {
       AERROR << "failed to call tracker.";
       out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
       PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
-  ADEBUG << "call tracker succ, there are "
-         << out_sensor_objects->objects.size() << " tracked objects.";
+  ADEBUG << "call tracker succ, there are " << out_sensor_objects->objects.size()
+         << " tracked objects.";
   PERF_BLOCK_END("lidar_tracker");
 
   /// call type fuser
   if (type_fuser_ != nullptr) {
     TypeFuserOptions type_fuser_options;
     type_fuser_options.timestamp = timestamp_;
-    if (!type_fuser_->FuseType(type_fuser_options,
-                               &(out_sensor_objects->objects))) {
+    if (!type_fuser_->FuseType(type_fuser_options, &(out_sensor_objects->objects))) {
       out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
       PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
@@ -272,8 +258,7 @@ bool LidarProcessSubnode::InitFrameDependence() {
   processing_data_ = dynamic_cast<LidarObjectData*>(
       shared_data_manager_->GetSharedData(lidar_processing_data_name));
   if (processing_data_ == nullptr) {
-    AERROR << "Failed to get shared data instance "
-           << lidar_processing_data_name;
+    AERROR << "Failed to get shared data instance " << lidar_processing_data_name;
     return false;
   }
   AINFO << "Init shared data successfully, data: " << processing_data_->name();
@@ -293,8 +278,7 @@ bool LidarProcessSubnode::InitFrameDependence() {
 
 bool LidarProcessSubnode::InitAlgorithmPlugin() {
   /// init roi filter
-  roi_filter_.reset(
-      BaseROIFilterRegisterer::GetInstanceByName(FLAGS_onboard_roi_filter));
+  roi_filter_.reset(BaseROIFilterRegisterer::GetInstanceByName(FLAGS_onboard_roi_filter));
   if (!roi_filter_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_roi_filter;
     return false;
@@ -303,12 +287,10 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     AERROR << "Failed to Init roi filter: " << roi_filter_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, roi_filter_: "
-        << roi_filter_->name();
+  AINFO << "Init algorithm plugin successfully, roi_filter_: " << roi_filter_->name();
 
   /// init segmentation
-  segmentor_.reset(
-      BaseSegmentationRegisterer::GetInstanceByName(FLAGS_onboard_segmentor));
+  segmentor_.reset(BaseSegmentationRegisterer::GetInstanceByName(FLAGS_onboard_segmentor));
   if (!segmentor_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_segmentor;
     return false;
@@ -317,12 +299,11 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     AERROR << "Failed to Init segmentor: " << segmentor_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, segmentor: "
-        << segmentor_->name();
+  AINFO << "Init algorithm plugin successfully, segmentor: " << segmentor_->name();
 
   /// init object build
-  object_builder_.reset(BaseObjectBuilderRegisterer::GetInstanceByName(
-      FLAGS_onboard_object_builder));
+  object_builder_.reset(
+      BaseObjectBuilderRegisterer::GetInstanceByName(FLAGS_onboard_object_builder));
   if (!object_builder_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_object_builder;
     return false;
@@ -331,12 +312,10 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     AERROR << "Failed to Init object builder: " << object_builder_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, object builder: "
-        << object_builder_->name();
+  AINFO << "Init algorithm plugin successfully, object builder: " << object_builder_->name();
 
   /// init pre object filter
-  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
-      FLAGS_onboard_object_filter));
+  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(FLAGS_onboard_object_filter));
   if (!object_filter_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_object_filter;
     return false;
@@ -345,12 +324,10 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     AERROR << "Failed to Init object filter: " << object_filter_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, object filter: "
-        << object_filter_->name();
+  AINFO << "Init algorithm plugin successfully, object filter: " << object_filter_->name();
 
   /// init tracker
-  tracker_.reset(
-      BaseTrackerRegisterer::GetInstanceByName(FLAGS_onboard_tracker));
+  tracker_.reset(BaseTrackerRegisterer::GetInstanceByName(FLAGS_onboard_tracker));
   if (!tracker_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_tracker;
     return false;
@@ -362,8 +339,7 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
   AINFO << "Init algorithm plugin successfully, tracker: " << tracker_->name();
 
   /// init type fuser
-  type_fuser_.reset(
-      BaseTypeFuserRegisterer::GetInstanceByName(FLAGS_onboard_type_fuser));
+  type_fuser_.reset(BaseTypeFuserRegisterer::GetInstanceByName(FLAGS_onboard_type_fuser));
   if (!type_fuser_) {
     AERROR << "Failed to get instance: " << FLAGS_onboard_type_fuser;
     return false;
@@ -372,34 +348,32 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
     AERROR << "Failed to Init type_fuser: " << type_fuser_->name();
     return false;
   }
-  AINFO << "Init algorithm plugin successfully, type_fuser: "
-        << type_fuser_->name();
+  AINFO << "Init algorithm plugin successfully, type_fuser: " << type_fuser_->name();
 
   return true;
 }
 
-void LidarProcessSubnode::TransPointCloudToPCL(
-    const sensor_msgs::PointCloud2& in_msg, PointCloudPtr* out_cloud) {
+void LidarProcessSubnode::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
+                                               PointCloudPtr*                  out_cloud) {
   // transform from ros to pcl
   pcl::PointCloud<pcl_util::PointXYZIT> in_cloud;
   pcl::fromROSMsg(in_msg, in_cloud);
   // transform from xyzit to xyzi
-  PointCloudPtr& cloud = *out_cloud;
-  cloud->header = in_cloud.header;
-  cloud->width = in_cloud.width;
-  cloud->height = in_cloud.height;
-  cloud->is_dense = in_cloud.is_dense;
-  cloud->sensor_origin_ = in_cloud.sensor_origin_;
+  PointCloudPtr& cloud       = *out_cloud;
+  cloud->header              = in_cloud.header;
+  cloud->width               = in_cloud.width;
+  cloud->height              = in_cloud.height;
+  cloud->is_dense            = in_cloud.is_dense;
+  cloud->sensor_origin_      = in_cloud.sensor_origin_;
   cloud->sensor_orientation_ = in_cloud.sensor_orientation_;
   cloud->points.resize(in_cloud.points.size());
   size_t points_num = 0;
   for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
     pcl_util::PointXYZIT& pt = in_cloud.points[idx];
-    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) &&
-        !std::isnan(pt.intensity)) {
-      cloud->points[points_num].x = pt.x;
-      cloud->points[points_num].y = pt.y;
-      cloud->points[points_num].z = pt.z;
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) && !std::isnan(pt.intensity)) {
+      cloud->points[points_num].x         = pt.x;
+      cloud->points[points_num].y         = pt.y;
+      cloud->points[points_num].z         = pt.z;
       cloud->points[points_num].intensity = pt.intensity;
       ++points_num;
     }
@@ -407,13 +381,13 @@ void LidarProcessSubnode::TransPointCloudToPCL(
   cloud->points.resize(points_num);
 }
 
-void LidarProcessSubnode::PublishDataAndEvent(
-    double timestamp, const SharedDataPtr<SensorObjects>& data) {
+void LidarProcessSubnode::PublishDataAndEvent(double                              timestamp,
+                                              const SharedDataPtr<SensorObjects>& data) {
   // set shared data
   std::string key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
-    AERROR << "Failed to produce shared key. time: "
-           << GLOG_TIMESTAMP(timestamp) << ", device_id: " << device_id_;
+    AERROR << "Failed to produce shared key. time: " << GLOG_TIMESTAMP(timestamp)
+           << ", device_id: " << device_id_;
     return;
   }
 
@@ -421,31 +395,26 @@ void LidarProcessSubnode::PublishDataAndEvent(
   // pub events
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
     const EventMeta& event_meta = pub_meta_events_[idx];
-    Event event;
-    event.event_id = event_meta.event_id;
+    Event            event;
+    event.event_id  = event_meta.event_id;
     event.timestamp = timestamp;
-    event.reserve = device_id_;
+    event.reserve   = device_id_;
     event_manager_->Publish(event);
   }
 }
 
-SensorType Lidar64ProcessSubnode::GetSensorType() const {
-  return SensorType::VELODYNE_64;
-}
+SensorType Lidar64ProcessSubnode::GetSensorType() const { return SensorType::VELODYNE_64; }
 
 void Lidar64ProcessSubnode::AddMessageCallback() {
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback<LidarProcessSubnode>(
-      &LidarProcessSubnode::OnPointCloud, this);
+  AdapterManager::AddPointCloudCallback<LidarProcessSubnode>(&LidarProcessSubnode::OnPointCloud,
+                                                             this);
 }
 
-SensorType Lidar16ProcessSubnode::GetSensorType() const {
-  return SensorType::VELODYNE_16;
-}
+SensorType Lidar16ProcessSubnode::GetSensorType() const { return SensorType::VELODYNE_16; }
 
 void Lidar16ProcessSubnode::AddMessageCallback() {
-  CHECK(AdapterManager::GetVLP16PointCloud())
-      << "VLP16 PointCloud is not initialized.";
+  CHECK(AdapterManager::GetVLP16PointCloud()) << "VLP16 PointCloud is not initialized.";
   AdapterManager::AddVLP16PointCloudCallback<LidarProcessSubnode>(
       &LidarProcessSubnode::OnPointCloud, this);
 }

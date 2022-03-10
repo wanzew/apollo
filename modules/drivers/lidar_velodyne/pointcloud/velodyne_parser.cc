@@ -28,8 +28,8 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-double VelodyneParser::get_gps_stamp(double current_packet_stamp,
-                                     double* previous_packet_stamp,
+double VelodyneParser::get_gps_stamp(double    current_packet_stamp,
+                                     double*   previous_packet_stamp,
                                      uint64_t* gps_base_usec) {
   if (current_packet_stamp < *previous_packet_stamp) {
     // plus 3600 when large jump back, discard little jump back for wrong time
@@ -37,8 +37,7 @@ double VelodyneParser::get_gps_stamp(double current_packet_stamp,
     if (std::abs(*previous_packet_stamp - current_packet_stamp) > 3599000000) {
       *gps_base_usec += 3600 * 1e6;
       AINFO << "Base time plus 3600s. Model: " << config_.model() << std::fixed
-            << ". current:" << current_packet_stamp
-            << ", last time:" << *previous_packet_stamp;
+            << ". current:" << current_packet_stamp << ", last time:" << *previous_packet_stamp;
     } else {
       AWARN << "Currrnt stamp:" << std::fixed << current_packet_stamp
             << " less than previous stamp:" << *previous_packet_stamp
@@ -52,7 +51,7 @@ double VelodyneParser::get_gps_stamp(double current_packet_stamp,
   }
 
   *previous_packet_stamp = current_packet_stamp;
-  double gps_stamp = *gps_base_usec + current_packet_stamp;
+  double gps_stamp       = *gps_base_usec + current_packet_stamp;
 
   gps_stamp /= 1e6;
   return gps_stamp;
@@ -61,18 +60,19 @@ double VelodyneParser::get_gps_stamp(double current_packet_stamp,
 VPoint VelodyneParser::get_nan_point(double timestamp) {
   VPoint nan_point;
   nan_point.timestamp = timestamp;
-  nan_point.x = nan;
-  nan_point.y = nan;
-  nan_point.z = nan;
+  nan_point.x         = nan;
+  nan_point.y         = nan;
+  nan_point.z         = nan;
   nan_point.intensity = 0;
   return nan_point;
 }
 
 VelodyneParser::VelodyneParser(const VelodyneConf& config)
-    : last_time_stamp_(0), config_(config), mode_(STRONGEST) {}
+    : last_time_stamp_(0)
+    , config_(config)
+    , mode_(STRONGEST) {}
 
-void VelodyneParser::init_angle_params(double view_direction,
-                                       double view_width) {
+void VelodyneParser::init_angle_params(double view_direction, double view_width) {
   // converting angle parameters into the velodyne reference (rad)
   double tmp_min_angle = view_direction + view_width / 2;
   double tmp_max_angle = view_direction - view_width / 2;
@@ -98,30 +98,27 @@ bool VelodyneParser::setup() {
     calibration_.read(config_.calibration_file());
 
     if (!calibration_.initialized_) {
-      AERROR << "Unable to open calibration file: "
-             << config_.calibration_file();
+      AERROR << "Unable to open calibration file: " << config_.calibration_file();
       return false;
     }
   }
 
   // setup angle parameters.
   init_angle_params(config_.view_direction(), config_.view_width());
-  init_sin_cos_rot_table(sin_rot_table_, cos_rot_table_, ROTATION_MAX_UNITS,
-                         ROTATION_RESOLUTION);
+  init_sin_cos_rot_table(sin_rot_table_, cos_rot_table_, ROTATION_MAX_UNITS, ROTATION_RESOLUTION);
   return true;
 }
 
 bool VelodyneParser::is_scan_valid(int rotation, float range) {
   // check range first
-  if (range < config_.min_range() || range > config_.max_range()) {
-    return false;
-  }
+  if (range < config_.min_range() || range > config_.max_range()) { return false; }
   return true;
 }
 
 void VelodyneParser::compute_coords(const union RawDistance& raw_distance,
-                                    const LaserCorrection& corrections,
-                                    const uint16_t& rotation, VPoint* point) {
+                                    const LaserCorrection&   corrections,
+                                    const uint16_t&          rotation,
+                                    VPoint*                  point) {
   if (rotation > 36000) {
     AERROR << "rotation must between 0 and 36000, now is :" << rotation;
     return;
@@ -132,16 +129,14 @@ void VelodyneParser::compute_coords(const union RawDistance& raw_distance,
   double z = 0.0;
 
   double distance1 = raw_distance.raw_distance * DISTANCE_RESOLUTION;
-  double distance = distance1 + corrections.dist_correction;
+  double distance  = distance1 + corrections.dist_correction;
 
   // cos(a-b) = cos(a)*cos(b) + sin(a)*sin(b)
   // sin(a-b) = sin(a)*cos(b) - cos(a)*sin(b)
-  double cos_rot_angle =
-      cos_rot_table_[rotation] * corrections.cos_rot_correction +
-      sin_rot_table_[rotation] * corrections.sin_rot_correction;
-  double sin_rot_angle =
-      sin_rot_table_[rotation] * corrections.cos_rot_correction -
-      cos_rot_table_[rotation] * corrections.sin_rot_correction;
+  double cos_rot_angle = cos_rot_table_[rotation] * corrections.cos_rot_correction +
+                         sin_rot_table_[rotation] * corrections.sin_rot_correction;
+  double sin_rot_angle = sin_rot_table_[rotation] * corrections.cos_rot_correction -
+                         cos_rot_table_[rotation] * corrections.sin_rot_correction;
 
   // double vert_offset = corrections.vert_offset_correction;
 
@@ -149,11 +144,11 @@ void VelodyneParser::compute_coords(const union RawDistance& raw_distance,
   double xy_distance = distance * corrections.cos_vert_correction;
 
   // Calculate temporal X, use absolute value.
-  double xx = fabs(xy_distance * sin_rot_angle -
-                   corrections.horiz_offset_correction * cos_rot_angle);
+  double xx =
+      fabs(xy_distance * sin_rot_angle - corrections.horiz_offset_correction * cos_rot_angle);
   // Calculate temporal Y, use absolute value
-  double yy = fabs(xy_distance * cos_rot_angle +
-                   corrections.horiz_offset_correction * sin_rot_angle);
+  double yy =
+      fabs(xy_distance * cos_rot_angle + corrections.horiz_offset_correction * sin_rot_angle);
 
   // Get 2points calibration values,Linear interpolation to get distance
   // correction for X and Y, that means distance correction use
@@ -163,12 +158,10 @@ void VelodyneParser::compute_coords(const union RawDistance& raw_distance,
 
   if (need_two_pt_correction_ && distance1 <= 2500) {
     distance_corr_x =
-        (corrections.dist_correction - corrections.dist_correction_x) *
-            (xx - 2.4) / 22.64 +
+        (corrections.dist_correction - corrections.dist_correction_x) * (xx - 2.4) / 22.64 +
         corrections.dist_correction_x;  // 22.64 = 25.04 - 2.4
     distance_corr_y =
-        (corrections.dist_correction - corrections.dist_correction_y) *
-            (yy - 1.93) / 23.11 +
+        (corrections.dist_correction - corrections.dist_correction_y) * (yy - 1.93) / 23.11 +
         corrections.dist_correction_y;  // 23.11 = 25.04 - 1.93
   } else {
     distance_corr_x = distance_corr_y = corrections.dist_correction;
@@ -180,18 +173,15 @@ void VelodyneParser::compute_coords(const union RawDistance& raw_distance,
   // xy_distance = distance_x * cos_vert_correction - vert_offset *
   // sin_vert_correction;
 
-  x = xy_distance * sin_rot_angle -
-      corrections.horiz_offset_correction * cos_rot_angle;
+  x = xy_distance * sin_rot_angle - corrections.horiz_offset_correction * cos_rot_angle;
 
   double distance_y = distance1 + distance_corr_y;
-  xy_distance = distance_y * corrections.cos_vert_correction;
+  xy_distance       = distance_y * corrections.cos_vert_correction;
   // xy_distance = distance_y * cos_vert_correction - vert_offset *
   // sin_vert_correction;
-  y = xy_distance * cos_rot_angle +
-      corrections.horiz_offset_correction * sin_rot_angle;
+  y = xy_distance * cos_rot_angle + corrections.horiz_offset_correction * sin_rot_angle;
 
-  z = distance * corrections.sin_vert_correction +
-      corrections.vert_offset_correction;
+  z = distance * corrections.sin_vert_correction + corrections.vert_offset_correction;
   // z = distance * sin_vert_correction + vert_offset * cos_vert_correction;
 
   /** Use standard ROS coordinate system (right-hand rule) */

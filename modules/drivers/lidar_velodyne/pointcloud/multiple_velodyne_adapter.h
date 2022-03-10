@@ -45,45 +45,28 @@ class MultipleVelodyneAdapter {
     return true;
   }
 
-  static void PublishVelodyneRawByIndex(
-      uint32_t index, velodyne_msgs::VelodyneScanUnifiedPtr scan) {
+  static void PublishVelodyneRawByIndex(uint32_t                              index,
+                                        velodyne_msgs::VelodyneScanUnifiedPtr scan) {
     switch (index) {
-      case 0:
-        AdapterManager::PublishVelodyneRaw0(*(scan.get()));
-        break;
-      case 1:
-        break;
-      default:
-        AERROR << "no index match!";
-        break;
+      case 0: AdapterManager::PublishVelodyneRaw0(*(scan.get())); break;
+      case 1: break;
+      default: AERROR << "no index match!"; break;
     }
     return;
   }
-  static void PublishPointCloudRawByIndex(
-      uint32_t index, sensor_msgs::PointCloud2Ptr pointcloud) {
+  static void PublishPointCloudRawByIndex(uint32_t index, sensor_msgs::PointCloud2Ptr pointcloud) {
     switch (index) {
-      case 0:
-        AdapterManager::PublishPointCloudRaw0(*(pointcloud.get()));
-        break;
-      case 1:
-        break;
-      default:
-        AERROR << "no index match!";
-        break;
+      case 0: AdapterManager::PublishPointCloudRaw0(*(pointcloud.get())); break;
+      case 1: break;
+      default: AERROR << "no index match!"; break;
     }
     return;
   }
-  static void PublishPointCloudByIndex(
-      uint32_t index, sensor_msgs::PointCloud2Ptr com_pointcloud) {
+  static void PublishPointCloudByIndex(uint32_t index, sensor_msgs::PointCloud2Ptr com_pointcloud) {
     switch (index) {
-      case 0:
-        AdapterManager::PublishPointCloud(*com_pointcloud);
-        break;
-      case 1:
-        break;
-      default:
-        AERROR << "no index match!";
-        break;
+      case 0: AdapterManager::PublishPointCloud(*com_pointcloud); break;
+      case 1: break;
+      default: AERROR << "no index match!"; break;
     }
     return;
   }

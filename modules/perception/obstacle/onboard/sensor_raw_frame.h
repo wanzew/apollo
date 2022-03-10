@@ -28,14 +28,14 @@ namespace perception {
 class SensorRawFrame {
  public:
   SensorRawFrame()
-      : sensor_type_(SensorType::UNKNOWN_SENSOR_TYPE),
-        timestamp_(0.0),
-        pose_(Eigen::Matrix4d::Identity()) {}
+      : sensor_type_(SensorType::UNKNOWN_SENSOR_TYPE)
+      , timestamp_(0.0)
+      , pose_(Eigen::Matrix4d::Identity()) {}
   virtual ~SensorRawFrame() {}
 
  public:
-  SensorType sensor_type_;
-  double timestamp_;
+  SensorType      sensor_type_;
+  double          timestamp_;
   Eigen::Matrix4d pose_;
 };
 
@@ -54,7 +54,7 @@ class RadarRawFrame : public SensorRawFrame {
   ~RadarRawFrame() {}
 
  public:
-  ContiRadar raw_obstacles_;
+  ContiRadar      raw_obstacles_;
   Eigen::Vector3f car_linear_speed_;
 };
 

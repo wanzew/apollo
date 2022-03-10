@@ -24,7 +24,8 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_double(safety_mode_seconds_before_estop, 10.0,
+DEFINE_double(safety_mode_seconds_before_estop,
+              10.0,
               "Interval before sending estop after we found critical errors.");
 
 namespace apollo {
@@ -32,8 +33,8 @@ namespace monitor {
 
 using apollo::common::KVDB;
 using apollo::common::util::ContainsKey;
-using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::FindOrNull;
+using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::StrCat;
 
 SafetyManager::SafetyManager() {
@@ -42,7 +43,7 @@ SafetyManager::SafetyManager() {
 }
 
 void SafetyManager::CheckSafety(const double current_time) {
-  auto *system_status = MonitorManager::GetStatus();
+  auto* system_status = MonitorManager::GetStatus();
   // Everything looks good or has been handled properly.
   if (!ShouldTriggerSafeMode(current_time)) {
     system_status->clear_passenger_msg();
@@ -63,58 +64,51 @@ void SafetyManager::CheckSafety(const double current_time) {
   }
 
   // Trigger EStop if no action was taken in time.
-  if (system_status->safety_mode_trigger_time() +
-      FLAGS_safety_mode_seconds_before_estop < current_time) {
+  if (system_status->safety_mode_trigger_time() + FLAGS_safety_mode_seconds_before_estop <
+      current_time) {
     system_status->set_require_emergency_stop(true);
   }
 }
 
 bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   // We only check safety mode in self driving mode.
-  if (!MonitorManager::IsInAutonomousDriving()) {
-    return false;
-  }
+  if (!MonitorManager::IsInAutonomousDriving()) { return false; }
 
   const std::string mode_name = KVDB::Get("apollo:dreamview:mode");
-  auto& log = MonitorManager::LogBuffer();
+  auto&             log       = MonitorManager::LogBuffer();
   if (mode_name.empty()) {
     log.ERROR("Cannot get apollo mode");
     return true;
   }
 
-  const apollo::dreamview::Mode *mode_conf =
-      FindOrNull(hmi_config_.modes(), mode_name);
+  const apollo::dreamview::Mode* mode_conf = FindOrNull(hmi_config_.modes(), mode_name);
   if (mode_conf == nullptr) {
     log.ERROR(StrCat("Cannot find configuration for apollo mode: ", mode_name));
     return true;
   }
 
-  const auto &hardware_status = MonitorManager::GetStatus()->hardware();
-  for (const auto &hardware : mode_conf->live_hardware()) {
-    const auto *status = FindOrNull(hardware_status, hardware);
+  const auto& hardware_status = MonitorManager::GetStatus()->hardware();
+  for (const auto& hardware : mode_conf->live_hardware()) {
+    const auto* status = FindOrNull(hardware_status, hardware);
     if (status == nullptr) {
       log.ERROR(StrCat("Cannot get status of hardware: ", hardware));
       return true;
     }
-    if (status->summary() == Summary::ERROR ||
-        status->summary() == Summary::FATAL) {
-      log.ERROR(StrCat(
-          "Hardware ", hardware, " triggers safety mode: ", status->msg()));
+    if (status->summary() == Summary::ERROR || status->summary() == Summary::FATAL) {
+      log.ERROR(StrCat("Hardware ", hardware, " triggers safety mode: ", status->msg()));
       return true;
     }
   }
 
   const auto& modules_status = MonitorManager::GetStatus()->modules();
-  for (const auto &module : mode_conf->live_modules()) {
-    const auto *status = FindOrNull(modules_status, module);
+  for (const auto& module : mode_conf->live_modules()) {
+    const auto* status = FindOrNull(modules_status, module);
     if (status == nullptr) {
       log.ERROR(StrCat("Cannot get status of module: ", module));
       return true;
     }
-    if (status->summary() == Summary::ERROR ||
-        status->summary() == Summary::FATAL) {
-      log.ERROR(StrCat(
-          "Module ", module, " triggers safety mode: ", status->msg()));
+    if (status->summary() == Summary::ERROR || status->summary() == Summary::FATAL) {
+      log.ERROR(StrCat("Module ", module, " triggers safety mode: ", status->msg()));
       return true;
     }
   }

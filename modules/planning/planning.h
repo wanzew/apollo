@@ -107,15 +107,14 @@ class Planning : public apollo::common::ApolloApp {
   /**
    * @brief Plan the trajectory given current vehicle state
    */
-  common::Status Plan(
-      const double current_time_stamp,
-      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* trajectory);
+  common::Status Plan(const double                                current_time_stamp,
+                      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+                      ADCTrajectory*                              trajectory);
 
-  common::Status InitFrame(const uint32_t sequence_num,
+  common::Status InitFrame(const uint32_t                 sequence_num,
                            const common::TrajectoryPoint& planning_start_point,
-                           const double start_time,
-                           const common::VehicleState& vehicle_state);
+                           const double                   start_time,
+                           const common::VehicleState&    vehicle_state);
 
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
@@ -147,10 +146,10 @@ class Planning : public apollo::common::ApolloApp {
 
   class VehicleConfig {
    public:
-    double x_ = 0.0;
-    double y_ = 0.0;
-    double theta_ = 0.0;
-    bool is_valid_ = false;
+    double x_        = 0.0;
+    double y_        = 0.0;
+    double theta_    = 0.0;
+    bool   is_valid_ = false;
   };
   VehicleConfig last_vehicle_config_;
 

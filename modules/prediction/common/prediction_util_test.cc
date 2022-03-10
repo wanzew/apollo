@@ -23,8 +23,8 @@ namespace prediction {
 namespace math_util {
 
 TEST(PredictionUtilTest, normalize) {
-  double value = 3.0;
-  double mean = 2.0;
+  double value   = 3.0;
+  double mean    = 2.0;
   double std_dev = 0.01;
   EXPECT_DOUBLE_EQ(Normalize(value, mean, std_dev), 99.999999);
 }
@@ -43,7 +43,7 @@ TEST(PredictionUtilTest, sigmoid) {
 }
 
 TEST(PredictionUtilTest, solvable_quadratic_equation) {
-  std::vector<double> coefficients = {5.0, 6.0, 1.0};
+  std::vector<double>       coefficients = {5.0, 6.0, 1.0};
   std::pair<double, double> roots;
   EXPECT_EQ(SolveQuadraticEquation(coefficients, &roots), 0);
   EXPECT_DOUBLE_EQ(roots.first, -0.2);
@@ -51,7 +51,7 @@ TEST(PredictionUtilTest, solvable_quadratic_equation) {
 }
 
 TEST(PredictionUtilTest, non_solvable_quadratic_equation) {
-  std::vector<double> coefficients = {5.0, 2.0, 1.0};
+  std::vector<double>       coefficients = {5.0, 2.0, 1.0};
   std::pair<double, double> roots;
   EXPECT_EQ(SolveQuadraticEquation(coefficients, &roots), -1);
 }
@@ -63,8 +63,8 @@ namespace predictor_util {
 using ::apollo::common::TrajectoryPoint;
 
 TEST(PredictionUtilTest, translate_point) {
-  double x = 1.0;
-  double y = 2.0;
+  double          x = 1.0;
+  double          y = 2.0;
   TrajectoryPoint trajectory_point;
   trajectory_point.mutable_path_point()->set_x(1.0);
   trajectory_point.mutable_path_point()->set_y(1.0);

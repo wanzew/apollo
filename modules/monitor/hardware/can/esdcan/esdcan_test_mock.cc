@@ -21,14 +21,14 @@ namespace monitor {
 namespace hw {
 
 NTCAN_RESULT EsdCanDetails::esdcan_do_test(int id) {
-  result = NTCAN_SUCCESS;
+  result     = NTCAN_SUCCESS;
   valid_flag = 0;
   return NTCAN_SUCCESS;
 }
 
-void EsdCanDetails::print_summary(std::ostream &os) {}
+void EsdCanDetails::print_summary(std::ostream& os) {}
 
-void EsdCanDetails::print_test_result(std::ostream &os) {}
+void EsdCanDetails::print_test_result(std::ostream& os) {}
 
 }  // namespace hw
 }  // namespace monitor

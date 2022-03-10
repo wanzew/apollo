@@ -35,9 +35,7 @@ uint32_t Wipercmd90::GetPeriod() const {
   return PERIOD;
 }
 
-void Wipercmd90::UpdateData(uint8_t* data) {
-  set_p_wiper_cmd(data, wiper_cmd_);
-}
+void Wipercmd90::UpdateData(uint8_t* data) { set_p_wiper_cmd(data, wiper_cmd_); }
 
 void Wipercmd90::Reset() {
   // TODO(QiL) :you should check this manually
@@ -56,8 +54,7 @@ Wipercmd90* Wipercmd90::set_wiper_cmd(Wiper_cmd_90::Wiper_cmdType wiper_cmd) {
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Wipercmd90::set_p_wiper_cmd(uint8_t* data,
-                                 Wiper_cmd_90::Wiper_cmdType wiper_cmd) {
+void Wipercmd90::set_p_wiper_cmd(uint8_t* data, Wiper_cmd_90::Wiper_cmdType wiper_cmd) {
   int x = wiper_cmd;
 
   Byte to_set(data + 0);

@@ -53,7 +53,7 @@ class MonitorLogger {
    * source is usually the module name who publishes the monitor messages.
    * @param source the source of the monitor messages.
    */
-  explicit MonitorLogger(const MonitorMessageItem::MessageSource &source)
+  explicit MonitorLogger(const MonitorMessageItem::MessageSource& source)
       : source_(source) {}
   virtual ~MonitorLogger() = default;
 
@@ -61,10 +61,10 @@ class MonitorLogger {
    * @brief Publish the messages.
    * @param messages a list of messages for
    */
-  virtual void Publish(const std::vector<MessageItem> &messages) const;
+  virtual void Publish(const std::vector<MessageItem>& messages) const;
 
  private:
-  virtual void DoPublish(MonitorMessage *message) const;
+  virtual void DoPublish(MonitorMessage* message) const;
 
   MonitorMessageItem::MessageSource source_;
 };

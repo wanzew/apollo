@@ -38,9 +38,10 @@ namespace common {
  * @param denominators Denominator coefficients for digital filter.
  * @param numerators Numerator coefficients for digital filter.
  */
-void LpfCoefficients(const double ts, const double cutoff_freq,
-                     std::vector<double> *denominators,
-                     std::vector<double> *numerators);
+void LpfCoefficients(const double         ts,
+                     const double         cutoff_freq,
+                     std::vector<double>* denominators,
+                     std::vector<double>* numerators);
 
 }  // namespace common
 }  // namespace apollo

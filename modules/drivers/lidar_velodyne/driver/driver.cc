@@ -28,25 +28,26 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-VelodyneDriver::VelodyneDriver() : basetime_(0), last_gps_time_(0) {}
+VelodyneDriver::VelodyneDriver()
+    : basetime_(0)
+    , last_gps_time_(0) {}
 
 void VelodyneDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
-                                                  uint64_t* basetime) {
+                                                  uint64_t*          basetime) {
   tm time;
   time.tm_year = nmea_time->year + (2000 - 1900);
-  time.tm_mon = nmea_time->mon - 1;
+  time.tm_mon  = nmea_time->mon - 1;
   time.tm_mday = nmea_time->day;
   time.tm_hour = nmea_time->hour;
-  time.tm_min = 0;
-  time.tm_sec = 0;
+  time.tm_min  = 0;
+  time.tm_sec  = 0;
 
   // set last gps time using gps socket packet
   last_gps_time_ = (nmea_time->min * 60 + nmea_time->sec) * 1e6;
-  AINFO << "Set base unix time : " << time.tm_year << "-" << time.tm_mon << "-"
-        << time.tm_mday << " " << time.tm_hour << ":" << time.tm_min << ":"
-        << time.tm_sec;
+  AINFO << "Set base unix time : " << time.tm_year << "-" << time.tm_mon << "-" << time.tm_mday
+        << " " << time.tm_hour << ":" << time.tm_min << ":" << time.tm_sec;
   uint64_t unix_base = static_cast<uint64_t>(timegm(&time));
-  *basetime = unix_base * 1e6;
+  *basetime          = unix_base * 1e6;
 }
 
 int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr scan) {
@@ -54,9 +55,7 @@ int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr scan) {
   // reading and publishing scans as fast as possible.
   scan->packets.resize(config_.npackets());
   int size = config_.npackets();
-  if (FLAGS_pipeline_mode) {
-    size = 1;
-  }
+  if (FLAGS_pipeline_mode) { size = 1; }
   for (int i = 0; i < size; ++i) {
     while (true) {
       // keep reading until full packet received
@@ -66,9 +65,7 @@ int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr scan) {
         break;  // got a full packet?
       }
 
-      if (rc < 0) {
-        return rc;
-      }
+      if (rc < 0) { return rc; }
     }
   }
 

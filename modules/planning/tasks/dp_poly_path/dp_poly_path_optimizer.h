@@ -40,13 +40,13 @@ class DpPolyPathOptimizer : public PathOptimizer {
  public:
   DpPolyPathOptimizer();
 
-  bool Init(const PlanningConfig &config) override;
+  bool Init(const PlanningConfig& config) override;
 
  private:
-  apollo::common::Status Process(const SpeedData &speed_data,
-                                 const ReferenceLine &reference_line,
-                                 const common::TrajectoryPoint &init_point,
-                                 PathData *const path_data) override;
+  apollo::common::Status Process(const SpeedData&               speed_data,
+                                 const ReferenceLine&           reference_line,
+                                 const common::TrajectoryPoint& init_point,
+                                 PathData* const                path_data) override;
 
  private:
   DpPolyPathConfig config_;

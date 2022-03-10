@@ -23,21 +23,19 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Ecustatus2516 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+class Ecustatus2516
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Ecustatus2516();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Percentage of battery remaining (BMS
   // status)', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
   // 'BATTERY_REMAINING_CAPACITY', 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '%'}
-  int battery_remaining_capacity(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+  int battery_remaining_capacity(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Current battery voltage (BMS status)',
   // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'BATTERY_VOLTAGE',
@@ -55,8 +53,7 @@ class Ecustatus2516 : public ::apollo::drivers::canbus::ProtocolData<
   // 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'BATTERY_TEMPERATURE',
   // 'is_signed_var': True, 'physical_range': '[-40|110]', 'bit': 48, 'type':
   // 'int', 'order': 'intel', 'physical_unit': '\xc2\xa1\xc3\x89'}
-  int battery_temperature(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  int battery_temperature(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ch

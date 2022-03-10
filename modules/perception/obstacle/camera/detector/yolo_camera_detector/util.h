@@ -29,11 +29,13 @@ namespace apollo {
 namespace perception {
 namespace yolo {
 
-bool load_types(const std::string &path, std::vector<ObjectType> *types);
-bool load_anchors(const std::string &path, std::vector<float> *anchors);
+bool load_types(const std::string& path, std::vector<ObjectType>* types);
+bool load_anchors(const std::string& path, std::vector<float>* anchors);
 
-void recover_bbox(int roi_w, int roi_h, int offset_y,
-                  std::vector<std::shared_ptr<VisualObject>> *objects);
+void recover_bbox(int                                         roi_w,
+                  int                                         roi_h,
+                  int                                         offset_y,
+                  std::vector<std::shared_ptr<VisualObject>>* objects);
 
 inline float sigmoid(float x) { return 1.0f / (1.0f + std::exp(-x)); }
 

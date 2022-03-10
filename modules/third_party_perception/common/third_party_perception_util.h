@@ -36,11 +36,14 @@ namespace third_party_perception {
 
 double GetAngleFromQuaternion(const apollo::common::Quaternion quaternion);
 
-void FillPerceptionPolygon(
-    apollo::perception::PerceptionObstacle* const perception_obstacle,
-    const double mid_x, const double mid_y, const double mid_z,
-    const double length, const double width, const double height,
-    const double heading);
+void FillPerceptionPolygon(apollo::perception::PerceptionObstacle* const perception_obstacle,
+                           const double                                  mid_x,
+                           const double                                  mid_y,
+                           const double                                  mid_z,
+                           const double                                  length,
+                           const double                                  width,
+                           const double                                  height,
+                           const double                                  heading);
 
 // TODO(lizh): change it to PerceptionObstacle::VEHICLE or so
 //             when perception obstacle type is extended.
@@ -54,14 +57,11 @@ double GetDefaultObjectLength(const int object_type);
 
 double GetDefaultObjectWidth(const int object_type);
 
-apollo::perception::Point SLtoXY(const double x, const double y,
-                                 const double theta);
+apollo::perception::Point SLtoXY(const double x, const double y, const double theta);
 
-apollo::perception::Point SLtoXY(const apollo::perception::Point& point,
-                                 const double theta);
+apollo::perception::Point SLtoXY(const apollo::perception::Point& point, const double theta);
 
-double Distance(const apollo::perception::Point& point1,
-                const apollo::perception::Point& point2);
+double Distance(const apollo::perception::Point& point1, const apollo::perception::Point& point2);
 
 double Speed(const apollo::perception::Point& point);
 

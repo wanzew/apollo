@@ -25,8 +25,7 @@
 #include "modules/common/log.h"
 #include "modules/routing/proto/routing.pb.h"
 
-DEFINE_bool(enable_remove_lane_id, true,
-            "True to remove lane id in routing request");
+DEFINE_bool(enable_remove_lane_id, true, "True to remove lane id in routing request");
 
 DEFINE_string(routing_test_file,
               "modules/routing/testdata/routing_tester/routing_test.pb.txt",
@@ -35,9 +34,9 @@ DEFINE_string(routing_test_file,
 int main(int argc, char** argv) {
   using std::this_thread::sleep_for;
 
+  using apollo::common::adapter::AdapterConfig;
   using apollo::common::adapter::AdapterManager;
   using apollo::common::adapter::AdapterManagerConfig;
-  using apollo::common::adapter::AdapterConfig;
 
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
@@ -54,8 +53,7 @@ int main(int argc, char** argv) {
   AINFO << "AdapterManager is initialized.";
 
   apollo::routing::RoutingRequest routing_request;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_routing_test_file,
-                                              &routing_request)) {
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_routing_test_file, &routing_request)) {
     AERROR << "failed to load file: " << FLAGS_routing_test_file;
     return -1;
   }

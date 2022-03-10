@@ -35,8 +35,10 @@ namespace math {
 template <typename T, std::size_t N>
 class HermiteSpline {
  public:
-  HermiteSpline(std::array<T, (N + 1) / 2> x0, std::array<T, (N + 1) / 2> x1,
-                const double z0 = 0.0, const double z1 = 1.0);
+  HermiteSpline(std::array<T, (N + 1) / 2> x0,
+                std::array<T, (N + 1) / 2> x1,
+                const double               z0 = 0.0,
+                const double               z1 = 1.0);
 
   virtual ~HermiteSpline() = default;
 
@@ -55,15 +57,17 @@ class HermiteSpline {
 template <typename T, std::size_t N>
 inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
                                           std::array<T, (N + 1) / 2> x1,
-                                          const double z0, const double z1)
-    : x0_(std::move(x0)), x1_(std::move(x1)), z0_(z0), delta_z_(z1 - z0) {
-  CHECK(N == 3 || N == 5)
-      << "Error: currently we only support cubic and quintic hermite splines!";
+                                          const double               z0,
+                                          const double               z1)
+    : x0_(std::move(x0))
+    , x1_(std::move(x1))
+    , z0_(z0)
+    , delta_z_(z1 - z0) {
+  CHECK(N == 3 || N == 5) << "Error: currently we only support cubic and quintic hermite splines!";
 }
 
 template <typename T, std::size_t N>
-inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
-                                       const double z) const {
+inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order, const double z) const {
   CHECK_LE(z0_, z);
   CHECK_LE(z, z0_ + delta_z_);
 
@@ -75,7 +79,7 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
     const T& v1 = x1_[1];
     switch (order) {
       case 0: {
-        const double t = (z - z0_) / delta_z_;
+        const double t  = (z - z0_) / delta_z_;
         const double t2 = t * t;
         const double t3 = t2 * t;
 
@@ -83,7 +87,7 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
                (-2.0 * t3 + 3.0 * t2) * p1 + (t3 - t2) * v1;
       }
       case 1: {
-        const double t = (z - z0_) / delta_z_;
+        const double t  = (z - z0_) / delta_z_;
         const double t2 = t * t;
 
         return (6.0 * t2 - 6.0 * t) * p0 + (3.0 * t2 - 4 * t + 1.0) * v0 +
@@ -91,13 +95,15 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
       }
       case 2: {
         const double t = (z - z0_) / delta_z_;
-        return (12.0 * t - 6.0) * p0 + (6.0 * t - 4.0) * v0 +
-               (-12.0 * t + 6.0) * p1 + (6.0 * t - 2.0) * v1;
+        return (12.0 * t - 6.0) * p0 + (6.0 * t - 4.0) * v0 + (-12.0 * t + 6.0) * p1 +
+               (6.0 * t - 2.0) * v1;
       }
       case 3: {
         return 12.0 * p0 + 6.0 * v0 - 12.0 * p1 + 6.0 * v1;
       }
-      default: { break; }
+      default: {
+        break;
+      }
     }
   } else {
     CHECK_EQ(5, N);
@@ -110,42 +116,42 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
 
     switch (order) {
       case 0: {
-        const double t = (z - z0_) / delta_z_;
-        const double t2 = t * t;
-        const double t3 = t * t2;
-        const double t4 = t2 * t2;
-        const double t5 = t2 * t3;
+        const double t    = (z - z0_) / delta_z_;
+        const double t2   = t * t;
+        const double t3   = t * t2;
+        const double t4   = t2 * t2;
+        const double t5   = t2 * t3;
         const double det0 = t3 - t4;
         const double det1 = t4 - t5;
-        const double h0 = 1.0 - 10.0 * t3 + 15.0 * t4 - 6.0 * t5;
-        const double h1 = t - 6.0 * t3 + 8.0 * t4 - 3.0 * t5;
-        const double h2 = 0.5 * (t2 - t5) - 1.5 * det0;
-        const double h3 = 10.0 * t3 - 15.0 * t4 + 6.0 * t5;
-        const double h4 = -4.0 * det0 + 3.0 * det1;
-        const double h5 = 0.5 * (det0 - det1);
+        const double h0   = 1.0 - 10.0 * t3 + 15.0 * t4 - 6.0 * t5;
+        const double h1   = t - 6.0 * t3 + 8.0 * t4 - 3.0 * t5;
+        const double h2   = 0.5 * (t2 - t5) - 1.5 * det0;
+        const double h3   = 10.0 * t3 - 15.0 * t4 + 6.0 * t5;
+        const double h4   = -4.0 * det0 + 3.0 * det1;
+        const double h5   = 0.5 * (det0 - det1);
 
         return h0 * p0 + h1 * v0 + h2 * a0 + h3 * p1 + h4 * v1 + h5 * a1;
       }
       case 1: {
-        const double t = (z - z0_) / delta_z_;
-        const double t2 = t * t;
-        const double t3 = t * t2;
-        const double t4 = t2 * t2;
+        const double t    = (z - z0_) / delta_z_;
+        const double t2   = t * t;
+        const double t3   = t * t2;
+        const double t4   = t2 * t2;
         const double det0 = t2 - t3;
         const double det1 = t3 - t4;
-        const double dh0 = -30.0 * det0 + 30.0 * det1;
-        const double dh1 = 1 - 18.0 * t2 + 32.0 * t3 - 15.0 * t4;
-        const double dh2 = t - 4.5 * t2 + 6.0 * t3 - 2.5 * t4;
-        const double dh3 = 30.0 * det0 - 30.0 * det1;
-        const double dh4 = -12.0 * t2 + 28.0 * t3 - 15.0 * t4;
-        const double dh5 = 1.5 * det0 - 2.5 * det1;
+        const double dh0  = -30.0 * det0 + 30.0 * det1;
+        const double dh1  = 1 - 18.0 * t2 + 32.0 * t3 - 15.0 * t4;
+        const double dh2  = t - 4.5 * t2 + 6.0 * t3 - 2.5 * t4;
+        const double dh3  = 30.0 * det0 - 30.0 * det1;
+        const double dh4  = -12.0 * t2 + 28.0 * t3 - 15.0 * t4;
+        const double dh5  = 1.5 * det0 - 2.5 * det1;
 
         return dh0 * p0 + dh1 * v0 + dh2 * a0 + dh3 * p1 + dh4 * v1 + dh5 * a1;
       }
       case 2: {
-        const double t = (z - z0_) / delta_z_;
-        const double t2 = t * t;
-        const double t3 = t * t2;
+        const double t    = (z - z0_) / delta_z_;
+        const double t2   = t * t;
+        const double t3   = t * t2;
         const double det0 = t - t2;
         const double det1 = t2 - t3;
         const double ddh0 = -60.0 * det0 + 120.0 * det1;
@@ -155,13 +161,12 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         const double ddh4 = -24.0 * det0 + 60.0 * det1;
         const double ddh5 = 3.0 * t - 12.0 * t2 + 10.0 * t3;
 
-        return ddh0 * p0 + ddh1 * v0 + ddh2 * a0 + ddh3 * p1 + ddh4 * v1 +
-               ddh5 * a1;
+        return ddh0 * p0 + ddh1 * v0 + ddh2 * a0 + ddh3 * p1 + ddh4 * v1 + ddh5 * a1;
       }
       case 3: {
-        const double t = (z - z0_) / delta_z_;
-        const double t2 = t * t;
-        const double det = t - t2;
+        const double t     = (z - z0_) / delta_z_;
+        const double t2    = t * t;
+        const double det   = t - t2;
         const double dddh0 = -60.0 + 360.0 * det;
         const double dddh1 = -36.0 + 192.0 * t - 180.0 * t2;
         const double dddh2 = -9.0 + 36.0 * t - 30.0 * t2;
@@ -169,11 +174,10 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         const double dddh4 = -24.0 + 168.0 * t - 180.0 * t2;
         const double dddh5 = 3.0 - 24.0 * t + 30.0 * t2;
 
-        return dddh0 * p0 + dddh1 * v0 + dddh2 * a0 + dddh3 * p1 + dddh4 * v1 +
-               dddh5 * a1;
+        return dddh0 * p0 + dddh1 * v0 + dddh2 * a0 + dddh3 * p1 + dddh4 * v1 + dddh5 * a1;
       }
       case 4: {
-        const double t = (z - z0_) / delta_z_;
+        const double t    = (z - z0_) / delta_z_;
         const double d4h0 = 360.0 - 720.0 * t;
         const double d4h1 = 192.0 - 360.0 * t;
         const double d4h2 = 36.0 - 60.0 * t;
@@ -181,8 +185,7 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         const double d4h4 = 168.0 - 360.0 * t;
         const double d4h5 = -24.0 + 60.0 * t;
 
-        return d4h0 * p0 + d4h1 * v0 + d4h2 * a0 + d4h3 * p1 + d4h4 * v1 +
-               d4h5 * a1;
+        return d4h0 * p0 + d4h1 * v0 + d4h2 * a0 + d4h3 * p1 + d4h4 * v1 + d4h5 * a1;
       }
       case 5: {
         const double d5h0 = -720.0;
@@ -192,10 +195,11 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         const double d5h4 = -360.0;
         const double d5h5 = 60.0;
 
-        return d5h0 * p0 + d5h1 * v0 + d5h2 * a0 + d5h3 * p1 + d5h4 * v1 +
-               d5h5 * a1;
+        return d5h0 * p0 + d5h1 * v0 + d5h2 * a0 + d5h3 * p1 + d5h4 * v1 + d5h5 * a1;
       }
-      default: { break; }
+      default: {
+        break;
+      }
     }
   }
   return T();

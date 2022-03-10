@@ -30,14 +30,13 @@ namespace apollo {
 namespace common {
 namespace vehicle_state_provider {
 
-using apollo::localization::LocalizationEstimate;
 using apollo::canbus::Chassis;
+using apollo::localization::LocalizationEstimate;
 
 class VehicleStateProviderTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string localization_file =
-        "modules/localization/testdata/3_localization_result_1.pb.txt";
+    std::string localization_file = "modules/localization/testdata/3_localization_result_1.pb.txt";
     CHECK(common::util::GetProtoFromFile(localization_file, &localization_));
     chassis_.set_speed_mps(3.0);
     chassis_.set_gear_location(canbus::Chassis::GEAR_DRIVE);
@@ -46,7 +45,7 @@ class VehicleStateProviderTest : public ::testing::Test {
 
  protected:
   LocalizationEstimate localization_;
-  Chassis chassis_;
+  Chassis              chassis_;
 };
 
 TEST_F(VehicleStateProviderTest, Accessors) {
@@ -59,18 +58,15 @@ TEST_F(VehicleStateProviderTest, Accessors) {
   EXPECT_DOUBLE_EQ(vehicle_state_provider->pitch(), -0.010712737572581465);
   EXPECT_DOUBLE_EQ(vehicle_state_provider->yaw(), 2.8735807348741953);
   EXPECT_DOUBLE_EQ(vehicle_state_provider->linear_velocity(), 3.0);
-  EXPECT_DOUBLE_EQ(vehicle_state_provider->angular_velocity(),
-                   -0.0079623083093763921);
-  EXPECT_DOUBLE_EQ(vehicle_state_provider->linear_acceleration(),
-                   -0.079383290718229638);
+  EXPECT_DOUBLE_EQ(vehicle_state_provider->angular_velocity(), -0.0079623083093763921);
+  EXPECT_DOUBLE_EQ(vehicle_state_provider->linear_acceleration(), -0.079383290718229638);
   EXPECT_DOUBLE_EQ(vehicle_state_provider->gear(), canbus::Chassis::GEAR_DRIVE);
 }
 
 TEST_F(VehicleStateProviderTest, EstimateFuturePosition) {
   auto* vehicle_state_provider = VehicleStateProvider::instance();
   vehicle_state_provider->Update(localization_, chassis_);
-  common::math::Vec2d future_position =
-      vehicle_state_provider->EstimateFuturePosition(1.0);
+  common::math::Vec2d future_position = vehicle_state_provider->EstimateFuturePosition(1.0);
   EXPECT_NEAR(future_position.x(), 356.707, 1e-3);
   EXPECT_NEAR(future_position.y(), 93.276, 1e-3);
   future_position = vehicle_state_provider->EstimateFuturePosition(2.0);

@@ -29,22 +29,24 @@ namespace perception {
 
 class CS2DAffinityTracker : public BaseAffinityTracker {
  public:
-  CS2DAffinityTracker() : BaseAffinityTracker() {}
+  CS2DAffinityTracker()
+      : BaseAffinityTracker() {}
 
   virtual ~CS2DAffinityTracker() {}
 
   bool Init() override;
-  bool GetAffinityMatrix(
-      const cv::Mat &img, const std::vector<Tracked> &tracked,
-      const std::vector<Detected> &detected,
-      std::vector<std::vector<float>> *affinity_matrix) override;
+  bool GetAffinityMatrix(const cv::Mat&                   img,
+                         const std::vector<Tracked>&      tracked,
+                         const std::vector<Detected>&     detected,
+                         std::vector<std::vector<float>>* affinity_matrix) override;
 
-  bool UpdateTracked(const cv::Mat &img, const std::vector<Detected> &detected,
-                     std::vector<Tracked> *tracked) override;
+  bool UpdateTracked(const cv::Mat&               img,
+                     const std::vector<Detected>& detected,
+                     std::vector<Tracked>*        tracked) override;
 
  private:
-  float sz_lim_ = 0.5f;         // max 2d box scale change
-  float pos_range_ = 1.3f;      // max 2D center change, based on 2d box size
+  float sz_lim_       = 0.5f;   // max 2d box scale change
+  float pos_range_    = 1.3f;   // max 2D center change, based on 2d box size
   float center_range_ = 10.0f;  // max diff in meter between unfiltered 3d pos
 };
 

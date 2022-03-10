@@ -30,7 +30,7 @@ namespace planning {
 
 TEST(StGraphDataTest, basic_test) {
   std::vector<const StBoundary*> boundary_vec;
-  auto boundary = StBoundary();
+  auto                           boundary = StBoundary();
   boundary_vec.push_back(&boundary);
   apollo::common::TrajectoryPoint traj_point;
   traj_point.mutable_path_point()->set_x(1.1);
@@ -43,7 +43,7 @@ TEST(StGraphDataTest, basic_test) {
   traj_point.set_a(1.022);
   traj_point.set_relative_time(1010.022);
 
-  SpeedLimit speed_limit;
+  SpeedLimit  speed_limit;
   StGraphData st_graph_data(boundary_vec, traj_point, speed_limit, 100.0);
   EXPECT_EQ(st_graph_data.st_boundaries().size(), 1);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().x(), 1.1);

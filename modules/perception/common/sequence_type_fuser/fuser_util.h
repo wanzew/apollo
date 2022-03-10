@@ -33,8 +33,8 @@ enum {
   VALID_OBJECT_TYPE = static_cast<int>(ObjectType::MAX_OBJECT_TYPE) - 2,
 };
 
-typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, 1> Vectord;
-typedef Eigen::Matrix<int, VALID_OBJECT_TYPE, 1> Vectori;
+typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, 1>                 Vectord;
+typedef Eigen::Matrix<int, VALID_OBJECT_TYPE, 1>                    Vectori;
 typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, VALID_OBJECT_TYPE> Matrixd;
 
 namespace fuser_util {
@@ -81,7 +81,7 @@ void NormalizeRow(Matrixd* prob);
  * @brief Print probability
  * @param prob Probability to be printed
  * @param name Name of probability to be printed
-*/
+ */
 void PrintProbability(const std::vector<float>& prob, const std::string& name);
 
 /**
@@ -106,9 +106,8 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
  * @param matrices The loaded Matrices
  * @return True if load successfully, false otherwise
  */
-bool LoadMultipleMatricesFile(
-    const std::string& filename,
-    std::unordered_map<std::string, Matrixd>* matrices);
+bool LoadMultipleMatricesFile(const std::string&                        filename,
+                              std::unordered_map<std::string, Matrixd>* matrices);
 
 }  // namespace fuser_util
 }  // namespace perception

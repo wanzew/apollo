@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "modules/common/util/testdata/simple.pb.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/util/util.h"
 
@@ -50,7 +50,9 @@ TEST(Util, IsProtoEqual) {
 TEST(Util, DistanceXY) {
   class TestPoint {
    public:
-    TestPoint(double x, double y) : x_(x), y_(y) {}
+    TestPoint(double x, double y)
+        : x_(x)
+        , y_(y) {}
     double x() const { return x_; }
     double y() const { return y_; }
 

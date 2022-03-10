@@ -37,8 +37,7 @@ ProbabilisticFusion::~ProbabilisticFusion() {
 
 bool ProbabilisticFusion::Init() {
   sensor_manager_ = PbfSensorManager::instance();
-  ACHECK(sensor_manager_ != nullptr)
-      << "Failed to get PbfSensorManager instance";
+  ACHECK(sensor_manager_ != nullptr) << "Failed to get PbfSensorManager instance";
   track_manager_ = PbfTrackManager::instance();
   ACHECK(track_manager_ != nullptr) << "Failed to get PbfTrackManager instance";
 
@@ -46,8 +45,7 @@ bool ProbabilisticFusion::Init() {
 
   // matching parameters
   if (config_.match_method() != "hm_matcher") {
-    AERROR << "undefined match_method " << config_.match_method()
-           << " and use default hm_matcher";
+    AERROR << "undefined match_method " << config_.match_method() << " and use default hm_matcher";
   }
   matcher_ = new PbfHmTrackObjectMatcher();
   if (!matcher_->Init()) {
@@ -62,8 +60,7 @@ bool ProbabilisticFusion::Init() {
   PbfTrack::SetMaxRadarInvisiblePeriod(config_.max_radar_invisible_period());
   PbfTrack::SetMaxCameraInvisiblePeriod(config_.max_camera_invisible_period());
   PbfTrack::SetMaxRadarConfidentAngle(config_.max_radar_confident_angle());
-  PbfTrack::SetMinRadarConfidentDistance(
-      config_.min_radar_confident_distance());
+  PbfTrack::SetMinRadarConfidentDistance(config_.min_radar_confident_distance());
   PbfTrack::SetPublishIfHasLidar(config_.publish_if_has_lidar());
   PbfTrack::SetPublishIfHasRadar(config_.publish_if_has_radar());
 
@@ -79,13 +76,12 @@ bool ProbabilisticFusion::Init() {
   return true;
 }
 
-bool ProbabilisticFusion::Fuse(
-    const std::vector<SensorObjects> &multi_sensor_objects,
-    std::vector<std::shared_ptr<Object>> *fused_objects) {
+bool ProbabilisticFusion::Fuse(const std::vector<SensorObjects>&     multi_sensor_objects,
+                               std::vector<std::shared_ptr<Object>>* fused_objects) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
 
   std::vector<PbfSensorFramePtr> frames;
-  double fusion_time = 0;
+  double                         fusion_time = 0;
   {
     sensor_data_rw_mutex_.lock();
     bool need_to_fusion = false;
@@ -93,24 +89,16 @@ bool ProbabilisticFusion::Fuse(
     for (size_t i = 0; i < multi_sensor_objects.size(); ++i) {
       auto sensor_type = multi_sensor_objects[i].sensor_type;
       ADEBUG << "add sensor measurement: " << GetSensorType(sensor_type)
-             << ", obj_cnt : " << multi_sensor_objects[i].objects.size() << ", "
-             << std::fixed << std::setprecision(12)
-             << multi_sensor_objects[i].timestamp;
-      if (is_lidar(sensor_type) && !config_.use_lidar()) {
-        continue;
-      }
-      if (is_radar(sensor_type) && !config_.use_radar()) {
-        continue;
-      }
-      if (is_camera(sensor_type) && !use_camera_) {
-        continue;
-      }
+             << ", obj_cnt : " << multi_sensor_objects[i].objects.size() << ", " << std::fixed
+             << std::setprecision(12) << multi_sensor_objects[i].timestamp;
+      if (is_lidar(sensor_type) && !config_.use_lidar()) { continue; }
+      if (is_radar(sensor_type) && !config_.use_radar()) { continue; }
+      if (is_camera(sensor_type) && !use_camera_) { continue; }
 
-      if (GetSensorType(multi_sensor_objects[i].sensor_type) ==
-          publish_sensor_id_) {
+      if (GetSensorType(multi_sensor_objects[i].sensor_type) == publish_sensor_id_) {
         need_to_fusion = true;
-        fusion_time = multi_sensor_objects[i].timestamp;
-        started_ = true;
+        fusion_time    = multi_sensor_objects[i].timestamp;
+        started_       = true;
         sensor_manager_->AddSensorMeasurements(multi_sensor_objects[i]);
       } else if (started_) {
         sensor_manager_->AddSensorMeasurements(multi_sensor_objects[i]);
@@ -148,85 +136,75 @@ std::string ProbabilisticFusion::name() const { return "ProbabilisticFusion"; }
 void ProbabilisticFusion::FuseFrame(PbfSensorFramePtr frame) {
   AINFO << "Fusing frame: " << frame->sensor_id << ","
         << "object_number: " << frame->objects.size() << ","
-        << "timestamp: " << std::fixed << std::setprecision(12)
-        << frame->timestamp;
-  std::vector<std::shared_ptr<PbfSensorObject>> &objects = frame->objects;
-  std::vector<std::shared_ptr<PbfSensorObject>> background_objects;
-  std::vector<std::shared_ptr<PbfSensorObject>> foreground_objects;
+        << "timestamp: " << std::fixed << std::setprecision(12) << frame->timestamp;
+  std::vector<std::shared_ptr<PbfSensorObject>>& objects = frame->objects;
+  std::vector<std::shared_ptr<PbfSensorObject>>  background_objects;
+  std::vector<std::shared_ptr<PbfSensorObject>>  foreground_objects;
   DecomposeFrameObjects(objects, &foreground_objects, &background_objects);
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
-  FuseForegroundObjects(&foreground_objects, ref_point, frame->sensor_type,
-                        frame->sensor_id, frame->timestamp);
+  FuseForegroundObjects(&foreground_objects, ref_point, frame->sensor_type, frame->sensor_id,
+                        frame->timestamp);
   track_manager_->RemoveLostTracks();
 }
 
 void ProbabilisticFusion::CreateNewTracks(
-    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
-    const std::vector<int> &unassigned_ids) {
+    const std::vector<std::shared_ptr<PbfSensorObject>>& sensor_objects,
+    const std::vector<int>&                              unassigned_ids) {
   for (size_t i = 0; i < unassigned_ids.size(); i++) {
-    int id = unassigned_ids[i];
+    int         id = unassigned_ids[i];
     PbfTrackPtr track(new PbfTrack(sensor_objects[id]));
     track_manager_->AddTrack(track);
   }
 }
 
 void ProbabilisticFusion::UpdateAssignedTracks(
-    std::vector<PbfTrackPtr> *tracks,
-    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
-    const std::vector<std::pair<int, int>> &assignments,
-    const std::vector<double> &track_object_dist) {
+    std::vector<PbfTrackPtr>*                            tracks,
+    const std::vector<std::shared_ptr<PbfSensorObject>>& sensor_objects,
+    const std::vector<std::pair<int, int>>&              assignments,
+    const std::vector<double>&                           track_object_dist) {
   for (size_t i = 0; i < assignments.size(); i++) {
     int local_track_index = assignments[i].first;
-    int local_obj_index = assignments[i].second;
-    (*tracks)[local_track_index]->UpdateWithSensorObject(
-        sensor_objects[local_obj_index], track_object_dist[local_track_index]);
+    int local_obj_index   = assignments[i].second;
+    (*tracks)[local_track_index]->UpdateWithSensorObject(sensor_objects[local_obj_index],
+                                                         track_object_dist[local_track_index]);
   }
 }
 
-void ProbabilisticFusion::UpdateUnassignedTracks(
-    std::vector<PbfTrackPtr> *tracks, const std::vector<int> &unassigned_tracks,
-    const std::vector<double> &track_object_dist, const SensorType &sensor_type,
-    const std::string &sensor_id, double timestamp) {
+void ProbabilisticFusion::UpdateUnassignedTracks(std::vector<PbfTrackPtr>*  tracks,
+                                                 const std::vector<int>&    unassigned_tracks,
+                                                 const std::vector<double>& track_object_dist,
+                                                 const SensorType&          sensor_type,
+                                                 const std::string&         sensor_id,
+                                                 double                     timestamp) {
   for (size_t i = 0; i < unassigned_tracks.size(); i++) {
     int local_track_index = unassigned_tracks[i];
     (*tracks)[local_track_index]->UpdateWithoutSensorObject(
-        sensor_type, sensor_id, track_object_dist[local_track_index],
-        timestamp);
+        sensor_type, sensor_id, track_object_dist[local_track_index], timestamp);
   }
 }
 
-void ProbabilisticFusion::CollectFusedObjects(
-    double timestamp, std::vector<std::shared_ptr<Object>> *fused_objects) {
-  if (fused_objects == nullptr) {
-    return;
-  }
+void ProbabilisticFusion::CollectFusedObjects(double                                timestamp,
+                                              std::vector<std::shared_ptr<Object>>* fused_objects) {
+  if (fused_objects == nullptr) { return; }
   fused_objects->clear();
 
-  int fg_obj_num = 0;
-  std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
+  int                       fg_obj_num = 0;
+  std::vector<PbfTrackPtr>& tracks     = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
     if (tracks[i]->AbleToPublish()) {
-      std::shared_ptr<PbfSensorObject> fused_object =
-          tracks[i]->GetFusedObject();
-      std::shared_ptr<Object> obj(new Object());
+      std::shared_ptr<PbfSensorObject> fused_object = tracks[i]->GetFusedObject();
+      std::shared_ptr<Object>          obj(new Object());
       obj->clone(*(fused_object->object));
-      obj->track_id = tracks[i]->GetTrackId();
-      std::shared_ptr<PbfSensorObject> pobj =
-          tracks[i]->GetLidarObject("lidar");
-      if (pobj != nullptr) {
-        obj->local_lidar_track_id = pobj->object->track_id;
-      }
+      obj->track_id                         = tracks[i]->GetTrackId();
+      std::shared_ptr<PbfSensorObject> pobj = tracks[i]->GetLidarObject("lidar");
+      if (pobj != nullptr) { obj->local_lidar_track_id = pobj->object->track_id; }
       pobj = tracks[i]->GetCameraObject("camera");
-      if (pobj != nullptr) {
-        obj->local_camera_track_id = pobj->object->track_id;
-      }
+      if (pobj != nullptr) { obj->local_camera_track_id = pobj->object->track_id; }
       pobj = tracks[i]->GetRadarObject("radar");
-      if (pobj != nullptr) {
-        obj->local_radar_track_id = pobj->object->track_id;
-      }
+      if (pobj != nullptr) { obj->local_radar_track_id = pobj->object->track_id; }
       obj->latest_tracked_time = timestamp;
-      obj->tracking_time = tracks[i]->GetTrackingPeriod();
+      obj->tracking_time       = tracks[i]->GetTrackingPeriod();
       fused_objects->push_back(obj);
       fg_obj_num++;
     }
@@ -238,9 +216,9 @@ void ProbabilisticFusion::CollectFusedObjects(
 }
 
 void ProbabilisticFusion::DecomposeFrameObjects(
-    const std::vector<std::shared_ptr<PbfSensorObject>> &frame_objects,
-    std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
-    std::vector<std::shared_ptr<PbfSensorObject>> *background_objects) {
+    const std::vector<std::shared_ptr<PbfSensorObject>>& frame_objects,
+    std::vector<std::shared_ptr<PbfSensorObject>>*       foreground_objects,
+    std::vector<std::shared_ptr<PbfSensorObject>>*       background_objects) {
   foreground_objects->clear();
   background_objects->clear();
   for (size_t i = 0; i < frame_objects.size(); i++) {
@@ -253,35 +231,34 @@ void ProbabilisticFusion::DecomposeFrameObjects(
 }
 
 void ProbabilisticFusion::FuseForegroundObjects(
-    std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
-    Eigen::Vector3d ref_point, const SensorType &sensor_type,
-    const std::string &sensor_id, double timestamp) {
-  std::vector<int> unassigned_tracks;
-  std::vector<int> unassigned_objects;
+    std::vector<std::shared_ptr<PbfSensorObject>>* foreground_objects,
+    Eigen::Vector3d                                ref_point,
+    const SensorType&                              sensor_type,
+    const std::string&                             sensor_id,
+    double                                         timestamp) {
+  std::vector<int>                 unassigned_tracks;
+  std::vector<int>                 unassigned_objects;
   std::vector<std::pair<int, int>> assignments;
 
-  std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
+  std::vector<PbfTrackPtr>& tracks = track_manager_->GetTracks();
 
   TrackObjectMatcherOptions options;
   options.ref_point = &ref_point;
 
   std::vector<double> track2measurements_dist;
   std::vector<double> measurement2tracks_dist;
-  matcher_->Match(tracks, *foreground_objects, options, &assignments,
-                  &unassigned_tracks, &unassigned_objects,
-                  &track2measurements_dist, &measurement2tracks_dist);
+  matcher_->Match(tracks, *foreground_objects, options, &assignments, &unassigned_tracks,
+                  &unassigned_objects, &track2measurements_dist, &measurement2tracks_dist);
 
-  ADEBUG << "fg_track_cnt = " << tracks.size()
-         << ", fg_obj_cnt = " << foreground_objects->size()
+  ADEBUG << "fg_track_cnt = " << tracks.size() << ", fg_obj_cnt = " << foreground_objects->size()
          << ", assignement = " << assignments.size()
          << ", unassigned_track_cnt = " << unassigned_tracks.size()
          << ", unassigned_obj_cnt = " << unassigned_objects.size();
 
-  UpdateAssignedTracks(&tracks, *foreground_objects, assignments,
-                       track2measurements_dist);
+  UpdateAssignedTracks(&tracks, *foreground_objects, assignments, track2measurements_dist);
 
-  UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist,
-                         sensor_type, sensor_id, timestamp);
+  UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist, sensor_type,
+                         sensor_id, timestamp);
 
   if (FLAGS_use_navigation_mode) {
     if (is_camera(sensor_type) || is_lidar(sensor_type)) {

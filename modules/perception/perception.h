@@ -35,14 +35,14 @@ namespace perception {
 
 class Perception : public common::ApolloApp {
  public:
-  std::string Name() const override;
+  std::string    Name() const override;
   common::Status Init() override;
   common::Status Start() override;
-  void Stop() override;
+  void           Stop() override;
 
  private:
   DAGStreaming dag_streaming_;
-  void RegistAllOnboardClass();
+  void         RegistAllOnboardClass();
 };
 
 }  // namespace perception

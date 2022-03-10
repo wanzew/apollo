@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H_
 
-#include <opencv2/opencv.hpp>
 #include <limits>
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 #include "Eigen/Core"
@@ -28,12 +28,12 @@ namespace perception {
 
 class Tracked {
  public:
-  cv::Rect box_;   // 2D bounding box
-  int track_id_;   // unique tracking id
-  int detect_id_;  // -1 means unmatched but kept
-  double first_timestamp_;
-  double last_timestamp_;
-  int last_frame_idx_;
+  cv::Rect box_;        // 2D bounding box
+  int      track_id_;   // unique tracking id
+  int      detect_id_;  // -1 means unmatched but kept
+  double   first_timestamp_;
+  double   last_timestamp_;
+  int      last_frame_idx_;
 
   // DLF: Deep Learning ROI Pooling features from detection
   std::vector<float> features_;
@@ -42,15 +42,15 @@ class Tracked {
   Eigen::Vector3f center_ = Eigen::Vector3f::Zero();
 
   // KCF
-  bool kcf_set_ = false;
+  bool                 kcf_set_ = false;
   std::vector<cv::Mat> x_f_;
-  cv::Mat alpha_f_;
+  cv::Mat              alpha_f_;
 };
 
 class Detected {
  public:
   cv::Rect box_;
-  int detect_id_;
+  int      detect_id_;
 
   // DLF: Deep Learning ROI Pooling features from detection
   std::vector<float> features_;
@@ -76,8 +76,7 @@ class BaseAffinityTracker {
   // Input must be regular and of the size in the following calls
   // (There must be the same number of entries in each row of the matrix)
   //
-  virtual bool SelectEntries(
-      const std::vector<std::vector<float>> &prev_matrix) {
+  virtual bool SelectEntries(const std::vector<std::vector<float>>& prev_matrix) {
     if (prev_matrix.empty()) return true;
 
     int row = prev_matrix.size();
@@ -85,12 +84,10 @@ class BaseAffinityTracker {
     int col = prev_matrix[0].size();
 
     selected_entry_matrix_.clear();
-    selected_entry_matrix_ =
-        std::vector<std::vector<bool>>(row, std::vector<bool>(col, false));
+    selected_entry_matrix_ = std::vector<std::vector<bool>>(row, std::vector<bool>(col, false));
     for (int i = 0; i < row; ++i) {
       for (int j = 0; j < col; ++j) {
-        if (9.0f > prev_matrix[i][j] &&
-            prev_matrix[i][j] > std::numeric_limits<float>::epsilon()) {
+        if (9.0f > prev_matrix[i][j] && prev_matrix[i][j] > std::numeric_limits<float>::epsilon()) {
           selected_entry_matrix_[i][j] = true;
         }
       }
@@ -102,8 +99,7 @@ class BaseAffinityTracker {
   // @brief Set the selection matrix to full entries
   virtual bool SelectFull(const int row, const int col) {
     selected_entry_matrix_.clear();
-    selected_entry_matrix_ =
-        std::vector<std::vector<bool>>(row, std::vector<bool>(col, true));
+    selected_entry_matrix_ = std::vector<std::vector<bool>>(row, std::vector<bool>(col, true));
     return true;
   }
 
@@ -111,15 +107,15 @@ class BaseAffinityTracker {
   // rows: tracked objects, cols: detected objects
   // affinity_matrix[i][j]: score for the affinity between i_th tracked obj and
   // j_th detected obj
-  virtual bool GetAffinityMatrix(
-      const cv::Mat &img, const std::vector<Tracked> &tracked,
-      const std::vector<Detected> &detected,
-      std::vector<std::vector<float>> *affinity_matrix) = 0;
+  virtual bool GetAffinityMatrix(const cv::Mat&                   img,
+                                 const std::vector<Tracked>&      tracked,
+                                 const std::vector<Detected>&     detected,
+                                 std::vector<std::vector<float>>* affinity_matrix) = 0;
 
   // @brief Update information used in tracked objects, for the next frame
-  virtual bool UpdateTracked(const cv::Mat &img,
-                             const std::vector<Detected> &detected,
-                             std::vector<Tracked> *tracked) = 0;
+  virtual bool UpdateTracked(const cv::Mat&               img,
+                             const std::vector<Detected>& detected,
+                             std::vector<Tracked>*        tracked) = 0;
 
  protected:
   // @brief Matrix for selecting which entries need calculation

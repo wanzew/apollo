@@ -33,17 +33,16 @@ class RadarTrack {
  public:
   RadarTrack();
 
-  RadarTrack(const Object &obs, const double timestamp);
+  RadarTrack(const Object& obs, const double timestamp);
 
-  RadarTrack(const RadarTrack &track);
+  RadarTrack(const RadarTrack& track);
 
-  RadarTrack &operator=(const RadarTrack &track);
+  RadarTrack& operator=(const RadarTrack& track);
 
   ~RadarTrack() {}
 
   // update the object after association with a radar obervation
-  void UpdataObsRadar(std::shared_ptr<Object> obs_radar,
-                      const double timestamp);
+  void UpdataObsRadar(std::shared_ptr<Object> obs_radar, const double timestamp);
 
   void SetObsRadar(std::shared_ptr<Object> obs_radar);
 
@@ -62,14 +61,14 @@ class RadarTrack {
   }
 
  private:
-  static int s_current_idx_;
-  static int s_tracked_times_threshold_;
-  int obs_id_;
-  double timestamp_;
+  static int              s_current_idx_;
+  static int              s_tracked_times_threshold_;
+  int                     obs_id_;
+  double                  timestamp_;
   std::shared_ptr<Object> obs_radar_;  // observation from radar
-  int tracked_times_;
-  double tracking_time_;
-  bool id_tracked_;
+  int                     tracked_times_;
+  double                  tracking_time_;
+  bool                    id_tracked_;
 };
 
 }  // namespace perception

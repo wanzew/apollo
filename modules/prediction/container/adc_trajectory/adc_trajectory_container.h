@@ -93,8 +93,8 @@ class ADCTrajectoryContainer : public Container {
  private:
   ::apollo::planning::ADCTrajectory adc_trajectory_;
   ::apollo::common::math::Polygon2d adc_junction_polygon_;
-  std::unordered_set<std::string> adc_lane_ids_;
-  std::vector<std::string> adc_lane_seq_;
+  std::unordered_set<std::string>   adc_lane_ids_;
+  std::vector<std::string>          adc_lane_seq_;
 };
 
 }  // namespace prediction

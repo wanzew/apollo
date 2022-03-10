@@ -35,16 +35,15 @@ class Converter {
   ~Converter();
 
   bool init(const VelodyneConf& conf);
-  bool convert_packets_to_pointcloud(
-      const velodyne_msgs::VelodyneScanUnifiedPtr scan_msg,
-      sensor_msgs::PointCloud2Ptr pointcloud);
+  bool convert_packets_to_pointcloud(const velodyne_msgs::VelodyneScanUnifiedPtr scan_msg,
+                                     sensor_msgs::PointCloud2Ptr                 pointcloud);
 
   bool append(const velodyne_msgs::VelodyneScanUnifiedPtr scan_msg);
   bool pack(sensor_msgs::PointCloud2Ptr pointcloud);
   bool ready();
 
  private:
-  VelodyneConf config_;
+  VelodyneConf    config_;
   VelodyneParser* parser_ = nullptr;
 };
 

@@ -36,7 +36,7 @@ class NavigationModeTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_use_navigation_mode = true;
-    FLAGS_test_data_dir = "modules/planning/testdata/navigation_mode_test";
+    FLAGS_test_data_dir       = "modules/planning/testdata/navigation_mode_test";
   }
 };
 
@@ -45,10 +45,10 @@ class NavigationModeTest : public PlanningTestBase {
  * A cruise test case
  */
 TEST_F(NavigationModeTest, cruise) {
-  std::string seq_num = "1";
-  FLAGS_enable_prediction = false;
+  std::string seq_num          = "1";
+  FLAGS_enable_prediction      = false;
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_chassis_file      = seq_num + "_chassis.pb.txt";
   FLAGS_test_relative_map_file = seq_num + "_relative_map.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);

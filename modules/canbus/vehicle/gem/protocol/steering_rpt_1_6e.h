@@ -24,13 +24,12 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Steeringrpt16e : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Steeringrpt16e
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Steeringrpt16e();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'MANUAL_INPUT', 'offset': 0.0, 'precision': 0.001,

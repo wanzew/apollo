@@ -26,13 +26,11 @@ namespace conti_radar {
 
 using apollo::drivers::ContiRadar;
 
-class ObjectQualityInfo60C
-    : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
+class ObjectQualityInfo60C : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
   ObjectQualityInfo60C();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ContiRadar* conti_radar) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ContiRadar* conti_radar) const override;
 
  private:
   int object_id(const std::uint8_t* bytes, int32_t length) const;

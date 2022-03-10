@@ -23,11 +23,11 @@
 namespace apollo {
 namespace perception {
 
-using std::vector;
-using std::string;
-using std::ifstream;
-using Eigen::MatrixXf;
 using Eigen::Map;
+using Eigen::MatrixXf;
+using std::ifstream;
+using std::string;
+using std::vector;
 
 bool MatrixProjector::project(vector<float>* feature) {
   if (feature == nullptr) {
@@ -37,11 +37,11 @@ bool MatrixProjector::project(vector<float>* feature) {
 
   if (feature->size() > 0) {
     feature->insert(feature->begin(), 1.0f);
-    MatrixXf v = Map<MatrixXf>(&(feature->at(0)), 1, feature->size());
+    MatrixXf v                 = Map<MatrixXf>(&(feature->at(0)), 1, feature->size());
     MatrixXf projected_feature = v * matrix_;
 
     feature->resize(projected_feature.size());
-    float *project_data = projected_feature.data();
+    float* project_data = projected_feature.data();
     for (auto feat = feature->begin(); feat != feature->end(); ++feat) {
       *feat = *project_data++;
     }
@@ -52,10 +52,10 @@ bool MatrixProjector::project(vector<float>* feature) {
 
 MatrixProjector::MatrixProjector(string weight_file) {
   ifstream f_in(weight_file.c_str());
-  int height = 0;
-  int width = 0;
-  char comment = ' ';
-  float temp = 0;
+  int      height  = 0;
+  int      width   = 0;
+  char     comment = ' ';
+  float    temp    = 0;
   f_in >> comment >> height >> width;
   vector<float> theta(height * width);
   for (auto i = theta.begin(); i != theta.end(); ++i) {

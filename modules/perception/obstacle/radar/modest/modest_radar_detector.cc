@@ -30,9 +30,7 @@ using apollo::common::util::GetProtoFromFile;
 bool ModestRadarDetector::Init() {
   GetProtoFromFile(FLAGS_modest_radar_detector_config, &config_);
 
-  if (FLAGS_use_navigation_mode) {
-    config_.set_use_had_map(false);
-  }
+  if (FLAGS_use_navigation_mode) { config_.set_use_had_map(false); }
 
   if (!FLAGS_use_navigation_mode && !config_.has_use_had_map()) {
     AERROR << "use_had_map not found.";
@@ -43,26 +41,26 @@ bool ModestRadarDetector::Init() {
   object_builder_.SetDelayFrame(config_.delay_frames());
   object_builder_.SetUseFpFilter(config_.use_fp_filter());
 
-  conti_params_.probexist_vehicle = config_.probexist_vehicle();
-  conti_params_.probexist_pedestrian = config_.probexist_pedestrian();
-  conti_params_.probexist_bicycle = config_.probexist_bicycle();
-  conti_params_.probexist_unknown = config_.probexist_unknown();
-  conti_params_.lo_vel_rms_vehicle = config_.lo_vel_rms_vehicle();
-  conti_params_.la_vel_rms_vehicle = config_.la_vel_rms_vehicle();
-  conti_params_.lo_dist_rms_vehicle = config_.lo_dist_rms_vehicle();
-  conti_params_.la_dist_rms_vehicle = config_.la_dist_rms_vehicle();
-  conti_params_.lo_vel_rms_pedestrian = config_.lo_vel_rms_pedestrian();
-  conti_params_.la_vel_rms_pedestrian = config_.la_vel_rms_pedestrian();
+  conti_params_.probexist_vehicle      = config_.probexist_vehicle();
+  conti_params_.probexist_pedestrian   = config_.probexist_pedestrian();
+  conti_params_.probexist_bicycle      = config_.probexist_bicycle();
+  conti_params_.probexist_unknown      = config_.probexist_unknown();
+  conti_params_.lo_vel_rms_vehicle     = config_.lo_vel_rms_vehicle();
+  conti_params_.la_vel_rms_vehicle     = config_.la_vel_rms_vehicle();
+  conti_params_.lo_dist_rms_vehicle    = config_.lo_dist_rms_vehicle();
+  conti_params_.la_dist_rms_vehicle    = config_.la_dist_rms_vehicle();
+  conti_params_.lo_vel_rms_pedestrian  = config_.lo_vel_rms_pedestrian();
+  conti_params_.la_vel_rms_pedestrian  = config_.la_vel_rms_pedestrian();
   conti_params_.lo_dist_rms_pedestrian = config_.lo_dist_rms_pedestrian();
   conti_params_.la_dist_rms_pedestrian = config_.la_dist_rms_pedestrian();
-  conti_params_.lo_vel_rms_bicycle = config_.lo_vel_rms_bicycle();
-  conti_params_.la_vel_rms_bicycle = config_.la_vel_rms_bicycle();
-  conti_params_.lo_dist_rms_bicycle = config_.lo_dist_rms_bicycle();
-  conti_params_.la_dist_rms_bicycle = config_.la_dist_rms_bicycle();
-  conti_params_.lo_vel_rms_unknown = config_.lo_vel_rms_unknown();
-  conti_params_.la_vel_rms_unknown = config_.la_vel_rms_unknown();
-  conti_params_.lo_dist_rms_unknown = config_.lo_dist_rms_unknown();
-  conti_params_.la_dist_rms_unknown = config_.la_dist_rms_unknown();
+  conti_params_.lo_vel_rms_bicycle     = config_.lo_vel_rms_bicycle();
+  conti_params_.la_vel_rms_bicycle     = config_.la_vel_rms_bicycle();
+  conti_params_.lo_dist_rms_bicycle    = config_.lo_dist_rms_bicycle();
+  conti_params_.la_dist_rms_bicycle    = config_.la_dist_rms_bicycle();
+  conti_params_.lo_vel_rms_unknown     = config_.lo_vel_rms_unknown();
+  conti_params_.la_vel_rms_unknown     = config_.la_vel_rms_unknown();
+  conti_params_.lo_dist_rms_unknown    = config_.lo_dist_rms_unknown();
+  conti_params_.la_dist_rms_unknown    = config_.la_dist_rms_unknown();
 
   object_builder_.SetContiParams(conti_params_);
   radar_tracker_.reset(new RadarTrackManager());
@@ -71,11 +69,10 @@ bool ModestRadarDetector::Init() {
   return true;
 }
 
-bool ModestRadarDetector::Detect(
-    const ContiRadar &raw_obstacles,
-    const std::vector<PolygonDType> &map_polygons,
-    const RadarDetectorOptions &options,
-    std::vector<std::shared_ptr<Object>> *objects) {
+bool ModestRadarDetector::Detect(const ContiRadar&                     raw_obstacles,
+                                 const std::vector<PolygonDType>&      map_polygons,
+                                 const RadarDetectorOptions&           options,
+                                 std::vector<std::shared_ptr<Object>>* objects) {
   if (objects == nullptr) {
     AERROR << "Objects is nullptr";
     return false;
@@ -99,14 +96,12 @@ bool ModestRadarDetector::Detect(
   // preparation
 
   SensorObjects radar_objects;
-  object_builder_.Build(raw_obstacles, radar_pose, main_velocity,
-                        &radar_objects);
-  radar_objects.timestamp =
-      static_cast<double>(raw_obstacles.header().timestamp_sec());
+  object_builder_.Build(raw_obstacles, radar_pose, main_velocity, &radar_objects);
+  radar_objects.timestamp   = static_cast<double>(raw_obstacles.header().timestamp_sec());
   radar_objects.sensor_type = SensorType::RADAR;
 
   // roi filter
-  auto &filter_objects = radar_objects.objects;
+  auto& filter_objects = radar_objects.objects;
   RoiFilter(map_polygons, &filter_objects);
   // treatment
   radar_tracker_->Process(radar_objects);
@@ -120,10 +115,8 @@ bool ModestRadarDetector::Detect(
     RadarFrameSupplement::state_vars.process_noise(2, 2) *= 10;
     RadarFrameSupplement::state_vars.process_noise(3, 3) *= 10;
 
-    RadarFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f,
-        0.0f, 0.33f, 0.0f;
-    RadarFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f,
-        1.0f, 0.0f, 0.33f;
+    RadarFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f, 0.0f, 0.33f, 0.0f;
+    RadarFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f, 1.0f, 0.0f, 0.33f;
     ADEBUG << "state trans matrix in RadarFrameSupplement is \n"
            << RadarFrameSupplement::state_vars.trans_matrix << std::endl;
     RadarFrameSupplement::state_vars.initialized_ = true;
@@ -131,32 +124,27 @@ bool ModestRadarDetector::Detect(
   return true;
 }
 
-bool ModestRadarDetector::CollectRadarResult(
-    std::vector<std::shared_ptr<Object>> *objects) {
-  std::vector<RadarTrack> &obs_track = radar_tracker_->GetTracks();
+bool ModestRadarDetector::CollectRadarResult(std::vector<std::shared_ptr<Object>>* objects) {
+  std::vector<RadarTrack>& obs_track = radar_tracker_->GetTracks();
   if (objects == nullptr) {
     AERROR << "objects is nullptr";
     return false;
   }
   for (size_t i = 0; i < obs_track.size(); ++i) {
-    std::shared_ptr<Object> object_ptr = std::shared_ptr<Object>(new Object());
-    const std::shared_ptr<Object> &object_radar_ptr =
-        obs_track[i].GetObsRadar();
-    if (config_.use_fp_filter() && object_radar_ptr->is_background) {
-      continue;
-    }
+    std::shared_ptr<Object>        object_ptr       = std::shared_ptr<Object>(new Object());
+    const std::shared_ptr<Object>& object_radar_ptr = obs_track[i].GetObsRadar();
+    if (config_.use_fp_filter() && object_radar_ptr->is_background) { continue; }
     object_ptr->clone(*object_radar_ptr);
-    object_ptr->tracking_time = obs_track[i].GetTrackingTime();
-    object_ptr->track_id = obs_track[i].GetObsId();
+    object_ptr->tracking_time       = obs_track[i].GetTrackingTime();
+    object_ptr->track_id            = obs_track[i].GetObsId();
     object_ptr->latest_tracked_time = obs_track[i].GetTimestamp();
     objects->push_back(object_ptr);
   }
   return true;
 }
 
-void ModestRadarDetector::RoiFilter(
-    const std::vector<PolygonDType> &map_polygons,
-    std::vector<std::shared_ptr<Object>> *filter_objects) {
+void ModestRadarDetector::RoiFilter(const std::vector<PolygonDType>&      map_polygons,
+                                    std::vector<std::shared_ptr<Object>>* filter_objects) {
   ADEBUG << "Before using hdmap, object size:" << filter_objects->size();
   // use new hdmap
   if (config_.use_had_map()) {
@@ -167,8 +155,7 @@ void ModestRadarDetector::RoiFilter(
         obs_position.x = filter_objects->at(i)->center(0);
         obs_position.y = filter_objects->at(i)->center(1);
         obs_position.z = filter_objects->at(i)->center(2);
-        if (RadarUtil::IsXyPointInHdmap<pcl_util::PointD>(obs_position,
-                                                          map_polygons)) {
+        if (RadarUtil::IsXyPointInHdmap<pcl_util::PointD>(obs_position, map_polygons)) {
           filter_objects->at(obs_number) = filter_objects->at(i);
           obs_number++;
         }

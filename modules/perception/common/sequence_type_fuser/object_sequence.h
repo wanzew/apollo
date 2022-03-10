@@ -45,8 +45,8 @@ class ObjectSequence {
    * @param timestamp The frame timestamp
    * @return True if add successfully, false otherwise
    */
-  bool AddTrackedFrameObjects(
-      const std::vector<std::shared_ptr<Object>>& objects, double timestamp);
+  bool AddTrackedFrameObjects(const std::vector<std::shared_ptr<Object>>& objects,
+                              double                                      timestamp);
 
   /**
    * @brief Get tracked objects in a time window
@@ -55,9 +55,9 @@ class ObjectSequence {
    * @param window_time The time interval
    * @return True if get track successfully, false otherwise
    */
-  bool GetTrackInTemporalWindow(
-      int track_id, std::map<int64_t, std::shared_ptr<Object>>* track,
-      double window_time);
+  bool GetTrackInTemporalWindow(int                                         track_id,
+                                std::map<int64_t, std::shared_ptr<Object>>* track,
+                                double                                      window_time);
 
  protected:
   /**
@@ -68,15 +68,13 @@ class ObjectSequence {
 
  private:
   const double kEps = 1e-9;
-  int64_t DoubleToMapKey(const double d) {
-    return static_cast<int64_t>(d / kEps);
-  }
-  double MapKeyToDouble(const int64_t key) { return key * kEps; }
+  int64_t      DoubleToMapKey(const double d) { return static_cast<int64_t>(d / kEps); }
+  double       MapKeyToDouble(const int64_t key) { return key * kEps; }
 
-  double current_;
+  double                                                    current_;
   std::map<int, std::map<int64_t, std::shared_ptr<Object>>> sequence_;
-  std::mutex mutex_;
-  static constexpr double s_max_time_out_ = 5.0;  // 5 seconds
+  std::mutex                                                mutex_;
+  static constexpr double                                   s_max_time_out_ = 5.0;  // 5 seconds
 };
 
 }  // namespace perception

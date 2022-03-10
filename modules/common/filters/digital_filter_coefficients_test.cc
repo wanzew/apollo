@@ -27,8 +27,8 @@ class DigitalFilterCoefficientsTest : public ::testing::Test {
 };
 
 TEST_F(DigitalFilterCoefficientsTest, LpfCoefficients) {
-  double ts = 0.01;
-  double cutoff_freq = 20;
+  double              ts          = 0.01;
+  double              cutoff_freq = 20;
   std::vector<double> den;
   std::vector<double> num;
   LpfCoefficients(ts, cutoff_freq, &den, &num);

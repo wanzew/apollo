@@ -17,9 +17,9 @@
 #include "modules/prediction/container/container_manager.h"
 
 #include "modules/common/log.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
-#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -36,16 +36,14 @@ void ContainerManager::Init(const AdapterManagerConfig& config) {
 
 void ContainerManager::RegisterContainers() {
   for (const auto& adapter_config : config_.config()) {
-    if (adapter_config.has_type() &&
-        (adapter_config.mode() == AdapterConfig::RECEIVE_ONLY ||
-         adapter_config.mode() == AdapterConfig::DUPLEX)) {
+    if (adapter_config.has_type() && (adapter_config.mode() == AdapterConfig::RECEIVE_ONLY ||
+                                      adapter_config.mode() == AdapterConfig::DUPLEX)) {
       RegisterContainer(adapter_config.type());
     }
   }
 }
 
-Container* ContainerManager::GetContainer(
-    const common::adapter::AdapterConfig::MessageType& type) {
+Container* ContainerManager::GetContainer(const common::adapter::AdapterConfig::MessageType& type) {
   if (containers_.find(type) != containers_.end()) {
     return containers_[type].get();
   } else {
@@ -53,8 +51,8 @@ Container* ContainerManager::GetContainer(
   }
 }
 
-std::unique_ptr<Container> ContainerManager::CreateContainer(
-    const common::adapter::AdapterConfig::MessageType& type) {
+std::unique_ptr<Container>
+ContainerManager::CreateContainer(const common::adapter::AdapterConfig::MessageType& type) {
   std::unique_ptr<Container> container_ptr(nullptr);
   if (type == AdapterConfig::PERCEPTION_OBSTACLES) {
     container_ptr.reset(new ObstaclesContainer());
@@ -66,8 +64,7 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
   return container_ptr;
 }
 
-void ContainerManager::RegisterContainer(
-    const common::adapter::AdapterConfig::MessageType& type) {
+void ContainerManager::RegisterContainer(const common::adapter::AdapterConfig::MessageType& type) {
   containers_[type] = CreateContainer(type);
   AINFO << "Container [" << type << "] is registered.";
 }

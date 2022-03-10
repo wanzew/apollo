@@ -46,10 +46,10 @@ namespace third_party_perception {
 
 class ThirdPartyPerception : public apollo::common::ApolloApp {
  public:
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
  private:
   // Upon receiving mobileye data
@@ -59,21 +59,20 @@ class ThirdPartyPerception : public apollo::common::ApolloApp {
   // Upon receiving conti radar data
   void OnContiRadar(const apollo::drivers::ContiRadar& message);
   // Upon receiving localization data
-  void OnLocalization(
-      const apollo::localization::LocalizationEstimate& message);
+  void OnLocalization(const apollo::localization::LocalizationEstimate& message);
   // Upont receiving chassis data
   void OnChassis(const apollo::canbus::Chassis& message);
   // publish perception obstacles when timer is triggered
   void OnTimer(const ros::TimerEvent&);
 
-  ros::Timer timer_;
-  std::mutex third_party_perception_mutex_;
-  apollo::perception::PerceptionObstacles mobileye_obstacles_;
-  apollo::perception::PerceptionObstacles radar_obstacles_;
+  ros::Timer                                 timer_;
+  std::mutex                                 third_party_perception_mutex_;
+  apollo::perception::PerceptionObstacles    mobileye_obstacles_;
+  apollo::perception::PerceptionObstacles    radar_obstacles_;
   apollo::localization::LocalizationEstimate localization_;
-  apollo::canbus::Chassis chassis_;
-  RadarObstacles current_radar_obstacles_;
-  RadarObstacles last_radar_obstacles_;
+  apollo::canbus::Chassis                    chassis_;
+  RadarObstacles                             current_radar_obstacles_;
+  RadarObstacles                             last_radar_obstacles_;
 };
 
 }  // namespace third_party_perception

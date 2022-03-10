@@ -31,14 +31,13 @@ class HttpClient {
   /**
    * @brief post a json to target url, get response as string.
    */
-  static Status Post(const std::string &url, const nlohmann::json &json,
-                     std::string *result = nullptr);
+  static Status
+  Post(const std::string& url, const nlohmann::json& json, std::string* result = nullptr);
 
   /**
    * @brief post a json to target url, get response as json.
    */
-  static Status Post(const std::string &url, const nlohmann::json &json,
-                     nlohmann::json *result);
+  static Status Post(const std::string& url, const nlohmann::json& json, nlohmann::json* result);
 };
 
 }  // namespace util

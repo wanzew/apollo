@@ -33,13 +33,10 @@ bool SequenceTypeFuser::Init() {
   }
 
   // get the transition matrix
-  const std::string& transition_property_file_path =
-      config_.transition_property_file_path();
+  const std::string& transition_property_file_path = config_.transition_property_file_path();
 
-  if (!fuser_util::LoadSingleMatrixFile(transition_property_file_path,
-                                        &transition_matrix_)) {
-    AERROR << "Fail to load single matrix file from: "
-           << transition_property_file_path;
+  if (!fuser_util::LoadSingleMatrixFile(transition_property_file_path, &transition_matrix_)) {
+    AERROR << "Fail to load single matrix file from: " << transition_property_file_path;
     return false;
   }
   transition_matrix_ += Matrixd::Ones() * 1e-6;
@@ -55,12 +52,9 @@ bool SequenceTypeFuser::Init() {
   ADEBUG << std::endl << transition_matrix_;
 
   // get classifier property
-  const std::string& classifiers_property_file_path =
-      config_.classifiers_property_file_path();
-  if (!fuser_util::LoadMultipleMatricesFile(classifiers_property_file_path,
-                                            &smooth_matrices_)) {
-    AERROR << "Fail to load multiple matrices from file: "
-           << classifiers_property_file_path;
+  const std::string& classifiers_property_file_path = config_.classifiers_property_file_path();
+  if (!fuser_util::LoadMultipleMatricesFile(classifiers_property_file_path, &smooth_matrices_)) {
+    AERROR << "Fail to load multiple matrices from file: " << classifiers_property_file_path;
     return false;
   }
   for (auto& pair : smooth_matrices_) {
@@ -70,7 +64,7 @@ bool SequenceTypeFuser::Init() {
   }
 
   confidence_smooth_matrix_ = Matrixd::Identity();
-  auto iter = smooth_matrices_.find("Confidence");
+  auto iter                 = smooth_matrices_.find("Confidence");
   if (iter != smooth_matrices_.end()) {
     confidence_smooth_matrix_ = iter->second;
     smooth_matrices_.erase(iter);
@@ -79,25 +73,20 @@ bool SequenceTypeFuser::Init() {
   return true;
 }
 
-bool SequenceTypeFuser::FuseType(
-    const TypeFuserOptions& options,
-    std::vector<std::shared_ptr<Object>>* objects) {
-  if (objects == nullptr) {
-    return false;
-  }
+bool SequenceTypeFuser::FuseType(const TypeFuserOptions&               options,
+                                 std::vector<std::shared_ptr<Object>>* objects) {
+  if (objects == nullptr) { return false; }
   if (options.timestamp > 0.0) {
     sequence_.AddTrackedFrameObjects(*objects, options.timestamp);
     std::map<int64_t, std::shared_ptr<Object>> tracked_objects;
     for (auto& object : *objects) {
       if (object->is_background) {
-        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
-                                  0);
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
         object->type = ObjectType::UNKNOWN_UNMOVABLE;
         continue;
       }
       const int track_id = object->track_id;
-      sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
-                                         config_.temporal_window());
+      sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects, config_.temporal_window());
       if (tracked_objects.size() == 0) {
         AERROR << "Find zero-length track, so skip.";
         continue;
@@ -115,11 +104,8 @@ bool SequenceTypeFuser::FuseType(
   return true;
 }
 
-bool SequenceTypeFuser::FuseWithCCRF(
-    std::map<int64_t, std::shared_ptr<Object>>* tracked_objects) {
-  if (tracked_objects == nullptr || tracked_objects->size() == 0) {
-    return false;
-  }
+bool SequenceTypeFuser::FuseWithCCRF(std::map<int64_t, std::shared_ptr<Object>>* tracked_objects) {
+  if (tracked_objects == nullptr || tracked_objects->size() == 0) { return false; }
 
   /// rectify object type with smooth matrices
   fused_oneshot_probs_.resize(tracked_objects->size());
@@ -141,33 +127,30 @@ bool SequenceTypeFuser::FuseWithCCRF(
   fused_sequence_probs_[0] += transition_matrix_.row(0).transpose();
   for (std::size_t i = 1; i < length; ++i) {
     for (std::size_t right = 0; right < VALID_OBJECT_TYPE; ++right) {
-      double max_prob = -DBL_MAX;
-      std::size_t id = 0;
+      double      max_prob = -DBL_MAX;
+      std::size_t id       = 0;
       for (std::size_t left = 0; left < VALID_OBJECT_TYPE; ++left) {
         const double prob = fused_sequence_probs_[i - 1](left) +
                             transition_matrix_(left, right) * s_alpha_ +
                             fused_oneshot_probs_[i](right);
         if (prob > max_prob) {
           max_prob = prob;
-          id = left;
+          id       = left;
         }
       }
       fused_sequence_probs_[i](right) = max_prob;
-      state_back_trace_[i](right) = id;
+      state_back_trace_[i](right)     = id;
     }
   }
   std::shared_ptr<Object> object = tracked_objects->rbegin()->second;
-  RecoverFromLogProb(&fused_sequence_probs_.back(), &object->type_probs,
-                     &object->type);
+  RecoverFromLogProb(&fused_sequence_probs_.back(), &object->type_probs, &object->type);
 
   return true;
 }
 
 bool SequenceTypeFuser::RectifyObjectType(const std::shared_ptr<Object>& object,
-                                          Vectord* log_prob) {
-  if (object == nullptr || log_prob == nullptr) {
-    return false;
-  }
+                                          Vectord*                       log_prob) {
+  if (object == nullptr || log_prob == nullptr) { return false; }
 
   log_prob->setZero();
 
@@ -179,20 +162,19 @@ bool SequenceTypeFuser::RectifyObjectType(const std::shared_ptr<Object>& object,
     return false;
   }
   static const Vectord epsilon = Vectord::Ones() * 1e-6;
-  single_prob = iter->second * single_prob + epsilon;
+  single_prob                  = iter->second * single_prob + epsilon;
   fuser_util::Normalize(&single_prob);
 
   double conf = object->score;
-  single_prob = conf * single_prob +
-                (1.0 - conf) * confidence_smooth_matrix_ * single_prob;
+  single_prob = conf * single_prob + (1.0 - conf) * confidence_smooth_matrix_ * single_prob;
   fuser_util::ToLog(&single_prob);
   *log_prob += single_prob;
   return true;
 }
 
-bool SequenceTypeFuser::RecoverFromLogProb(Vectord* prob,
+bool SequenceTypeFuser::RecoverFromLogProb(Vectord*            prob,
                                            std::vector<float>* dst,
-                                           ObjectType* type) {
+                                           ObjectType*         type) {
   fuser_util::ToExp(prob);
   fuser_util::Normalize(prob);
   fuser_util::FromEigenVector(*prob, dst);

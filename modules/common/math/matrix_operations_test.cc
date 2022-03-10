@@ -91,15 +91,15 @@ TEST(ContinuousToDiscreteTest, c2d_fixed_size) {
 
   Eigen::Matrix<float, 1, 1> prt_d_d;
 
-  bool res = ContinuousToDiscrete<float, 2, 1, 1>(
-      m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
+  bool res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
+                                                  &prt_c_d, &prt_d_d);
 
   EXPECT_FALSE(res);
 
   ts = 1;
 
-  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
-                                             &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d,
+                                             &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -118,8 +118,8 @@ TEST(ContinuousToDiscreteTest, c2d_fixed_size) {
 
   ts = 0.1;
 
-  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
-                                             &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d,
+                                             &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -138,8 +138,8 @@ TEST(ContinuousToDiscreteTest, c2d_fixed_size) {
 
   ts = 0.01;
 
-  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
-                                             &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d,
+                                             &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -176,15 +176,13 @@ TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
 
   Eigen::MatrixXd prt_d_d;
 
-  bool res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
-                                  &prt_c_d, &prt_d_d);
+  bool res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_FALSE(res);
 
   ts = 1;
 
-  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
-                             &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -203,8 +201,7 @@ TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
 
   ts = 0.1;
 
-  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
-                             &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -223,8 +220,7 @@ TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
 
   ts = 0.01;
 
-  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
-                             &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 

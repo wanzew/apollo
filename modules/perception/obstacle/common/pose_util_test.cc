@@ -16,8 +16,8 @@
 
 #include "modules/perception/obstacle/common/pose_util.h"
 
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -31,12 +31,12 @@ class PoseUtilTest : public testing::Test {
 };
 
 TEST_F(PoseUtilTest, ReadPoseFile) {
-  std::string data_path = "modules/perception/data/hm_tracker_test/";
-  std::string file_name = "QN68P2_12_1476265365_1476265665_2.pose";
-  std::string test_file = data_path + file_name;
+  std::string     data_path = "modules/perception/data/hm_tracker_test/";
+  std::string     file_name = "QN68P2_12_1476265365_1476265665_2.pose";
+  std::string     test_file = data_path + file_name;
   Eigen::Matrix4d pose;
-  int frame_id;
-  double time_stamp;
+  int             frame_id;
+  double          time_stamp;
   EXPECT_TRUE(ReadPoseFile(test_file, &pose, &frame_id, &time_stamp));
   EXPECT_EQ(frame_id, 11989);
   EXPECT_EQ(time_stamp, 588.419051);

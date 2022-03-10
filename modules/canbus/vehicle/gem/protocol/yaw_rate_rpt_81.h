@@ -24,13 +24,12 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Yawraterpt81 : public ::apollo::drivers::canbus::ProtocolData<
-                         ::apollo::canbus::ChassisDetail> {
+class Yawraterpt81
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Yawraterpt81();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'YAW_RATE', 'offset': 0.0, 'precision': 0.01,

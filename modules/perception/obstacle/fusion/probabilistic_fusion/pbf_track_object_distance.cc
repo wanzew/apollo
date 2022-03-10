@@ -37,11 +37,10 @@ DECLARE_bool(use_distance_angle_fusion);
 namespace apollo {
 namespace perception {
 
-float PbfTrackObjectDistance::Compute(
-    PbfTrackPtr fused_track,
-    const std::shared_ptr<PbfSensorObject> &sensor_object,
-    const TrackObjectDistanceOptions &options) {
-  const SensorType &sensor_type = sensor_object->sensor_type;
+float PbfTrackObjectDistance::Compute(PbfTrackPtr                             fused_track,
+                                      const std::shared_ptr<PbfSensorObject>& sensor_object,
+                                      const TrackObjectDistanceOptions&       options) {
+  const SensorType& sensor_type = sensor_object->sensor_type;
   ADEBUG << "sensor type: " << static_cast<int>(sensor_type);
   std::shared_ptr<PbfSensorObject> fused_object = fused_track->GetFusedObject();
   if (fused_object == nullptr) {
@@ -49,17 +48,15 @@ float PbfTrackObjectDistance::Compute(
     return std::numeric_limits<float>::max();
   }
 
-  Eigen::Vector3d *ref_point = options.ref_point;
+  Eigen::Vector3d* ref_point = options.ref_point;
   if (ref_point == nullptr) {
     AERROR << "reference point is nullptr";
     return std::numeric_limits<float>::max();
   }
 
-  float distance = std::numeric_limits<float>::max();
-  const std::shared_ptr<PbfSensorObject> &lidar_object =
-      fused_track->GetLatestLidarObject();
-  const std::shared_ptr<PbfSensorObject> &radar_object =
-      fused_track->GetLatestRadarObject();
+  float                                   distance     = std::numeric_limits<float>::max();
+  const std::shared_ptr<PbfSensorObject>& lidar_object = fused_track->GetLatestLidarObject();
+  const std::shared_ptr<PbfSensorObject>& radar_object = fused_track->GetLatestRadarObject();
 
   if (FLAGS_use_navigation_mode) {
     if (FLAGS_use_distance_angle_fusion) {
@@ -70,18 +67,15 @@ float PbfTrackObjectDistance::Compute(
   } else {
     if (is_lidar(sensor_type)) {
       if (lidar_object != nullptr) {
-        distance = ComputeVelodyne64Velodyne64(fused_object, sensor_object,
-                                               *ref_point);
+        distance = ComputeVelodyne64Velodyne64(fused_object, sensor_object, *ref_point);
       } else if (radar_object != nullptr) {
-        distance =
-            ComputeVelodyne64Radar(sensor_object, fused_object, *ref_point);
+        distance = ComputeVelodyne64Radar(sensor_object, fused_object, *ref_point);
       } else {
         AWARN << "All of the objects are nullptr";
       }
     } else if (is_radar(sensor_type)) {
       if (lidar_object != nullptr) {
-        distance =
-            ComputeVelodyne64Radar(fused_object, sensor_object, *ref_point);
+        distance = ComputeVelodyne64Radar(fused_object, sensor_object, *ref_point);
       } else if (radar_object != nullptr) {
         distance = std::numeric_limits<float>::max();
         //    distance = compute_radar_radar(fused_object, sensor_object,
@@ -97,36 +91,36 @@ float PbfTrackObjectDistance::Compute(
 }
 
 float PbfTrackObjectDistance::ComputeVelodyne64Velodyne64(
-    const std::shared_ptr<PbfSensorObject> &fused_object,
-    const std::shared_ptr<PbfSensorObject> &sensor_object,
-    const Eigen::Vector3d &ref_pos, int range) {
-  float distance =
-      ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
+    const std::shared_ptr<PbfSensorObject>& fused_object,
+    const std::shared_ptr<PbfSensorObject>& sensor_object,
+    const Eigen::Vector3d&                  ref_pos,
+    int                                     range) {
+  float distance = ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
   ADEBUG << "compute_velodyne64_velodyne64 distance: " << distance;
   return distance;
 }
 
 float PbfTrackObjectDistance::ComputeVelodyne64Radar(
-    const std::shared_ptr<PbfSensorObject> &fused_object,
-    const std::shared_ptr<PbfSensorObject> &sensor_object,
-    const Eigen::Vector3d &ref_pos, int range) {
-  float distance =
-      ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
+    const std::shared_ptr<PbfSensorObject>& fused_object,
+    const std::shared_ptr<PbfSensorObject>& sensor_object,
+    const Eigen::Vector3d&                  ref_pos,
+    int                                     range) {
+  float distance = ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
   ADEBUG << "compute_velodyne64_radar distance " << distance;
   return distance;
 }
 
 float PbfTrackObjectDistance::ComputeRadarRadar(
-    const std::shared_ptr<PbfSensorObject> &fused_object,
-    const std::shared_ptr<PbfSensorObject> &sensor_object,
-    const Eigen::Vector3d &ref_pos, int range) {
-  float distance =
-      ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
+    const std::shared_ptr<PbfSensorObject>& fused_object,
+    const std::shared_ptr<PbfSensorObject>& sensor_object,
+    const Eigen::Vector3d&                  ref_pos,
+    int                                     range) {
+  float distance = ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
   ADEBUG << "compute_radar_radar distance " << distance;
   return distance;
 }
 
-float PbfTrackObjectDistance::GetAngle(const std::shared_ptr<Object> &obj) {
+float PbfTrackObjectDistance::GetAngle(const std::shared_ptr<Object>& obj) {
   if (obj->center[0] == 0) {
     if (obj->center[1] > 0) {
       return M_PI / 2;
@@ -138,39 +132,37 @@ float PbfTrackObjectDistance::GetAngle(const std::shared_ptr<Object> &obj) {
 }
 
 float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
-    const std::shared_ptr<PbfSensorObject> &fused_object,
-    const std::shared_ptr<PbfSensorObject> &sensor_object) {
-  static float weight_x = 0.8f;
-  static float weight_y = 0.2f;
-  static float speed_diff = 5.0f;
-  static float epislon = 0.1f;
-  static float angle_tolerance = 1.0f;
+    const std::shared_ptr<PbfSensorObject>& fused_object,
+    const std::shared_ptr<PbfSensorObject>& sensor_object) {
+  static float weight_x               = 0.8f;
+  static float weight_y               = 0.2f;
+  static float speed_diff             = 5.0f;
+  static float epislon                = 0.1f;
+  static float angle_tolerance        = 1.0f;
   static float distance_tolerance_max = 5.0f;
   static float distance_tolerance_min = 2.0f;
 
-  const std::shared_ptr<Object> &fobj = fused_object->object;
-  const std::shared_ptr<Object> &sobj = sensor_object->object;
+  const std::shared_ptr<Object>& fobj = fused_object->object;
+  const std::shared_ptr<Object>& sobj = sensor_object->object;
 
   if (fobj == nullptr || sobj == nullptr) {
     AERROR << "Object is nullptr.";
     return std::numeric_limits<float>::max();
   }
 
-  Eigen::Vector3d &fcenter = fobj->center;
-  Eigen::Vector3d &scenter = sobj->center;
+  Eigen::Vector3d& fcenter = fobj->center;
+  Eigen::Vector3d& scenter = sobj->center;
 
   float euclid_dist = static_cast<float>(((fcenter - scenter).norm()));
 
-  if (euclid_dist > distance_tolerance_max) {
-    return std::numeric_limits<float>::max();
-  }
+  if (euclid_dist > distance_tolerance_max) { return std::numeric_limits<float>::max(); }
 
   float range_distance_ratio = std::numeric_limits<float>::max();
-  float angle_distance_diff = 0.0f;
+  float angle_distance_diff  = 0.0f;
 
   if (fcenter(0) > epislon && std::abs(fcenter(1)) > epislon) {
     float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
-    assert(x_ratio >=0);
+    assert(x_ratio >= 0);
     float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
 
     if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent &&
@@ -180,42 +172,35 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
 
   } else if (fcenter(0) > epislon) {
     float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
-    if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent) {
-      range_distance_ratio = x_ratio;
-    }
+    if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent) { range_distance_ratio = x_ratio; }
   } else if (std::abs(fcenter(1)) > epislon) {
     float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
-    if (y_ratio < FLAGS_pbf_fusion_assoc_distance_percent) {
-      range_distance_ratio = y_ratio;
-    }
+    if (y_ratio < FLAGS_pbf_fusion_assoc_distance_percent) { range_distance_ratio = y_ratio; }
   }
   float distance = range_distance_ratio;
 
   if (is_radar(sensor_object->sensor_type)) {
-    float sangle = GetAngle(sobj);
-    float fangle = GetAngle(fobj);
+    float sangle        = GetAngle(sobj);
+    float fangle        = GetAngle(fobj);
     angle_distance_diff = (std::abs(sangle - fangle) * 180) / M_PI;
-    float fobject_dist = static_cast<float>(fcenter.norm());
-    double svelocity = sobj->velocity.norm();
-    double fvelocity = fobj->velocity.norm();
+    float  fobject_dist = static_cast<float>(fcenter.norm());
+    double svelocity    = sobj->velocity.norm();
+    double fvelocity    = fobj->velocity.norm();
     if (svelocity > 0.0 && fvelocity > 0.0) {
-      float cos_distance =
-          sobj->velocity.dot(fobj->velocity) / (svelocity * fvelocity);
+      float cos_distance = sobj->velocity.dot(fobj->velocity) / (svelocity * fvelocity);
       if (cos_distance < FLAGS_pbf_distance_speed_cos_diff) {
         ADEBUG << "ignore radar data for fusing" << cos_distance;
         distance = std::numeric_limits<float>::max();
       }
     }
 
-    if (std::abs(svelocity - fvelocity) > speed_diff ||
-        angle_distance_diff > angle_tolerance) {
+    if (std::abs(svelocity - fvelocity) > speed_diff || angle_distance_diff > angle_tolerance) {
       ADEBUG << "ignore radar data for fusing" << speed_diff;
       distance = std::numeric_limits<float>::max();
     }
 
-    float distance_allowed =
-        std::max(static_cast<float>(fobject_dist * sin(angle_distance_diff)),
-                 distance_tolerance_min);
+    float distance_allowed = std::max(static_cast<float>(fobject_dist * sin(angle_distance_diff)),
+                                      distance_tolerance_min);
     if (euclid_dist > distance_allowed) {
       ADEBUG << "ignore radar data for fusing " << distance_allowed;
       distance = std::numeric_limits<float>::max();
@@ -225,21 +210,20 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
 }
 
 float PbfTrackObjectDistance::ComputeDistance3D(
-    const std::shared_ptr<PbfSensorObject> &fused_object,
-    const std::shared_ptr<PbfSensorObject> &sensor_object,
-    const Eigen::Vector3d &ref_pos, const int range) {
-  const std::shared_ptr<Object> &obj = fused_object->object;
+    const std::shared_ptr<PbfSensorObject>& fused_object,
+    const std::shared_ptr<PbfSensorObject>& sensor_object,
+    const Eigen::Vector3d&                  ref_pos,
+    const int                               range) {
+  const std::shared_ptr<Object>& obj = fused_object->object;
   if (obj == nullptr) {
     AERROR << "Object is nullptr.";
     return std::numeric_limits<float>::max();
   }
-  const PolygonDType &fused_poly = obj->polygon;
-  Eigen::Vector3d fused_poly_center(0, 0, 0);
-  bool fused_state =
-      ComputePolygonCenter(fused_poly, ref_pos, range, &fused_poly_center);
+  const PolygonDType& fused_poly = obj->polygon;
+  Eigen::Vector3d     fused_poly_center(0, 0, 0);
+  bool fused_state = ComputePolygonCenter(fused_poly, ref_pos, range, &fused_poly_center);
   if (!fused_state) {
-    AERROR << "fail to compute polygon center! fused polygon size:"
-           << fused_poly.size();
+    AERROR << "fail to compute polygon center! fused polygon size:" << fused_poly.size();
     return std::numeric_limits<float>::max();
   }
 
@@ -248,14 +232,12 @@ float PbfTrackObjectDistance::ComputeDistance3D(
     AERROR << "Object is nullptr.";
     return std::numeric_limits<float>::max();
   }
-  const PolygonDType &sensor_poly = obj2->polygon;
-  Eigen::Vector3d sensor_poly_center(0, 0, 0);
-  bool sensor_state =
-      ComputePolygonCenter(sensor_poly, ref_pos, range, &sensor_poly_center);
+  const PolygonDType& sensor_poly = obj2->polygon;
+  Eigen::Vector3d     sensor_poly_center(0, 0, 0);
+  bool sensor_state = ComputePolygonCenter(sensor_poly, ref_pos, range, &sensor_poly_center);
 
   if (!sensor_state) {
-    AERROR << "fail to compute sensor polygon center: polygon size:"
-           << sensor_poly.size();
+    AERROR << "fail to compute sensor polygon center: polygon size:" << sensor_poly.size();
     return std::numeric_limits<float>::max();
   }
 
@@ -265,21 +247,19 @@ float PbfTrackObjectDistance::ComputeDistance3D(
   return ComputeEuclideanDistance(fused_poly_center, sensor_poly_center);
 }
 
-float PbfTrackObjectDistance::ComputeEuclideanDistance(
-    const Eigen::Vector3d &des, const Eigen::Vector3d &src) {
+float PbfTrackObjectDistance::ComputeEuclideanDistance(const Eigen::Vector3d& des,
+                                                       const Eigen::Vector3d& src) {
   Eigen::Vector3d diff_pos = des - src;
   return std::sqrt(diff_pos.head(2).cwiseProduct(diff_pos.head(2)).sum());
 }
 
-bool PbfTrackObjectDistance::ComputePolygonCenter(const PolygonDType &polygon,
-                                                  Eigen::Vector3d *center) {
+bool PbfTrackObjectDistance::ComputePolygonCenter(const PolygonDType& polygon,
+                                                  Eigen::Vector3d*    center) {
   CHECK_NOTNULL(center);
-  if (polygon.empty()) {
-    return false;
-  }
+  if (polygon.empty()) { return false; }
   *center = Eigen::Vector3d(0, 0, 0);
   for (size_t i = 0; i < polygon.size(); ++i) {
-    const auto &point = polygon.points[i];
+    const auto& point = polygon.points[i];
     (*center)(0) += point.x;
     (*center)(1) += point.y;
   }
@@ -287,25 +267,25 @@ bool PbfTrackObjectDistance::ComputePolygonCenter(const PolygonDType &polygon,
   return true;
 }
 
-bool PbfTrackObjectDistance::ComputePolygonCenter(
-    const PolygonDType &polygon, const Eigen::Vector3d &ref_pos, int range,
-    Eigen::Vector3d *center) {
+bool PbfTrackObjectDistance::ComputePolygonCenter(const PolygonDType&    polygon,
+                                                  const Eigen::Vector3d& ref_pos,
+                                                  int                    range,
+                                                  Eigen::Vector3d*       center) {
   CHECK_NOTNULL(center);
-  PolygonDType polygon_part;
+  PolygonDType                     polygon_part;
   std::set<std::pair<double, int>> distance2idx_set;
 
   for (size_t idx = 0; idx < polygon.size(); ++idx) {
-    const auto &point = polygon.points[idx];
-    double distance =
-        sqrt(pow(point.x - ref_pos(0), 2) + pow(point.y - ref_pos(1), 2));
+    const auto& point    = polygon.points[idx];
+    double      distance = sqrt(pow(point.x - ref_pos(0), 2) + pow(point.y - ref_pos(1), 2));
     distance2idx_set.insert(std::make_pair(distance, idx));
   }
 
-  int size = distance2idx_set.size();
-  int nu = std::min(size, std::max(range, size / range + 1));
+  int size  = distance2idx_set.size();
+  int nu    = std::min(size, std::max(range, size / range + 1));
   int count = 0;
-  for (auto it = distance2idx_set.begin();
-       it != distance2idx_set.end() && count < nu; ++it, ++count) {
+  for (auto it = distance2idx_set.begin(); it != distance2idx_set.end() && count < nu;
+       ++it, ++count) {
     polygon_part.push_back(polygon[it->second]);
   }
   return ComputePolygonCenter(polygon_part, center);

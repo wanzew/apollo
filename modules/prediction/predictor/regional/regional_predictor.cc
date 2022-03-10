@@ -37,12 +37,8 @@ Eigen::Vector2d GetUnitVector2d(const TrajectoryPoint& from_point,
                                 const TrajectoryPoint& to_point) {
   double delta_x = to_point.path_point().x() - from_point.path_point().x();
   double delta_y = to_point.path_point().y() - from_point.path_point().y();
-  if (std::fabs(delta_x) <= std::numeric_limits<double>::epsilon()) {
-    delta_x = 0.0;
-  }
-  if (std::fabs(delta_y) <= std::numeric_limits<double>::epsilon()) {
-    delta_y = 0.0;
-  }
+  if (std::fabs(delta_x) <= std::numeric_limits<double>::epsilon()) { delta_x = 0.0; }
+  if (std::fabs(delta_y) <= std::numeric_limits<double>::epsilon()) { delta_y = 0.0; }
 
   const double norm = std::hypot(delta_x, delta_y);
   if (norm > 1e-10) {
@@ -56,8 +52,8 @@ void CompressVector2d(const double to_length, Eigen::Vector2d* vec) {
   const double norm = std::hypot(vec->operator[](0), vec->operator[](1));
   if (norm > to_length) {
     const double ratio = to_length / norm;
-    vec->operator[](0) *= ratio;
-    vec->operator[](1) *= ratio;
+    vec->        operator[](0) *= ratio;
+    vec->        operator[](1) *= ratio;
   }
 }
 
@@ -80,9 +76,7 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
   }
 
   double speed = 0.0;
-  if (feature.has_speed()) {
-    speed = feature.speed();
-  }
+  if (feature.has_speed()) { speed = feature.speed(); }
   if (speed > FLAGS_still_speed) {
     GenerateMovingTrajectory(obstacle, 1.0);
   } else {
@@ -90,23 +84,22 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
   }
 }
 
-void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
-                                                double probability) {
+void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle, double probability) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
   }
   const Feature& feature = obstacle->latest_feature();
-  if (!feature.has_position() || !feature.position().has_x() ||
-      !feature.position().has_y() || !feature.has_velocity()) {
+  if (!feature.has_position() || !feature.position().has_x() || !feature.position().has_y() ||
+      !feature.has_velocity()) {
     AERROR << "Missing position or velocity.";
     return;
   }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  double heading = feature.velocity_heading();
-  const double total_time = FLAGS_prediction_pedestrian_total_time;
-  const int start_index = NumOfTrajectories();
+  double          heading     = feature.velocity_heading();
+  const double    total_time  = FLAGS_prediction_pedestrian_total_time;
+  const int       start_index = NumOfTrajectories();
 
   std::vector<TrajectoryPoint> points;
   DrawStillTrajectory(position, heading, 0.0, total_time, &points);
@@ -115,15 +108,14 @@ void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
   SetEqualProbability(probability, start_index);
 }
 
-void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
-                                                 double probability) {
+void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle, double probability) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
   }
   const Feature& feature = obstacle->latest_feature();
-  if (!feature.has_position() || !feature.position().has_x() ||
-      !feature.position().has_y() || !feature.has_velocity()) {
+  if (!feature.has_position() || !feature.position().has_x() || !feature.position().has_y() ||
+      !feature.has_velocity()) {
     AERROR << "Missing position or velocity.";
     return;
   }
@@ -135,28 +127,29 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
     acc = {feature.acceleration().x(), feature.acceleration().y()};
   }
 
-  const double total_time = FLAGS_prediction_pedestrian_total_time;
+  const double                 total_time = FLAGS_prediction_pedestrian_total_time;
   std::vector<TrajectoryPoint> left_points;
   std::vector<TrajectoryPoint> right_points;
 
-  DrawMovingTrajectory(position, velocity, acc,
-                       obstacle->kf_pedestrian_tracker(), total_time,
+  DrawMovingTrajectory(position, velocity, acc, obstacle->kf_pedestrian_tracker(), total_time,
                        &left_points, &right_points);
   int start_index = NumOfTrajectories();
 
-  Trajectory left_trajectory = GenerateTrajectory(left_points);
+  Trajectory left_trajectory  = GenerateTrajectory(left_points);
   Trajectory right_trajectory = GenerateTrajectory(right_points);
   trajectories_.push_back(std::move(left_trajectory));
   trajectories_.push_back(std::move(right_trajectory));
   SetEqualProbability(probability, start_index);
 }
 
-void RegionalPredictor::DrawStillTrajectory(
-    const Eigen::Vector2d& position, const double heading, const double speed,
-    const double total_time, std::vector<TrajectoryPoint>* points) {
-  double delta_ts = FLAGS_prediction_period;
-  double x = position[0];
-  double y = position[1];
+void RegionalPredictor::DrawStillTrajectory(const Eigen::Vector2d&        position,
+                                            const double                  heading,
+                                            const double                  speed,
+                                            const double                  total_time,
+                                            std::vector<TrajectoryPoint>* points) {
+  double delta_ts    = FLAGS_prediction_period;
+  double x           = position[0];
+  double y           = position[1];
   double direction_x = std::cos(heading);
   double direction_y = std::sin(heading);
   for (int i = 0; i < static_cast<int>(total_time / delta_ts); ++i) {
@@ -173,13 +166,15 @@ void RegionalPredictor::DrawStillTrajectory(
 }
 
 void RegionalPredictor::DrawMovingTrajectory(
-    const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-    const Eigen::Vector2d& acceleration,
+    const Eigen::Vector2d&                                     position,
+    const Eigen::Vector2d&                                     velocity,
+    const Eigen::Vector2d&                                     acceleration,
     const apollo::common::math::KalmanFilter<double, 2, 2, 4>& kf,
-    const double total_time, std::vector<TrajectoryPoint>* left_points,
-    std::vector<TrajectoryPoint>* right_points) {
-  double delta_ts = FLAGS_prediction_period;
-  Eigen::Vector2d vel = velocity;
+    const double                                               total_time,
+    std::vector<TrajectoryPoint>*                              left_points,
+    std::vector<TrajectoryPoint>*                              right_points) {
+  double          delta_ts = FLAGS_prediction_period;
+  Eigen::Vector2d vel      = velocity;
   CompressVector2d(FLAGS_pedestrian_max_speed, &vel);
   Eigen::Vector2d acc = acceleration;
   CompressVector2d(FLAGS_pedestrian_max_acc, &acc);
@@ -195,34 +190,36 @@ void RegionalPredictor::DrawMovingTrajectory(
   starting_point.set_v(speed);
 
   Eigen::Vector2d translated_vec(0.0, 0.0);
-  GetTrajectoryCandidatePoints(translated_vec, vel, acc, kf, total_time,
-                               &middle_points, &boundary_points);
+  GetTrajectoryCandidatePoints(translated_vec, vel, acc, kf, total_time, &middle_points,
+                               &boundary_points);
 
   if (middle_points.empty() || boundary_points.size() < 2) {
     ADEBUG << "No valid points found.";
     return;
   }
 
-  UpdateTrajectoryPoints(starting_point, vel, delta_ts, middle_points,
-                         boundary_points, left_points, right_points);
+  UpdateTrajectoryPoints(starting_point, vel, delta_ts, middle_points, boundary_points, left_points,
+                         right_points);
   for (size_t i = 0; i < left_points->size(); ++i) {
-    apollo::prediction::predictor_util::TranslatePoint(
-        position[0], position[1], &(left_points->operator[](i)));
+    apollo::prediction::predictor_util::TranslatePoint(position[0], position[1],
+                                                       &(left_points->operator[](i)));
   }
   for (size_t i = 0; i < right_points->size(); ++i) {
-    apollo::prediction::predictor_util::TranslatePoint(
-        position[0], position[1], &(right_points->operator[](i)));
+    apollo::prediction::predictor_util::TranslatePoint(position[0], position[1],
+                                                       &(right_points->operator[](i)));
   }
 }
 
 void RegionalPredictor::GetTrajectoryCandidatePoints(
-    const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-    const Eigen::Vector2d& acceleration,
+    const Eigen::Vector2d&               position,
+    const Eigen::Vector2d&               velocity,
+    const Eigen::Vector2d&               acceleration,
     const KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker,
-    const double total_time, std::vector<TrajectoryPoint>* middle_points,
-    std::vector<TrajectoryPoint>* boundary_points) {
-  double delta_ts = FLAGS_prediction_period;
-  KalmanFilter<double, 2, 2, 4> kf = kf_pedestrian_tracker;
+    const double                         total_time,
+    std::vector<TrajectoryPoint>*        middle_points,
+    std::vector<TrajectoryPoint>*        boundary_points) {
+  double                        delta_ts = FLAGS_prediction_period;
+  KalmanFilter<double, 2, 2, 4> kf       = kf_pedestrian_tracker;
   // set the control matrix and control vector
   Eigen::Matrix<double, 2, 2> P = kf.GetStateCovariance();
   Eigen::Matrix<double, 2, 1> x;
@@ -252,25 +249,23 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
 
   for (int i = 0; i < static_cast<int>(total_time / delta_ts); ++i) {
     kf.Predict(u);
-    Eigen::Matrix<double, 2, 2> P = kf.GetStateCovariance();
-    double ellipse_len_x = std::sqrt(std::fabs(P(0, 0)));
-    double ellipse_len_y = std::sqrt(std::fabs(P(1, 1)));
+    Eigen::Matrix<double, 2, 2> P             = kf.GetStateCovariance();
+    double                      ellipse_len_x = std::sqrt(std::fabs(P(0, 0)));
+    double                      ellipse_len_y = std::sqrt(std::fabs(P(1, 1)));
     ellipse_len_x *= FLAGS_coeff_mul_sigma;
     ellipse_len_y *= FLAGS_coeff_mul_sigma;
 
-    Eigen::Matrix<double, 2, 1> state = kf.GetStateEstimate();
-    double middle_point_x = state(0, 0);
-    double middle_point_y = state(1, 0);
-    TrajectoryPoint middle_point;
+    Eigen::Matrix<double, 2, 1> state          = kf.GetStateEstimate();
+    double                      middle_point_x = state(0, 0);
+    double                      middle_point_y = state(1, 0);
+    TrajectoryPoint             middle_point;
     middle_point.mutable_path_point()->set_x(middle_point_x);
     middle_point.mutable_path_point()->set_y(middle_point_y);
     TrajectoryPoint boundary_point_1;
     TrajectoryPoint boundary_point_2;
-    Eigen::Vector2d direction =
-        GetUnitVector2d(prev_middle_point, middle_point);
-    GetTwoEllipsePoints(middle_point_x, middle_point_y, direction[0],
-                        direction[1], ellipse_len_x, ellipse_len_y,
-                        &boundary_point_1, &boundary_point_2);
+    Eigen::Vector2d direction = GetUnitVector2d(prev_middle_point, middle_point);
+    GetTwoEllipsePoints(middle_point_x, middle_point_y, direction[0], direction[1], ellipse_len_x,
+                        ellipse_len_y, &boundary_point_1, &boundary_point_2);
     prev_middle_point = middle_point;
 
     middle_points->push_back(std::move(middle_point));
@@ -279,17 +274,18 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
   }
 }
 
-void RegionalPredictor::UpdateTrajectoryPoints(
-    const TrajectoryPoint& starting_point, const Eigen::Vector2d& velocity,
-    const double delta_ts, const std::vector<TrajectoryPoint>& middle_points,
-    const std::vector<TrajectoryPoint>& boundary_points,
-    std::vector<TrajectoryPoint>* left_points,
-    std::vector<TrajectoryPoint>* right_points) {
+void RegionalPredictor::UpdateTrajectoryPoints(const TrajectoryPoint&              starting_point,
+                                               const Eigen::Vector2d&              velocity,
+                                               const double                        delta_ts,
+                                               const std::vector<TrajectoryPoint>& middle_points,
+                                               const std::vector<TrajectoryPoint>& boundary_points,
+                                               std::vector<TrajectoryPoint>*       left_points,
+                                               std::vector<TrajectoryPoint>*       right_points) {
   if (2 * middle_points.size() != boundary_points.size()) {
     AWARN << "Middle and ellipse points sizes not match";
   }
-  double speed = std::hypot(velocity[0], velocity[1]);
-  double left_heading = std::atan2(velocity[1], velocity[0]);
+  double speed         = std::hypot(velocity[0], velocity[1]);
+  double left_heading  = std::atan2(velocity[1], velocity[0]);
   double right_heading = std::atan2(velocity[1], velocity[0]);
 
   TrajectoryPoint left_starting_point = starting_point;
@@ -297,29 +293,22 @@ void RegionalPredictor::UpdateTrajectoryPoints(
   TrajectoryPoint right_starting_point = starting_point;
   right_points->push_back(std::move(right_starting_point));
 
-  int left_i = 0;
+  int left_i  = 0;
   int right_i = 0;
   for (size_t i = 0; i < middle_points.size(); ++i) {
     TrajectoryPoint prev_middle_point = starting_point;
-    if (i > 0) {
-      prev_middle_point = middle_points[i - 1];
-    }
-    Eigen::Vector2d middle_direction =
-        GetUnitVector2d(prev_middle_point, middle_points[i]);
-    if (2 * i > boundary_points.size()) {
-      break;
-    }
+    if (i > 0) { prev_middle_point = middle_points[i - 1]; }
+    Eigen::Vector2d middle_direction = GetUnitVector2d(prev_middle_point, middle_points[i]);
+    if (2 * i > boundary_points.size()) { break; }
     TrajectoryPoint boundary_point_1 = boundary_points[2 * i];
-    InsertTrajectoryPoint(prev_middle_point, middle_direction, boundary_point_1,
-                          speed, delta_ts, &left_i, &right_i, &left_heading,
-                          &right_heading, left_points, right_points);
-    if (2 * i + 1 >= boundary_points.size()) {
-      break;
-    }
+    InsertTrajectoryPoint(prev_middle_point, middle_direction, boundary_point_1, speed, delta_ts,
+                          &left_i, &right_i, &left_heading, &right_heading, left_points,
+                          right_points);
+    if (2 * i + 1 >= boundary_points.size()) { break; }
     TrajectoryPoint boundary_point_2 = boundary_points[2 * i + 1];
-    InsertTrajectoryPoint(prev_middle_point, middle_direction, boundary_point_2,
-                          speed, delta_ts, &left_i, &right_i, &left_heading,
-                          &right_heading, left_points, right_points);
+    InsertTrajectoryPoint(prev_middle_point, middle_direction, boundary_point_2, speed, delta_ts,
+                          &left_i, &right_i, &left_heading, &right_heading, left_points,
+                          right_points);
   }
 
   left_points->back().set_v(speed);
@@ -331,21 +320,24 @@ void RegionalPredictor::UpdateTrajectoryPoints(
   right_points->back().mutable_path_point()->set_theta(right_heading);
 }
 
-void RegionalPredictor::InsertTrajectoryPoint(
-    const TrajectoryPoint& prev_middle_point,
-    const Eigen::Vector2d& middle_direction,
-    const TrajectoryPoint& boundary_point, const double speed,
-    const double delta_ts, int* left_i, int* right_i, double* left_heading,
-    double* right_heading, std::vector<TrajectoryPoint>* left_points,
-    std::vector<TrajectoryPoint>* right_points) {
-  Eigen::Vector2d boundary_direction =
-      GetUnitVector2d(prev_middle_point, boundary_point);
-  double cross_product = CrossProduct(boundary_direction, middle_direction);
+void RegionalPredictor::InsertTrajectoryPoint(const TrajectoryPoint&        prev_middle_point,
+                                              const Eigen::Vector2d&        middle_direction,
+                                              const TrajectoryPoint&        boundary_point,
+                                              const double                  speed,
+                                              const double                  delta_ts,
+                                              int*                          left_i,
+                                              int*                          right_i,
+                                              double*                       left_heading,
+                                              double*                       right_heading,
+                                              std::vector<TrajectoryPoint>* left_points,
+                                              std::vector<TrajectoryPoint>* right_points) {
+  Eigen::Vector2d boundary_direction = GetUnitVector2d(prev_middle_point, boundary_point);
+  double          cross_product      = CrossProduct(boundary_direction, middle_direction);
   if (cross_product < 0.0) {
     if (!left_points->empty()) {
       TrajectoryPoint& prev_point = left_points->back();
-      Eigen::Vector2d dir = GetUnitVector2d(prev_point, boundary_point);
-      *left_heading = std::atan2(dir[1], dir[0]);
+      Eigen::Vector2d  dir        = GetUnitVector2d(prev_point, boundary_point);
+      *left_heading               = std::atan2(dir[1], dir[0]);
       prev_point.mutable_path_point()->set_theta(*left_heading);
       prev_point.set_v(speed);
       prev_point.set_relative_time((*left_i) * delta_ts);
@@ -355,8 +347,8 @@ void RegionalPredictor::InsertTrajectoryPoint(
   } else {
     if (!right_points->empty()) {
       TrajectoryPoint& prev_point = right_points->back();
-      Eigen::Vector2d dir = GetUnitVector2d(prev_point, boundary_point);
-      *right_heading = std::atan2(dir[1], dir[0]);
+      Eigen::Vector2d  dir        = GetUnitVector2d(prev_point, boundary_point);
+      *right_heading              = std::atan2(dir[1], dir[0]);
       prev_point.mutable_path_point()->set_theta(*right_heading);
       prev_point.set_v(speed);
       prev_point.set_relative_time((*right_i) * delta_ts);
@@ -366,11 +358,14 @@ void RegionalPredictor::InsertTrajectoryPoint(
   }
 }
 
-void RegionalPredictor::GetTwoEllipsePoints(
-    const double position_x, const double position_y, const double direction_x,
-    const double direction_y, const double ellipse_len_x,
-    const double ellipse_len_y, TrajectoryPoint* ellipse_point_1,
-    TrajectoryPoint* ellipse_point_2) {
+void RegionalPredictor::GetTwoEllipsePoints(const double     position_x,
+                                            const double     position_y,
+                                            const double     direction_x,
+                                            const double     direction_y,
+                                            const double     ellipse_len_x,
+                                            const double     ellipse_len_y,
+                                            TrajectoryPoint* ellipse_point_1,
+                                            TrajectoryPoint* ellipse_point_2) {
   // vertical case
   if (std::fabs(direction_x) <= std::numeric_limits<double>::epsilon()) {
     ellipse_point_1->mutable_path_point()->set_x(position_x - ellipse_len_x);
@@ -389,8 +384,8 @@ void RegionalPredictor::GetTwoEllipsePoints(
   }
   // general case
   std::vector<double> coefficients;
-  GetQuadraticCoefficients(position_x, position_y, direction_x, direction_y,
-                           ellipse_len_x, ellipse_len_y, &coefficients);
+  GetQuadraticCoefficients(position_x, position_y, direction_x, direction_y, ellipse_len_x,
+                           ellipse_len_y, &coefficients);
   std::pair<double, double> roots(position_x, position_y);
   apollo::prediction::math_util::SolveQuadraticEquation(coefficients, &roots);
   const double temp_p = 0.0 - direction_x / direction_y;
@@ -408,25 +403,26 @@ void RegionalPredictor::GetTwoEllipsePoints(
   ellipse_point_2->mutable_path_point()->set_y(ellipse_point_2_y);
 }
 
-void RegionalPredictor::GetQuadraticCoefficients(
-    const double position_x, const double position_y, const double direction_x,
-    const double direction_y, const double ellipse_len_x,
-    const double ellipse_len_y, std::vector<double>* coefficients) {
+void RegionalPredictor::GetQuadraticCoefficients(const double         position_x,
+                                                 const double         position_y,
+                                                 const double         direction_x,
+                                                 const double         direction_y,
+                                                 const double         ellipse_len_x,
+                                                 const double         ellipse_len_y,
+                                                 std::vector<double>* coefficients) {
   coefficients->clear();
   const double temp_p = 0.0 - direction_x / direction_y;
   const double temp_q = position_y - temp_p * position_x;
 
   // three coefficients a, b, c for the equation a x^2 + b x + c = 0
-  const double coefficient_a = ellipse_len_y * ellipse_len_y +
-                               ellipse_len_x * ellipse_len_x * temp_p * temp_p;
+  const double coefficient_a =
+      ellipse_len_y * ellipse_len_y + ellipse_len_x * ellipse_len_x * temp_p * temp_p;
 
-  const double coefficient_b =
-      0.0 - 2.0 * position_x * ellipse_len_y * ellipse_len_y +
-      2.0 * temp_p * (temp_q - position_y) * ellipse_len_x * ellipse_len_x;
+  const double coefficient_b = 0.0 - 2.0 * position_x * ellipse_len_y * ellipse_len_y +
+                               2.0 * temp_p * (temp_q - position_y) * ellipse_len_x * ellipse_len_x;
 
   const double coefficient_c =
-      ellipse_len_x * ellipse_len_x * (temp_q - position_y) *
-          (temp_q - position_y) -
+      ellipse_len_x * ellipse_len_x * (temp_q - position_y) * (temp_q - position_y) -
       ellipse_len_x * ellipse_len_x * ellipse_len_y * ellipse_len_y +
       ellipse_len_y * ellipse_len_y * position_x * position_x;
 
@@ -435,16 +431,12 @@ void RegionalPredictor::GetQuadraticCoefficients(
   coefficients->push_back(std::move(coefficient_c));
 }
 
-void RegionalPredictor::UpdateHeading(const TrajectoryPoint& curr_point,
+void RegionalPredictor::UpdateHeading(const TrajectoryPoint&        curr_point,
                                       std::vector<TrajectoryPoint>* points) {
-  if (points->empty()) {
-    return;
-  }
+  if (points->empty()) { return; }
   TrajectoryPoint& prev_point = points->back();
-  const double delta_x =
-      curr_point.path_point().x() - prev_point.path_point().x();
-  const double delta_y =
-      curr_point.path_point().y() - prev_point.path_point().y();
+  const double     delta_x    = curr_point.path_point().x() - prev_point.path_point().x();
+  const double     delta_y    = curr_point.path_point().y() - prev_point.path_point().y();
   prev_point.mutable_path_point()->set_theta(std::atan2(delta_y, delta_x));
 }
 

@@ -24,8 +24,8 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Steeringcmd6d : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+class Steeringcmd6d
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

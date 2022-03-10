@@ -32,10 +32,8 @@ namespace control {
 class Interpolation1DTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string control_conf_file =
-        "modules/control/testdata/conf/lincoln.pb.txt";
-    CHECK(common::util::GetProtoFromFile(control_conf_file,
-                                                   &control_conf_));
+    std::string control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
+    CHECK(common::util::GetProtoFromFile(control_conf_file, &control_conf_));
   }
 
  protected:
@@ -73,8 +71,7 @@ TEST_F(Interpolation1DTest, unordered) {
 }
 
 TEST_F(Interpolation1DTest, gain_scheduler) {
-  const auto& gain_scheduler =
-      control_conf_.lat_controller_conf().lat_err_gain_scheduler();
+  const auto& gain_scheduler = control_conf_.lat_controller_conf().lat_err_gain_scheduler();
   AINFO << "Lateral Error Gain Scheduler:" << gain_scheduler.DebugString();
 
   Interpolation1D::DataType xy;

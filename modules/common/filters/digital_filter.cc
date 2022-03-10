@@ -29,23 +29,23 @@ const double kDoubleEpsilon = 1.0e-6;
 namespace apollo {
 namespace common {
 
-DigitalFilter::DigitalFilter(const std::vector<double> &denominators,
-                             const std::vector<double> &numerators) {
+DigitalFilter::DigitalFilter(const std::vector<double>& denominators,
+                             const std::vector<double>& numerators) {
   set_coefficients(denominators, numerators);
 }
 
-void DigitalFilter::set_denominators(const std::vector<double> &denominators) {
+void DigitalFilter::set_denominators(const std::vector<double>& denominators) {
   denominators_ = denominators;
   y_values_.resize(denominators_.size(), 0.0);
 }
 
-void DigitalFilter::set_numerators(const std::vector<double> &numerators) {
+void DigitalFilter::set_numerators(const std::vector<double>& numerators) {
   numerators_ = numerators;
   x_values_.resize(numerators_.size(), 0.0);
 }
 
-void DigitalFilter::set_coefficients(const std::vector<double> &denominators,
-                                     const std::vector<double> &numerators) {
+void DigitalFilter::set_coefficients(const std::vector<double>& denominators,
+                                     const std::vector<double>& numerators) {
   set_denominators(denominators);
   set_numerators(numerators);
 }
@@ -63,12 +63,10 @@ double DigitalFilter::Filter(const double x_insert) {
 
   x_values_.pop_back();
   x_values_.push_front(x_insert);
-  const double xside =
-      Compute(x_values_, numerators_, 0, numerators_.size() - 1);
+  const double xside = Compute(x_values_, numerators_, 0, numerators_.size() - 1);
 
   y_values_.pop_back();
-  const double yside =
-      Compute(y_values_, denominators_, 1, denominators_.size() - 1);
+  const double yside = Compute(y_values_, denominators_, 1, denominators_.size() - 1);
 
   double y_insert = 0.0;
   if (std::abs(denominators_.front()) > kDoubleEpsilon) {
@@ -89,10 +87,10 @@ double DigitalFilter::UpdateLast(const double input) {
   }
 }
 
-double DigitalFilter::Compute(const std::deque<double> &values,
-                              const std::vector<double> &coefficients,
-                              const std::size_t coeff_start,
-                              const std::size_t coeff_end) {
+double DigitalFilter::Compute(const std::deque<double>&  values,
+                              const std::vector<double>& coefficients,
+                              const std::size_t          coeff_start,
+                              const std::size_t          coeff_end) {
   if (coeff_start > coeff_end || coeff_end >= coefficients.size()) {
     AERROR << "Invalid inputs.";
     return 0.0;
@@ -102,21 +100,17 @@ double DigitalFilter::Compute(const std::deque<double> &values,
     return 0.0;
   }
   double sum = 0.0;
-  int i = coeff_start;
-  for (auto &value : values) {
+  int    i   = coeff_start;
+  for (auto& value : values) {
     sum += value * coefficients[i];
     ++i;
   }
   return sum;
 }
 
-const std::vector<double> &DigitalFilter::denominators() const {
-  return denominators_;
-}
+const std::vector<double>& DigitalFilter::denominators() const { return denominators_; }
 
-const std::vector<double> &DigitalFilter::numerators() const {
-  return numerators_;
-}
+const std::vector<double>& DigitalFilter::numerators() const { return numerators_; }
 
 double DigitalFilter::dead_zone() const { return dead_zone_; }
 

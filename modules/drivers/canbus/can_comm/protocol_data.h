@@ -50,8 +50,7 @@ class ProtocolData {
    * @param length the length of the input array
    * @return the value of checksum
    */
-  static std::uint8_t CalculateCheckSum(const uint8_t *input,
-                                        const uint32_t length);
+  static std::uint8_t CalculateCheckSum(const uint8_t* input, const uint32_t length);
   /**
    * @brief construct protocol data.
    */
@@ -80,13 +79,12 @@ class ProtocolData {
    * @param length the length of the input bytes
    * @param sensor_data the parsed sensor_data
    */
-  virtual void Parse(const uint8_t *bytes, int32_t length,
-                     SensorType *sensor_data) const;
+  virtual void Parse(const uint8_t* bytes, int32_t length, SensorType* sensor_data) const;
 
   /*
    * @brief update the data
    */
-  virtual void UpdateData(uint8_t *data);
+  virtual void UpdateData(uint8_t* data);
 
   /*
    * @brief reset the protocol data
@@ -106,22 +104,15 @@ class ProtocolData {
 template <typename SensorType>
 template <typename T>
 T ProtocolData<SensorType>::BoundedValue(T lower, T upper, T val) {
-  if (lower > upper) {
-    return val;
-  }
-  if (val < lower) {
-    return lower;
-  }
-  if (val > upper) {
-    return upper;
-  }
+  if (lower > upper) { return val; }
+  if (val < lower) { return lower; }
+  if (val > upper) { return upper; }
   return val;
 }
 
 // (SUM(input))^0xFF
 template <typename SensorType>
-uint8_t ProtocolData<SensorType>::CalculateCheckSum(const uint8_t *input,
-                                                    const uint32_t length) {
+uint8_t ProtocolData<SensorType>::CalculateCheckSum(const uint8_t* input, const uint32_t length) {
   return std::accumulate(input, input + length, 0) ^ 0xFF;
 }
 
@@ -137,11 +128,12 @@ int32_t ProtocolData<SensorType>::GetLength() const {
 }
 
 template <typename SensorType>
-void ProtocolData<SensorType>::Parse(const uint8_t *bytes, int32_t length,
-                                     SensorType *sensor_data) const {}
+void ProtocolData<SensorType>::Parse(const uint8_t* bytes,
+                                     int32_t        length,
+                                     SensorType*    sensor_data) const {}
 
 template <typename SensorType>
-void ProtocolData<SensorType>::UpdateData(uint8_t * /*data*/) {}
+void ProtocolData<SensorType>::UpdateData(uint8_t* /*data*/) {}
 
 template <typename SensorType>
 void ProtocolData<SensorType>::Reset() {}

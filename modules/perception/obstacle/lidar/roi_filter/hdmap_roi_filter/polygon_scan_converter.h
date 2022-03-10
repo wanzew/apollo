@@ -16,13 +16,13 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PSC_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PSC_H_
 
+#include "Eigen/Core"
+#include "Eigen/StdVector"
+#include "gflags/gflags.h"
 #include <algorithm>
 #include <limits>
 #include <utility>
 #include <vector>
-#include "Eigen/Core"
-#include "Eigen/StdVector"
-#include "gflags/gflags.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
@@ -39,14 +39,12 @@ namespace perception {
  */
 class PolygonScanConverter {
  public:
-  typedef Eigen::Matrix<double, 2, 1> Point;
+  typedef Eigen::Matrix<double, 2, 1>                         Point;
   typedef std::vector<Point, Eigen::aligned_allocator<Point>> Polygon;
-  typedef std::pair<double, double> Interval;
-  typedef std::pair<Point, Point> Segment;
+  typedef std::pair<double, double>                           Interval;
+  typedef std::pair<Point, Point>                             Segment;
   struct Edge {
-    bool operator<(const Edge& other) const {
-      return y < other.y;
-    }
+    bool operator<(const Edge& other) const { return y < other.y; }
     bool MoveUp(const double delta_x);
 
     double max_x;
@@ -59,8 +57,10 @@ class PolygonScanConverter {
 
   typedef Bitmap2D::DirectionMajor DirectionMajor;
 
-  void Init(const DirectionMajor major_dir, const Interval& valid_range,
-            const Polygon& polygon, const double step);
+  void Init(const DirectionMajor major_dir,
+            const Interval&      valid_range,
+            const Polygon&       polygon,
+            const double         step);
 
   static inline DirectionMajor OppositeDirection(DirectionMajor dir_major) {
     return static_cast<DirectionMajor>(dir_major ^ 1);
@@ -69,9 +69,9 @@ class PolygonScanConverter {
   void ConvertScans(std::vector<std::vector<Interval>>* scans_intervals);
 
  private:
-  static const double kEpsilon;
-  static const double kInf;
-  Polygon polygon_;
+  static const double  kEpsilon;
+  static const double  kInf;
+  Polygon              polygon_;
   std::vector<Segment> segments_;
 
   std::vector<double> slope_;
@@ -80,9 +80,9 @@ class PolygonScanConverter {
 
   std::vector<Edge> active_edge_table_;
 
-  double min_x_;
-  double step_;
-  size_t scans_size_;
+  double         min_x_;
+  double         step_;
+  size_t         scans_size_;
   DirectionMajor major_dir_;
   DirectionMajor op_major_dir_;
 
@@ -94,13 +94,11 @@ class PolygonScanConverter {
 
   void BuildEdgeTable();
 
-  void UpdateActiveEdgeTable(const size_t x_id,
-                             std::vector<Interval>* scan_intervals);
+  void UpdateActiveEdgeTable(const size_t x_id, std::vector<Interval>* scan_intervals);
 
   void ConvertPolygonToSegments();
 
-  bool ConvertSegmentToEdge(const size_t seg_id,
-                            std::pair<int, Edge>* out_edge);
+  bool ConvertSegmentToEdge(const size_t seg_id, std::pair<int, Edge>* out_edge);
 };
 
 }  // namespace perception

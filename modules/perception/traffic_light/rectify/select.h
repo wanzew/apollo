@@ -33,10 +33,10 @@ class GaussianSelect : public ISelectLight {
  public:
   GaussianSelect() = default;
 
-  virtual void Select(const cv::Mat &ros_image,
-                      const std::vector<LightPtr> &hdmap_bboxes,
-                      const std::vector<LightPtr> &refined_bboxes,
-                      std::vector<LightPtr> *selected_bboxes);
+  virtual void Select(const cv::Mat&               ros_image,
+                      const std::vector<LightPtr>& hdmap_bboxes,
+                      const std::vector<LightPtr>& refined_bboxes,
+                      std::vector<LightPtr>*       selected_bboxes);
 };
 
 }  // namespace traffic_light

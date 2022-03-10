@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/localization/msf/msf_localization.h"
 
-#include "gtest/gtest.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "gtest/gtest.h"
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
@@ -35,7 +35,7 @@ class MSFLocalizationTest : public ::testing::Test {
     AdapterManagerConfig config;
     config.set_is_ros(false);
     {
-      auto *sub_config = config.add_config();
+      auto* sub_config = config.add_config();
       sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
       sub_config->set_type(AdapterConfig::LOCALIZATION);
     }

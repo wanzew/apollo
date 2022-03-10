@@ -19,11 +19,11 @@
 #include <string>
 #include <utility>
 
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/control_conf.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace control {
@@ -39,9 +39,8 @@ class ControlTest : public ::testing::Test {
 TEST_F(ControlTest, Name) { EXPECT_EQ("control", control_.Name()); }
 
 TEST_F(ControlTest, Init) {
-  FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
-  FLAGS_control_adapter_config_filename =
-      "modules/control/testdata/conf/adapter.conf";
+  FLAGS_control_conf_file               = "modules/control/testdata/conf/lincoln.pb.txt";
+  FLAGS_control_adapter_config_filename = "modules/control/testdata/conf/adapter.conf";
   EXPECT_EQ(common::Status::OK(), control_.Init());
 }
 

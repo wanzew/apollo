@@ -55,7 +55,7 @@ class VehicleConfigHelper {
    * @param config A VehicleConfig class instance. The VehicleConfig class is
    * defined by modules/common/configs/proto/vehicle_config.proto.
    */
-  static void Init(const VehicleConfig &config);
+  static void Init(const VehicleConfig& config);
 
   /**
    * @brief Initialize vehicle configurations with \p config_file.
@@ -65,13 +65,13 @@ class VehicleConfigHelper {
    * defined by protobuf file
    * modules/common/configs/proto/vehicle_config.proto.
    */
-  static void Init(const std::string &config_file);
+  static void Init(const std::string& config_file);
 
   /**
    * @brief Get the current vehicle configuration.
    * @return the current VehicleConfig instance reference.
    */
-  static const VehicleConfig &GetConfig();
+  static const VehicleConfig& GetConfig();
 
   /**
    * @brief Get the safe turning radius when the vehicle is turning with
@@ -109,7 +109,7 @@ class VehicleConfigHelper {
 
  private:
   static VehicleConfig vehicle_config_;
-  static bool is_init_;
+  static bool          is_init_;
   DECLARE_SINGLETON(VehicleConfigHelper);
 };
 

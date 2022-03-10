@@ -35,17 +35,14 @@ uint32_t Turncmd63::GetPeriod() const {
   return PERIOD;
 }
 
-void Turncmd63::UpdateData(uint8_t* data) {
-  set_p_turn_signal_cmd(data, turn_signal_cmd_);
-}
+void Turncmd63::UpdateData(uint8_t* data) { set_p_turn_signal_cmd(data, turn_signal_cmd_); }
 
 void Turncmd63::Reset() {
   // TODO(QiL) :you should check this manually
   turn_signal_cmd_ = Turn_cmd_63::TURN_SIGNAL_CMD_NONE;
 }
 
-Turncmd63* Turncmd63::set_turn_signal_cmd(
-    Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd) {
+Turncmd63* Turncmd63::set_turn_signal_cmd(Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd) {
   turn_signal_cmd_ = turn_signal_cmd;
   return this;
 }
@@ -55,8 +52,8 @@ Turncmd63* Turncmd63::set_turn_signal_cmd(
 // 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
 // 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Turncmd63::set_p_turn_signal_cmd(
-    uint8_t* data, Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd) {
+void Turncmd63::set_p_turn_signal_cmd(uint8_t*                         data,
+                                      Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd) {
   int x = turn_signal_cmd;
 
   Byte to_set(data + 0);

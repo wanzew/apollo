@@ -66,7 +66,7 @@ TEST(Vec2dTest, NomralCases) {
 
 TEST(Vec2dTest, rotate) {
   Vec2d pt(4, 0);
-  auto p1 = pt.rotate(M_PI / 2.0);
+  auto  p1 = pt.rotate(M_PI / 2.0);
   EXPECT_NEAR(p1.x(), 0.0, 1e-5);
   EXPECT_NEAR(p1.y(), 4.0, 1e-5);
   auto p2 = pt.rotate(M_PI);

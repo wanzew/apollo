@@ -30,8 +30,9 @@ using ::apollo::drivers::canbus::Byte;
 Steeringmotorrpt173::Steeringmotorrpt173() {}
 const int32_t Steeringmotorrpt173::ID = 0x73;
 
-void Steeringmotorrpt173::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
+void Steeringmotorrpt173::Parse(const std::uint8_t* bytes,
+                                int32_t             length,
+                                ChassisDetail*      chassis) const {
   chassis->mutable_gem()->mutable_steering_motor_rpt_1_73()->set_motor_current(
       motor_current(bytes, length));
   chassis->mutable_gem()->mutable_steering_motor_rpt_1_73()->set_shaft_position(
@@ -41,12 +42,11 @@ void Steeringmotorrpt173::Parse(const std::uint8_t* bytes, int32_t length,
 // config detail: {'name': 'motor_current', 'offset': 0.0, 'precision': 0.001,
 // 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]',
 // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'amps'}
-double Steeringmotorrpt173::motor_current(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 0);
+double Steeringmotorrpt173::motor_current(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -69,12 +69,11 @@ double Steeringmotorrpt173::motor_current(const std::uint8_t* bytes,
 // 'len': 32, 'is_signed_var': True, 'physical_range':
 // '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'amps'}
-double Steeringmotorrpt173::shaft_position(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 4);
+double Steeringmotorrpt173::shaft_position(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

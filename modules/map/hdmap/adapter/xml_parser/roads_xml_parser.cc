@@ -33,7 +33,7 @@ namespace hdmap {
 namespace adapter {
 
 Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
-                             std::vector<RoadInternal>* roads) {
+                             std::vector<RoadInternal>*  roads) {
   CHECK_NOTNULL(roads);
 
   auto road_node = xml_node.FirstChildElement("road");
@@ -41,9 +41,8 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     // road attributes
     std::string id;
     std::string junction_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*road_node, "id", &id);
-    checker += UtilXmlParser::QueryStringAttribute(*road_node, "junction",
-                                                   &junction_id);
+    int         checker = UtilXmlParser::QueryStringAttribute(*road_node, "id", &id);
+    checker += UtilXmlParser::QueryStringAttribute(*road_node, "junction", &junction_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parsing road attributes";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -55,8 +54,7 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
       road_internal.road.mutable_junction_id()->set_id(junction_id);
     }
     // lanes
-    RETURN_IF_ERROR(LanesXmlParser::Parse(*road_node, road_internal.id,
-                                          &road_internal.sections));
+    RETURN_IF_ERROR(LanesXmlParser::Parse(*road_node, road_internal.id, &road_internal.sections));
 
     // objects
     auto sub_node = road_node->FirstChildElement("objects");
@@ -70,16 +68,14 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
       // speed_bumps
       ObjectsXmlParser::ParseSpeedBumps(*sub_node, &road_internal.speed_bumps);
       // parking_spaces
-      ObjectsXmlParser::ParseParkingSpaces(
-                                    *sub_node, &road_internal.parking_spaces);
+      ObjectsXmlParser::ParseParkingSpaces(*sub_node, &road_internal.parking_spaces);
     }
 
     // signals
     sub_node = road_node->FirstChildElement("signals");
     if (sub_node != nullptr) {
       // traffic lights
-      SignalsXmlParser::ParseTrafficLights(*sub_node,
-                                           &road_internal.traffic_lights);
+      SignalsXmlParser::ParseTrafficLights(*sub_node, &road_internal.traffic_lights);
       // stop signs
       SignalsXmlParser::ParseStopSigns(*sub_node, &road_internal.stop_signs);
       // yield signs

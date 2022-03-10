@@ -48,8 +48,7 @@ class BaseMapMatrix {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int CreateBinary(unsigned char* buf,
-                                    unsigned int buf_size) const = 0;
+  virtual unsigned int CreateBinary(unsigned char* buf, unsigned int buf_size) const = 0;
   /**@brief Get the binary size of the object. */
   virtual unsigned int GetBinarySize() const = 0;
   /**@brief get intensity image of node. */

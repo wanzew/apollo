@@ -35,15 +35,15 @@ typedef struct {
 } UTC_Time_T;
 #endif
 typedef struct _PandoraPicHeader_s {
-  char SOP[2];
+  char          SOP[2];
   unsigned char pic_id;
   unsigned char type;
-  unsigned int width;
-  unsigned int height;
-  unsigned timestamp;
-  unsigned len;
-  unsigned int totalLen;
-  unsigned int position;
+  unsigned int  width;
+  unsigned int  height;
+  unsigned      timestamp;
+  unsigned      len;
+  unsigned int  totalLen;
+  unsigned int  position;
 #ifdef UTC_TIME
   UTC_Time_T UTC_Time;
 #endif
@@ -51,20 +51,19 @@ typedef struct _PandoraPicHeader_s {
 
 typedef struct _PandoraPic {
   PandoraPicHeader header;
-  void* yuv;
+  void*            yuv;
 } PandoraPic;
 
 #ifdef UTC_TIME
-#define PANDORA_CLIENT_HEADER_SIZE (34)
+#  define PANDORA_CLIENT_HEADER_SIZE (34)
 #else
-#define PANDORA_CLIENT_HEADER_SIZE (28)
+#  define PANDORA_CLIENT_HEADER_SIZE (28)
 #endif
 
 typedef int (*CallBack)(void* handle, int cmd, void* param, void* userp);
 
-void* PandoraClientNew(const char* ip, int port, CallBack callback,
-                       void* userp);
-void PandoraClientDestroy(void* handle);
+void* PandoraClientNew(const char* ip, int port, CallBack callback, void* userp);
+void  PandoraClientDestroy(void* handle);
 
 #ifdef __cplusplus
 }

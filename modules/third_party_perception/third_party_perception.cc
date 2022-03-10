@@ -50,10 +50,8 @@ Status ThirdPartyPerception::Init() {
 
   CHECK(AdapterManager::GetMobileye()) << "Mobileye is not initialized.";
   AdapterManager::AddMobileyeCallback(&ThirdPartyPerception::OnMobileye, this);
-  CHECK(AdapterManager::GetLocalization())
-      << "Localization is not initialized.";
-  AdapterManager::AddLocalizationCallback(&ThirdPartyPerception::OnLocalization,
-                                          this);
+  CHECK(AdapterManager::GetLocalization()) << "Localization is not initialized.";
+  AdapterManager::AddLocalizationCallback(&ThirdPartyPerception::OnLocalization, this);
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
   AdapterManager::AddChassisCallback(&ThirdPartyPerception::OnChassis, this);
 
@@ -61,21 +59,18 @@ Status ThirdPartyPerception::Init() {
   // level. This is just temperary change.
   if (!FLAGS_use_conti_radar) {
     CHECK(AdapterManager::GetDelphiESR()) << "DelphiESR is not initialized.";
-    AdapterManager::AddDelphiESRCallback(&ThirdPartyPerception::OnDelphiESR,
-                                         this);
+    AdapterManager::AddDelphiESRCallback(&ThirdPartyPerception::OnDelphiESR, this);
   } else {
-    CHECK(AdapterManager::GetContiRadar())
-        << "GetContiRadar is not initialized.";
-    AdapterManager::AddContiRadarCallback(&ThirdPartyPerception::OnContiRadar,
-                                          this);
+    CHECK(AdapterManager::GetContiRadar()) << "GetContiRadar is not initialized.";
+    AdapterManager::AddContiRadarCallback(&ThirdPartyPerception::OnContiRadar, this);
   }
   return Status::OK();
 }
 
 Status ThirdPartyPerception::Start() {
   const double duration = 1.0 / FLAGS_third_party_perception_freq;
-  timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
-                                       &ThirdPartyPerception::OnTimer, this);
+  timer_ =
+      AdapterManager::CreateTimer(ros::Duration(duration), &ThirdPartyPerception::OnTimer, this);
 
   return Status::OK();
 }
@@ -86,8 +81,8 @@ void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   ADEBUG << "Received mobileye data: run mobileye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   if (FLAGS_enable_mobileye) {
-    mobileye_obstacles_ = conversion::MobileyeToPerceptionObstacles(
-        message, localization_, chassis_);
+    mobileye_obstacles_ =
+        conversion::MobileyeToPerceptionObstacles(message, localization_, chassis_);
   }
 }
 
@@ -101,13 +96,11 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
   ADEBUG << "Received delphi esr data: run delphi esr callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
-  current_radar_obstacles_ = conversion::DelphiToRadarObstacles(
-      message, localization_, last_radar_obstacles_);
-  RadarObstacles filtered_radar_obstacles =
-      filter::FilterRadarObstacles(current_radar_obstacles_);
+  current_radar_obstacles_ =
+      conversion::DelphiToRadarObstacles(message, localization_, last_radar_obstacles_);
+  RadarObstacles filtered_radar_obstacles = filter::FilterRadarObstacles(current_radar_obstacles_);
   if (FLAGS_enable_radar) {
-    radar_obstacles_ = conversion::RadarObstaclesToPerceptionObstacles(
-        filtered_radar_obstacles);
+    radar_obstacles_ = conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
   }
 }
 
@@ -115,13 +108,11 @@ void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
   ADEBUG << "Received delphi esr data: run continental radar callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
-  current_radar_obstacles_ = conversion::ContiToRadarObstacles(
-      message, localization_, last_radar_obstacles_, chassis_);
-  RadarObstacles filtered_radar_obstacles =
-      filter::FilterRadarObstacles(current_radar_obstacles_);
+  current_radar_obstacles_ =
+      conversion::ContiToRadarObstacles(message, localization_, last_radar_obstacles_, chassis_);
+  RadarObstacles filtered_radar_obstacles = filter::FilterRadarObstacles(current_radar_obstacles_);
   if (FLAGS_enable_radar) {
-    radar_obstacles_ = conversion::RadarObstaclesToPerceptionObstacles(
-        filtered_radar_obstacles);
+    radar_obstacles_ = conversion::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
   }
 }
 

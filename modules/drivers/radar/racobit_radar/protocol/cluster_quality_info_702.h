@@ -26,13 +26,11 @@ namespace racobit_radar {
 
 using apollo::drivers::RacobitRadar;
 
-class ClusterQualityInfo702
-    : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
+class ClusterQualityInfo702 : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
  public:
   static const uint32_t ID;
   ClusterQualityInfo702();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             RacobitRadar* racobit_radar) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, RacobitRadar* racobit_radar) const override;
 
  private:
   int target_id(const std::uint8_t* bytes, int32_t length) const;

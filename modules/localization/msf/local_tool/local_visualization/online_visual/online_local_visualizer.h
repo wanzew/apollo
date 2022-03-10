@@ -85,20 +85,20 @@ class OnlineLocalVisualizer : public apollo::common::ApolloApp {
 
  private:
   void InitParams();
-  void OnPointCloud(const sensor_msgs::PointCloud2 &message);
-  void OnLidarLocalization(const LocalizationEstimate &message);
-  void OnGNSSLocalization(const LocalizationEstimate &message);
-  void OnFusionLocalization(const LocalizationEstimate &message);
+  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+  void OnLidarLocalization(const LocalizationEstimate& message);
+  void OnGNSSLocalization(const LocalizationEstimate& message);
+  void OnFusionLocalization(const LocalizationEstimate& message);
 
-  void ParsePointCloudMessage(const sensor_msgs::PointCloud2 &message,
-                              std::vector<Eigen::Vector3d> *pt3ds,
-                              std::vector<unsigned char> *intensities);
+  void ParsePointCloudMessage(const sensor_msgs::PointCloud2& message,
+                              std::vector<Eigen::Vector3d>*   pt3ds,
+                              std::vector<unsigned char>*     intensities);
 
  private:
   apollo::common::monitor::MonitorLogger monitor_logger_;
-  std::string lidar_extrinsic_file_;
-  std::string map_folder_;
-  std::string map_visual_folder_;
+  std::string                            lidar_extrinsic_file_;
+  std::string                            map_folder_;
+  std::string                            map_visual_folder_;
 };
 
 }  // namespace msf

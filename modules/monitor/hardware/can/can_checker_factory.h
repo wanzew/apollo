@@ -32,9 +32,8 @@ namespace apollo {
 namespace monitor {
 
 class CanCheckerFactory
-    : public apollo::common::util::Factory<
-          ::apollo::drivers::canbus::CANCardParameter::CANCardBrand,
-          HwCheckerInterface> {
+    : public apollo::common::util::
+          Factory<::apollo::drivers::canbus::CANCardParameter::CANCardBrand, HwCheckerInterface> {
  public:
   /**
    * @brief Register can checkers
@@ -46,8 +45,8 @@ class CanCheckerFactory
    * @param The parameter to create a can checker
    * @return A pointer to the created can checker
    */
-  std::unique_ptr<HwCheckerInterface> CreateCanChecker(
-      const ::apollo::drivers::canbus::CANCardParameter &parameter);
+  std::unique_ptr<HwCheckerInterface>
+  CreateCanChecker(const ::apollo::drivers::canbus::CANCardParameter& parameter);
 
  private:
   DECLARE_SINGLETON(CanCheckerFactory);
@@ -57,4 +56,3 @@ class CanCheckerFactory
 }  // namespace apollo
 
 #endif  // MODULES_MONITOR_HARDWARE_CAN_CAN_CHECKER_FACTORY_H_
-

@@ -19,22 +19,24 @@
 namespace apollo {
 namespace control {
 
-void HysteresisFilter::filter(const double input_value, const double threshold,
+void HysteresisFilter::filter(const double input_value,
+                              const double threshold,
                               const double hysteresis_upper,
-                              const double hysteresis_lower, int *state,
-                              double *output_value) {
+                              const double hysteresis_lower,
+                              int*         state,
+                              double*      output_value) {
   // Use integer to represent mode as of now, for instance,
   // 1 is throttle, 0 is brake, then threshold is speed error
   if (input_value > threshold + hysteresis_upper) {
-    *state = 1;
+    *state          = 1;
     previous_state_ = *state;
-    *output_value = threshold + hysteresis_upper;
+    *output_value   = threshold + hysteresis_upper;
   } else if (input_value < threshold - hysteresis_lower) {
-    *state = 0;
+    *state          = 0;
     previous_state_ = *state;
-    *output_value = threshold - hysteresis_lower;
+    *output_value   = threshold - hysteresis_lower;
   } else {
-    *state = previous_state_;
+    *state        = previous_state_;
     *output_value = input_value;
   }
 }

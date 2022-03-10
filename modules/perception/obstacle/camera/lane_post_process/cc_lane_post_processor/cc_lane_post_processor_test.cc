@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "opencv2/opencv.hpp"
+#include "gtest/gtest.h"
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
@@ -46,12 +46,10 @@ class CCLanePostProcessorTest : public ::testing::Test {
  protected:
   CCLanePostProcessorTest() {}
   ~CCLanePostProcessorTest() {}
-  void SetUp() override {
-    cc_lane_post_processor_.reset(new CCLanePostProcessor());
-  }
+  void SetUp() override { cc_lane_post_processor_.reset(new CCLanePostProcessor()); }
 
  protected:
-  shared_ptr<CCLanePostProcessor> cc_lane_post_processor_;
+  shared_ptr<CCLanePostProcessor>        cc_lane_post_processor_;
   lane_post_process_config::ModelConfigs config_;
 };
 
@@ -65,13 +63,11 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
 
   const string input_test_image_file = FLAGS_test_dir + "test_image.jpg";
   AINFO << "test original image file: " << input_test_image_file;
-  cv::Mat test_image_ori =
-      cv::imread(input_test_image_file, CV_LOAD_IMAGE_COLOR);
+  cv::Mat test_image_ori = cv::imread(input_test_image_file, CV_LOAD_IMAGE_COLOR);
 
   const string input_lane_map_file = FLAGS_test_dir + "lane_map.jpg";
   AINFO << "input lane map file: " << input_lane_map_file;
-  cv::Mat lane_map_ori =
-      cv::imread(input_lane_map_file, CV_LOAD_IMAGE_GRAYSCALE);
+  cv::Mat lane_map_ori = cv::imread(input_lane_map_file, CV_LOAD_IMAGE_GRAYSCALE);
 
   string input_lane_map_file_test = FLAGS_test_dir + "test_lane_map.jpg";
   cv::imwrite(input_lane_map_file_test, lane_map_ori);
@@ -84,10 +80,9 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
   lane_map_conf_thresh = config_.lane_map_confidence_thresh();
   ADEBUG << "lane_map_conf_thresh = " << lane_map_conf_thresh;
 
-  LaneObjectsPtr lane_objects = std::make_shared<LaneObjects>();
+  LaneObjectsPtr               lane_objects = std::make_shared<LaneObjects>();
   CameraLanePostProcessOptions lane_post_process_options;
-  cc_lane_post_processor_->Process(lane_map, lane_post_process_options,
-                                   &lane_objects);
+  cc_lane_post_processor_->Process(lane_map, lane_post_process_options, &lane_objects);
 
   AINFO << "#lane objects = " << lane_objects->size();
 
@@ -108,9 +103,7 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
 
   // draw lane objects
   for (size_t k = 0; k < lane_objects->size(); ++k) {
-    if (lane_objects->at(k).is_compensated) {
-      continue;
-    }
+    if (lane_objects->at(k).is_compensated) { continue; }
 
     cv::Scalar lane_object_color;
     switch (lane_objects->at(k).spatial) {
@@ -139,35 +132,32 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
         break;
       }
       default: {
-        AERROR << "unknown lane spatial label: "
-               << static_cast<int>(lane_objects->at(k).spatial);
+        AERROR << "unknown lane spatial label: " << static_cast<int>(lane_objects->at(k).spatial);
       }
     }
 
     // Besides the fitted polynomial curves we draw lane markers as well
-    for (auto p = lane_objects->at(k).image_pos.begin();
-         p != lane_objects->at(k).image_pos.end(); ++p) {
+    for (auto p = lane_objects->at(k).image_pos.begin(); p != lane_objects->at(k).image_pos.end();
+         ++p) {
       cv::circle(vis_lane_objects_image,
-                 cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())),
-                 4, lane_object_color, -1);
+                 cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())), 4,
+                 lane_object_color, -1);
     }
 
     // draw polynomial curve
-    float img_y_start =
-        static_cast<float>(lane_objects->at(k).img_curve.x_start);
-    float img_y_end = static_cast<float>(lane_objects->at(k).img_curve.x_end);
-    float start = std::min(img_y_start, img_y_end);
-    float end = std::max(img_y_start, img_y_end);
-    float a = lane_objects->at(k).img_curve.a;
-    float b = lane_objects->at(k).img_curve.b;
-    float c = lane_objects->at(k).img_curve.c;
-    float d = lane_objects->at(k).img_curve.d;
+    float img_y_start = static_cast<float>(lane_objects->at(k).img_curve.x_start);
+    float img_y_end   = static_cast<float>(lane_objects->at(k).img_curve.x_end);
+    float start       = std::min(img_y_start, img_y_end);
+    float end         = std::max(img_y_start, img_y_end);
+    float a           = lane_objects->at(k).img_curve.a;
+    float b           = lane_objects->at(k).img_curve.b;
+    float c           = lane_objects->at(k).img_curve.c;
+    float d           = lane_objects->at(k).img_curve.d;
 
     for (float l = start; l <= end; l++) {
       cv::circle(vis_lane_objects_image,
-                 cv::Point(static_cast<int>(GetPolyValue(a, b, c, d, l)),
-                           static_cast<int>(l)),
-                 2, lane_object_color, -1);
+                 cv::Point(static_cast<int>(GetPolyValue(a, b, c, d, l)), static_cast<int>(l)), 2,
+                 lane_object_color, -1);
     }
   }
 

@@ -30,7 +30,8 @@ namespace {
 
 class BlockingEnv : public leveldb::EnvWrapper {
  public:
-  BlockingEnv() : leveldb::EnvWrapper(leveldb::Env::Default()) {}
+  BlockingEnv()
+      : leveldb::EnvWrapper(leveldb::Env::Default()) {}
 
   // Block on trying to lock file.
   leveldb::Status LockFile(const std::string& fname, leveldb::FileLock** lock) {
@@ -46,7 +47,7 @@ class BlockingEnv : public leveldb::EnvWrapper {
 leveldb::Options DBOptions() {
   leveldb::Options options;
   options.create_if_missing = true;
-  options.env = new BlockingEnv();
+  options.env               = new BlockingEnv();
   return options;
 }
 
@@ -59,68 +60,57 @@ std::unique_ptr<leveldb::DB> KVDB::GetDB() {
   }
 
   static const auto options = DBOptions();
-  leveldb::DB *db = nullptr;
-  const auto status = leveldb::DB::Open(options, FLAGS_kv_db_path, &db);
+  leveldb::DB*      db      = nullptr;
+  const auto        status  = leveldb::DB::Open(options, FLAGS_kv_db_path, &db);
   if (!status.ok()) {
-    AERROR << "Unable to open DB path " << FLAGS_kv_db_path << ": "
-           << status.ToString();
+    AERROR << "Unable to open DB path " << FLAGS_kv_db_path << ": " << status.ToString();
     return nullptr;
   }
 
   return std::unique_ptr<leveldb::DB>(db);
 }
 
-bool KVDB::Put(const std::string &key, const std::string &value,
-               const bool sync) {
+bool KVDB::Put(const std::string& key, const std::string& value, const bool sync) {
   auto db = GetDB();
-  if (db == nullptr) {
-    return false;
-  }
+  if (db == nullptr) { return false; }
 
   leveldb::WriteOptions options;
-  options.sync = sync;
+  options.sync      = sync;
   const auto status = db->Put(options, key, value);
   AERROR_IF(!status.ok()) << status.ToString();
   return status.ok();
 }
 
-bool KVDB::Delete(const std::string &key, const bool sync) {
+bool KVDB::Delete(const std::string& key, const bool sync) {
   auto db = GetDB();
-  if (db == nullptr) {
-    return false;
-  }
+  if (db == nullptr) { return false; }
 
   leveldb::WriteOptions options;
-  options.sync = sync;
+  options.sync      = sync;
   const auto status = db->Delete(options, key);
   AERROR_IF(!status.ok()) << status.ToString();
   return status.ok();
 }
 
-bool KVDB::Has(const std::string &key) {
+bool KVDB::Has(const std::string& key) {
   auto db = GetDB();
-  if (db == nullptr) {
-    return false;
-  }
+  if (db == nullptr) { return false; }
 
   static leveldb::ReadOptions options;
-  std::string value;
-  const auto status = db->Get(options, key, &value);
+  std::string                 value;
+  const auto                  status = db->Get(options, key, &value);
   // Log error except IsNotFound.
   AERROR_IF(!status.ok() && !status.IsNotFound()) << status.ToString();
   return status.ok();
 }
 
-std::string KVDB::Get(const std::string &key,
-                      const std::string &default_value) {
+std::string KVDB::Get(const std::string& key, const std::string& default_value) {
   auto db = GetDB();
-  if (db == nullptr) {
-    return default_value;
-  }
+  if (db == nullptr) { return default_value; }
 
   static leveldb::ReadOptions options;
-  std::string value;
-  const auto status = db->Get(options, key, &value);
+  std::string                 value;
+  const auto                  status = db->Get(options, key, &value);
   // Log error except IsNotFound.
   AERROR_IF(!status.ok() && !status.IsNotFound()) << status.ToString();
   return status.ok() ? value : default_value;

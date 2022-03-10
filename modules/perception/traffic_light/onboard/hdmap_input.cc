@@ -28,21 +28,20 @@ using apollo::hdmap::HDMapUtil;
 // HDMapInput
 HDMapInput::HDMapInput() {}
 
-bool HDMapInput::GetSignals(const Eigen::Matrix4d &pointd,
-                            std::vector<apollo::hdmap::Signal> *signals) {
+bool HDMapInput::GetSignals(const Eigen::Matrix4d&              pointd,
+                            std::vector<apollo::hdmap::Signal>* signals) {
   auto hdmap = HDMapUtil::BaseMapPtr();
 
   std::vector<hdmap::SignalInfoConstPtr> forward_signals;
-  apollo::common::PointENU point;
+  apollo::common::PointENU               point;
   point.set_x(pointd(0, 3));
   point.set_y(pointd(1, 3));
   point.set_z(pointd(2, 3));
-  int result = hdmap->GetForwardNearestSignalsOnLane(
-      point, FLAGS_query_signal_range, &forward_signals);
+  int result =
+      hdmap->GetForwardNearestSignalsOnLane(point, FLAGS_query_signal_range, &forward_signals);
 
   if (result != 0) {
-    AERROR << "Failed to call HDMap::get_signal. point: "
-           << point.ShortDebugString();
+    AERROR << "Failed to call HDMap::get_signal. point: " << point.ShortDebugString();
     return false;
   }
 

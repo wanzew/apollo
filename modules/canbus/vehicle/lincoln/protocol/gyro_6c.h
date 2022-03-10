@@ -22,8 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_GYRO_6C_H_
 #define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_GYRO_6C_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -38,8 +38,7 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Gyro6c : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Gyro6c : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -50,8 +49,8 @@ class Gyro6c : public ::apollo::drivers::canbus::ProtocolData<
    * @param timestamp the timestamp of input data
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const;
+  virtual void
+  Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const;
 
   /**
    * @brief calculate the roll rate based on byte array.
@@ -62,7 +61,7 @@ class Gyro6c : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of roll rate
    */
-  double roll_rate(const std::uint8_t *bytes, int32_t length) const;
+  double roll_rate(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief calculate longitudinal_acceleration based on byte array.
@@ -73,7 +72,7 @@ class Gyro6c : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of yaw rate
    */
-  double yaw_rate(const std::uint8_t *bytes, int32_t length) const;
+  double yaw_rate(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

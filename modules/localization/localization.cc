@@ -20,7 +20,7 @@
 #include "modules/common/util/file.h"
 #include "modules/localization/common/localization_gflags.h"
 #ifdef __x86_64__
-#include "modules/localization/msf/msf_localization.h"
+#  include "modules/localization/msf/msf_localization.h"
 #endif
 #include "modules/localization/rtk/rtk_localization.h"
 
@@ -30,43 +30,34 @@ namespace localization {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-std::string Localization::Name() const {
-  return FLAGS_localization_module_name;
-}
+std::string Localization::Name() const { return FLAGS_localization_module_name; }
 
 void Localization::RegisterLocalizationMethods() {
-  localization_factory_.Register(
-      LocalizationConfig::RTK,
-      []() -> LocalizationBase* { return new RTKLocalization(); });
+  localization_factory_.Register(LocalizationConfig::RTK,
+                                 []() -> LocalizationBase* { return new RTKLocalization(); });
 
 #ifdef __x86_64__
-  localization_factory_.Register(
-      LocalizationConfig::MSF,
-      []() -> LocalizationBase* { return new MSFLocalization(); });
+  localization_factory_.Register(LocalizationConfig::MSF,
+                                 []() -> LocalizationBase* { return new MSFLocalization(); });
 #endif
 }
 
 Status Localization::Init() {
   RegisterLocalizationMethods();
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_localization_config_file,
-                                              &config_)) {
-    AERROR << "failed to load localization config file "
-           << FLAGS_localization_config_file;
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_localization_config_file, &config_)) {
+    AERROR << "failed to load localization config file " << FLAGS_localization_config_file;
     return Status(ErrorCode::LOCALIZATION_ERROR,
-                  "failed to load localization config file: " +
-                      FLAGS_localization_config_file);
+                  "failed to load localization config file: " + FLAGS_localization_config_file);
   }
 
   return Status::OK();
 }
 
 Status Localization::Start() {
-  localization_ =
-      localization_factory_.CreateObject(config_.localization_type());
+  localization_ = localization_factory_.CreateObject(config_.localization_type());
   if (!localization_) {
     return Status(ErrorCode::LOCALIZATION_ERROR,
-                  "localization is not initialized with config : " +
-                      config_.DebugString());
+                  "localization is not initialized with config : " + config_.DebugString());
   }
   localization_->Start();
 

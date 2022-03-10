@@ -20,8 +20,8 @@
 #include <netinet/in.h>
 #include <pcap.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <string>
+#include <unistd.h>
 
 namespace apollo {
 namespace drivers {
@@ -30,8 +30,8 @@ namespace hesai {
 #define ETHERNET_MTU (1500)
 
 typedef struct PandarPacket_s {
-  double stamp;
-  uint8_t data[ETHERNET_MTU];
+  double   stamp;
+  uint8_t  data[ETHERNET_MTU];
   uint32_t size;
 } PandarPacket;
 
@@ -40,8 +40,8 @@ class Input {
   Input(uint16_t port, uint16_t gpsPort);
   ~Input();
   Input(std::string filePath, int type);  // not implemented
-  int getPacket(PandarPacket *pkt);
-  int getPacketFromPcap(PandarPacket *pkt);  // not implemented
+  int getPacket(PandarPacket* pkt);
+  int getPacketFromPcap(PandarPacket* pkt);  // not implemented
 
  private:
   int socketForLidar;

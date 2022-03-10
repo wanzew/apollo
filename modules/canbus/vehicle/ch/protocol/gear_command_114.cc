@@ -34,17 +34,14 @@ uint32_t Gearcommand114::GetPeriod() const {
   return PERIOD;
 }
 
-void Gearcommand114::UpdateData(uint8_t* data) {
-  set_p_gear_cmd(data, gear_cmd_);
-}
+void Gearcommand114::UpdateData(uint8_t* data) { set_p_gear_cmd(data, gear_cmd_); }
 
 void Gearcommand114::Reset() {
   // you should check this manually
   gear_cmd_ = Gear_command_114::GEAR_CMD_NEUTRAL;
 }
 
-Gearcommand114* Gearcommand114::set_gear_cmd(
-    Gear_command_114::Gear_cmdType gear_cmd) {
+Gearcommand114* Gearcommand114::set_gear_cmd(Gear_command_114::Gear_cmdType gear_cmd) {
   gear_cmd_ = gear_cmd;
   return this;
 }
@@ -54,8 +51,7 @@ Gearcommand114* Gearcommand114::set_gear_cmd(
 // 'GEAR_CMD_DRIVE'}, 'precision': 1.0, 'len': 8, 'name': 'GEAR_CMD',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[1|4]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-void Gearcommand114::set_p_gear_cmd(uint8_t* data,
-                                    Gear_command_114::Gear_cmdType gear_cmd) {
+void Gearcommand114::set_p_gear_cmd(uint8_t* data, Gear_command_114::Gear_cmdType gear_cmd) {
   int x = gear_cmd;
 
   Byte to_set(data + 0);

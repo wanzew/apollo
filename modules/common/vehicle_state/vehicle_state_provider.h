@@ -54,15 +54,14 @@ class VehicleStateProvider {
    * @param chassis Chassis information of the vehicle.
    */
   Status Update(const localization::LocalizationEstimate& localization,
-                const canbus::Chassis& chassis);
+                const canbus::Chassis&                    chassis);
 
   /**
    * @brief Update VehicleStateProvider instance by protobuf files.
    * @param localization_file the localization protobuf file.
    * @param chassis_file The chassis protobuf file
    */
-  void Update(const std::string& localization_file,
-              const std::string& chassis_file);
+  void Update(const std::string& localization_file, const std::string& chassis_file);
 
   double timestamp() const;
 
@@ -173,10 +172,9 @@ class VehicleStateProvider {
   const VehicleState& vehicle_state() const;
 
  private:
-  bool ConstructExceptLinearVelocity(
-      const localization::LocalizationEstimate& localization);
+  bool ConstructExceptLinearVelocity(const localization::LocalizationEstimate& localization);
 
-  common::VehicleState vehicle_state_;
+  common::VehicleState               vehicle_state_;
   localization::LocalizationEstimate original_localization_;
 
   DECLARE_SINGLETON(VehicleStateProvider);

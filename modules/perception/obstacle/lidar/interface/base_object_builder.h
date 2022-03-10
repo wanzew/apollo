@@ -78,7 +78,7 @@ class BaseObjectBuilder {
   // @brief: calc object feature, and fill fields.
   // @param [in]: options.
   // @param [in/out]: object list.
-  virtual bool Build(const ObjectBuilderOptions& options,
+  virtual bool Build(const ObjectBuilderOptions&           options,
                      std::vector<std::shared_ptr<Object>>* objects) = 0;
 
   virtual std::string name() const = 0;
@@ -86,11 +86,10 @@ class BaseObjectBuilder {
  protected:
   virtual void SetDefaultValue(pcl_util::PointCloudPtr cloud,
                                std::shared_ptr<Object> obj,
-                               Eigen::Vector4f* min_pt,
-                               Eigen::Vector4f* max_pt) {
+                               Eigen::Vector4f*        min_pt,
+                               Eigen::Vector4f*        max_pt) {
     GetCloudMinMax3D<pcl_util::Point>(cloud, min_pt, max_pt);
-    Eigen::Vector3f center(((*min_pt)[0] + (*max_pt)[0]) / 2,
-                           ((*min_pt)[1] + (*max_pt)[1]) / 2,
+    Eigen::Vector3f center(((*min_pt)[0] + (*max_pt)[0]) / 2, ((*min_pt)[1] + (*max_pt)[1]) / 2,
                            ((*min_pt)[2] + (*max_pt)[2]) / 2);
 
     // handle degeneration case
@@ -107,9 +106,9 @@ class BaseObjectBuilder {
     // width
     obj->width = (*max_pt)[1] - (*min_pt)[1];
     if (obj->length - obj->width < 0) {
-      float tmp = obj->length;
-      obj->length = obj->width;
-      obj->width = tmp;
+      float tmp      = obj->length;
+      obj->length    = obj->width;
+      obj->width     = tmp;
       obj->direction = Eigen::Vector3d(0.0, 1.0, 0.0);
     } else {
       obj->direction = Eigen::Vector3d(1.0, 0.0, 0.0);
@@ -117,9 +116,9 @@ class BaseObjectBuilder {
     // height
     obj->height = (*max_pt)[2] - (*min_pt)[2];
     // center
-    obj->center = Eigen::Vector3d(((*max_pt)[0] + (*min_pt)[0]) / 2,
-                                  ((*max_pt)[1] + (*min_pt)[1]) / 2,
-                                  ((*max_pt)[2] + (*min_pt)[2]) / 2);
+    obj->center =
+        Eigen::Vector3d(((*max_pt)[0] + (*min_pt)[0]) / 2, ((*max_pt)[1] + (*min_pt)[1]) / 2,
+                        ((*max_pt)[2] + (*min_pt)[2]) / 2);
     // polygon
     if (cloud->size() < 4) {
       obj->polygon.points.resize(4);

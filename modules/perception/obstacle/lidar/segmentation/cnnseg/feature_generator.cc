@@ -30,18 +30,13 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
   out_blob_ = out_blob;
 
   // raw feature parameters
-  range_ = feature_param.has_point_cloud_range()
-               ? static_cast<int>(feature_param.point_cloud_range())
-               : 60;
-  width_ =
-      feature_param.has_width() ? static_cast<int>(feature_param.width()) : 640;
-  height_ = feature_param.has_height()
-                ? static_cast<int>(feature_param.height())
-                : 640;
-  min_height_ =
-      feature_param.has_min_height() ? feature_param.min_height() : -5.0;
-  max_height_ =
-      feature_param.has_max_height() ? feature_param.max_height() : 5.0;
+  range_ = feature_param.has_point_cloud_range() ?
+               static_cast<int>(feature_param.point_cloud_range()) :
+               60;
+  width_      = feature_param.has_width() ? static_cast<int>(feature_param.width()) : 640;
+  height_     = feature_param.has_height() ? static_cast<int>(feature_param.height()) : 640;
+  min_height_ = feature_param.has_min_height() ? feature_param.min_height() : -5.0;
+  max_height_ = feature_param.has_max_height() ? feature_param.max_height() : 5.0;
   CHECK_EQ(width_, height_)
       << "Current implementation version requires input_width == input_height.";
 
@@ -54,21 +49,21 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
   }
 
   Dtype* out_blob_data = nullptr;
-  out_blob_data = out_blob_->mutable_cpu_data();
+  out_blob_data        = out_blob_->mutable_cpu_data();
 
-  int channel_index = 0;
-  max_height_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
-  mean_height_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
-  count_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
-  direction_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
-  top_intensity_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
+  int channel_index    = 0;
+  max_height_data_     = out_blob_data + out_blob_->offset(0, channel_index++);
+  mean_height_data_    = out_blob_data + out_blob_->offset(0, channel_index++);
+  count_data_          = out_blob_data + out_blob_->offset(0, channel_index++);
+  direction_data_      = out_blob_data + out_blob_->offset(0, channel_index++);
+  top_intensity_data_  = out_blob_data + out_blob_->offset(0, channel_index++);
   mean_intensity_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
-  distance_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
-  nonempty_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
+  distance_data_       = out_blob_data + out_blob_->offset(0, channel_index++);
+  nonempty_data_       = out_blob_data + out_blob_->offset(0, channel_index++);
   CHECK_EQ(out_blob_->offset(0, channel_index), out_blob_->count());
 
   // compute direction and distance features
-  int siz = height_ * width_;
+  int           siz = height_ * width_;
   vector<Dtype> direction_data(siz);
   vector<Dtype> distance_data(siz);
 
@@ -76,13 +71,11 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
     for (int col = 0; col < width_; ++col) {
       int idx = row * width_ + col;
       // * row <-> x, column <-> y
-      float center_x = Pixel2Pc(row, height_, range_);
-      float center_y = Pixel2Pc(col, width_, range_);
-      constexpr double K_CV_PI = 3.1415926535897932384626433832795;
-      direction_data[idx] =
-          static_cast<Dtype>(std::atan2(center_y, center_x) / (2.0 * K_CV_PI));
-      distance_data[idx] =
-          static_cast<Dtype>(std::hypot(center_x, center_y) / 60.0 - 0.5);
+      float            center_x = Pixel2Pc(row, height_, range_);
+      float            center_y = Pixel2Pc(col, width_, range_);
+      constexpr double K_CV_PI  = 3.1415926535897932384626433832795;
+      direction_data[idx] = static_cast<Dtype>(std::atan2(center_y, center_x) / (2.0 * K_CV_PI));
+      distance_data[idx]  = static_cast<Dtype>(std::hypot(center_x, center_y) / 60.0 - 0.5);
     }
   }
   caffe::caffe_copy(siz, direction_data.data(), direction_data_);
@@ -92,8 +85,7 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 }
 
 template <typename Dtype>
-void FeatureGenerator<Dtype>::Generate(
-    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr) {
+void FeatureGenerator<Dtype>::Generate(apollo::perception::pcl_util::PointCloudConstPtr pc_ptr) {
   const auto& points = pc_ptr->points;
 
   // DO NOT remove this line!!!
@@ -110,10 +102,8 @@ void FeatureGenerator<Dtype>::Generate(
   caffe::caffe_set(siz, Dtype(0), nonempty_data_);
 
   map_idx_.resize(points.size());
-  float inv_res_x =
-      0.5 * static_cast<float>(width_) / static_cast<float>(range_);
-  float inv_res_y =
-      0.5 * static_cast<float>(height_) / static_cast<float>(range_);
+  float inv_res_x = 0.5 * static_cast<float>(width_) / static_cast<float>(range_);
+  float inv_res_y = 0.5 * static_cast<float>(height_) / static_cast<float>(range_);
 
   for (size_t i = 0; i < points.size(); ++i) {
     if (points[i].z <= min_height_ || points[i].z >= max_height_) {
@@ -130,11 +120,11 @@ void FeatureGenerator<Dtype>::Generate(
     }
     map_idx_[i] = pos_y * width_ + pos_x;
 
-    int idx = map_idx_[i];
-    float pz = points[i].z;
-    float pi = points[i].intensity / 255.0;
+    int   idx = map_idx_[i];
+    float pz  = points[i].z;
+    float pi  = points[i].intensity / 255.0;
     if (max_height_data_[idx] < pz) {
-      max_height_data_[idx] = pz;
+      max_height_data_[idx]    = pz;
       top_intensity_data_[idx] = pi;
     }
     mean_height_data_[idx] += static_cast<Dtype>(pz);
@@ -158,14 +148,14 @@ void FeatureGenerator<Dtype>::Generate(
 template bool FeatureGenerator<float>::Init(const FeatureParam& feature_param,
                                             caffe::Blob<float>* blob);
 
-template void FeatureGenerator<float>::Generate(
-    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr);
+template void
+FeatureGenerator<float>::Generate(apollo::perception::pcl_util::PointCloudConstPtr pc_ptr);
 
-template bool FeatureGenerator<double>::Init(const FeatureParam& feature_param,
+template bool FeatureGenerator<double>::Init(const FeatureParam&  feature_param,
                                              caffe::Blob<double>* blob);
 
-template void FeatureGenerator<double>::Generate(
-    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr);
+template void
+FeatureGenerator<double>::Generate(apollo::perception::pcl_util::PointCloudConstPtr pc_ptr);
 
 }  // namespace cnnseg
 }  // namespace perception

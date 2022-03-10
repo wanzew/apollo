@@ -38,27 +38,25 @@ namespace perception {
 extern std::vector<cv::Scalar> color_table;
 
 // Color definition for CV
-const cv::Scalar COLOR_WHITE = cv::Scalar(255, 255, 255);
-const cv::Scalar COLOR_GREEN = cv::Scalar(0, 255, 0);
-const cv::Scalar COLOR_BLUE = cv::Scalar(255, 0, 0);
+const cv::Scalar COLOR_WHITE  = cv::Scalar(255, 255, 255);
+const cv::Scalar COLOR_GREEN  = cv::Scalar(0, 255, 0);
+const cv::Scalar COLOR_BLUE   = cv::Scalar(255, 0, 0);
 const cv::Scalar COLOR_YELLOW = cv::Scalar(0, 255, 255);
-const cv::Scalar COLOR_RED = cv::Scalar(0, 0, 255);
-const cv::Scalar COLOR_BLACK = cv::Scalar(0, 0, 0);
+const cv::Scalar COLOR_RED    = cv::Scalar(0, 0, 255);
+const cv::Scalar COLOR_BLACK  = cv::Scalar(0, 0, 0);
 
-bool LoadVisualObjectFromFile(
-    const std::string &file_name,
-    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
+bool LoadVisualObjectFromFile(const std::string&                          file_name,
+                              std::vector<std::shared_ptr<VisualObject>>* visual_objects);
 
-bool WriteVisualObjectToFile(
-    const std::string &file_name,
-    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
+bool WriteVisualObjectToFile(const std::string&                          file_name,
+                             std::vector<std::shared_ptr<VisualObject>>* visual_objects);
 
-bool LoadGTfromFile(const std::string &gt_path,
-                    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
+bool LoadGTfromFile(const std::string&                          gt_path,
+                    std::vector<std::shared_ptr<VisualObject>>* visual_objects);
 
 std::string GetTypeText(ObjectType type);
 
-ObjectType GetObjectType(const std::string &type_text);
+ObjectType GetObjectType(const std::string& type_text);
 
 }  // namespace perception
 }  // namespace apollo

@@ -60,8 +60,7 @@ class SenderMessage {
    * @param protocol_data A pointer of ProtocolData
    *        which contains the content to send.
    */
-  SenderMessage(const uint32_t message_id,
-                ProtocolData<SensorType> *protocol_data);
+  SenderMessage(const uint32_t message_id, ProtocolData<SensorType>* protocol_data);
 
   /**
    * @brief Constructor which takes message ID and protocol data and
@@ -72,8 +71,9 @@ class SenderMessage {
    * @param init_with_one If it is true, then initialize all bits in
    *        the protocal data as one.
    */
-  SenderMessage(const uint32_t message_id,
-                ProtocolData<SensorType> *protocol_data, bool init_with_one);
+  SenderMessage(const uint32_t            message_id,
+                ProtocolData<SensorType>* protocol_data,
+                bool                      init_with_one);
 
   /**
    * @brief Destructor.
@@ -112,16 +112,16 @@ class SenderMessage {
   int32_t curr_period() const;
 
  private:
-  uint32_t message_id_ = 0;
-  ProtocolData<SensorType> *protocol_data_ = nullptr;
+  uint32_t                  message_id_    = 0;
+  ProtocolData<SensorType>* protocol_data_ = nullptr;
 
-  int32_t period_ = 0;
+  int32_t period_      = 0;
   int32_t curr_period_ = 0;
 
  private:
   static std::mutex mutex_;
-  struct CanFrame can_frame_to_send_;
-  struct CanFrame can_frame_to_update_;
+  struct CanFrame   can_frame_to_send_;
+  struct CanFrame   can_frame_to_update_;
 };
 
 /**
@@ -147,7 +147,7 @@ class CanSender {
    * @param enable_log whether enable record the send can frame log
    * @return An error code indicating the status of this initialization.
    */
-  common::ErrorCode Init(CanClient *can_client, bool enable_log);
+  common::ErrorCode Init(CanClient* can_client, bool enable_log);
 
   /**
    * @brief Add a message with its ID, protocol data.
@@ -157,8 +157,8 @@ class CanSender {
    * @param init_with_one If it is true, then initialize all bits in
    *        the protocal data as one. By default, it is false.
    */
-  void AddMessage(uint32_t message_id, ProtocolData<SensorType> *protocol_data,
-                  bool init_one = false);
+  void
+  AddMessage(uint32_t message_id, ProtocolData<SensorType>* protocol_data, bool init_one = false);
 
   /**
    * @brief Start the CAN sender.
@@ -189,15 +189,14 @@ class CanSender {
  private:
   void PowerSendThreadFunc();
 
-  bool NeedSend(const SenderMessage<SensorType> &msg,
-                const int32_t delta_period);
-  bool is_init_ = false;
+  bool NeedSend(const SenderMessage<SensorType>& msg, const int32_t delta_period);
+  bool is_init_    = false;
   bool is_running_ = false;
 
-  CanClient *can_client_ = nullptr;  // Owned by global canbus.cc
+  CanClient*                             can_client_ = nullptr;  // Owned by global canbus.cc
   std::vector<SenderMessage<SensorType>> send_messages_;
-  std::unique_ptr<std::thread> thread_;
-  bool enable_log_ = false;
+  std::unique_ptr<std::thread>           thread_;
+  bool                                   enable_log_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(CanSender);
 };
@@ -208,15 +207,16 @@ template <typename SensorType>
 std::mutex SenderMessage<SensorType>::mutex_;
 
 template <typename SensorType>
-SenderMessage<SensorType>::SenderMessage(
-    const uint32_t message_id, ProtocolData<SensorType> *protocol_data)
+SenderMessage<SensorType>::SenderMessage(const uint32_t            message_id,
+                                         ProtocolData<SensorType>* protocol_data)
     : SenderMessage(message_id, protocol_data, false) {}
 
 template <typename SensorType>
-SenderMessage<SensorType>::SenderMessage(
-    const uint32_t message_id, ProtocolData<SensorType> *protocol_data,
-    bool init_with_one)
-    : message_id_(message_id), protocol_data_(protocol_data) {
+SenderMessage<SensorType>::SenderMessage(const uint32_t            message_id,
+                                         ProtocolData<SensorType>* protocol_data,
+                                         bool                      init_with_one)
+    : message_id_(message_id)
+    , protocol_data_(protocol_data) {
   if (init_with_one) {
     for (int32_t i = 0; i < protocol_data->GetLength(); ++i) {
       can_frame_to_update_.data[i] = 0xFF;
@@ -224,10 +224,10 @@ SenderMessage<SensorType>::SenderMessage(
   }
   int32_t len = protocol_data_->GetLength();
 
-  can_frame_to_update_.id = message_id_;
+  can_frame_to_update_.id  = message_id_;
   can_frame_to_update_.len = len;
 
-  period_ = protocol_data_->GetPeriod();
+  period_      = protocol_data_->GetPeriod();
   curr_period_ = period_;
 
   Update();
@@ -236,9 +236,7 @@ SenderMessage<SensorType>::SenderMessage(
 template <typename SensorType>
 void SenderMessage<SensorType>::UpdateCurrPeriod(const int32_t period_delta) {
   curr_period_ -= period_delta;
-  if (curr_period_ <= 0) {
-    curr_period_ = period_;
-  }
+  if (curr_period_ <= 0) { curr_period_ = period_; }
 }
 
 template <typename SensorType>
@@ -276,42 +274,36 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
   sch.sched_priority = 99;
   pthread_setschedparam(pthread_self(), SCHED_FIFO, &sch);
 
-  const int32_t INIT_PERIOD = 5000;  // 5ms
-  int32_t delta_period = INIT_PERIOD;
-  int32_t new_delta_period = INIT_PERIOD;
+  const int32_t INIT_PERIOD      = 5000;  // 5ms
+  int32_t       delta_period     = INIT_PERIOD;
+  int32_t       new_delta_period = INIT_PERIOD;
 
-  int64_t tm_start = 0;
-  int64_t tm_end = 0;
+  int64_t tm_start       = 0;
+  int64_t tm_end         = 0;
   int64_t sleep_interval = 0;
 
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
-    tm_start = common::time::AsInt64<common::time::micros>(
-        common::time::Clock::Now());
+    tm_start         = common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
     new_delta_period = INIT_PERIOD;
 
-    for (auto &message : send_messages_) {
+    for (auto& message : send_messages_) {
       bool need_send = NeedSend(message, delta_period);
       message.UpdateCurrPeriod(delta_period);
       new_delta_period = std::min(new_delta_period, message.curr_period());
 
-      if (!need_send) {
-        continue;
-      }
+      if (!need_send) { continue; }
       std::vector<CanFrame> can_frames;
-      CanFrame can_frame = message.CanFrame();
+      CanFrame              can_frame = message.CanFrame();
       can_frames.push_back(can_frame);
       if (can_client_->SendSingleFrame(can_frames) != common::ErrorCode::OK) {
         AERROR << "Send msg failed:" << can_frame.CanFrameString();
       }
-      if (enable_log()) {
-        ADEBUG << "send_can_frame#" << can_frame.CanFrameString();
-      }
+      if (enable_log()) { ADEBUG << "send_can_frame#" << can_frame.CanFrameString(); }
     }
-    delta_period = new_delta_period;
-    tm_end = common::time::AsInt64<common::time::micros>(
-        common::time::Clock::Now());
+    delta_period   = new_delta_period;
+    tm_end         = common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
     sleep_interval = delta_period - (tm_end - tm_start);
 
     if (sleep_interval > 0) {
@@ -326,8 +318,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
 }
 
 template <typename SensorType>
-common::ErrorCode CanSender<SensorType>::Init(CanClient *can_client,
-                                              bool enable_log) {
+common::ErrorCode CanSender<SensorType>::Init(CanClient* can_client, bool enable_log) {
   if (is_init_) {
     AERROR << "Duplicated Init request.";
     return common::ErrorCode::CANBUS_ERROR;
@@ -336,22 +327,21 @@ common::ErrorCode CanSender<SensorType>::Init(CanClient *can_client,
     AERROR << "Invalid can client.";
     return common::ErrorCode::CANBUS_ERROR;
   }
-  is_init_ = true;
+  is_init_    = true;
   can_client_ = can_client;
   enable_log_ = enable_log;
   return common::ErrorCode::OK;
 }
 
 template <typename SensorType>
-void CanSender<SensorType>::AddMessage(uint32_t message_id,
-                                       ProtocolData<SensorType> *protocol_data,
-                                       bool init_with_one) {
+void CanSender<SensorType>::AddMessage(uint32_t                  message_id,
+                                       ProtocolData<SensorType>* protocol_data,
+                                       bool                      init_with_one) {
   if (protocol_data == nullptr) {
     AERROR << "invalid protocol data.";
     return;
   }
-  send_messages_.emplace_back(
-      SenderMessage<SensorType>(message_id, protocol_data, init_with_one));
+  send_messages_.emplace_back(SenderMessage<SensorType>(message_id, protocol_data, init_with_one));
   AINFO << "Add send message:" << std::hex << message_id;
 }
 
@@ -369,7 +359,7 @@ common::ErrorCode CanSender<SensorType>::Start() {
 
 template <typename SensorType>
 void CanSender<SensorType>::Update() {
-  for (auto &message : send_messages_) {
+  for (auto& message : send_messages_) {
     message.Update();
   }
 }
@@ -379,9 +369,7 @@ void CanSender<SensorType>::Stop() {
   if (is_running_) {
     AINFO << "Stopping can sender ...";
     is_running_ = false;
-    if (thread_ != nullptr && thread_->joinable()) {
-      thread_->join();
-    }
+    if (thread_ != nullptr && thread_->joinable()) { thread_->join(); }
     thread_.reset();
   } else {
     AERROR << "CanSender is not running.";
@@ -401,8 +389,8 @@ bool CanSender<SensorType>::enable_log() const {
 }
 
 template <typename SensorType>
-bool CanSender<SensorType>::NeedSend(const SenderMessage<SensorType> &msg,
-                                     const int32_t delta_period) {
+bool CanSender<SensorType>::NeedSend(const SenderMessage<SensorType>& msg,
+                                     const int32_t                    delta_period) {
   return msg.curr_period() <= delta_period;
 }
 

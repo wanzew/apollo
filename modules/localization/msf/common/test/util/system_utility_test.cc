@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/common/util/system_utility.h"
-#include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
+#include <gtest/gtest.h>
 
 namespace apollo {
 namespace localization {
@@ -32,44 +32,37 @@ class SystemUtilityTestSuite : public ::testing::Test {
 
 /**@brief Rect2DTest. */
 TEST_F(SystemUtilityTestSuite, SystemTest) {
-  bool flag = system::IsExists(
-      "modules/localization/msf/common/test/test_data/test_folder/file1.txt");
+  bool flag =
+      system::IsExists("modules/localization/msf/common/test/test_data/test_folder/file1.txt");
   ASSERT_TRUE(flag);
-  flag = system::IsExists(
-      "modules/localization/msf/common/test/test_data/file4.txt");
+  flag = system::IsExists("modules/localization/msf/common/test/test_data/file4.txt");
   ASSERT_FALSE(flag);
   flag = system::IsDirectory("modules/localization/msf/common/test/test_data");
   ASSERT_TRUE(flag);
   flag = system::IsDirectory("modules/localization/msf/common/test/test");
   ASSERT_FALSE(flag);
-  flag = system::CreateDirectory(
-      "modules/localization/msf/common/test/test_data/tem");
+  flag = system::CreateDirectory("modules/localization/msf/common/test/test_data/tem");
   ASSERT_TRUE(flag);
   unsigned int size;
-  flag = system::GetFileSize(
-      "modules/localization/msf/common/test/test_data/test_folder/file1.txt",
-      &size);
+  flag = system::GetFileSize("modules/localization/msf/common/test/test_data/test_folder/file1.txt",
+                             &size);
   ASSERT_TRUE(flag);
   ASSERT_EQ(size, 1);
-  flag = system::CopyFile(
-      "modules/localization/msf/common/test/test_data/test_folder/file1.txt",
-      "modules/localization/msf/common/test/test_data/tem/file1.txt");
+  flag = system::CopyFile("modules/localization/msf/common/test/test_data/test_folder/file1.txt",
+                          "modules/localization/msf/common/test/test_data/tem/file1.txt");
   ASSERT_TRUE(flag);
   std::vector<std::string> ret1;
-  system::GetFilesInFolderRecursive(
-      "modules/localization/msf/common/test/test_data", ".txt", &ret1);
+  system::GetFilesInFolderRecursive("modules/localization/msf/common/test/test_data", ".txt",
+                                    &ret1);
   ASSERT_EQ(ret1.size(), 4);
   std::vector<std::string> ret2;
-  system::GetFilesInFolder(
-      "modules/localization/msf/common/test/test_data/test_folder", ".txt",
-      &ret2);
+  system::GetFilesInFolder("modules/localization/msf/common/test/test_data/test_folder", ".txt",
+                           &ret2);
   ASSERT_EQ(ret2.size(), 3);
   std::vector<std::string> ret3;
-  system::GetFoldersInFolder("modules/localization/msf/common/test/test_data/",
-                             &ret3);
+  system::GetFoldersInFolder("modules/localization/msf/common/test/test_data/", &ret3);
   ASSERT_EQ(ret3.size(), 2);
-  boost::filesystem::remove_all(
-      "modules/localization/msf/common/test/test_data/tem");
+  boost::filesystem::remove_all("modules/localization/msf/common/test/test_data/tem");
 }
 
 }  // namespace msf

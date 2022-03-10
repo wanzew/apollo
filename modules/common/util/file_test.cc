@@ -17,9 +17,9 @@
 #include "modules/common/util/file.h"
 
 #include "boost/filesystem.hpp"
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/common/util/testdata/simple.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {
@@ -33,9 +33,7 @@ class FileTest : public ::testing::Test {
     boost::filesystem::create_directory(temp_dir);
   }
 
-  std::string FilePath(const std::string &file_name) {
-    return temp_dir + "/" + file_name;
-  }
+  std::string FilePath(const std::string& file_name) { return temp_dir + "/" + file_name; }
 
   std::string temp_dir;
 };
@@ -105,13 +103,10 @@ TEST_F(FileTest, ListSubPaths) {
   const auto root_subdirs = ListSubPaths("/");
 
   // Some common root subdirs should exist.
-  EXPECT_NE(root_subdirs.end(),
-            std::find(root_subdirs.begin(), root_subdirs.end(), "home"));
-  EXPECT_NE(root_subdirs.end(),
-            std::find(root_subdirs.begin(), root_subdirs.end(), "root"));
+  EXPECT_NE(root_subdirs.end(), std::find(root_subdirs.begin(), root_subdirs.end(), "home"));
+  EXPECT_NE(root_subdirs.end(), std::find(root_subdirs.begin(), root_subdirs.end(), "root"));
   // Something shouldn't exist.
-  EXPECT_EQ(root_subdirs.end(),
-            std::find(root_subdirs.begin(), root_subdirs.end(), "impossible"));
+  EXPECT_EQ(root_subdirs.end(), std::find(root_subdirs.begin(), root_subdirs.end(), "impossible"));
 }
 
 TEST_F(FileTest, GetAbsolutePath) {
@@ -124,7 +119,7 @@ TEST_F(FileTest, GetAbsolutePath) {
 }
 
 TEST_F(FileTest, GetFileNamesInFolderById) {
-  std::string data_path = "modules/perception/data/hm_tracker_test/";
+  std::string              data_path = "modules/perception/data/hm_tracker_test/";
   std::vector<std::string> seg_filenames;
   GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
   std::vector<std::string> pose_filenames;

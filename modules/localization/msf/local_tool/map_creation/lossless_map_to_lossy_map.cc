@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_matrix.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_pool.h"
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
@@ -31,31 +31,29 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-typedef LossyMap2D LossyMap;
-typedef LossyMapNode2D LossyMapNode;
+typedef LossyMap2D         LossyMap;
+typedef LossyMapNode2D     LossyMapNode;
 typedef LossyMapNodePool2D LossyMapNodePool;
-typedef LossyMapMatrix2D LossyMapMatrix;
-typedef LossyMapConfig2D LossyMapConfig;
+typedef LossyMapMatrix2D   LossyMapMatrix;
+typedef LossyMapConfig2D   LossyMapConfig;
 
 MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
   MapNodeIndex index;
-  char buf[100];
-  sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_,
-         buf, &index.zone_id_, &index.m_, &index.n_);
+  char         buf[100];
+  sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_, buf,
+         &index.zone_id_, &index.m_, &index.n_);
   std::string zone = buf;
   // std::cout << zone << std::endl;
-  if (zone == "south") {
-    index.zone_id_ = -index.zone_id_;
-  }
+  if (zone == "south") { index.zone_id_ = -index.zone_id_; }
   std::cout << index << std::endl;
   return index;
 }
 
-bool GetAllMapIndex(const std::string& src_map_folder,
-                    const std::string& dst_map_folder,
+bool GetAllMapIndex(const std::string&       src_map_folder,
+                    const std::string&       dst_map_folder,
                     std::list<MapNodeIndex>* buf) {
-  std::string src_map_path = src_map_folder + "/map";
-  std::string dst_map_path = dst_map_folder + "/map";
+  std::string             src_map_path = src_map_folder + "/map";
+  std::string             dst_map_path = dst_map_folder + "/map";
   boost::filesystem::path src_map_path_boost(src_map_path);
   boost::filesystem::path dst_map_path_boost(dst_map_path);
 
@@ -73,17 +71,15 @@ bool GetAllMapIndex(const std::string& src_map_folder,
       if (iter->path().extension() == "") {
         // map_bin_path.push_back(iter->path().string());
         std::string tmp = iter->path().string();
-        tmp = tmp.substr(src_map_path.length(), tmp.length());
+        tmp             = tmp.substr(src_map_path.length(), tmp.length());
         buf->push_back(GetMapIndexFromMapFolder(tmp));
       }
     } else {
       std::string tmp = iter->path().string();
-      tmp = tmp.substr(src_map_path.length(), tmp.length());
-      tmp = dst_map_path + tmp;
+      tmp             = tmp.substr(src_map_path.length(), tmp.length());
+      tmp             = dst_map_path + tmp;
       boost::filesystem::path p(tmp);
-      if (!boost::filesystem::exists(p)) {
-        boost::filesystem::create_directory(p);
-      }
+      if (!boost::filesystem::exists(p)) { boost::filesystem::create_directory(p); }
     }
   }
 
@@ -110,27 +106,24 @@ int main(int argc, char** argv) {
   boost::program_options::options_description boost_desc("Allowed options");
   boost_desc.add_options()("help", "produce help message")(
       "srcdir", boost::program_options::value<std::string>(),
-      "provide the data base dir")("dstdir",
-                                   boost::program_options::value<std::string>(),
+      "provide the data base dir")("dstdir", boost::program_options::value<std::string>(),
                                    "provide the lossy map destination dir");
 
   boost::program_options::variables_map boost_args;
-  boost::program_options::store(
-      boost::program_options::parse_command_line(argc, argv, boost_desc),
-      boost_args);
+  boost::program_options::store(boost::program_options::parse_command_line(argc, argv, boost_desc),
+                                boost_args);
   boost::program_options::notify(boost_args);
 
-  if (boost_args.count("help") || !boost_args.count("srcdir") ||
-      !boost_args.count("dstdir")) {
+  if (boost_args.count("help") || !boost_args.count("srcdir") || !boost_args.count("dstdir")) {
     std::cout << boost_desc << std::endl;
     return 0;
   }
 
-  const std::string src_path = boost_args["srcdir"].as<std::string>();
-  const std::string dst_path = boost_args["dstdir"].as<std::string>();
-  std::string src_map_folder = src_path + "/";
+  const std::string src_path       = boost_args["srcdir"].as<std::string>();
+  const std::string dst_path       = boost_args["dstdir"].as<std::string>();
+  std::string       src_map_folder = src_path + "/";
 
-  LosslessMapConfig lossless_config("lossless_map");
+  LosslessMapConfig   lossless_config("lossless_map");
   LosslessMapNodePool lossless_map_node_pool(25, 8);
   lossless_map_node_pool.Initial(&lossless_config);
 
@@ -160,7 +153,7 @@ int main(int argc, char** argv) {
 
   std::cout << "lossy map directory structure has built." << std::endl;
 
-  LossyMapConfig lossy_config("lossy_map");
+  LossyMapConfig   lossy_config("lossy_map");
   LossyMapNodePool lossy_map_node_pool(25, 8);
   lossy_map_node_pool.Initial(&lossy_config);
   LossyMap lossy_map(&lossy_config);
@@ -171,8 +164,8 @@ int main(int argc, char** argv) {
     std::cout << "lossy_map config xml not exist" << std::endl;
   }
 
-  int index = 0;
-  auto itr = buf.begin();
+  int  index = 0;
+  auto itr   = buf.begin();
   for (; itr != buf.end(); ++itr, ++index) {
     // int single_alt = 0;
     // int double_alt = 0;
@@ -191,41 +184,39 @@ int main(int argc, char** argv) {
     LosslessMapMatrix& lossless_matrix =
         static_cast<LosslessMapMatrix&>(lossless_node->GetMapCellMatrix());
 
-    LossyMapNode* lossy_node =
-        static_cast<LossyMapNode*>(lossy_map.GetMapNodeSafe(*itr));
-    LossyMapMatrix& lossy_matrix =
-        static_cast<LossyMapMatrix&>(lossy_node->GetMapCellMatrix());
+    LossyMapNode*   lossy_node   = static_cast<LossyMapNode*>(lossy_map.GetMapNodeSafe(*itr));
+    LossyMapMatrix& lossy_matrix = static_cast<LossyMapMatrix&>(lossy_node->GetMapCellMatrix());
 
     int rows = lossless_config.map_node_size_y_;
     int cols = lossless_config.map_node_size_x_;
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
-        float intensity = lossless_node->GetValue(row, col);
-        float intensity_var = lossless_node->GetVar(row, col);
-        unsigned int count = lossless_node->GetCount(row, col);
+        float        intensity     = lossless_node->GetValue(row, col);
+        float        intensity_var = lossless_node->GetVar(row, col);
+        unsigned int count         = lossless_node->GetCount(row, col);
 
         // Read altitude
-        float altitude_ground = 0.0;
-        float altitude_avg = 0.0;
-        bool is_ground_useful = false;
-        std::vector<float> layer_alts;
+        float                     altitude_ground  = 0.0;
+        float                     altitude_avg     = 0.0;
+        bool                      is_ground_useful = false;
+        std::vector<float>        layer_alts;
         std::vector<unsigned int> layer_counts;
         lossless_matrix.GetMapCell(row, col).GetCount(&layer_counts);
         lossless_matrix.GetMapCell(row, col).GetAlt(&layer_alts);
         if (layer_counts.size() == 0 || layer_alts.size() == 0) {
-          altitude_avg = lossless_node->GetAlt(row, col);
+          altitude_avg     = lossless_node->GetAlt(row, col);
           is_ground_useful = false;
         } else {
-          altitude_avg = lossless_node->GetAlt(row, col);
-          altitude_ground = layer_alts[0];
+          altitude_avg     = lossless_node->GetAlt(row, col);
+          altitude_ground  = layer_alts[0];
           is_ground_useful = true;
         }
 
-        lossy_matrix[row][col].intensity = intensity;
-        lossy_matrix[row][col].intensity_var = intensity_var;
-        lossy_matrix[row][col].count = count;
-        lossy_matrix[row][col].altitude = altitude_avg;
-        lossy_matrix[row][col].altitude_ground = altitude_ground;
+        lossy_matrix[row][col].intensity        = intensity;
+        lossy_matrix[row][col].intensity_var    = intensity_var;
+        lossy_matrix[row][col].count            = count;
+        lossy_matrix[row][col].altitude         = altitude_avg;
+        lossy_matrix[row][col].altitude_ground  = altitude_ground;
         lossy_matrix[row][col].is_ground_useful = is_ground_useful;
       }
     }

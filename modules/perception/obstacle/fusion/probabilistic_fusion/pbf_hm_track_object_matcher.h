@@ -34,43 +34,40 @@ namespace perception {
 
 class PbfHmTrackObjectMatcher : public PbfBaseTrackObjectMatcher {
  public:
-  PbfHmTrackObjectMatcher() = default;
+  PbfHmTrackObjectMatcher()          = default;
   virtual ~PbfHmTrackObjectMatcher() = default;
 
-  bool Match(
-      const std::vector<PbfTrackPtr> &fusion_tracks,
-      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
-      const TrackObjectMatcherOptions &options,
-      std::vector<std::pair<int, int>> *assignments,
-      std::vector<int> *unassigned_fusion_tracks,
-      std::vector<int> *unassigned_sensor_tracks,
-      std::vector<double> *track2measurements_dist,
-      std::vector<double> *measurement2track_dist) override;
+  bool Match(const std::vector<PbfTrackPtr>&                      fusion_tracks,
+             const std::vector<std::shared_ptr<PbfSensorObject>>& sensor_objects,
+             const TrackObjectMatcherOptions&                     options,
+             std::vector<std::pair<int, int>>*                    assignments,
+             std::vector<int>*                                    unassigned_fusion_tracks,
+             std::vector<int>*                                    unassigned_sensor_tracks,
+             std::vector<double>*                                 track2measurements_dist,
+             std::vector<double>*                                 measurement2track_dist) override;
 
   bool Init() override;
 
   std::string name() const override;
 
  protected:
-  void ComputeAssociationMat(
-      const std::vector<PbfTrackPtr> &fusion_tracks,
-      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
-      const std::vector<int> &unassigned_fusion_tracks,
-      const std::vector<int> &unassigned_sensor_objects,
-      const Eigen::Vector3d &ref_point,
-      std::vector<std::vector<double>> *association_mat);
-  bool HmAssign(const std::vector<std::vector<double>> &association_mat,
-                std::vector<std::pair<int, int>> *assignments,
-                std::vector<int> *unassigned_fusion_tracks,
-                std::vector<int> *unassigned_sensor_objects);
-  void MinimizeAssignment(
-      const std::vector<std::vector<double>> &association_mat,
-      std::vector<int> *ref_idx, std::vector<int> *new_idx);
-  void ComputeConnectedComponents(
-      const std::vector<std::vector<double>> &association_mat,
-      const float connected_threshold,
-      std::vector<std::vector<int>> *track_components,
-      std::vector<std::vector<int>> *obj_components);
+  void ComputeAssociationMat(const std::vector<PbfTrackPtr>&                      fusion_tracks,
+                             const std::vector<std::shared_ptr<PbfSensorObject>>& sensor_objects,
+                             const std::vector<int>&           unassigned_fusion_tracks,
+                             const std::vector<int>&           unassigned_sensor_objects,
+                             const Eigen::Vector3d&            ref_point,
+                             std::vector<std::vector<double>>* association_mat);
+  bool HmAssign(const std::vector<std::vector<double>>& association_mat,
+                std::vector<std::pair<int, int>>*       assignments,
+                std::vector<int>*                       unassigned_fusion_tracks,
+                std::vector<int>*                       unassigned_sensor_objects);
+  void MinimizeAssignment(const std::vector<std::vector<double>>& association_mat,
+                          std::vector<int>*                       ref_idx,
+                          std::vector<int>*                       new_idx);
+  void ComputeConnectedComponents(const std::vector<std::vector<double>>& association_mat,
+                                  const float                             connected_threshold,
+                                  std::vector<std::vector<int>>*          track_components,
+                                  std::vector<std::vector<int>>*          obj_components);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(PbfHmTrackObjectMatcher);

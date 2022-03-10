@@ -16,8 +16,8 @@
 
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
 
-#include <vector>
 #include "gtest/gtest.h"
+#include <vector>
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
@@ -28,17 +28,14 @@ namespace apollo {
 namespace perception {
 
 TEST(HDMapInputTest, test_GetROI) {
-  HdmapStructPtr hdmap;
-  auto* hdmap_input = HDMapInput::instance();
-  pcl_util::PointD velodyne_pose_world = {587054.96336391149,
-                                          4141606.3593586856, 0.0};
-  EXPECT_FALSE(
-      hdmap_input->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap));
-  FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
+  HdmapStructPtr   hdmap;
+  auto*            hdmap_input         = HDMapInput::instance();
+  pcl_util::PointD velodyne_pose_world = {587054.96336391149, 4141606.3593586856, 0.0};
+  EXPECT_FALSE(hdmap_input->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap));
+  FLAGS_map_dir           = "modules/map/data/sunnyvale_loop";
   FLAGS_base_map_filename = "base_map.bin";
   hdmap::HDMapUtil::ReloadMaps();
-  EXPECT_TRUE(
-      hdmap_input->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap));
+  EXPECT_TRUE(hdmap_input->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap));
   EXPECT_TRUE(hdmap != nullptr);
 }
 

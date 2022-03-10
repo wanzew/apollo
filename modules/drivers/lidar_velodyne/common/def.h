@@ -17,22 +17,17 @@
 #ifndef MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_DEF_H_
 #define MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_DEF_H_
 
-#include <set>
 #include "modules/drivers/lidar_velodyne/proto/velodyne_conf.pb.h"
+#include <set>
 
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-static const std::set<VelodyneModel> v64_models = {
-      V64E_S2,
-      V64E_S3S,
-      V64E_S3D_STRONGEST,
-      V64E_S3D_LAST,
-      V64E_S3D_DUAL
-};
+static const std::set<VelodyneModel> v64_models = {V64E_S2, V64E_S3S, V64E_S3D_STRONGEST,
+                                                   V64E_S3D_LAST, V64E_S3D_DUAL};
 static const std::set<VelodyneModel> v16_models = {VLP16};
-static const char* valid_models =
+static const char*                   valid_models =
     "V64E_S2|V64E_S3S|V64E_S3D_STRONGEST|V64E_S3D_LAST|V64E_S3D_DUAL|VLP16";
 }  // namespace lidar_velodyne
 }  // namespace drivers

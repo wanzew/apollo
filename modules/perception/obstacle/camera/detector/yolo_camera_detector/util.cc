@@ -28,12 +28,12 @@ namespace apollo {
 namespace perception {
 namespace yolo {
 
+using std::ifstream;
+using std::map;
 using std::string;
 using std::vector;
-using std::map;
-using std::ifstream;
 
-bool load_types(const string &path, vector<ObjectType> *types) {
+bool load_types(const string& path, vector<ObjectType>* types) {
   const map<string, ObjectType> type_map = {
       {"UNKNOWN", apollo::perception::ObjectType::UNKNOWN},
       {"UNKNOWN_MOVABLE", apollo::perception::ObjectType::UNKNOWN_MOVABLE},
@@ -46,8 +46,7 @@ bool load_types(const string &path, vector<ObjectType> *types) {
   ifstream ifs(path, ifstream::in);
   if (!ifs.good()) {
     AERROR << "type_list not found, use default: VEHICLE, BICYCLE, PEDESTRIAN";
-    (*types) = {apollo::perception::ObjectType::VEHICLE,
-                apollo::perception::ObjectType::BICYCLE,
+    (*types) = {apollo::perception::ObjectType::VEHICLE, apollo::perception::ObjectType::BICYCLE,
                 apollo::perception::ObjectType::PEDESTRIAN};
   } else {
     string type;
@@ -67,13 +66,13 @@ bool load_types(const string &path, vector<ObjectType> *types) {
   return true;
 }
 
-bool load_anchors(const string &path, vector<float> *anchors) {
+bool load_anchors(const string& path, vector<float>* anchors) {
   if (anchors == NULL) {
     AERROR << "input anchors is a null pointer.";
     return false;
   }
 
-  int num_anchors = 0;
+  int      num_anchors = 0;
   ifstream ifs(path, ifstream::in);
   ifs >> num_anchors;
   if (!ifs.good()) {
@@ -93,25 +92,27 @@ bool load_anchors(const string &path, vector<float> *anchors) {
   return true;
 }
 
-void recover_bbox(int roi_w, int roi_h, int offset_y,
-                  std::vector<std::shared_ptr<VisualObject>> *objects) {
-  for (auto &obj : *objects) {
-    float xmin = obj->upper_left[0];
-    float ymin = obj->upper_left[1];
-    float xmax = obj->lower_right[0];
-    float ymax = obj->lower_right[1];
-    int x = xmin * roi_w;
-    int w = (xmax - xmin) * roi_w;
-    int y = ymin * roi_h + offset_y;
-    int h = (ymax - ymin) * roi_h;
+void recover_bbox(int                                         roi_w,
+                  int                                         roi_h,
+                  int                                         offset_y,
+                  std::vector<std::shared_ptr<VisualObject>>* objects) {
+  for (auto& obj : *objects) {
+    float    xmin = obj->upper_left[0];
+    float    ymin = obj->upper_left[1];
+    float    xmax = obj->lower_right[0];
+    float    ymax = obj->lower_right[1];
+    int      x    = xmin * roi_w;
+    int      w    = (xmax - xmin) * roi_w;
+    int      y    = ymin * roi_h + offset_y;
+    int      h    = (ymax - ymin) * roi_h;
     cv::Rect rect_det(x, y, w, h);
     cv::Rect rect_img(0, 0, roi_w, roi_h + offset_y);
-    cv::Rect rect = rect_det & rect_img;
-    obj->upper_left[0] = rect.x;
-    obj->upper_left[1] = rect.y;
+    cv::Rect rect       = rect_det & rect_img;
+    obj->upper_left[0]  = rect.x;
+    obj->upper_left[1]  = rect.y;
     obj->lower_right[0] = rect.x + rect.width;
     obj->lower_right[1] = rect.y + rect.height;
-    double eps = 1e-2;
+    double eps          = 1e-2;
 
     // Truncation assignment based on bbox positions
     if ((ymin < eps) || (ymax >= 1.0 - eps)) {

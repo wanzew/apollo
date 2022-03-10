@@ -20,8 +20,8 @@
 
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
-#include "gtest/gtest.h"
 #include "modules/common/log.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
@@ -36,20 +36,19 @@ namespace control {
 class MPCControllerTest : public ControlTestBase {
  public:
   virtual void SetUp() {
-    FLAGS_test_data_dir = "modules/control/testdata/mpc_controller_test/";
-    FLAGS_control_conf_file =
-        "modules/control/testdata/mpc_controller_test/lincoln.pb.txt";
+    FLAGS_test_data_dir     = "modules/control/testdata/mpc_controller_test/";
+    FLAGS_control_conf_file = "modules/control/testdata/mpc_controller_test/lincoln.pb.txt";
 
     FLAGS_use_navigation_mode = false;
   }
 };
 
 TEST_F(MPCControllerTest, stop_overshoot) {
-  FLAGS_enable_csv_debug = true;
+  FLAGS_enable_csv_debug       = true;
   FLAGS_test_localization_file = "1_localization.pb.txt";
-  FLAGS_test_pad_file = "1_pad.pb.txt";
-  FLAGS_test_planning_file = "1_planning.pb.txt";
-  FLAGS_test_chassis_file = "1_chassis.pb.txt";
+  FLAGS_test_pad_file          = "1_pad.pb.txt";
+  FLAGS_test_planning_file     = "1_planning.pb.txt";
+  FLAGS_test_chassis_file      = "1_chassis.pb.txt";
   ControlTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }

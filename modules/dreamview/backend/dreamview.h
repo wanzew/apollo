@@ -41,10 +41,10 @@ namespace dreamview {
 
 class Dreamview : public apollo::common::ApolloApp {
  public:
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
   virtual ~Dreamview() = default;
 
  private:
@@ -54,15 +54,15 @@ class Dreamview : public apollo::common::ApolloApp {
   ros::Timer exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
-  std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
-  std::unique_ptr<CivetServer> server_;
-  std::unique_ptr<SimControl> sim_control_;
-  std::unique_ptr<WebSocketHandler> websocket_;
-  std::unique_ptr<WebSocketHandler> map_ws_;
-  std::unique_ptr<WebSocketHandler> point_cloud_ws_;
-  std::unique_ptr<ImageHandler> image_;
-  std::unique_ptr<MapService> map_service_;
-  std::unique_ptr<HMI> hmi_;
+  std::unique_ptr<PointCloudUpdater>      point_cloud_updater_;
+  std::unique_ptr<CivetServer>            server_;
+  std::unique_ptr<SimControl>             sim_control_;
+  std::unique_ptr<WebSocketHandler>       websocket_;
+  std::unique_ptr<WebSocketHandler>       map_ws_;
+  std::unique_ptr<WebSocketHandler>       point_cloud_ws_;
+  std::unique_ptr<ImageHandler>           image_;
+  std::unique_ptr<MapService>             map_service_;
+  std::unique_ptr<HMI>                    hmi_;
 };
 
 }  // namespace dreamview

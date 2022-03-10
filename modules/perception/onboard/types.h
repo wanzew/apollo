@@ -26,13 +26,13 @@
 namespace apollo {
 namespace perception {
 
-using EventID = int;
+using EventID   = int;
 using SubnodeID = int;
 using apollo::common::time::TimeUtil;
 
 struct Event {
-  EventID event_id = 0;
-  double timestamp = 0.0;
+  EventID     event_id  = 0;
+  double      timestamp = 0.0;
   std::string reserve;
   // TODO(Yangguang Li):
   double local_timestamp = 0.0;  // local timestamp to compute process delay.
@@ -41,36 +41,38 @@ struct Event {
 
   std::string to_string() const {
     std::ostringstream oss;
-    oss << "event_id: " << event_id
-        << " timestamp: " << GLOG_TIMESTAMP(timestamp)
+    oss << "event_id: " << event_id << " timestamp: " << GLOG_TIMESTAMP(timestamp)
         << " reserve: " << reserve;
     return oss.str();
   }
 };
 
 struct EventMeta {
-  EventID event_id;
+  EventID     event_id;
   std::string name;
-  SubnodeID from_node;
-  SubnodeID to_node;
-  EventMeta() : event_id(0), from_node(0), to_node(0) {}
+  SubnodeID   from_node;
+  SubnodeID   to_node;
+  EventMeta()
+      : event_id(0)
+      , from_node(0)
+      , to_node(0) {}
 
   std::string to_string() const {
     std::ostringstream oss;
-    oss << "event_id: " << event_id << " name: " << name
-        << " from_node: " << from_node << " to_node: " << to_node;
+    oss << "event_id: " << event_id << " name: " << name << " from_node: " << from_node
+        << " to_node: " << to_node;
     return oss.str();
   }
 };
 
 enum IoStreamType {
   // source type
-  ROSMSG_SOURCE = 0,
-  FILE_SOURCE = 1,
+  ROSMSG_SOURCE   = 0,
+  FILE_SOURCE     = 1,
   PCD_FILE_SOURCE = 2,
   // sink type
-  ROSMSG_SINK = 9,
-  FILE_SINK = 10,
+  ROSMSG_SINK         = 9,
+  FILE_SINK           = 10,
   BENCHMARK_FILE_SINK = 11,
   // unknown
   UNKNOWN_TYPE = 16,

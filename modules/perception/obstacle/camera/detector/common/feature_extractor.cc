@@ -17,9 +17,9 @@
 #include "modules/perception/obstacle/camera/detector/common/feature_extractor.h"
 
 #include <fcntl.h>
+#include <fstream>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <fstream>
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -30,24 +30,23 @@ namespace perception {
 
 using apollo::common::math::L2Norm;
 
-bool ReorgFeatureExtractor::init(
-    const ExtractorParam &param,
-    const boost::shared_ptr<caffe::Blob<float>> feat_blob, int input_width,
-    int input_height) {
+bool ReorgFeatureExtractor::init(const ExtractorParam&                       param,
+                                 const boost::shared_ptr<caffe::Blob<float>> feat_blob,
+                                 int                                         input_width,
+                                 int                                         input_height) {
   // setup bottom and top
   int feat_height = feat_blob->height();
-  int feat_width = feat_blob->width();
-  int ref_height = param.reorg_param().ref_height();
-  int ref_width = param.reorg_param().ref_width();
-  ref_height = ref_height == 0 ? feat_height : ref_height;
-  ref_width = ref_width == 0 ? feat_width : ref_width;
+  int feat_width  = feat_blob->width();
+  int ref_height  = param.reorg_param().ref_height();
+  int ref_width   = param.reorg_param().ref_width();
+  ref_height      = ref_height == 0 ? feat_height : ref_height;
+  ref_width       = ref_width == 0 ? feat_width : ref_width;
 
   CHECK_EQ(feat_height / ref_height, feat_width / ref_width)
       << "Invalid aspect ratio: " << feat_height << "x" << feat_width
-      << ", fb_height=" << feat_blob->height()
-      << ", fb_width=" << feat_blob->width() << ", ref_height=" << ref_height
-      << ", ref_width=" << ref_width << ", feat_height=" << feat_height
-      << ", feat_width=" << feat_width;
+      << ", fb_height=" << feat_blob->height() << ", fb_width=" << feat_blob->width()
+      << ", ref_height=" << ref_height << ", ref_width=" << ref_width
+      << ", feat_height=" << feat_height << ", feat_width=" << feat_width;
 
   skip_reorg_ = ref_height == feat_height;
   if (skip_reorg_) {
@@ -62,40 +61,32 @@ bool ReorgFeatureExtractor::init(
   // create LayerParameter
   caffe::LayerParameter layer_param;
   layer_param.set_type("Reorg");
-  auto *reorg_param = layer_param.mutable_reorg_param();
-  int reorg_stride = feat_height / ref_height;
+  auto* reorg_param  = layer_param.mutable_reorg_param();
+  int   reorg_stride = feat_height / ref_height;
   reorg_param->set_stride(reorg_stride);
   ADEBUG << "Use Reorg: stride=" << reorg_param->stride();
   reorg_layer_ = caffe::LayerRegistry<float>::CreateLayer(layer_param);
   reorg_layer_->SetUp(bottom_vec_, top_vec_);
 
-  ADEBUG << "Shape mismatch: feat_blob=" << feat_blob
-         << ", reorg_stride=" << reorg_stride;
+  ADEBUG << "Shape mismatch: feat_blob=" << feat_blob << ", reorg_stride=" << reorg_stride;
 
   return true;
 }
 
-bool ReorgFeatureExtractor::extract(
-    std::vector<std::shared_ptr<VisualObject>> *objects) {
+bool ReorgFeatureExtractor::extract(std::vector<std::shared_ptr<VisualObject>>* objects) {
   CHECK_NOTNULL(objects);
-  if (objects->empty()) {
-    return true;
-  }
-  if (!skip_reorg_) {
-    reorg_layer_->Forward(bottom_vec_, top_vec_);
-  }
+  if (objects->empty()) { return true; }
+  if (!skip_reorg_) { reorg_layer_->Forward(bottom_vec_, top_vec_); }
 
   // get object feature
-  for (auto &obj : *objects) {
-    int x = (obj->upper_left[0] + obj->lower_right[0]) * 0.5 *
-            reorg_feat_blob_->width();
-    int y = (obj->upper_left[1] + obj->lower_right[1]) * 0.5 *
-            reorg_feat_blob_->height();
-    int offset = reorg_feat_blob_->offset(0, 0, y, x);
-    int feat_dim = reorg_feat_blob_->channels();
+  for (auto& obj : *objects) {
+    int x           = (obj->upper_left[0] + obj->lower_right[0]) * 0.5 * reorg_feat_blob_->width();
+    int y           = (obj->upper_left[1] + obj->lower_right[1]) * 0.5 * reorg_feat_blob_->height();
+    int offset      = reorg_feat_blob_->offset(0, 0, y, x);
+    int feat_dim    = reorg_feat_blob_->channels();
     int spatial_dim = reorg_feat_blob_->count(2);
     ADEBUG << "feat_dim: " << feat_dim << ", spatial_dim: " << spatial_dim;
-    const float *feat_data = reorg_feat_blob_->cpu_data() + offset;
+    const float* feat_data = reorg_feat_blob_->cpu_data() + offset;
     for (int c = 0; c < feat_dim; ++c) {
       obj->object_feature.push_back(feat_data[c * spatial_dim]);
     }
@@ -106,15 +97,15 @@ bool ReorgFeatureExtractor::extract(
   return true;
 }
 
-bool ROIPoolingFeatureExtractor::init(
-    const ExtractorParam &param,
-    const boost::shared_ptr<caffe::Blob<float>> feat_blob, int input_width,
-    int input_height) {
+bool ROIPoolingFeatureExtractor::init(const ExtractorParam&                       param,
+                                      const boost::shared_ptr<caffe::Blob<float>> feat_blob,
+                                      int                                         input_width,
+                                      int                                         input_height) {
   // setup bottom and top
   int feat_height = feat_blob->height();
-  int feat_width = feat_blob->width();
-  input_height_ = input_height == 0 ? feat_height : input_height;
-  input_width_ = input_width == 0 ? feat_width : input_width;
+  int feat_width  = feat_blob->width();
+  input_height_   = input_height == 0 ? feat_height : input_height;
+  input_width_    = input_width == 0 ? feat_width : input_width;
 
   CHECK_EQ(input_height_ / feat_height, input_width_ / feat_width)
       << "Invalid aspect ratio: " << feat_height << "x" << feat_width;
@@ -126,7 +117,7 @@ bool ROIPoolingFeatureExtractor::init(
   // create LayerParameter
   caffe::LayerParameter layer_param;
   layer_param.set_type("ROIPooling");
-  auto *rp_param = layer_param.mutable_roi_pooling_param();
+  auto* rp_param = layer_param.mutable_roi_pooling_param();
   rp_param->set_pooled_h(param.roi_pooling_param().pooled_h());
   rp_param->set_pooled_w(param.roi_pooling_param().pooled_w());
   rp_param->set_use_floor(param.roi_pooling_param().use_floor());
@@ -141,31 +132,27 @@ bool ROIPoolingFeatureExtractor::init(
   return true;
 }
 
-bool ROIPoolingFeatureExtractor::extract(
-    std::vector<std::shared_ptr<VisualObject>> *objects) {
+bool ROIPoolingFeatureExtractor::extract(std::vector<std::shared_ptr<VisualObject>>* objects) {
   CHECK_NOTNULL(objects);
-  if (objects->empty()) {
-    return true;
-  }
+  if (objects->empty()) { return true; }
   rois_blob_.Reshape({static_cast<int>(objects->size()), 5});
-  float *rois_data = rois_blob_.mutable_cpu_data();
-  for (const auto &obj : *objects) {
+  float* rois_data = rois_blob_.mutable_cpu_data();
+  for (const auto& obj : *objects) {
     rois_data[0] = 0;
     rois_data[1] = obj->upper_left[0] * input_width_;
     rois_data[2] = obj->upper_left[1] * input_height_;
     rois_data[3] = obj->lower_right[0] * input_width_;
     rois_data[4] = obj->lower_right[1] * input_height_;
-    ADEBUG << rois_data[0] << " " << rois_data[1] << " " << rois_data[2] << " "
-           << rois_data[3] << " " << rois_data[4];
+    ADEBUG << rois_data[0] << " " << rois_data[1] << " " << rois_data[2] << " " << rois_data[3]
+           << " " << rois_data[4];
     rois_data += rois_blob_.offset(1);
   }
   roi_pooling_layer_->Forward(bottom_vec_, top_vec_);
-  int feat_dim = roi_feat_blob_.count() / objects->size();
-  const float *feat_data = roi_feat_blob_.cpu_data();
-  for (const auto &obj : *objects) {
+  int          feat_dim  = roi_feat_blob_.count() / objects->size();
+  const float* feat_data = roi_feat_blob_.cpu_data();
+  for (const auto& obj : *objects) {
     obj->object_feature.resize(feat_dim);
-    memcpy(obj->object_feature.data(), feat_data,
-           feat_dim * sizeof(feat_data[0]));
+    memcpy(obj->object_feature.data(), feat_data, feat_dim * sizeof(feat_data[0]));
     L2Norm(feat_dim, obj->object_feature.data());
     feat_data += feat_dim;
   }

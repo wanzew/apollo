@@ -59,71 +59,69 @@ class NaviObstacleDecider : public Task {
    * @brief Get vehicle parameter
    * @return vehicle parameter
    */
-  const ::apollo::common::VehicleParam &VehicleParam();
+  const ::apollo::common::VehicleParam& VehicleParam();
 
   /**
    * @brief Get unsafe obstacles' ID
    * @return unsafe_obstacle_ID_
    */
-  const std::vector<std::tuple<std::string, double, double>> &UnsafeObstacles();
+  const std::vector<std::tuple<std::string, double, double>>& UnsafeObstacles();
 
   /**
    * @brief get the actual nudgable distance according to the
    * position of the obstacle
    * @return actual nudgable distance
    */
-  double GetNudgeDistance(
-      const std::vector<const Obstacle *> &obstacles,
-      const ReferenceLine &reference_line, const PathDecision &path_decision,
-      const std::vector<common::PathPoint> &path_data_points,
-      int *lane_obstacles_num);
+  double GetNudgeDistance(const std::vector<const Obstacle*>&   obstacles,
+                          const ReferenceLine&                  reference_line,
+                          const PathDecision&                   path_decision,
+                          const std::vector<common::PathPoint>& path_data_points,
+                          int*                                  lane_obstacles_num);
 
   /**
    * @brief get the unsafe obstacles between trajectory and reference line.
    * @return obstacles' ID.
    */
-  void GetUnsafeObstaclesInfo(
-      const std::vector<common::PathPoint> &path_data_points,
-      const std::vector<const Obstacle *> &obstacles);
+  void GetUnsafeObstaclesInfo(const std::vector<common::PathPoint>& path_data_points,
+                              const std::vector<const Obstacle*>&   obstacles);
 
  private:
   /**
    * @brief process path's obstacles info
    * @return Number of obstacles in the current lane
    */
-  int ProcessPathObstacle(
-      const std::vector<const Obstacle *> &obstacles,
-      const std::vector<common::PathPoint> &path_data_points,
-      const PathDecision &path_decision, const double min_lane_width);
+  int ProcessPathObstacle(const std::vector<const Obstacle*>&   obstacles,
+                          const std::vector<common::PathPoint>& path_data_points,
+                          const PathDecision&                   path_decision,
+                          const double                          min_lane_width);
 
-  void JudgePointLeftOrRight(
-      const common::PathPoint &projection_point,
-      const std::vector<common::PathPoint> &path_data_points,
-      const Obstacle *current_obstacle, const double proj_len, double *dist);
+  void JudgePointLeftOrRight(const common::PathPoint&              projection_point,
+                             const std::vector<common::PathPoint>& path_data_points,
+                             const Obstacle*                       current_obstacle,
+                             const double                          proj_len,
+                             double*                               dist);
   /**
    * @brief Get the minimum path width
    * @return minimum path width
    */
-  double GetMinLaneWidth(const std::vector<common::PathPoint> &path_data_points,
-                         const ReferenceLine &reference_line);
+  double GetMinLaneWidth(const std::vector<common::PathPoint>& path_data_points,
+                         const ReferenceLine&                  reference_line);
 
  private:
-  std::map<double, double> obstacle_lat_dist_;
+  std::map<double, double>                             obstacle_lat_dist_;
   std::vector<std::tuple<std::string, double, double>> unsafe_obstacle_info_;
 
   // TODO(all): Add your member functions and variables.
 };
 
-inline const ::apollo::common::VehicleParam &
-NaviObstacleDecider::VehicleParam() {
-  const auto &vehicle_param = apollo::common::VehicleConfigHelper::instance()
-                                  ->GetConfig()
-                                  .vehicle_param();
+inline const ::apollo::common::VehicleParam& NaviObstacleDecider::VehicleParam() {
+  const auto& vehicle_param =
+      apollo::common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   return vehicle_param;
 }
 
-inline const std::vector<std::tuple<std::string, double, double>>
-    &NaviObstacleDecider::UnsafeObstacles() {
+inline const std::vector<std::tuple<std::string, double, double>>&
+NaviObstacleDecider::UnsafeObstacles() {
   return unsafe_obstacle_info_;
 }
 

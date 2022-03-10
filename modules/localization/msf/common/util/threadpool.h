@@ -36,7 +36,8 @@ template <typename T, typename Mutex>
 class LockingPtr {
  public:
   LockingPtr(volatile const T& obj, volatile const Mutex& mtx)
-      : obj_(const_cast<T*>(&obj)), mutex_(*const_cast<Mutex*>(&mtx)) {
+      : obj_(const_cast<T*>(&obj))
+      , mutex_(*const_cast<Mutex*>(&mtx)) {
     mutex_.lock();
   }
 
@@ -47,7 +48,7 @@ class LockingPtr {
   T* operator->() const { return obj_; }
 
  private:
-  T* obj_;
+  T*     obj_;
   Mutex& mutex_;
   DISALLOW_COPY_AND_ASSIGN(LockingPtr);
 };
@@ -55,26 +56,24 @@ class LockingPtr {
 class ScopeGuard {
  public:
   explicit ScopeGuard(std::function<void()> const& call_on_exit)
-      : function_(call_on_exit), is_active_(true) {}
+      : function_(call_on_exit)
+      , is_active_(true) {}
 
   ~ScopeGuard() {
-    if (is_active_ && function_) {
-      function_();
-    }
+    if (is_active_ && function_) { function_(); }
   }
 
   void Disable() { is_active_ = false; }
 
  private:
   std::function<void()> const function_;
-  bool is_active_;
+  bool                        is_active_;
   DISALLOW_COPY_AND_ASSIGN(ScopeGuard);
 };
 
 class FifoScheduler {
  public:
-  typedef std::function<void()>
-      TaskType;  //!< Indicates the scheduler's task type.
+  typedef std::function<void()> TaskType;  //!< Indicates the scheduler's task type.
 
  public:
   bool Push(TaskType const& task) {
@@ -97,23 +96,20 @@ class FifoScheduler {
 };
 
 template <typename ThreadPool>
-class WorkerThread
-    : public std::enable_shared_from_this<WorkerThread<ThreadPool>> {
+class WorkerThread : public std::enable_shared_from_this<WorkerThread<ThreadPool>> {
  public:
-  explicit WorkerThread(std::shared_ptr<ThreadPool> const& pool) : pool_(pool) {
+  explicit WorkerThread(std::shared_ptr<ThreadPool> const& pool)
+      : pool_(pool) {
     DCHECK(pool);
   }
 
-  void DiedUnexpectedly() {
-    pool_->WorkerDiedUnexpectedly(this->shared_from_this());
-  }
+  void DiedUnexpectedly() { pool_->WorkerDiedUnexpectedly(this->shared_from_this()); }
 
  public:
   void run() {
     ScopeGuard notify_exception(bind(&WorkerThread::DiedUnexpectedly, this));
 
-    while (pool_->execute_task()) {
-    }
+    while (pool_->execute_task()) {}
 
     notify_exception.Disable();
     pool_->worker_destructed(this->shared_from_this());
@@ -123,25 +119,20 @@ class WorkerThread
 
   static void create_and_attach(std::shared_ptr<ThreadPool> const& pool) {
     std::shared_ptr<WorkerThread> worker(new WorkerThread(pool));
-    if (worker) {
-      worker->thread_.reset(
-          new std::thread(std::bind(&WorkerThread::run, worker)));
-    }
+    if (worker) { worker->thread_.reset(new std::thread(std::bind(&WorkerThread::run, worker))); }
   }
 
  private:
-  std::shared_ptr<ThreadPool>
-      pool_;  //!< Pointer to the pool which created the worker.
-  std::shared_ptr<std::thread>
-      thread_;  //!< Pointer to the thread which executes the run loop.
+  std::shared_ptr<ThreadPool>  pool_;    //!< Pointer to the pool which created the worker.
+  std::shared_ptr<std::thread> thread_;  //!< Pointer to the thread which executes the run loop.
 };
 
 class ThreadPool;
 class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
  public:  // Type definitions
-  typedef std::function<void()> TaskType;
-  typedef FifoScheduler TaskQueueType;
-  typedef ThreadPoolImpl PoolType;
+  typedef std::function<void()>  TaskType;
+  typedef FifoScheduler          TaskQueueType;
+  typedef ThreadPoolImpl         PoolType;
   typedef WorkerThread<PoolType> WorkerType;
 
  private:
@@ -151,10 +142,10 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
  public:
   /// Constructor.
   ThreadPoolImpl()
-      : terminate_all_workers_(false),
-        worker_count_(0),
-        target_worker_count_(0),
-        active_worker_count_(0) {
+      : terminate_all_workers_(false)
+      , worker_count_(0)
+      , target_worker_count_(0)
+      , active_worker_count_(0) {
     m_scheduler.Clear();
   }
 
@@ -198,8 +189,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
    * \return The number of pending tasks.
    */
   size_t pending() const volatile {
-    LockingPtr<const PoolType, std::recursive_mutex> locked_this(*this,
-                                                                 monitor_);
+    LockingPtr<const PoolType, std::recursive_mutex> locked_this(*this, monitor_);
     return locked_this->m_scheduler.Size();
   }
 
@@ -215,8 +205,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
    * \remarks This function is more efficient that the check 'pending() == 0'.
    */
   bool Empty() const volatile {
-    LockingPtr<const PoolType, std::recursive_mutex> locked_this(*this,
-                                                                 monitor_);
+    LockingPtr<const PoolType, std::recursive_mutex> locked_this(*this, monitor_);
     return locked_this->m_scheduler.Empty();
   }
 
@@ -234,8 +223,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
         self->worker_idle_or_terminated_event_.wait(lock);
       }
     } else {
-      while (task_threshold <
-             self->active_worker_count_ + self->m_scheduler.Size()) {
+      while (task_threshold < self->active_worker_count_ + self->m_scheduler.Size()) {
         self->worker_idle_or_terminated_event_.wait(lock);
       }
     }
@@ -283,13 +271,10 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
     if (worker_count_ <= target_worker_count_) {  // increase worker count
       while (worker_count_ < target_worker_count_) {
         try {
-          WorkerThread<PoolType>::create_and_attach(
-              locked_this->shared_from_this());
+          WorkerThread<PoolType>::create_and_attach(locked_this->shared_from_this());
           worker_count_++;
           active_worker_count_++;
-        } catch (...) {
-          return false;
-        }
+        } catch (...) { return false; }
       }
     } else {  // decrease worker count
       locked_this->task_or_terminate_workers_event_
@@ -321,9 +306,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
     active_worker_count_--;
     locked_this->worker_idle_or_terminated_event_.notify_all();
 
-    if (terminate_all_workers_) {
-      locked_this->terminated_workers_.push_back(worker);
-    }
+    if (terminate_all_workers_) { locked_this->terminated_workers_.push_back(worker); }
   }
 
   bool execute_task() volatile {
@@ -360,9 +343,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
     }
 
     // call task function
-    if (task) {
-      task();
-    }
+    if (task) { task(); }
 
     // guard->Disable();
     return true;
@@ -372,7 +353,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
            // same time:
   TaskQueueType m_scheduler;
 
-  bool terminate_all_workers_;
+  bool                                     terminate_all_workers_;
   std::vector<std::shared_ptr<WorkerType>> terminated_workers_;  // List of
                                                                  // workers
                                                                  // which are
@@ -404,9 +385,7 @@ class ThreadPool {
   explicit ThreadPool(size_t initial_threads = 0)
       : threadpool_impl_(new ThreadPoolImpl()) {
     bool suc = threadpool_impl_->resize(initial_threads);
-    if (suc == false) {
-      std::cerr << "ThreadPool can't resize thread num." << std::endl;
-    }
+    if (suc == false) { std::cerr << "ThreadPool can't resize thread num." << std::endl; }
   }
 
   ~ThreadPool() { Shutdown(); }
@@ -418,9 +397,7 @@ class ThreadPool {
     return;
   }
 
-  bool schedule(TaskType const& task) {
-    return threadpool_impl_->schedule(task);
-  }
+  bool schedule(TaskType const& task) { return threadpool_impl_->schedule(task); }
 
   size_t active() const { return threadpool_impl_->active(); }
 

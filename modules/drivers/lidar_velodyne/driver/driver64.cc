@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <time.h>
 #include <cmath>
 #include <string>
+#include <time.h>
 
 #include "ros/ros.h"
 
@@ -69,9 +69,9 @@ bool Velodyne64Driver::poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) {
 
   // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
-  scan->header.stamp = ros::Time().now();
+  scan->header.stamp    = ros::Time().now();
   scan->header.frame_id = config_.frame_id();
-  scan->basetime = basetime_;
+  scan->basetime        = basetime_;
 
   return true;
 }

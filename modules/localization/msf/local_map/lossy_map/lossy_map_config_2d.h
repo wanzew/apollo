@@ -17,8 +17,8 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_CONFIG_2D_H_
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_CONFIG_2D_H_
 
-#include <string>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include <string>
 
 namespace apollo {
 namespace localization {

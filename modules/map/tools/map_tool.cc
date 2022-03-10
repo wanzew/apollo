@@ -1,18 +1,18 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include <string>
 
@@ -38,15 +38,13 @@ static void ShiftMap(Map* map_pb) {
         point.set_y(point.y() + FLAGS_y_offset);
       }
     }
-    for (auto& segment :
-        *(lane.mutable_left_boundary()->mutable_curve()->mutable_segment())) {
+    for (auto& segment : *(lane.mutable_left_boundary()->mutable_curve()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
         point.set_y(point.y() + FLAGS_y_offset);
       }
     }
-    for (auto& segment :
-        *(lane.mutable_right_boundary()->mutable_curve()->mutable_segment())) {
+    for (auto& segment : *(lane.mutable_right_boundary()->mutable_curve()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
         point.set_y(point.y() + FLAGS_y_offset);
@@ -75,14 +73,13 @@ static void OutputMap(const Map& map_pb) {
 int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
-  FLAGS_v = 3;
+  FLAGS_v               = 3;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  Map map_pb;
+  Map        map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
-  CHECK(apollo::common::util::GetProtoFromFile(map_file, &map_pb))
-      << "Fail to open:" << map_file;
+  CHECK(apollo::common::util::GetProtoFromFile(map_file, &map_pb)) << "Fail to open:" << map_file;
   ShiftMap(&map_pb);
   OutputMap(map_pb);
   AINFO << "modified map at:" << FLAGS_output_dir;

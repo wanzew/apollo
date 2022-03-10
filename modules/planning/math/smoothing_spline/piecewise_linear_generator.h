@@ -37,8 +37,7 @@ namespace planning {
 class PiecewiseLinearGenerator {
  public:
   // x = f(t)
-  PiecewiseLinearGenerator(const uint32_t num_of_segments,
-                           const double unit_segment);
+  PiecewiseLinearGenerator(const uint32_t num_of_segments, const double unit_segment);
   virtual ~PiecewiseLinearGenerator() = default;
 
   PiecewiseLinearConstraint* mutable_constraint();
@@ -53,11 +52,11 @@ class PiecewiseLinearGenerator {
 
  private:
   const uint32_t num_of_segments_;
-  const double unit_segment_;
-  const double total_t_;
+  const double   unit_segment_;
+  const double   total_t_;
 
   PiecewiseLinearConstraint constraint_;
-  PiecewiseLinearKernel kernel_;
+  PiecewiseLinearKernel     kernel_;
 
   std::unique_ptr<apollo::common::math::QpSolver> qp_solver_;
 };

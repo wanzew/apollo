@@ -40,10 +40,10 @@ class ISelectLight {
    * @param  light boxes detected
    * @param  selected boxes
    */
-  virtual void Select(const cv::Mat &ros_image,
-                      const std::vector<LightPtr> &hdmap_bboxes,
-                      const std::vector<LightPtr> &refined_bboxes,
-                      std::vector<LightPtr> *selected_bboxes) = 0;
+  virtual void Select(const cv::Mat&               ros_image,
+                      const std::vector<LightPtr>& hdmap_bboxes,
+                      const std::vector<LightPtr>& refined_bboxes,
+                      std::vector<LightPtr>*       selected_bboxes) = 0;
 };
 
 /**
@@ -61,13 +61,12 @@ class IRefine {
    *         when perform finished, lights will
    *         contain more information
    */
-  virtual void Perform(const cv::Mat &ros_image,
-                       std::vector<LightPtr> *lights) = 0;
+  virtual void Perform(const cv::Mat& ros_image, std::vector<LightPtr>* lights) = 0;
   /**
    * @brief: support ROI
    * @param  input roi
    */
-  virtual void SetCropBox(const cv::Rect &box) = 0;
+  virtual void SetCropBox(const cv::Rect& box) = 0;
 };
 
 /**
@@ -82,9 +81,8 @@ class IGetBox {
    * @param  lights from projection
    * @param  final roi
    */
-  virtual void GetCropBox(const cv::Size &size,
-                          const std::vector<LightPtr> &lights,
-                          cv::Rect *cropbox) = 0;
+  virtual void
+  GetCropBox(const cv::Size& size, const std::vector<LightPtr>& lights, cv::Rect* cropbox) = 0;
   virtual ~IGetBox() = default;
 };
 
@@ -94,9 +92,8 @@ class IGetBox {
  */
 class DummyRefine : public IRefine {
  public:
-  void Perform(const cv::Mat &ros_image,
-               std::vector<LightPtr> *lights) override {}
-  void SetCropBox(const cv::Rect &box) override {}
+  void Perform(const cv::Mat& ros_image, std::vector<LightPtr>* lights) override {}
+  void SetCropBox(const cv::Rect& box) override {}
 };
 
 }  // namespace traffic_light

@@ -40,13 +40,12 @@ class PredictionInterface : public apollo::common::ApolloApp {
    * @brief main logic of the prediction module, triggered upon receiving a new
    * frame of perception obstacle message.
    */
-  virtual void RunOnce(
-      const perception::PerceptionObstacles &perception_obstacles) = 0;
+  virtual void RunOnce(const perception::PerceptionObstacles& perception_obstacles) = 0;
 
   /**
    * @brief Fill the header and publish the prediction message.
    */
-  void Publish(prediction::PredictionObstacles *prediction_obstacles) {
+  void Publish(prediction::PredictionObstacles* prediction_obstacles) {
     using apollo::common::adapter::AdapterManager;
     AdapterManager::FillPredictionHeader(Name(), prediction_obstacles);
     AdapterManager::PublishPrediction(*prediction_obstacles);

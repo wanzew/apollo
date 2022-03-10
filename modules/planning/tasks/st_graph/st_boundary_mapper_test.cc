@@ -36,7 +36,7 @@ class StBoundaryMapperTest : public ::testing::Test {
   virtual void SetUp() {
     hdmap_.LoadMapFromFile(map_file);
     const std::string lane_id = "1_-1";
-    lane_info_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(lane_id));
+    lane_info_ptr             = hdmap_.GetLaneById(hdmap::MakeMapId(lane_id));
     if (!lane_info_ptr) {
       AERROR << "failed to find lane " << lane_id << " from map " << map_file;
       return;
@@ -44,9 +44,9 @@ class StBoundaryMapperTest : public ::testing::Test {
     ReferenceLineSmootherConfig config;
 
     std::vector<ReferencePoint> ref_points;
-    const auto& points = lane_info_ptr->points();
-    const auto& headings = lane_info_ptr->headings();
-    const auto& accumulate_s = lane_info_ptr->accumulate_s();
+    const auto&                 points       = lane_info_ptr->points();
+    const auto&                 headings     = lane_info_ptr->headings();
+    const auto&                 accumulate_s = lane_info_ptr->accumulate_s();
     for (std::size_t i = 0; i < points.size(); ++i) {
       std::vector<hdmap::LaneWaypoint> waypoint;
       waypoint.emplace_back(lane_info_ptr, accumulate_s[i]);
@@ -70,23 +70,22 @@ class StBoundaryMapperTest : public ::testing::Test {
   }
 
  protected:
-  const std::string map_file =
-      "modules/planning/testdata/garage_map/base_map.txt";
-  hdmap::HDMap hdmap_;
-  common::math::Vec2d vehicle_position_;
+  const std::string              map_file = "modules/planning/testdata/garage_map/base_map.txt";
+  hdmap::HDMap                   hdmap_;
+  common::math::Vec2d            vehicle_position_;
   std::unique_ptr<ReferenceLine> reference_line_;
-  hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
-  PathData path_data_;
-  FrenetFramePath frenet_frame_path_;
+  hdmap::LaneInfoConstPtr        lane_info_ptr = nullptr;
+  PathData                       path_data_;
+  FrenetFramePath                frenet_frame_path_;
 };
 
 TEST_F(StBoundaryMapperTest, check_overlap_test) {
-  StBoundaryConfig config;
-  double planning_distance = 70.0;
-  double planning_time = 10.0;
-  SLBoundary adc_sl_boundary;
-  StBoundaryMapper mapper(adc_sl_boundary, config, *reference_line_, path_data_,
-                          planning_distance, planning_time, false);
+  StBoundaryConfig  config;
+  double            planning_distance = 70.0;
+  double            planning_time     = 10.0;
+  SLBoundary        adc_sl_boundary;
+  StBoundaryMapper  mapper(adc_sl_boundary, config, *reference_line_, path_data_, planning_distance,
+                          planning_time, false);
   common::PathPoint path_point;
   path_point.set_x(1.0);
   path_point.set_y(1.0);

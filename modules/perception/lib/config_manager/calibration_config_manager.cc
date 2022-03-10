@@ -28,8 +28,8 @@ namespace apollo {
 namespace perception {
 
 // @brief load transformation_matrix from file
-bool load_transformation_matrix_from_file(
-    const std::string &file_name, Eigen::Matrix4d *transformation_matrix) {
+bool load_transformation_matrix_from_file(const std::string& file_name,
+                                          Eigen::Matrix4d*   transformation_matrix) {
   try {
     YAML::Node config = YAML::LoadFile(file_name);
     if (!config) {
@@ -37,37 +37,31 @@ bool load_transformation_matrix_from_file(
       return false;
     }
     if (!config["transform"]) {
-      AWARN << "Open TransformationMatrix File:" << file_name
-            << " has no transform.";
+      AWARN << "Open TransformationMatrix File:" << file_name << " has no transform.";
       return false;
     }
     // fill translation
     if (config["transform"]["translation"]) {
-      (*transformation_matrix)(0, 3) =
-          config["transform"]["translation"]["x"].as<double>();
-      (*transformation_matrix)(1, 3) =
-          config["transform"]["translation"]["y"].as<double>();
-      (*transformation_matrix)(2, 3) =
-          config["transform"]["translation"]["z"].as<double>();
+      (*transformation_matrix)(0, 3) = config["transform"]["translation"]["x"].as<double>();
+      (*transformation_matrix)(1, 3) = config["transform"]["translation"]["y"].as<double>();
+      (*transformation_matrix)(2, 3) = config["transform"]["translation"]["z"].as<double>();
     } else {
-      AWARN << "TransformationMatrix File:" << file_name
-            << " has no transform:translation.";
+      AWARN << "TransformationMatrix File:" << file_name << " has no transform:translation.";
       return false;
     }
     // fill rotation
     if (config["transform"]["rotation"]) {
-      double qx = config["transform"]["rotation"]["x"].as<double>();
-      double qy = config["transform"]["rotation"]["y"].as<double>();
-      double qz = config["transform"]["rotation"]["z"].as<double>();
-      double qw = config["transform"]["rotation"]["w"].as<double>();
+      double                    qx = config["transform"]["rotation"]["x"].as<double>();
+      double                    qy = config["transform"]["rotation"]["y"].as<double>();
+      double                    qz = config["transform"]["rotation"]["z"].as<double>();
+      double                    qw = config["transform"]["rotation"]["w"].as<double>();
       Eigen::Quaternion<double> rotation(qw, qx, qy, qz);
       (*transformation_matrix).block<3, 3>(0, 0) = rotation.toRotationMatrix();
     } else {
-      AWARN << "TransformationMatrix File:" << file_name
-            << " has no transform:rotation.";
+      AWARN << "TransformationMatrix File:" << file_name << " has no transform:rotation.";
       return false;
     }
-  } catch (const YAML::Exception &e) {
+  } catch (const YAML::Exception& e) {
     AERROR << file_name << " load failed. error:" << e.what();
     AERROR << "Please ensure param file is exist or format is correct";
     return false;
@@ -81,8 +75,9 @@ bool load_transformation_matrix_from_file(
   return true;
 }
 
-bool load_matrix4d_from_file(const std::string &file_name,
-                             const std::string &key, Eigen::Matrix4d *matrix) {
+bool load_matrix4d_from_file(const std::string& file_name,
+                             const std::string& key,
+                             Eigen::Matrix4d*   matrix) {
   try {
     YAML::Node config = YAML::LoadFile(file_name);
     if (!config) {
@@ -110,7 +105,7 @@ bool load_matrix4d_from_file(const std::string &file_name,
     (*matrix)(3, 1) = config[key]["3"]["1"].as<double>();
     (*matrix)(3, 2) = config[key]["3"]["2"].as<double>();
     (*matrix)(3, 3) = config[key]["3"]["3"].as<double>();
-  } catch (const YAML::Exception &e) {
+  } catch (const YAML::Exception& e) {
     AERROR << file_name << " load failed. error:" << e.what();
     AERROR << "Please ensure param file is exist or format is correct";
     return false;
@@ -119,25 +114,24 @@ bool load_matrix4d_from_file(const std::string &file_name,
   return true;
 }
 
-bool CameraCoeffient::init(const std::string &camera_type,
-                           const std::string &camera_extrinsic_file_name,
-                           const std::string &camera_intrinsic_file_name) {
+bool CameraCoeffient::init(const std::string& camera_type,
+                           const std::string& camera_extrinsic_file_name,
+                           const std::string& camera_intrinsic_file_name) {
   camera_type_str = camera_type;
 
   try {
     if (!init_camera_extrinsic_matrix(camera_extrinsic_file_name)) {
-      AERROR << camera_type_str << " init failed. lidar to camera matrix file:"
-             << camera_extrinsic_file_name;
+      AERROR << camera_type_str
+             << " init failed. lidar to camera matrix file:" << camera_extrinsic_file_name;
       return false;
     }
 
-    if (!init_camera_intrinsic_matrix_and_distort_params(
-            camera_intrinsic_file_name)) {
-      AERROR << camera_type_str << " init failed. camera intrinsic matrix file:"
-             << camera_intrinsic_file_name;
+    if (!init_camera_intrinsic_matrix_and_distort_params(camera_intrinsic_file_name)) {
+      AERROR << camera_type_str
+             << " init failed. camera intrinsic matrix file:" << camera_intrinsic_file_name;
       return false;
     }
-  } catch (const YAML::Exception &e) {
+  } catch (const YAML::Exception& e) {
     AERROR << camera_type_str << " init failed. error:" << e.what();
     AERROR << "Please ensure param file is exist or format is correct";
     return false;
@@ -145,20 +139,18 @@ bool CameraCoeffient::init(const std::string &camera_type,
   return true;
 }
 
-bool CameraCoeffient::init_camera_extrinsic_matrix(
-    const std::string &file_name) {
+bool CameraCoeffient::init_camera_extrinsic_matrix(const std::string& file_name) {
   if (!load_transformation_matrix_from_file(file_name, &camera_extrinsic) &&
       !load_matrix4d_from_file(file_name, "T", &camera_extrinsic)) {
     AERROR << "Load camera_extrinsic matrix file failed. file:" << file_name;
     return false;
   }
-  AINFO << camera_type_str
-        << " camera_extrinsic matrix is:" << camera_extrinsic;
+  AINFO << camera_type_str << " camera_extrinsic matrix is:" << camera_extrinsic;
   return true;
 }
 
 bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
-    const std::string &file_name) {
+    const std::string& file_name) {
   YAML::Node config = YAML::LoadFile(file_name);
   if (config["K"]) {
     camera_intrinsic(0, 0) = config["K"][0].as<double>();
@@ -183,23 +175,20 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
       distort_params[i] = config["D"][i].as<double>();
     }
   } else {
-    AERROR << "load camera distortion coefficients failed. file_name:"
-           << file_name;
+    AERROR << "load camera distortion coefficients failed. file_name:" << file_name;
     return false;
   }
 
   if (config["height"]) {
     image_height = config["height"].as<size_t>();
   } else {
-    AERROR << "load image height from camera intrinsic failed. file:"
-           << file_name;
+    AERROR << "load image height from camera intrinsic failed. file:" << file_name;
     return false;
   }
   if (config["width"]) {
     image_width = config["width"].as<size_t>();
   } else {
-    AERROR << "Load image width from camera intrinsic failed. file:"
-           << file_name;
+    AERROR << "Load image width from camera intrinsic failed. file:" << file_name;
     return false;
   }
 
@@ -211,7 +200,7 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
 
 CalibrationConfigManager::CalibrationConfigManager()
     : camera_calibration_(new CameraCalibration()) {
-  work_root_ = FLAGS_work_root;
+  work_root_             = FLAGS_work_root;
   camera_extrinsic_path_ = FLAGS_front_camera_extrinsics_file;
   camera_intrinsic_path_ = FLAGS_front_camera_intrinsics_file;
   init();
@@ -231,12 +220,9 @@ bool CalibrationConfigManager::reset() {
 CalibrationConfigManager::~CalibrationConfigManager() {}
 
 bool CalibrationConfigManager::init_internal() {
-  if (inited_) {
-    return true;
-  }
+  if (inited_) { return true; }
 
-  if (!camera_calibration_->init(camera_intrinsic_path_,
-                                 camera_extrinsic_path_)) {
+  if (!camera_calibration_->init(camera_intrinsic_path_, camera_extrinsic_path_)) {
     AERROR << "init intrinsics failure: " << camera_intrinsic_path_ << " "
            << camera_extrinsic_path_;
     return false;
@@ -249,23 +235,22 @@ bool CalibrationConfigManager::init_internal() {
 }
 
 CameraCalibration::CameraCalibration()
-    : _camera2car_pose(new Eigen::Matrix<double, 4, 4>()),
-      _car2camera_pose(new Eigen::Matrix<double, 4, 4>()),
-      undistort_handler_(new ImageGpuPreprocessHandler()),
-      camera_model_(new CameraDistort<double>()) {}
+    : _camera2car_pose(new Eigen::Matrix<double, 4, 4>())
+    , _car2camera_pose(new Eigen::Matrix<double, 4, 4>())
+    , undistort_handler_(new ImageGpuPreprocessHandler())
+    , camera_model_(new CameraDistort<double>()) {}
 
 CameraCalibration::~CameraCalibration() {}
 
-bool CameraCalibration::init(const std::string &intrinsic_path,
-                             const std::string &extrinsic_path) {
+bool CameraCalibration::init(const std::string& intrinsic_path, const std::string& extrinsic_path) {
   if (!camera_coefficient_.init("", extrinsic_path, intrinsic_path)) {
     AERROR << "init camera coefficient failed";
     return false;
   }
 
   camera_intrinsic_ = camera_coefficient_.camera_intrinsic;
-  image_height_ = camera_coefficient_.image_height;
-  image_width_ = camera_coefficient_.image_width;
+  image_height_     = camera_coefficient_.image_height;
+  image_width_      = camera_coefficient_.image_width;
   *_camera2car_pose = camera_coefficient_.camera_extrinsic;
   *_car2camera_pose = _camera2car_pose->inverse();
 
@@ -282,25 +267,23 @@ bool CameraCalibration::init(const std::string &intrinsic_path,
 }
 
 void CameraCalibration::calculate_homographic() {
-  auto camera_intrinsic_inverse = camera_intrinsic_.block(0, 0, 3, 3).inverse();
-  auto car2camera_3_4 = (*_car2camera_pose).block(0, 0, 3, 4);
+  auto            camera_intrinsic_inverse = camera_intrinsic_.block(0, 0, 3, 3).inverse();
+  auto            car2camera_3_4           = (*_car2camera_pose).block(0, 0, 3, 4);
   Eigen::Matrix3d camera_2car_stripped;
   camera_2car_stripped.col(0) = car2camera_3_4.col(0);
   camera_2car_stripped.col(1) = car2camera_3_4.col(1);
   camera_2car_stripped.col(2) = car2camera_3_4.col(3);
-  homography_mat_ = camera_2car_stripped.inverse() * camera_intrinsic_inverse;
-  homography_mat_inverse_ = homography_mat_.inverse();
+  homography_mat_             = camera_2car_stripped.inverse() * camera_intrinsic_inverse;
+  homography_mat_inverse_     = homography_mat_.inverse();
 }
 
 void CameraCalibration::init_camera_model() {
-  camera_model_->set(camera_intrinsic_.block(0, 0, 3, 3), image_width_,
-                     image_height_);
+  camera_model_->set(camera_intrinsic_.block(0, 0, 3, 3), image_width_, image_height_);
 }
 
-bool CameraCalibration::init_undistortion(const std::string &intrinsics_path) {
+bool CameraCalibration::init_undistortion(const std::string& intrinsics_path) {
   AINFO << "Loading intrinsics: " << intrinsics_path;
-  int err =
-      undistort_handler_->init(intrinsics_path, FLAGS_obs_camera_detector_gpu);
+  int err = undistort_handler_->init(intrinsics_path, FLAGS_obs_camera_detector_gpu);
 
   if (err != 0) {
     AERROR << "Undistortion initialization failed with error code: " << err;

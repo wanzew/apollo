@@ -35,7 +35,8 @@ namespace math {
 
 class QpSolver {
  public:
-  QpSolver(const Eigen::MatrixXd& kernel_matrix, const Eigen::MatrixXd& offset,
+  QpSolver(const Eigen::MatrixXd& kernel_matrix,
+           const Eigen::MatrixXd& offset,
            const Eigen::MatrixXd& affine_inequality_matrix,
            const Eigen::MatrixXd& affine_inequality_boundary,
            const Eigen::MatrixXd& affine_equality_matrix,
@@ -57,7 +58,7 @@ class QpSolver {
   const Eigen::MatrixXd& affine_inequality_boundary() const;
 
  protected:
-  virtual bool sanity_check() = 0;
+  virtual bool    sanity_check() = 0;
   Eigen::MatrixXd params_;
   Eigen::MatrixXd kernel_matrix_;
   Eigen::MatrixXd offset_;

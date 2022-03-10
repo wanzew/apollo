@@ -48,13 +48,11 @@ static inline int baud_obs_num(int type) {
     case 1033:  // receiver and antenna descriptor, for station
     case 1044:  // qzss ephemerides
     case 1045:  // galileo
-    default:
-      return 0;
+    default: return 0;
   }
 }
 
-static inline bool gnss_sys(int message_type,
-                            apollo::drivers::gnss::GnssType* gnss_type) {
+static inline bool gnss_sys(int message_type, apollo::drivers::gnss::GnssType* gnss_type) {
   switch (message_type) {
     case 1019:  // gps ephemerides
       *gnss_type = apollo::drivers::gnss::GnssType::GPS_SYS;
@@ -73,40 +71,28 @@ static inline bool gnss_sys(int message_type,
       break;
 
     case 1044:  // qzss ephemerides
-    default:
-      return false;
+    default: return false;
   }
   return true;
 }
 
-static inline bool gnss_sys_type(int sys_id,
-                                 apollo::drivers::gnss::GnssType* gnss_type) {
+static inline bool gnss_sys_type(int sys_id, apollo::drivers::gnss::GnssType* gnss_type) {
   switch (sys_id) {
-    case SYS_GPS:
-      *gnss_type = apollo::drivers::gnss::GnssType::GPS_SYS;
-      break;
+    case SYS_GPS: *gnss_type = apollo::drivers::gnss::GnssType::GPS_SYS; break;
 
-    case SYS_CMP:
-      *gnss_type = apollo::drivers::gnss::GnssType::BDS_SYS;
-      break;
+    case SYS_CMP: *gnss_type = apollo::drivers::gnss::GnssType::BDS_SYS; break;
 
-    case SYS_GLO:
-      *gnss_type = apollo::drivers::gnss::GnssType::GLO_SYS;
-      break;
+    case SYS_GLO: *gnss_type = apollo::drivers::gnss::GnssType::GLO_SYS; break;
 
-    case SYS_GAL:
-      *gnss_type = apollo::drivers::gnss::GnssType::GAL_SYS;
-      break;
+    case SYS_GAL: *gnss_type = apollo::drivers::gnss::GnssType::GAL_SYS; break;
 
-    default:
-      AINFO << "Not support sys id: " << sys_id;
-      return false;
+    default: AINFO << "Not support sys id: " << sys_id; return false;
   }
   return true;
 }
 
-static inline bool gnss_baud_id(apollo::drivers::gnss::GnssType sys_type,
-                                int seq,
+static inline bool gnss_baud_id(apollo::drivers::gnss::GnssType    sys_type,
+                                int                                seq,
                                 apollo::drivers::gnss::GnssBandID* baud_id) {
   switch (sys_type) {
     case apollo::drivers::gnss::GnssType::GPS_SYS:
@@ -147,16 +133,14 @@ static inline bool gnss_baud_id(apollo::drivers::gnss::GnssType sys_type,
       break;
 
     default:
-      AINFO << "Not support sys " << static_cast<int>(sys_type) << ", seq "
-            << seq;
+      AINFO << "Not support sys " << static_cast<int>(sys_type) << ", seq " << seq;
       return false;
   }
   return true;
 }
 
-static inline bool gnss_time_type(
-    apollo::drivers::gnss::GnssType sys_type,
-    apollo::drivers::gnss::GnssTimeType* time_type) {
+static inline bool gnss_time_type(apollo::drivers::gnss::GnssType      sys_type,
+                                  apollo::drivers::gnss::GnssTimeType* time_type) {
   switch (sys_type) {
     case apollo::drivers::gnss::GnssType::GPS_SYS:
       *time_type = apollo::drivers::gnss::GnssTimeType::GPS_TIME;
@@ -174,9 +158,7 @@ static inline bool gnss_time_type(
       *time_type = apollo::drivers::gnss::GnssTimeType::GAL_TIME;
       break;
 
-    default:
-      AINFO << "Not support sys " << static_cast<int>(sys_type);
-      return false;
+    default: AINFO << "Not support sys " << static_cast<int>(sys_type); return false;
   }
   return true;
 }

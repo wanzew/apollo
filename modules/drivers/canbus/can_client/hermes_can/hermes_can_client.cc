@@ -30,12 +30,10 @@ namespace can {
 using apollo::common::ErrorCode;
 
 HermesCanClient::~HermesCanClient() {
-  if (_dev_handler) {
-    Stop();
-  }
+  if (_dev_handler) { Stop(); }
 }
 
-bool HermesCanClient::Init(const CANCardParameter &parameter) {
+bool HermesCanClient::Init(const CANCardParameter& parameter) {
   if (!parameter.has_channel_id()) {
     AERROR << "Init CAN failed: parameter does not have channel id. The "
               "parameter is "
@@ -48,13 +46,11 @@ bool HermesCanClient::Init(const CANCardParameter &parameter) {
 }
 
 ErrorCode HermesCanClient::Start() {
-  if (_is_init) {
-    return ErrorCode::OK;
-  }
+  if (_is_init) { return ErrorCode::OK; }
 
   if (_card_port > MAX_CAN_PORT || _card_port < 0) {
-    AERROR << "can port number [" << _card_port << "] is out of the range [0,"
-           << MAX_CAN_PORT << "]";
+    AERROR << "can port number [" << _card_port << "] is out of the range [0," << MAX_CAN_PORT
+           << "]";
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
   // open device
@@ -64,8 +60,7 @@ ErrorCode HermesCanClient::Start() {
                           &_dev_handler);
 
   if (ret != ErrorCode::OK) {
-    AERROR << "Open device error code: " << ret
-           << ", channel id: " << _card_port;
+    AERROR << "Open device error code: " << ret << ", channel id: " << _card_port;
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
   AERROR << "Open device succ code: " << ret << ", channel id: " << _card_port;
@@ -90,17 +85,15 @@ ErrorCode HermesCanClient::Start() {
 
 void HermesCanClient::Stop() {
   if (_is_init) {
-    _is_init = false;
+    _is_init    = false;
     int32_t ret = bcan_close(_dev_handler);
-    if (ret != ErrorCode::OK) {
-      AERROR << "close error code: " << ret;
-    }
+    if (ret != ErrorCode::OK) { AERROR << "close error code: " << ret; }
   }
 }
 
 // Synchronous transmission of CAN messages
-apollo::common::ErrorCode HermesCanClient::Send(
-    const std::vector<CanFrame> &frames, int32_t *const frame_num) {
+apollo::common::ErrorCode HermesCanClient::Send(const std::vector<CanFrame>& frames,
+                                                int32_t* const               frame_num) {
   /*
   typedef struct bcan_msg {
       uint32_t bcan_msg_id;        // source CAN node id
@@ -123,18 +116,17 @@ apollo::common::ErrorCode HermesCanClient::Send(
   //       return ErrorCode::CAN_CLIENT_ERROR_FRAME_NUM;
   //    }
   for (int i = 0; i < *frame_num; ++i) {
-    _send_frames[i].bcan_msg_id = frames[i].id;
+    _send_frames[i].bcan_msg_id      = frames[i].id;
     _send_frames[i].bcan_msg_datalen = frames[i].len;
     memcpy(_send_frames[i].bcan_msg_data, frames[i].data, frames[i].len);
   }
 
   // Synchronous transmission of CAN messages
   int32_t send_num = *frame_num;
-  int32_t ret = bcan_send(_dev_handler, _send_frames, send_num);
+  int32_t ret      = bcan_send(_dev_handler, _send_frames, send_num);
   if (ret < 0) {
     int ret_send_error = bcan_get_status(_dev_handler);
-    AERROR << "send message failed, error code: " << ret
-           << ", send error: " << ret_send_error;
+    AERROR << "send message failed, error code: " << ret << ", send error: " << ret_send_error;
     return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
   }
   *frame_num = ret;
@@ -142,9 +134,9 @@ apollo::common::ErrorCode HermesCanClient::Send(
 }
 
 // buf size must be 8 bytes, every time, we receive only one frame
-const int RX_TIMEOUT = -7;
-apollo::common::ErrorCode HermesCanClient::Receive(
-    std::vector<CanFrame> *const frames, int32_t *const frame_num) {
+const int                 RX_TIMEOUT = -7;
+apollo::common::ErrorCode HermesCanClient::Receive(std::vector<CanFrame>* const frames,
+                                                   int32_t* const               frame_num) {
   if (!_is_init) {
     AERROR << "Hermes can client is not init! Please init first!";
     return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
@@ -163,8 +155,7 @@ apollo::common::ErrorCode HermesCanClient::Receive(
   }
   if (ret < 0) {
     int ret_rece_error = bcan_get_status(_dev_handler);
-    AERROR << "receive message failed, error code:" << ret
-           << "receive error:" << ret_rece_error;
+    AERROR << "receive message failed, error code:" << ret << "receive error:" << ret_rece_error;
     return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
   }
   *frame_num = ret;
@@ -172,9 +163,9 @@ apollo::common::ErrorCode HermesCanClient::Receive(
   // is ret num is equal *frame_num?
   for (int i = 0; i < *frame_num; ++i) {
     CanFrame cf;
-    cf.id = _recv_frames[i].bcan_msg_id;
-    cf.len = _recv_frames[i].bcan_msg_datalen;
-    cf.timestamp.tv_sec = _recv_frames[i].bcan_msg_timestamp.tv_sec;
+    cf.id                = _recv_frames[i].bcan_msg_id;
+    cf.len               = _recv_frames[i].bcan_msg_datalen;
+    cf.timestamp.tv_sec  = _recv_frames[i].bcan_msg_timestamp.tv_sec;
     cf.timestamp.tv_usec = _recv_frames[i].bcan_msg_timestamp.tv_usec;
     memcpy(cf.data, _recv_frames[i].bcan_msg_data, cf.len);
     frames->push_back(cf);

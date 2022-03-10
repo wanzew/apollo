@@ -36,7 +36,7 @@ namespace perception {
 
 class AsyncFusion : public BaseFusion {
  public:
-  AsyncFusion() = default;
+  AsyncFusion()  = default;
   ~AsyncFusion() = default;
 
   virtual bool Init();
@@ -45,8 +45,8 @@ class AsyncFusion : public BaseFusion {
   // @param [in]: multi sensor objects.
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
-  virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<std::shared_ptr<Object>> *fused_objects);
+  virtual bool Fuse(const std::vector<SensorObjects>&     multi_sensor_objects,
+                    std::vector<std::shared_ptr<Object>>* fused_objects);
 
   virtual std::string name() const;
 
@@ -54,45 +54,42 @@ class AsyncFusion : public BaseFusion {
   void FuseFrame(PbfSensorFramePtr frame);
 
   /**@brief create new tracks for objects not assigned to current tracks*/
-  void CreateNewTracks(
-      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
-      const std::vector<int> &unassigned_ids);
+  void CreateNewTracks(const std::vector<std::shared_ptr<PbfSensorObject>>& sensor_objects,
+                       const std::vector<int>&                              unassigned_ids);
 
   /**@brief update current tracks with matched objects*/
-  void UpdateAssignedTracks(
-      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
-      const std::vector<std::pair<int, int>> &assignments,
-      const std::vector<double> &track_objects_dist,
-      std::vector<PbfTrackPtr> const *tracks);
+  void UpdateAssignedTracks(const std::vector<std::shared_ptr<PbfSensorObject>>& sensor_objects,
+                            const std::vector<std::pair<int, int>>&              assignments,
+                            const std::vector<double>&                           track_objects_dist,
+                            std::vector<PbfTrackPtr> const*                      tracks);
 
   /**@brief update current tracks which cannot find matched objects*/
-  void UpdateUnassignedTracks(const std::vector<int> &unassigned_tracks,
-                              const std::vector<double> &track_object_dist,
-                              const SensorType &sensor_type,
-                              const std::string &sensor_id,
-                              const double timestamp,
-                              std::vector<PbfTrackPtr> *tracks);
+  void UpdateUnassignedTracks(const std::vector<int>&    unassigned_tracks,
+                              const std::vector<double>& track_object_dist,
+                              const SensorType&          sensor_type,
+                              const std::string&         sensor_id,
+                              const double               timestamp,
+                              std::vector<PbfTrackPtr>*  tracks);
 
-  void CollectFusedObjects(double timestamp,
-                           std::vector<std::shared_ptr<Object>> *fused_objects);
+  void CollectFusedObjects(double timestamp, std::vector<std::shared_ptr<Object>>* fused_objects);
 
-  void DecomposeFrameObjects(
-      const std::vector<std::shared_ptr<PbfSensorObject>> &frame_objects,
-      std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
-      std::vector<std::shared_ptr<PbfSensorObject>> *background_objects);
+  void DecomposeFrameObjects(const std::vector<std::shared_ptr<PbfSensorObject>>& frame_objects,
+                             std::vector<std::shared_ptr<PbfSensorObject>>* foreground_objects,
+                             std::vector<std::shared_ptr<PbfSensorObject>>* background_objects);
 
-  void FuseForegroundObjects(
-      const Eigen::Vector3d &ref_point, const SensorType &sensor_type,
-      const std::string &sensor_id, const double timestamp,
-      std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects);
+  void FuseForegroundObjects(const Eigen::Vector3d&                         ref_point,
+                             const SensorType&                              sensor_type,
+                             const std::string&                             sensor_id,
+                             const double                                   timestamp,
+                             std::vector<std::shared_ptr<PbfSensorObject>>* foreground_objects);
 
-  PbfSensorFramePtr ConstructFrame(const SensorObjects &obj);
+  PbfSensorFramePtr ConstructFrame(const SensorObjects& obj);
 
  protected:
-  bool started_ = false;
+  bool                                       started_ = false;
   std::unique_ptr<PbfBaseTrackObjectMatcher> matcher_;
-  PbfTrackManager *track_manager_ = nullptr;
-  std::mutex fusion_mutex_;
+  PbfTrackManager*                           track_manager_ = nullptr;
+  std::mutex                                 fusion_mutex_;
 
   async_fusion_config::ModelConfigs config_;
 

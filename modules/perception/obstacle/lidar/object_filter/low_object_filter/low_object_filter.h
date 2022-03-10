@@ -30,24 +30,25 @@ namespace perception {
 
 class LowObjectFilter : public BaseObjectFilter {
  public:
-  LowObjectFilter() : BaseObjectFilter() {}
+  LowObjectFilter()
+      : BaseObjectFilter() {}
   virtual ~LowObjectFilter() {}
 
   bool Init();
 
   std::string name() const { return "LowObjectFilter"; }
 
-  bool Filter(const ObjectFilterOptions& obj_filter_options,
+  bool Filter(const ObjectFilterOptions&            obj_filter_options,
               std::vector<std::shared_ptr<Object>>* objects);
 
  protected:
-  void FilterLowObject(const ObjectFilterOptions& obj_filter_options,
+  void FilterLowObject(const ObjectFilterOptions&            obj_filter_options,
                        std::vector<std::shared_ptr<Object>>* objects);
 
  private:
   low_object_filter_config::ModelConfigs config_;
-  float object_height_threshold_  = 0.f;
-  float object_position_height_threshold_ = 0.f;
+  float                                  object_height_threshold_          = 0.f;
+  float                                  object_position_height_threshold_ = 0.f;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LowObjectFilter);

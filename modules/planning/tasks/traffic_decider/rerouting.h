@@ -37,14 +37,13 @@ class Rerouting : public TrafficRule {
   explicit Rerouting(const TrafficRuleConfig& config);
   virtual ~Rerouting() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   bool ChangeLaneFailRerouting();
 
   ReferenceLineInfo* reference_line_info_ = nullptr;
-  Frame* frame_ = nullptr;
+  Frame*             frame_               = nullptr;
 };
 
 }  // namespace planning

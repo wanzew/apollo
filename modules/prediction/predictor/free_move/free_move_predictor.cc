@@ -16,11 +16,11 @@
 
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 
+#include "Eigen/Dense"
 #include <cmath>
 #include <limits>
 #include <utility>
 #include <vector>
-#include "Eigen/Dense"
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -43,39 +43,39 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 
   const Feature& feature = obstacle->latest_feature();
 
-  if (!feature.has_position() || !feature.has_velocity() ||
-      !feature.position().has_x() || !feature.position().has_y()) {
-    AERROR << "Obstacle [" << obstacle->id()
-           << " is missing position or velocity";
+  if (!feature.has_position() || !feature.has_velocity() || !feature.position().has_x() ||
+      !feature.position().has_y()) {
+    AERROR << "Obstacle [" << obstacle->id() << " is missing position or velocity";
     return;
   }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
   Eigen::Vector2d acc(feature.acceleration().x(), feature.acceleration().y());
-  double theta = feature.velocity_heading();
+  double          theta = feature.velocity_heading();
 
   std::vector<TrajectoryPoint> points(0);
-  double prediction_total_time = FLAGS_prediction_duration;
+  double                       prediction_total_time = FLAGS_prediction_duration;
   if (obstacle->type() == PerceptionObstacle::PEDESTRIAN) {
     prediction_total_time = FLAGS_prediction_pedestrian_total_time;
   }
-  DrawFreeMoveTrajectoryPoints(position, velocity, acc, theta,
-      prediction_total_time, FLAGS_prediction_period, &points);
+  DrawFreeMoveTrajectoryPoints(position, velocity, acc, theta, prediction_total_time,
+                               FLAGS_prediction_period, &points);
 
-  Trajectory trajectory = GenerateTrajectory(points);
-  int start_index = 0;
+  Trajectory trajectory  = GenerateTrajectory(points);
+  int        start_index = 0;
   trajectories_.push_back(std::move(trajectory));
   SetEqualProbability(1.0, start_index);
-  ADEBUG << "Obstacle [" << obstacle->id() << "] has " << trajectories_.size()
-         << " trajectories.";
+  ADEBUG << "Obstacle [" << obstacle->id() << "] has " << trajectories_.size() << " trajectories.";
 }
 
-void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
-    const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-    const Eigen::Vector2d& acc, const double theta,
-    const double total_time, const double period,
-    std::vector<TrajectoryPoint>* points) {
+void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(const Eigen::Vector2d&        position,
+                                                     const Eigen::Vector2d&        velocity,
+                                                     const Eigen::Vector2d&        acc,
+                                                     const double                  theta,
+                                                     const double                  total_time,
+                                                     const double                  period,
+                                                     std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 6, 1> state;
   state.setZero();
   state(0, 0) = 0.0;
@@ -95,12 +95,12 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   transition(3, 5) = period;
 
   size_t num = static_cast<size_t>(total_time / period);
-  ::apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
-      &state, transition, theta, num, period, points);
+  ::apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(&state, transition, theta,
+                                                                         num, period, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
-    ::apollo::prediction::predictor_util::TranslatePoint(
-        position[0], position[1], &(points->operator[](i)));
+    ::apollo::prediction::predictor_util::TranslatePoint(position[0], position[1],
+                                                         &(points->operator[](i)));
   }
 }
 

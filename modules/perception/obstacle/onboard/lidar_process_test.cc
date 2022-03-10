@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "pcl/io/pcd_io.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
@@ -44,10 +44,9 @@ class LidarProcessTest : public testing::Test {
     common::adapter::AdapterManagerConfig config;
     config.set_is_ros(false);
     {
-      auto *sub_config = config.add_config();
+      auto* sub_config = config.add_config();
       sub_config->set_mode(common::adapter::AdapterConfig::PUBLISH_ONLY);
-      sub_config->set_type(
-          common::adapter::AdapterConfig::PERCEPTION_OBSTACLES);
+      sub_config->set_type(common::adapter::AdapterConfig::PERCEPTION_OBSTACLES);
     }
 
     common::adapter::AdapterManager::Init(config);
@@ -74,19 +73,17 @@ TEST_F(LidarProcessTest, test_Init) {
 }
 
 TEST_F(LidarProcessTest, test_Process) {
-  std::string pcd_file =
-      "modules/perception/data/hm_tracker_test/"
-      "QN68P2_12_1476265365_1476265665_2.pcd";
-  PointCloudPtr point_cloud(new PointCloud);
-  pcl::PointCloud<pcl_util::PointXYZIT>::Ptr org_cloud(
-      new pcl::PointCloud<pcl_util::PointXYZIT>);
+  std::string pcd_file = "modules/perception/data/hm_tracker_test/"
+                         "QN68P2_12_1476265365_1476265665_2.pcd";
+  PointCloudPtr                              point_cloud(new PointCloud);
+  pcl::PointCloud<pcl_util::PointXYZIT>::Ptr org_cloud(new pcl::PointCloud<pcl_util::PointXYZIT>);
   pcl::io::loadPCDFile(pcd_file, *org_cloud);
   point_cloud->points.reserve(org_cloud->points.size());
   for (size_t i = 0; i < org_cloud->points.size(); ++i) {
     pcl_util::Point pt;
-    pt.x = org_cloud->points[i].x;
-    pt.y = org_cloud->points[i].y;
-    pt.z = org_cloud->points[i].z;
+    pt.x         = org_cloud->points[i].x;
+    pt.y         = org_cloud->points[i].y;
+    pt.z         = org_cloud->points[i].z;
     pt.intensity = org_cloud->points[i].intensity;
     if (std::isnan(org_cloud->points[i].x)) continue;
     point_cloud->push_back(pt);
@@ -98,24 +95,22 @@ TEST_F(LidarProcessTest, test_Process) {
 }
 
 TEST_F(LidarProcessTest, test_GeneratePbMsg) {
-  double timestamp = 1234.567;
+  double timestamp          = 1234.567;
   lidar_process_.timestamp_ = timestamp;
   vector<std::shared_ptr<Object>> objs;
-  std::shared_ptr<Object> obj1 = std::make_shared<Object>();
-  obj1->type = ObjectType::VEHICLE;
+  std::shared_ptr<Object>         obj1 = std::make_shared<Object>();
+  obj1->type                           = ObjectType::VEHICLE;
   objs.push_back(obj1);
   std::shared_ptr<Object> obj2 = std::make_shared<Object>();
-  obj2->type = ObjectType::PEDESTRIAN;
+  obj2->type                   = ObjectType::PEDESTRIAN;
   objs.push_back(obj2);
   lidar_process_.objects_ = objs;
 
   PerceptionObstacles obstacles;
   lidar_process_.GeneratePbMsg(&obstacles);
   EXPECT_EQ(obstacles.perception_obstacle_size(), 2);
-  EXPECT_EQ(obstacles.perception_obstacle(0).type(),
-            PerceptionObstacle::VEHICLE);
-  EXPECT_EQ(obstacles.perception_obstacle(1).type(),
-            PerceptionObstacle::PEDESTRIAN);
+  EXPECT_EQ(obstacles.perception_obstacle(0).type(), PerceptionObstacle::VEHICLE);
+  EXPECT_EQ(obstacles.perception_obstacle(1).type(), PerceptionObstacle::PEDESTRIAN);
 }
 
 }  // namespace perception

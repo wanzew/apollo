@@ -23,15 +23,13 @@ namespace monitor {
 
 using apollo::common::adapter::AdapterManager;
 
-void MonitorLogger::Publish(const std::vector<MessageItem> &messages) const {
+void MonitorLogger::Publish(const std::vector<MessageItem>& messages) const {
   // compose a monitor message
-  if (messages.empty()) {
-    return;
-  }
+  if (messages.empty()) { return; }
   MonitorMessage monitor_msg;
 
-  for (const auto &msg_item : messages) {
-    MonitorMessageItem *monitor_msg_item = monitor_msg.add_item();
+  for (const auto& msg_item : messages) {
+    MonitorMessageItem* monitor_msg_item = monitor_msg.add_item();
     monitor_msg_item->set_source(source_);
     monitor_msg_item->set_log_level(msg_item.first);
     monitor_msg_item->set_msg(msg_item.second);
@@ -41,7 +39,7 @@ void MonitorLogger::Publish(const std::vector<MessageItem> &messages) const {
   DoPublish(&monitor_msg);
 }
 
-void MonitorLogger::DoPublish(MonitorMessage *message) const {
+void MonitorLogger::DoPublish(MonitorMessage* message) const {
   CHECK(AdapterManager::Initialized())
       << "AdapterManager must be initialized before using monitor.";
   CHECK(AdapterManager::GetMonitor() != nullptr)

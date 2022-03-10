@@ -28,22 +28,20 @@ namespace planning {
 using apollo::common::math::Vec2d;
 
 TEST(Spline2dConstraint, add_boundary_01) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   std::vector<double> t_coord = {0.0};
-  std::vector<double> angle = {0.0};
-  std::vector<Vec2d> ref_point;
+  std::vector<double> angle   = {0.0};
+  std::vector<Vec2d>  ref_point;
   ref_point.emplace_back(Vec2d(0.0, 0.0));
-  std::vector<double> lateral_bound = {1.0};
+  std::vector<double> lateral_bound      = {1.0};
   std::vector<double> longitidinal_bound = {2.0};
 
-  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound,
-                           lateral_bound);
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound, lateral_bound);
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(4, 8);
@@ -70,22 +68,20 @@ TEST(Spline2dConstraint, add_boundary_01) {
 
 // test add boundary with non-zero angle
 TEST(Spline2dConstraint, add_boundary_02) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   std::vector<double> t_coord = {0.0};
-  std::vector<double> angle = {0.2};
-  std::vector<Vec2d> ref_point;
+  std::vector<double> angle   = {0.2};
+  std::vector<Vec2d>  ref_point;
   ref_point.emplace_back(Vec2d(0.0, 0.0));
-  std::vector<double> lateral_bound = {1.0};
+  std::vector<double> lateral_bound      = {1.0};
   std::vector<double> longitidinal_bound = {2.0};
 
-  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound,
-                           lateral_bound);
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound, lateral_bound);
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(4, 8);
@@ -112,22 +108,20 @@ TEST(Spline2dConstraint, add_boundary_02) {
 
 // test add boundary with multiple splines
 TEST(Spline2dConstraint, add_boundary_03) {
-  std::vector<double> x_knots = {0.0, 1.0, 2.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0, 2.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   std::vector<double> t_coord = {1.0};
-  std::vector<double> angle = {0.2};
-  std::vector<Vec2d> ref_point;
+  std::vector<double> angle   = {0.2};
+  std::vector<Vec2d>  ref_point;
   ref_point.emplace_back(Vec2d(0.0, 0.0));
-  std::vector<double> lateral_bound = {1.0};
+  std::vector<double> lateral_bound      = {1.0};
   std::vector<double> longitidinal_bound = {2.0};
 
-  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound,
-                           lateral_bound);
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound, lateral_bound);
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(4, 16);
@@ -153,22 +147,20 @@ TEST(Spline2dConstraint, add_boundary_03) {
 }
 
 TEST(Spline2dConstraint, add_boundary_04) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   std::vector<double> t_coord = {0.0};
-  std::vector<double> angle = {-M_PI / 2.0};
-  std::vector<Vec2d> ref_point;
+  std::vector<double> angle   = {-M_PI / 2.0};
+  std::vector<Vec2d>  ref_point;
   ref_point.emplace_back(Vec2d(0.0, 0.0));
-  std::vector<double> lateral_bound = {1.0};
+  std::vector<double> lateral_bound      = {1.0};
   std::vector<double> longitidinal_bound = {2.0};
 
-  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound,
-                           lateral_bound);
-  const auto mat = constraint.inequality_constraint().constraint_matrix();
-  const auto boundary =
-      constraint.inequality_constraint().constraint_boundary();
+  constraint.Add2dBoundary(t_coord, angle, ref_point, longitidinal_bound, lateral_bound);
+  const auto mat      = constraint.inequality_constraint().constraint_matrix();
+  const auto boundary = constraint.inequality_constraint().constraint_boundary();
 
   // clang-format off
   Eigen::MatrixXd ref_mat = Eigen::MatrixXd::Zero(4, 8);
@@ -194,15 +186,15 @@ TEST(Spline2dConstraint, add_boundary_04) {
 }
 
 TEST(Spline2dConstraint, add_point_angle_constraint_01) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   double t_coord = 0.0;
-  double angle = 45.0 * M_PI / 180.0;
+  double angle   = 45.0 * M_PI / 180.0;
 
   constraint.AddPointAngleConstraint(t_coord, angle);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -226,15 +218,15 @@ TEST(Spline2dConstraint, add_point_angle_constraint_01) {
 }
 
 TEST(Spline2dConstraint, add_point_angle_constraint_02) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   double t_coord = 0.0;
-  double angle = 0.0 * M_PI / 180.0;
+  double angle   = 0.0 * M_PI / 180.0;
 
   constraint.AddPointAngleConstraint(t_coord, angle);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -258,15 +250,15 @@ TEST(Spline2dConstraint, add_point_angle_constraint_02) {
 }
 
 TEST(Spline2dConstraint, add_point_angle_constraint_03) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   double t_coord = 0.0;
-  double angle = 60.0 * M_PI / 180.0;
+  double angle   = 60.0 * M_PI / 180.0;
 
   constraint.AddPointAngleConstraint(t_coord, angle);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -290,15 +282,15 @@ TEST(Spline2dConstraint, add_point_angle_constraint_03) {
 }
 
 TEST(Spline2dConstraint, add_point_angle_constraint_04) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   double t_coord = 0.0;
-  double angle = 90.0 * M_PI / 180.0;
+  double angle   = 90.0 * M_PI / 180.0;
 
   constraint.AddPointAngleConstraint(t_coord, angle);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -322,15 +314,15 @@ TEST(Spline2dConstraint, add_point_angle_constraint_04) {
 }
 
 TEST(Spline2dConstraint, add_point_angle_constraint_05) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   double t_coord = 0.0;
-  double angle = 135.0 * M_PI / 180.0;
+  double angle   = 135.0 * M_PI / 180.0;
 
   constraint.AddPointAngleConstraint(t_coord, angle);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off
@@ -354,15 +346,15 @@ TEST(Spline2dConstraint, add_point_angle_constraint_05) {
 }
 
 TEST(Spline2dConstraint, add_point_angle_constraint_06) {
-  std::vector<double> x_knots = {0.0, 1.0};
-  int32_t spline_order = 3;
-  Spline2dConstraint constraint(x_knots, spline_order);
+  std::vector<double> x_knots      = {0.0, 1.0};
+  int32_t             spline_order = 3;
+  Spline2dConstraint  constraint(x_knots, spline_order);
 
   double t_coord = 1.0;
-  double angle = 60.0 * M_PI / 180.0;
+  double angle   = 60.0 * M_PI / 180.0;
 
   constraint.AddPointAngleConstraint(t_coord, angle);
-  const auto mat = constraint.equality_constraint().constraint_matrix();
+  const auto mat      = constraint.equality_constraint().constraint_matrix();
   const auto boundary = constraint.equality_constraint().constraint_boundary();
 
   // clang-format off

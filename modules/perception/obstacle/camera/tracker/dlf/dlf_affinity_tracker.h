@@ -30,23 +30,25 @@ namespace perception {
 
 class DLFAffinityTracker : public BaseAffinityTracker {
  public:
-  DLFAffinityTracker() : BaseAffinityTracker() {}
+  DLFAffinityTracker()
+      : BaseAffinityTracker() {}
 
   virtual ~DLFAffinityTracker() {}
 
   bool Init() override;
 
-  bool GetAffinityMatrix(
-      const cv::Mat &img, const std::vector<Tracked> &tracked,
-      const std::vector<Detected> &detected,
-      std::vector<std::vector<float>> *affinity_matrix) override;
+  bool GetAffinityMatrix(const cv::Mat&                   img,
+                         const std::vector<Tracked>&      tracked,
+                         const std::vector<Detected>&     detected,
+                         std::vector<std::vector<float>>* affinity_matrix) override;
 
-  bool UpdateTracked(const cv::Mat &img, const std::vector<Detected> &detected,
-                     std::vector<Tracked> *tracked) override;
+  bool UpdateTracked(const cv::Mat&               img,
+                     const std::vector<Detected>& detected,
+                     std::vector<Tracked>*        tracked) override;
 
  private:
   //  Thresholds are fine-tuned and detector-dependant
-  const float kConfThreshold_ = 1.0f;
+  const float kConfThreshold_   = 1.0f;
   const float kFilterThreshold_ = 0.0f;
 };
 

@@ -34,11 +34,11 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::SLPoint;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::math::Vec2d;
-using apollo::common::SLPoint;
 
-bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
+bool PathData::SetDiscretizedPath(const DiscretizedPath& path) {
   if (reference_line_ == nullptr) {
     AERROR << "Should NOT set discretized path when reference line is nullptr. "
               "Please set reference line first.";
@@ -54,7 +54,7 @@ bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
   return true;
 }
 
-bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
+bool PathData::SetFrenetPath(const FrenetFramePath& frenet_path) {
   if (reference_line_ == nullptr) {
     AERROR << "Should NOT set frenet path when reference line is nullptr. "
               "Please set reference line first.";
@@ -70,41 +70,32 @@ bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
   return true;
 }
 
-const DiscretizedPath &PathData::discretized_path() const {
-  return discretized_path_;
-}
+const DiscretizedPath& PathData::discretized_path() const { return discretized_path_; }
 
 bool PathData::Empty() const {
-  return discretized_path_.NumOfPoints() == 0 &&
-         frenet_path_.NumOfPoints() == 0;
+  return discretized_path_.NumOfPoints() == 0 && frenet_path_.NumOfPoints() == 0;
 }
 
-std::list<std::pair<DiscretizedPath, FrenetFramePath>>
-    &PathData::path_data_history() {
+std::list<std::pair<DiscretizedPath, FrenetFramePath>>& PathData::path_data_history() {
   return path_data_history_;
 }
 
-const FrenetFramePath &PathData::frenet_frame_path() const {
-  return frenet_path_;
-}
+const FrenetFramePath& PathData::frenet_frame_path() const { return frenet_path_; }
 
-void PathData::SetReferenceLine(const ReferenceLine *reference_line) {
+void PathData::SetReferenceLine(const ReferenceLine* reference_line) {
   Clear();
   reference_line_ = reference_line;
 }
 
-bool PathData::GetPathPointWithPathS(
-    const double s, common::PathPoint *const path_point) const {
+bool PathData::GetPathPointWithPathS(const double s, common::PathPoint* const path_point) const {
   *path_point = discretized_path_.Evaluate(s);
   return true;
 }
 
-bool PathData::GetPathPointWithRefS(const double ref_s,
-                                    common::PathPoint *const path_point) const {
+bool PathData::GetPathPointWithRefS(const double ref_s, common::PathPoint* const path_point) const {
   DCHECK_NOTNULL(reference_line_);
   DCHECK_NOTNULL(path_point);
-  DCHECK_EQ(discretized_path_.path_points().size(),
-            frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.path_points().size(), frenet_path_.points().size());
   if (ref_s < 0) {
     AERROR << "ref_s[" << ref_s << "] should be > 0";
     return false;
@@ -115,27 +106,24 @@ bool PathData::GetPathPointWithRefS(const double ref_s,
     return false;
   }
 
-  uint32_t index = 0;
+  uint32_t     index            = 0;
   const double kDistanceEpsilon = 1e-3;
   for (uint32_t i = 0; i + 1 < frenet_path_.points().size(); ++i) {
     if (fabs(ref_s - frenet_path_.points().at(i).s()) < kDistanceEpsilon) {
       path_point->CopyFrom(discretized_path_.path_points().at(i));
       return true;
     }
-    if (frenet_path_.points().at(i).s() < ref_s &&
-        ref_s <= frenet_path_.points().at(i + 1).s()) {
+    if (frenet_path_.points().at(i).s() < ref_s && ref_s <= frenet_path_.points().at(i + 1).s()) {
       index = i;
       break;
     }
   }
   double r = (ref_s - frenet_path_.points().at(index).s()) /
-             (frenet_path_.points().at(index + 1).s() -
-              frenet_path_.points().at(index).s());
+             (frenet_path_.points().at(index + 1).s() - frenet_path_.points().at(index).s());
 
-  const double discretized_path_s =
-      discretized_path_.path_points().at(index).s() +
-      r * (discretized_path_.path_points().at(index + 1).s() -
-           discretized_path_.path_points().at(index).s());
+  const double discretized_path_s = discretized_path_.path_points().at(index).s() +
+                                    r * (discretized_path_.path_points().at(index + 1).s() -
+                                         discretized_path_.path_points().at(index).s());
   path_point->CopyFrom(discretized_path_.Evaluate(discretized_path_s));
 
   return true;
@@ -148,23 +136,21 @@ void PathData::Clear() {
 }
 
 std::string PathData::DebugString() const {
-  const auto &path_points = discretized_path_.path_points();
-  const auto limit =
-      std::min(path_points.size(),
-               static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
+  const auto& path_points = discretized_path_.path_points();
+  const auto  limit =
+      std::min(path_points.size(), static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
-  return apollo::common::util::StrCat(
-      "[\n", apollo::common::util::PrintDebugStringIter(
-                 path_points.begin(), path_points.begin() + limit, ",\n"),
-      "]\n");
+  return apollo::common::util::StrCat("[\n",
+                                      apollo::common::util::PrintDebugStringIter(
+                                          path_points.begin(), path_points.begin() + limit, ",\n"),
+                                      "]\n");
 }
 
-bool PathData::SLToXY(const FrenetFramePath &frenet_path,
-                      DiscretizedPath *const discretized_path) {
+bool PathData::SLToXY(const FrenetFramePath& frenet_path, DiscretizedPath* const discretized_path) {
   DCHECK_NOTNULL(discretized_path);
   std::vector<common::PathPoint> path_points;
-  for (const common::FrenetFramePoint &frenet_point : frenet_path.points()) {
-    common::SLPoint sl_point;
+  for (const common::FrenetFramePoint& frenet_point : frenet_path.points()) {
+    common::SLPoint     sl_point;
     common::math::Vec2d cartesian_point;
     sl_point.set_s(frenet_point.s());
     sl_point.set_l(frenet_point.l());
@@ -172,14 +158,12 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
       AERROR << "Fail to convert sl point to xy point";
       return false;
     }
-    ReferencePoint ref_point =
-        reference_line_->GetReferencePoint(frenet_point.s());
-    double theta = CartesianFrenetConverter::CalculateTheta(
-        ref_point.heading(), ref_point.kappa(), frenet_point.l(),
-        frenet_point.dl());
-    double kappa = CartesianFrenetConverter::CalculateKappa(
-        ref_point.kappa(), ref_point.dkappa(), frenet_point.l(),
-        frenet_point.dl(), frenet_point.ddl());
+    ReferencePoint ref_point = reference_line_->GetReferencePoint(frenet_point.s());
+    double theta = CartesianFrenetConverter::CalculateTheta(ref_point.heading(), ref_point.kappa(),
+                                                            frenet_point.l(), frenet_point.dl());
+    double kappa = CartesianFrenetConverter::CalculateKappa(ref_point.kappa(), ref_point.dkappa(),
+                                                            frenet_point.l(), frenet_point.dl(),
+                                                            frenet_point.ddl());
 
     common::PathPoint path_point = common::util::MakePathPoint(
         cartesian_point.x(), cartesian_point.y(), 0.0, theta, kappa, 0.0, 0.0);
@@ -190,10 +174,9 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
     } else {
       common::math::Vec2d last(path_points.back().x(), path_points.back().y());
       common::math::Vec2d current(path_point.x(), path_point.y());
-      double distance = (last - current).Length();
+      double              distance = (last - current).Length();
       path_point.set_s(path_points.back().s() + distance);
-      path_point.set_dkappa((path_point.kappa() - path_points.back().kappa()) /
-                            distance);
+      path_point.set_dkappa((path_point.kappa() - path_points.back().kappa()) / distance);
     }
     path_points.push_back(std::move(path_point));
   }
@@ -202,13 +185,12 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
   return true;
 }
 
-bool PathData::XYToSL(const DiscretizedPath &discretized_path,
-                      FrenetFramePath *const frenet_path) {
+bool PathData::XYToSL(const DiscretizedPath& discretized_path, FrenetFramePath* const frenet_path) {
   CHECK_NOTNULL(frenet_path);
   CHECK_NOTNULL(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
-  const double max_len = reference_line_->Length();
-  for (const auto &path_point : discretized_path.path_points()) {
+  const double                          max_len = reference_line_->Length();
+  for (const auto& path_point : discretized_path.path_points()) {
     SLPoint sl_point;
     if (!reference_line_->XYToSL({path_point.x(), path_point.y()}, &sl_point)) {
       AERROR << "Fail to transfer cartesian point to frenet point.";

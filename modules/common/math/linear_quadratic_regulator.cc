@@ -27,9 +27,13 @@ namespace math {
 
 using Matrix = Eigen::MatrixXd;
 
-void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
-                     const Matrix &R, const double tolerance,
-                     const uint max_num_iteration, Matrix *ptr_K) {
+void SolveLQRProblem(const Matrix& A,
+                     const Matrix& B,
+                     const Matrix& Q,
+                     const Matrix& R,
+                     const double  tolerance,
+                     const uint    max_num_iteration,
+                     Matrix*       ptr_K) {
   if (A.rows() != A.cols() || B.rows() != A.rows() || Q.rows() != Q.cols() ||
       Q.rows() != A.rows() || R.rows() != R.cols() || R.rows() != B.cols()) {
     AERROR << "LQR solver: one or more matrices have incompatible dimensions.";
@@ -41,15 +45,14 @@ void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
 
   // Solves a discrete-time Algebraic Riccati equation (DARE)
   // Calculate Matrix Difference Riccati Equation, initialize P and Q
-  Matrix P = Q;
-  uint num_iteration = 0;
-  double diff = std::numeric_limits<double>::max();
+  Matrix P             = Q;
+  uint   num_iteration = 0;
+  double diff          = std::numeric_limits<double>::max();
   while (num_iteration++ < max_num_iteration && diff > tolerance) {
-    Matrix P_next =
-        AT * P * A - AT * P * B * (R + BT * P * B).inverse() * BT * P * A + Q;
+    Matrix P_next = AT * P * A - AT * P * B * (R + BT * P * B).inverse() * BT * P * A + Q;
     // check the difference between P and P_next
     diff = fabs((P_next - P).maxCoeff());
-    P = P_next;
+    P    = P_next;
   }
 
   if (num_iteration >= max_num_iteration) {

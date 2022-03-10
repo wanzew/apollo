@@ -15,9 +15,9 @@
  *****************************************************************************/
 
 #ifndef MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_
-#define MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_
+#  define MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_
 
-#include "gflags/gflags.h"
+#  include "gflags/gflags.h"
 
 DECLARE_string(node_name);
 

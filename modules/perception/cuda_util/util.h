@@ -17,36 +17,34 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
 
-#include <cuda_runtime.h>
 #include <caffe/caffe.hpp>
+#include <cuda_runtime.h>
 #include <memory>
 
 namespace apollo {
 namespace perception {
 
-#define CUDA_CHECK(condition)                                         \
-  /* Code block avoids redefinition of cudaError_t error */           \
-  do {                                                                \
-    cudaError_t error = condition;                                    \
-    CHECK_EQ(error, cudaSuccess) << " " << cudaGetErrorString(error); \
+#define CUDA_CHECK(condition)                                                                      \
+  /* Code block avoids redefinition of cudaError_t error */                                        \
+  do {                                                                                             \
+    cudaError_t error = condition;                                                                 \
+    CHECK_EQ(error, cudaSuccess) << " " << cudaGetErrorString(error);                              \
   } while (0)
 
-void gpu_memcpy(const size_t N, const void *X, void *Y);
+void gpu_memcpy(const size_t N, const void* X, void* Y);
 
-inline void perception_gpu_memset(const size_t N, const int alpha, void *X) {
+inline void perception_gpu_memset(const size_t N, const int alpha, void* X) {
   CUDA_CHECK(cudaMemset(X, alpha, N));
 }
-inline void perception_memset(const size_t N, const int alpha, void *X) {
-  memset(X, alpha, N);
-}
+inline void perception_memset(const size_t N, const int alpha, void* X) { memset(X, alpha, N); }
 
-inline void PerceptionMallocHost(void **ptr, size_t size, bool *use_cuda) {
+inline void PerceptionMallocHost(void** ptr, size_t size, bool* use_cuda) {
   CUDA_CHECK(cudaMallocHost(ptr, size));
   *use_cuda = true;
   return;
 }
 
-inline void PerceptionFreeHost(void *ptr, bool use_cuda) {
+inline void PerceptionFreeHost(void* ptr, bool use_cuda) {
   if (use_cuda) {
     CUDA_CHECK(cudaFreeHost(ptr));
     return;
@@ -57,15 +55,21 @@ inline void PerceptionFreeHost(void *ptr, bool use_cuda) {
 
 int divup(int a, int b);
 
-void resize(cv::Mat frame, caffe::Blob<float> *dst,
-            std::shared_ptr<caffe::SyncedMemory> src_gpu, int start_axis);
+void resize(cv::Mat                              frame,
+            caffe::Blob<float>*                  dst,
+            std::shared_ptr<caffe::SyncedMemory> src_gpu,
+            int                                  start_axis);
 // resize with mean and scale
-void resize(cv::Mat frame, caffe::Blob<float> *dst,
-            std::shared_ptr<caffe::SyncedMemory> src_gpu, int start_axis,
-            const float mean_b, const float mean_g, const float mean_r,
-            const float scale);
+void resize(cv::Mat                              frame,
+            caffe::Blob<float>*                  dst,
+            std::shared_ptr<caffe::SyncedMemory> src_gpu,
+            int                                  start_axis,
+            const float                          mean_b,
+            const float                          mean_g,
+            const float                          mean_r,
+            const float                          scale);
 
-void yuyv2bgr(const uint8_t *yuv, uint8_t *rgb, const int pixel_num);
+void yuyv2bgr(const uint8_t* yuv, uint8_t* rgb, const int pixel_num);
 }  // namespace perception
 }  // namespace apollo
 

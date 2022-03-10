@@ -16,10 +16,10 @@
 
 #include "modules/common/util/json_util.h"
 
-#include "google/protobuf/util/json_util.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include "google/protobuf/util/json_util.h"
 #include "modules/common/proto/error_code.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {

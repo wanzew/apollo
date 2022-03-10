@@ -33,33 +33,32 @@ struct TrackStateVars {
   Eigen::Matrix4d process_noise = Eigen::Matrix4d::Identity();
   // Eigen::Matrix4d measure_noise = Eigen::Matrix4f::Identity();
   Eigen::Matrix4d trans_matrix = Eigen::Matrix4d::Identity();
-  bool initialized_ = false;
+  bool            initialized_ = false;
 };
 
 struct alignas(16) LidarFrameSupplement {
   static TrackStateVars state_vars;
 };
 
-typedef std::shared_ptr<LidarFrameSupplement> LidarFrameSupplementPtr;
-typedef std::shared_ptr<const LidarFrameSupplement>
-    LidarFrameSupplementConstPtr;
+typedef std::shared_ptr<LidarFrameSupplement>       LidarFrameSupplementPtr;
+typedef std::shared_ptr<const LidarFrameSupplement> LidarFrameSupplementConstPtr;
 
 struct alignas(16) RadarSupplement {
   RadarSupplement();
   ~RadarSupplement();
   RadarSupplement(const RadarSupplement& rhs);
   RadarSupplement& operator=(const RadarSupplement& rhs);
-  void clone(const RadarSupplement& rhs);
+  void             clone(const RadarSupplement& rhs);
 
   // distance
   float range = 0.0f;
   // x -> forward, y -> left
-  float angle = 0.0f;
-  float relative_radial_velocity = 0.0f;
+  float angle                        = 0.0f;
+  float relative_radial_velocity     = 0.0f;
   float relative_tangential_velocity = 0.0f;
-  float radial_velocity = 0.0f;
+  float radial_velocity              = 0.0f;
 };
-typedef std::shared_ptr<RadarSupplement> RadarSupplementPtr;
+typedef std::shared_ptr<RadarSupplement>       RadarSupplementPtr;
 typedef std::shared_ptr<const RadarSupplement> RadarSupplementConstPtr;
 
 struct alignas(16) RadarFrameSupplement {
@@ -67,40 +66,38 @@ struct alignas(16) RadarFrameSupplement {
   ~RadarFrameSupplement();
   RadarFrameSupplement(const RadarFrameSupplement& rhs);
   RadarFrameSupplement& operator=(const RadarFrameSupplement& rhs);
-  void clone(const RadarFrameSupplement& rhs);
+  void                  clone(const RadarFrameSupplement& rhs);
   static TrackStateVars state_vars;
 };
 
-typedef std::shared_ptr<RadarFrameSupplement> RadarFrameSupplementPtr;
-typedef std::shared_ptr<const RadarFrameSupplement>
-    RadarFrameSupplementConstPtr;
+typedef std::shared_ptr<RadarFrameSupplement>       RadarFrameSupplementPtr;
+typedef std::shared_ptr<const RadarFrameSupplement> RadarFrameSupplementConstPtr;
 
 struct alignas(16) CameraFrameSupplement {
   CameraFrameSupplement();
   ~CameraFrameSupplement();
   CameraFrameSupplement(const CameraFrameSupplement& rhs);
   CameraFrameSupplement& operator=(const CameraFrameSupplement& rhs);
-  void clone(const CameraFrameSupplement& rhs);
+  void                   clone(const CameraFrameSupplement& rhs);
 
-  cv::Mat depth_map;
-  cv::Mat label_map;
-  cv::Mat lane_map;
-  cv::Mat img_src;
-  std::string source_topic;
+  cv::Mat               depth_map;
+  cv::Mat               label_map;
+  cv::Mat               lane_map;
+  cv::Mat               img_src;
+  std::string           source_topic;
   static TrackStateVars state_vars;
 };
 
 typedef std::shared_ptr<CameraFrameSupplement> CameraFrameSupplementPtr;
 
-typedef std::shared_ptr<const CameraFrameSupplement>
-    CameraFrameSupplementConstPtr;
+typedef std::shared_ptr<const CameraFrameSupplement> CameraFrameSupplementConstPtr;
 
 struct alignas(16) CameraSupplement {
   CameraSupplement();
   ~CameraSupplement();
   CameraSupplement(const CameraSupplement& rhs);
   CameraSupplement& operator=(const CameraSupplement& rhs);
-  void clone(const CameraSupplement& rhs);
+  void              clone(const CameraSupplement& rhs);
 
   // upper-left corner: x1, y1
   Eigen::Vector2d upper_left;
@@ -129,42 +126,42 @@ struct alignas(16) CameraSupplement {
   double alpha = 0.0;
 };
 
-typedef std::shared_ptr<CameraSupplement> CameraSupplementPtr;
+typedef std::shared_ptr<CameraSupplement>       CameraSupplementPtr;
 typedef std::shared_ptr<const CameraSupplement> CameraSupplementConstPtr;
 
 typedef Eigen::Matrix4f MotionType;
 struct alignas(16) VehicleStatus {
-  float roll_rate = 0;
-  float pitch_rate = 0;
-  float yaw_rate = 0;
-  float velocity = 0;
-  float velocity_x = 0;
-  float velocity_y = 0;
-  float velocity_z = 0;
-  double time_ts = 0;     // time stamp
-  double time_d = 0;      // time stamp difference in image
-  MotionType motion = MotionType::Identity();  // Motion Matrix
+  float      roll_rate  = 0;
+  float      pitch_rate = 0;
+  float      yaw_rate   = 0;
+  float      velocity   = 0;
+  float      velocity_x = 0;
+  float      velocity_y = 0;
+  float      velocity_z = 0;
+  double     time_ts    = 0;                       // time stamp
+  double     time_d     = 0;                       // time stamp difference in image
+  MotionType motion     = MotionType::Identity();  // Motion Matrix
 };
 
 typedef boost::circular_buffer<VehicleStatus> MotionBuffer;
-typedef std::shared_ptr<MotionBuffer> MotionBufferPtr;
-typedef std::shared_ptr<const MotionBuffer> MotionBufferConstPtr;
+typedef std::shared_ptr<MotionBuffer>         MotionBufferPtr;
+typedef std::shared_ptr<const MotionBuffer>   MotionBufferConstPtr;
 
 struct alignas(16) Vehicle3DStatus {
-  float yaw_delta;  // azimuth angle change
-  float pitch_delta;
-  float roll_delta;
-  float velocity_x;          // east
-  float velocity_y;          // north
-  float velocity_z;          // up
-  float time_t;              // time stamp
-  float time_d;              // time stamp difference in image
-  Eigen::Matrix4f motion3d;  // 3-d Motion Matrix
+  float           yaw_delta;  // azimuth angle change
+  float           pitch_delta;
+  float           roll_delta;
+  float           velocity_x;  // east
+  float           velocity_y;  // north
+  float           velocity_z;  // up
+  float           time_t;      // time stamp
+  float           time_d;      // time stamp difference in image
+  Eigen::Matrix4f motion3d;    // 3-d Motion Matrix
 };
 
 typedef boost::circular_buffer<Vehicle3DStatus> Motion3DBuffer;
-typedef std::shared_ptr<Motion3DBuffer> Motion3DBufferPtr;
-typedef std::shared_ptr<const Motion3DBuffer> Motion3DBufferConstPtr;
+typedef std::shared_ptr<Motion3DBuffer>         Motion3DBufferPtr;
+typedef std::shared_ptr<const Motion3DBuffer>   Motion3DBufferConstPtr;
 
 }  // namespace perception
 }  // namespace apollo

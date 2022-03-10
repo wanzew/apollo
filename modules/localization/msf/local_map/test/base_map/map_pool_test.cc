@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_pool.h"
+#include <gtest/gtest.h>
 
 namespace apollo {
 namespace localization {
@@ -33,7 +33,7 @@ class BaseMapPoolTestSuite : public ::testing::Test {
 /**@brief Test all public methods in BaseMapNodePool.*/
 TEST_F(BaseMapPoolTestSuite, MapNodePoolTest) {
   LosslessMapConfig option;
-  bool is_fixed_size = false;
+  bool              is_fixed_size = false;
 
   LosslessMapNodePool pool(3, 3);
   pool.Initial(&option, is_fixed_size);

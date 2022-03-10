@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_UTIL_H_
 
+#include "modules/perception/obstacle/base/types.h"
 #include <fstream>
 #include <vector>
-#include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
@@ -27,11 +27,10 @@ namespace perception {
 class RadarUtil {
  public:
   template <typename PointT>
-  static bool IsXyPointIn2dXyPolygon(const PointT &point,
-                                     const PolygonDType &polygon) {
-    bool in_poly = false;
+  static bool IsXyPointIn2dXyPolygon(const PointT& point, const PolygonDType& polygon) {
+    bool   in_poly = false;
     double x1, x2, y1, y2;
-    int nr_poly_points = static_cast<int>(polygon.points.size());
+    int    nr_poly_points = static_cast<int>(polygon.points.size());
     // start with the last point to make the check last point<->first point the
     // first one
     double xold = polygon.points[nr_poly_points - 1].x;
@@ -61,8 +60,7 @@ class RadarUtil {
   }
 
   template <typename PointT>
-  static bool IsXyPointInHdmap(const PointT &p,
-                               const std::vector<PolygonDType> &polygons) {
+  static bool IsXyPointInHdmap(const PointT& p, const std::vector<PolygonDType>& polygons) {
     bool in_flag = false;
     for (std::size_t j = 0; j < polygons.size(); j++) {
       if (IsXyPointIn2dXyPolygon<PointT>(p, polygons[j])) {
@@ -73,9 +71,11 @@ class RadarUtil {
     return in_flag;
   }
 
-  static void MockRadarPolygon(const Eigen::Vector3d &center,
-                               const double length, const double width,
-                               const double theta, PolygonDType *polygon);
+  static void MockRadarPolygon(const Eigen::Vector3d& center,
+                               const double           length,
+                               const double           width,
+                               const double           theta,
+                               PolygonDType*          polygon);
 };
 
 }  // namespace perception

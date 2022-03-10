@@ -45,8 +45,8 @@ class PredictionMap {
    * @param s The distance along the lane.
    * @return The position with coordinates.
    */
-  static Eigen::Vector2d PositionOnLane(
-      std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s);
+  static Eigen::Vector2d PositionOnLane(std::shared_ptr<const hdmap::LaneInfo> lane_info,
+                                        const double                           s);
 
   /**
    * @brief Get the heading of a point on a specific distance along a lane.
@@ -54,8 +54,7 @@ class PredictionMap {
    * @param s The distance along the lane.
    * @return The heading of the point.
    */
-  static double HeadingOnLane(std::shared_ptr<const hdmap::LaneInfo> lane_info,
-                              const double s);
+  static double HeadingOnLane(std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s);
 
   /**
    * @brief Get the curvature of a point on a specific distance along a lane.
@@ -71,8 +70,7 @@ class PredictionMap {
    * @param s The distance along the lane.
    * @return The width on the distance s.
    */
-  static double LaneTotalWidth(std::shared_ptr<const hdmap::LaneInfo> lane_info,
-                               const double s);
+  static double LaneTotalWidth(std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s);
 
   /**
    * @brief Get a shared pointer to a lane by lane ID.
@@ -88,9 +86,10 @@ class PredictionMap {
    * @param s The longitudinal coordinate of the position.
    * @param l The lateral coordinate of the position.
    */
-  static bool GetProjection(const Eigen::Vector2d& position,
+  static bool GetProjection(const Eigen::Vector2d&                 position,
                             std::shared_ptr<const hdmap::LaneInfo> lane_info,
-                            double* s, double* l);
+                            double*                                s,
+                            double*                                l);
 
   /**
    * @brief Get the nearest path point to a longitudinal coordinate on a lane.
@@ -99,9 +98,9 @@ class PredictionMap {
    * @param path_point The nearest path point.
    * @param If the process is successful.
    */
-  static bool ProjectionFromLane(
-      std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s,
-      hdmap::MapPathPoint* path_point);
+  static bool ProjectionFromLane(std::shared_ptr<const hdmap::LaneInfo> lane_info,
+                                 const double                           s,
+                                 hdmap::MapPathPoint*                   path_point);
 
   /**
    * @brief Determine if a lane is a virtual lane.
@@ -115,8 +114,7 @@ class PredictionMap {
    * @param The point coordinate.
    * @return If the point is on a virtual lane.
    */
-  static bool OnVirtualLane(const Eigen::Vector2d& position,
-                            const double radius);
+  static bool OnVirtualLane(const Eigen::Vector2d& position, const double radius);
 
   /**
    * @brief Get the connected lanes from some specified lanes.
@@ -126,12 +124,14 @@ class PredictionMap {
    * @param on_lane If the position is on lane.
    * @param lanes The searched lanes.
    */
-  static void OnLane(
-      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& prev_lanes,
-      const Eigen::Vector2d& point, const double heading, const double radius,
-      const bool on_lane, const int max_num_lane,
-      const double max_lane_angle_diff,
-      std::vector<std::shared_ptr<const hdmap::LaneInfo>>* lanes);
+  static void OnLane(const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& prev_lanes,
+                     const Eigen::Vector2d&                                     point,
+                     const double                                               heading,
+                     const double                                               radius,
+                     const bool                                                 on_lane,
+                     const int                                                  max_num_lane,
+                     const double                                               max_lane_angle_diff,
+                     std::vector<std::shared_ptr<const hdmap::LaneInfo>>*       lanes);
 
   /**
    * @brief Check if there are any junctions within the range centered at
@@ -142,7 +142,7 @@ class PredictionMap {
    */
   static bool NearJunction(const Eigen::Vector2d& point, const double radius);
 
-   /**
+  /**
    * @brief Check if the obstacle is in a junction.
    * @param point position
    * @param radius the radius to search candidate junctions
@@ -166,7 +166,7 @@ class PredictionMap {
    * @return The heading of the input point on the input lane.
    */
   static double PathHeading(std::shared_ptr<const hdmap::LaneInfo> lane_info,
-                            const common::PointENU& point);
+                            const common::PointENU&                point);
 
   /**
    * @brief Get the smooth point on a lane by a longitudinal coordinate.
@@ -177,9 +177,11 @@ class PredictionMap {
    * @param heading The lane heading on the point.
    * @return If the process is successful.
    */
-  static bool SmoothPointFromLane(const std::string& id, const double s,
-                                  const double l, Eigen::Vector2d* point,
-                                  double* heading);
+  static bool SmoothPointFromLane(const std::string& id,
+                                  const double       s,
+                                  const double       l,
+                                  Eigen::Vector2d*   point,
+                                  double*            heading);
 
   /**
    * @brief Get nearby lanes by a position and current lanes.
@@ -189,11 +191,13 @@ class PredictionMap {
    * @param lanes The current lanes.
    * @param nearby_lanes The searched nearby lanes.
    */
-  static void NearbyLanesByCurrentLanes(
-      const Eigen::Vector2d& point, const double heading, const double radius,
-      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes,
-      const int max_num_lane,
-      std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
+  static void
+  NearbyLanesByCurrentLanes(const Eigen::Vector2d&                                     point,
+                            const double                                               heading,
+                            const double                                               radius,
+                            const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes,
+                            const int                                                  max_num_lane,
+                            std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
 
   /**
    * @brief Get nearby lanes by a position.
@@ -201,8 +205,7 @@ class PredictionMap {
    * @param radius The searching radius.
    * @return A vector of nearby lane IDs.
    */
-  static std::vector<std::string> NearbyLaneIds(const Eigen::Vector2d& point,
-                                                const double radius);
+  static std::vector<std::string> NearbyLaneIds(const Eigen::Vector2d& point, const double radius);
 
   /**
    * @brief Check if a lane is a left neighbor of another lane.
@@ -210,9 +213,8 @@ class PredictionMap {
    * @param curr_lane The current lane.
    * @return If left_lane is a left neighbor of curr_lane.
    */
-  static bool IsLeftNeighborLane(
-      std::shared_ptr<const hdmap::LaneInfo> left_lane,
-      std::shared_ptr<const hdmap::LaneInfo> curr_lane);
+  static bool IsLeftNeighborLane(std::shared_ptr<const hdmap::LaneInfo> left_lane,
+                                 std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
    * @brief Check if a lane is a left neighbor of one of some lanes.
@@ -220,9 +222,8 @@ class PredictionMap {
    * @param lanes The current lanes.
    * @return If left_lane is a left neighbor of one of lanes.
    */
-  static bool IsLeftNeighborLane(
-      std::shared_ptr<const hdmap::LaneInfo> left_lane,
-      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
+  static bool IsLeftNeighborLane(std::shared_ptr<const hdmap::LaneInfo> left_lane,
+                                 const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if a lane is a right neighbor of another lane.
@@ -230,9 +231,8 @@ class PredictionMap {
    * @param curr_lane The current lane.
    * @return If right_lane is a right neighbor of curr_lane.
    */
-  static bool IsRightNeighborLane(
-      std::shared_ptr<const hdmap::LaneInfo> right_lane,
-      std::shared_ptr<const hdmap::LaneInfo> curr_lane);
+  static bool IsRightNeighborLane(std::shared_ptr<const hdmap::LaneInfo> right_lane,
+                                  std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
    * @brief Check if a lane is a right neighbor of one of some lanes.
@@ -240,9 +240,8 @@ class PredictionMap {
    * @param lanes The current lanes.
    * @return If right_lane is a right neighbor of one of lanes.
    */
-  static bool IsRightNeighborLane(
-      std::shared_ptr<const hdmap::LaneInfo> right_lane,
-      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
+  static bool IsRightNeighborLane(std::shared_ptr<const hdmap::LaneInfo> right_lane,
+                                  const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if a lane is a successor of another lane.
@@ -259,9 +258,8 @@ class PredictionMap {
    * @param lanes The current lanes.
    * @return If succ_lane is a successor of one of lanes.
    */
-  static bool IsSuccessorLane(
-      std::shared_ptr<const hdmap::LaneInfo> succ_lane,
-      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
+  static bool IsSuccessorLane(std::shared_ptr<const hdmap::LaneInfo>                     succ_lane,
+                              const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if a lane is a predecessor of another lane.
@@ -269,9 +267,8 @@ class PredictionMap {
    * @param curr_lane The current lane.
    * @return If pred_lane is a predecessor of curr_lane.
    */
-  static bool IsPredecessorLane(
-      std::shared_ptr<const hdmap::LaneInfo> pred_lane,
-      std::shared_ptr<const hdmap::LaneInfo> curr_lane);
+  static bool IsPredecessorLane(std::shared_ptr<const hdmap::LaneInfo> pred_lane,
+                                std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
    * @brief Check if a lane is a predecessor of one of some lanes.
@@ -279,9 +276,8 @@ class PredictionMap {
    * @param lanes The current lanes.
    * @return If pred_lane is a predecessor of one of lanes.
    */
-  static bool IsPredecessorLane(
-      std::shared_ptr<const hdmap::LaneInfo> pred_lane,
-      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
+  static bool IsPredecessorLane(std::shared_ptr<const hdmap::LaneInfo> pred_lane,
+                                const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if two lanes are identical.
@@ -298,9 +294,8 @@ class PredictionMap {
    * @param lanes The lanes.
    * @return If other_lane is identical to one of lanes.
    */
-  static bool IsIdenticalLane(
-      std::shared_ptr<const hdmap::LaneInfo> other_lane,
-      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
+  static bool IsIdenticalLane(std::shared_ptr<const hdmap::LaneInfo>                     other_lane,
+                              const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Get lane turn type.

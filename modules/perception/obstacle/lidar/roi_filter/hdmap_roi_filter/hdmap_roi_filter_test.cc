@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "gflags/gflags.h"
-#include "gtest/gtest.h"
 #include "pcl/io/pcd_io.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/log.h"
 
@@ -35,7 +35,7 @@ const char polygon_file_name[] =
 const char pcd_file_name[] =
     "/apollo/modules/perception/data/hdmap_roi_filter_test/poly_mask_ut.pcd";
 
-bool LoadPolygonFile(const std::string& absolute_file_name,
+bool LoadPolygonFile(const std::string&        absolute_file_name,
                      std::vector<PolygonType>* polygons_ptr) {
   std::ifstream polygon_data(absolute_file_name, std::ifstream::in);
   if (!polygon_data) {
@@ -47,7 +47,7 @@ bool LoadPolygonFile(const std::string& absolute_file_name,
   polygon_data >> polygons_num;
 
   auto& polygons = *polygons_ptr;
-  polygons = std::vector<PolygonType>(polygons_num);
+  polygons       = std::vector<PolygonType>(polygons_num);
 
   for (auto& polygon : polygons) {
     size_t points_num = 0;
@@ -66,7 +66,8 @@ bool LoadPolygonFile(const std::string& absolute_file_name,
 
 class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
  public:
-  HdmapROIFilterTest() : pts_cloud_ptr_(new pcl_util::PointCloud) {}
+  HdmapROIFilterTest()
+      : pts_cloud_ptr_(new pcl_util::PointCloud) {}
 
  protected:
   void SetUp() {
@@ -81,12 +82,12 @@ class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
   void filter();
 
   std::unique_ptr<HdmapROIFilter> hdmap_roi_filter_ptr_;
-  std::vector<PolygonType> polygons_;
-  pcl_util::PointCloudPtr pts_cloud_ptr_;
+  std::vector<PolygonType>        polygons_;
+  pcl_util::PointCloudPtr         pts_cloud_ptr_;
 };
 
 void HdmapROIFilterTest::init() {
-  FLAGS_work_root = "/apollo/modules/perception/data";
+  FLAGS_work_root           = "/apollo/modules/perception/data";
   FLAGS_config_manager_path = "config_manager_test/config_manager.config";
   ASSERT_TRUE(Init());
 }
@@ -96,7 +97,7 @@ void HdmapROIFilterTest::filter() {
 
   ASSERT_TRUE(FilterWithPolygonMask(pts_cloud_ptr_, polygons_, &indices));
 
-  size_t points_num = pts_cloud_ptr_->size();
+  size_t            points_num = pts_cloud_ptr_->size();
   std::vector<bool> is_in_roi(points_num, false);
 
   for (const auto& id : indices.indices) {
@@ -126,10 +127,8 @@ void HdmapROIFilterTest::filter() {
     }
   }
 
-  ADEBUG << "True positive: " << true_positive
-         << ", False positive: " << false_positive
-         << ", True negitive: " << true_negitive
-         << ", False negative: " << false_negitive;
+  ADEBUG << "True positive: " << true_positive << ", False positive: " << false_positive
+         << ", True negitive: " << true_negitive << ", False negative: " << false_negitive;
 }
 
 TEST_F(HdmapROIFilterTest, test_filter) {

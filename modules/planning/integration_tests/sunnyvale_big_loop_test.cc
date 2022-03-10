@@ -52,10 +52,10 @@ using apollo::planning::util::GetPlanningStatus;
 class SunnyvaleBigLoopTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
-    FLAGS_use_navigation_mode = false;
-    FLAGS_map_dir = "modules/map/data/sunnyvale_big_loop";
-    FLAGS_test_base_map_filename = "base_map.bin";
-    FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
+    FLAGS_use_navigation_mode        = false;
+    FLAGS_map_dir                    = "modules/map/data/sunnyvale_big_loop";
+    FLAGS_test_base_map_filename     = "base_map.bin";
+    FLAGS_test_data_dir              = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
 
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
@@ -75,19 +75,18 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-  std::string seq_num = "1";
+  std::string seq_num              = "1";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: DRIVE
   auto stop_sign_status = GetPlanningStatus()->stop_sign();
-  EXPECT_TRUE(stop_sign_status.has_status() &&
-              stop_sign_status.status() == StopSignStatus::DRIVE);
+  EXPECT_TRUE(stop_sign_status.has_status() && stop_sign_status.status() == StopSignStatus::DRIVE);
 }
 
 /*
@@ -98,11 +97,11 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-  std::string seq_num = "2";
+  std::string seq_num              = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // set PlanningStatus: stop_status = DRIVE
@@ -113,8 +112,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: STOP
-  EXPECT_TRUE(stop_sign_status->has_status() &&
-              stop_sign_status->status() == StopSignStatus::STOP);
+  EXPECT_TRUE(stop_sign_status->has_status() && stop_sign_status->status() == StopSignStatus::STOP);
 }
 
 /*
@@ -125,30 +123,27 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-
-  std::string seq_num = "2";
+  std::string seq_num              = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // set PlanningStatus: wait_time < STOP_DURATION
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
-  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::STOP_SIGN);
-  double stop_duration = stop_sign_config->stop_sign().stop_duration();
-  double wait_time = stop_duration - 0.5;
-  double stop_start_time = Clock::NowInSeconds() - wait_time;
+  auto*  stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
+  double stop_duration    = stop_sign_config->stop_sign().stop_duration();
+  double wait_time        = stop_duration - 0.5;
+  double stop_start_time  = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: STOP
-  EXPECT_TRUE(stop_sign_status->has_status() &&
-              stop_sign_status->status() == StopSignStatus::STOP);
+  EXPECT_TRUE(stop_sign_status->has_status() && stop_sign_status->status() == StopSignStatus::STOP);
 }
 
 /*
@@ -159,24 +154,23 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-  std::string seq_num = "2";
+  std::string seq_num              = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::STOP_SIGN);
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   // set PlanningStatus: wait time > STOP_DURATION
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
-  double stop_duration = stop_sign_config->stop_sign().stop_duration();
-  double wait_time = stop_duration + 0.5;
+  double stop_duration   = stop_sign_config->stop_sign().stop_duration();
+  double wait_time       = stop_duration + 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
@@ -201,33 +195,32 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-  std::string seq_num = "3";
+  std::string seq_num              = "3";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // set configs
-  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::STOP_SIGN);
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
 
   // step 2
 
-  seq_num = "4";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  seq_num                      = "4";
+  FLAGS_test_prediction_file   = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_chassis_file      = seq_num + "_chassis.pb.txt";
   PlanningTestBase::UpdateData();
 
   // set PlanningStatus
-  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
-  double stop_duration = stop_sign_config->stop_sign().stop_duration();
-  double wait_time = stop_duration + 1;
-  double stop_start_time = Clock::NowInSeconds() - wait_time;
+  auto*  stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  double stop_duration    = stop_sign_config->stop_sign().stop_duration();
+  double wait_time        = stop_duration + 1;
+  double stop_start_time  = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   RUN_GOLDEN_TEST_DECISION(1);
@@ -256,16 +249,15 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-  std::string seq_num = "5";
+  std::string seq_num              = "5";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::STOP_SIGN);
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -274,25 +266,24 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   // wait time is enough
   // but vehicles are still there (use the same data as previous test)
 
-  seq_num = "6";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  seq_num                      = "6";
+  FLAGS_test_prediction_file   = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_chassis_file      = seq_num + "_chassis.pb.txt";
   PlanningTestBase::UpdateData();
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_status(StopSignStatus::STOP);
-  double stop_duration = stop_sign_config->stop_sign().stop_duration();
-  double wait_time = stop_duration + 0.5;
+  double stop_duration   = stop_sign_config->stop_sign().stop_duration();
+  double wait_time       = stop_duration + 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningStatus value: WAIT
-  EXPECT_TRUE(stop_sign_status->has_status() &&
-              stop_sign_status->status() == StopSignStatus::WAIT);
+  EXPECT_TRUE(stop_sign_status->has_status() && stop_sign_status->status() == StopSignStatus::WAIT);
   // check PlanningStatus value on watch vehicles
   // waiting for vehicle 4059 on lane 868_1_-1
   EXPECT_EQ(1, stop_sign_status->lane_watch_vehicles_size());
@@ -305,10 +296,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   // wait time is enough
   // previously watch vehicles are gone
 
-  seq_num = "7";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  seq_num                      = "7";
+  FLAGS_test_prediction_file   = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_chassis_file      = seq_num + "_chassis.pb.txt";
   PlanningTestBase::UpdateData();
 
   // set PlanningStatus
@@ -319,8 +310,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   RUN_GOLDEN_TEST_DECISION(2);
 
   // check PlanningStatus value: WAIT
-  EXPECT_TRUE(stop_sign_status->has_status() &&
-              stop_sign_status->status() == StopSignStatus::WAIT);
+  EXPECT_TRUE(stop_sign_status->has_status() && stop_sign_status->status() == StopSignStatus::WAIT);
   // check PlanningStatus value on watch vehicles
   EXPECT_EQ(0, stop_sign_status->lane_watch_vehicles_size());
 
@@ -349,16 +339,15 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-  std::string seq_num = "12";
+  std::string seq_num              = "12";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::STOP_SIGN);
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -377,10 +366,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
               lane_watch_vehicles.watch_vehicles(0) == "12257");
 
   // step 2: pass stop sign
-  seq_num = "13";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  seq_num                      = "13";
+  FLAGS_test_prediction_file   = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_chassis_file      = seq_num + "_chassis.pb.txt";
   PlanningTestBase::UpdateData();
 
   RUN_GOLDEN_TEST_DECISION(1);
@@ -391,10 +380,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
 
   // step 3: 2nd round
 
-  seq_num = "12";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  seq_num                      = "12";
+  FLAGS_test_prediction_file   = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_chassis_file      = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(2);
@@ -414,16 +403,15 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-  std::string seq_num = "14";
+  std::string seq_num              = "14";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::STOP_SIGN);
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(true);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -435,18 +423,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_status(StopSignStatus::STOP);
-  double stop_duration = stop_sign_config->stop_sign().stop_duration();
-  double wait_time = stop_duration + 0.5;
+  double stop_duration   = stop_sign_config->stop_sign().stop_duration();
+  double wait_time       = stop_duration + 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   // set config
-  stop_sign_config->mutable_stop_sign()
-      ->mutable_creep()
-      ->set_creep_distance_to_stop_line(1.0);
-  stop_sign_config->mutable_stop_sign()
-      ->mutable_creep()
-      ->set_max_valid_stop_distance(1.0);
+  stop_sign_config->mutable_stop_sign()->mutable_creep()->set_creep_distance_to_stop_line(1.0);
+  stop_sign_config->mutable_stop_sign()->mutable_creep()->set_max_valid_stop_distance(1.0);
 
   RUN_GOLDEN_TEST_DECISION(1);
 
@@ -457,9 +441,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   // step 3: STOP_DONE
 
   // set config: to make it s valid stop for the same data file
-  stop_sign_config->mutable_stop_sign()
-      ->mutable_creep()
-      ->set_max_valid_stop_distance(4.0);
+  stop_sign_config->mutable_stop_sign()->mutable_creep()->set_max_valid_stop_distance(4.0);
 
   RUN_GOLDEN_TEST_DECISION(2);
 
@@ -479,11 +461,11 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "101";
+  std::string seq_num              = "101";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -500,11 +482,11 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "102";
+  std::string seq_num              = "102";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -521,11 +503,11 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "200";
+  std::string seq_num              = "200";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -542,11 +524,11 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "201";
+  std::string seq_num              = "201";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -561,10 +543,9 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   // timeout on static pesestrian
 
   // set PlanningStatus
-  auto* crosswalk_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::CROSSWALK);
-  double stop_timeout = crosswalk_config->crosswalk().stop_timeout();
-  double wait_time = stop_timeout + 0.5;
+  auto*  crosswalk_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::CROSSWALK);
+  double stop_timeout     = crosswalk_config->crosswalk().stop_timeout();
+  double wait_time        = stop_timeout + 0.5;
   for (int i = 0; i < crosswalk_status->stop_timers_size(); ++i) {
     auto stop_timer = crosswalk_status->mutable_stop_timers(i);
     if (stop_timer->obstacle_id() == "11652") {
@@ -581,12 +562,12 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "300";
-  FLAGS_enable_prediction = false;
+  std::string seq_num              = "300";
+  FLAGS_enable_prediction          = false;
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_traffic_light_file = seq_num + "_traffic_light.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_traffic_light_file    = seq_num + "_traffic_light.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -598,11 +579,11 @@ TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "400";
+  std::string seq_num              = "400";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -621,16 +602,15 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "600";
+  std::string seq_num              = "600";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::DESTINATION);
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -649,21 +629,19 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "601";
+  std::string seq_num              = "601";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::DESTINATION);
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(true);
   destination_config->mutable_destination()->set_pull_over_plan_distance(35.0);
 
-  auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::PULL_OVER);
+  auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::PULL_OVER);
   pull_over_config->mutable_pull_over()->set_plan_distance(35.0);
   pull_over_config->mutable_pull_over()->set_operation_length(10.0);
 
@@ -671,28 +649,24 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
 
   // check PlanningStatus value: PULL OVER
   auto* planning_state = GetPlanningStatus()->mutable_planning_state();
-  EXPECT_TRUE(planning_state->has_pull_over() &&
-              planning_state->pull_over().in_pull_over());
+  EXPECT_TRUE(planning_state->has_pull_over() && planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
-  common::PointENU start_point_0 = planning_state->pull_over().start_point();
-  common::PointENU stop_point_0 = planning_state->pull_over().stop_point();
-  double stop_point_heading_0 =
-      planning_state->pull_over().stop_point_heading();
-  double status_set_time_0 = planning_state->pull_over().status_set_time();
+  common::PointENU start_point_0        = planning_state->pull_over().start_point();
+  common::PointENU stop_point_0         = planning_state->pull_over().stop_point();
+  double           stop_point_heading_0 = planning_state->pull_over().stop_point_heading();
+  double           status_set_time_0    = planning_state->pull_over().status_set_time();
 
   // check PULL OVER decision
   RUN_GOLDEN_TEST_DECISION(1);
 
-  EXPECT_TRUE(planning_state->has_pull_over() &&
-              planning_state->pull_over().in_pull_over());
+  EXPECT_TRUE(planning_state->has_pull_over() && planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
-  common::PointENU start_point_1 = planning_state->pull_over().start_point();
-  common::PointENU stop_point_1 = planning_state->pull_over().stop_point();
-  double stop_point_heading_1 =
-      planning_state->pull_over().stop_point_heading();
-  double status_set_time_1 = planning_state->pull_over().status_set_time();
+  common::PointENU start_point_1        = planning_state->pull_over().start_point();
+  common::PointENU stop_point_1         = planning_state->pull_over().stop_point();
+  double           stop_point_heading_1 = planning_state->pull_over().stop_point_heading();
+  double           status_set_time_1    = planning_state->pull_over().status_set_time();
 
   // start_point/stop_point/etc shall be the same among cycles
   EXPECT_DOUBLE_EQ(start_point_0.x(), start_point_1.x());
@@ -716,21 +690,19 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
-  std::string seq_num = "601";
+  std::string seq_num              = "601";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::DESTINATION);
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(true);
   destination_config->mutable_destination()->set_pull_over_plan_distance(20.0);
 
-  auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::PULL_OVER);
+  auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::PULL_OVER);
   pull_over_config->mutable_pull_over()->set_plan_distance(20.0);
   pull_over_config->mutable_pull_over()->set_operation_length(5.0);
 
@@ -739,8 +711,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
 
   // check PlanningStatus value: PULL OVER
   auto* planning_state = GetPlanningStatus()->mutable_planning_state();
-  EXPECT_TRUE(planning_state->has_pull_over() &&
-              planning_state->pull_over().in_pull_over());
+  EXPECT_TRUE(planning_state->has_pull_over() && planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
   // step 2: pull over failed, stop inlane
@@ -750,10 +721,8 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   // set destination point further to make inlane stop
   // be able to use this dest point stop fence so that the test result is fixed
   // instead of using adc's position which may differ for some reason
-  planning_state->mutable_pull_over()->mutable_inlane_dest_point()->set_x(
-        587163.74162973207);
-  planning_state->mutable_pull_over()->mutable_inlane_dest_point()->set_y(
-        4141196.1366618969);
+  planning_state->mutable_pull_over()->mutable_inlane_dest_point()->set_x(587163.74162973207);
+  planning_state->mutable_pull_over()->mutable_inlane_dest_point()->set_y(4141196.1366618969);
 
   // set config
   pull_over_config->mutable_pull_over()->set_operation_length(21.0);

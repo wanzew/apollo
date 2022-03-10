@@ -43,10 +43,10 @@ namespace perception {
 struct LaneFrameOptions {
   // used for initialization
   SpaceType space_type = SpaceType::IMAGE;  // space type
-  cv::Rect image_roi;
-  bool use_cc = true;
-  int min_cc_pixel_num = 10;  // minimum number of pixels of CC
-  int min_cc_size = 5;        // minimum size of CC
+  cv::Rect  image_roi;
+  bool      use_cc           = true;
+  int       min_cc_pixel_num = 10;  // minimum number of pixels of CC
+  int       min_cc_size      = 5;   // minimum size of CC
 
   bool use_non_mask = false;  // indicating whether use non_mask or not
 
@@ -60,8 +60,8 @@ struct LaneFrameOptions {
   ScalarType min_y_search_offset = 0.0;
 
   AssociationParam assoc_param;
-  GroupParam group_param;
-  int orientation_estimation_skip_marker_num = 1;
+  GroupParam       group_param;
+  int              orientation_estimation_skip_marker_num = 1;
 
   // for determining lane object label
   // predefined label interval distance
@@ -80,20 +80,20 @@ struct LaneFrameOptions {
 class LaneFrame {
  public:
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
-            const std::shared_ptr<NonMask>& non_mask,
-            const LaneFrameOptions& options,
-            const double scale,
-            const int start_y_pos);
+            const std::shared_ptr<NonMask>&           non_mask,
+            const LaneFrameOptions&                   options,
+            const double                              scale,
+            const int                                 start_y_pos);
 
-  bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
-            const std::shared_ptr<NonMask>& non_mask,
+  bool Init(const std::vector<ConnectedComponentPtr>&     input_cc,
+            const std::shared_ptr<NonMask>&               non_mask,
             const std::shared_ptr<Projector<ScalarType>>& projector,
-            const LaneFrameOptions& options,
-            const double scale,
-            const int start_y_pos);
+            const LaneFrameOptions&                       options,
+            const double                                  scale,
+            const int                                     start_y_pos);
 
   void SetTransformer(const std::shared_ptr<Projector<ScalarType>>& projector) {
-    projector_ = projector;
+    projector_         = projector;
     is_projector_init_ = true;
   }
 
@@ -111,22 +111,24 @@ class LaneFrame {
 
   Bbox bbox(int i) const { return boxes_.at(i); }
 
-  bool FitPolyCurve(const int graph_id, const ScalarType& graph_siz,
-                    PolyModel* poly_coef, ScalarType* lateral_distance) const;
+  bool FitPolyCurve(const int         graph_id,
+                    const ScalarType& graph_siz,
+                    PolyModel*        poly_coef,
+                    ScalarType*       lateral_distance) const;
 
  protected:
   ScalarType ComputeMarkerPairDistance(const Marker& ref, const Marker& tar);
 
-  std::vector<int> ComputeMarkerEdges(
-      std::vector<std::unordered_map<int, ScalarType>>* edges);
+  std::vector<int> ComputeMarkerEdges(std::vector<std::unordered_map<int, ScalarType>>* edges);
 
   bool GreedyGroupConnectAssociation();
 
-  int AddGroupIntoGraph(const Group& group, Graph* graph,
-                        std::unordered_set<int>* hash_marker_idx);
+  int AddGroupIntoGraph(const Group& group, Graph* graph, std::unordered_set<int>* hash_marker_idx);
 
-  int AddGroupIntoGraph(const Group& group, const int start_marker_ascend_id,
-                        const int end_marker_descend_id, Graph* graph,
+  int AddGroupIntoGraph(const Group&             group,
+                        const int                start_marker_ascend_id,
+                        const int                end_marker_descend_id,
+                        Graph*                   graph,
                         std::unordered_set<int>* hash_marker_idx);
 
   void ComputeBbox();
@@ -137,7 +139,7 @@ class LaneFrame {
 
   // markers
   std::vector<Marker> markers_;
-  int max_cc_num_ = 0;
+  int                 max_cc_num_ = 0;
 
   // CC index for each marker
   std::vector<int> cc_idx_;
@@ -145,14 +147,14 @@ class LaneFrame {
   std::unordered_map<int, std::vector<int>> cc_marker_lut_;
 
   std::shared_ptr<const Projector<ScalarType>> projector_;
-  bool is_projector_init_ = false;
+  bool                                         is_projector_init_ = false;
 
   // lane marker clusters
   std::vector<Graph> graphs_;
   // tight bounding boxes of lane clusters
   std::vector<Bbox> boxes_;
-  double scale_;
-  double start_y_pos_;
+  double            scale_;
+  double            start_y_pos_;
 };
 
 }  // namespace perception

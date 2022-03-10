@@ -43,9 +43,10 @@ class ObstacleClusters {
    * @param lane info
    * @return a corresponding lane graph
    */
-  static const LaneGraph& GetLaneGraph(
-      const double start_s, const double length,
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
+  static const LaneGraph&
+  GetLaneGraph(const double                                   start_s,
+               const double                                   length,
+               std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
  private:
   ObstacleClusters() = delete;

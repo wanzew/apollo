@@ -26,13 +26,11 @@ namespace conti_radar {
 
 using apollo::drivers::ContiRadar;
 
-class ClusterGeneralInfo701
-    : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
+class ClusterGeneralInfo701 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
   ClusterGeneralInfo701();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ContiRadar* conti_radar) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ContiRadar* conti_radar) const override;
 
  private:
   int obstacle_id(const std::uint8_t* bytes, int32_t length) const;

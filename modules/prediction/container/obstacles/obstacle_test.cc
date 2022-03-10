@@ -37,17 +37,17 @@ namespace prediction {
 class ObstacleTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    FLAGS_p_var = 0.1;
-    FLAGS_q_var = 0.1;
-    FLAGS_r_var = 0.001;
-    FLAGS_enable_kf_tracking = true;
-    FLAGS_min_prediction_length = 50.0;
+    FLAGS_p_var                             = 0.1;
+    FLAGS_q_var                             = 0.1;
+    FLAGS_r_var                             = 0.001;
+    FLAGS_enable_kf_tracking                = true;
+    FLAGS_min_prediction_length             = 50.0;
     FLAGS_adjust_velocity_by_position_shift = false;
 
     int num_frame = 3;
     for (int i = 1; i <= num_frame; ++i) {
-      const auto filename = common::util::StrCat(
-          "modules/prediction/testdata/frame_sequence/frame_", i, ".pb.txt");
+      const auto filename =
+          common::util::StrCat("modules/prediction/testdata/frame_sequence/frame_", i, ".pb.txt");
       perception::PerceptionObstacles perception_obstacles;
       common::util::GetProtoFromFile(filename, &perception_obstacles);
       container_.Insert(perception_obstacles);
@@ -115,15 +115,15 @@ TEST_F(ObstacleTest, VehicleVelocity) {
 }
 
 TEST_F(ObstacleTest, VehicleHeading) {
-  Obstacle* obstacle_ptr = container_.GetObstacle(1);
+  Obstacle*      obstacle_ptr   = container_.GetObstacle(1);
   const Feature& latest_feature = obstacle_ptr->latest_feature();
   EXPECT_DOUBLE_EQ(latest_feature.theta(), -0.352);
 }
 
 TEST_F(ObstacleTest, VehicleLaneGraph) {
-  Obstacle* obstacle_ptr = container_.GetObstacle(1);
-  const Feature& latest_feature = obstacle_ptr->latest_feature();
-  const LaneGraph& lane_graph = latest_feature.lane().lane_graph();
+  Obstacle*        obstacle_ptr   = container_.GetObstacle(1);
+  const Feature&   latest_feature = obstacle_ptr->latest_feature();
+  const LaneGraph& lane_graph     = latest_feature.lane().lane_graph();
   EXPECT_EQ(lane_graph.lane_sequence_size(), 2);
 
   EXPECT_EQ(lane_graph.lane_sequence(0).lane_segment_size(), 3);
@@ -193,7 +193,7 @@ TEST_F(ObstacleTest, PedestrianVelocity) {
 }
 
 TEST_F(ObstacleTest, PedestrianHeading) {
-  Obstacle* obstacle_ptr = container_.GetObstacle(101);
+  Obstacle*      obstacle_ptr   = container_.GetObstacle(101);
   const Feature& latest_feature = obstacle_ptr->latest_feature();
   EXPECT_DOUBLE_EQ(latest_feature.theta(), 1.220);
 }

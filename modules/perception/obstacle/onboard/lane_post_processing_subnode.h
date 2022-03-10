@@ -44,7 +44,7 @@ namespace perception {
 
 class LanePostProcessingSubnode : public Subnode {
  public:
-  LanePostProcessingSubnode() = default;
+  LanePostProcessingSubnode()          = default;
   virtual ~LanePostProcessingSubnode() = default;
   apollo::common::Status ProcEvents() override;
 
@@ -56,28 +56,27 @@ class LanePostProcessingSubnode : public Subnode {
   void RegistAllAlgorithms();
   bool InitAlgorithmPlugin();
   bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs);
-  void PublishDataAndEvent(const double timestamp,
-                           const SharedDataPtr<LaneObjects>& lane_objects);
+  void PublishDataAndEvent(const double timestamp, const SharedDataPtr<LaneObjects>& lane_objects);
   void PublishPerceptionPb(LaneObjectsPtr lane_objects);
 
-  std::string device_id_ = "camera";
-  uint64_t seq_num_ = 0;
-  double timestamp_ns_ = 0.0;
+  std::string device_id_    = "camera";
+  uint64_t    seq_num_      = 0;
+  double      timestamp_ns_ = 0.0;
 
   std::unique_ptr<BaseCameraLanePostProcessor> lane_post_processor_;
-  CameraObjectData* camera_object_data_ = nullptr;
+  CameraObjectData*                            camera_object_data_ = nullptr;
 
-  bool publish_ = false;
+  bool            publish_          = false;
   LaneSharedData* lane_shared_data_ = nullptr;
 
-  uint64_t min_processing_time_ = UINT64_MAX;
-  uint64_t max_processing_time_ = 0;
-  uint64_t tot_processing_time_ = 0;
+  uint64_t                     min_processing_time_ = UINT64_MAX;
+  uint64_t                     max_processing_time_ = 0;
+  uint64_t                     tot_processing_time_ = 0;
   CameraLanePostProcessOptions options_;
 
   MotionService* motion_service_ = nullptr;
-  std::mutex mutex_;
-  EventID motion_event_id_;
+  std::mutex     mutex_;
+  EventID        motion_event_id_;
   DISALLOW_COPY_AND_ASSIGN(LanePostProcessingSubnode);
 };
 

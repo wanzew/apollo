@@ -27,10 +27,10 @@ namespace planning {
 
 TEST(CubicPolynomialCurve1d, Evaluate) {
   {
-    double x0 = 0.0;
-    double dx0 = 0.0;
-    double ddx0 = 0.0;
-    double x1 = 10.0;
+    double x0    = 0.0;
+    double dx0   = 0.0;
+    double ddx0  = 0.0;
+    double x1    = 10.0;
     double param = 8.0;
 
     CubicPolynomialCurve1d curve(x0, dx0, ddx0, x1, param);
@@ -40,10 +40,10 @@ TEST(CubicPolynomialCurve1d, Evaluate) {
     EXPECT_NEAR(0, curve.Evaluate(2, 0.0), 1e-8);
   }
   {
-    double x0 = 0.0;
-    double dx0 = 0.0;
-    double ddx0 = 0.0;
-    double x1 = 5.0;
+    double x0    = 0.0;
+    double dx0   = 0.0;
+    double ddx0  = 0.0;
+    double x1    = 5.0;
     double param = 3.0;
 
     CubicPolynomialCurve1d curve(x0, dx0, ddx0, x1, param);
@@ -54,10 +54,10 @@ TEST(CubicPolynomialCurve1d, Evaluate) {
   }
 
   {
-    double x0 = 1.0;
-    double dx0 = 2.0;
-    double ddx0 = 3.0;
-    double x1 = 5.0;
+    double x0    = 1.0;
+    double dx0   = 2.0;
+    double ddx0  = 3.0;
+    double x1    = 5.0;
     double param = 3.0;
 
     CubicPolynomialCurve1d curve(x0, dx0, ddx0, x1, param);

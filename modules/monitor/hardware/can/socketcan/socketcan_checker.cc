@@ -33,18 +33,16 @@ SocketCanChecker::SocketCanChecker() {
   name_ = apollo::common::util::StrCat(SOCKET_CAN_NAME, "-", can_id_);
 }
 
-HardwareStatus::Status SocketCanChecker::socketcan_result_to_hw_status(
-    int socketcan_status) {
+HardwareStatus::Status SocketCanChecker::socketcan_result_to_hw_status(int socketcan_status) {
   // @todo: device not present detection in socket_can_test.
   return socketcan_status == 0 ? HardwareStatus::OK : HardwareStatus::ERR;
 }
 
-std::string SocketCanChecker::socketcan_result_to_message(
-    int socketcan_status) {
+std::string SocketCanChecker::socketcan_result_to_message(int socketcan_status) {
   return socketcan_status == 0 ? "OK" : "Failed";
 }
 
-void SocketCanChecker::run_check(std::vector<HwCheckResult> *results) {
+void SocketCanChecker::run_check(std::vector<HwCheckResult>* results) {
   AINFO << "To check SOCKET-CAN-" << can_id_;
 
   int result = socketcan_do_test(can_id_);

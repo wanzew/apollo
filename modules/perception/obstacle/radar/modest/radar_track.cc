@@ -20,57 +20,54 @@ namespace apollo {
 namespace perception {
 
 // Static member variable
-int RadarTrack::s_current_idx_ = 0;
+int RadarTrack::s_current_idx_             = 0;
 int RadarTrack::s_tracked_times_threshold_ = 4;
 
 RadarTrack::RadarTrack() {
   s_current_idx_ %= MAX_RADAR_IDX;
-  obs_id_ = s_current_idx_++;
-  obs_radar_ = nullptr;
+  obs_id_        = s_current_idx_++;
+  obs_radar_     = nullptr;
   tracked_times_ = 1;
   tracking_time_ = 0.0;
 }
 
-RadarTrack::RadarTrack(const Object &obs, const double timestamp) {
+RadarTrack::RadarTrack(const Object& obs, const double timestamp) {
   s_current_idx_ %= MAX_RADAR_IDX;
-  obs_id_ = s_current_idx_++;
-  obs_radar_ = std::shared_ptr<Object>(new Object);
-  *obs_radar_ = obs;
-  timestamp_ = timestamp;
+  obs_id_        = s_current_idx_++;
+  obs_radar_     = std::shared_ptr<Object>(new Object);
+  *obs_radar_    = obs;
+  timestamp_     = timestamp;
   tracked_times_ = 1;
   tracking_time_ = 0.0;
-  id_tracked_ = false;
+  id_tracked_    = false;
 }
 
-RadarTrack::RadarTrack(const RadarTrack &track) {
-  obs_id_ = track.obs_id_;
-  obs_radar_ = track.obs_radar_;
+RadarTrack::RadarTrack(const RadarTrack& track) {
+  obs_id_        = track.obs_id_;
+  obs_radar_     = track.obs_radar_;
   tracked_times_ = track.tracked_times_;
   tracking_time_ = track.tracking_time_;
-  timestamp_ = track.timestamp_;
-  id_tracked_ = track.id_tracked_;
+  timestamp_     = track.timestamp_;
+  id_tracked_    = track.id_tracked_;
 }
 
-RadarTrack &RadarTrack::operator=(const RadarTrack &track) {
-  obs_id_ = track.obs_id_;
-  obs_radar_ = track.obs_radar_;
+RadarTrack& RadarTrack::operator=(const RadarTrack& track) {
+  obs_id_        = track.obs_id_;
+  obs_radar_     = track.obs_radar_;
   tracked_times_ = track.tracked_times_;
   tracking_time_ = track.tracking_time_;
-  timestamp_ = track.timestamp_;
-  id_tracked_ = track.id_tracked_;
+  timestamp_     = track.timestamp_;
+  id_tracked_    = track.id_tracked_;
   return *this;
 }
 
-void RadarTrack::UpdataObsRadar(std::shared_ptr<Object> obs_radar,
-                                const double timestamp) {
+void RadarTrack::UpdataObsRadar(std::shared_ptr<Object> obs_radar, const double timestamp) {
   obs_radar_ = obs_radar;
   tracking_time_ += timestamp - timestamp_;
   timestamp_ = timestamp;
 }
 
-void RadarTrack::SetObsRadar(std::shared_ptr<Object> obs_radar) {
-  obs_radar_ = obs_radar;
-}
+void RadarTrack::SetObsRadar(std::shared_ptr<Object> obs_radar) { obs_radar_ = obs_radar; }
 
 void RadarTrack::IncreaseTrackedTimes() { tracked_times_++; }
 

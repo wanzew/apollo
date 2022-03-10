@@ -23,10 +23,10 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Steering65Test, General) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
-  int32_t length = 8;
+  uint8_t       data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  int32_t       length  = 8;
   ChassisDetail cd;
-  Steering65 steering;
+  Steering65    steering;
   steering.Parse(data, length, &cd);
 
   EXPECT_FALSE(cd.eps().steering_enabled());

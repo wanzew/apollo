@@ -30,7 +30,7 @@ TEST(TestPiecewiseLinearConstraint, add_monotone_inequality_constraint) {
   PiecewiseLinearConstraint constraint(10, 0.1);
   constraint.AddMonotoneInequalityConstraint();
   const auto mat = constraint.inequality_constraint_matrix();
-  const auto bd = constraint.inequality_constraint_boundary();
+  const auto bd  = constraint.inequality_constraint_boundary();
 
   MatrixXd mat_golden(10, 10);
   // clang-format off
@@ -55,9 +55,9 @@ TEST(TestPiecewiseLinearConstraint, add_monotone_inequality_constraint) {
 
 TEST(TestPiecewiseLinearConstraint, add_boundary) {
   PiecewiseLinearConstraint constraint(10, 0.1);
-  std::vector<uint32_t> index_list;
-  std::vector<double> lower_bound;
-  std::vector<double> upper_bound;
+  std::vector<uint32_t>     index_list;
+  std::vector<double>       lower_bound;
+  std::vector<double>       upper_bound;
   for (uint32_t i = 0; i < 10; ++i) {
     index_list.push_back(i);
     lower_bound.push_back(1.0);
@@ -66,7 +66,7 @@ TEST(TestPiecewiseLinearConstraint, add_boundary) {
 
   constraint.AddBoundary(index_list, lower_bound, upper_bound);
   const auto mat = constraint.inequality_constraint_matrix();
-  const auto bd = constraint.inequality_constraint_boundary();
+  const auto bd  = constraint.inequality_constraint_boundary();
 
   MatrixXd mat_golden(20, 10);
   // clang-format off
@@ -95,16 +95,16 @@ TEST(TestPiecewiseLinearConstraint, add_boundary) {
   EXPECT_EQ(mat, mat_golden);
 
   MatrixXd bd_golden(20, 1);
-  bd_golden << -100, 1, -100, 1, -100, 1, -100, 1, -100, 1, -100, 1, -100, 1,
-      -100, 1, -100, 1, -100, 1;
+  bd_golden << -100, 1, -100, 1, -100, 1, -100, 1, -100, 1, -100, 1, -100, 1, -100, 1, -100, 1,
+      -100, 1;
   EXPECT_EQ(bd, bd_golden);
 }
 
 TEST(TestPiecewiseLinearConstraint, add_derivative_boundary) {
   PiecewiseLinearConstraint constraint(10, 0.1);
-  std::vector<uint32_t> index_list;
-  std::vector<double> lower_bound;
-  std::vector<double> upper_bound;
+  std::vector<uint32_t>     index_list;
+  std::vector<double>       lower_bound;
+  std::vector<double>       upper_bound;
   for (uint32_t i = 0; i < 10; ++i) {
     index_list.push_back(i);
     lower_bound.push_back(1.0);
@@ -113,7 +113,7 @@ TEST(TestPiecewiseLinearConstraint, add_derivative_boundary) {
 
   constraint.AddDerivativeBoundary(index_list, lower_bound, upper_bound);
   const auto mat = constraint.inequality_constraint_matrix();
-  const auto bd = constraint.inequality_constraint_boundary();
+  const auto bd  = constraint.inequality_constraint_boundary();
 
   MatrixXd mat_golden(20, 10);
   // clang-format off
@@ -142,17 +142,17 @@ TEST(TestPiecewiseLinearConstraint, add_derivative_boundary) {
   EXPECT_EQ(mat, mat_golden);
 
   MatrixXd bd_golden(20, 1);
-  bd_golden << -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10,
-      0.1, -10, 0.1, -10, 0.1, -10, 0.1;
+  bd_golden << -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10, 0.1, -10,
+      0.1, -10, 0.1;
 
   EXPECT_EQ(bd, bd_golden);
 }
 
 TEST(TestPiecewiseLinearConstraint, add_second_derivative_boundary) {
   PiecewiseLinearConstraint constraint(10, 0.1);
-  std::vector<uint32_t> index_list;
-  std::vector<double> lower_bound;
-  std::vector<double> upper_bound;
+  std::vector<uint32_t>     index_list;
+  std::vector<double>       lower_bound;
+  std::vector<double>       upper_bound;
   for (uint32_t i = 0; i < 10; ++i) {
     index_list.push_back(i);
     lower_bound.push_back(-4.0);
@@ -160,10 +160,9 @@ TEST(TestPiecewiseLinearConstraint, add_second_derivative_boundary) {
   }
 
   const double init_derivative = 0.1;
-  constraint.AddSecondDerivativeBoundary(init_derivative, index_list,
-                                         lower_bound, upper_bound);
+  constraint.AddSecondDerivativeBoundary(init_derivative, index_list, lower_bound, upper_bound);
   const auto mat = constraint.inequality_constraint_matrix();
-  const auto bd = constraint.inequality_constraint_boundary();
+  const auto bd  = constraint.inequality_constraint_boundary();
 
   MatrixXd mat_golden(20, 10);
   // clang-format off
@@ -192,9 +191,8 @@ TEST(TestPiecewiseLinearConstraint, add_second_derivative_boundary) {
   EXPECT_EQ(mat, mat_golden);
 
   MatrixXd bd_golden(20, 1);
-  bd_golden << -0.03, -0.03, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02,
-      -0.04, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02,
-      -0.04;
+  bd_golden << -0.03, -0.03, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04,
+      -0.02, -0.04, -0.02, -0.04, -0.02, -0.04, -0.02, -0.04;
   EXPECT_EQ(bd.rows(), 20);
   EXPECT_EQ(bd.cols(), 1);
   for (uint32_t i = 0; i < bd.rows(); ++i) {

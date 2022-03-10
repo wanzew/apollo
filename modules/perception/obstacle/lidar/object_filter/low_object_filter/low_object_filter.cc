@@ -27,38 +27,35 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
-using apollo::common::util::GetProtoFromFile;
 
 bool LowObjectFilter::Init() {
   if (!GetProtoFromFile(FLAGS_low_object_filter_config, &config_)) {
-    AERROR << "Cannot get config proto from file: "
-           << FLAGS_low_object_filter_config;
+    AERROR << "Cannot get config proto from file: " << FLAGS_low_object_filter_config;
     return false;
   }
-  object_height_threshold_ = config_.object_height_threshold();
-  object_position_height_threshold_ =
-                    config_.object_position_height_threshold();
+  object_height_threshold_          = config_.object_height_threshold();
+  object_position_height_threshold_ = config_.object_position_height_threshold();
   return true;
 }
 
-bool LowObjectFilter::Filter(const ObjectFilterOptions& obj_filter_options,
+bool LowObjectFilter::Filter(const ObjectFilterOptions&            obj_filter_options,
                              std::vector<std::shared_ptr<Object>>* objects) {
   FilterLowObject(obj_filter_options, objects);
 
   return true;
 }
 
-void LowObjectFilter::FilterLowObject(
-    const ObjectFilterOptions& obj_filter_options,
-    std::vector<std::shared_ptr<Object>>* objects) {
-  int object_number = objects->size();
+void LowObjectFilter::FilterLowObject(const ObjectFilterOptions&            obj_filter_options,
+                                      std::vector<std::shared_ptr<Object>>* objects) {
+  int object_number     = objects->size();
   int valid_objects_num = 0;
   for (std::size_t i = 0; i < objects->size(); ++i) {
-    std::shared_ptr<Object> obj = objects->at(i);
-    float max_height = -100.0;
-    float min_height = 100.0;
+    std::shared_ptr<Object> obj        = objects->at(i);
+    float                   max_height = -100.0;
+    float                   min_height = 100.0;
     for (std::size_t pi = 0; pi < obj->cloud->points.size(); ++pi) {
       auto pt = obj->cloud->points[pi];
       if (pt.z < min_height) {
@@ -69,20 +66,18 @@ void LowObjectFilter::FilterLowObject(
     }
 
     // object is low and flat
-    if (max_height - min_height < object_height_threshold_
-        && max_height < object_position_height_threshold_) {
+    if (max_height - min_height < object_height_threshold_ &&
+        max_height < object_position_height_threshold_) {
       continue;
     }
 
-    if (static_cast<int>(i) != valid_objects_num) {
-      (*objects)[valid_objects_num] = (*objects)[i];
-    }
+    if (static_cast<int>(i) != valid_objects_num) { (*objects)[valid_objects_num] = (*objects)[i]; }
 
     valid_objects_num++;
   }
   objects->resize(valid_objects_num);
-  AINFO << "low_object_filter: object number " << object_number << " -> "
-        << valid_objects_num << "\n";
+  AINFO << "low_object_filter: object number " << object_number << " -> " << valid_objects_num
+        << "\n";
 }
 
 }  // namespace perception

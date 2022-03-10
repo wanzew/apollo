@@ -17,12 +17,12 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_CACHE_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_CACHE_H
 
+#include "boost/thread.hpp"
+#include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 #include <deque>
 #include <list>
 #include <map>
 #include <utility>
-#include "boost/thread.hpp"
-#include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
 namespace apollo {
 namespace localization {
@@ -32,36 +32,34 @@ namespace msf {
 template <class Key, class Element>
 class LRUCache {
  public:
-  typedef typename std::list<std::pair<Key, Element *>>::iterator ListIterator;
-  typedef typename std::list<std::pair<Key, Element *>>::reverse_iterator
-      ListReverseIterator;
-  typedef typename std::map<Key, ListIterator>::iterator MapIterator;
+  typedef typename std::list<std::pair<Key, Element*>>::iterator         ListIterator;
+  typedef typename std::list<std::pair<Key, Element*>>::reverse_iterator ListReverseIterator;
+  typedef typename std::map<Key, ListIterator>::iterator                 MapIterator;
   /**@brief The constructor. */
-  explicit LRUCache(int capacity) : capacity_(capacity) {}
+  explicit LRUCache(int capacity)
+      : capacity_(capacity) {}
   /**@brief The destructor. */
   virtual ~LRUCache() {}
   /**@brief Find element for key if it exists in the cache. If not exist, return
    * false. */
-  bool Get(const Key &key, Element **value);
+  bool Get(const Key& key, Element** value);
   /**@brief Caches element for key. If cache is full,
    * return the removed element, otherwise return null. */
-  Element *Put(const Key &key, Element *value);
+  Element* Put(const Key& key, Element* value);
   /**@brief Remove element for key. if it exist in the cache,
    * return the element, otherwise return null. */
-  Element *Remove(const Key &key);
+  Element* Remove(const Key& key);
   /**@brief Remove the Least Recently Used element in the cache.
    * return the removed element or null. */
-  Element *ClearOne();
+  Element* ClearOne();
   // bool clear();
   /**@brief Find element for key in the cache. If it exists, move it to the head
    * of queue. */
-  bool IsExist(const Key &key);
+  bool IsExist(const Key& key);
   /**@brief Change cache's max capacity. New capacity must be larger than size
    * in use. */
   bool ChangeCapacity(int capacity) {
-    if (static_cast<int>(list_.size()) > capacity) {
-      return false;
-    }
+    if (static_cast<int>(list_.size()) > capacity) { return false; }
     capacity_ = capacity;
     return true;
   }
@@ -75,7 +73,7 @@ class LRUCache {
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
-  virtual bool Destroy(Element **value);
+  virtual bool Destroy(Element** value);
 
  private:
   /**@brief The max caoacity of LRUCache. */
@@ -83,15 +81,13 @@ class LRUCache {
   /**@brief Increse the search speed in queue. */
   std::map<Key, ListIterator> map_;
   /**@brief The least recently used queue. */
-  std::list<std::pair<Key, Element *>> list_;
+  std::list<std::pair<Key, Element*>> list_;
 };
 
 template <class Key, class Element>
-bool LRUCache<Key, Element>::Get(const Key &key, Element **value) {
+bool LRUCache<Key, Element>::Get(const Key& key, Element** value) {
   MapIterator found_iter = map_.find(key);
-  if (found_iter == map_.end()) {
-    return false;
-  }
+  if (found_iter == map_.end()) { return false; }
   // move the corresponding key to list front
   list_.splice(list_.begin(), list_, found_iter->second);
   *value = found_iter->second->second;
@@ -99,13 +95,13 @@ bool LRUCache<Key, Element>::Get(const Key &key, Element **value) {
 }
 
 template <class Key, class Element>
-Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
+Element* LRUCache<Key, Element>::Put(const Key& key, Element* value) {
   if (value == NULL) {
     std::cout << "LRUCache Warning: put a NULL" << std::endl;
     return NULL;
   }
-  Element *node_remove = NULL;
-  MapIterator found_iter = map_.find(key);
+  Element*    node_remove = NULL;
+  MapIterator found_iter  = map_.find(key);
   if (found_iter != map_.end()) {
     // move the corresponding key to list front
     list_.splice(list_.begin(), list_, found_iter->second);
@@ -133,8 +129,7 @@ Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
     // }
   }
   if (static_cast<int>(map_.size()) >= capacity_) {
-    std::cout << "LRUCache Warning: the cache size is temporarily increased!"
-              << std::endl;
+    std::cout << "LRUCache Warning: the cache size is temporarily increased!" << std::endl;
   }
   list_.emplace_front(key, value);  // push_front
   map_[key] = list_.begin();
@@ -142,18 +137,16 @@ Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
 }
 
 template <class Key, class Element>
-bool LRUCache<Key, Element>::IsExist(const Key &key) {
+bool LRUCache<Key, Element>::IsExist(const Key& key) {
   MapIterator found_iter = map_.find(key);
-  if (found_iter != map_.end()) {
-    list_.splice(list_.begin(), list_, found_iter->second);
-  }
+  if (found_iter != map_.end()) { list_.splice(list_.begin(), list_, found_iter->second); }
   return found_iter != map_.end();
 }
 
 template <class Key, class Element>
-Element *LRUCache<Key, Element>::Remove(const Key &key) {
-  Element *node_remove = NULL;
-  MapIterator found_iter = map_.find(key);
+Element* LRUCache<Key, Element>::Remove(const Key& key) {
+  Element*    node_remove = NULL;
+  MapIterator found_iter  = map_.find(key);
 
   if (found_iter == map_.end()) {
     // don't find key in cache
@@ -169,10 +162,10 @@ Element *LRUCache<Key, Element>::Remove(const Key &key) {
 }
 
 template <class Key, class Element>
-Element *LRUCache<Key, Element>::ClearOne() {
+Element* LRUCache<Key, Element>::ClearOne() {
   // std::cout << "clear_one start" << std::endl;
-  Element *node_remove = NULL;
-  ListReverseIterator ritr = list_.rbegin();
+  Element*            node_remove = NULL;
+  ListReverseIterator ritr        = list_.rbegin();
   while (ritr != list_.rend()) {
     if (Destroy(&(ritr->second))) {
       node_remove = ritr->second;
@@ -187,7 +180,7 @@ Element *LRUCache<Key, Element>::ClearOne() {
 }
 
 template <class Key, class Element>
-bool LRUCache<Key, Element>::Destroy(Element **value) {
+bool LRUCache<Key, Element>::Destroy(Element** value) {
   return true;
 }
 
@@ -195,14 +188,15 @@ bool LRUCache<Key, Element>::Destroy(Element **value) {
 template <class Key, class MapNode>
 class MapNodeCacheL1 : public LRUCache<Key, MapNode> {
  public:
-  explicit MapNodeCacheL1(int capacity) : LRUCache<Key, MapNode>(capacity) {}
+  explicit MapNodeCacheL1(int capacity)
+      : LRUCache<Key, MapNode>(capacity) {}
 
  protected:
   /**@brief do something before remove a element from cache.
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
-  virtual bool Destroy(MapNode **value) {
+  virtual bool Destroy(MapNode** value) {
     (*value)->SetIsReserved(false);
     return true;
   }
@@ -212,14 +206,15 @@ class MapNodeCacheL1 : public LRUCache<Key, MapNode> {
 template <class Key, class MapNode>
 class MapNodeCacheL2 : public LRUCache<Key, MapNode> {
  public:
-  explicit MapNodeCacheL2(int capacity) : LRUCache<Key, MapNode>(capacity) {}
+  explicit MapNodeCacheL2(int capacity)
+      : LRUCache<Key, MapNode>(capacity) {}
 
  protected:
   /**@brief do something before remove a element from cache.
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
-  virtual bool Destroy(MapNode **value) { return !((*value)->GetIsReserved()); }
+  virtual bool Destroy(MapNode** value) { return !((*value)->GetIsReserved()); }
 };
 
 }  // namespace msf

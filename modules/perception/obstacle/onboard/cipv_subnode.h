@@ -43,23 +43,21 @@ class CIPVSubnode : public Subnode {
   bool InitInternal() override;
 
  private:
-  bool InitOutputStream(
-      const std::unordered_map<std::string, std::string>& fields);
+  bool InitOutputStream(const std::unordered_map<std::string, std::string>& fields);
   bool SubscribeEvents(Event* event) const;
 
-  bool GetSharedData(const Event& event,
-                     std::shared_ptr<SensorObjects>* sensor_objects);
-  void PublishDataAndEvent(const float timestamp,
+  bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* sensor_objects);
+  void PublishDataAndEvent(const float                         timestamp,
                            const SharedDataPtr<SensorObjects>& sensor_objects,
-                           CIPVObjectData* cipv_object_data);
+                           CIPVObjectData*                     cipv_object_data);
 
   CameraObjectData* camera_object_data_ = nullptr;
-  LaneSharedData* lane_shared_data_ = nullptr;
-  CIPVObjectData* cipv_object_data_ = nullptr;
-  EventID camera_event_id_;
-  EventID lane_event_id_;
-  Cipv cipv_;
-  std::string device_id_;
+  LaneSharedData*   lane_shared_data_   = nullptr;
+  CIPVObjectData*   cipv_object_data_   = nullptr;
+  EventID           camera_event_id_;
+  EventID           lane_event_id_;
+  Cipv              cipv_;
+  std::string       device_id_;
   DISALLOW_COPY_AND_ASSIGN(CIPVSubnode);
 };
 

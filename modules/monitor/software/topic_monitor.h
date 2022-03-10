@@ -27,12 +27,12 @@ namespace monitor {
 
 class TopicMonitor : public RecurrentRunner {
  public:
-  TopicMonitor(const TopicConf &config, TopicStatus *status);
+  TopicMonitor(const TopicConf& config, TopicStatus* status);
   void RunOnce(const double current_time) override;
 
  private:
-  const TopicConf &config_;
-  TopicStatus *status_;
+  const TopicConf& config_;
+  TopicStatus*     status_;
 };
 
 }  // namespace monitor

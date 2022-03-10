@@ -48,10 +48,10 @@ using apollo::perception::pcl_util::PointXYZIT;
 
 class LidarExChecker : public apollo::common::ApolloApp {
  public:
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
  private:
   // get extrinsics which are calibrated before

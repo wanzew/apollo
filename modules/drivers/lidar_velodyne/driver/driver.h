@@ -36,20 +36,19 @@ class VelodyneDriver {
   virtual ~VelodyneDriver() {}
 
   virtual bool poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) = 0;
-  virtual bool init() = 0;
+  virtual bool init()                                           = 0;
 
  protected:
-  VelodyneConf config_;
+  VelodyneConf             config_;
   boost::shared_ptr<Input> input_;
-  ros::Publisher output_;
-  std::string topic_;
+  ros::Publisher           output_;
+  std::string              topic_;
 
   uint64_t basetime_;
   uint32_t last_gps_time_;
-  int poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr scan);
-  void set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
-                                    uint64_t* basetime);
-  void update_gps_top_hour(unsigned int current_time);
+  int      poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr scan);
+  void     set_base_time_from_nmea_time(const NMEATimePtr& nmea_time, uint64_t* basetime);
+  void     update_gps_top_hour(unsigned int current_time);
 };
 
 class Velodyne64Driver : public VelodyneDriver {

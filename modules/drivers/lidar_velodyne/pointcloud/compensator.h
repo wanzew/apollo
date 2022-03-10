@@ -39,42 +39,41 @@ class Compensator {
   virtual ~Compensator() {}
 
   /**
-  * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
-  * compensator
-  */
+   * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
+   * compensator
+   */
   bool pointcloud_compensate(const sensor_msgs::PointCloud2ConstPtr msg,
-                             sensor_msgs::PointCloud2Ptr q_msg);
+                             sensor_msgs::PointCloud2Ptr            q_msg);
 
  private:
   /**
-  * @brief get pose affine from tf2 by gps timestamp
-  *   novatel-preprocess broadcast the tf2 transfrom.
-  */
-  bool query_pose_affine_from_tf2(const double& timestamp,
-                                  Eigen::Affine3d* pose);
+   * @brief get pose affine from tf2 by gps timestamp
+   *   novatel-preprocess broadcast the tf2 transfrom.
+   */
+  bool query_pose_affine_from_tf2(const double& timestamp, Eigen::Affine3d* pose);
   /**
-  * @brief check if message is valid, check width, height, timesatmp.
-  *   set timestamp_offset and point data type
-  */
+   * @brief check if message is valid, check width, height, timesatmp.
+   *   set timestamp_offset and point data type
+   */
   bool check_message(const sensor_msgs::PointCloud2ConstPtr msg);
   /**
-  * @brief motion compensation for point cloud
-  */
+   * @brief motion compensation for point cloud
+   */
   template <typename Scalar>
   void motion_compensation(sensor_msgs::PointCloud2Ptr msg,
-                           const double timestamp_min,
-                           const double timestamp_max,
-                           const Eigen::Affine3d& pose_min_time,
-                           const Eigen::Affine3d& pose_max_time);
+                           const double                timestamp_min,
+                           const double                timestamp_max,
+                           const Eigen::Affine3d&      pose_min_time,
+                           const Eigen::Affine3d&      pose_max_time);
   /**
-  * @brief get min timestamp and max timestamp from points in pointcloud2
-  */
+   * @brief get min timestamp and max timestamp from points in pointcloud2
+   */
   inline void get_timestamp_interval(const sensor_msgs::PointCloud2ConstPtr msg,
-                                     double* timestamp_min,
-                                     double* timestamp_max);
+                                     double*                                timestamp_min,
+                                     double*                                timestamp_max);
   /**
-  * @brief get point field size by sensor_msgs::datatype
-  */
+   * @brief get point field size by sensor_msgs::datatype
+   */
   inline uint get_field_size(const int data_type);
 
   // varibes for point fields value, we get point x,y,z by these offset

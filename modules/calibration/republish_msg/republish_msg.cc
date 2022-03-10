@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/calibration/republish_msg/common/republish_msg_gflags.h"
 #include "modules/calibration/republish_msg/republish_msg.h"
+#include "modules/calibration/republish_msg/common/republish_msg_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "ros/include/ros/ros.h"
@@ -23,9 +23,9 @@
 namespace apollo {
 namespace calibration {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 
 std::string RepublishMsg::Name() const { return "republish_msg"; }
 
@@ -34,41 +34,36 @@ Status RepublishMsg::Init() {
 
   CHECK(AdapterManager::GetInsStat()) << "INS status is not initialized.";
   CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
-  CHECK(AdapterManager::GetRelativeOdometry())
-      << "Relative odometry is not initialized.";
+  CHECK(AdapterManager::GetRelativeOdometry()) << "Relative odometry is not initialized.";
 
   AdapterManager::AddGpsCallback(&RepublishMsg::OnGps, this);
   AdapterManager::AddInsStatCallback(&RepublishMsg::OnInsStat, this);
 
   is_first_gps_msg_ = true;
-  position_type_ = 0;
+  position_type_    = 0;
 
   return Status::OK();
 }
 
-void RepublishMsg::OnInsStat(const drivers::gnss::InsStat& msg) {
-  position_type_ = msg.pos_type();
-}
+void RepublishMsg::OnInsStat(const drivers::gnss::InsStat& msg) { position_type_ = msg.pos_type(); }
 
 void RepublishMsg::OnGps(const localization::Gps& msg) {
   if (msg.has_localization()) {
     const auto pose_msg = msg.localization();
 
-    Eigen::Quaterniond rotation(
-        pose_msg.orientation().qw(), pose_msg.orientation().qx(),
-        pose_msg.orientation().qy(), pose_msg.orientation().qz());
-    Eigen::Translation3d translation(pose_msg.position().x(),
-                                     pose_msg.position().y(),
+    Eigen::Quaterniond   rotation(pose_msg.orientation().qw(), pose_msg.orientation().qx(),
+                                pose_msg.orientation().qy(), pose_msg.orientation().qz());
+    Eigen::Translation3d translation(pose_msg.position().x(), pose_msg.position().y(),
                                      pose_msg.position().z());
-    Eigen::Affine3d pose = translation * rotation;
+    Eigen::Affine3d      pose = translation * rotation;
 
     if (is_first_gps_msg_) {
       is_first_gps_msg_ = false;
-      offset_ = pose.inverse();
+      offset_           = pose.inverse();
     }
 
-    Eigen::Affine3d pub_pose = offset_ * pose;
-    Eigen::Quaterniond pub_rot(pub_pose.rotation());
+    Eigen::Affine3d      pub_pose = offset_ * pose;
+    Eigen::Quaterniond   pub_rot(pub_pose.rotation());
     Eigen::Translation3d pub_trans(pub_pose.translation());
 
     calibration::republish_msg::RelativeOdometry pub_msg;

@@ -31,9 +31,9 @@ namespace traffic_light {
 
 // Camera id
 enum CameraId {
-  UNKNOWN = -1,
-  LONG_FOCUS = 0,   // 25mm
-  SHORT_FOCUS = 1,  // 6mm
+  UNKNOWN         = -1,
+  LONG_FOCUS      = 0,  // 25mm
+  SHORT_FOCUS     = 1,  // 6mm
   CAMERA_ID_COUNT = 2
 };
 
@@ -58,7 +58,7 @@ class Image {
    * @param [in] camera id
    * @param [in] mat image
    */
-  bool Init(const double ts, const CameraId &device_id, const cv::Mat &mat);
+  bool Init(const double ts, const CameraId& device_id, const cv::Mat& mat);
 
   /**
    * @brief init
@@ -66,7 +66,8 @@ class Image {
    * @param [in] camera id
    * @param [in] raw ros image data
    */
-  bool Init(const double ts, const CameraId &device_id,
+  bool Init(const double                                ts,
+            const CameraId&                             device_id,
             boost::shared_ptr<const sensor_msgs::Image> image_data);
 
   /**
@@ -88,7 +89,7 @@ class Image {
   /**
    * @brief return image as cv::Mat
    */
-  const cv::Mat &mat() const;
+  const cv::Mat& mat() const;
 
   /**
    * @brief return image's size
@@ -119,13 +120,13 @@ class Image {
   bool GenerateMat();
 
  private:
-  bool contain_image_ = false;
-  bool contain_mat_ = false;
-  double timestamp_ = 0.0;                  // Image's timestamp
-  CameraId camera_id_ = CameraId::UNKNOWN;  // camera's id
-  cv::Mat mat_;                             // Image's data
+  bool                                        contain_image_ = false;
+  bool                                        contain_mat_   = false;
+  double                                      timestamp_     = 0.0;  // Image's timestamp
+  CameraId                                    camera_id_     = CameraId::UNKNOWN;  // camera's id
+  cv::Mat                                     mat_;                                // Image's data
   boost::shared_ptr<const sensor_msgs::Image> image_data_;
-  friend std::ostream &operator<<(std::ostream &os, const Image &image);
+  friend std::ostream&                        operator<<(std::ostream& os, const Image& image);
 };
 
 typedef std::shared_ptr<Image> ImageSharedPtr;

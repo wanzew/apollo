@@ -49,12 +49,13 @@ class PandoraCamera {
    *        gps_callback      The callback of GPS structure
    *        type       				The device type
    */
-  PandoraCamera(
-      const std::string &device_ip, const uint16_t pandoraCameraPort,
-      boost::function<void(boost::shared_ptr<cv::Mat> matp, double timestamp,
-                           int picid, bool distortion)>
-          camera_callback,
-      boost::function<void(bool connected)> connection_changed, int tz);
+  PandoraCamera(const std::string& device_ip,
+                const uint16_t     pandoraCameraPort,
+                boost::function<void(
+                    boost::shared_ptr<cv::Mat> matp, double timestamp, int picid, bool distortion)>
+                                                      camera_callback,
+                boost::function<void(bool connected)> connection_changed,
+                int                                   tz);
   ~PandoraCamera();
 
   /**
@@ -62,39 +63,38 @@ class PandoraCamera {
    * @param angle The start angle
    */
 
-  bool loadIntrinsics(const std::vector<cv::Mat> &cameras_k,
-                      const std::vector<cv::Mat> &cameras_d);
+  bool loadIntrinsics(const std::vector<cv::Mat>& cameras_k, const std::vector<cv::Mat>& cameras_d);
 
-  int Start();
+  int  Start();
   void Stop();
-  void pushPicture(PandoraPic *pic);
+  void pushPicture(PandoraPic* pic);
 
  private:
   void processPic();
 
-  int decompressJpeg(uint8_t *jpgBuffer, const uint32_t jpgSize, uint8_t **bmp,
-                     uint32_t *bmpSize);
-  void yuv422ToCvmat(boost::shared_ptr<cv::Mat> dst, const void *pYUV422,
-                     const int nWidth, const int nHeight, const int bitDepth);
-  void yuv422ToRgb24(const uint8_t *uyvy422, uint8_t *rgb24, const int width,
-                     const int height);
-  void yuvToRgb(const int iY, const int iU, const int iV, int *iR, int *iG,
-                int *iB);
+  int  decompressJpeg(uint8_t* jpgBuffer, const uint32_t jpgSize, uint8_t** bmp, uint32_t* bmpSize);
+  void yuv422ToCvmat(boost::shared_ptr<cv::Mat> dst,
+                     const void*                pYUV422,
+                     const int                  nWidth,
+                     const int                  nHeight,
+                     const int                  bitDepth);
+  void yuv422ToRgb24(const uint8_t* uyvy422, uint8_t* rgb24, const int width, const int height);
+  void yuvToRgb(const int iY, const int iU, const int iV, int* iR, int* iG, int* iB);
 
-  pthread_mutex_t pic_lock_;
-  sem_t pic_sem_;
-  boost::thread *process_pic_thread_;
-  bool continue_process_pic_;
-  bool need_remap_;
-  std::string ip_;
-  uint16_t camera_port_;
-  void *pandora_client_;
-  std::list<PandoraPic *> pic_list_;
-  std::vector<cv::Mat> mapx_;
-  std::vector<cv::Mat> mapy_;
-  boost::function<void(boost::shared_ptr<cv::Mat> matp, double timestamp,
-                       int pic_id, bool distortion)>
-      camera_callback_;
+  pthread_mutex_t        pic_lock_;
+  sem_t                  pic_sem_;
+  boost::thread*         process_pic_thread_;
+  bool                   continue_process_pic_;
+  bool                   need_remap_;
+  std::string            ip_;
+  uint16_t               camera_port_;
+  void*                  pandora_client_;
+  std::list<PandoraPic*> pic_list_;
+  std::vector<cv::Mat>   mapx_;
+  std::vector<cv::Mat>   mapy_;
+  boost::function<void(
+      boost::shared_ptr<cv::Mat> matp, double timestamp, int pic_id, bool distortion)>
+                                        camera_callback_;
   boost::function<void(bool connected)> connection_changed_;
 
   int tz_second_;

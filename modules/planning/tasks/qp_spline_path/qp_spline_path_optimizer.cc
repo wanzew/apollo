@@ -36,16 +36,15 @@ QpSplinePathOptimizer::QpSplinePathOptimizer()
 bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
   qp_spline_path_config_ = config.em_planner_config().qp_spline_path_config();
   std::vector<double> init_knots;
-  spline_generator_.reset(
-      new Spline1dGenerator(init_knots, qp_spline_path_config_.spline_order()));
+  spline_generator_.reset(new Spline1dGenerator(init_knots, qp_spline_path_config_.spline_order()));
   is_init_ = true;
   return true;
 }
 
-Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
-                                      const ReferenceLine& reference_line,
+Status QpSplinePathOptimizer::Process(const SpeedData&               speed_data,
+                                      const ReferenceLine&           reference_line,
                                       const common::TrajectoryPoint& init_point,
-                                      PathData* const path_data) {
+                                      PathData* const                path_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
@@ -57,24 +56,22 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
   path_generator.SetChangeLane(reference_line_info_->IsChangeLanePath());
 
   double boundary_extension = 0.0;
-  bool is_final_attempt = false;
+  bool   is_final_attempt   = false;
 
   bool ret = path_generator.Generate(
-      reference_line_info_->path_decision()->path_obstacles().Items(),
-      speed_data, init_point, boundary_extension, is_final_attempt, path_data);
+      reference_line_info_->path_decision()->path_obstacles().Items(), speed_data, init_point,
+      boundary_extension, is_final_attempt, path_data);
   if (!ret) {
     AERROR << "failed to generate spline path with boundary_extension = 0.";
 
     boundary_extension = qp_spline_path_config_.cross_lane_lateral_extension();
-    is_final_attempt = true;
+    is_final_attempt   = true;
 
-    ret = path_generator.Generate(
-        reference_line_info_->path_decision()->path_obstacles().Items(),
-        speed_data, init_point, boundary_extension, is_final_attempt,
-        path_data);
+    ret = path_generator.Generate(reference_line_info_->path_decision()->path_obstacles().Items(),
+                                  speed_data, init_point, boundary_extension, is_final_attempt,
+                                  path_data);
     if (!ret) {
-      const std::string msg =
-          "failed to generate spline path at final attempt.";
+      const std::string msg = "failed to generate spline path at final attempt.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }

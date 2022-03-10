@@ -23,8 +23,7 @@ namespace fuser_util {
 
 void FromStdVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
   (*dst_prob)(0) = src_prob[0];
-  for (std::size_t i = 3; i < static_cast<int>(ObjectType::MAX_OBJECT_TYPE);
-       ++i) {
+  for (std::size_t i = 3; i < static_cast<int>(ObjectType::MAX_OBJECT_TYPE); ++i) {
     (*dst_prob)(i - 2) = static_cast<double>(src_prob[i]);
   }
 }
@@ -32,8 +31,7 @@ void FromStdVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
 void FromEigenVector(const Vectord& src_prob, std::vector<float>* dst_prob) {
   dst_prob->assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
   dst_prob->at(0) = src_prob(0);
-  for (std::size_t i = 3; i < static_cast<int>(ObjectType::MAX_OBJECT_TYPE);
-       ++i) {
+  for (std::size_t i = 3; i < static_cast<int>(ObjectType::MAX_OBJECT_TYPE); ++i) {
     dst_prob->at(i) = static_cast<float>(src_prob(i - 2));
   }
 }
@@ -53,7 +51,7 @@ void ToExp(Vectord* prob) {
 
 void Normalize(Vectord* prob) {
   double sum = prob->sum();
-  sum = sum < 1e-9 ? 1e-9 : sum;
+  sum        = sum < 1e-9 ? 1e-9 : sum;
   *prob /= sum;
 }
 
@@ -72,13 +70,13 @@ void NormalizeRow(Matrixd* prob) {
 
 void PrintProbability(const std::vector<float>& prob, const std::string& name) {
   ADEBUG << name << ": ";
-  float max_prob = -DBL_MAX;
-  std::size_t max_id = 0;
+  float       max_prob = -DBL_MAX;
+  std::size_t max_id   = 0;
   for (std::size_t i = 0; i < prob.size(); ++i) {
     ADEBUG << std::setprecision(3) << prob[i] << " ";
     if (prob[i] > max_prob) {
       max_prob = prob[i];
-      max_id = i;
+      max_id   = i;
     }
   }
   ADEBUG << " max_type: " << max_id << std::endl;
@@ -94,9 +92,7 @@ bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix) {
 }
 
 bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
-  if (matrix == nullptr) {
-    return false;
-  }
+  if (matrix == nullptr) { return false; }
   std::ifstream fin(filename);
   if (!fin.is_open()) {
     AERROR << "Fail to open file: " << filename;
@@ -107,12 +103,9 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
   return true;
 }
 
-bool LoadMultipleMatricesFile(
-    const std::string& filename,
-    std::unordered_map<std::string, Matrixd>* matrices) {
-  if (matrices == nullptr) {
-    return false;
-  }
+bool LoadMultipleMatricesFile(const std::string&                        filename,
+                              std::unordered_map<std::string, Matrixd>* matrices) {
+  if (matrices == nullptr) { return false; }
   std::ifstream fin(filename);
   if (!fin.is_open()) {
     AERROR << "Fail to open file: " << filename;

@@ -31,49 +31,44 @@ class CNNAdapter {
  public:
   virtual void forward() = 0;
 
-  virtual boost::shared_ptr<caffe::Blob<float>> get_blob_by_name(
-      const std::string &name) = 0;
+  virtual boost::shared_ptr<caffe::Blob<float>> get_blob_by_name(const std::string& name) = 0;
 
-  virtual bool init(const std::vector<std::string> &input_names,
-                    const std::vector<std::string> &output_names,
-                    const std::string &proto_file,
-                    const std::string &weight_file, int gpu_id,
-                    const std::string &model_root = "") = 0;
+  virtual bool init(const std::vector<std::string>& input_names,
+                    const std::vector<std::string>& output_names,
+                    const std::string&              proto_file,
+                    const std::string&              weight_file,
+                    int                             gpu_id,
+                    const std::string&              model_root = "") = 0;
 
-  virtual bool shape(const std::string &name, std::vector<int> *res) = 0;
-  virtual bool reshape_input(const std::string &name,
-                             const std::vector<int> &shape) = 0;
+  virtual bool shape(const std::string& name, std::vector<int>* res)                 = 0;
+  virtual bool reshape_input(const std::string& name, const std::vector<int>& shape) = 0;
 };
 
 class CNNCaffe : public CNNAdapter {
  public:
   CNNCaffe() = default;
 
-  bool init(const std::vector<std::string> &input_names,
-            const std::vector<std::string> &output_names,
-            const std::string &proto_file, const std::string &weight_file,
-            int gpu_id, const std::string &model_root = "") override;
+  bool init(const std::vector<std::string>& input_names,
+            const std::vector<std::string>& output_names,
+            const std::string&              proto_file,
+            const std::string&              weight_file,
+            int                             gpu_id,
+            const std::string&              model_root = "") override;
 
   void forward() override;
 
-  boost::shared_ptr<caffe::Blob<float>> get_blob_by_name(
-      const std::string &name) override;
+  boost::shared_ptr<caffe::Blob<float>> get_blob_by_name(const std::string& name) override;
 
-  bool shape(const std::string &name, std::vector<int> *res) override {
+  bool shape(const std::string& name, std::vector<int>* res) override {
     auto blob = get_blob_by_name(name);
-    if (blob == nullptr) {
-      return false;
-    }
+    if (blob == nullptr) { return false; }
     *res = blob->shape();
     return true;
   }
 
-  bool reshape_input(const std::string &name,
-                     const std::vector<int> &shape) override {
+  bool reshape_input(const std::string& name, const std::vector<int>& shape) override {
     auto blob = get_blob_by_name(name);
-    if (blob == nullptr) {
-      return false;
-    }
+    if (blob == nullptr) { return false; }
     blob->Reshape(shape);
     forward();
     return true;
@@ -81,7 +76,7 @@ class CNNCaffe : public CNNAdapter {
 
  private:
   boost::shared_ptr<caffe::Net<float>> net_;
-  int gpu_id_ = 0;
+  int                                  gpu_id_ = 0;
 };
 
 }  // namespace perception

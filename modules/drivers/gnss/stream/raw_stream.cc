@@ -37,8 +37,8 @@ namespace gnss {
 
 using apollo::common::adapter::AdapterManager;
 
-void switch_stream_status(const apollo::drivers::gnss::Stream::Status &status,
-                          StreamStatus_Type *report_status_type) {
+void switch_stream_status(const apollo::drivers::gnss::Stream::Status& status,
+                          StreamStatus_Type*                           report_status_type) {
   switch (status) {
     case apollo::drivers::gnss::Stream::Status::CONNECTED:
       *report_status_type = StreamStatus::CONNECTED;
@@ -49,25 +49,21 @@ void switch_stream_status(const apollo::drivers::gnss::Stream::Status &status,
       break;
 
     case apollo::drivers::gnss::Stream::Status::ERROR:
-    default:
-      *report_status_type = StreamStatus::DISCONNECTED;
-      break;
+    default: *report_status_type = StreamStatus::DISCONNECTED; break;
   }
 }
 std::string getLocalTimeFileStr() {
   time_t it = std::time(0);
-  char local_time_char[64];
-  std::strftime(local_time_char, sizeof(local_time_char), "%Y%m%d_%H%M%S",
-                localtime(&it));
+  char   local_time_char[64];
+  std::strftime(local_time_char, sizeof(local_time_char), "%Y%m%d_%H%M%S", localtime(&it));
   std::string local_time_str = local_time_char;
   CHECK(apollo::common::util::EnsureDirectory(FLAGS_gpsbin_folder))
       << "gbsbin folder : " << FLAGS_gpsbin_folder << " create fail";
-  std::string local_time_file_str =
-      FLAGS_gpsbin_folder + "/" + local_time_str + ".bin";
+  std::string local_time_file_str = FLAGS_gpsbin_folder + "/" + local_time_str + ".bin";
   return local_time_file_str;
 }
 
-Stream *create_stream(const config::Stream &sd) {
+Stream* create_stream(const config::Stream& sd) {
   switch (sd.type_case()) {
     case config::Stream::kSerial:
       if (!sd.serial().has_device()) {
@@ -79,8 +75,7 @@ Stream *create_stream(const config::Stream &sd) {
                << sd.serial().baud_rate();
         return nullptr;
       }
-      return Stream::create_serial(sd.serial().device().c_str(),
-                                   sd.serial().baud_rate());
+      return Stream::create_serial(sd.serial().device().c_str(), sd.serial().baud_rate());
 
     case config::Stream::kTcp:
       if (!sd.tcp().has_address()) {
@@ -125,15 +120,14 @@ Stream *create_stream(const config::Stream &sd) {
         AERROR << "ntrip def has no passwd field.";
         return nullptr;
       }
-      return Stream::create_ntrip(
-          sd.ntrip().address(), sd.ntrip().port(), sd.ntrip().mount_point(),
-          sd.ntrip().user(), sd.ntrip().password(), sd.ntrip().timeout_s());
-    default:
-      return nullptr;
+      return Stream::create_ntrip(sd.ntrip().address(), sd.ntrip().port(), sd.ntrip().mount_point(),
+                                  sd.ntrip().user(), sd.ntrip().password(), sd.ntrip().timeout_s());
+    default: return nullptr;
   }
 }
 
-RawStream::RawStream(const config::Config &config) : config_(config) {
+RawStream::RawStream(const config::Config& config)
+    : config_(config) {
   data_parser_ptr_.reset(new DataParser(config_));
   rtcm_parser_ptr_.reset(new RtcmParser());
 }
@@ -158,12 +152,11 @@ bool RawStream::Init() {
   stream_status_.set_ins_stream_type(StreamStatus::DISCONNECTED);
   stream_status_.set_rtk_stream_in_type(StreamStatus::DISCONNECTED);
   stream_status_.set_rtk_stream_out_type(StreamStatus::DISCONNECTED);
-  AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
-                                         &stream_status_);
+  AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name, &stream_status_);
   AdapterManager::PublishStreamStatus(stream_status_);
 
   // Creates streams.
-  Stream *s = nullptr;
+  Stream* s = nullptr;
   if (!config_.has_data()) {
     AINFO << "Error: Config file must provide the data stream.";
     return false;
@@ -175,7 +168,7 @@ bool RawStream::Init() {
   }
   data_stream_.reset(s);
 
-  Status *status = new Status();
+  Status* status = new Status();
   if (!status) {
     AERROR << "Failed to create data stream status.";
     return false;
@@ -197,7 +190,7 @@ bool RawStream::Init() {
     }
     command_stream_status_.reset(status);
   } else {
-    command_stream_ = data_stream_;
+    command_stream_        = data_stream_;
     command_stream_status_ = data_stream_status_;
   }
 
@@ -235,25 +228,20 @@ bool RawStream::Init() {
       }
       out_rtk_stream_status_.reset(status);
     } else {
-      out_rtk_stream_ = data_stream_;
+      out_rtk_stream_        = data_stream_;
       out_rtk_stream_status_ = data_stream_status_;
     }
 
     if (config_.has_rtk_solution_type()) {
-      if (config_.rtk_solution_type() ==
-          config::Config::RTK_SOFTWARE_SOLUTION) {
+      if (config_.rtk_solution_type() == config::Config::RTK_SOFTWARE_SOLUTION) {
         rtk_software_solution_ = true;
       }
     }
   }
 
-  if (config_.login_commands_size() == 0) {
-    AWARN << "No login_commands in config file.";
-  }
+  if (config_.login_commands_size() == 0) { AWARN << "No login_commands in config file."; }
 
-  if (config_.logout_commands_size() == 0) {
-    AWARN << "No logout_commands in config file.";
-  }
+  if (config_.logout_commands_size() == 0) { AWARN << "No logout_commands in config file."; }
 
   // connect and login
   if (!Connect()) {
@@ -267,8 +255,8 @@ bool RawStream::Init() {
   }
 
   const std::string gpsbin_file = getLocalTimeFileStr();
-  gpsbin_stream_.reset(new std::ofstream(
-      gpsbin_file, std::ios::app | std::ios::out | std::ios::binary));
+  gpsbin_stream_.reset(
+      new std::ofstream(gpsbin_file, std::ios::app | std::ios::out | std::ios::binary));
   AdapterManager::AddGnssRawDataCallback(&RawStream::GpsbinCallback, this);
   return true;
 }
@@ -277,24 +265,22 @@ void RawStream::Start() {
   data_thread_ptr_.reset(new std::thread(&RawStream::DataSpin, this));
   rtk_thread_ptr_.reset(new std::thread(&RawStream::RtkSpin, this));
   if (config_.has_wheel_parameters()) {
-    wheel_velocity_timer_ = AdapterManager::CreateTimer(
-        ros::Duration(1), &RawStream::OnWheelVelocityTimer, this);
+    wheel_velocity_timer_ =
+        AdapterManager::CreateTimer(ros::Duration(1), &RawStream::OnWheelVelocityTimer, this);
   }
 }
 
-void RawStream::OnWheelVelocityTimer(const ros::TimerEvent &) {
+void RawStream::OnWheelVelocityTimer(const ros::TimerEvent&) {
   AdapterManager::Observe();
   if (AdapterManager::GetChassis()->Empty()) {
     AINFO << "No chassis message received";
     return;
   }
-  auto chassis = AdapterManager::GetChassis()->GetLatestObservedPtr();
-  auto latency_sec =
-      ros::Time::now().toSec() - chassis->header().timestamp_sec();
-  auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
-  auto speed_cmps = std::to_string(std::lround(chassis->speed_mps() * 100));
-  auto cmd_wheelvelocity =
-      "WHEELVELOCITY " + latency_ms + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
+  auto chassis           = AdapterManager::GetChassis()->GetLatestObservedPtr();
+  auto latency_sec       = ros::Time::now().toSec() - chassis->header().timestamp_sec();
+  auto latency_ms        = std::to_string(std::lround(latency_sec * 1000));
+  auto speed_cmps        = std::to_string(std::lround(chassis->speed_mps() * 100));
+  auto cmd_wheelvelocity = "WHEELVELOCITY " + latency_ms + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
   AINFO << "Write command: " << cmd_wheelvelocity;
   command_stream_->write(cmd_wheelvelocity);
 }
@@ -389,7 +375,7 @@ bool RawStream::Disconnect() {
 
 bool RawStream::Login() {
   std::vector<std::string> login_data;
-  for (const auto &login_command : config_.login_commands()) {
+  for (const auto& login_command : config_.login_commands()) {
     data_stream_->write(login_command);
     login_data.emplace_back(login_command);
     AINFO << "Login command: " << login_command;
@@ -407,7 +393,7 @@ bool RawStream::Login() {
 }
 
 bool RawStream::Logout() {
-  for (const auto &logout_command : config_.logout_commands()) {
+  for (const auto& logout_command : config_.logout_commands()) {
     data_stream_->write(logout_command);
     AINFO << "Logout command: " << logout_command;
   }
@@ -415,43 +401,38 @@ bool RawStream::Logout() {
 }
 
 void RawStream::StreamStatusCheck() {
-  bool status_report = false;
+  bool              status_report = false;
   StreamStatus_Type report_stream_status;
 
-  if (data_stream_ &&
-      (data_stream_->get_status() != data_stream_status_->status)) {
+  if (data_stream_ && (data_stream_->get_status() != data_stream_status_->status)) {
     data_stream_status_->status = data_stream_->get_status();
-    status_report = true;
+    status_report               = true;
     switch_stream_status(data_stream_status_->status, &report_stream_status);
     stream_status_.set_ins_stream_type(report_stream_status);
   }
 
-  if (in_rtk_stream_ &&
-      (in_rtk_stream_->get_status() != in_rtk_stream_status_->status)) {
+  if (in_rtk_stream_ && (in_rtk_stream_->get_status() != in_rtk_stream_status_->status)) {
     in_rtk_stream_status_->status = in_rtk_stream_->get_status();
-    status_report = true;
+    status_report                 = true;
     switch_stream_status(in_rtk_stream_status_->status, &report_stream_status);
     stream_status_.set_rtk_stream_in_type(report_stream_status);
   }
 
-  if (out_rtk_stream_ &&
-      (out_rtk_stream_->get_status() != out_rtk_stream_status_->status)) {
+  if (out_rtk_stream_ && (out_rtk_stream_->get_status() != out_rtk_stream_status_->status)) {
     out_rtk_stream_status_->status = out_rtk_stream_->get_status();
-    status_report = true;
+    status_report                  = true;
     switch_stream_status(out_rtk_stream_status_->status, &report_stream_status);
     stream_status_.set_rtk_stream_out_type(report_stream_status);
   }
 
   if (status_report) {
-    AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
-                                           &stream_status_);
+    AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name, &stream_status_);
     AdapterManager::PublishStreamStatus(stream_status_);
   }
 }
 
 void RawStream::DataSpin() {
-  AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
-                                         &stream_status_);
+  AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name, &stream_status_);
   AdapterManager::PublishStreamStatus(stream_status_);
   while (ros::ok()) {
     size_t length = data_stream_->read(buffer_, BUFFER_SIZE);
@@ -461,21 +442,17 @@ void RawStream::DataSpin() {
         AERROR << "New data sting msg failed.";
         continue;
       }
-      msg_pub->data.assign(reinterpret_cast<const char *>(buffer_), length);
+      msg_pub->data.assign(reinterpret_cast<const char*>(buffer_), length);
       AdapterManager::PublishGnssRawData(*msg_pub);  // for data recorder
       data_parser_ptr_->ParseRawData(msg_pub);
-      if (push_location_) {
-        PushGpgga(length);
-      }
+      if (push_location_) { PushGpgga(length); }
     }
     StreamStatusCheck();
   }
 }
 
 void RawStream::RtkSpin() {
-  if (in_rtk_stream_ == nullptr) {
-    return;
-  }
+  if (in_rtk_stream_ == nullptr) { return; }
   while (ros::ok()) {
     size_t length = in_rtk_stream_->read(buffer_rtk_, BUFFER_SIZE);
     if (length > 0) {
@@ -483,13 +460,10 @@ void RawStream::RtkSpin() {
         PublishRtkData(length);
       } else {
         PublishRtkData(length);
-        if (out_rtk_stream_ == nullptr) {
-          continue;
-        }
+        if (out_rtk_stream_ == nullptr) { continue; }
         size_t ret = out_rtk_stream_->write(buffer_rtk_, length);
         if (ret != length) {
-          AERROR << "Expect write out rtk stream bytes " << length
-                 << " but got " << ret;
+          AERROR << "Expect write out rtk stream bytes " << length << " but got " << ret;
         }
       }
     }
@@ -499,43 +473,37 @@ void RawStream::RtkSpin() {
 void RawStream::PublishRtkData(size_t length) {
   std_msgs::StringPtr rtkmsg(new std_msgs::String);
   CHECK_NOTNULL(rtkmsg);
-  rtkmsg->data.assign(reinterpret_cast<const char *>(buffer_rtk_), length);
+  rtkmsg->data.assign(reinterpret_cast<const char*>(buffer_rtk_), length);
   AdapterManager::PublishRtcmData(*rtkmsg);
   rtcm_parser_ptr_->ParseRtcmData(rtkmsg);
 }
 
 void RawStream::PushGpgga(size_t length) {
-  if (!in_rtk_stream_) {
-    return;
-  }
+  if (!in_rtk_stream_) { return; }
 
-  char *gpgga = strstr(reinterpret_cast<char *>(buffer_), "$GPGGA");
+  char* gpgga = strstr(reinterpret_cast<char*>(buffer_), "$GPGGA");
   if (gpgga) {
-    char *p = strchr(gpgga, '*');
+    char* p = strchr(gpgga, '*');
     if (p) {
       p += 5;
-      if (size_t(p - reinterpret_cast<char *>(buffer_)) <= length) {
+      if (size_t(p - reinterpret_cast<char*>(buffer_)) <= length) {
         AINFO_EVERY(5) << "Push gpgga.";
-        in_rtk_stream_->write(reinterpret_cast<uint8_t *>(gpgga),
-                              reinterpret_cast<uint8_t *>(p) - buffer_);
+        in_rtk_stream_->write(reinterpret_cast<uint8_t*>(gpgga),
+                              reinterpret_cast<uint8_t*>(p) - buffer_);
       }
     }
   }
 }
 
 void RawStream::GpsbinSpin() {
-  if (gpsbin_stream_ == nullptr) {
-    return;
-  }
+  if (gpsbin_stream_ == nullptr) { return; }
   while (ros::ok()) {
     std_msgs::String raw_data;
     gpsbin_stream_->write(raw_data.data.c_str(), raw_data.data.size());
   }
 }
-void RawStream::GpsbinCallback(const std_msgs::String &raw_data) {
-  if (gpsbin_stream_ == nullptr) {
-    return;
-  }
+void RawStream::GpsbinCallback(const std_msgs::String& raw_data) {
+  if (gpsbin_stream_ == nullptr) { return; }
   gpsbin_stream_->write(raw_data.data.c_str(), raw_data.data.size());
 }
 

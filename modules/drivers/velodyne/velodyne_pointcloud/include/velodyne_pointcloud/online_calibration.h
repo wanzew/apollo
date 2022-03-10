@@ -17,10 +17,10 @@
 #ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_ONLINE_CALIBRATION_H_
 #define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_ONLINE_CALIBRATION_H_
 
-#include <ros/ros.h>
-#include <vector>
 #include "velodyne_msgs/VelodyneScanUnified.h"
 #include "velodyne_pointcloud/calibration.h"
+#include <ros/ros.h>
+#include <vector>
 
 namespace apollo {
 namespace drivers {
@@ -33,19 +33,15 @@ class OnlineCalibration {
   OnlineCalibration() {}
   ~OnlineCalibration() {}
 
-  int decode(velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msgs);
-  void dump(const std::string& file_path);
-  void get_unit_index();
-  bool inited() const {
-    return inited_;
-  }
-  Calibration calibration() const {
-    return calibration_;
-  }
+  int         decode(velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msgs);
+  void        dump(const std::string& file_path);
+  void        get_unit_index();
+  bool        inited() const { return inited_; }
+  Calibration calibration() const { return calibration_; }
 
  private:
-  bool inited_;
-  Calibration calibration_;
+  bool                 inited_;
+  Calibration          calibration_;
   std::vector<uint8_t> status_types_;
   std::vector<uint8_t> status_values_;
   // store first two "unit#" value index

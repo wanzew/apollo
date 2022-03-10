@@ -42,29 +42,29 @@ namespace planning {
 
 class QpSplinePathGenerator {
  public:
-  QpSplinePathGenerator(Spline1dGenerator* spline_generator,
-                        const ReferenceLine& reference_line,
+  QpSplinePathGenerator(Spline1dGenerator*        spline_generator,
+                        const ReferenceLine&      reference_line,
                         const QpSplinePathConfig& qp_spline_path_config,
-                        const SLBoundary& adc_sl_boundary);
+                        const SLBoundary&         adc_sl_boundary);
 
   void SetDebugLogger(apollo::planning_internal::Debug* debug);
 
   void SetChangeLane(bool is_change_lane_path);
 
   bool Generate(const std::vector<const PathObstacle*>& path_obstacles,
-                const SpeedData& speed_data,
-                const common::TrajectoryPoint& init_point,
-                const double boundary_extension, bool is_final_attempt,
-                PathData* const path_data);
+                const SpeedData&                        speed_data,
+                const common::TrajectoryPoint&          init_point,
+                const double                            boundary_extension,
+                bool                                    is_final_attempt,
+                PathData* const                         path_data);
 
  private:
-  bool CalculateFrenetPoint(const common::TrajectoryPoint& traj_point,
+  bool CalculateFrenetPoint(const common::TrajectoryPoint&  traj_point,
                             common::FrenetFramePoint* const sl_point);
 
   bool InitSpline(const double start_s, const double end_s);
 
-  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame,
-                     const double boundary_extension);
+  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame, const double boundary_extension);
 
   void AddKernel();
 
@@ -73,21 +73,21 @@ class QpSplinePathGenerator {
   bool Solve();
 
  private:
-  Spline1dGenerator* spline_generator_ = nullptr;
-  apollo::planning_internal::Debug* planning_debug_ = nullptr;
-  const ReferenceLine& reference_line_;
-  const QpSplinePathConfig& qp_spline_path_config_;
+  Spline1dGenerator*                spline_generator_ = nullptr;
+  apollo::planning_internal::Debug* planning_debug_   = nullptr;
+  const ReferenceLine&              reference_line_;
+  const QpSplinePathConfig&         qp_spline_path_config_;
 
-  common::TrajectoryPoint init_trajectory_point_;
+  common::TrajectoryPoint  init_trajectory_point_;
   common::FrenetFramePoint init_frenet_point_;
 
   std::vector<double> knots_;
   std::vector<double> evaluated_s_;
 
   const DiscretizedPath* last_discretized_path_ = nullptr;
-  SLBoundary adc_sl_boundary_;
-  bool is_change_lane_path_ = false;
-  double ref_l_ = 0.0;
+  SLBoundary             adc_sl_boundary_;
+  bool                   is_change_lane_path_ = false;
+  double                 ref_l_               = 0.0;
 };
 
 }  // namespace planning

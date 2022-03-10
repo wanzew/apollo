@@ -56,30 +56,22 @@ bool FusionSubnode::InitInternal() {
     AERROR << "Failed to init fusion:" << FLAGS_onboard_fusion;
     return false;
   }
-  radar_object_data_ = dynamic_cast<RadarObjectData *>(
-      shared_data_manager_->GetSharedData("RadarObjectData"));
-  if (radar_object_data_ == nullptr) {
-    AWARN << "Failed to get RadarObjectData.";
-  }
-  lidar_object_data_ = dynamic_cast<LidarObjectData *>(
-      shared_data_manager_->GetSharedData("LidarObjectData"));
-  if (lidar_object_data_ == nullptr) {
-    AWARN << "Failed to get LidarObjectData.";
-  }
-  camera_object_data_ = dynamic_cast<CameraObjectData *>(
-      shared_data_manager_->GetSharedData("CameraObjectData"));
-  if (camera_object_data_ == nullptr) {
-    AWARN << "Failed to get CameraObjectData.";
-  }
+  radar_object_data_ =
+      dynamic_cast<RadarObjectData*>(shared_data_manager_->GetSharedData("RadarObjectData"));
+  if (radar_object_data_ == nullptr) { AWARN << "Failed to get RadarObjectData."; }
+  lidar_object_data_ =
+      dynamic_cast<LidarObjectData*>(shared_data_manager_->GetSharedData("LidarObjectData"));
+  if (lidar_object_data_ == nullptr) { AWARN << "Failed to get LidarObjectData."; }
+  camera_object_data_ =
+      dynamic_cast<CameraObjectData*>(shared_data_manager_->GetSharedData("CameraObjectData"));
+  if (camera_object_data_ == nullptr) { AWARN << "Failed to get CameraObjectData."; }
 
-  fusion_data_ = dynamic_cast<FusionSharedData *>(
-      shared_data_manager_->GetSharedData("FusionSharedData"));
-  if (fusion_data_ == nullptr) {
-    AWARN << "Failed to get FusionSharedData.";
-  }
+  fusion_data_ =
+      dynamic_cast<FusionSharedData*>(shared_data_manager_->GetSharedData("FusionSharedData"));
+  if (fusion_data_ == nullptr) { AWARN << "Failed to get FusionSharedData."; }
 
-  lane_shared_data_ = dynamic_cast<LaneSharedData *>(
-      shared_data_manager_->GetSharedData("LaneSharedData"));
+  lane_shared_data_ =
+      dynamic_cast<LaneSharedData*>(shared_data_manager_->GetSharedData("LaneSharedData"));
   if (lane_shared_data_ == nullptr) {
     AWARN << "failed to get shared data instance: LaneSharedData ";
   }
@@ -88,11 +80,8 @@ bool FusionSubnode::InitInternal() {
 
   // init motion service
   if (motion_event_id_ != -1) {
-    motion_service_ = dynamic_cast<MotionService*>(
-        DAGStreaming::GetSubnodeByName("MotionService"));
-    if (motion_service_ == nullptr) {
-      AWARN << "motion service not inited";
-    }
+    motion_service_ = dynamic_cast<MotionService*>(DAGStreaming::GetSubnodeByName("MotionService"));
+    if (motion_service_ == nullptr) { AWARN << "motion service not inited"; }
   }
 
   if (!InitOutputStream()) {
@@ -148,8 +137,7 @@ bool FusionSubnode::InitOutputStream() {
     AINFO << "camera_event_id will be set -1";
     camera_event_id_ = -1;
   } else {
-    camera_event_id_ =
-        static_cast<EventID>(atoi((camera_iter->second).c_str()));
+    camera_event_id_ = static_cast<EventID>(atoi((camera_iter->second).c_str()));
   }
 
   auto lane_iter = reserve_field_map.find("lane_event_id");
@@ -161,15 +149,13 @@ bool FusionSubnode::InitOutputStream() {
     lane_event_id_ = static_cast<EventID>(atoi((lane_iter->second).c_str()));
   }
 
-
   auto motion_iter = reserve_field_map.find("motion_event_id");
   if (motion_iter == reserve_field_map.end()) {
     AWARN << "Failed to find motion_event_id:" << reserve_;
     AINFO << "motion_event_id will be set -1";
     motion_event_id_ = -1;
   } else {
-    motion_event_id_ =
-      static_cast<EventID>(atoi((motion_iter->second).c_str()));
+    motion_event_id_ = static_cast<EventID>(atoi((motion_iter->second).c_str()));
   }
 
   return true;
@@ -181,8 +167,8 @@ Status FusionSubnode::ProcEvents() {
 
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
-      AERROR << "event meta id:" << event_meta.event_id << " "
-             << event_meta.from_node << " " << event_meta.to_node;
+      AERROR << "event meta id:" << event_meta.event_id << " " << event_meta.from_node << " "
+             << event_meta.to_node;
       return Status(ErrorCode::PERCEPTION_ERROR, "Subscribe event fail.");
     }
     if (events.empty()) {
@@ -193,8 +179,7 @@ Status FusionSubnode::ProcEvents() {
 
     if (event_meta.event_id != pub_driven_event_id_) {
       ADEBUG << "Not pub_driven_event_id, skip to publish."
-             << " event_id:" << event_meta.event_id
-             << " fused_obj_cnt:" << objects_.size();
+             << " event_id:" << event_meta.event_id << " fused_obj_cnt:" << objects_.size();
       continue;
     }
 
@@ -203,15 +188,14 @@ Status FusionSubnode::ProcEvents() {
     if (GeneratePbMsg(&obstacles)) {
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
     }
-    AINFO << "Publish 3d perception fused msg. timestamp:"
-          << GLOG_TIMESTAMP(timestamp_) << " obj_cnt:" << objects_.size();
+    AINFO << "Publish 3d perception fused msg. timestamp:" << GLOG_TIMESTAMP(timestamp_)
+          << " obj_cnt:" << objects_.size();
   }
   return Status::OK();
 }
 
-Status FusionSubnode::Process(const EventMeta &event_meta,
-                              const std::vector<Event> &events) {
-  CipvOptions cipv_options;
+Status FusionSubnode::Process(const EventMeta& event_meta, const std::vector<Event>& events) {
+  CipvOptions                cipv_options;
   std::vector<SensorObjects> sensor_objs;
   if (!BuildSensorObjs(events, &sensor_objs)) {
     AERROR << "Failed to build_sensor_objs";
@@ -223,9 +207,8 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   double latest_fused_ts = sensor_objs.back().timestamp;
   if (!fusion_->Fuse(sensor_objs, &objects_)) {
     AWARN << "Failed to call fusion plugin."
-          << " event_meta: [" << event_meta.to_string()
-          << "] event_cnt:" << events.size() << " event_0: ["
-          << events[0].to_string() << "]";
+          << " event_meta: [" << event_meta.to_string() << "] event_cnt:" << events.size()
+          << " event_0: [" << events[0].to_string() << "]";
     error_code_ = common::PERCEPTION_ERROR_PROCESS;
     return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call fusion plugin.");
   }
@@ -234,7 +217,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   } else if (event_meta.event_id == radar_event_id_) {
     PERF_BLOCK_END("fusion_radar");
   } else if (event_meta.event_id == camera_event_id_) {
-    for (auto &obj : sensor_objs) {
+    for (auto& obj : sensor_objs) {
       if (obj.sensor_type == SensorType::CAMERA) {
         AINFO << "fusion received image : " << GLOG_TIMESTAMP(obj.timestamp)
               << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
@@ -243,9 +226,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     }
     PERF_BLOCK_END("fusion_camera");
   } else if (event_meta.event_id == motion_event_id_) {
-    if (motion_service_ != nullptr) {
-      motion_buffer_ = motion_service_->GetMotionBuffer();
-    }
+    if (motion_service_ != nullptr) { motion_buffer_ = motion_service_->GetMotionBuffer(); }
   }
 
   // Process CIPV
@@ -260,17 +241,17 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
       cipv_options.yaw_rate = motion_buffer_[0].yaw_rate;
     }
     ADEBUG << "[CIPVSubnode] velocity " << cipv_options.velocity
-          << ", yaw rate: " << cipv_options.yaw_rate;
-    for (auto &obj : sensor_objs) {
-        if (obj.sensor_type == SensorType::CAMERA) {
-          cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
-        }
+           << ", yaw rate: " << cipv_options.yaw_rate;
+    for (auto& obj : sensor_objs) {
+      if (obj.sensor_type == SensorType::CAMERA) {
+        cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
+      }
     }
 
     apollo::common::time::Timer timer;
     timer.Start();
     // Get Drop points
-  //  motion_buffer_ = motion_service_->GetMotionBuffer();
+    //  motion_buffer_ = motion_service_->GetMotionBuffer();
     if (motion_buffer_.size() > 0) {
       cipv_.CollectDrops(motion_buffer_, &objects_);
     } else {
@@ -278,7 +259,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     }
 
     ++seq_num_;
-    uint64_t t = timer.End("CollectDrops");
+    uint64_t t           = timer.End("CollectDrops");
     min_processing_time_ = std::min(min_processing_time_, t);
     max_processing_time_ = std::max(max_processing_time_, t);
     tot_processing_time_ += t;
@@ -290,15 +271,13 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
 
   if (objects_.size() > 0 && FLAGS_publish_fusion_event) {
     SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);
-    fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
-    fusion_item_ptr->fused_sensor_ts = latest_fused_ts;
-    const std::string &device_id = events[0].reserve;
+    fusion_item_ptr->timestamp              = objects_[0]->latest_tracked_time;
+    fusion_item_ptr->fused_sensor_ts        = latest_fused_ts;
+    const std::string& device_id            = events[0].reserve;
     fusion_item_ptr->fused_sensor_device_id = device_id;
     for (auto obj : objects_) {
       std::shared_ptr<Object> objclone(new Object());
-      if (obj->b_cipv == true) {
-        AINFO << "CIPV ID: " << obj->track_id;
-      }
+      if (obj->b_cipv == true) { AINFO << "CIPV ID: " << obj->track_id; }
       objclone->clone(*obj);
       fusion_item_ptr->obstacles.push_back(objclone);
     }
@@ -308,33 +287,30 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     PublishDataAndEvent(fusion_item_ptr->timestamp, device_id, fusion_item_ptr);
   }
 
-  timestamp_ = sensor_objs[0].timestamp;
+  timestamp_  = sensor_objs[0].timestamp;
   error_code_ = common::OK;
   return Status::OK();
 }
 
-void FusionSubnode::PublishDataAndEvent(const double timestamp,
-                                        const std::string &device_id,
-                                        const SharedDataPtr<FusionItem> &data) {
+void FusionSubnode::PublishDataAndEvent(const double                     timestamp,
+                                        const std::string&               device_id,
+                                        const SharedDataPtr<FusionItem>& data) {
   CommonSharedDataKey key(timestamp, device_id);
-  bool fusion_succ = fusion_data_->Add(key, data);
-  if (!fusion_succ) {
-    AERROR << "fusion shared data addkey failure";
-  }
+  bool                fusion_succ = fusion_data_->Add(key, data);
+  if (!fusion_succ) { AERROR << "fusion shared data addkey failure"; }
   AINFO << "adding key in fusion shared data " << key.ToString();
 
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
-    const EventMeta &event_meta = pub_meta_events_[idx];
-    Event event;
-    event.event_id = event_meta.event_id;
+    const EventMeta& event_meta = pub_meta_events_[idx];
+    Event            event;
+    event.event_id  = event_meta.event_id;
     event.timestamp = timestamp;
-    event.reserve = device_id;
+    event.reserve   = device_id;
     event_manager_->Publish(event);
   }
 }
 
-bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta,
-                                    std::vector<Event> *events) const {
+bool FusionSubnode::SubscribeEvents(const EventMeta& event_meta, std::vector<Event>* events) const {
   Event event;
   // no blocking
   while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
@@ -342,15 +318,12 @@ bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta,
   }
   return true;
 }
-bool FusionSubnode::BuildSensorObjs(
-    const std::vector<Event> &events,
-    std::vector<SensorObjects> *multi_sensor_objs) {
+bool FusionSubnode::BuildSensorObjs(const std::vector<Event>&   events,
+                                    std::vector<SensorObjects>* multi_sensor_objs) {
   PERF_FUNCTION();
   for (auto event : events) {
     std::shared_ptr<SensorObjects> sensor_objects;
-    if (!GetSharedData(event, &sensor_objects)) {
-      return false;
-    }
+    if (!GetSharedData(event, &sensor_objects)) { return false; }
     // Make sure timestamp and type are filled.
     sensor_objects->timestamp = event.timestamp;
     if (event.event_id == lidar_event_id_) {
@@ -370,11 +343,10 @@ bool FusionSubnode::BuildSensorObjs(
   return true;
 }
 
-bool FusionSubnode::GetSharedData(const Event &event,
-                                  std::shared_ptr<SensorObjects> *objs) {
-  double timestamp = event.timestamp;
-  const std::string &device_id = event.reserve;
-  std::string data_key;
+bool FusionSubnode::GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs) {
+  double             timestamp = event.timestamp;
+  const std::string& device_id = event.reserve;
+  std::string        data_key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id, &data_key)) {
     AERROR << "Failed to produce shared data key. EventID:" << event.event_id
            << " timestamp:" << timestamp << " device_id:" << device_id;
@@ -383,11 +355,9 @@ bool FusionSubnode::GetSharedData(const Event &event,
   bool get_data_succ = false;
   if (event.event_id == lidar_event_id_ && lidar_object_data_ != nullptr) {
     get_data_succ = lidar_object_data_->Get(data_key, objs);
-  } else if (event.event_id == radar_event_id_ &&
-             radar_object_data_ != nullptr) {
+  } else if (event.event_id == radar_event_id_ && radar_object_data_ != nullptr) {
     get_data_succ = radar_object_data_->Get(data_key, objs);
-  } else if (event.event_id == camera_event_id_ &&
-             camera_object_data_ != nullptr) {
+  } else if (event.event_id == camera_event_id_ && camera_object_data_ != nullptr) {
     get_data_succ = camera_object_data_->Get(data_key, objs);
 
     if (lane_shared_data_ != nullptr && lane_event_id_ != -1) {
@@ -408,10 +378,10 @@ bool FusionSubnode::GetSharedData(const Event &event,
   return true;
 }
 
-bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
-  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
-      FLAGS_obstacle_module_name, obstacles);
-  common::Header *header = obstacles->mutable_header();
+bool FusionSubnode::GeneratePbMsg(PerceptionObstacles* obstacles) {
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(FLAGS_obstacle_module_name,
+                                                                 obstacles);
+  common::Header* header = obstacles->mutable_header();
   if (pub_driven_event_id_ == lidar_event_id_) {
     header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
     header->set_camera_timestamp(0);
@@ -424,16 +394,16 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
 
   obstacles->set_error_code(error_code_);
 
-  for (const auto &obj : objects_) {
-    PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
+  for (const auto& obj : objects_) {
+    PerceptionObstacle* obstacle = obstacles->add_perception_obstacle();
     // add CIPV
     if (obj->b_cipv == true) {
-      CIPVInfo *cipv = obstacles->mutable_cipv_info();
+      CIPVInfo* cipv = obstacles->mutable_cipv_info();
       cipv->set_cipv_id(obj->track_id);
     }
     // add drops
     for (size_t i = 0; i < obj->drops.size(); i++) {
-      Point *drops = obstacle->add_drops();
+      Point* drops = obstacle->add_drops();
       drops->set_x(obj->drops[i][0]);
       drops->set_y(obj->drops[i][1]);
       drops->set_z(obj->drops[i][2]);
@@ -444,13 +414,12 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   if (FLAGS_use_navigation_mode) {
     // Relative speed of objects + latest ego car speed in X
     for (auto obstacle : obstacles->perception_obstacle()) {
-      obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
-                                         chassis_speed_mps_);
+      obstacle.mutable_velocity()->set_x(obstacle.velocity().x() + chassis_speed_mps_);
     }
 
     // generate lane marker protobuf messages
     if (lane_shared_data_ != nullptr && lane_event_id_ != -1) {
-      LaneMarkers *lane_markers = obstacles->mutable_lane_marker();
+      LaneMarkers* lane_markers = obstacles->mutable_lane_marker();
       LaneObjectsToLaneMarkerProto(*(lane_objects_), lane_markers);
     }
   }
@@ -464,7 +433,7 @@ void FusionSubnode::RegistAllAlgorithm() {
   RegisterFactoryAsyncFusion();
 }
 
-void FusionSubnode::OnChassis(const Chassis &chassis) {
+void FusionSubnode::OnChassis(const Chassis& chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";
   chassis_.CopyFrom(chassis);
   ADEBUG << "Received chassis information " << chassis_.ShortDebugString();

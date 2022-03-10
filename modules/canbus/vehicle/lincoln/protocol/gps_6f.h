@@ -22,8 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_GPS_6F_H_
 #define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_GPS_6F_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -38,8 +38,7 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Gps6f : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -50,8 +49,8 @@ class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
    * @param timestamp the timestamp of input data
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const;
+  virtual void
+  Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const;
 
   /**
    * @brief get altitude from byte array
@@ -63,7 +62,7 @@ class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of altitude
    */
-  double altitude(const std::uint8_t *bytes, int32_t length) const;
+  double altitude(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get heading from byte array
@@ -75,7 +74,7 @@ class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of heading
    */
-  double heading(const std::uint8_t *bytes, int32_t length) const;
+  double heading(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get speed from byte array
@@ -86,7 +85,7 @@ class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of speed
    */
-  int32_t speed(const std::uint8_t *bytes, int32_t length) const;
+  int32_t speed(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get hdop from byte array
@@ -97,7 +96,7 @@ class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of hdop
    */
-  double hdop(const std::uint8_t *bytes, int32_t length) const;
+  double hdop(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get vdop from byte array
@@ -108,7 +107,7 @@ class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of vdop
    */
-  double vdop(const std::uint8_t *bytes, int32_t length) const;
+  double vdop(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get fix quality from byte array
@@ -119,7 +118,7 @@ class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of fix quality
    */
-  int32_t fix_quality(const std::uint8_t *bytes, int32_t length) const;
+  int32_t fix_quality(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief get number of satellites from byte array
@@ -130,7 +129,7 @@ class Gps6f : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the number of satellites
    */
-  int32_t num_satellites(const std::uint8_t *bytes, int32_t length) const;
+  int32_t num_satellites(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

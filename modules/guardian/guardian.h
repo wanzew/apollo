@@ -43,10 +43,10 @@ namespace guardian {
 
 class Guardian : public apollo::common::ApolloApp {
  public:
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
  private:
   void OnTimer(const ros::TimerEvent&);
@@ -56,9 +56,9 @@ class Guardian : public apollo::common::ApolloApp {
   void PassThroughControlCommand();
   void TriggerSafetyMode();
 
-  apollo::canbus::Chassis chassis_;
-  apollo::monitor::SystemStatus system_status_;
-  apollo::control::ControlCommand control_cmd_;
+  apollo::canbus::Chassis           chassis_;
+  apollo::monitor::SystemStatus     system_status_;
+  apollo::control::ControlCommand   control_cmd_;
   apollo::guardian::GuardianCommand guardian_cmd_;
 
   std::mutex mutex_;

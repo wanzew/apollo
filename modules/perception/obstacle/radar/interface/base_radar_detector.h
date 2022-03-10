@@ -71,30 +71,30 @@ namespace apollo {
 namespace perception {
 
 using apollo::common::Header;
-using apollo::drivers::ContiRadarObs;
 using apollo::drivers::ContiRadar;
+using apollo::drivers::ContiRadarObs;
 
 struct RadarDetectorOptions {
-  Eigen::Matrix4d *radar2world_pose = nullptr;
-  Eigen::Vector3f car_linear_speed = Eigen::Vector3f::Zero();
+  Eigen::Matrix4d* radar2world_pose = nullptr;
+  Eigen::Vector3f  car_linear_speed = Eigen::Vector3f::Zero();
 };
 enum class ContiObjectType {
-  CONTI_POINT = 0,
-  CONTI_CAR = 1,
-  CONTI_TRUCK = 2,
-  CONTI_PEDESTRIAN = 3,
-  CONTI_MOTOCYCLE = 4,
-  CONTI_BICYCLE = 5,
-  CONTI_WIDE = 6,
-  CONTI_UNKNOWN = 7,
+  CONTI_POINT           = 0,
+  CONTI_CAR             = 1,
+  CONTI_TRUCK           = 2,
+  CONTI_PEDESTRIAN      = 3,
+  CONTI_MOTOCYCLE       = 4,
+  CONTI_BICYCLE         = 5,
+  CONTI_WIDE            = 6,
+  CONTI_UNKNOWN         = 7,
   CONTI_MAX_OBJECT_TYPE = 8,
 };
 enum class ContiMeasState {
-  CONTI_DELETED = 0,
-  CONTI_NEW = 1,
-  CONTI_MEASURED = 2,
-  CONTI_PREDICTED = 3,
-  CONTI_DELETED_FOR = 4,
+  CONTI_DELETED        = 0,
+  CONTI_NEW            = 1,
+  CONTI_MEASURED       = 2,
+  CONTI_PREDICTED      = 3,
+  CONTI_DELETED_FOR    = 4,
   CONTI_NEW_FROM_MERGE = 5,
 };
 struct ContiParams {
@@ -121,20 +121,20 @@ struct ContiParams {
 };
 class BaseRadarDetector {
  public:
-  BaseRadarDetector() = default;
+  BaseRadarDetector()          = default;
   virtual ~BaseRadarDetector() = default;
-  virtual bool Init() = 0;
+  virtual bool Init()          = 0;
   // @brief: Radar raw obstacles -> objects.
   // @param [in]: raw obstacles from radar driver.
   // @param [in]: roi map polygons, using world frame.
   // @param [in]: options.
   // @param [out]: transformed objects.
   // return true if detect successfully, otherwise return false
-  virtual bool Detect(const ContiRadar &raw_obstacles,
-                      const std::vector<PolygonDType> &map_polygons,
-                      const RadarDetectorOptions &options,
-                      std::vector<std::shared_ptr<Object>> *objects) = 0;
-  virtual std::string name() const = 0;
+  virtual bool        Detect(const ContiRadar&                     raw_obstacles,
+                             const std::vector<PolygonDType>&      map_polygons,
+                             const RadarDetectorOptions&           options,
+                             std::vector<std::shared_ptr<Object>>* objects) = 0;
+  virtual std::string name() const                                          = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseRadarDetector);

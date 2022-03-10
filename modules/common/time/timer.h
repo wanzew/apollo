@@ -17,8 +17,8 @@
 #ifndef MODULES_COMMON_TIME_TIMER_H_
 #define MODULES_COMMON_TIME_TIMER_H_
 
-#include <stdint.h>
 #include <chrono>
+#include <stdint.h>
 #include <string>
 
 #include "modules/common/macro.h"
@@ -40,7 +40,7 @@ class Timer {
   // also output msg and time in glog.
   // automatically start a new timer.
   // no-thread safe.
-  uint64_t End(const std::string &msg);
+  uint64_t End(const std::string& msg);
 
  private:
   // in ms.
@@ -52,12 +52,15 @@ class Timer {
 
 class TimerWrapper {
  public:
-  explicit TimerWrapper(const std::string &msg) : msg_(msg) { timer_.Start(); }
+  explicit TimerWrapper(const std::string& msg)
+      : msg_(msg) {
+    timer_.Start();
+  }
 
   ~TimerWrapper() { timer_.End(msg_); }
 
  private:
-  Timer timer_;
+  Timer       timer_;
   std::string msg_;
 
   DISALLOW_COPY_AND_ASSIGN(TimerWrapper);
@@ -67,11 +70,11 @@ class TimerWrapper {
 }  // namespace common
 }  // namespace apollo
 
-#define PERF_FUNCTION(function_name) \
+#define PERF_FUNCTION(function_name)                                                               \
   apollo::common::time::TimerWrapper _timer_wrapper_(function_name)
 
-#define PERF_BLOCK_START()             \
-  apollo::common::time::Timer _timer_; \
+#define PERF_BLOCK_START()                                                                         \
+  apollo::common::time::Timer _timer_;                                                             \
   _timer_.Start()
 
 #define PERF_BLOCK_END(msg) _timer_.End(msg)

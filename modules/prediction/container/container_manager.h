@@ -44,31 +44,29 @@ class ContainerManager {
    * @brief Container manager initialization
    * @param Adapter config
    */
-  void Init(const common::adapter::AdapterManagerConfig &config);
+  void Init(const common::adapter::AdapterManagerConfig& config);
 
   /**
    * @brief Get mutable container
    * @param Type of the container
    * @return Pointer to the container given the name
    */
-  Container *GetContainer(
-      const common::adapter::AdapterConfig::MessageType &type);
+  Container* GetContainer(const common::adapter::AdapterConfig::MessageType& type);
 
  private:
   /**
    * @breif Register a container
    * @param Container type
    */
-  void RegisterContainer(
-      const common::adapter::AdapterConfig::MessageType &type);
+  void RegisterContainer(const common::adapter::AdapterConfig::MessageType& type);
 
   /**
    * @brief Create a container
    * @param Container type
    * @return Container pointer
    */
-  std::unique_ptr<Container> CreateContainer(
-      const common::adapter::AdapterConfig::MessageType &type);
+  std::unique_ptr<Container>
+  CreateContainer(const common::adapter::AdapterConfig::MessageType& type);
 
   /**
    * @brief Register all containers
@@ -76,9 +74,7 @@ class ContainerManager {
   void RegisterContainers();
 
  private:
-  std::map<common::adapter::AdapterConfig::MessageType,
-           std::unique_ptr<Container>>
-      containers_;
+  std::map<common::adapter::AdapterConfig::MessageType, std::unique_ptr<Container>> containers_;
 
   common::adapter::AdapterManagerConfig config_;
 

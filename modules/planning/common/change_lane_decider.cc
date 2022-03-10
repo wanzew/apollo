@@ -30,13 +30,13 @@ namespace planning {
 using common::time::Clock;
 
 void ChangeLaneDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
-                                     const std::string& path_id) {
+                                     const std::string&       path_id) {
   UpdateStatus(Clock::NowInSeconds(), status_code, path_id);
 }
 
-void ChangeLaneDecider::UpdateStatus(double timestamp,
+void ChangeLaneDecider::UpdateStatus(double                   timestamp,
                                      ChangeLaneStatus::Status status_code,
-                                     const std::string& path_id) {
+                                     const std::string&       path_id) {
   auto* change_lane_status = util::GetPlanningStatus()->mutable_change_lane();
   change_lane_status->set_timestamp(timestamp);
   change_lane_status->set_path_id(path_id);
@@ -52,16 +52,14 @@ void ChangeLaneDecider::PrioritizeChangeLane(
   auto iter = reference_line_info->begin();
   while (iter != reference_line_info->end()) {
     if (iter->IsChangeLanePath()) {
-      reference_line_info->splice(reference_line_info->begin(),
-                                  *reference_line_info, iter);
+      reference_line_info->splice(reference_line_info->begin(), *reference_line_info, iter);
       break;
     }
     ++iter;
   }
 }
 
-void ChangeLaneDecider::RemoveChangeLane(
-    std::list<ReferenceLineInfo>* reference_line_info) const {
+void ChangeLaneDecider::RemoveChangeLane(std::list<ReferenceLineInfo>* reference_line_info) const {
   auto iter = reference_line_info->begin();
   while (iter != reference_line_info->end()) {
     if (iter->IsChangeLanePath()) {
@@ -72,18 +70,14 @@ void ChangeLaneDecider::RemoveChangeLane(
   }
 }
 
-std::string GetCurrentPathId(
-    const std::list<ReferenceLineInfo>& reference_line_info) {
+std::string GetCurrentPathId(const std::list<ReferenceLineInfo>& reference_line_info) {
   for (const auto& info : reference_line_info) {
-    if (!info.IsChangeLanePath()) {
-      return info.Lanes().Id();
-    }
+    if (!info.IsChangeLanePath()) { return info.Lanes().Id(); }
   }
   return "";
 }
 
-bool ChangeLaneDecider::Apply(
-    std::list<ReferenceLineInfo>* reference_line_info) {
+bool ChangeLaneDecider::Apply(std::list<ReferenceLineInfo>* reference_line_info) {
   if (reference_line_info->empty()) {
     AERROR << "Reference lines empty";
     return false;
@@ -94,8 +88,8 @@ bool ChangeLaneDecider::Apply(
     return true;
   }
 
-  auto* prev_status = util::GetPlanningStatus()->mutable_change_lane();
-  double now = Clock::NowInSeconds();
+  auto*  prev_status = util::GetPlanningStatus()->mutable_change_lane();
+  double now         = Clock::NowInSeconds();
 
   if (!prev_status->has_status()) {
     UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_SUCCESS,
@@ -126,8 +120,7 @@ bool ChangeLaneDecider::Apply(
         PrioritizeChangeLane(reference_line_info);
       } else {
         RemoveChangeLane(reference_line_info);
-        UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_SUCCESS,
-                     current_path_id);
+        UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_SUCCESS, current_path_id);
       }
       return true;
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
@@ -138,8 +131,7 @@ bool ChangeLaneDecider::Apply(
       }
       return true;
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_SUCCESS) {
-      if (now - prev_status->timestamp() <
-          FLAGS_change_lane_success_freeze_time) {
+      if (now - prev_status->timestamp() < FLAGS_change_lane_success_freeze_time) {
         RemoveChangeLane(reference_line_info);
       } else {
         PrioritizeChangeLane(reference_line_info);

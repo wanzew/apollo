@@ -32,52 +32,41 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
 
-RTKReplayPlanner::RTKReplayPlanner() {
-  ReadTrajectoryFile(FLAGS_rtk_trajectory_filename);
-}
+RTKReplayPlanner::RTKReplayPlanner() { ReadTrajectoryFile(FLAGS_rtk_trajectory_filename); }
 
 Status RTKReplayPlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
-Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point,
-                              Frame* frame) {
-  auto status = Status::OK();
+Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point, Frame* frame) {
+  auto status   = Status::OK();
   bool has_plan = false;
-  auto it = std::find_if(
-      frame->reference_line_info().begin(), frame->reference_line_info().end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
+  auto it = std::find_if(frame->reference_line_info().begin(), frame->reference_line_info().end(),
+                         [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
   if (it != frame->reference_line_info().end()) {
-    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
+    status   = PlanOnReferenceLine(planning_start_point, frame, &(*it));
     has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
                 it->TrajectoryLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
-    }
+    if (!has_plan) { AERROR << "Fail to plan for lane change."; }
   }
 
   if (!has_plan || !FLAGS_prioritize_change_lane) {
     for (auto& reference_line_info : frame->reference_line_info()) {
-      if (reference_line_info.IsChangeLanePath()) {
-        continue;
-      }
-      status = PlanOnReferenceLine(planning_start_point, frame,
-                                   &reference_line_info);
+      if (reference_line_info.IsChangeLanePath()) { continue; }
+      status = PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
       if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
-               << reference_line_info.Lanes().Id();
+        AERROR << "planner failed to make a driving plan for: " << reference_line_info.Lanes().Id();
       }
     }
   }
   return status;
 }
 
-Status RTKReplayPlanner::PlanOnReferenceLine(
-    const TrajectoryPoint& planning_init_point, Frame*,
-    ReferenceLineInfo* reference_line_info) {
+Status RTKReplayPlanner::PlanOnReferenceLine(const TrajectoryPoint& planning_init_point,
+                                             Frame*,
+                                             ReferenceLineInfo* reference_line_info) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
-    std::string msg(
-        "RTKReplayPlanner doesn't have a recorded trajectory or "
-        "the recorded trajectory doesn't have enough valid trajectory "
-        "points.");
+    std::string msg("RTKReplayPlanner doesn't have a recorded trajectory or "
+                    "the recorded trajectory doesn't have enough valid trajectory "
+                    "points.");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -87,30 +76,26 @@ Status RTKReplayPlanner::PlanOnReferenceLine(
 
   std::uint32_t forward_buffer = FLAGS_rtk_trajectory_forward;
   // end_index is excluded.
-  std::uint32_t end_index = std::min<std::uint32_t>(
-      complete_rtk_trajectory_.size(), matched_index + forward_buffer);
+  std::uint32_t end_index =
+      std::min<std::uint32_t>(complete_rtk_trajectory_.size(), matched_index + forward_buffer);
 
   //  auto* trajectory_points = trajectory_pb->mutable_trajectory_point();
-  std::vector<TrajectoryPoint> trajectory_points(
-      complete_rtk_trajectory_.begin() + matched_index,
-      complete_rtk_trajectory_.begin() + end_index);
+  std::vector<TrajectoryPoint> trajectory_points(complete_rtk_trajectory_.begin() + matched_index,
+                                                 complete_rtk_trajectory_.begin() + end_index);
 
   // reset relative time
   double zero_time = complete_rtk_trajectory_[matched_index].relative_time();
   for (auto& trajectory_point : trajectory_points) {
-    trajectory_point.set_relative_time(trajectory_point.relative_time() -
-                                       zero_time);
+    trajectory_point.set_relative_time(trajectory_point.relative_time() - zero_time);
   }
 
   // check if the trajectory has enough points;
   // if not, append the last points multiple times and
   // adjust their corresponding time stamps.
-  while (trajectory_points.size() <
-         static_cast<std::size_t>(FLAGS_rtk_trajectory_forward)) {
+  while (trajectory_points.size() < static_cast<std::size_t>(FLAGS_rtk_trajectory_forward)) {
     const auto& last_point = trajectory_points.rbegin();
-    auto new_point = last_point;
-    new_point->set_relative_time(new_point->relative_time() +
-                                 FLAGS_rtk_trajectory_resolution);
+    auto        new_point  = last_point;
+    new_point->set_relative_time(new_point->relative_time() + FLAGS_rtk_trajectory_resolution);
     trajectory_points.push_back(*new_point);
   }
   reference_line_info->SetTrajectory(DiscretizedTrajectory(trajectory_points));
@@ -118,9 +103,7 @@ Status RTKReplayPlanner::PlanOnReferenceLine(
 }
 
 void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
-  if (!complete_rtk_trajectory_.empty()) {
-    complete_rtk_trajectory_.clear();
-  }
+  if (!complete_rtk_trajectory_.empty()) { complete_rtk_trajectory_.clear(); }
 
   std::ifstream file_in(filename.c_str());
   if (!file_in.is_open()) {
@@ -134,9 +117,7 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
 
   while (true) {
     getline(file_in, line);
-    if (line == "") {
-      break;
-    }
+    if (line == "") { break; }
 
     auto tokens = apollo::common::util::StringTokenizer::Split(line, "\t ");
     if (tokens.size() < 11) {
@@ -168,25 +149,22 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
   file_in.close();
 }
 
-std::uint32_t RTKReplayPlanner::QueryPositionMatchedPoint(
-    const TrajectoryPoint& start_point,
-    const std::vector<TrajectoryPoint>& trajectory) const {
-  auto func_distance_square = [](const TrajectoryPoint& point, const double x,
-                                 const double y) {
+std::uint32_t
+RTKReplayPlanner::QueryPositionMatchedPoint(const TrajectoryPoint&              start_point,
+                                            const std::vector<TrajectoryPoint>& trajectory) const {
+  auto func_distance_square = [](const TrajectoryPoint& point, const double x, const double y) {
     double dx = point.path_point().x() - x;
     double dy = point.path_point().y() - y;
     return dx * dx + dy * dy;
   };
-  double d_min =
-      func_distance_square(trajectory.front(), start_point.path_point().x(),
-                           start_point.path_point().y());
+  double        d_min     = func_distance_square(trajectory.front(), start_point.path_point().x(),
+                                      start_point.path_point().y());
   std::uint32_t index_min = 0;
   for (std::uint32_t i = 1; i < trajectory.size(); ++i) {
-    double d_temp =
-        func_distance_square(trajectory[i], start_point.path_point().x(),
-                             start_point.path_point().y());
+    double d_temp = func_distance_square(trajectory[i], start_point.path_point().x(),
+                                         start_point.path_point().y());
     if (d_temp < d_min) {
-      d_min = d_temp;
+      d_min     = d_temp;
       index_min = i;
     }
   }

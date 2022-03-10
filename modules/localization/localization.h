@@ -75,9 +75,8 @@ class Localization : public apollo::common::ApolloApp {
   void RegisterLocalizationMethods();
 
   std::unique_ptr<LocalizationBase> localization_;
-  apollo::common::util::Factory<LocalizationConfig::LocalizationType,
-                                LocalizationBase>
-      localization_factory_;
+  apollo::common::util::Factory<LocalizationConfig::LocalizationType, LocalizationBase>
+                     localization_factory_;
   LocalizationConfig config_;
 };
 

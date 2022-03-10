@@ -16,11 +16,11 @@
 
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_ROSBAG_READER_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_ROSBAG_READER_H
+#include "modules/localization/msf/local_tool/data_extraction/base_exporter.h"
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "modules/localization/msf/local_tool/data_extraction/base_exporter.h"
 
 namespace apollo {
 namespace localization {
@@ -35,15 +35,14 @@ class RosbagReader {
   RosbagReader();
   ~RosbagReader();
 
-  void Subscribe(const std::string& topic,
+  void Subscribe(const std::string&             topic,
                  BaseExporter::OnRosmsgCallback call_back,
-                 BaseExporter::Ptr exporter);
+                 BaseExporter::Ptr              exporter);
   void Read(const std::string& file_name);
 
  private:
   std::vector<std::string> topics_;
-  std::unordered_map<
-      std::string, std::pair<BaseExporter::Ptr, BaseExporter::OnRosmsgCallback>>
+  std::unordered_map<std::string, std::pair<BaseExporter::Ptr, BaseExporter::OnRosmsgCallback>>
       call_back_map_;
 };
 

@@ -22,16 +22,14 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-bool Input::exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
-                                         const uint8_t* bytes) {
+bool Input::exract_nmea_time_from_packet(const NMEATimePtr& nmea_time, const uint8_t* bytes) {
   int gprmc_index = 206;
 
-  int field_count = 0;
-  int time_field_index = 0;
+  int field_count          = 0;
+  int time_field_index     = 0;
   int validity_field_index = 0;
-  int date_field_index = 0;
-  while (bytes[++gprmc_index] != '*' &&
-         gprmc_index < POSITIONING_DATA_PACKET_SIZE) {
+  int date_field_index     = 0;
+  while (bytes[++gprmc_index] != '*' && gprmc_index < POSITIONING_DATA_PACKET_SIZE) {
     if (bytes[gprmc_index] == ',') {
       ++field_count;
       if (field_count == 1 && time_field_index == 0) {
@@ -49,27 +47,19 @@ bool Input::exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
     }
   }
 
-  nmea_time->year = (bytes[date_field_index + 4] - '0') * 10 +
-                    (bytes[date_field_index + 5] - '0');
-  nmea_time->mon = (bytes[date_field_index + 2] - '0') * 10 +
-                   (bytes[date_field_index + 3] - '0');
-  nmea_time->day = (bytes[date_field_index] - '0') * 10 +
-                   (bytes[date_field_index + 1] - '0');
-  nmea_time->hour = (bytes[time_field_index] - '0') * 10 +
-                    (bytes[time_field_index + 1] - '0');
-  nmea_time->min = (bytes[time_field_index + 2] - '0') * 10 +
-                   (bytes[time_field_index + 3] - '0');
-  nmea_time->sec = (bytes[time_field_index + 4] - '0') * 10 +
-                   (bytes[time_field_index + 5] - '0');
+  nmea_time->year = (bytes[date_field_index + 4] - '0') * 10 + (bytes[date_field_index + 5] - '0');
+  nmea_time->mon  = (bytes[date_field_index + 2] - '0') * 10 + (bytes[date_field_index + 3] - '0');
+  nmea_time->day  = (bytes[date_field_index] - '0') * 10 + (bytes[date_field_index + 1] - '0');
+  nmea_time->hour = (bytes[time_field_index] - '0') * 10 + (bytes[time_field_index + 1] - '0');
+  nmea_time->min  = (bytes[time_field_index + 2] - '0') * 10 + (bytes[time_field_index + 3] - '0');
+  nmea_time->sec  = (bytes[time_field_index + 4] - '0') * 10 + (bytes[time_field_index + 5] - '0');
 
-  if (nmea_time->year < 0 || nmea_time->year > 99 || nmea_time->mon > 12 ||
-      nmea_time->mon < 1 || nmea_time->day > 31 || nmea_time->day < 1 ||
-      nmea_time->hour > 23 || nmea_time->hour < 0 || nmea_time->min > 59 ||
-      nmea_time->min < 0 || nmea_time->sec > 59 || nmea_time->sec < 0) {
-    AERROR << "Invalid GPS time: " << nmea_time->year << "-" << nmea_time->mon
-           << "-" << nmea_time->day << " " << nmea_time->hour << ":"
-           << nmea_time->min << ":" << nmea_time->sec
-           << "make sure have connected to GPS device";
+  if (nmea_time->year < 0 || nmea_time->year > 99 || nmea_time->mon > 12 || nmea_time->mon < 1 ||
+      nmea_time->day > 31 || nmea_time->day < 1 || nmea_time->hour > 23 || nmea_time->hour < 0 ||
+      nmea_time->min > 59 || nmea_time->min < 0 || nmea_time->sec > 59 || nmea_time->sec < 0) {
+    AERROR << "Invalid GPS time: " << nmea_time->year << "-" << nmea_time->mon << "-"
+           << nmea_time->day << " " << nmea_time->hour << ":" << nmea_time->min << ":"
+           << nmea_time->sec << "make sure have connected to GPS device";
     return false;
   }
   return true;

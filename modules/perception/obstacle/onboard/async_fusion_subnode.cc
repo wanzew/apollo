@@ -53,28 +53,22 @@ bool AsyncFusionSubnode::InitInternal() {
     AERROR << "Failed to init fusion:" << FLAGS_onboard_fusion;
     return false;
   }
-  radar_object_data_ = dynamic_cast<RadarObjectData *>(
-      shared_data_manager_->GetSharedData("RadarObjectData"));
-  if (radar_object_data_ == nullptr) {
-    AWARN << "Failed to get RadarObjectData.";
-  }
-  camera_object_data_ = dynamic_cast<CameraObjectData *>(
-      shared_data_manager_->GetSharedData("CameraObjectData"));
-  if (camera_object_data_ == nullptr) {
-    AWARN << "Failed to get CameraObjectData.";
-  }
-  lane_shared_data_ = dynamic_cast<LaneSharedData *>(
-      shared_data_manager_->GetSharedData("LaneSharedData"));
+  radar_object_data_ =
+      dynamic_cast<RadarObjectData*>(shared_data_manager_->GetSharedData("RadarObjectData"));
+  if (radar_object_data_ == nullptr) { AWARN << "Failed to get RadarObjectData."; }
+  camera_object_data_ =
+      dynamic_cast<CameraObjectData*>(shared_data_manager_->GetSharedData("CameraObjectData"));
+  if (camera_object_data_ == nullptr) { AWARN << "Failed to get CameraObjectData."; }
+  lane_shared_data_ =
+      dynamic_cast<LaneSharedData*>(shared_data_manager_->GetSharedData("LaneSharedData"));
   if (lane_shared_data_ == nullptr) {
     AERROR << "failed to get shared data instance: LaneSharedData ";
     return false;
   }
 
-  fusion_data_ = dynamic_cast<FusionSharedData *>(
-      shared_data_manager_->GetSharedData("FusionSharedData"));
-  if (fusion_data_ == nullptr) {
-    AWARN << "Failed to get FusionSharedData.";
-  }
+  fusion_data_ =
+      dynamic_cast<FusionSharedData*>(shared_data_manager_->GetSharedData("FusionSharedData"));
+  if (fusion_data_ == nullptr) { AWARN << "Failed to get FusionSharedData."; }
 
   if (!InitOutputStream()) {
     AERROR << "Failed to init output stream.";
@@ -111,8 +105,7 @@ bool AsyncFusionSubnode::InitOutputStream() {
     AINFO << "camera_event_id will be set -1";
     camera_event_id_ = -1;
   } else {
-    camera_event_id_ =
-        static_cast<EventID>(atoi((camera_iter->second).c_str()));
+    camera_event_id_ = static_cast<EventID>(atoi((camera_iter->second).c_str()));
   }
 
   auto lane_iter = reserve_field_map.find("lane_event_id");
@@ -129,13 +122,11 @@ bool AsyncFusionSubnode::InitOutputStream() {
 Status AsyncFusionSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
     std::vector<Event> events;
-    if (event_meta.event_id == lane_event_id_) {
-        continue;
-    }
+    if (event_meta.event_id == lane_event_id_) { continue; }
 
     if (!SubscribeEvents(event_meta, &events)) {
-      AERROR << "event meta id:" << event_meta.event_id << " "
-             << event_meta.from_node << " " << event_meta.to_node;
+      AERROR << "event meta id:" << event_meta.event_id << " " << event_meta.from_node << " "
+             << event_meta.to_node;
       return Status(ErrorCode::PERCEPTION_ERROR, "Subscribe event fail.");
     }
 
@@ -155,42 +146,38 @@ Status AsyncFusionSubnode::ProcEvents() {
       // Assume FLU coordinate system
       if (FLAGS_use_navigation_mode) {
         for (auto obstacle : obstacles.perception_obstacle()) {
-          obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
-                                             chassis_speed_mps_);
+          obstacle.mutable_velocity()->set_x(obstacle.velocity().x() + chassis_speed_mps_);
         }
       }
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
     }
-    AINFO << "Publish 3d perception fused msg. timestamp:"
-          << GLOG_TIMESTAMP(timestamp_) << " obj_cnt:" << objects_.size();
+    AINFO << "Publish 3d perception fused msg. timestamp:" << GLOG_TIMESTAMP(timestamp_)
+          << " obj_cnt:" << objects_.size();
   }
   return Status::OK();
 }
 
-void AsyncFusionSubnode::PublishDataAndEvent(
-    const double timestamp, const std::string &device_id,
-    const SharedDataPtr<FusionItem> &data) {
+void AsyncFusionSubnode::PublishDataAndEvent(const double                     timestamp,
+                                             const std::string&               device_id,
+                                             const SharedDataPtr<FusionItem>& data) {
   CommonSharedDataKey key(timestamp, device_id);
-  bool fusion_succ = fusion_data_->Add(key, data);
-  if (!fusion_succ) {
-      AERROR <<"fusion shared data addkey failure";
-  }
+  bool                fusion_succ = fusion_data_->Add(key, data);
+  if (!fusion_succ) { AERROR << "fusion shared data addkey failure"; }
 
   ADEBUG << "adding key in fusion shared data " << key.ToString();
 
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
-    const EventMeta &event_meta = pub_meta_events_[idx];
-    Event event;
-    event.event_id = event_meta.event_id;
+    const EventMeta& event_meta = pub_meta_events_[idx];
+    Event            event;
+    event.event_id  = event_meta.event_id;
     event.timestamp = timestamp;
-    event.reserve = device_id;
+    event.reserve   = device_id;
     event_manager_->Publish(event);
   }
 }
 
-Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
-                                   const std::vector<Event> &events) {
-  const std::string &device_id = events[0].reserve;
+Status AsyncFusionSubnode::Process(const EventMeta& event_meta, const std::vector<Event>& events) {
+  const std::string& device_id = events[0].reserve;
   // const double timestamp = events[0].timestamp;
 
   std::vector<SensorObjects> sensor_objs;
@@ -233,23 +220,21 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
 
   // publishing result to pnc
   if (event_meta.event_id == camera_event_id_) {
-      for (auto sensor_obj : sensor_objs) {
-          PublishPerceptionPb(sensor_obj);
-      }
+    for (auto sensor_obj : sensor_objs) {
+      PublishPerceptionPb(sensor_obj);
+    }
   }
 
   error_code_ = common::OK;
   return Status::OK();
 }
 
-void AsyncFusionSubnode::PublishPerceptionPb(
-    const SensorObjects &sensor_objects) {
+void AsyncFusionSubnode::PublishPerceptionPb(const SensorObjects& sensor_objects) {
   AINFO << "Camera publish perception pb data";
   PerceptionObstacles obstacles;
   // Header
-  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
-      "perception_obstacle", &obstacles);
-  common::Header *header = obstacles.mutable_header();
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader("perception_obstacle", &obstacles);
+  common::Header* header = obstacles.mutable_header();
   header->set_lidar_timestamp(0);
   // use timestamp in nanoseconds
   header->set_camera_timestamp(sensor_objects.timestamp * 1e9);
@@ -257,26 +242,25 @@ void AsyncFusionSubnode::PublishPerceptionPb(
   obstacles.set_error_code(sensor_objects.error_code);
 
   // generate lane marker protobuf messages
-  LaneMarkers *lane_markers = obstacles.mutable_lane_marker();
+  LaneMarkers* lane_markers = obstacles.mutable_lane_marker();
   LaneObjectsToLaneMarkerProto(*(sensor_objects.lane_objects), lane_markers);
   // Serialize each Object
-  for (const auto &obj : sensor_objects.objects) {
-    PerceptionObstacle *obstacle = obstacles.add_perception_obstacle();
+  for (const auto& obj : sensor_objects.objects) {
+    PerceptionObstacle* obstacle = obstacles.add_perception_obstacle();
     obj->Serialize(obstacle);
   }
 
   // Relative speed of objects + latest ego car speed in X
   for (auto obstacle : obstacles.perception_obstacle()) {
-    obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
-                                       chassis_.speed_mps());
+    obstacle.mutable_velocity()->set_x(obstacle.velocity().x() + chassis_.speed_mps());
   }
 
   common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
   ADEBUG << "Camera Obstacles: " << obstacles.ShortDebugString();
 }
 
-bool AsyncFusionSubnode::SubscribeEvents(const EventMeta &event_meta,
-                                         std::vector<Event> *events) const {
+bool AsyncFusionSubnode::SubscribeEvents(const EventMeta&    event_meta,
+                                         std::vector<Event>* events) const {
   Event event;
   // blocking call for each of these events
   while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
@@ -285,21 +269,16 @@ bool AsyncFusionSubnode::SubscribeEvents(const EventMeta &event_meta,
   }
 
   // only obtain latest event from a sensor queue
-  if (event.event_id !=0 && event.timestamp !=0.0) {
-      events->push_back(event);
-  }
+  if (event.event_id != 0 && event.timestamp != 0.0) { events->push_back(event); }
   return true;
 }
 
-bool AsyncFusionSubnode::BuildSensorObjs(
-    const std::vector<Event> &events,
-    std::vector<SensorObjects> *multi_sensor_objs) {
+bool AsyncFusionSubnode::BuildSensorObjs(const std::vector<Event>&   events,
+                                         std::vector<SensorObjects>* multi_sensor_objs) {
   PERF_FUNCTION();
   for (auto event : events) {
     std::shared_ptr<SensorObjects> sensor_objects;
-    if (!GetSharedData(event, &sensor_objects)) {
-      return false;
-    }
+    if (!GetSharedData(event, &sensor_objects)) { return false; }
     // Make sure timestamp and type are filled.
     sensor_objects->timestamp = event.timestamp;
 
@@ -318,11 +297,10 @@ bool AsyncFusionSubnode::BuildSensorObjs(
   return true;
 }
 
-bool AsyncFusionSubnode::GetSharedData(const Event &event,
-                                       std::shared_ptr<SensorObjects> *objs) {
-  double timestamp = event.timestamp;
-  const std::string &device_id = event.reserve;
-  std::string data_key;
+bool AsyncFusionSubnode::GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs) {
+  double             timestamp = event.timestamp;
+  const std::string& device_id = event.reserve;
+  std::string        data_key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id, &data_key)) {
     AERROR << "Failed to produce shared data key. EventID:" << event.event_id
            << " timestamp:" << timestamp << " device_id:" << device_id;
@@ -332,14 +310,12 @@ bool AsyncFusionSubnode::GetSharedData(const Event &event,
 
   if (event.event_id == radar_event_id_ && radar_object_data_ != nullptr) {
     get_data_succ = radar_object_data_->Get(data_key, objs);
-  } else if (event.event_id == camera_event_id_ &&
-             camera_object_data_ != nullptr) {
+  } else if (event.event_id == camera_event_id_ && camera_object_data_ != nullptr) {
     get_data_succ = camera_object_data_->Get(data_key, objs);
     // trying to get lane shared data as well
     Event lane_event;
     if (event_manager_->Subscribe(lane_event_id_, &lane_event, false)) {
-      get_data_succ =
-          lane_shared_data_->Get(data_key, &((*objs)->lane_objects));
+      get_data_succ = lane_shared_data_->Get(data_key, &((*objs)->lane_objects));
       AINFO << "getting lane data successfully for data key " << data_key;
     }
   } else {
@@ -355,18 +331,18 @@ bool AsyncFusionSubnode::GetSharedData(const Event &event,
   return true;
 }
 
-bool AsyncFusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
-  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
-      FLAGS_obstacle_module_name, obstacles);
-  common::Header *header = obstacles->mutable_header();
+bool AsyncFusionSubnode::GeneratePbMsg(PerceptionObstacles* obstacles) {
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(FLAGS_obstacle_module_name,
+                                                                 obstacles);
+  common::Header* header = obstacles->mutable_header();
   header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
   header->set_camera_timestamp(0);
   header->set_radar_timestamp(0);
 
   obstacles->set_error_code(error_code_);
 
-  for (const auto &obj : objects_) {
-    PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
+  for (const auto& obj : objects_) {
+    PerceptionObstacle* obstacle = obstacles->add_perception_obstacle();
     obj->Serialize(obstacle);
   }
 
@@ -374,11 +350,9 @@ bool AsyncFusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   return true;
 }
 
-void AsyncFusionSubnode::RegistAllAlgorithm() {
-  RegisterFactoryAsyncFusion();
-}
+void AsyncFusionSubnode::RegistAllAlgorithm() { RegisterFactoryAsyncFusion(); }
 
-void AsyncFusionSubnode::OnChassis(const Chassis &chassis) {
+void AsyncFusionSubnode::OnChassis(const Chassis& chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";
   chassis_.CopyFrom(chassis);
   chassis_speed_mps_ = chassis.speed_mps();

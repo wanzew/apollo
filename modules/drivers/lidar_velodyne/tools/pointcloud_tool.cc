@@ -32,8 +32,8 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::GetProtoFromFile;
 
@@ -49,8 +49,7 @@ Status PointCloudTool::Init() {
   AdapterManager::Init(FLAGS_tools_adapter_config_filename);
   if (FLAGS_open_pointcloud_dump) {
     RETURN_VAL_IF_NULL(AdapterManager::GetPointCloud(), error);
-    AdapterManager::AddPointCloudCallback(&PointCloudTool::pointcloud_dump,
-                                          this);
+    AdapterManager::AddPointCloudCallback(&PointCloudTool::pointcloud_dump, this);
   }
 
   if (FLAGS_open_pointcloud_convert) {
@@ -61,16 +60,14 @@ Status PointCloudTool::Init() {
       AERROR << "new or init converter fail.";
       return error;
     }
-    AdapterManager::AddVelodyneRaw0Callback(&PointCloudTool::pointcloud_convert,
-                                            this);
+    AdapterManager::AddVelodyneRaw0Callback(&PointCloudTool::pointcloud_convert, this);
   }
 
   if (FLAGS_open_pointcloud_compensate) {
     RETURN_VAL_IF_NULL(AdapterManager::GetPointCloud(), error);
     compensator_ = new Compensator(conf_.module_conf());
     RETURN_VAL_IF_NULL(compensator_, error);
-    AdapterManager::AddPointCloudRaw0Callback(
-        &PointCloudTool::pointcloud_compensate, this);
+    AdapterManager::AddPointCloudRaw0Callback(&PointCloudTool::pointcloud_compensate, this);
   }
 
   return Status::OK();
@@ -93,17 +90,14 @@ void PointCloudTool::Stop() {
 void PointCloudTool::pointcloud_dump(const sensor_msgs::PointCloud2& message) {
   VPointCloud msg;
   pcl::fromROSMsg(message, msg);
-  std::string ordered_file_path =
-      conf_.save_folder() + "/" + conf_.file_prefix() +
-      boost::lexical_cast<std::string>(msg.header.seq) + ".msg";
+  std::string ordered_file_path = conf_.save_folder() + "/" + conf_.file_prefix() +
+                                  boost::lexical_cast<std::string>(msg.header.seq) + ".msg";
   dump_msg<VPointCloud>(msg, ordered_file_path);
 }
 
-void PointCloudTool::pointcloud_convert(
-    const velodyne_msgs::VelodyneScanUnified& message) {
-  velodyne_msgs::VelodyneScanUnifiedPtr raw(
-      new velodyne_msgs::VelodyneScanUnified());
-  sensor_msgs::PointCloud2Ptr pointcloud(new sensor_msgs::PointCloud2());
+void PointCloudTool::pointcloud_convert(const velodyne_msgs::VelodyneScanUnified& message) {
+  velodyne_msgs::VelodyneScanUnifiedPtr raw(new velodyne_msgs::VelodyneScanUnified());
+  sensor_msgs::PointCloud2Ptr           pointcloud(new sensor_msgs::PointCloud2());
 
   *raw = message;
   if (!converter_->convert_packets_to_pointcloud(raw, pointcloud)) {
@@ -113,8 +107,7 @@ void PointCloudTool::pointcloud_convert(
   AdapterManager::PublishPointCloudRaw0(*pointcloud);
 }
 
-void PointCloudTool::pointcloud_compensate(
-    const sensor_msgs::PointCloud2& message) {
+void PointCloudTool::pointcloud_compensate(const sensor_msgs::PointCloud2& message) {
   sensor_msgs::PointCloud2Ptr pt(new sensor_msgs::PointCloud2());
   sensor_msgs::PointCloud2Ptr comper_pt(new sensor_msgs::PointCloud2());
 

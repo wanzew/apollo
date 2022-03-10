@@ -33,7 +33,7 @@ namespace perception {
 
 class ObjectBuilder {
  public:
-  ObjectBuilder() = default;
+  ObjectBuilder()  = default;
   ~ObjectBuilder() = default;
 
   // @brief: build radar objects
@@ -42,23 +42,22 @@ class ObjectBuilder {
   // @param [in]: host car velocity from localization
   // @param [out]: built radar objects
   // @return nothing
-  bool Build(const ContiRadar &raw_obstacles, const Eigen::Matrix4d &radar_pose,
-             const Eigen::Vector2d &main_velocity,
-             SensorObjects *radar_objects);
+  bool Build(const ContiRadar&      raw_obstacles,
+             const Eigen::Matrix4d& radar_pose,
+             const Eigen::Vector2d& main_velocity,
+             SensorObjects*         radar_objects);
 
   void SetDelayFrame(int delay_frames) { delay_frames_ = delay_frames; }
 
   void SetUseFpFilter(bool use_fp_filter) { use_fp_filter_ = use_fp_filter; }
 
-  void SetContiParams(const ContiParams &conti_params) {
-    conti_params_ = conti_params;
-  }
+  void SetContiParams(const ContiParams& conti_params) { conti_params_ = conti_params; }
 
  private:
   std::unordered_map<int, int> continuous_ids_;
-  int delay_frames_ = 4;
-  bool use_fp_filter_ = true;
-  ContiParams conti_params_;
+  int                          delay_frames_  = 4;
+  bool                         use_fp_filter_ = true;
+  ContiParams                  conti_params_;
 };
 
 }  // namespace perception

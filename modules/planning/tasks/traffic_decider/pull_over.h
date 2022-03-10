@@ -45,17 +45,16 @@ class PullOver : public TrafficRule {
   explicit PullOver(const TrafficRuleConfig& config);
   virtual ~PullOver() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   enum ValidateStopPointCode {
-    OK = 0,
-    OUT_OF_REFERENCE_LINE = 1,
-    PASS_DEST_POINT_TOO_FAR = 2,
-    BEHIND_ADC = 3,
+    OK                          = 0,
+    OUT_OF_REFERENCE_LINE       = 1,
+    PASS_DEST_POINT_TOO_FAR     = 2,
+    BEHIND_ADC                  = 3,
     OPERATION_LENGTH_NOT_ENOUGH = 4,
-    PARKING_SPOT_NOT_AVAIL = 5,
+    PARKING_SPOT_NOT_AVAIL      = 5,
   };
 
   /**
@@ -76,8 +75,7 @@ class PullOver : public TrafficRule {
   /**
    * Find a safe place to pull over based on the vehicle's current state.
    */
-  int FindPullOverStop(const double stop_point_s,
-                       common::PointENU* stop_point);
+  int FindPullOverStop(const double stop_point_s, common::PointENU* stop_point);
   int FindPullOverStop(common::PointENU* stop_point);
 
   /**
@@ -98,20 +96,20 @@ class PullOver : public TrafficRule {
    */
   int BuildPullOverStop(const common::PointENU& stop_point);
   int BuildInLaneStop(const common::PointENU& pull_over_stop_point);
-  int BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
-                        const double stop_line_s,
+  int BuildStopDecision(const std::string&      vistual_obstacle_id_postfix,
+                        const double            stop_line_s,
                         const common::PointENU& stop_point,
-                        const double stop_point_heading);
+                        const double            stop_point_heading);
 
  private:
-  static constexpr char const* const PULL_OVER_VO_ID_PREFIX = "PO_";
-  static constexpr char const* const INLANE_STOP_VO_ID_POSTFIX = "_INLANE";
-  static constexpr double PARKING_SPOT_LONGITUDINAL_BUFFER = 1.0;
-  static uint32_t failure_count_;
-  static common::PointENU stop_point_;
-  static common::PointENU inlane_adc_potiion_stop_point_;
-  Frame* frame_ = nullptr;
-  ReferenceLineInfo* reference_line_info_ = nullptr;
+  static constexpr char const* const PULL_OVER_VO_ID_PREFIX           = "PO_";
+  static constexpr char const* const INLANE_STOP_VO_ID_POSTFIX        = "_INLANE";
+  static constexpr double            PARKING_SPOT_LONGITUDINAL_BUFFER = 1.0;
+  static uint32_t                    failure_count_;
+  static common::PointENU            stop_point_;
+  static common::PointENU            inlane_adc_potiion_stop_point_;
+  Frame*                             frame_               = nullptr;
+  ReferenceLineInfo*                 reference_line_info_ = nullptr;
 };
 
 }  // namespace planning

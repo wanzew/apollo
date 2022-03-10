@@ -24,8 +24,7 @@ namespace network {
 
 RnnModel::RnnModel() {}
 
-void RnnModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output) const {
+void RnnModel::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) const {
   Eigen::MatrixXf inp1;
   Eigen::MatrixXf inp2;
   layers_[0]->Run({inputs[0]}, &inp1);
@@ -69,9 +68,7 @@ void RnnModel::SetState(const std::vector<Eigen::MatrixXf>& states) {
   layers_[5]->ResetState();
 }
 
-void RnnModel::State(std::vector<Eigen::MatrixXf>* states) const {
-  layers_[4]->State(states);
-}
+void RnnModel::State(std::vector<Eigen::MatrixXf>* states) const { layers_[4]->State(states); }
 
 void RnnModel::ResetState() const {
   layers_[4]->ResetState();

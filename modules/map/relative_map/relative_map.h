@@ -77,13 +77,13 @@ class RelativeMap : public RelativeMapInterface {
 
   void OnReceiveNavigationInfo(const NavigationInfo& navigation_info);
 
-  common::adapter::AdapterManagerConfig adapter_conf_;
-  RelativeMapConfig config_;
+  common::adapter::AdapterManagerConfig  adapter_conf_;
+  RelativeMapConfig                      config_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
 
   NavigationLane navigation_lane_;
-  std::mutex navigation_lane_mutex_;
-  ros::Timer timer_;
+  std::mutex     navigation_lane_mutex_;
+  ros::Timer     timer_;
 };
 
 }  // namespace relative_map

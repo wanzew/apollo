@@ -25,7 +25,7 @@ namespace util {
 
 using common::adapter::AdapterManager;
 
-PlanningStatus *GetPlanningStatus() {
+PlanningStatus* GetPlanningStatus() {
   static PlanningStatus status;
   return &status;
 }
@@ -34,9 +34,7 @@ void DumpPlanningContext() {
   AdapterManager::GetLocalization()->DumpLatestMessage();
   AdapterManager::GetChassis()->DumpLatestMessage();
   AdapterManager::GetRoutingResponse()->DumpLatestMessage();
-  if (FLAGS_enable_prediction) {
-    AdapterManager::GetPrediction()->DumpLatestMessage();
-  }
+  if (FLAGS_enable_prediction) { AdapterManager::GetPrediction()->DumpLatestMessage(); }
 }
 
 }  // namespace util

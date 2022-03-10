@@ -38,23 +38,20 @@ class Destination : public TrafficRule {
   explicit Destination(const TrafficRuleConfig& config);
   virtual ~Destination() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
-  int BuildStopDecision(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info);
-  int Stop(Frame* const frame,
-           ReferenceLineInfo* const reference_line_info,
-           const std::string lane_id,
-           const double lane_s);
+  void MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
+  int  BuildStopDecision(Frame* const frame, ReferenceLineInfo* const reference_line_info);
+  int  Stop(Frame* const             frame,
+            ReferenceLineInfo* const reference_line_info,
+            const std::string        lane_id,
+            const double             lane_s);
   bool CheckPullOver(ReferenceLineInfo* const reference_line_info,
-                     const std::string lane_id,
-                     const double lane_s,
-                     common::PointENU* dest_point);
-  int PullOver(common::PointENU* const dest_point);
+                     const std::string        lane_id,
+                     const double             lane_s,
+                     common::PointENU*        dest_point);
+  int  PullOver(common::PointENU* const dest_point);
 };
 
 }  // namespace planning

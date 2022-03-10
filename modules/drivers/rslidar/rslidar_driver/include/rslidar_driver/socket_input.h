@@ -29,22 +29,22 @@ namespace apollo {
 namespace drivers {
 namespace rslidar {
 
-static int MSOP_DATA_PORT = 6699;//6699;//2368;
-static int DIFOP_DATA_PORT = 7788;//6699;//8308;
-static const int POLL_TIMEOUT = 1000;  // one second (in msec)
+static int       MSOP_DATA_PORT  = 6699;  // 6699;//2368;
+static int       DIFOP_DATA_PORT = 7788;  // 6699;//8308;
+static const int POLL_TIMEOUT    = 1000;  // one second (in msec)
 
 /** @brief Live rslidar input from socket. */
 class SocketInput : public Input {
  public:
   SocketInput();
   virtual ~SocketInput();
-  void init(int &port);
-  int get_msop_data_packet(rslidar_msgs::rslidarPacket *pkt);
-  //int get_positioning_data_packtet(const NMEATimePtr &nmea_time);
+  void init(int& port);
+  int  get_msop_data_packet(rslidar_msgs::rslidarPacket* pkt);
+  // int get_positioning_data_packtet(const NMEATimePtr &nmea_time);
 
  private:
-  int sockfd_;
-  int port_;
+  int  sockfd_;
+  int  port_;
   bool input_available(int timeout);
 };
 
@@ -52,4 +52,4 @@ class SocketInput : public Input {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  
+#endif

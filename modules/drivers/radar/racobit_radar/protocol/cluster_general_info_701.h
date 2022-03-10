@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_CLUSTER_GENERAL_INFO_701_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_CLUSTER_GENERAL_INFO_701_H_
+#  define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_CLUSTER_GENERAL_INFO_701_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
+#  include "modules/drivers/canbus/can_comm/protocol_data.h"
+#  include "modules/drivers/proto/racobit_radar.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -26,13 +26,11 @@ namespace racobit_radar {
 
 using apollo::drivers::RacobitRadar;
 
-class ClusterGeneralInfo701
-    : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
+class ClusterGeneralInfo701 : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
  public:
   static const uint32_t ID;
   ClusterGeneralInfo701();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             RacobitRadar* racobit_radar) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, RacobitRadar* racobit_radar) const override;
 
  private:
   int obstacle_id(const std::uint8_t* bytes, int32_t length) const;

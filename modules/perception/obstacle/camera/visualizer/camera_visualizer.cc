@@ -35,29 +35,26 @@ std::map<std::string, cv::Scalar> kColorTable = {
     {std::string("debug_roi"), cv::Scalar(255, 169, 255)}};
 
 std::vector<std::shared_ptr<Image>> g_cached_images;
-const int kMaxCachedImageNum = 10;
+const int                           kMaxCachedImageNum = 10;
 
-void OnPerception(const PerceptionObstacles &);
+void OnPerception(const PerceptionObstacles&);
 void OnImageShort(sensor_msgs::ImagePtr);
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   ros::init(argc, argv, "camera_visualizer");
   ros::NodeHandle n;
 
   ros::Subscriber sub_perception_debug =
       n.subscribe(FLAGS_perception_obstacle_topic, 1000, OnPerception);
-  ros::Subscriber sub_tl_image_short =
-      n.subscribe(FLAGS_image_short_topic, 1000, OnImageShort);
+  ros::Subscriber sub_tl_image_short = n.subscribe(FLAGS_image_short_topic, 1000, OnImageShort);
 
   ros::spin();
   return 0;
 }
 
-void OnPerception(const PerceptionObstacles &obstacles) {
+void OnPerception(const PerceptionObstacles& obstacles) {
   // TODO(all): add debug into perception debug pb and draw on image.
-  if (g_cached_images.empty()) {
-    return;
-  }
+  if (g_cached_images.empty()) { return; }
   g_cached_images.back()->GenerateMat();
   cv::Mat img = g_cached_images.back()->mat();
 
@@ -70,7 +67,7 @@ void OnImage(CameraId camera_id, sensor_msgs::ImagePtr msg) {
   boost::shared_ptr<sensor_msgs::Image> img(new sensor_msgs::Image);
   *img = *msg;
   boost::shared_ptr<const sensor_msgs::Image> img_msg(img);
-  std::shared_ptr<Image> image(new Image);
+  std::shared_ptr<Image>                      image(new Image);
   if (!image->Init(img_msg->header.stamp.toSec(), camera_id, img_msg)) {
     std::cerr << "camera_visualizer load image failed.";
   }
@@ -81,6 +78,4 @@ void OnImage(CameraId camera_id, sensor_msgs::ImagePtr msg) {
   }
 }
 
-void OnImageShort(sensor_msgs::ImagePtr msg) {
-  OnImage(CameraId::SHORT_FOCUS, msg);
-}
+void OnImageShort(sensor_msgs::ImagePtr msg) { OnImage(CameraId::SHORT_FOCUS, msg); }

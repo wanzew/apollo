@@ -31,15 +31,14 @@ namespace perception {
 
 class PbfSensor {
  public:
-  explicit PbfSensor(const std::string &sensor_id, const SensorType &type);
+  explicit PbfSensor(const std::string& sensor_id, const SensorType& type);
   ~PbfSensor();
 
   /*
    * @brief query frames whose time stamp is in range (latest_fused_time_stamp_,
    * time_stamp); update latest_query_timestamp_ by time_stamp.
    */
-  void QueryLatestFrames(double time_stamp,
-                         std::vector<PbfSensorFramePtr> *frames);
+  void QueryLatestFrames(double time_stamp, std::vector<PbfSensorFramePtr>* frames);
 
   /*
    * @brief query latest frame whose time stamp is in range
@@ -49,22 +48,19 @@ class PbfSensor {
   PbfSensorFramePtr QueryLatestFrame(const double time_stamp);
 
   /**@brief add a frame objects*/
-  void AddFrame(const SensorObjects &frame);
+  void AddFrame(const SensorObjects& frame);
 
   /**@brief query pose at time_stamp, return false if not found*/
-  bool GetPose(const double time_stamp, const double time_range,
-               Eigen::Matrix4d *pose);
+  bool GetPose(const double time_stamp, const double time_range, Eigen::Matrix4d* pose);
 
-  static void SetMaxCachedFrameNumber(const int number) {
-    s_max_cached_frame_number_ = number;
-  }
+  static void SetMaxCachedFrameNumber(const int number) { s_max_cached_frame_number_ = number; }
 
  protected:
   /**@brief cached frames in FIFO*/
   std::deque<PbfSensorFramePtr> frames_;
 
   std::string sensor_id_;
-  SensorType sensor_type_;
+  SensorType  sensor_type_;
 
   /**@brief max size of frames_*/
   static size_t s_max_cached_frame_number_;

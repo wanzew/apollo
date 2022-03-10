@@ -17,10 +17,10 @@
 #ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_pointcloud_dump_H_
 #define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_pointcloud_dump_H_
 
-#include <pcl_ros/point_cloud.h>
-#include <ros/ros.h>
 #include <fstream>
 #include <iostream>
+#include <pcl_ros/point_cloud.h>
+#include <ros/ros.h>
 
 #include "rslidar_pointcloud/rslidarParser.h"
 
@@ -35,14 +35,14 @@ class PointCloudDump {
   ~PointCloudDump() {}
 
  private:
-  void save_callback(const VPointCloud::ConstPtr &msg);
+  void save_callback(const VPointCloud::ConstPtr& msg);
 
   // save msg folder
   std::string save_folder_;
   // sub topic name
   std::string topic_name_;
   // save file prefix,file will be prefix_msgseq.msg
-  std::string file_prefix_;
+  std::string     file_prefix_;
   ros::Subscriber pointcloud_sub_;
 };
 

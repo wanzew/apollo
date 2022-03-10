@@ -50,9 +50,7 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   // TODO(startcode) seems map_ can be changed to a local variable of this
   // function, but test will fail if I do so. if so.
   if (apollo::common::util::EndWith(map_filename, ".xml")) {
-    if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) {
-      return -1;
-    }
+    if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) { return -1; }
   } else if (!apollo::common::util::GetProtoFromFile(map_filename, &map_)) {
     return -1;
   }
@@ -80,20 +78,16 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
     stop_sign_table_[stop_sign.id().id()].reset(new StopSignInfo(stop_sign));
   }
   for (const auto& yield_sign : map_.yield()) {
-    yield_sign_table_[yield_sign.id().id()].reset(
-        new YieldSignInfo(yield_sign));
+    yield_sign_table_[yield_sign.id().id()].reset(new YieldSignInfo(yield_sign));
   }
   for (const auto& clear_area : map_.clear_area()) {
-    clear_area_table_[clear_area.id().id()].reset(
-        new ClearAreaInfo(clear_area));
+    clear_area_table_[clear_area.id().id()].reset(new ClearAreaInfo(clear_area));
   }
   for (const auto& speed_bump : map_.speed_bump()) {
-    speed_bump_table_[speed_bump.id().id()].reset(
-        new SpeedBumpInfo(speed_bump));
+    speed_bump_table_[speed_bump.id().id()].reset(new SpeedBumpInfo(speed_bump));
   }
   for (const auto& parking_space : map_.parking_space()) {
-    parking_space_table_[parking_space.id().id()].reset(
-        new ParkingSpaceInfo(parking_space));
+    parking_space_table_[parking_space.id().id()].reset(new ParkingSpaceInfo(parking_space));
   }
   for (const auto& overlap : map_.overlap()) {
     overlap_table_[overlap.id().id()].reset(new OverlapInfo(overlap));
@@ -196,24 +190,21 @@ ParkingSpaceInfoConstPtr HDMapImpl::GetParkingSpaceById(const Id& id) const {
   return it != parking_space_table_.end() ? it->second : nullptr;
 }
 
-int HDMapImpl::GetLanes(const PointENU& point, double distance,
+int HDMapImpl::GetLanes(const PointENU&                point,
+                        double                         distance,
                         std::vector<LaneInfoConstPtr>* lanes) const {
   return GetLanes({point.x(), point.y()}, distance, lanes);
 }
 
-int HDMapImpl::GetLanes(const Vec2d& point, double distance,
+int HDMapImpl::GetLanes(const Vec2d&                   point,
+                        double                         distance,
                         std::vector<LaneInfoConstPtr>* lanes) const {
-  if (lanes == nullptr || lane_segment_kdtree_ == nullptr) {
-    return -1;
-  }
+  if (lanes == nullptr || lane_segment_kdtree_ == nullptr) { return -1; }
 
   lanes->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *lane_segment_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int                status = SearchObjects(point, distance, *lane_segment_kdtree_, &ids);
+  if (status < 0) { return status; }
 
   for (const auto& id : ids) {
     lanes->emplace_back(GetLaneById(CreateHDMapId(id)));
@@ -221,22 +212,20 @@ int HDMapImpl::GetLanes(const Vec2d& point, double distance,
   return 0;
 }
 
-int HDMapImpl::GetRoads(const PointENU& point, double distance,
+int HDMapImpl::GetRoads(const PointENU&                point,
+                        double                         distance,
                         std::vector<RoadInfoConstPtr>* roads) const {
   return GetRoads({point.x(), point.y()}, distance, roads);
 }
 
-int HDMapImpl::GetRoads(const Vec2d& point, double distance,
+int HDMapImpl::GetRoads(const Vec2d&                   point,
+                        double                         distance,
                         std::vector<RoadInfoConstPtr>* roads) const {
   std::vector<LaneInfoConstPtr> lanes;
-  if (GetLanes(point, distance, &lanes) != 0) {
-    return -1;
-  }
+  if (GetLanes(point, distance, &lanes) != 0) { return -1; }
   std::unordered_set<std::string> road_ids;
   for (auto& lane : lanes) {
-    if (!lane->road_id().id().empty()) {
-      road_ids.insert(lane->road_id().id());
-    }
+    if (!lane->road_id().id().empty()) { road_ids.insert(lane->road_id().id()); }
   }
 
   for (auto& road_id : road_ids) {
@@ -248,123 +237,100 @@ int HDMapImpl::GetRoads(const Vec2d& point, double distance,
   return 0;
 }
 
-int HDMapImpl::GetJunctions(
-    const PointENU& point, double distance,
-    std::vector<JunctionInfoConstPtr>* junctions) const {
+int HDMapImpl::GetJunctions(const PointENU&                    point,
+                            double                             distance,
+                            std::vector<JunctionInfoConstPtr>* junctions) const {
   return GetJunctions({point.x(), point.y()}, distance, junctions);
 }
 
-int HDMapImpl::GetJunctions(
-    const Vec2d& point, double distance,
-    std::vector<JunctionInfoConstPtr>* junctions) const {
-  if (junctions == nullptr || junction_polygon_kdtree_ == nullptr) {
-    return -1;
-  }
+int HDMapImpl::GetJunctions(const Vec2d&                       point,
+                            double                             distance,
+                            std::vector<JunctionInfoConstPtr>* junctions) const {
+  if (junctions == nullptr || junction_polygon_kdtree_ == nullptr) { return -1; }
   junctions->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *junction_polygon_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int                status = SearchObjects(point, distance, *junction_polygon_kdtree_, &ids);
+  if (status < 0) { return status; }
   for (const auto& id : ids) {
     junctions->emplace_back(GetJunctionById(CreateHDMapId(id)));
   }
   return 0;
 }
 
-int HDMapImpl::GetSignals(const PointENU& point, double distance,
+int HDMapImpl::GetSignals(const PointENU&                  point,
+                          double                           distance,
                           std::vector<SignalInfoConstPtr>* signals) const {
   return GetSignals({point.x(), point.y()}, distance, signals);
 }
 
-int HDMapImpl::GetSignals(const Vec2d& point, double distance,
+int HDMapImpl::GetSignals(const Vec2d&                     point,
+                          double                           distance,
                           std::vector<SignalInfoConstPtr>* signals) const {
-  if (signals == nullptr || signal_segment_kdtree_ == nullptr) {
-    return -1;
-  }
+  if (signals == nullptr || signal_segment_kdtree_ == nullptr) { return -1; }
   signals->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *signal_segment_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int                status = SearchObjects(point, distance, *signal_segment_kdtree_, &ids);
+  if (status < 0) { return status; }
   for (const auto& id : ids) {
     signals->emplace_back(GetSignalById(CreateHDMapId(id)));
   }
   return 0;
 }
 
-int HDMapImpl::GetCrosswalks(
-    const PointENU& point, double distance,
-    std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
+int HDMapImpl::GetCrosswalks(const PointENU&                     point,
+                             double                              distance,
+                             std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
   return GetCrosswalks({point.x(), point.y()}, distance, crosswalks);
 }
 
-int HDMapImpl::GetCrosswalks(
-    const Vec2d& point, double distance,
-    std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
-  if (crosswalks == nullptr || crosswalk_polygon_kdtree_ == nullptr) {
-    return -1;
-  }
+int HDMapImpl::GetCrosswalks(const Vec2d&                        point,
+                             double                              distance,
+                             std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
+  if (crosswalks == nullptr || crosswalk_polygon_kdtree_ == nullptr) { return -1; }
   crosswalks->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *crosswalk_polygon_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int status = SearchObjects(point, distance, *crosswalk_polygon_kdtree_, &ids);
+  if (status < 0) { return status; }
   for (const auto& id : ids) {
     crosswalks->emplace_back(GetCrosswalkById(CreateHDMapId(id)));
   }
   return 0;
 }
 
-int HDMapImpl::GetStopSigns(
-    const PointENU& point, double distance,
-    std::vector<StopSignInfoConstPtr>* stop_signs) const {
+int HDMapImpl::GetStopSigns(const PointENU&                    point,
+                            double                             distance,
+                            std::vector<StopSignInfoConstPtr>* stop_signs) const {
   return GetStopSigns({point.x(), point.y()}, distance, stop_signs);
 }
 
-int HDMapImpl::GetStopSigns(
-    const Vec2d& point, double distance,
-    std::vector<StopSignInfoConstPtr>* stop_signs) const {
-  if (stop_signs == nullptr || stop_sign_segment_kdtree_ == nullptr) {
-    return -1;
-  }
+int HDMapImpl::GetStopSigns(const Vec2d&                       point,
+                            double                             distance,
+                            std::vector<StopSignInfoConstPtr>* stop_signs) const {
+  if (stop_signs == nullptr || stop_sign_segment_kdtree_ == nullptr) { return -1; }
   stop_signs->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *stop_sign_segment_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int status = SearchObjects(point, distance, *stop_sign_segment_kdtree_, &ids);
+  if (status < 0) { return status; }
   for (const auto& id : ids) {
     stop_signs->emplace_back(GetStopSignById(CreateHDMapId(id)));
   }
   return 0;
 }
 
-int HDMapImpl::GetYieldSigns(
-    const PointENU& point, double distance,
-    std::vector<YieldSignInfoConstPtr>* yield_signs) const {
+int HDMapImpl::GetYieldSigns(const PointENU&                     point,
+                             double                              distance,
+                             std::vector<YieldSignInfoConstPtr>* yield_signs) const {
   return GetYieldSigns({point.x(), point.y()}, distance, yield_signs);
 }
 
-int HDMapImpl::GetYieldSigns(
-    const Vec2d& point, double distance,
-    std::vector<YieldSignInfoConstPtr>* yield_signs) const {
-  if (yield_signs == nullptr || yield_sign_segment_kdtree_ == nullptr) {
-    return -1;
-  }
+int HDMapImpl::GetYieldSigns(const Vec2d&                        point,
+                             double                              distance,
+                             std::vector<YieldSignInfoConstPtr>* yield_signs) const {
+  if (yield_signs == nullptr || yield_sign_segment_kdtree_ == nullptr) { return -1; }
   yield_signs->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *yield_sign_segment_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int status = SearchObjects(point, distance, *yield_sign_segment_kdtree_, &ids);
+  if (status < 0) { return status; }
   for (const auto& id : ids) {
     yield_signs->emplace_back(GetYieldSignById(CreateHDMapId(id)));
   }
@@ -372,25 +338,20 @@ int HDMapImpl::GetYieldSigns(
   return 0;
 }
 
-int HDMapImpl::GetClearAreas(
-    const PointENU& point, double distance,
-    std::vector<ClearAreaInfoConstPtr>* clear_areas) const {
+int HDMapImpl::GetClearAreas(const PointENU&                     point,
+                             double                              distance,
+                             std::vector<ClearAreaInfoConstPtr>* clear_areas) const {
   return GetClearAreas({point.x(), point.y()}, distance, clear_areas);
 }
 
-int HDMapImpl::GetClearAreas(
-    const Vec2d& point, double distance,
-    std::vector<ClearAreaInfoConstPtr>* clear_areas) const {
-  if (clear_areas == nullptr || clear_area_polygon_kdtree_ == nullptr) {
-    return -1;
-  }
+int HDMapImpl::GetClearAreas(const Vec2d&                        point,
+                             double                              distance,
+                             std::vector<ClearAreaInfoConstPtr>* clear_areas) const {
+  if (clear_areas == nullptr || clear_area_polygon_kdtree_ == nullptr) { return -1; }
   clear_areas->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *clear_area_polygon_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int status = SearchObjects(point, distance, *clear_area_polygon_kdtree_, &ids);
+  if (status < 0) { return status; }
   for (const auto& id : ids) {
     clear_areas->emplace_back(GetClearAreaById(CreateHDMapId(id)));
   }
@@ -398,25 +359,20 @@ int HDMapImpl::GetClearAreas(
   return 0;
 }
 
-int HDMapImpl::GetSpeedBumps(
-    const PointENU& point, double distance,
-    std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const {
+int HDMapImpl::GetSpeedBumps(const PointENU&                     point,
+                             double                              distance,
+                             std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const {
   return GetSpeedBumps({point.x(), point.y()}, distance, speed_bumps);
 }
 
-int HDMapImpl::GetSpeedBumps(
-    const Vec2d& point, double distance,
-    std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const {
-  if (speed_bumps == nullptr || speed_bump_segment_kdtree_ == nullptr) {
-    return -1;
-  }
+int HDMapImpl::GetSpeedBumps(const Vec2d&                        point,
+                             double                              distance,
+                             std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const {
+  if (speed_bumps == nullptr || speed_bump_segment_kdtree_ == nullptr) { return -1; }
   speed_bumps->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *speed_bump_segment_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int status = SearchObjects(point, distance, *speed_bump_segment_kdtree_, &ids);
+  if (status < 0) { return status; }
   for (const auto& id : ids) {
     speed_bumps->emplace_back(GetSpeedBumpById(CreateHDMapId(id)));
   }
@@ -424,25 +380,20 @@ int HDMapImpl::GetSpeedBumps(
   return 0;
 }
 
-int HDMapImpl::GetParkingSpaces(
-    const PointENU& point, double distance,
-    std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const {
+int HDMapImpl::GetParkingSpaces(const PointENU&                        point,
+                                double                                 distance,
+                                std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const {
   return GetParkingSpaces({point.x(), point.y()}, distance, parking_spaces);
 }
 
-int HDMapImpl::GetParkingSpaces(
-    const Vec2d& point, double distance,
-    std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const {
-  if (parking_spaces == nullptr || parking_space_polygon_kdtree_ == nullptr) {
-    return -1;
-  }
+int HDMapImpl::GetParkingSpaces(const Vec2d&                           point,
+                                double                                 distance,
+                                std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const {
+  if (parking_spaces == nullptr || parking_space_polygon_kdtree_ == nullptr) { return -1; }
   parking_spaces->clear();
   std::vector<std::string> ids;
-  const int status =
-      SearchObjects(point, distance, *parking_space_polygon_kdtree_, &ids);
-  if (status < 0) {
-    return status;
-  }
+  const int status = SearchObjects(point, distance, *parking_space_polygon_kdtree_, &ids);
+  if (status < 0) { return status; }
   for (const auto& id : ids) {
     parking_spaces->emplace_back(GetParkingSpaceById(CreateHDMapId(id)));
   }
@@ -450,120 +401,116 @@ int HDMapImpl::GetParkingSpaces(
   return 0;
 }
 
-int HDMapImpl::GetNearestLane(const PointENU& point,
-                              LaneInfoConstPtr* nearest_lane, double* nearest_s,
-                              double* nearest_l) const {
-  return GetNearestLane({point.x(), point.y()}, nearest_lane, nearest_s,
-                        nearest_l);
+int HDMapImpl::GetNearestLane(const PointENU&   point,
+                              LaneInfoConstPtr* nearest_lane,
+                              double*           nearest_s,
+                              double*           nearest_l) const {
+  return GetNearestLane({point.x(), point.y()}, nearest_lane, nearest_s, nearest_l);
 }
 
-int HDMapImpl::GetNearestLane(const Vec2d& point,
-                              LaneInfoConstPtr* nearest_lane, double* nearest_s,
-                              double* nearest_l) const {
+int HDMapImpl::GetNearestLane(const Vec2d&      point,
+                              LaneInfoConstPtr* nearest_lane,
+                              double*           nearest_s,
+                              double*           nearest_l) const {
   CHECK_NOTNULL(nearest_lane);
   CHECK_NOTNULL(nearest_s);
   CHECK_NOTNULL(nearest_l);
   const auto* segment_object = lane_segment_kdtree_->GetNearestObject(point);
-  if (segment_object == nullptr) {
-    return -1;
-  }
+  if (segment_object == nullptr) { return -1; }
   const Id& lane_id = segment_object->object()->id();
-  *nearest_lane = GetLaneById(lane_id);
+  *nearest_lane     = GetLaneById(lane_id);
   CHECK(*nearest_lane);
-  const int id = segment_object->id();
+  const int   id      = segment_object->id();
   const auto& segment = (*nearest_lane)->segments()[id];
-  Vec2d nearest_pt;
+  Vec2d       nearest_pt;
   segment.DistanceTo(point, &nearest_pt);
-  *nearest_s = (*nearest_lane)->accumulate_s()[id] +
-               nearest_pt.DistanceTo(segment.start());
+  *nearest_s = (*nearest_lane)->accumulate_s()[id] + nearest_pt.DistanceTo(segment.start());
   *nearest_l = segment.unit_direction().CrossProd(point - segment.start());
 
   return 0;
 }
 
-int HDMapImpl::GetNearestLaneWithHeading(
-    const PointENU& point, const double distance, const double central_heading,
-    const double max_heading_difference, LaneInfoConstPtr* nearest_lane,
-    double* nearest_s, double* nearest_l) const {
-  return GetNearestLaneWithHeading({point.x(), point.y()}, distance,
-                                   central_heading, max_heading_difference,
-                                   nearest_lane, nearest_s, nearest_l);
+int HDMapImpl::GetNearestLaneWithHeading(const PointENU&   point,
+                                         const double      distance,
+                                         const double      central_heading,
+                                         const double      max_heading_difference,
+                                         LaneInfoConstPtr* nearest_lane,
+                                         double*           nearest_s,
+                                         double*           nearest_l) const {
+  return GetNearestLaneWithHeading({point.x(), point.y()}, distance, central_heading,
+                                   max_heading_difference, nearest_lane, nearest_s, nearest_l);
 }
 
-int HDMapImpl::GetNearestLaneWithHeading(
-    const Vec2d& point, const double distance, const double central_heading,
-    const double max_heading_difference, LaneInfoConstPtr* nearest_lane,
-    double* nearest_s, double* nearest_l) const {
+int HDMapImpl::GetNearestLaneWithHeading(const Vec2d&      point,
+                                         const double      distance,
+                                         const double      central_heading,
+                                         const double      max_heading_difference,
+                                         LaneInfoConstPtr* nearest_lane,
+                                         double*           nearest_s,
+                                         double*           nearest_l) const {
   CHECK_NOTNULL(nearest_lane);
   CHECK_NOTNULL(nearest_s);
   CHECK_NOTNULL(nearest_l);
 
   std::vector<LaneInfoConstPtr> lanes;
-  if (GetLanesWithHeading(point, distance, central_heading,
-                          max_heading_difference, &lanes) != 0) {
+  if (GetLanesWithHeading(point, distance, central_heading, max_heading_difference, &lanes) != 0) {
     return -1;
   }
 
-  double s = 0;
+  double s       = 0;
   size_t s_index = 0;
-  Vec2d map_point;
+  Vec2d  map_point;
   double min_distance = distance;
   for (const auto& lane : lanes) {
-    double s_offset = 0.0;
-    int s_offset_index = 0;
-    double distance =
-        lane->DistanceTo(point, &map_point, &s_offset, &s_offset_index);
+    double s_offset       = 0.0;
+    int    s_offset_index = 0;
+    double distance       = lane->DistanceTo(point, &map_point, &s_offset, &s_offset_index);
     if (distance < min_distance) {
-      min_distance = distance;
+      min_distance  = distance;
       *nearest_lane = lane;
-      s = s_offset;
-      s_index = s_offset_index;
+      s             = s_offset;
+      s_index       = s_offset_index;
     }
   }
 
-  if (*nearest_lane == nullptr) {
-    return -1;
-  }
+  if (*nearest_lane == nullptr) { return -1; }
 
-  *nearest_s = s;
-  int segment_index = std::min(s_index, (*nearest_lane)->segments().size() - 1);
-  const auto& segment_2d = (*nearest_lane)->segments()[segment_index];
-  *nearest_l =
-      segment_2d.unit_direction().CrossProd(point - segment_2d.start());
+  *nearest_s                = s;
+  int         segment_index = std::min(s_index, (*nearest_lane)->segments().size() - 1);
+  const auto& segment_2d    = (*nearest_lane)->segments()[segment_index];
+  *nearest_l                = segment_2d.unit_direction().CrossProd(point - segment_2d.start());
 
   return 0;
 }
 
-int HDMapImpl::GetLanesWithHeading(const PointENU& point, const double distance,
-                                   const double central_heading,
-                                   const double max_heading_difference,
+int HDMapImpl::GetLanesWithHeading(const PointENU&                point,
+                                   const double                   distance,
+                                   const double                   central_heading,
+                                   const double                   max_heading_difference,
                                    std::vector<LaneInfoConstPtr>* lanes) const {
   return GetLanesWithHeading({point.x(), point.y()}, distance, central_heading,
                              max_heading_difference, lanes);
 }
 
-int HDMapImpl::GetLanesWithHeading(const Vec2d& point, const double distance,
-                                   const double central_heading,
-                                   const double max_heading_difference,
+int HDMapImpl::GetLanesWithHeading(const Vec2d&                   point,
+                                   const double                   distance,
+                                   const double                   central_heading,
+                                   const double                   max_heading_difference,
                                    std::vector<LaneInfoConstPtr>* lanes) const {
   CHECK_NOTNULL(lanes);
   std::vector<LaneInfoConstPtr> all_lanes;
-  const int status = GetLanes(point, distance, &all_lanes);
-  if (status < 0 || all_lanes.size() <= 0) {
-    return -1;
-  }
+  const int                     status = GetLanes(point, distance, &all_lanes);
+  if (status < 0 || all_lanes.size() <= 0) { return -1; }
 
   lanes->clear();
   for (auto& lane : all_lanes) {
-    Vec2d proj_pt(0.0, 0.0);
-    double s_offset = 0.0;
-    int s_offset_index = 0;
-    double dis = lane->DistanceTo(point, &proj_pt, &s_offset, &s_offset_index);
+    Vec2d  proj_pt(0.0, 0.0);
+    double s_offset       = 0.0;
+    int    s_offset_index = 0;
+    double dis            = lane->DistanceTo(point, &proj_pt, &s_offset, &s_offset_index);
     if (dis <= distance) {
-      double heading_diff =
-          fabs(lane->headings()[s_offset_index] - central_heading);
-      if (fabs(apollo::common::math::NormalizeAngle(heading_diff)) <=
-          max_heading_difference) {
+      double heading_diff = fabs(lane->headings()[s_offset_index] - central_heading);
+      if (fabs(apollo::common::math::NormalizeAngle(heading_diff)) <= max_heading_difference) {
         lanes->push_back(lane);
       }
     }
@@ -572,10 +519,10 @@ int HDMapImpl::GetLanesWithHeading(const Vec2d& point, const double distance,
   return 0;
 }
 
-int HDMapImpl::GetRoadBoundaries(
-    const PointENU& point, double radius,
-    std::vector<RoadROIBoundaryPtr>* road_boundaries,
-    std::vector<JunctionBoundaryPtr>* junctions) const {
+int HDMapImpl::GetRoadBoundaries(const PointENU&                   point,
+                                 double                            radius,
+                                 std::vector<RoadROIBoundaryPtr>*  road_boundaries,
+                                 std::vector<JunctionBoundaryPtr>* junctions) const {
   CHECK_NOTNULL(road_boundaries);
   CHECK_NOTNULL(junctions);
 
@@ -583,27 +530,21 @@ int HDMapImpl::GetRoadBoundaries(
   junctions->clear();
 
   std::vector<LaneInfoConstPtr> lanes;
-  if (GetLanes(point, radius, &lanes) != 0 || lanes.size() <= 0) {
-    return -1;
-  }
+  if (GetLanes(point, radius, &lanes) != 0 || lanes.size() <= 0) { return -1; }
 
   std::unordered_set<std::string> junction_id_set;
   std::unordered_set<std::string> road_section_id_set;
   for (const auto& lane : lanes) {
-    const auto road_id = lane->road_id();
-    const auto section_id = lane->section_id();
-    std::string unique_id = road_id.id() + section_id.id();
-    if (road_section_id_set.count(unique_id) > 0) {
-      continue;
-    }
+    const auto  road_id    = lane->road_id();
+    const auto  section_id = lane->section_id();
+    std::string unique_id  = road_id.id() + section_id.id();
+    if (road_section_id_set.count(unique_id) > 0) { continue; }
     road_section_id_set.insert(unique_id);
     const auto road_ptr = GetRoadById(road_id);
     CHECK_NOTNULL(road_ptr);
     if (road_ptr->has_junction_id()) {
       const Id junction_id = road_ptr->junction_id();
-      if (junction_id_set.count(junction_id.id()) > 0) {
-        continue;
-      }
+      if (junction_id_set.count(junction_id.id()) > 0) { continue; }
       junction_id_set.insert(junction_id.id());
       JunctionBoundaryPtr junction_boundary_ptr(new JunctionBoundary());
       junction_boundary_ptr->junction_info = GetJunctionById(junction_id);
@@ -614,8 +555,7 @@ int HDMapImpl::GetRoadBoundaries(
       road_boundary_ptr->mutable_id()->CopyFrom(road_ptr->id());
       for (const auto& section : road_ptr->sections()) {
         if (section.id().id() == section_id.id()) {
-          road_boundary_ptr->add_road_boundaries()->CopyFrom(
-              section.boundary());
+          road_boundary_ptr->add_road_boundaries()->CopyFrom(section.boundary());
         }
       }
       road_boundaries->push_back(road_boundary_ptr);
@@ -625,20 +565,20 @@ int HDMapImpl::GetRoadBoundaries(
   return 0;
 }
 
-int HDMapImpl::GetForwardNearestSignalsOnLane(
-    const apollo::common::PointENU& point, const double distance,
-    std::vector<SignalInfoConstPtr>* signals) const {
+int HDMapImpl::GetForwardNearestSignalsOnLane(const apollo::common::PointENU&  point,
+                                              const double                     distance,
+                                              std::vector<SignalInfoConstPtr>* signals) const {
   CHECK_NOTNULL(signals);
 
   signals->clear();
-  LaneInfoConstPtr lane_ptr = nullptr;
-  double nearest_s = 0.0;
-  double nearest_l = 0.0;
+  LaneInfoConstPtr lane_ptr  = nullptr;
+  double           nearest_s = 0.0;
+  double           nearest_l = 0.0;
 
   std::vector<LaneInfoConstPtr> temp_surrounding_lanes;
   std::vector<LaneInfoConstPtr> surrounding_lanes;
-  int s_index = 0;
-  apollo::common::math::Vec2d car_point;
+  int                           s_index = 0;
+  apollo::common::math::Vec2d   car_point;
   car_point.set_x(point.x());
   car_point.set_y(point.y());
   apollo::common::math::Vec2d map_point;
@@ -647,9 +587,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     return -1;
   }
   for (const auto& surround_lane : temp_surrounding_lanes) {
-    if (surround_lane->IsOnLane(car_point)) {
-      surrounding_lanes.push_back(surround_lane);
-    }
+    if (surround_lane->IsOnLane(car_point)) { surrounding_lanes.push_back(surround_lane); }
   }
   if (surrounding_lanes.empty()) {
     AINFO << "Car is not on lane.";
@@ -657,51 +595,43 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   }
   for (const auto& lane : surrounding_lanes) {
     if (!lane->signals().empty()) {
-      lane_ptr = lane;
-      nearest_l =
-          lane_ptr->DistanceTo(car_point, &map_point, &nearest_s, &s_index);
+      lane_ptr  = lane;
+      nearest_l = lane_ptr->DistanceTo(car_point, &map_point, &nearest_s, &s_index);
       break;
     }
   }
   if (lane_ptr == nullptr) {
     GetNearestLane(point, &lane_ptr, &nearest_s, &nearest_l);
-    if (lane_ptr == nullptr) {
-      return -1;
-    }
+    if (lane_ptr == nullptr) { return -1; }
   }
 
   double unused_distance = distance + kBackwardDistance;
-  double back_distance = kBackwardDistance;
-  double s = nearest_s;
+  double back_distance   = kBackwardDistance;
+  double s               = nearest_s;
   while (s < back_distance) {
     for (const auto& predecessor_lane_id : lane_ptr->lane().predecessor_id()) {
       lane_ptr = GetLaneById(predecessor_lane_id);
-      if (lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) {
-        break;
-      }
+      if (lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) { break; }
     }
     back_distance = back_distance - s;
-    s = lane_ptr->total_length();
+    s             = lane_ptr->total_length();
   }
   double s_start = s - back_distance;
   while (lane_ptr != nullptr) {
-    double signal_min_dist = std::numeric_limits<double>::infinity();
+    double                          signal_min_dist = std::numeric_limits<double>::infinity();
     std::vector<SignalInfoConstPtr> min_dist_signal_ptr;
     for (const auto& overlap_id : lane_ptr->lane().overlap_id()) {
-      OverlapInfoConstPtr overlap_ptr = GetOverlapById(overlap_id);
-      double lane_overlap_offset_s = 0.0;
-      SignalInfoConstPtr signal_ptr = nullptr;
+      OverlapInfoConstPtr overlap_ptr           = GetOverlapById(overlap_id);
+      double              lane_overlap_offset_s = 0.0;
+      SignalInfoConstPtr  signal_ptr            = nullptr;
       for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
         if (overlap_ptr->overlap().object(i).id().id() == lane_ptr->id().id()) {
           lane_overlap_offset_s =
-              overlap_ptr->overlap().object(i).lane_overlap_info().start_s() -
-              s_start;
+              overlap_ptr->overlap().object(i).lane_overlap_info().start_s() - s_start;
           continue;
         }
         signal_ptr = GetSignalById(overlap_ptr->overlap().object(i).id());
-        if (signal_ptr == nullptr || lane_overlap_offset_s < 0.0) {
-          break;
-        }
+        if (signal_ptr == nullptr || lane_overlap_offset_s < 0.0) { break; }
         if (lane_overlap_offset_s < signal_min_dist) {
           signal_min_dist = lane_overlap_offset_s;
           min_dist_signal_ptr.clear();
@@ -717,38 +647,30 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
       break;
     }
     unused_distance = unused_distance - (lane_ptr->total_length() - s_start);
-    if (unused_distance <= 0) {
-      break;
-    }
+    if (unused_distance <= 0) { break; }
     LaneInfoConstPtr tmp_lane_ptr = nullptr;
     for (const auto& successor_lane_id : lane_ptr->lane().successor_id()) {
       tmp_lane_ptr = GetLaneById(successor_lane_id);
-      if (tmp_lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) {
-        break;
-      }
+      if (tmp_lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) { break; }
     }
     lane_ptr = tmp_lane_ptr;
-    s_start = 0;
+    s_start  = 0;
   }
   return 0;
 }
 
-int HDMapImpl::GetStopSignAssociatedStopSigns(
-    const Id& id, std::vector<StopSignInfoConstPtr>* stop_signs) const {
+int HDMapImpl::GetStopSignAssociatedStopSigns(const Id&                          id,
+                                              std::vector<StopSignInfoConstPtr>* stop_signs) const {
   CHECK_NOTNULL(stop_signs);
 
   const auto& stop_sign = GetStopSignById(id);
-  if (stop_sign == nullptr) {
-    return -1;
-  }
+  if (stop_sign == nullptr) { return -1; }
 
   std::vector<Id> associate_stop_sign_ids;
-  const auto junction_ids = stop_sign->OverlapJunctionIds();
+  const auto      junction_ids = stop_sign->OverlapJunctionIds();
   for (const auto& junction_id : junction_ids) {
     const auto& junction = GetJunctionById(junction_id);
-    if (junction == nullptr) {
-      continue;
-    }
+    if (junction == nullptr) { continue; }
     const auto stop_sign_ids = junction->OverlapStopSignIds();
     std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
               std::back_inserter(associate_stop_sign_ids));
@@ -761,31 +683,25 @@ int HDMapImpl::GetStopSignAssociatedStopSigns(
       continue;
     }
     const auto& stop_sign = GetStopSignById(stop_sign_id);
-    if (stop_sign == nullptr) {
-      continue;
-    }
+    if (stop_sign == nullptr) { continue; }
     stop_signs->push_back(stop_sign);
   }
 
   return 0;
 }
 
-int HDMapImpl::GetStopSignAssociatedLanes(
-    const Id& id, std::vector<LaneInfoConstPtr>* lanes) const {
+int HDMapImpl::GetStopSignAssociatedLanes(const Id&                      id,
+                                          std::vector<LaneInfoConstPtr>* lanes) const {
   CHECK_NOTNULL(lanes);
 
   const auto& stop_sign = GetStopSignById(id);
-  if (stop_sign == nullptr) {
-    return -1;
-  }
+  if (stop_sign == nullptr) { return -1; }
 
   std::vector<Id> associate_stop_sign_ids;
-  const auto junction_ids = stop_sign->OverlapJunctionIds();
+  const auto      junction_ids = stop_sign->OverlapJunctionIds();
   for (const auto& junction_id : junction_ids) {
     const auto& junction = GetJunctionById(junction_id);
-    if (junction == nullptr) {
-      continue;
-    }
+    if (junction == nullptr) { continue; }
     const auto stop_sign_ids = junction->OverlapStopSignIds();
     std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
               std::back_inserter(associate_stop_sign_ids));
@@ -798,19 +714,14 @@ int HDMapImpl::GetStopSignAssociatedLanes(
       continue;
     }
     const auto& stop_sign = GetStopSignById(stop_sign_id);
-    if (stop_sign == nullptr) {
-      continue;
-    }
+    if (stop_sign == nullptr) { continue; }
     const auto lane_ids = stop_sign->OverlapLaneIds();
-    std::copy(lane_ids.begin(), lane_ids.end(),
-              std::back_inserter(associate_lane_ids));
+    std::copy(lane_ids.begin(), lane_ids.end(), std::back_inserter(associate_lane_ids));
   }
 
   for (const auto lane_id : associate_lane_ids) {
     const auto& lane = GetLaneById(lane_id);
-    if (lane == nullptr) {
-      continue;
-    }
+    if (lane == nullptr) { continue; }
     lanes->push_back(lane);
   }
 
@@ -818,31 +729,30 @@ int HDMapImpl::GetStopSignAssociatedLanes(
 }
 
 template <class Table, class BoxTable, class KDTree>
-void HDMapImpl::BuildSegmentKDTree(const Table& table,
-                                   const AABoxKDTreeParams& params,
-                                   BoxTable* const box_table,
+void HDMapImpl::BuildSegmentKDTree(const Table&                   table,
+                                   const AABoxKDTreeParams&       params,
+                                   BoxTable* const                box_table,
                                    std::unique_ptr<KDTree>* const kdtree) {
   box_table->clear();
   for (const auto& info_with_id : table) {
     const auto* info = info_with_id.second.get();
     for (size_t id = 0; id < info->segments().size(); ++id) {
       const auto& segment = info->segments()[id];
-      box_table->emplace_back(
-          apollo::common::math::AABox2d(segment.start(), segment.end()), info,
-          &segment, id);
+      box_table->emplace_back(apollo::common::math::AABox2d(segment.start(), segment.end()), info,
+                              &segment, id);
     }
   }
   kdtree->reset(new KDTree(*box_table, params));
 }
 
 template <class Table, class BoxTable, class KDTree>
-void HDMapImpl::BuildPolygonKDTree(const Table& table,
-                                   const AABoxKDTreeParams& params,
-                                   BoxTable* const box_table,
+void HDMapImpl::BuildPolygonKDTree(const Table&                   table,
+                                   const AABoxKDTreeParams&       params,
+                                   BoxTable* const                box_table,
                                    std::unique_ptr<KDTree>* const kdtree) {
   box_table->clear();
   for (const auto& info_with_id : table) {
-    const auto* info = info_with_id.second.get();
+    const auto* info    = info_with_id.second.get();
     const auto& polygon = info->polygon();
     box_table->emplace_back(polygon.AABoundingBox(), info, &polygon, 0);
   }
@@ -852,23 +762,21 @@ void HDMapImpl::BuildPolygonKDTree(const Table& table,
 void HDMapImpl::BuildLaneSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 16;
-  BuildSegmentKDTree(lane_table_, params, &lane_segment_boxes_,
-                     &lane_segment_kdtree_);
+  params.max_leaf_size      = 16;
+  BuildSegmentKDTree(lane_table_, params, &lane_segment_boxes_, &lane_segment_kdtree_);
 }
 
 void HDMapImpl::BuildJunctionPolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 1;
-  BuildPolygonKDTree(junction_table_, params, &junction_polygon_boxes_,
-                     &junction_polygon_kdtree_);
+  params.max_leaf_size      = 1;
+  BuildPolygonKDTree(junction_table_, params, &junction_polygon_boxes_, &junction_polygon_kdtree_);
 }
 
 void HDMapImpl::BuildCrosswalkPolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 1;
+  params.max_leaf_size      = 1;
   BuildPolygonKDTree(crosswalk_table_, params, &crosswalk_polygon_boxes_,
                      &crosswalk_polygon_kdtree_);
 }
@@ -876,15 +784,14 @@ void HDMapImpl::BuildCrosswalkPolygonKDTree() {
 void HDMapImpl::BuildSignalSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 4;
-  BuildSegmentKDTree(signal_table_, params, &signal_segment_boxes_,
-                     &signal_segment_kdtree_);
+  params.max_leaf_size      = 4;
+  BuildSegmentKDTree(signal_table_, params, &signal_segment_boxes_, &signal_segment_kdtree_);
 }
 
 void HDMapImpl::BuildStopSignSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 4;
+  params.max_leaf_size      = 4;
   BuildSegmentKDTree(stop_sign_table_, params, &stop_sign_segment_boxes_,
                      &stop_sign_segment_kdtree_);
 }
@@ -892,7 +799,7 @@ void HDMapImpl::BuildStopSignSegmentKDTree() {
 void HDMapImpl::BuildYieldSignSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 4;
+  params.max_leaf_size      = 4;
   BuildSegmentKDTree(yield_sign_table_, params, &yield_sign_segment_boxes_,
                      &yield_sign_segment_kdtree_);
 }
@@ -900,7 +807,7 @@ void HDMapImpl::BuildYieldSignSegmentKDTree() {
 void HDMapImpl::BuildClearAreaPolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 4;
+  params.max_leaf_size      = 4;
   BuildPolygonKDTree(clear_area_table_, params, &clear_area_polygon_boxes_,
                      &clear_area_polygon_kdtree_);
 }
@@ -908,7 +815,7 @@ void HDMapImpl::BuildClearAreaPolygonKDTree() {
 void HDMapImpl::BuildSpeedBumpSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 4;
+  params.max_leaf_size      = 4;
   BuildSegmentKDTree(speed_bump_table_, params, &speed_bump_segment_boxes_,
                      &speed_bump_segment_kdtree_);
 }
@@ -916,20 +823,18 @@ void HDMapImpl::BuildSpeedBumpSegmentKDTree() {
 void HDMapImpl::BuildParkingSpacePolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
-  params.max_leaf_size = 4;
-  BuildPolygonKDTree(parking_space_table_, params,
-                     &parking_space_polygon_boxes_,
+  params.max_leaf_size      = 4;
+  BuildPolygonKDTree(parking_space_table_, params, &parking_space_polygon_boxes_,
                      &parking_space_polygon_kdtree_);
 }
 
 template <class KDTree>
-int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
-                             const KDTree& kdtree,
+int HDMapImpl::SearchObjects(const Vec2d&                    center,
+                             const double                    radius,
+                             const KDTree&                   kdtree,
                              std::vector<std::string>* const results) {
-  if (results == nullptr) {
-    return -1;
-  }
-  auto objects = kdtree.GetObjects(center, radius);
+  if (results == nullptr) { return -1; }
+  auto                            objects = kdtree.GetObjects(center, radius);
   std::unordered_set<std::string> result_ids;
   result_ids.reserve(objects.size());
   for (const auto* object_ptr : objects) {

@@ -34,28 +34,25 @@ namespace hw {
 /// A collection of details data about a given ESD-CAN interface.
 class EsdCanDetails : public ::apollo::monitor::HwCheckResultDetails {
  public:
-  enum ValidMasks {
-    IF_STATUS = 0x1u,
-    STATS = 0x2u,
-    CTRL_STATE = 0x4u,
-    BITRATE = 0x8u
-  };
+  enum ValidMasks { IF_STATUS = 0x1u, STATS = 0x2u, CTRL_STATE = 0x4u, BITRATE = 0x8u };
 
-  EsdCanDetails() : result(NTCAN_NET_NOT_FOUND), valid_flag(0) {}
+  EsdCanDetails()
+      : result(NTCAN_NET_NOT_FOUND)
+      , valid_flag(0) {}
 
-  void print_summary(std::ostream &os) override;
+  void print_summary(std::ostream& os) override;
 
-  void print_test_result(std::ostream &os) override;
+  void print_test_result(std::ostream& os) override;
 
   /// Test (check) esdcan of the given id.
   /// @param stats where to store can bus stats.
   /// @param details where to store detailed can stats/state information.
   NTCAN_RESULT esdcan_do_test(int id);
 
-  CAN_IF_STATUS if_status;
+  CAN_IF_STATUS       if_status;
   NTCAN_BUS_STATISTIC stats;
-  NTCAN_CTRL_STATE ctrl_state;
-  NTCAN_BITRATE bitrate;
+  NTCAN_CTRL_STATE    ctrl_state;
+  NTCAN_BITRATE       bitrate;
 
   NTCAN_RESULT result;
   /// Bits flag indicating which fields are valid.
@@ -64,7 +61,7 @@ class EsdCanDetails : public ::apollo::monitor::HwCheckResultDetails {
  private:
   /// Invalidates all fields.
   inline void invalidate() {
-    result = NTCAN_NET_NOT_FOUND;
+    result     = NTCAN_NET_NOT_FOUND;
     valid_flag = 0;
   }
 

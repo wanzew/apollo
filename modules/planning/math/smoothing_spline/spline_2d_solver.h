@@ -42,8 +42,8 @@ class Spline2dSolver {
 
   // customize setup
   Spline2dConstraint* mutable_constraint();
-  Spline2dKernel* mutable_kernel();
-  Spline2d* mutable_spline();
+  Spline2dKernel*     mutable_kernel();
+  Spline2d*           mutable_spline();
 
   // solve
   bool Solve();
@@ -52,13 +52,13 @@ class Spline2dSolver {
   const Spline2d& spline() const;
 
  private:
-  Spline2d spline_;
-  Spline2dKernel kernel_;
-  Spline2dConstraint constraint_;
+  Spline2d                              spline_;
+  Spline2dKernel                        kernel_;
+  Spline2dConstraint                    constraint_;
   std::unique_ptr<::qpOASES::SQProblem> sqp_solver_;
 
-  int last_num_constraint_ = 0;
-  int last_num_param_ = 0;
+  int  last_num_constraint_  = 0;
+  int  last_num_param_       = 0;
   bool last_problem_success_ = false;
 };
 

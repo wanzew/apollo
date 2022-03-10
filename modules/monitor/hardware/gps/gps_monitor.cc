@@ -26,11 +26,13 @@ DEFINE_string(gps_hardware_name, "GPS", "Name of the GPS hardware.");
 DEFINE_string(gps_monitor_name, "GpsMonitor", "Name of the GPS monitor.");
 DEFINE_double(gps_monitor_interval, 3, "GPS status checking interval (s).");
 
-DEFINE_double(acceptable_gnss_best_pose_std_dev, 0.5,
+DEFINE_double(acceptable_gnss_best_pose_std_dev,
+              0.5,
               "Acceptable Gnss BestPose standard deviation on latitude, "
               "longitude and height.");
 
-DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 120,
+DEFINE_double(acceptable_gnss_best_pose_unstable_duration,
+              120,
               "Acceptable Gnss BestPose unstable duration in seconds.");
 
 namespace apollo {
@@ -39,19 +41,16 @@ namespace monitor {
 using apollo::common::adapter::AdapterManager;
 using apollo::drivers::gnss_status::InsStatus;
 
-GpsMonitor::GpsMonitor() : RecurrentRunner(FLAGS_gps_monitor_name,
-                                           FLAGS_gps_monitor_interval) {
-  CHECK(AdapterManager::GetGnssStatus()) <<
-      "GnssStatusAdapter is not initialized.";
-  CHECK(AdapterManager::GetInsStatus()) <<
-      "InsStatusAdapter is not initialized.";
+GpsMonitor::GpsMonitor()
+    : RecurrentRunner(FLAGS_gps_monitor_name, FLAGS_gps_monitor_interval) {
+  CHECK(AdapterManager::GetGnssStatus()) << "GnssStatusAdapter is not initialized.";
+  CHECK(AdapterManager::GetInsStatus()) << "InsStatusAdapter is not initialized.";
 }
 
 void GpsMonitor::RunOnce(const double current_time) {
-  static auto *status = MonitorManager::GetHardwareStatus(
-      FLAGS_gps_hardware_name);
+  static auto* status = MonitorManager::GetHardwareStatus(FLAGS_gps_hardware_name);
   // Check Gnss status.
-  auto *gnss_status_adapter = AdapterManager::GetGnssStatus();
+  auto* gnss_status_adapter = AdapterManager::GetGnssStatus();
   gnss_status_adapter->Observe();
   if (gnss_status_adapter->Empty()) {
     status->set_status(HardwareStatus::ERR);
@@ -65,7 +64,7 @@ void GpsMonitor::RunOnce(const double current_time) {
   }
 
   // Check Ins status.
-  auto *ins_status_adapter = AdapterManager::GetInsStatus();
+  auto* ins_status_adapter = AdapterManager::GetInsStatus();
   ins_status_adapter->Observe();
   if (ins_status_adapter->Empty()) {
     status->set_status(HardwareStatus::ERR);
@@ -77,8 +76,7 @@ void GpsMonitor::RunOnce(const double current_time) {
       status->set_status(HardwareStatus::NOT_READY);
       status->set_detailed_msg("INS ALIGNING");
       return;
-    case InsStatus::GOOD:
-      break;
+    case InsStatus::GOOD: break;
     case InsStatus::INVALID:
     default:
       status->set_status(HardwareStatus::ERR);
@@ -87,17 +85,16 @@ void GpsMonitor::RunOnce(const double current_time) {
   }
 
   // Check Gnss BestPose.
-  auto *best_pose_adapter = AdapterManager::GetGnssBestPose();
+  auto* best_pose_adapter = AdapterManager::GetGnssBestPose();
   best_pose_adapter->Observe();
   if (best_pose_adapter->Empty()) {
     status->set_status(HardwareStatus::ERR);
     status->set_detailed_msg("No Gnss BestPose message.");
     return;
   }
-  const auto &best_pose = best_pose_adapter->GetLatestObserved();
-  const double largest_std_dev = std::max({best_pose.latitude_std_dev(),
-                                           best_pose.longitude_std_dev(),
-                                           best_pose.height_std_dev()});
+  const auto&  best_pose       = best_pose_adapter->GetLatestObserved();
+  const double largest_std_dev = std::max(
+      {best_pose.latitude_std_dev(), best_pose.longitude_std_dev(), best_pose.height_std_dev()});
   if (largest_std_dev > FLAGS_acceptable_gnss_best_pose_std_dev) {
     status->set_status(HardwareStatus::GPS_UNSTABLE_WARNING);
     status->set_detailed_msg("GPS BestPose is unstable.");

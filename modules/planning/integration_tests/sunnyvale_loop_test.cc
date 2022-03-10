@@ -37,11 +37,11 @@ namespace planning {
 class SunnyvaleLoopTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
-    FLAGS_use_navigation_mode = false;
-    FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
-    FLAGS_test_base_map_filename = "base_map_test.bin";
-    FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
-    FLAGS_planning_upper_speed_limit = 12.5;
+    FLAGS_use_navigation_mode               = false;
+    FLAGS_map_dir                           = "modules/map/data/sunnyvale_loop";
+    FLAGS_test_base_map_filename            = "base_map_test.bin";
+    FLAGS_test_data_dir                     = "modules/planning/testdata/sunnyvale_loop_test";
+    FLAGS_planning_upper_speed_limit        = 12.5;
     FLAGS_use_multi_thread_to_add_obstacles = false;
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
     ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
@@ -54,11 +54,11 @@ class SunnyvaleLoopTest : public PlanningTestBase {
  * A cruise test case
  */
 TEST_F(SunnyvaleLoopTest, cruise) {
-  std::string seq_num = "1";
+  std::string seq_num              = "1";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -67,11 +67,11 @@ TEST_F(SunnyvaleLoopTest, cruise) {
  * stop case to trigger QP ST failed to solve
  */
 TEST_F(SunnyvaleLoopTest, stop) {
-  std::string seq_num = "2";
+  std::string seq_num              = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
@@ -82,11 +82,11 @@ TEST_F(SunnyvaleLoopTest, stop) {
  * A follow test case
  */
 TEST_F(SunnyvaleLoopTest, follow_01) {
-  std::string seq_num = "3";
+  std::string seq_num              = "3";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -96,11 +96,11 @@ TEST_F(SunnyvaleLoopTest, follow_01) {
  * A nudge test case
  */
 TEST_F(SunnyvaleLoopTest, nudge) {
-  std::string seq_num = "4";
+  std::string seq_num              = "4";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -110,11 +110,11 @@ TEST_F(SunnyvaleLoopTest, nudge) {
  * A follow test case
  */
 TEST_F(SunnyvaleLoopTest, follow_02) {
-  std::string seq_num = "5";
+  std::string seq_num              = "5";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -124,11 +124,11 @@ TEST_F(SunnyvaleLoopTest, follow_02) {
  * A follow test case
  */
 TEST_F(SunnyvaleLoopTest, follow_03) {
-  std::string seq_num = "6";
+  std::string seq_num              = "6";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -138,11 +138,11 @@ TEST_F(SunnyvaleLoopTest, follow_03) {
  * A slowdown test case
  */
 TEST_F(SunnyvaleLoopTest, slowdown_01) {
-  std::string seq_num = "7";
+  std::string seq_num              = "7";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -152,11 +152,11 @@ TEST_F(SunnyvaleLoopTest, slowdown_01) {
  * A right turn test case
  */
 TEST_F(SunnyvaleLoopTest, rightturn_01) {
-  std::string seq_num = "8";
+  std::string seq_num              = "8";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
@@ -168,12 +168,12 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
  * A traffic light test case
  */
 TEST_F(SunnyvaleLoopTest, rightturn_with_red_light) {
-  std::string seq_num = "8";
+  std::string seq_num              = "8";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_traffic_light_file = seq_num + "_traffic_light.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_traffic_light_file    = seq_num + "_traffic_light.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -183,11 +183,11 @@ TEST_F(SunnyvaleLoopTest, rightturn_with_red_light) {
  * A change lane test case
  */
 TEST_F(SunnyvaleLoopTest, change_lane) {
-  std::string seq_num = "9";
+  std::string seq_num              = "9";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_enable_prediction = false;
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_enable_prediction          = false;
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -198,16 +198,15 @@ TEST_F(SunnyvaleLoopTest, change_lane) {
 TEST_F(SunnyvaleLoopTest, mission_complete) {
   ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
 
-  std::string seq_num = "10";
+  std::string seq_num              = "10";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_enable_prediction = false;
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_enable_prediction          = false;
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::DESTINATION);
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
@@ -217,11 +216,11 @@ TEST_F(SunnyvaleLoopTest, mission_complete) {
  * test change lane with obstacle at target lane
  */
 TEST_F(SunnyvaleLoopTest, avoid_change_left) {
-  std::string seq_num = "11";
-  FLAGS_reckless_change_lane = true;
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  std::string seq_num              = "11";
+  FLAGS_reckless_change_lane       = true;
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
@@ -231,11 +230,11 @@ TEST_F(SunnyvaleLoopTest, avoid_change_left) {
  * test qp path failure
  */
 TEST_F(SunnyvaleLoopTest, qp_path_failure) {
-  std::string seq_num = "12";
-  FLAGS_reckless_change_lane = true;
-  FLAGS_enable_prediction = false;
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  std::string seq_num              = "12";
+  FLAGS_reckless_change_lane       = true;
+  FLAGS_enable_prediction          = false;
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
@@ -250,19 +249,18 @@ TEST_F(SunnyvaleLoopTest, qp_path_failure) {
 TEST_F(SunnyvaleLoopTest, change_lane_failback) {
   //// temporarly disable this test case, because a lane in routing cannot be
   //// found on test map.
-  auto target_lane = hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(
-      hdmap::MakeMapId("2020_1_-2"));
+  auto target_lane = hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(hdmap::MakeMapId("2020_1_-2"));
   if (target_lane == nullptr) {
     AERROR << "Could not find lane 2020_1_-2 on map " << hdmap::BaseMapFile();
     return;
   }
-  std::string seq_num = "13";
-  FLAGS_reckless_change_lane = true;
-  FLAGS_enable_prediction = true;
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  std::string seq_num              = "13";
+  FLAGS_reckless_change_lane       = true;
+  FLAGS_enable_prediction          = true;
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }

@@ -38,8 +38,8 @@ class SummaryMonitor : public RecurrentRunner {
   static void SummarizeModules();
   static void SummarizeHardware();
 
-  size_t system_status_fp_ = 0;
-  double last_broadcast_ = 0;
+  size_t                         system_status_fp_ = 0;
+  double                         last_broadcast_   = 0;
   std::unique_ptr<SafetyManager> safety_manager_;
 };
 

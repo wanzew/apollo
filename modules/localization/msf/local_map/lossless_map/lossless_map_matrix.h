@@ -72,8 +72,7 @@ struct LosslessMapCell {
   void Reset();
   /**@brief Set the value of a layer that layer_id > 0.
    * The target layer is found according to the altitude. */
-  void SetValueLayer(double altitude, unsigned char intensity,
-                     double altitude_thres = 10.0);
+  void SetValueLayer(double altitude, unsigned char intensity, double altitude_thres = 10.0);
   /**@brief Set the value.
    * @param <altitude> The altitude of the cell.
    * @param <intensity> The reflectance intensity.
@@ -162,16 +161,14 @@ class LosslessMapMatrix : public BaseMapMatrix {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int CreateBinary(unsigned char* buf,
-                                    unsigned int buf_size) const;
+  virtual unsigned int CreateBinary(unsigned char* buf, unsigned int buf_size) const;
   /**@brief Get the binary size of the object. */
   virtual unsigned int GetBinarySize() const;
   /**@brief get intensity image of node. */
   virtual void GetIntensityImg(cv::Mat* intensity_img) const;
 
   /**@brief Get a map cell. */
-  inline const LosslessMapCell& GetMapCell(unsigned int row,
-                                           unsigned int col) const {
+  inline const LosslessMapCell& GetMapCell(unsigned int row, unsigned int col) const {
     DCHECK_LT(row, rows_);
     DCHECK_LT(col, cols_);
     return map_cells_[row * cols_ + col];
@@ -183,12 +180,8 @@ class LosslessMapMatrix : public BaseMapMatrix {
     return map_cells_[row * cols_ + col];
   }
 
-  inline LosslessMapCell* operator[](int row) {
-    return map_cells_ + row * cols_;
-  }
-  inline const LosslessMapCell* operator[](int row) const {
-    return map_cells_ + row * cols_;
-  }
+  inline LosslessMapCell*       operator[](int row) { return map_cells_ + row * cols_; }
+  inline const LosslessMapCell* operator[](int row) const { return map_cells_ + row * cols_; }
 
  protected:
   /**@brief The number of rows. */

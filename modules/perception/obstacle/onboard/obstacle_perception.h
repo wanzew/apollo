@@ -32,12 +32,7 @@
 namespace apollo {
 namespace perception {
 
-enum ObstacleShowType {
-  SHOW_LIDAR = 0,
-  SHOW_RADAR = 1,
-  SHOW_FUSED = 2,
-  MAX_SHOW_TYPE
-};
+enum ObstacleShowType { SHOW_LIDAR = 0, SHOW_RADAR = 1, SHOW_FUSED = 2, MAX_SHOW_TYPE };
 
 class ObstaclePerception {
  public:
@@ -64,8 +59,7 @@ class ObstaclePerception {
    * @param out_objects The obstacle perception results
    * @return True if process successfully, false otherwise
    */
-  bool Process(SensorRawFrame* frame,
-               std::vector<std::shared_ptr<Object>>* out_objects);
+  bool Process(SensorRawFrame* frame, std::vector<std::shared_ptr<Object>>* out_objects);
 
  private:
   /**
@@ -74,15 +68,15 @@ class ObstaclePerception {
   void RegistAllAlgorithm();
 
   /// obstacle detector
-  std::unique_ptr<LidarProcess> lidar_perception_;
+  std::unique_ptr<LidarProcess>      lidar_perception_;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
-  std::unique_ptr<BaseFusion> fusion_;
+  std::unique_ptr<BaseFusion>        fusion_;
 
   /// visualization
   std::unique_ptr<OpenglVisualizer> frame_visualizer_ = nullptr;
-  ObstacleShowType obstacle_show_type_;
-  FrameContent frame_content_;
-  bool lidar_pose_inited_;
+  ObstacleShowType                  obstacle_show_type_;
+  FrameContent                      frame_content_;
+  bool                              lidar_pose_inited_;
 
   DISALLOW_COPY_AND_ASSIGN(ObstaclePerception);
 };  // class ObstaclePerception

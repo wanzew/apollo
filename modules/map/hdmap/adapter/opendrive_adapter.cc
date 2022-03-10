@@ -24,8 +24,7 @@ namespace apollo {
 namespace hdmap {
 namespace adapter {
 
-bool OpendriveAdapter::LoadData(const std::string& filename,
-                                apollo::hdmap::Map* pb_map) {
+bool OpendriveAdapter::LoadData(const std::string& filename, apollo::hdmap::Map* pb_map) {
   CHECK_NOTNULL(pb_map);
 
   tinyxml2::XMLDocument document;
@@ -39,7 +38,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
   CHECK(root_node != nullptr);
   // header
   PbHeader* map_header = pb_map->mutable_header();
-  Status status = HeaderXmlParser::Parse(*root_node, map_header);
+  Status    status     = HeaderXmlParser::Parse(*root_node, map_header);
   if (!status.ok()) {
     AERROR << "fail to parse opendrive header, " << status.error_message();
     return false;

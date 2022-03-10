@@ -36,7 +36,8 @@ class RoadGraph {
    * @param length The length to build the road graph.
    * @param lane_info_ptr The starting lane.
    */
-  RoadGraph(const double start_s, const double length,
+  RoadGraph(const double                           start_s,
+            const double                           length,
             std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
 
   /**
@@ -54,17 +55,18 @@ class RoadGraph {
    * @return If the given lane ID and lane s is on the lane graph
    */
   bool IsOnLaneGraph(std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
-                     const LaneGraph& lane_graph);
+                     const LaneGraph&                       lane_graph);
 
  private:
-  void ComputeLaneSequence(const double accumulated_s, const double start_s,
+  void ComputeLaneSequence(const double                           accumulated_s,
+                           const double                           start_s,
                            std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
-                           std::vector<LaneSegment>* const lane_segments,
-                           LaneGraph* const lane_graph_ptr) const;
+                           std::vector<LaneSegment>* const        lane_segments,
+                           LaneGraph* const                       lane_graph_ptr) const;
 
  private:
-  double start_s_ = 0;
-  double length_ = -1.0;
+  double                                 start_s_       = 0;
+  double                                 length_        = -1.0;
   std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr_ = nullptr;
 };
 

@@ -34,8 +34,7 @@ namespace common {
 
 class TransformListener {
  public:
-  TransformListener(tf2::BufferCore* buffer, ros::NodeHandle* nh,
-                    bool spin_thread = true);
+  TransformListener(tf2::BufferCore* buffer, ros::NodeHandle* nh, bool spin_thread = true);
 
   ~TransformListener();
 
@@ -51,14 +50,14 @@ class TransformListener {
 
   void CallbackImpl(tf2_msgs::TFMessage::ConstPtr tf, bool is_static);
 
-  ros::CallbackQueue tf_message_callback_queue_;
+  ros::CallbackQueue           tf_message_callback_queue_;
   std::unique_ptr<std::thread> dedicated_listener_thread_;
-  ros::NodeHandle* node_;  // Doesn't own NodeHandle
-  ros::Subscriber tf_subscriber_;
-  ros::Subscriber tf_static_subscriber_;
-  tf2::BufferCore* buffer_;
-  bool using_dedicated_thread_;
-  double last_update_;
+  ros::NodeHandle*             node_;  // Doesn't own NodeHandle
+  ros::Subscriber              tf_subscriber_;
+  ros::Subscriber              tf_static_subscriber_;
+  tf2::BufferCore*             buffer_;
+  bool                         using_dedicated_thread_;
+  double                       last_update_;
 
   static constexpr int kQueueSize = 100;
 };

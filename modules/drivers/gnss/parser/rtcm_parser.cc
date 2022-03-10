@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <std_msgs/String.h>
-#include <memory>
 #include "ros/include/ros/ros.h"
+#include <memory>
+#include <std_msgs/String.h>
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/drivers/gnss/gnss_gflags.h"
@@ -28,9 +28,9 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using ::apollo::drivers::gnss::GnssEphemeris;
-using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::common::adapter::AdapterManager;
+using ::apollo::drivers::gnss::EpochObservation;
+using ::apollo::drivers::gnss::GnssEphemeris;
 
 bool RtcmParser::Init() {
   rtcm_parser_.reset(Parser::CreateRtcmV3(true));
@@ -43,14 +43,12 @@ bool RtcmParser::Init() {
   return true;
 }
 
-void RtcmParser::ParseRtcmData(const std_msgs::String::ConstPtr &msg) {
-  if (!inited_flag_) {
-    return;
-  }
+void RtcmParser::ParseRtcmData(const std_msgs::String::ConstPtr& msg) {
+  if (!inited_flag_) { return; }
 
   rtcm_parser_->Update(msg->data);
   Parser::MessageType type;
-  MessagePtr msg_ptr;
+  MessagePtr          msg_ptr;
 
   while (ros::ok()) {
     type = rtcm_parser_->GetMessage(&msg_ptr);
@@ -63,16 +61,11 @@ void RtcmParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
   std_msgs::String msg_pub;
 
   switch (type) {
-    case Parser::MessageType::EPHEMERIDES:
-      PublishEphemeris(message);
-      break;
+    case Parser::MessageType::EPHEMERIDES: PublishEphemeris(message); break;
 
-    case Parser::MessageType::OBSERVATION:
-      PublishObservation(message);
-      break;
+    case Parser::MessageType::OBSERVATION: PublishObservation(message); break;
 
-    default:
-      break;
+    default: break;
   }
 }
 

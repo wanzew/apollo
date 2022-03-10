@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <unistd.h>
 #include <climits>
 #include <fstream>
 #include <sstream>
+#include <unistd.h>
 
 #include "google/protobuf/text_format.h"
 #include "modules/common/adapters/adapter_manager.h"
@@ -42,8 +42,7 @@ uint32_t ThirdPartyPerceptionTestBase::s_seq_num_ = 0;
 
 void ThirdPartyPerceptionTestBase::SetUpTestCase() {
   ros::Time::init();
-  FLAGS_adapter_config_filename =
-      "modules/third_party_perception/testdata/conf/adapter.conf";
+  FLAGS_adapter_config_filename = "modules/third_party_perception/testdata/conf/adapter.conf";
 }
 
 void ThirdPartyPerceptionTestBase::SetUp() { ++s_seq_num_; }

@@ -54,7 +54,7 @@ class ControllerAgent {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  common::Status Init(const ControlConf *control_conf);
+  common::Status Init(const ControlConf* control_conf);
 
   /**
    * @brief compute control command based on current vehicle status
@@ -65,10 +65,10 @@ class ControllerAgent {
    * @param cmd control command
    * @return Status computation status
    */
-  common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      control::ControlCommand *cmd);
+  common::Status ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                                       const canbus::Chassis*                    chassis,
+                                       const planning::ADCTrajectory*            trajectory,
+                                       control::ControlCommand*                  cmd);
 
   /**
    * @brief reset ControllerAgent
@@ -82,14 +82,13 @@ class ControllerAgent {
    * Register new controllers. If you need to add a new type of controller,
    * You should first register your controller in this function.
    */
-  void RegisterControllers(const ControlConf *control_conf);
+  void RegisterControllers(const ControlConf* control_conf);
 
-  common::Status InitializeConf(const ControlConf *control_conf);
+  common::Status InitializeConf(const ControlConf* control_conf);
 
-  const ControlConf *control_conf_ = nullptr;
-  common::util::Factory<ControlConf::ControllerType, Controller>
-      controller_factory_;
-  std::vector<std::unique_ptr<Controller>> controller_list_;
+  const ControlConf*                                             control_conf_ = nullptr;
+  common::util::Factory<ControlConf::ControllerType, Controller> controller_factory_;
+  std::vector<std::unique_ptr<Controller>>                       controller_list_;
 };
 
 }  // namespace control

@@ -17,21 +17,21 @@
 #ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_DRIVER_INPUT_H_
 #define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_DRIVER_INPUT_H_
 
+#include "rslidar_msgs/rslidarScan.h"
 #include <ros/ros.h>
+#include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <signal.h>
-#include "rslidar_msgs/rslidarScan.h"
 
 namespace apollo {
 namespace drivers {
 namespace rslidar {
 
-static const size_t FIRING_DATA_PACKET_SIZE = 1248;  //1206
+static const size_t FIRING_DATA_PACKET_SIZE      = 1248;  // 1206
 static const size_t POSITIONING_DATA_PACKET_SIZE = 512;
-static const size_t ETHERNET_HEADER_SIZE = 42;
-static const int SOCKET_TIMEOUT = -2;
-static const int RECIEVE_FAIL = -3;
+static const size_t ETHERNET_HEADER_SIZE         = 42;
+static const int    SOCKET_TIMEOUT               = -2;
+static const int    RECIEVE_FAIL                 = -3;
 
 struct NMEATime {
   uint16_t year;
@@ -48,17 +48,16 @@ class Input {
  public:
   Input() {}
   virtual ~Input() {}
-  virtual int get_msop_data_packet(rslidar_msgs::rslidarPacket* pkt) = 0;
+  virtual int  get_msop_data_packet(rslidar_msgs::rslidarPacket* pkt) = 0;
   virtual void init() {}
   virtual void init(int& port) {}
 
  protected:
-  bool exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
-                                    const uint8_t* bytes);
+  bool exract_nmea_time_from_packet(const NMEATimePtr& nmea_time, const uint8_t* bytes);
 };
 
 }  // namespace rslidar
 }  // namespace drivers
 }  // namespace apollo
 
-#endif 
+#endif

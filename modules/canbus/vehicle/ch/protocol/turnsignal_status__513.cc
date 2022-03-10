@@ -28,8 +28,9 @@ using ::apollo::drivers::canbus::Byte;
 Turnsignalstatus513::Turnsignalstatus513() {}
 const int32_t Turnsignalstatus513::ID = 0x513;
 
-void Turnsignalstatus513::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
+void Turnsignalstatus513::Parse(const std::uint8_t* bytes,
+                                int32_t             length,
+                                ChassisDetail*      chassis) const {
   chassis->mutable_ch()->mutable_turnsignal_status__513()->set_turn_signal_sts(
       turn_signal_sts(bytes, length));
 }
@@ -40,9 +41,8 @@ void Turnsignalstatus513::Parse(const std::uint8_t* bytes, int32_t length,
 // 'turn_signal_sts', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|2]', 'bit': 0, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 Turnsignal_status__513::Turn_signal_stsType
-Turnsignalstatus513::turn_signal_sts(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte t0(bytes + 0);
+Turnsignalstatus513::turn_signal_sts(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
   return static_cast<Turnsignal_status__513::Turn_signal_stsType>(x);

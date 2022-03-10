@@ -60,7 +60,7 @@ struct AABoxKDTreeParams {
 template <class ObjectType>
 class AABoxKDTree2dNode {
  public:
-  using ObjectPtr = const ObjectType *;
+  using ObjectPtr = const ObjectType*;
   /**
    * @brief Constructor which takes a vector of objects,
    *        parameters and depth of the node.
@@ -68,8 +68,9 @@ class AABoxKDTree2dNode {
    * @param params Parameters to build the KD-tree.
    * @param depth Depth of the KD-tree node.
    */
-  AABoxKDTree2dNode(const std::vector<ObjectPtr> &objects,
-                    const AABoxKDTreeParams &params, int depth)
+  AABoxKDTree2dNode(const std::vector<ObjectPtr>& objects,
+                    const AABoxKDTreeParams&      params,
+                    int                           depth)
       : depth_(depth) {
     CHECK(!objects.empty());
 
@@ -83,12 +84,12 @@ class AABoxKDTree2dNode {
 
       // Split to sub-nodes.
       if (!left_subnode_objects.empty()) {
-        left_subnode_.reset(new AABoxKDTree2dNode<ObjectType>(
-            left_subnode_objects, params, depth + 1));
+        left_subnode_.reset(
+            new AABoxKDTree2dNode<ObjectType>(left_subnode_objects, params, depth + 1));
       }
       if (!right_subnode_objects.empty()) {
-        right_subnode_.reset(new AABoxKDTree2dNode<ObjectType>(
-            right_subnode_objects, params, depth + 1));
+        right_subnode_.reset(
+            new AABoxKDTree2dNode<ObjectType>(right_subnode_objects, params, depth + 1));
       }
     } else {
       InitObjects(objects);
@@ -101,9 +102,9 @@ class AABoxKDTree2dNode {
    * @param point The target point. Search it's nearest object.
    * @return The nearest object to the target point.
    */
-  ObjectPtr GetNearestObject(const Vec2d &point) const {
-    ObjectPtr nearest_object = nullptr;
-    double min_distance_sqr = std::numeric_limits<double>::infinity();
+  ObjectPtr GetNearestObject(const Vec2d& point) const {
+    ObjectPtr nearest_object   = nullptr;
+    double    min_distance_sqr = std::numeric_limits<double>::infinity();
     GetNearestObjectInternal(point, &min_distance_sqr, &nearest_object);
     return nearest_object;
   }
@@ -115,8 +116,7 @@ class AABoxKDTree2dNode {
    * @param distance The radius of the range to search objects.
    * @return All objects within the specified distance to the specified point.
    */
-  std::vector<ObjectPtr> GetObjects(const Vec2d &point,
-                                    const double distance) const {
+  std::vector<ObjectPtr> GetObjects(const Vec2d& point, const double distance) const {
     std::vector<ObjectPtr> result_objects;
     GetObjectsInternal(point, distance, Square(distance), &result_objects);
     return result_objects;
@@ -126,58 +126,46 @@ class AABoxKDTree2dNode {
    * @brief Get the axis-aligned bounding box of the objects.
    * @return The axis-aligned bounding box of the objects.
    */
-  AABox2d GetBoundingBox() const {
-    return AABox2d({min_x_, min_y_}, {max_x_, max_y_});
-  }
+  AABox2d GetBoundingBox() const { return AABox2d({min_x_, min_y_}, {max_x_, max_y_}); }
 
  private:
-  void InitObjects(const std::vector<ObjectPtr> &objects) {
-    num_objects_ = objects.size();
+  void InitObjects(const std::vector<ObjectPtr>& objects) {
+    num_objects_           = objects.size();
     objects_sorted_by_min_ = objects;
     objects_sorted_by_max_ = objects;
     std::sort(objects_sorted_by_min_.begin(), objects_sorted_by_min_.end(),
               [&](ObjectPtr obj1, ObjectPtr obj2) {
-                return partition_ == PARTITION_X
-                           ? obj1->aabox().min_x() < obj2->aabox().min_x()
-                           : obj1->aabox().min_y() < obj2->aabox().min_y();
+                return partition_ == PARTITION_X ? obj1->aabox().min_x() < obj2->aabox().min_x() :
+                                                   obj1->aabox().min_y() < obj2->aabox().min_y();
               });
     std::sort(objects_sorted_by_max_.begin(), objects_sorted_by_max_.end(),
               [&](ObjectPtr obj1, ObjectPtr obj2) {
-                return partition_ == PARTITION_X
-                           ? obj1->aabox().max_x() > obj2->aabox().max_x()
-                           : obj1->aabox().max_y() > obj2->aabox().max_y();
+                return partition_ == PARTITION_X ? obj1->aabox().max_x() > obj2->aabox().max_x() :
+                                                   obj1->aabox().max_y() > obj2->aabox().max_y();
               });
     objects_sorted_by_min_bound_.reserve(num_objects_);
     for (ObjectPtr object : objects_sorted_by_min_) {
-      objects_sorted_by_min_bound_.push_back(partition_ == PARTITION_X
-                                                 ? object->aabox().min_x()
-                                                 : object->aabox().min_y());
+      objects_sorted_by_min_bound_.push_back(partition_ == PARTITION_X ? object->aabox().min_x() :
+                                                                         object->aabox().min_y());
     }
     objects_sorted_by_max_bound_.reserve(num_objects_);
     for (ObjectPtr object : objects_sorted_by_max_) {
-      objects_sorted_by_max_bound_.push_back(partition_ == PARTITION_X
-                                                 ? object->aabox().max_x()
-                                                 : object->aabox().max_y());
+      objects_sorted_by_max_bound_.push_back(partition_ == PARTITION_X ? object->aabox().max_x() :
+                                                                         object->aabox().max_y());
     }
   }
 
-  bool SplitToSubNodes(const std::vector<ObjectPtr> &objects,
-                       const AABoxKDTreeParams &params) {
-    if (params.max_depth >= 0 && depth_ >= params.max_depth) {
-      return false;
-    }
-    if (static_cast<int>(objects.size()) <= std::max(1, params.max_leaf_size)) {
-      return false;
-    }
+  bool SplitToSubNodes(const std::vector<ObjectPtr>& objects, const AABoxKDTreeParams& params) {
+    if (params.max_depth >= 0 && depth_ >= params.max_depth) { return false; }
+    if (static_cast<int>(objects.size()) <= std::max(1, params.max_leaf_size)) { return false; }
     if (params.max_leaf_dimension >= 0.0 &&
-        std::max(max_x_ - min_x_, max_y_ - min_y_) <=
-            params.max_leaf_dimension) {
+        std::max(max_x_ - min_x_, max_y_ - min_y_) <= params.max_leaf_dimension) {
       return false;
     }
     return true;
   }
 
-  double LowerDistanceSquareToPoint(const Vec2d &point) const {
+  double LowerDistanceSquareToPoint(const Vec2d& point) const {
     double dx = 0.0;
     if (point.x() < min_x_) {
       dx = min_x_ - point.x();
@@ -193,32 +181,24 @@ class AABoxKDTree2dNode {
     return dx * dx + dy * dy;
   }
 
-  double UpperDistanceSquareToPoint(const Vec2d &point) const {
-    const double dx =
-        (point.x() > mid_x_ ? (point.x() - min_x_) : (point.x() - max_x_));
-    const double dy =
-        (point.y() > mid_y_ ? (point.y() - min_y_) : (point.y() - max_y_));
+  double UpperDistanceSquareToPoint(const Vec2d& point) const {
+    const double dx = (point.x() > mid_x_ ? (point.x() - min_x_) : (point.x() - max_x_));
+    const double dy = (point.y() > mid_y_ ? (point.y() - min_y_) : (point.y() - max_y_));
     return dx * dx + dy * dy;
   }
 
-  void GetAllObjects(std::vector<ObjectPtr> *const result_objects) const {
-    result_objects->insert(result_objects->end(),
-                           objects_sorted_by_min_.begin(),
+  void GetAllObjects(std::vector<ObjectPtr>* const result_objects) const {
+    result_objects->insert(result_objects->end(), objects_sorted_by_min_.begin(),
                            objects_sorted_by_min_.end());
-    if (left_subnode_ != nullptr) {
-      left_subnode_->GetAllObjects(result_objects);
-    }
-    if (right_subnode_ != nullptr) {
-      right_subnode_->GetAllObjects(result_objects);
-    }
+    if (left_subnode_ != nullptr) { left_subnode_->GetAllObjects(result_objects); }
+    if (right_subnode_ != nullptr) { right_subnode_->GetAllObjects(result_objects); }
   }
 
-  void GetObjectsInternal(const Vec2d &point, const double distance,
-                          const double distance_sqr,
-                          std::vector<ObjectPtr> *const result_objects) const {
-    if (LowerDistanceSquareToPoint(point) > distance_sqr) {
-      return;
-    }
+  void GetObjectsInternal(const Vec2d&                  point,
+                          const double                  distance,
+                          const double                  distance_sqr,
+                          std::vector<ObjectPtr>* const result_objects) const {
+    if (LowerDistanceSquareToPoint(point) > distance_sqr) { return; }
     if (UpperDistanceSquareToPoint(point) <= distance_sqr) {
       GetAllObjects(result_objects);
       return;
@@ -227,103 +207,79 @@ class AABoxKDTree2dNode {
     if (pvalue < partition_position_) {
       const double limit = pvalue + distance;
       for (int i = 0; i < num_objects_; ++i) {
-        if (objects_sorted_by_min_bound_[i] > limit) {
-          break;
-        }
+        if (objects_sorted_by_min_bound_[i] > limit) { break; }
         ObjectPtr object = objects_sorted_by_min_[i];
-        if (object->DistanceSquareTo(point) <= distance_sqr) {
-          result_objects->push_back(object);
-        }
+        if (object->DistanceSquareTo(point) <= distance_sqr) { result_objects->push_back(object); }
       }
     } else {
       const double limit = pvalue - distance;
       for (int i = 0; i < num_objects_; ++i) {
-        if (objects_sorted_by_max_bound_[i] < limit) {
-          break;
-        }
+        if (objects_sorted_by_max_bound_[i] < limit) { break; }
         ObjectPtr object = objects_sorted_by_max_[i];
-        if (object->DistanceSquareTo(point) <= distance_sqr) {
-          result_objects->push_back(object);
-        }
+        if (object->DistanceSquareTo(point) <= distance_sqr) { result_objects->push_back(object); }
       }
     }
     if (left_subnode_ != nullptr) {
-      left_subnode_->GetObjectsInternal(point, distance, distance_sqr,
-                                        result_objects);
+      left_subnode_->GetObjectsInternal(point, distance, distance_sqr, result_objects);
     }
     if (right_subnode_ != nullptr) {
-      right_subnode_->GetObjectsInternal(point, distance, distance_sqr,
-                                         result_objects);
+      right_subnode_->GetObjectsInternal(point, distance, distance_sqr, result_objects);
     }
   }
 
-  void GetNearestObjectInternal(const Vec2d &point,
-                                double *const min_distance_sqr,
-                                ObjectPtr *const nearest_object) const {
-    if (LowerDistanceSquareToPoint(point) >= *min_distance_sqr - kMathEpsilon) {
-      return;
-    }
-    const double pvalue = (partition_ == PARTITION_X ? point.x() : point.y());
-    const bool search_left_first = (pvalue < partition_position_);
+  void GetNearestObjectInternal(const Vec2d&     point,
+                                double* const    min_distance_sqr,
+                                ObjectPtr* const nearest_object) const {
+    if (LowerDistanceSquareToPoint(point) >= *min_distance_sqr - kMathEpsilon) { return; }
+    const double pvalue            = (partition_ == PARTITION_X ? point.x() : point.y());
+    const bool   search_left_first = (pvalue < partition_position_);
     if (search_left_first) {
       if (left_subnode_ != nullptr) {
-        left_subnode_->GetNearestObjectInternal(point, min_distance_sqr,
-                                                nearest_object);
+        left_subnode_->GetNearestObjectInternal(point, min_distance_sqr, nearest_object);
       }
     } else {
       if (right_subnode_ != nullptr) {
-        right_subnode_->GetNearestObjectInternal(point, min_distance_sqr,
-                                                 nearest_object);
+        right_subnode_->GetNearestObjectInternal(point, min_distance_sqr, nearest_object);
       }
     }
-    if (*min_distance_sqr <= kMathEpsilon) {
-      return;
-    }
+    if (*min_distance_sqr <= kMathEpsilon) { return; }
 
     if (search_left_first) {
       for (int i = 0; i < num_objects_; ++i) {
         const double bound = objects_sorted_by_min_bound_[i];
-        if (bound > pvalue && Square(bound - pvalue) > *min_distance_sqr) {
-          break;
-        }
-        ObjectPtr object = objects_sorted_by_min_[i];
+        if (bound > pvalue && Square(bound - pvalue) > *min_distance_sqr) { break; }
+        ObjectPtr    object       = objects_sorted_by_min_[i];
         const double distance_sqr = object->DistanceSquareTo(point);
         if (distance_sqr < *min_distance_sqr) {
           *min_distance_sqr = distance_sqr;
-          *nearest_object = object;
+          *nearest_object   = object;
         }
       }
     } else {
       for (int i = 0; i < num_objects_; ++i) {
         const double bound = objects_sorted_by_max_bound_[i];
-        if (bound < pvalue && Square(bound - pvalue) > *min_distance_sqr) {
-          break;
-        }
-        ObjectPtr object = objects_sorted_by_max_[i];
+        if (bound < pvalue && Square(bound - pvalue) > *min_distance_sqr) { break; }
+        ObjectPtr    object       = objects_sorted_by_max_[i];
         const double distance_sqr = object->DistanceSquareTo(point);
         if (distance_sqr < *min_distance_sqr) {
           *min_distance_sqr = distance_sqr;
-          *nearest_object = object;
+          *nearest_object   = object;
         }
       }
     }
-    if (*min_distance_sqr <= kMathEpsilon) {
-      return;
-    }
+    if (*min_distance_sqr <= kMathEpsilon) { return; }
     if (search_left_first) {
       if (right_subnode_ != nullptr) {
-        right_subnode_->GetNearestObjectInternal(point, min_distance_sqr,
-                                                 nearest_object);
+        right_subnode_->GetNearestObjectInternal(point, min_distance_sqr, nearest_object);
       }
     } else {
       if (left_subnode_ != nullptr) {
-        left_subnode_->GetNearestObjectInternal(point, min_distance_sqr,
-                                                nearest_object);
+        left_subnode_->GetNearestObjectInternal(point, min_distance_sqr, nearest_object);
       }
     }
   }
 
-  void ComputeBoundary(const std::vector<ObjectPtr> &objects) {
+  void ComputeBoundary(const std::vector<ObjectPtr>& objects) {
     min_x_ = std::numeric_limits<double>::infinity();
     min_y_ = std::numeric_limits<double>::infinity();
     max_x_ = -std::numeric_limits<double>::infinity();
@@ -336,24 +292,23 @@ class AABoxKDTree2dNode {
     }
     mid_x_ = (min_x_ + max_x_) / 2.0;
     mid_y_ = (min_y_ + max_y_) / 2.0;
-    CHECK(!std::isinf(max_x_) && !std::isinf(max_y_) && !std::isinf(min_x_) &&
-          !std::isinf(min_y_))
+    CHECK(!std::isinf(max_x_) && !std::isinf(max_y_) && !std::isinf(min_x_) && !std::isinf(min_y_))
         << "the provided object box size is infinity";
   }
 
   void ComputePartition() {
     if (max_x_ - min_x_ >= max_y_ - min_y_) {
-      partition_ = PARTITION_X;
+      partition_          = PARTITION_X;
       partition_position_ = (min_x_ + max_x_) / 2.0;
     } else {
-      partition_ = PARTITION_Y;
+      partition_          = PARTITION_Y;
       partition_position_ = (min_y_ + max_y_) / 2.0;
     }
   }
 
-  void PartitionObjects(const std::vector<ObjectPtr> &objects,
-                        std::vector<ObjectPtr> *const left_subnode_objects,
-                        std::vector<ObjectPtr> *const right_subnode_objects) {
+  void PartitionObjects(const std::vector<ObjectPtr>& objects,
+                        std::vector<ObjectPtr>* const left_subnode_objects,
+                        std::vector<ObjectPtr>* const right_subnode_objects) {
     left_subnode_objects->clear();
     right_subnode_objects->clear();
     std::vector<ObjectPtr> other_objects;
@@ -382,12 +337,12 @@ class AABoxKDTree2dNode {
   }
 
  private:
-  int num_objects_ = 0;
+  int                    num_objects_ = 0;
   std::vector<ObjectPtr> objects_sorted_by_min_;
   std::vector<ObjectPtr> objects_sorted_by_max_;
-  std::vector<double> objects_sorted_by_min_bound_;
-  std::vector<double> objects_sorted_by_max_bound_;
-  int depth_ = 0;
+  std::vector<double>    objects_sorted_by_min_bound_;
+  std::vector<double>    objects_sorted_by_max_bound_;
+  int                    depth_ = 0;
 
   // Boundary
   double min_x_ = 0.0;
@@ -401,10 +356,10 @@ class AABoxKDTree2dNode {
     PARTITION_X = 1,
     PARTITION_Y = 2,
   };
-  Partition partition_ = PARTITION_X;
-  double partition_position_ = 0.0;
+  Partition partition_          = PARTITION_X;
+  double    partition_position_ = 0.0;
 
-  std::unique_ptr<AABoxKDTree2dNode<ObjectType>> left_subnode_ = nullptr;
+  std::unique_ptr<AABoxKDTree2dNode<ObjectType>> left_subnode_  = nullptr;
   std::unique_ptr<AABoxKDTree2dNode<ObjectType>> right_subnode_ = nullptr;
 };
 
@@ -415,17 +370,16 @@ class AABoxKDTree2dNode {
 template <class ObjectType>
 class AABoxKDTree2d {
  public:
-  using ObjectPtr = const ObjectType *;
+  using ObjectPtr = const ObjectType*;
 
   /**
    * @brief Contructor which takes a vector of objects and parameters.
    * @param params Parameters to build the KD-tree.
    */
-  AABoxKDTree2d(const std::vector<ObjectType> &objects,
-                const AABoxKDTreeParams &params) {
+  AABoxKDTree2d(const std::vector<ObjectType>& objects, const AABoxKDTreeParams& params) {
     if (!objects.empty()) {
       std::vector<ObjectPtr> object_ptrs;
-      for (const auto &object : objects) {
+      for (const auto& object : objects) {
         object_ptrs.push_back(&object);
       }
       root_.reset(new AABoxKDTree2dNode<ObjectType>(object_ptrs, params, 0));
@@ -437,7 +391,7 @@ class AABoxKDTree2d {
    * @param point The target point. Search it's nearest object.
    * @return The nearest object to the target point.
    */
-  ObjectPtr GetNearestObject(const Vec2d &point) const {
+  ObjectPtr GetNearestObject(const Vec2d& point) const {
     return root_ == nullptr ? nullptr : root_->GetNearestObject(point);
   }
 
@@ -447,11 +401,8 @@ class AABoxKDTree2d {
    * @param distance The radius of the range to search objects.
    * @return All objects within the specified distance to the specified point.
    */
-  std::vector<ObjectPtr> GetObjects(const Vec2d &point,
-                                    const double distance) const {
-    if (root_ == nullptr) {
-      return {};
-    }
+  std::vector<ObjectPtr> GetObjects(const Vec2d& point, const double distance) const {
+    if (root_ == nullptr) { return {}; }
     return root_->GetObjects(point, distance);
   }
 
@@ -459,9 +410,7 @@ class AABoxKDTree2d {
    * @brief Get the axis-aligned bounding box of the objects.
    * @return The axis-aligned bounding box of the objects.
    */
-  AABox2d GetBoundingBox() const {
-    return root_ == nullptr ? AABox2d() : root_->GetBoundingBox();
-  }
+  AABox2d GetBoundingBox() const { return root_ == nullptr ? AABox2d() : root_->GetBoundingBox(); }
 
  private:
   std::unique_ptr<AABoxKDTree2dNode<ObjectType>> root_ = nullptr;

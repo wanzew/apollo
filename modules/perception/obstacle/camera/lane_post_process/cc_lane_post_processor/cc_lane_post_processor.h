@@ -44,30 +44,31 @@ namespace perception {
 #define CUDA_CC false
 #define USE_HISTORY_TO_EXTEND_LANE false
 struct CCLanePostProcessorOptions {
-  SpaceType space_type;
-  ScalarType lane_map_conf_thresh;
-  ScalarType cc_split_siz;
-  int cc_split_len;
+  SpaceType        space_type;
+  ScalarType       lane_map_conf_thresh;
+  ScalarType       cc_split_siz;
+  int              cc_split_len;
   LaneFrameOptions frame;
 
   CCLanePostProcessorOptions()
-      : space_type(SpaceType::VEHICLE),
-        lane_map_conf_thresh(0.5),
-        cc_split_siz(100.0),
-        cc_split_len(50) {}
+      : space_type(SpaceType::VEHICLE)
+      , lane_map_conf_thresh(0.5)
+      , cc_split_siz(100.0)
+      , cc_split_len(50) {}
 };
 
 class CCLanePostProcessor : public BaseCameraLanePostProcessor {
  public:
-  CCLanePostProcessor() : BaseCameraLanePostProcessor() {}
+  CCLanePostProcessor()
+      : BaseCameraLanePostProcessor() {}
 
   ~CCLanePostProcessor() {}
 
   bool Init() override;
 
-  bool Process(const cv::Mat &lane_map,
-               const CameraLanePostProcessOptions &options,
-               LaneObjectsPtr *lane_instances) override;
+  bool Process(const cv::Mat&                      lane_map,
+               const CameraLanePostProcessOptions& options,
+               LaneObjectsPtr*                     lane_instances) override;
 
   void set_max_distance_to_see(ScalarType max_distance_to_see) {
     max_distance_to_see_ = max_distance_to_see;
@@ -80,23 +81,19 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   cv::Rect roi() const { return roi_; }
 
-  const std::shared_ptr<LaneFrame> &cur_frame() { return cur_frame_; }
+  const std::shared_ptr<LaneFrame>& cur_frame() { return cur_frame_; }
 
-  std::shared_ptr<std::vector<LaneInstance>> &cur_lane_instances() {
-    return cur_lane_instances_;
-  }
+  std::shared_ptr<std::vector<LaneInstance>>& cur_lane_instances() { return cur_lane_instances_; }
 
  protected:
   // @brief: add instance into a lane object
-  bool AddInstanceIntoLaneObject(const LaneInstance &instance,
-                                 LaneObject *lane_object);
+  bool AddInstanceIntoLaneObject(const LaneInstance& instance, LaneObject* lane_object);
 
   // @brief: add instance into a lane object (for "image" mode)
-  bool AddInstanceIntoLaneObjectImage(const LaneInstance &instance,
-                                      LaneObject *lane_object);
+  bool AddInstanceIntoLaneObjectImage(const LaneInstance& instance, LaneObject* lane_object);
 
   // @brief: generate lane instances from lane map (using lane_frame)
-  bool GenerateLaneInstances(const cv::Mat &lane_map);
+  bool GenerateLaneInstances(const cv::Mat& lane_map);
 
   bool CompensateLaneObjects(LaneObjectsPtr lane_objects);
 
@@ -106,11 +103,10 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   void FilterWithLaneHistory(LaneObjectsPtr lane_objects);
 
-  bool CorrectWithLaneHistory(int l, LaneObjectsPtr lane_objects,
-                              std::vector<bool> *is_valid);
-  bool FindLane(const LaneObjects &lane_objects, int spatial_label, int *index);
+  bool CorrectWithLaneHistory(int l, LaneObjectsPtr lane_objects, std::vector<bool>* is_valid);
+  bool FindLane(const LaneObjects& lane_objects, int spatial_label, int* index);
 
-  void ExtendLaneWithHistory(const LaneObject &history, LaneObject *lane);
+  void ExtendLaneWithHistory(const LaneObject& history, LaneObject* lane);
 
  private:
   CCLanePostProcessorOptions options_;
@@ -118,37 +114,37 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
   std::shared_ptr<NonMask> non_mask_;
 
   double time_stamp_ = 0.0;
-  int frame_id_ = -1;
+  int    frame_id_   = -1;
 #if CUDA_CC
   std::shared_ptr<ConnectedComponentGeneratorGPU> cc_generator_;
 #else
   std::shared_ptr<ConnectedComponentGenerator> cc_generator_;
 #endif
   std::shared_ptr<LaneFrame> cur_frame_;
-  LaneInstancesPtr cur_lane_instances_;
+  LaneInstancesPtr           cur_lane_instances_;
 
   ScalarType max_distance_to_see_ = 500.0;
-  int image_width_ = 1080;
-  int image_height_ = 1920;
-  cv::Rect roi_;
+  int        image_width_         = 1080;
+  int        image_height_        = 1920;
+  cv::Rect   roi_;
 
   double scale_;
-  int start_y_pos_;
-  bool is_x_longitude_ = true;
+  int    start_y_pos_;
+  bool   is_x_longitude_ = true;
 
   std::shared_ptr<Projector<ScalarType>> projector_;
 
   bool is_init_ = false;
-  bool vis_ = false;
+  bool vis_     = false;
 
   lane_post_process_config::ModelConfigs config_;
 
-  bool use_history_ = false;
+  bool                                use_history_ = false;
   boost::circular_buffer<LaneObjects> lane_history_;
-  MotionBufferPtr motion_buffer_ = nullptr;
-  const std::vector<SpatialLabelType> interested_labels_ = {
-      SpatialLabelType::L_0, SpatialLabelType::R_0};
-  LaneObjectsPtr generated_lanes_ = nullptr;
+  MotionBufferPtr                     motion_buffer_     = nullptr;
+  const std::vector<SpatialLabelType> interested_labels_ = {SpatialLabelType::L_0,
+                                                            SpatialLabelType::R_0};
+  LaneObjectsPtr                      generated_lanes_   = nullptr;
   DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
 };
 

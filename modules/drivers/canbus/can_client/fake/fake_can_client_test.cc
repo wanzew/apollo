@@ -32,7 +32,7 @@ namespace drivers {
 namespace canbus {
 namespace can {
 
-using Clock = common::time::Clock;
+using Clock  = common::time::Clock;
 using micros = common::time::micros;
 using apollo::common::ErrorCode;
 
@@ -41,12 +41,12 @@ class FakeCanClientTest : public ::testing::Test {
   static const int32_t FRAME_LEN = 10;
 
   virtual void SetUp() {
-    send_time_ = 0;
-    recv_time_ = 0;
+    send_time_       = 0;
+    recv_time_       = 0;
     send_succ_count_ = 0;
     recv_succ_count_ = 0;
-    send_err_count_ = 0;
-    recv_err_count_ = 0;
+    send_err_count_  = 0;
+    recv_err_count_  = 0;
     param_.set_brand(CANCardParameter::ESD_CAN);
     param_.set_channel_id(CANCardParameter::CHANNEL_ID_ZERO);
     send_client_ = std::unique_ptr<FakeCanClient>(new FakeCanClient());
@@ -61,22 +61,22 @@ class FakeCanClientTest : public ::testing::Test {
   std::unique_ptr<FakeCanClient> send_client_;
   std::unique_ptr<FakeCanClient> recv_client_;
 
-  int64_t send_time_ = 0;
-  int64_t recv_time_ = 0;
-  int32_t send_succ_count_ = 0;
-  int32_t recv_succ_count_ = 0;
-  int32_t send_err_count_ = 0;
-  int32_t recv_err_count_ = 0;
+  int64_t           send_time_       = 0;
+  int64_t           recv_time_       = 0;
+  int32_t           send_succ_count_ = 0;
+  int32_t           recv_succ_count_ = 0;
+  int32_t           send_err_count_  = 0;
+  int32_t           recv_err_count_  = 0;
   std::stringstream recv_ss_;
-  CANCardParameter param_;
+  CANCardParameter  param_;
 };
 
 TEST_F(FakeCanClientTest, SendMessage) {
   std::vector<CanFrame> frames;
   frames.resize(FRAME_LEN);
   for (int32_t i = 0; i < FRAME_LEN; ++i) {
-    frames[i].id = 1 & 0x3FF;
-    frames[i].len = 8;
+    frames[i].id      = 1 & 0x3FF;
+    frames[i].len     = 8;
     frames[i].data[7] = 1 % 256;
     for (int32_t j = 0; j < 7; ++j) {
       frames[i].data[j] = j;
@@ -84,7 +84,7 @@ TEST_F(FakeCanClientTest, SendMessage) {
   }
 
   int32_t frame_num = FRAME_LEN;
-  auto ret = send_client_->Send(frames, &frame_num);
+  auto    ret       = send_client_->Send(frames, &frame_num);
   EXPECT_EQ(ret, ErrorCode::OK);
   EXPECT_EQ(send_client_->GetErrorString(0), "");
   send_client_->Stop();
@@ -92,7 +92,7 @@ TEST_F(FakeCanClientTest, SendMessage) {
 
 TEST_F(FakeCanClientTest, ReceiveMessage) {
   std::vector<CanFrame> buf;
-  int32_t frame_num = FRAME_LEN;
+  int32_t               frame_num = FRAME_LEN;
 
   auto ret = recv_client_->Receive(&buf, &frame_num);
   EXPECT_EQ(ret, ErrorCode::OK);

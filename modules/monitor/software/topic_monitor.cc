@@ -35,30 +35,20 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::util::StrCat;
 using apollo::common::util::StringPrintf;
 
-AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
+AdapterBase* GetAdapterByMessageType(const AdapterConfig::MessageType type) {
   switch (type) {
-    case AdapterConfig::POINT_CLOUD:
-      return CHECK_NOTNULL(AdapterManager::GetPointCloud());
-    case AdapterConfig::IMAGE_LONG:
-      return CHECK_NOTNULL(AdapterManager::GetImageLong());
-    case AdapterConfig::IMAGE_SHORT:
-      return CHECK_NOTNULL(AdapterManager::GetImageShort());
-    case AdapterConfig::LOCALIZATION:
-      return CHECK_NOTNULL(AdapterManager::GetLocalization());
+    case AdapterConfig::POINT_CLOUD: return CHECK_NOTNULL(AdapterManager::GetPointCloud());
+    case AdapterConfig::IMAGE_LONG: return CHECK_NOTNULL(AdapterManager::GetImageLong());
+    case AdapterConfig::IMAGE_SHORT: return CHECK_NOTNULL(AdapterManager::GetImageShort());
+    case AdapterConfig::LOCALIZATION: return CHECK_NOTNULL(AdapterManager::GetLocalization());
     case AdapterConfig::PERCEPTION_OBSTACLES:
       return CHECK_NOTNULL(AdapterManager::GetPerceptionObstacles());
-    case AdapterConfig::PREDICTION:
-      return CHECK_NOTNULL(AdapterManager::GetPrediction());
-    case AdapterConfig::PLANNING_TRAJECTORY:
-      return CHECK_NOTNULL(AdapterManager::GetPlanning());
-    case AdapterConfig::CONTROL_COMMAND:
-      return CHECK_NOTNULL(AdapterManager::GetControlCommand());
-    case AdapterConfig::CONTI_RADAR:
-      return CHECK_NOTNULL(AdapterManager::GetContiRadar());
-    case AdapterConfig::RELATIVE_MAP:
-      return CHECK_NOTNULL(AdapterManager::GetRelativeMap());
-    default:
-      break;
+    case AdapterConfig::PREDICTION: return CHECK_NOTNULL(AdapterManager::GetPrediction());
+    case AdapterConfig::PLANNING_TRAJECTORY: return CHECK_NOTNULL(AdapterManager::GetPlanning());
+    case AdapterConfig::CONTROL_COMMAND: return CHECK_NOTNULL(AdapterManager::GetControlCommand());
+    case AdapterConfig::CONTI_RADAR: return CHECK_NOTNULL(AdapterManager::GetContiRadar());
+    case AdapterConfig::RELATIVE_MAP: return CHECK_NOTNULL(AdapterManager::GetRelativeMap());
+    default: break;
   }
   AFATAL << "No adapter registered for " << type;
   return nullptr;
@@ -66,13 +56,13 @@ AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
 
 }  // namespace
 
-TopicMonitor::TopicMonitor(const TopicConf &config, TopicStatus *status)
+TopicMonitor::TopicMonitor(const TopicConf& config, TopicStatus* status)
     : RecurrentRunner(FLAGS_topic_monitor_name, FLAGS_topic_monitor_interval)
-    , config_(config), status_(status) {
-}
+    , config_(config)
+    , status_(status) {}
 
 void TopicMonitor::RunOnce(const double current_time) {
-  auto *adapter = GetAdapterByMessageType(config_.type());
+  auto* adapter = GetAdapterByMessageType(config_.type());
   if (!adapter->HasReceived()) {
     status_->set_message_delay(-1);
     return;

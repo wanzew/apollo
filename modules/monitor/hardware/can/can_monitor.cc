@@ -32,26 +32,20 @@ namespace monitor {
 
 using apollo::canbus::CanbusConf;
 
-CanMonitor::CanMonitor() : RecurrentRunner(FLAGS_can_monitor_name,
-                                           FLAGS_can_monitor_interval) {
-}
+CanMonitor::CanMonitor()
+    : RecurrentRunner(FLAGS_can_monitor_name, FLAGS_can_monitor_interval) {}
 
 void CanMonitor::RunOnce(const double current_time) {
-  static auto *status = MonitorManager::GetHardwareStatus(
-      FLAGS_can_hardware_name);
+  static auto* status = MonitorManager::GetHardwareStatus(FLAGS_can_hardware_name);
 
   CanbusConf canbus_conf;
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
-                                               &canbus_conf));
+  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file, &canbus_conf));
 
-  auto *can_chk_factory = CanCheckerFactory::instance();
+  auto* can_chk_factory = CanCheckerFactory::instance();
   can_chk_factory->RegisterCanCheckers();
-  auto can_chk =
-      can_chk_factory->CreateCanChecker(canbus_conf.can_card_parameter());
+  auto can_chk = can_chk_factory->CreateCanChecker(canbus_conf.can_card_parameter());
 
-  if (can_chk == nullptr) {
-    return;
-  }
+  if (can_chk == nullptr) { return; }
 
   std::vector<HwCheckResult> can_rslt;
   can_chk->run_check(&can_rslt);
@@ -59,8 +53,7 @@ void CanMonitor::RunOnce(const double current_time) {
 
   status->set_status(static_cast<HardwareStatus::Status>(can_rslt[0].status));
   status->set_detailed_msg(can_rslt[0].mssg);
-  ADEBUG << "Done checking " << FLAGS_can_hardware_name
-         << ", status=" << status->status();
+  ADEBUG << "Done checking " << FLAGS_can_hardware_name << ", status=" << status->status();
 }
 
 }  // namespace monitor

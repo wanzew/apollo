@@ -33,7 +33,7 @@ namespace dreamview {
 
 class HMI {
  public:
-  HMI(WebSocketHandler *websocket, MapService *map_service);
+  HMI(WebSocketHandler* websocket, MapService* map_service);
 
  private:
   // Broadcast HMIStatus to all clients.
@@ -41,18 +41,18 @@ class HMI {
   void DeferredBroadcastHMIStatus();
 
   // Send VehicleParam to the given conn, or broadcast if conn is null.
-  void SendVehicleParam(WebSocketHandler::Connection *conn = nullptr);
+  void SendVehicleParam(WebSocketHandler::Connection* conn = nullptr);
 
   void RegisterMessageHandlers();
 
   // No ownership.
-  WebSocketHandler *websocket_;
-  MapService *map_service_;
+  WebSocketHandler* websocket_;
+  MapService*       map_service_;
 
   // For HMIStatus broadcasting.
   std::unique_ptr<std::thread> broadcast_hmi_status_thread_;
-  bool need_broadcast_ = false;
-  std::mutex need_broadcast_mutex_;
+  bool                         need_broadcast_ = false;
+  std::mutex                   need_broadcast_mutex_;
 
   apollo::common::monitor::MonitorLogger logger_;
 };

@@ -45,19 +45,21 @@ namespace data_generator {
 
 class Velodyne64 : public Sensor {
  public:
-  explicit Velodyne64(const SensorConfig& config) : Sensor(config) {}
+  explicit Velodyne64(const SensorConfig& config)
+      : Sensor(config) {}
   virtual ~Velodyne64() = default;
   bool Process() override;
 
  private:
   bool ProcessPointCloudData(const sensor_msgs::PointCloud2& message);
   void TransPointCloudMsgToPCL(const sensor_msgs::PointCloud2& cloud_msg,
-                               pcl_util::PointCloudPtr* cloud_pcl);
-  bool GetTrans(const std::string& to_frame, const std::string& from_frame,
-                const double query_time, Eigen::Matrix4d* trans);
-  bool TransformPointCloudToWorld(
-      std::shared_ptr<Eigen::Matrix4d> velodyne_trans,
-      pcl_util::PointCloudPtr* cld);
+                               pcl_util::PointCloudPtr*        cloud_pcl);
+  bool GetTrans(const std::string& to_frame,
+                const std::string& from_frame,
+                const double       query_time,
+                Eigen::Matrix4d*   trans);
+  bool TransformPointCloudToWorld(std::shared_ptr<Eigen::Matrix4d> velodyne_trans,
+                                  pcl_util::PointCloudPtr*         cld);
 };
 
 }  // namespace data_generator

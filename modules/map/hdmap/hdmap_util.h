@@ -59,17 +59,14 @@ std::string RoutingMapFile();
  */
 inline std::string EndWayPointFile() {
   if (FLAGS_use_navigation_mode) {
-    return apollo::common::util::StrCat(
-        FLAGS_navigation_mode_end_way_point_file);
+    return apollo::common::util::StrCat(FLAGS_navigation_mode_end_way_point_file);
   } else {
-    return apollo::common::util::StrCat(FLAGS_map_dir, "/",
-                                        FLAGS_end_way_point_filename);
+    return apollo::common::util::StrCat(FLAGS_map_dir, "/", FLAGS_end_way_point_filename);
   }
 }
 
 inline std::string SpeedControlFile() {
-  return apollo::common::util::StrCat(FLAGS_map_dir, "/",
-                                      FLAGS_speed_control_filename);
+  return apollo::common::util::StrCat(FLAGS_map_dir, "/", FLAGS_speed_control_filename);
 }
 
 const SpeedControls* GetSpeedControls();
@@ -109,11 +106,11 @@ class HDMapUtil {
   HDMapUtil() = delete;
 
   static std::unique_ptr<HDMap> base_map_;
-  static uint64_t base_map_seq_;
-  static std::mutex base_map_mutex_;
+  static uint64_t               base_map_seq_;
+  static std::mutex             base_map_mutex_;
 
   static std::unique_ptr<HDMap> sim_map_;
-  static std::mutex sim_map_mutex_;
+  static std::mutex             sim_map_mutex_;
 };
 
 }  // namespace hdmap

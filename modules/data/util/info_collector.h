@@ -32,21 +32,21 @@ namespace data {
 class InfoCollector {
  public:
   // Get task information.
-  static const StaticInfo &GetStaticInfo();
+  static const StaticInfo& GetStaticInfo();
 
   // Get specific information.
   // Listening topics: ChassisDetail.
-  static const VehicleInfo &GetVehicleInfo();
-  static const EnvironmentInfo &GetEnvironmentInfo();
-  static const HardwareInfo &GetHardwareInfo();
-  static const SoftwareInfo &GetSoftwareInfo();
-  static const UserInfo &GetUserInfo();
+  static const VehicleInfo&     GetVehicleInfo();
+  static const EnvironmentInfo& GetEnvironmentInfo();
+  static const HardwareInfo&    GetHardwareInfo();
+  static const SoftwareInfo&    GetSoftwareInfo();
+  static const UserInfo&        GetUserInfo();
 
   // Utils.
   static std::string GetDockerImage();
 
  private:
-  StaticInfo static_info_;
+  StaticInfo     static_info_;
   StaticInfoConf config_;
 
   DECLARE_SINGLETON(InfoCollector);

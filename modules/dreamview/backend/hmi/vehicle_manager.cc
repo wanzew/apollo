@@ -32,34 +32,29 @@ using apollo::common::util::StrCat;
 
 VehicleManager::VehicleManager() {
   CHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))
-      << "Unable to parse VehicleData config file "
-      << FLAGS_vehicle_data_config_filename;
-  for (auto &data_file : *vehicle_data_.mutable_data_files()) {
-    data_file.set_dest_path(
-        apollo::common::util::TranslatePath(data_file.dest_path()));
+      << "Unable to parse VehicleData config file " << FLAGS_vehicle_data_config_filename;
+  for (auto& data_file : *vehicle_data_.mutable_data_files()) {
+    data_file.set_dest_path(apollo::common::util::TranslatePath(data_file.dest_path()));
   }
 }
 
-bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
+bool VehicleManager::UseVehicle(const std::string& vehicle_data_path) {
   if (!apollo::common::util::DirectoryExists(vehicle_data_path)) {
     AERROR << "Cannot find vehicle data: " << vehicle_data_path;
     return false;
   }
 
-  for (const auto &data_file : vehicle_data_.data_files()) {
-    const auto source_path =
-        StrCat(vehicle_data_path, "/", data_file.source_path());
-    const auto &dest_path = data_file.dest_path();
+  for (const auto& data_file : vehicle_data_.data_files()) {
+    const auto  source_path = StrCat(vehicle_data_path, "/", data_file.source_path());
+    const auto& dest_path   = data_file.dest_path();
 
     const bool ret = apollo::common::util::Copy(source_path, dest_path);
     AINFO_IF(ret) << "Copied " << source_path << " to " << dest_path;
   }
 
-  static const std::string kBroadcastExtrinsicsCmd =
-      "bash scripts/broadcast_extrinsics.sh";
-  const int ret = std::system(kBroadcastExtrinsicsCmd.c_str());
-  AERROR_IF(ret != 0) << "Command returns " << ret << ": "
-                      << kBroadcastExtrinsicsCmd;
+  static const std::string kBroadcastExtrinsicsCmd = "bash scripts/broadcast_extrinsics.sh";
+  const int                ret                     = std::system(kBroadcastExtrinsicsCmd.c_str());
+  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << kBroadcastExtrinsicsCmd;
 
   return true;
 }

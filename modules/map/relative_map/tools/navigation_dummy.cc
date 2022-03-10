@@ -32,9 +32,9 @@ DEFINE_string(navigation_dummy_file,
 int main(int argc, char** argv) {
   using std::this_thread::sleep_for;
 
+  using apollo::common::adapter::AdapterConfig;
   using apollo::common::adapter::AdapterManager;
   using apollo::common::adapter::AdapterManagerConfig;
-  using apollo::common::adapter::AdapterConfig;
 
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
@@ -51,8 +51,7 @@ int main(int argc, char** argv) {
   AINFO << "AdapterManager is initialized.";
 
   apollo::relative_map::NavigationInfo navigation_info;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_navigation_dummy_file,
-                                              &navigation_info)) {
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_navigation_dummy_file, &navigation_info)) {
     AERROR << "failed to load file: " << FLAGS_navigation_dummy_file;
     return -1;
   }

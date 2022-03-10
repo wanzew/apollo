@@ -38,9 +38,7 @@ class LatticePlanner : public Planner {
 
   virtual ~LatticePlanner() = default;
 
-  common::Status Init(const PlanningConfig& config) override {
-    return common::Status::OK();
-  }
+  common::Status Init(const PlanningConfig& config) override { return common::Status::OK(); }
 
   /**
    * @brief Override function Plan in parent class Planner.
@@ -48,8 +46,7 @@ class LatticePlanner : public Planner {
    * @param frame Current planning frame.
    * @return OK if planning succeeds; error otherwise.
    */
-  common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame) override;
+  common::Status Plan(const common::TrajectoryPoint& planning_init_point, Frame* frame) override;
 
   /**
    * @brief Override function Plan in parent class Planner.
@@ -58,18 +55,17 @@ class LatticePlanner : public Planner {
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  common::Status PlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+  common::Status PlanOnReferenceLine(const common::TrajectoryPoint& planning_init_point,
+                                     Frame*                         frame,
+                                     ReferenceLineInfo*             reference_line_info) override;
 
  private:
   DiscretizedTrajectory GetFutureTrajectory() const;
 
-  bool MapFutureTrajectoryToSL(
-      const DiscretizedTrajectory& future_trajectory,
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      std::vector<common::SpeedPoint>* st_points,
-      std::vector<common::FrenetFramePoint>* sl_points);
+  bool MapFutureTrajectoryToSL(const DiscretizedTrajectory&           future_trajectory,
+                               const std::vector<common::PathPoint>&  discretized_reference_line,
+                               std::vector<common::SpeedPoint>*       st_points,
+                               std::vector<common::FrenetFramePoint>* sl_points);
 };
 
 }  // namespace planning

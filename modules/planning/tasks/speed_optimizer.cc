@@ -30,33 +30,33 @@ using apollo::common::Status;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
-SpeedOptimizer::SpeedOptimizer(const std::string& name) : Task(name) {}
+SpeedOptimizer::SpeedOptimizer(const std::string& name)
+    : Task(name) {}
 
-apollo::common::Status SpeedOptimizer::Execute(
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
+apollo::common::Status SpeedOptimizer::Execute(Frame*             frame,
+                                               ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
 
-  auto ret = Process(
-      reference_line_info->AdcSlBoundary(), reference_line_info->path_data(),
-      frame->PlanningStartPoint(), reference_line_info->reference_line(),
-      *reference_line_info->mutable_speed_data(),
-      reference_line_info->path_decision(),
-      reference_line_info->mutable_speed_data());
+  auto ret =
+      Process(reference_line_info->AdcSlBoundary(), reference_line_info->path_data(),
+              frame->PlanningStartPoint(), reference_line_info->reference_line(),
+              *reference_line_info->mutable_speed_data(), reference_line_info->path_decision(),
+              reference_line_info->mutable_speed_data());
 
   RecordDebugInfo(reference_line_info->speed_data());
   return ret;
 }
 
 void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
-  auto* debug = reference_line_info_->mutable_debug();
-  auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
+  auto* debug          = reference_line_info_->mutable_debug();
+  auto  ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
   ptr_speed_plan->set_name(Name());
   ptr_speed_plan->mutable_speed_point()->CopyFrom(
       {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
 }
 
 void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
-                                        STGraphDebug* st_graph_debug) const {
+                                        STGraphDebug*      st_graph_debug) const {
   if (!FLAGS_enable_record_debug || !st_graph_debug) {
     ADEBUG << "Skip record debug info";
     return;
@@ -71,22 +71,19 @@ void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_FOLLOW);
         break;
       case StBoundary::BoundaryType::OVERTAKE:
-        boundary_debug->set_type(
-            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
+        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
         break;
       case StBoundary::BoundaryType::STOP:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_STOP);
         break;
       case StBoundary::BoundaryType::UNKNOWN:
-        boundary_debug->set_type(
-            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
+        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
         break;
       case StBoundary::BoundaryType::YIELD:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
         break;
       case StBoundary::BoundaryType::KEEP_CLEAR:
-        boundary_debug->set_type(
-            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_KEEP_CLEAR);
+        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_KEEP_CLEAR);
         break;
     }
 

@@ -37,10 +37,10 @@ using apollo::common::Status;
 using apollo::common::math::Clamp;
 
 namespace {
-constexpr double kDefaultSStep = 1.0;
-constexpr double kDefaultSMax = 2.0;
+constexpr double kDefaultSStep             = 1.0;
+constexpr double kDefaultSMax              = 2.0;
 constexpr double kDefaultSafeDistanceRatio = 1.0;
-constexpr double kDefaultSafeDistanceBase = 2.0;
+constexpr double kDefaultSafeDistanceBase  = 2.0;
 }  // namespace
 
 static void CheckConstraints(const NaviSpeedTsConstraints& constraints) {
@@ -56,31 +56,30 @@ static void CheckConstraints(const NaviSpeedTsConstraints& constraints) {
 }
 
 static void CombineConstraints(const NaviSpeedTsConstraints& constraints,
-                               NaviSpeedTsConstraints* dst) {
-  dst->t_min = std::max(constraints.t_min, dst->t_min);
-  dst->v_max = std::min(constraints.v_max, dst->v_max);
-  dst->v_preffered = std::min(constraints.v_preffered, dst->v_preffered);
-  dst->a_max = std::min(constraints.a_max, dst->a_max);
-  dst->a_preffered = std::min(constraints.a_preffered, dst->a_preffered);
-  dst->b_max = std::min(constraints.b_max, dst->b_max);
-  dst->b_preffered = std::min(constraints.b_preffered, dst->b_preffered);
-  dst->da_max = std::min(constraints.da_max, dst->da_max);
+                               NaviSpeedTsConstraints*       dst) {
+  dst->t_min        = std::max(constraints.t_min, dst->t_min);
+  dst->v_max        = std::min(constraints.v_max, dst->v_max);
+  dst->v_preffered  = std::min(constraints.v_preffered, dst->v_preffered);
+  dst->a_max        = std::min(constraints.a_max, dst->a_max);
+  dst->a_preffered  = std::min(constraints.a_preffered, dst->a_preffered);
+  dst->b_max        = std::min(constraints.b_max, dst->b_max);
+  dst->b_preffered  = std::min(constraints.b_preffered, dst->b_preffered);
+  dst->da_max       = std::min(constraints.da_max, dst->da_max);
   dst->da_preffered = std::min(constraints.da_preffered, dst->da_preffered);
 }
 
 NaviSpeedTsGraph::NaviSpeedTsGraph() {
-  Reset(kDefaultSStep, kDefaultSMax, [](double v) {
-    return kDefaultSafeDistanceRatio * v + kDefaultSafeDistanceBase;
-  });
+  Reset(kDefaultSStep, kDefaultSMax,
+        [](double v) { return kDefaultSafeDistanceRatio * v + kDefaultSafeDistanceBase; });
 }
 
-void NaviSpeedTsGraph::Reset(
-    double s_step, double s_max,
-    const std::function<double(double v)>& get_safe_distance) {
+void NaviSpeedTsGraph::Reset(double                                 s_step,
+                             double                                 s_max,
+                             const std::function<double(double v)>& get_safe_distance) {
   CHECK_GT(s_step, 0.0);
   CHECK_GE(s_max, s_step);
 
-  s_step_ = s_step;
+  s_step_            = s_step;
   get_safe_distance_ = get_safe_distance;
 
   auto point_num = (std::size_t)((s_max + s_step_) / s_step_);
@@ -91,15 +90,14 @@ double NaviSpeedTsGraph::Step() const { return s_step_; }
 
 std::size_t NaviSpeedTsGraph::PointNum() const { return constraints_.size(); }
 
-void NaviSpeedTsGraph::UpdateConstraints(
-    const NaviSpeedTsConstraints& constraints) {
+void NaviSpeedTsGraph::UpdateConstraints(const NaviSpeedTsConstraints& constraints) {
   CheckConstraints(constraints);
 
-  for (auto& pc : constraints_) CombineConstraints(constraints, &pc);
+  for (auto& pc : constraints_)
+    CombineConstraints(constraints, &pc);
 }
 
-void NaviSpeedTsGraph::UpdatePointConstraints(
-    double s, const NaviSpeedTsConstraints& constraints) {
+void NaviSpeedTsGraph::UpdatePointConstraints(double s, const NaviSpeedTsConstraints& constraints) {
   CHECK_GE(s, 0.0);
   CheckConstraints(constraints);
 
@@ -121,7 +119,9 @@ void NaviSpeedTsGraph::UpdateObstacleConstraints(double distance, double v) {
   }
 }
 
-Status NaviSpeedTsGraph::Solve(double start_v, double start_a, double start_da,
+Status NaviSpeedTsGraph::Solve(double                         start_v,
+                               double                         start_a,
+                               double                         start_da,
                                std::vector<NaviSpeedTsPoint>* points) {
   CHECK_NOTNULL(points);
 
@@ -129,64 +129,59 @@ Status NaviSpeedTsGraph::Solve(double start_v, double start_a, double start_da,
 
   // compute the first point
   auto& point = (*points)[0];
-  point.s = 0.0;
-  point.t = 0.0;
-  point.v = std::abs(start_v);
-  point.a = start_a;
-  point.da = start_da;
+  point.s     = 0.0;
+  point.t     = 0.0;
+  point.v     = std::abs(start_v);
+  point.a     = start_a;
+  point.da    = start_da;
 
   // compute the remaining points
   for (size_t i = 1; i < points->size(); i++) {
-    const auto& prev = (*points)[i - 1];
+    const auto& prev        = (*points)[i - 1];
     const auto& constraints = constraints_[i];
-    auto& point = (*points)[i];
+    auto&       point       = (*points)[i];
 
     // compute v_max base on v_max and a_max
     auto v_max = constraints.v_max;
     auto a_max = constraints.a_max;
-    v_max = std::min(std::sqrt(prev.v * prev.v + 2 * a_max * s_step_), v_max);
+    v_max      = std::min(std::sqrt(prev.v * prev.v + 2 * a_max * s_step_), v_max);
 
     // compute t_min base on v_max
     auto t_min = std::max(prev.t, constraints.t_min);
-    t_min = std::max(prev.t + s_step_ / v_max, t_min);
+    t_min      = std::max(prev.t + s_step_ / v_max, t_min);
 
     // compute t_max base on b_max
     auto t_max = std::numeric_limits<double>::infinity();
     auto b_max = constraints.b_max;
     if (prev.v * prev.v / (2 * b_max) > s_step_)
-      t_max =
-          prev.t +
-          (prev.v - std::sqrt(prev.v * prev.v - 2 * b_max * s_step_)) / b_max;
+      t_max = prev.t + (prev.v - std::sqrt(prev.v * prev.v - 2 * b_max * s_step_)) / b_max;
 
     // if t_max < t_min
     if (t_max < t_min) {
       AERROR << "failure to satisfy the constraints.";
       points->resize(i);
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "failure to satisfy the constraints.");
+      return Status(ErrorCode::PLANNING_ERROR, "failure to satisfy the constraints.");
     }
 
     // compute v_preffered
     auto v_preffered = constraints.v_preffered;
     if (v_preffered > prev.v) {
       auto a_preffered = constraints.a_preffered;
-      v_preffered = std::min(
-          std::sqrt(prev.v * prev.v + 2 * a_preffered * s_step_), v_preffered);
+      v_preffered = std::min(std::sqrt(prev.v * prev.v + 2 * a_preffered * s_step_), v_preffered);
     } else if (v_preffered < prev.v) {
       auto b_preffered = constraints.b_preffered;
-      if ((prev.v * prev.v - v_preffered * v_preffered) >
-          2 * b_preffered * s_step_)
+      if ((prev.v * prev.v - v_preffered * v_preffered) > 2 * b_preffered * s_step_)
         v_preffered = std::sqrt(prev.v * prev.v - 2 * b_preffered * s_step_);
     }
 
     // compute t_preffered base on v_preffered and safe distance
     auto t_preffered = prev.t + s_step_ / v_preffered;
-    auto distance = get_safe_distance_(prev.v);
-    auto s = prev.s + s_step_;
-    auto d_idx = (s + distance) / s_step_;
+    auto distance    = get_safe_distance_(prev.v);
+    auto s           = prev.s + s_step_;
+    auto d_idx       = (s + distance) / s_step_;
     if (d_idx < constraints_.size()) {
       const auto& d_constraints = constraints_[d_idx];
-      t_preffered = std::max(d_constraints.t_min, t_preffered);
+      t_preffered               = std::max(d_constraints.t_min, t_preffered);
     } else {
       t_preffered = std::numeric_limits<double>::infinity();
     }
@@ -195,8 +190,8 @@ Status NaviSpeedTsGraph::Solve(double start_v, double start_a, double start_da,
     point.t = Clamp(t_preffered, t_min, t_max);
     auto dt = point.t - prev.t;
     // TODO(all): if v < 0
-    point.v = std::max(2 * s_step_ / dt - prev.v, 0.0);
-    point.a = (point.v - prev.v) / dt;
+    point.v  = std::max(2 * s_step_ / dt - prev.v, 0.0);
+    point.a  = (point.v - prev.v) / dt;
     point.da = (point.a - prev.a) / dt;
 
     // if t is infinity

@@ -31,9 +31,9 @@ class ProcessMonitor : public RecurrentRunner {
   void RunOnce(const double current_time) override;
 
  private:
-  static void UpdateModule(
-      const std::string &module_name, const ProcessConf &process_conf,
-      const std::map<std::string, std::string> &running_processes);
+  static void UpdateModule(const std::string&                        module_name,
+                           const ProcessConf&                        process_conf,
+                           const std::map<std::string, std::string>& running_processes);
 };
 
 }  // namespace monitor

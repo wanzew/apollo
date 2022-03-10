@@ -60,11 +60,10 @@ class VehicleController {
    * @param message_manager a pointer to the message_manager.
    * @return error_code
    */
-  virtual common::ErrorCode Init(
-      const VehicleParameter &params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>
-          *const message_manager) = 0;
+  virtual common::ErrorCode
+  Init(const VehicleParameter&                                params,
+       CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+       MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) = 0;
 
   /**
    * @brief start the vehicle controller.
@@ -88,15 +87,14 @@ class VehicleController {
    * @param command the control command
    * @return error_code
    */
-  virtual common::ErrorCode Update(const control::ControlCommand &command);
+  virtual common::ErrorCode Update(const control::ControlCommand& command);
 
   /**
    * @brief set vehicle to appointed driving mode.
    * @param driving mode to be appointed.
    * @return error_code
    */
-  virtual common::ErrorCode SetDrivingMode(
-      const Chassis::DrivingMode &driving_mode);
+  virtual common::ErrorCode SetDrivingMode(const Chassis::DrivingMode& driving_mode);
 
  private:
   /*
@@ -105,10 +103,10 @@ class VehicleController {
    */
   virtual void Emergency() = 0;
 
-  virtual common::ErrorCode EnableAutoMode() = 0;
-  virtual common::ErrorCode DisableAutoMode() = 0;
+  virtual common::ErrorCode EnableAutoMode()         = 0;
+  virtual common::ErrorCode DisableAutoMode()        = 0;
   virtual common::ErrorCode EnableSteeringOnlyMode() = 0;
-  virtual common::ErrorCode EnableSpeedOnlyMode() = 0;
+  virtual common::ErrorCode EnableSpeedOnlyMode()    = 0;
 
   /*
    * @brief NEUTRAL, REVERSE, DRIVE
@@ -147,26 +145,26 @@ class VehicleController {
   /*
    * @brief set Electrical Park Brake
    */
-  virtual void SetEpbBreak(const control::ControlCommand &command) = 0;
-  virtual void SetBeam(const control::ControlCommand &command) = 0;
-  virtual void SetHorn(const control::ControlCommand &command) = 0;
-  virtual void SetTurningSignal(const control::ControlCommand &command) = 0;
+  virtual void SetEpbBreak(const control::ControlCommand& command)      = 0;
+  virtual void SetBeam(const control::ControlCommand& command)          = 0;
+  virtual void SetHorn(const control::ControlCommand& command)          = 0;
+  virtual void SetTurningSignal(const control::ControlCommand& command) = 0;
 
   virtual void SetLimits() {}
 
  protected:
   virtual Chassis::DrivingMode driving_mode();
-  virtual void set_driving_mode(const Chassis::DrivingMode &driving_mode);
+  virtual void                 set_driving_mode(const Chassis::DrivingMode& driving_mode);
 
  protected:
-  canbus::VehicleParameter params_;
-  common::VehicleParam vehicle_params_;
-  CanSender<::apollo::canbus::ChassisDetail> *can_sender_ = nullptr;
-  MessageManager<::apollo::canbus::ChassisDetail> *message_manager_ = nullptr;
-  bool is_initialized_ = false;  // own by derviative concrete controller
-  Chassis::DrivingMode driving_mode_ = Chassis::COMPLETE_MANUAL;
-  bool is_reset_ = false;  // reset command from control command
-  std::mutex mode_mutex_;  // only use in this base class
+  canbus::VehicleParameter                         params_;
+  common::VehicleParam                             vehicle_params_;
+  CanSender<::apollo::canbus::ChassisDetail>*      can_sender_      = nullptr;
+  MessageManager<::apollo::canbus::ChassisDetail>* message_manager_ = nullptr;
+  bool                 is_initialized_ = false;  // own by derviative concrete controller
+  Chassis::DrivingMode driving_mode_   = Chassis::COMPLETE_MANUAL;
+  bool                 is_reset_       = false;  // reset command from control command
+  std::mutex           mode_mutex_;              // only use in this base class
 };
 
 }  // namespace canbus

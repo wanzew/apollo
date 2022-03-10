@@ -31,13 +31,13 @@ namespace perception {
 
 class SharedDataManager {
  public:
-  SharedDataManager() = default;
+  SharedDataManager()  = default;
   ~SharedDataManager() = default;
 
-  bool Init(const DAGConfig::SharedDataConfig &data_config);
+  bool Init(const DAGConfig::SharedDataConfig& data_config);
 
   // thread-safe.
-  SharedData *GetSharedData(const std::string &name) const;
+  SharedData* GetSharedData(const std::string& name) const;
 
   void Reset();
 
@@ -45,7 +45,7 @@ class SharedDataManager {
 
  private:
   std::unordered_map<std::string, std::unique_ptr<SharedData>> shared_data_map_;
-  bool inited_ = false;
+  bool                                                         inited_ = false;
   DISALLOW_COPY_AND_ASSIGN(SharedDataManager);
 };
 

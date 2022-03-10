@@ -44,19 +44,17 @@ namespace planning {
 
 class DPRoadGraph {
  public:
-  explicit DPRoadGraph(const DpPolyPathConfig &config,
-                       const ReferenceLineInfo &reference_line_info,
-                       const SpeedData &speed_data);
+  explicit DPRoadGraph(const DpPolyPathConfig&  config,
+                       const ReferenceLineInfo& reference_line_info,
+                       const SpeedData&         speed_data);
 
   ~DPRoadGraph() = default;
 
-  bool FindPathTunnel(const common::TrajectoryPoint &init_point,
-                      const std::vector<const PathObstacle *> &obstacles,
-                      PathData *const path_data);
+  bool FindPathTunnel(const common::TrajectoryPoint&          init_point,
+                      const std::vector<const PathObstacle*>& obstacles,
+                      PathData* const                         path_data);
 
-  void SetDebugLogger(apollo::planning_internal::Debug *debug) {
-    planning_debug_ = debug;
-  }
+  void SetDebugLogger(apollo::planning_internal::Debug* debug) { planning_debug_ = debug; }
 
  private:
   /**
@@ -66,65 +64,70 @@ class DPRoadGraph {
    public:
     DPRoadGraphNode() = default;
 
-    DPRoadGraphNode(const common::SLPoint point_sl,
-                    const DPRoadGraphNode *node_prev)
-        : sl_point(point_sl), min_cost_prev_node(node_prev) {}
+    DPRoadGraphNode(const common::SLPoint point_sl, const DPRoadGraphNode* node_prev)
+        : sl_point(point_sl)
+        , min_cost_prev_node(node_prev) {}
 
-    DPRoadGraphNode(const common::SLPoint point_sl,
-                    const DPRoadGraphNode *node_prev,
-                    const ComparableCost &cost)
-        : sl_point(point_sl), min_cost_prev_node(node_prev), min_cost(cost) {}
+    DPRoadGraphNode(const common::SLPoint  point_sl,
+                    const DPRoadGraphNode* node_prev,
+                    const ComparableCost&  cost)
+        : sl_point(point_sl)
+        , min_cost_prev_node(node_prev)
+        , min_cost(cost) {}
 
-    void UpdateCost(const DPRoadGraphNode *node_prev,
-                    const QuinticPolynomialCurve1d &curve,
-                    const ComparableCost &cost) {
+    void UpdateCost(const DPRoadGraphNode*          node_prev,
+                    const QuinticPolynomialCurve1d& curve,
+                    const ComparableCost&           cost) {
       if (cost <= min_cost) {
-        min_cost = cost;
+        min_cost           = cost;
         min_cost_prev_node = node_prev;
-        min_cost_curve = curve;
+        min_cost_curve     = curve;
       }
     }
 
-    common::SLPoint sl_point;
-    const DPRoadGraphNode *min_cost_prev_node = nullptr;
-    ComparableCost min_cost = {true, true, true,
-                               std::numeric_limits<float>::infinity(),
+    common::SLPoint          sl_point;
+    const DPRoadGraphNode*   min_cost_prev_node = nullptr;
+    ComparableCost           min_cost = {true, true, true, std::numeric_limits<float>::infinity(),
                                std::numeric_limits<float>::infinity()};
     QuinticPolynomialCurve1d min_cost_curve;
   };
 
-  bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
-                           std::vector<DPRoadGraphNode> *min_cost_path);
+  bool GenerateMinCostPath(const std::vector<const PathObstacle*>& obstacles,
+                           std::vector<DPRoadGraphNode>*           min_cost_path);
 
-  bool SamplePathWaypoints(
-      const common::TrajectoryPoint &init_point,
-      std::vector<std::vector<common::SLPoint>> *const points);
+  bool SamplePathWaypoints(const common::TrajectoryPoint&                   init_point,
+                           std::vector<std::vector<common::SLPoint>>* const points);
 
-  bool CalculateFrenetPoint(const common::TrajectoryPoint &traj_point,
-                            common::FrenetFramePoint *const frenet_frame_point);
+  bool CalculateFrenetPoint(const common::TrajectoryPoint&  traj_point,
+                            common::FrenetFramePoint* const frenet_frame_point);
 
-  bool IsValidCurve(const QuinticPolynomialCurve1d &curve) const;
+  bool IsValidCurve(const QuinticPolynomialCurve1d& curve) const;
 
-  void GetCurveCost(TrajectoryCost trajectory_cost,
-                    const QuinticPolynomialCurve1d &curve, const float start_s,
-                    const float end_s, const uint32_t curr_level,
-                    const uint32_t total_level, ComparableCost *cost);
+  void GetCurveCost(TrajectoryCost                  trajectory_cost,
+                    const QuinticPolynomialCurve1d& curve,
+                    const float                     start_s,
+                    const float                     end_s,
+                    const uint32_t                  curr_level,
+                    const uint32_t                  total_level,
+                    ComparableCost*                 cost);
 
-  void UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
-                  const uint32_t level, const uint32_t total_level,
-                  TrajectoryCost *trajectory_cost, DPRoadGraphNode *front,
-                  DPRoadGraphNode *cur_node);
+  void UpdateNode(const std::list<DPRoadGraphNode>& prev_nodes,
+                  const uint32_t                    level,
+                  const uint32_t                    total_level,
+                  TrajectoryCost*                   trajectory_cost,
+                  DPRoadGraphNode*                  front,
+                  DPRoadGraphNode*                  cur_node);
   bool HasSidepass();
 
  private:
-  DpPolyPathConfig config_;
-  common::TrajectoryPoint init_point_;
-  const ReferenceLineInfo &reference_line_info_;
-  const ReferenceLine &reference_line_;
-  SpeedData speed_data_;
-  common::SLPoint init_sl_point_;
-  common::FrenetFramePoint init_frenet_frame_point_;
-  apollo::planning_internal::Debug *planning_debug_ = nullptr;
+  DpPolyPathConfig                  config_;
+  common::TrajectoryPoint           init_point_;
+  const ReferenceLineInfo&          reference_line_info_;
+  const ReferenceLine&              reference_line_;
+  SpeedData                         speed_data_;
+  common::SLPoint                   init_sl_point_;
+  common::FrenetFramePoint          init_frenet_frame_point_;
+  apollo::planning_internal::Debug* planning_debug_ = nullptr;
 
   ObjectSidePass sidepass_;
 };

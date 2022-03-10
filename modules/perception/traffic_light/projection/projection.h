@@ -30,26 +30,28 @@ namespace traffic_light {
 // @brief Projection for each Camera.
 class BoundaryProjection : public BaseProjection {
  public:
-  bool Project(const CameraCoeffient &camera_coeffient,
-               const Eigen::Matrix4d &pose,
-               const apollo::hdmap::Signal &tl_info,
-               Light *light) const override;
+  bool Project(const CameraCoeffient&       camera_coeffient,
+               const Eigen::Matrix4d&       pose,
+               const apollo::hdmap::Signal& tl_info,
+               Light*                       light) const override;
 
  private:
-  bool ProjectPoint(const CameraCoeffient &coeffient,
-                    const Eigen::Matrix4d &pose,
-                    const apollo::common::Point3D &point, int *center_x,
-                    int *center_y) const;
+  bool ProjectPoint(const CameraCoeffient&         coeffient,
+                    const Eigen::Matrix4d&         pose,
+                    const apollo::common::Point3D& point,
+                    int*                           center_x,
+                    int*                           center_y) const;
 
-  bool ProjectPointDistort(const CameraCoeffient &coeffient,
-                           const Eigen::Matrix4d &pose,
-                           const apollo::common::PointENU &point, int *center_x,
-                           int *center_y) const;
+  bool ProjectPointDistort(const CameraCoeffient&          coeffient,
+                           const Eigen::Matrix4d&          pose,
+                           const apollo::common::PointENU& point,
+                           int*                            center_x,
+                           int*                            center_y) const;
 
-  Eigen::Matrix<double, 2, 1> PixelDenormalize(
-      const Eigen::Matrix<double, 2, 1> &pt2d,
-      const Eigen::Matrix<double, 3, 4> &camera_intrinsic,
-      const Eigen::Matrix<double, 5, 1> &distort_params) const;
+  Eigen::Matrix<double, 2, 1>
+  PixelDenormalize(const Eigen::Matrix<double, 2, 1>& pt2d,
+                   const Eigen::Matrix<double, 3, 4>& camera_intrinsic,
+                   const Eigen::Matrix<double, 5, 1>& distort_params) const;
 };
 
 REGISTER_PROJECTION(BoundaryProjection);

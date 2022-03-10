@@ -20,44 +20,42 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/common/util/file.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/util/file.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterManager;
 
 class PredictorManagerTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    std::string file =
-        "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+    std::string file = "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
-  common::adapter::AdapterManagerConfig adapter_conf_;
-  PredictionConf prediction_conf_;
+  common::adapter::AdapterManagerConfig   adapter_conf_;
+  PredictionConf                          prediction_conf_;
 };
 
 TEST_F(PredictorManagerTest, General) {
   FLAGS_enable_trim_prediction_trajectory = false;
-  std::string conf_file = "modules/prediction/testdata/adapter_conf.pb.txt";
-  bool ret_load_conf = common::util::GetProtoFromFile(
-      conf_file, &adapter_conf_);
+  std::string conf_file                   = "modules/prediction/testdata/adapter_conf.pb.txt";
+  bool        ret_load_conf = common::util::GetProtoFromFile(conf_file, &adapter_conf_);
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 
@@ -66,8 +64,7 @@ TEST_F(PredictorManagerTest, General) {
   PredictorManager::instance()->Init(prediction_conf_);
 
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
+      ContainerManager::instance()->GetContainer(AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles_);
 

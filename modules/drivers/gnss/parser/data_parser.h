@@ -17,13 +17,12 @@
 #ifndef MODULES_DRIVERS_GNSS_DATA_PARSER_H_
 #define MODULES_DRIVERS_GNSS_DATA_PARSER_H_
 
-
-#include <proj_api.h>
-#include <std_msgs/String.h>
-#include <memory>
 #include "ros/include/geometry_msgs/TransformStamped.h"
 #include "ros/include/ros/ros.h"
 #include "ros/include/tf2_ros/transform_broadcaster.h"
+#include <memory>
+#include <proj_api.h>
+#include <std_msgs/String.h>
 
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
@@ -44,10 +43,10 @@ using ::apollo::drivers::gnss_status::InsStatus;
 
 class DataParser {
  public:
-  explicit DataParser(const config::Config &config);
+  explicit DataParser(const config::Config& config);
   ~DataParser() {}
   bool Init();
-  void ParseRawData(const std_msgs::String::ConstPtr &msg);
+  void ParseRawData(const std_msgs::String::ConstPtr& msg);
 
  private:
   void DispatchMessage(Parser::MessageType type, MessagePtr message);
@@ -59,21 +58,21 @@ class DataParser {
   void PublishEphemeris(const MessagePtr message);
   void PublishObservation(const MessagePtr message);
   void PublishHeading(const MessagePtr message);
-  void CheckInsStatus(drivers::gnss::Ins *ins);
-  void CheckGnssStatus(drivers::gnss::Gnss *gnss);
-  void GpsToTransformStamped(const ::apollo::localization::Gps &gps,
-                             geometry_msgs::TransformStamped *transform);
+  void CheckInsStatus(drivers::gnss::Ins* ins);
+  void CheckGnssStatus(drivers::gnss::Gnss* gnss);
+  void GpsToTransformStamped(const ::apollo::localization::Gps& gps,
+                             geometry_msgs::TransformStamped*   transform);
 
-  bool inited_flag_ = false;
-  config::Config config_;
-  std::unique_ptr<Parser> data_parser_;
+  bool                          inited_flag_ = false;
+  config::Config                config_;
+  std::unique_ptr<Parser>       data_parser_;
   tf2_ros::TransformBroadcaster tf_broadcaster_;
 
   GnssStatus gnss_status_;
-  InsStatus ins_status_;
-  uint32_t ins_status_record_ = static_cast<uint32_t>(0);
-  projPJ wgs84pj_source_;
-  projPJ utm_target_;
+  InsStatus  ins_status_;
+  uint32_t   ins_status_record_ = static_cast<uint32_t>(0);
+  projPJ     wgs84pj_source_;
+  projPJ     utm_target_;
 };
 
 }  // namespace gnss

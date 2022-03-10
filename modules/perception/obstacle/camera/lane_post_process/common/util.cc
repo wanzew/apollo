@@ -22,74 +22,54 @@
 namespace apollo {
 namespace perception {
 
-void RectAngle(ScalarType *theta) {
-  if (theta == NULL) {
-    return;
-  }
-  if (*theta < 0) {
-    (*theta) += static_cast<ScalarType>(2 * M_PI);
-  }
+void RectAngle(ScalarType* theta) {
+  if (theta == NULL) { return; }
+  if (*theta < 0) { (*theta) += static_cast<ScalarType>(2 * M_PI); }
 }
 
-void NonMask::AddPolygonPoint(const ScalarType &x, const ScalarType &y) {
+void NonMask::AddPolygonPoint(const ScalarType& x, const ScalarType& y) {
   polygon_.push_back(Vector2D(x, y));
 }
 
-int NonMask::ComputeOrientation(const Vector2D &p1, const Vector2D &p2,
-                                const Vector2D &q) const {
-  ScalarType cross = (q.x() - p1.x()) * (p2.y() - p1.y()) -
-                     (p2.x() - p1.x()) * (q.y() - p1.y());
+int NonMask::ComputeOrientation(const Vector2D& p1, const Vector2D& p2, const Vector2D& q) const {
+  ScalarType cross = (q.x() - p1.x()) * (p2.y() - p1.y()) - (p2.x() - p1.x()) * (q.y() - p1.y());
   if (std::fabs(cross) < kEpsilon) {
     return 0;  // colinear
   }
   return cross > 0 ? 1 : -1;  // 1: clockwise, -1: anti-clockwise
 }
 
-bool NonMask::IsColinear(const Vector2D &p1, const Vector2D &p2,
-                         const Vector2D &q) const {
-  ScalarType cross = (q.x() - p1.x()) * (p2.y() - p1.y()) -
-                     (p2.x() - p1.x()) * (q.y() - p1.y());
+bool NonMask::IsColinear(const Vector2D& p1, const Vector2D& p2, const Vector2D& q) const {
+  ScalarType cross = (q.x() - p1.x()) * (p2.y() - p1.y()) - (p2.x() - p1.x()) * (q.y() - p1.y());
   return std::fabs(cross) < kEpsilon;
 }
 
-bool NonMask::IsOnLineSegmentWhenColinear(const Vector2D &p1,
-                                          const Vector2D &p2,
-                                          const Vector2D &q) const {
-  return q.x() <= std::max(p1.x(), p2.x()) &&
-         q.x() >= std::min(p1.x(), p2.x()) &&
+bool NonMask::IsOnLineSegmentWhenColinear(const Vector2D& p1,
+                                          const Vector2D& p2,
+                                          const Vector2D& q) const {
+  return q.x() <= std::max(p1.x(), p2.x()) && q.x() >= std::min(p1.x(), p2.x()) &&
          q.y() <= std::max(p1.y(), p2.y()) && q.y() >= std::min(p1.y(), p2.y());
 }
 
-bool NonMask::IsLineSegmentIntersect(const Vector2D &p1, const Vector2D &p2,
-                                     const Vector2D &p3,
-                                     const Vector2D &p4) const {
+bool NonMask::IsLineSegmentIntersect(const Vector2D& p1,
+                                     const Vector2D& p2,
+                                     const Vector2D& p3,
+                                     const Vector2D& p4) const {
   int relative_orientation_123 = ComputeOrientation(p1, p2, p3);
   int relative_orientation_124 = ComputeOrientation(p1, p2, p4);
   int relative_orientation_341 = ComputeOrientation(p3, p4, p1);
   int relative_orientation_342 = ComputeOrientation(p3, p4, p2);
 
-  if (relative_orientation_123 == 0 &&
-      IsOnLineSegmentWhenColinear(p1, p2, p3)) {
-    return true;
-  }
-  if (relative_orientation_124 == 0 &&
-      IsOnLineSegmentWhenColinear(p1, p2, p4)) {
-    return true;
-  }
-  if (relative_orientation_341 == 0 &&
-      IsOnLineSegmentWhenColinear(p3, p4, p1)) {
-    return true;
-  }
-  if (relative_orientation_342 == 0 &&
-      IsOnLineSegmentWhenColinear(p3, p4, p2)) {
-    return true;
-  }
+  if (relative_orientation_123 == 0 && IsOnLineSegmentWhenColinear(p1, p2, p3)) { return true; }
+  if (relative_orientation_124 == 0 && IsOnLineSegmentWhenColinear(p1, p2, p4)) { return true; }
+  if (relative_orientation_341 == 0 && IsOnLineSegmentWhenColinear(p3, p4, p1)) { return true; }
+  if (relative_orientation_342 == 0 && IsOnLineSegmentWhenColinear(p3, p4, p2)) { return true; }
 
   return (relative_orientation_123 != relative_orientation_124) &&
          (relative_orientation_341 != relative_orientation_342);
 }
 
-bool NonMask::IsInsideMask(const Vector2D &p) const {
+bool NonMask::IsInsideMask(const Vector2D& p) const {
   int n = static_cast<int>(polygon_.size());
   if (n < 3) return false;
 
@@ -110,9 +90,7 @@ bool NonMask::IsInsideMask(const Vector2D &p) const {
     }
 
     ++curt;
-    if (++next == n) {
-      next = 0;
-    }
+    if (++next == n) { next = 0; }
   }
 
   return intersec_count % 2 != 0;

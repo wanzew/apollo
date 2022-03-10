@@ -21,7 +21,8 @@ namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
-GLFusionVisualizer::GLFusionVisualizer() : name_("GLFusionVisualizer") {}
+GLFusionVisualizer::GLFusionVisualizer()
+    : name_("GLFusionVisualizer") {}
 
 bool GLFusionVisualizer::init() {
   opengl_vs_ = std::shared_ptr<GLFWFusionViewer>(new GLFWFusionViewer());
@@ -42,9 +43,8 @@ bool GLFusionVisualizer::init() {
   return true;
 }
 
-void GLFusionVisualizer::render(FrameContent *content) {
-  opengl_vs_->set_camera_para(camera_center_velodyne_, view_point_velodyne_,
-                              up_velodyne_);
+void GLFusionVisualizer::render(FrameContent* content) {
+  opengl_vs_->set_camera_para(camera_center_velodyne_, view_point_velodyne_, up_velodyne_);
   opengl_vs_->set_forward_dir(forward_world_);
   opengl_vs_->set_main_car(main_car_world_);
   opengl_vs_->set_frame_content(content);
@@ -53,21 +53,20 @@ void GLFusionVisualizer::render(FrameContent *content) {
   AINFO << "GLFusionVisualizer spin_once";
 }
 
-void GLFusionVisualizer::set_background_color(float r, float g, float b,
-                                              float a) {
+void GLFusionVisualizer::set_background_color(float r, float g, float b, float a) {
   opengl_vs_->set_background_color(Eigen::Vector3d(r, g, b));
 }
 
 void GLFusionVisualizer::set_camera_position() {
-  up_velodyne_[0] = 0;
-  up_velodyne_[1] = 1;
-  up_velodyne_[2] = 0;
-  forward_velodyne_[0] = 1;
-  forward_velodyne_[1] = 0;
-  forward_velodyne_[2] = 0;
-  view_point_velodyne_[0] = 0;
-  view_point_velodyne_[1] = 0;
-  view_point_velodyne_[2] = 0;
+  up_velodyne_[0]            = 0;
+  up_velodyne_[1]            = 1;
+  up_velodyne_[2]            = 0;
+  forward_velodyne_[0]       = 1;
+  forward_velodyne_[1]       = 0;
+  forward_velodyne_[2]       = 0;
+  view_point_velodyne_[0]    = 0;
+  view_point_velodyne_[1]    = 0;
+  view_point_velodyne_[2]    = 0;
   camera_center_velodyne_[0] = 0;
   camera_center_velodyne_[1] = 0;
   camera_center_velodyne_[2] = 100;
@@ -92,43 +91,40 @@ void GLFusionVisualizer::set_main_car_points() {
   main_car_[3][2] = 0.0;
 }
 
-void GLFusionVisualizer::update_camera_system(FrameContent *content) {
+void GLFusionVisualizer::update_camera_system(FrameContent* content) {
   Eigen::Matrix4d pose_v2w = Eigen::Matrix4d::Identity();
-  Eigen::Vector4d camera_center_w(camera_center_velodyne_[0],
-                                  camera_center_velodyne_[1],
+  Eigen::Vector4d camera_center_w(camera_center_velodyne_[0], camera_center_velodyne_[1],
                                   camera_center_velodyne_[2], 0);
-  camera_center_w = pose_v2w * camera_center_w;
+  camera_center_w         = pose_v2w * camera_center_w;
   camera_center_world_[0] = camera_center_w[0];
   camera_center_world_[1] = camera_center_w[1];
   camera_center_world_[2] = camera_center_w[2];
 
   Eigen::Vector4d view_point_w(view_point_velodyne_[0], view_point_velodyne_[1],
                                view_point_velodyne_[2], 0);
-  view_point_w = pose_v2w * view_point_w;
+  view_point_w         = pose_v2w * view_point_w;
   view_point_world_[0] = view_point_w[0];
   view_point_world_[1] = view_point_w[1];
   view_point_world_[2] = view_point_w[2];
 
   Eigen::Vector4d up_w(up_velodyne_[0], up_velodyne_[1], up_velodyne_[2], 0);
 
-  up_w = pose_v2w * up_w;
+  up_w         = pose_v2w * up_w;
   up_world_[0] = up_w[0];
   up_world_[1] = up_w[1];
   up_world_[2] = up_w[2];
 
-  Eigen::Vector4d fd_w(forward_velodyne_[0], forward_velodyne_[1],
-                       forward_velodyne_[2], 0);
-  fd_w = pose_v2w * fd_w;
+  Eigen::Vector4d fd_w(forward_velodyne_[0], forward_velodyne_[1], forward_velodyne_[2], 0);
+  fd_w              = pose_v2w * fd_w;
   forward_world_[0] = fd_w[0];
   forward_world_[1] = fd_w[1];
   forward_world_[2] = fd_w[2];
 
   main_car_world_.resize(4);
   for (size_t i = 0; i < 4; ++i) {
-    Eigen::Vector4d main_car_w(main_car_[i][0], main_car_[i][1],
-                               main_car_[i][2], 0.0);
+    Eigen::Vector4d main_car_w(main_car_[i][0], main_car_[i][1], main_car_[i][2], 0.0);
 
-    main_car_w = pose_v2w * main_car_w;
+    main_car_w            = pose_v2w * main_car_w;
     main_car_world_[i][0] = main_car_w[0];
     main_car_world_[i][1] = main_car_w[1];
     main_car_world_[i][2] = main_car_w[2];

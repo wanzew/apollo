@@ -30,16 +30,15 @@
 namespace apollo {
 namespace planning {
 
-PiecewiseAccelerationTrajectory1d::PiecewiseAccelerationTrajectory1d(
-    const double start_s, const double start_v) {
+PiecewiseAccelerationTrajectory1d::PiecewiseAccelerationTrajectory1d(const double start_s,
+                                                                     const double start_v) {
   s_.push_back(start_s);
   v_.push_back(start_v);
   a_.push_back(0.0);
   t_.push_back(0.0);
 }
 
-void PiecewiseAccelerationTrajectory1d::AppendSegment(
-    const double a, const double t_duration) {
+void PiecewiseAccelerationTrajectory1d::AppendSegment(const double a, const double t_duration) {
   double s0 = s_.back();
   double v0 = v_.back();
   double t0 = t_.back();
@@ -48,8 +47,8 @@ void PiecewiseAccelerationTrajectory1d::AppendSegment(
   CHECK(v1 >= -FLAGS_lattice_epsilon);
 
   double delta_s = (v0 + v1) * t_duration * 0.5;
-  double s1 = s0 + delta_s;
-  double t1 = t0 + t_duration;
+  double s1      = s0 + delta_s;
+  double t1      = t0 + t_duration;
 
   CHECK(s1 >= s0 - FLAGS_lattice_epsilon);
   s1 = std::max(s1, s0);
@@ -74,34 +73,28 @@ double PiecewiseAccelerationTrajectory1d::ParamLength() const {
 }
 
 std::string PiecewiseAccelerationTrajectory1d::ToString() const {
-  return apollo::common::util::StrCat(apollo::common::util::PrintIter(s_, "\t"),
-                                      apollo::common::util::PrintIter(t_, "\t"),
-                                      apollo::common::util::PrintIter(v_, "\t"),
-                                      apollo::common::util::PrintIter(a_, "\t"),
-                                      "\n");
+  return apollo::common::util::StrCat(
+      apollo::common::util::PrintIter(s_, "\t"), apollo::common::util::PrintIter(t_, "\t"),
+      apollo::common::util::PrintIter(v_, "\t"), apollo::common::util::PrintIter(a_, "\t"), "\n");
 }
 
 double PiecewiseAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
-                                                  const double param) const {
+                                                   const double        param) const {
   CHECK_GT(t_.size(), 1);
   CHECK(t_.front() <= param && param <= t_.back());
 
   switch (order) {
-    case 0:
-      return Evaluate_s(param);
-    case 1:
-      return Evaluate_v(param);
-    case 2:
-      return Evaluate_a(param);
-    case 3:
-      return Evaluate_j(param);
+    case 0: return Evaluate_s(param);
+    case 1: return Evaluate_v(param);
+    case 2: return Evaluate_a(param);
+    case 3: return Evaluate_j(param);
   }
   return 0.0;
 }
 
 double PiecewiseAccelerationTrajectory1d::Evaluate_s(const double t) const {
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
-  auto index = std::distance(t_.begin(), it_lower);
+  auto index    = std::distance(t_.begin(), it_lower);
 
   double s0 = s_[index - 1];
   double v0 = v_[index - 1];
@@ -117,7 +110,7 @@ double PiecewiseAccelerationTrajectory1d::Evaluate_s(const double t) const {
 
 double PiecewiseAccelerationTrajectory1d::Evaluate_v(const double t) const {
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
-  auto index = std::distance(t_.begin(), it_lower);
+  auto index    = std::distance(t_.begin(), it_lower);
 
   double v0 = v_[index - 1];
   double t0 = t_[index - 1];
@@ -131,21 +124,18 @@ double PiecewiseAccelerationTrajectory1d::Evaluate_v(const double t) const {
 
 double PiecewiseAccelerationTrajectory1d::Evaluate_a(const double t) const {
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
-  auto index = std::distance(t_.begin(), it_lower);
+  auto index    = std::distance(t_.begin(), it_lower);
   return a_[index - 1];
 }
 
-double PiecewiseAccelerationTrajectory1d::Evaluate_j(const double t) const {
-  return 0.0;
-}
+double PiecewiseAccelerationTrajectory1d::Evaluate_j(const double t) const { return 0.0; }
 
-std::array<double, 4> PiecewiseAccelerationTrajectory1d::Evaluate(
-    const double t) const {
+std::array<double, 4> PiecewiseAccelerationTrajectory1d::Evaluate(const double t) const {
   CHECK_GT(t_.size(), 1);
   CHECK(t_.front() <= t && t <= t_.back());
 
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
-  auto index = std::distance(t_.begin(), it_lower);
+  auto index    = std::distance(t_.begin(), it_lower);
 
   double s0 = s_[index - 1];
   double v0 = v_[index - 1];

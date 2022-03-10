@@ -13,15 +13,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
-#include <math.h>
 #include "glog/logging.h"
+#include <math.h>
 
 namespace apollo {
 namespace hdmap {
 namespace adapter {
 
 CoordinateConvertTool::CoordinateConvertTool()
-  : pj_from_(NULL), pj_to_(NULL) {}
+    : pj_from_(NULL)
+    , pj_to_(NULL) {}
 
 CoordinateConvertTool::~CoordinateConvertTool() {
   if (pj_from_) {
@@ -40,13 +41,13 @@ CoordinateConvertTool* CoordinateConvertTool::GetInstance() {
   return &instance;
 }
 
-Status CoordinateConvertTool::SetConvertParam(const std::string &source_param,
-                                             const std::string &dst_param) {
+Status CoordinateConvertTool::SetConvertParam(const std::string& source_param,
+                                              const std::string& dst_param) {
   source_convert_param_ = source_param;
-  dst_convert_param_ = dst_param;
+  dst_convert_param_    = dst_param;
   if (pj_from_) {
-      pj_free(pj_from_);
-      pj_from_ = NULL;
+    pj_free(pj_from_);
+    pj_from_ = NULL;
   }
 
   if (pj_to_) {
@@ -70,21 +71,22 @@ Status CoordinateConvertTool::SetConvertParam(const std::string &source_param,
 }
 
 Status CoordinateConvertTool::CoordiateConvert(const double longitude,
-                                             const double latitude,
-                                             const double height_ellipsoid,
-                                             double* utm_x, double* utm_y,
-                                             double* utm_z) {
+                                               const double latitude,
+                                               const double height_ellipsoid,
+                                               double*      utm_x,
+                                               double*      utm_y,
+                                               double*      utm_z) {
   CHECK_NOTNULL(utm_x);
   CHECK_NOTNULL(utm_y);
   CHECK_NOTNULL(utm_z);
   if (!pj_from_ || !pj_to_) {
-      std::string err_msg = "no transform param";
-      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    std::string err_msg = "no transform param";
+    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
 
   double gps_longitude = longitude;
-  double gps_latitude = latitude;
-  double gps_alt = height_ellipsoid;
+  double gps_latitude  = latitude;
+  double gps_alt       = height_ellipsoid;
 
   if (pj_is_latlong(pj_from_)) {
     gps_longitude *= DEG_TO_RAD;
@@ -92,8 +94,7 @@ Status CoordinateConvertTool::CoordiateConvert(const double longitude,
     gps_alt = height_ellipsoid;
   }
 
-  if (0 != pj_transform(pj_from_, pj_to_, 1, 1, &gps_longitude,
-                          &gps_latitude, &gps_alt)) {
+  if (0 != pj_transform(pj_from_, pj_to_, 1, 1, &gps_longitude, &gps_latitude, &gps_alt)) {
     std::string err_msg = "fail to transform coordinate";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }

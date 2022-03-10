@@ -32,8 +32,9 @@ using apollo::drivers::canbus::Byte;
 ClusterGeneralInfo701::ClusterGeneralInfo701() {}
 const uint32_t ClusterGeneralInfo701::ID = 0x701;
 
-void ClusterGeneralInfo701::Parse(const std::uint8_t* bytes, int32_t length,
-                                  RacobitRadar* racobit_radar) const {
+void ClusterGeneralInfo701::Parse(const std::uint8_t* bytes,
+                                  int32_t             length,
+                                  RacobitRadar*       racobit_radar) const {
   auto obs = racobit_radar->add_contiobs();
   obs->set_clusterortrack(true);
   obs->set_obstacle_id(obstacle_id(bytes, length));
@@ -44,26 +45,24 @@ void ClusterGeneralInfo701::Parse(const std::uint8_t* bytes, int32_t length,
   obs->set_rcs(rcs(bytes, length));
   obs->set_dynprop(dynprop(bytes, length));
   double timestamp = apollo::common::time::Clock::NowInSeconds();
-  auto header = obs->mutable_header();
+  auto   header    = obs->mutable_header();
   header->CopyFrom(racobit_radar->header());
   header->set_timestamp_sec(timestamp);
 }
 
-int ClusterGeneralInfo701::obstacle_id(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes);
+int ClusterGeneralInfo701::obstacle_id(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes);
   uint32_t x = t0.get_byte(0, 8);
 
   int ret = x;
   return ret;
 }
 
-double ClusterGeneralInfo701::longitude_dist(const std::uint8_t* bytes,
-                                             int32_t length) const {
-  Byte t0(bytes + 1);
+double ClusterGeneralInfo701::longitude_dist(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 1);
   uint32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte     t1(bytes + 2);
   uint32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
@@ -71,12 +70,11 @@ double ClusterGeneralInfo701::longitude_dist(const std::uint8_t* bytes,
   return ret;
 }
 
-double ClusterGeneralInfo701::lateral_dist(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 2);
+double ClusterGeneralInfo701::lateral_dist(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 2);
   uint32_t x = t0.get_byte(0, 2);
 
-  Byte t1(bytes + 3);
+  Byte     t1(bytes + 3);
   uint32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -84,12 +82,11 @@ double ClusterGeneralInfo701::lateral_dist(const std::uint8_t* bytes,
   return ret;
 }
 
-double ClusterGeneralInfo701::longitude_vel(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 4);
+double ClusterGeneralInfo701::longitude_vel(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 4);
   uint32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte     t1(bytes + 5);
   uint32_t t = t1.get_byte(6, 2);
   x <<= 2;
   x |= t;
@@ -97,12 +94,11 @@ double ClusterGeneralInfo701::longitude_vel(const std::uint8_t* bytes,
   return ret;
 }
 
-double ClusterGeneralInfo701::lateral_vel(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 5);
+double ClusterGeneralInfo701::lateral_vel(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 5);
   uint32_t x = t0.get_byte(0, 6);
 
-  Byte t1(bytes + 6);
+  Byte     t1(bytes + 6);
   uint32_t t = t1.get_byte(5, 3);
   x <<= 3;
   x |= t;
@@ -110,19 +106,17 @@ double ClusterGeneralInfo701::lateral_vel(const std::uint8_t* bytes,
   return ret;
 }
 
-double ClusterGeneralInfo701::rcs(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 7);
-  uint32_t x = t0.get_byte(0, 8);
-  double ret = x * CLUSTER_RCS_RES + CLUSTER_RCS;
+double ClusterGeneralInfo701::rcs(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 7);
+  uint32_t x   = t0.get_byte(0, 8);
+  double   ret = x * CLUSTER_RCS_RES + CLUSTER_RCS;
   return ret;
 }
 
-int ClusterGeneralInfo701::dynprop(const std::uint8_t* bytes,
-                                   int32_t length) const {
-  Byte t0(bytes + 6);
-  uint32_t x = t0.get_byte(0, 3);
-  int ret = x;
+int ClusterGeneralInfo701::dynprop(const std::uint8_t* bytes, int32_t length) const {
+  Byte     t0(bytes + 6);
+  uint32_t x   = t0.get_byte(0, 3);
+  int      ret = x;
   return ret;
 }
 

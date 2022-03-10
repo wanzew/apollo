@@ -41,19 +41,22 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::Point;
 
 double GetAngleFromQuaternion(const Quaternion quaternion) {
-  double theta = std::atan2(2.0 * quaternion.qw() * quaternion.qz() +
-                                quaternion.qx() * quaternion.qy(),
-                            1.0 - 2.0 * (quaternion.qy() * quaternion.qy() +
-                                         quaternion.qz() * quaternion.qz())) +
-                 std::acos(-1.0) / 2.0;
+  double theta =
+      std::atan2(
+          2.0 * quaternion.qw() * quaternion.qz() + quaternion.qx() * quaternion.qy(),
+          1.0 - 2.0 * (quaternion.qy() * quaternion.qy() + quaternion.qz() * quaternion.qz())) +
+      std::acos(-1.0) / 2.0;
   return theta;
 }
 
 void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
-                           const double mid_x, const double mid_y,
-                           const double mid_z, const double length,
-                           const double width, const double height,
-                           const double heading) {
+                           const double              mid_x,
+                           const double              mid_y,
+                           const double              mid_z,
+                           const double              length,
+                           const double              width,
+                           const double              height,
+                           const double              heading) {
   // Generate a 2D cube whose vertices are given in counter-clock order when
   // viewed from top
   const int sign_l[4] = {1, 1, -1, -1};
@@ -123,9 +126,7 @@ double GetDefaultObjectWidth(const int object_type) {
   return default_object_width;
 }
 
-Point SLtoXY(const Point& point, const double theta) {
-  return SLtoXY(point.x(), point.y(), theta);
-}
+Point SLtoXY(const Point& point, const double theta) { return SLtoXY(point.x(), point.y(), theta); }
 
 Point SLtoXY(const double x, const double y, const double theta) {
   Point converted_point;
@@ -135,17 +136,15 @@ Point SLtoXY(const double x, const double y, const double theta) {
 }
 
 double Distance(const Point& point1, const Point& point2) {
-  double distance =
-      std::sqrt((point1.x() - point2.x()) * (point1.x() - point2.x()) +
-                (point1.y() - point2.y()) * (point1.y() - point2.y()));
+  double distance = std::sqrt((point1.x() - point2.x()) * (point1.x() - point2.x()) +
+                              (point1.y() - point2.y()) * (point1.y() - point2.y()));
   return distance;
 }
 
 double GetNearestLaneHeading(const PointENU& point_enu) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {
-    AERROR << "Failed to get nearest lane for point "
-           << point_enu.DebugString();
+    AERROR << "Failed to get nearest lane for point " << point_enu.DebugString();
     return -1.0;
   }
 
@@ -154,12 +153,10 @@ double GetNearestLaneHeading(const PointENU& point_enu) {
   double nearest_s;
   double nearest_l;
 
-  int status =
-      hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
+  int status = hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
   // TODO(lizh): make it a formal status below
   if (status != 0) {
-    AERROR << "Failed to get nearest lane for point "
-           << point_enu.DebugString();
+    AERROR << "Failed to get nearest lane for point " << point_enu.DebugString();
     return -1.0;
   }
   double lane_heading = nearest_lane->Heading(nearest_s);
@@ -184,8 +181,7 @@ double GetNearestLaneHeading(const Point& point) {
 double GetNearestLaneHeading(const double x, const double y, const double z) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {
-    AERROR << "Failed to get nearest lane for point (" << x << ", " << y << ", "
-           << z << ")";
+    AERROR << "Failed to get nearest lane for point (" << x << ", " << y << ", " << z << ")";
     return -1.0;
   }
 
@@ -213,8 +209,7 @@ double GetLateralDistanceToNearestLane(const Point& point) {
   double nearest_s;
   double nearest_l;
 
-  int status =
-      hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
+  int status = hdmap->GetNearestLane(point_enu, &nearest_lane, &nearest_s, &nearest_l);
   // TODO(lizh): make it a formal status below
   if (status != 0) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
@@ -228,9 +223,7 @@ double Speed(const Point& point) {
   return std::sqrt(point.x() * point.x() + point.y() + point.y());
 }
 
-double Speed(const double vx, const double vy) {
-  return std::sqrt(vx * vx + vy * vy);
-}
+double Speed(const double vx, const double vy) { return std::sqrt(vx * vx + vy * vy); }
 
 double HeadingDifference(const double theta1, const double theta2) {
   double theta_diff = std::abs(theta1 - theta2);

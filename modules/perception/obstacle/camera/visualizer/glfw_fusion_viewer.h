@@ -42,7 +42,7 @@ namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
-#define BUFFER_OFFSET(offset) (static_cast<GLvoid *>(offset))
+#define BUFFER_OFFSET(offset) (static_cast<GLvoid*>(offset))
 
 typedef struct {
   GLfloat x;
@@ -70,9 +70,7 @@ class GLFWFusionViewer {
 
   bool initialize();
 
-  void set_frame_content(FrameContent *frame_content) {
-    frame_content_ = frame_content;
-  }
+  void set_frame_content(FrameContent* frame_content) { frame_content_ = frame_content; }
 
   void spin();
 
@@ -80,18 +78,15 @@ class GLFWFusionViewer {
 
   void close();
 
-  void set_background_color(Eigen::Vector3d i_bg_color) {
-    bg_color_ = i_bg_color;
-  }
+  void set_background_color(Eigen::Vector3d i_bg_color) { bg_color_ = i_bg_color; }
 
-  void set_camera_para(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center,
+  void set_camera_para(Eigen::Vector3d i_position,
+                       Eigen::Vector3d i_scn_center,
                        Eigen::Vector3d i_up_vector);
 
   void set_forward_dir(Eigen::Vector3d forward) { forward_dir_ = forward; }
 
-  void set_main_car(const std::vector<Eigen::Vector3d> &main_car) {
-    main_car_ = main_car;
-  }
+  void set_main_car(const std::vector<Eigen::Vector3d>& main_car) { main_car_ = main_car; }
 
   // callback assistants
   void resize_framebuffer(int width, int height);
@@ -107,26 +102,21 @@ class GLFWFusionViewer {
   void resize_window(int width, int height);
 
   // callback functions
-  static void framebuffer_size_callback(GLFWwindow *window, int width,
-                                        int height);
+  static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-  static void window_size_callback(GLFWwindow *window, int width, int height);
+  static void window_size_callback(GLFWwindow* window, int width, int height);
 
   // input related
-  static void key_callback(GLFWwindow *window, int key, int scancode,
-                           int action, int mods);
+  static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-  static void mouse_button_callback(GLFWwindow *window, int button, int action,
-                                    int mods);
+  static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
-  static void mouse_cursor_position_callback(GLFWwindow *window, double xpos,
-                                             double ypos);
+  static void mouse_cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 
-  static void mouse_scroll_callback(GLFWwindow *window, double xoffset,
-                                    double yoffset);
+  static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
   // error handling
-  static void error_callback(int error, const char *description);
+  static void error_callback(int error, const char* description);
 
  private:
   bool window_init();
@@ -139,114 +129,148 @@ class GLFWFusionViewer {
 
   void render();
 
-  float project_point(const Eigen::VectorXf &in, Eigen::Vector2f *out,
-                      const MotionType &motion_matrix);
+  float
+  project_point(const Eigen::VectorXf& in, Eigen::Vector2f* out, const MotionType& motion_matrix);
 
  protected:
-  vec3 get_velocity_src_position(const std::shared_ptr<Object> &object);
+  vec3 get_velocity_src_position(const std::shared_ptr<Object>& object);
 
   // capture screen
-  void capture_screen(const std::string &file_name);
+  void capture_screen(const std::string& file_name);
 
-  void draw_car_trajectory(FrameContent *content);
-  void draw_trajectories(FrameContent *content);
+  void draw_car_trajectory(FrameContent* content);
+  void draw_trajectories(FrameContent* content);
 
   void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius, GLfloat z = 0);
 
   // for drawing camera 2d results
  protected:
   // @brief Get camera intrinsics with distortion coefficients from file
-  bool get_camera_distort_intrinsics(const std::string &file_name,
-                                     CameraDistort<double> *camera_distort);
+  bool get_camera_distort_intrinsics(const std::string&     file_name,
+                                     CameraDistort<double>* camera_distort);
 
   // @brief Project 3D point to 2D image using pin-hole camera model with
   // distortion
-  bool project_point_undistort(Eigen::Matrix4d w2c, Eigen::Vector3d pc,
-                               Eigen::Vector2d *p2d);
+  bool project_point_undistort(Eigen::Matrix4d w2c, Eigen::Vector3d pc, Eigen::Vector2d* p2d);
 
-  void get_8points(float width, float height, float length,
-                   std::vector<Eigen::Vector3d> *point);
+  void get_8points(float width, float height, float length, std::vector<Eigen::Vector3d>* point);
 
-  bool get_boundingbox(Eigen::Vector3d center, Eigen::Matrix4d w2c, float width,
-                       float height, float length, Eigen::Vector3d dir,
-                       float theta, std::vector<Eigen::Vector2d> *points);
+  bool get_boundingbox(Eigen::Vector3d               center,
+                       Eigen::Matrix4d               w2c,
+                       float                         width,
+                       float                         height,
+                       float                         length,
+                       Eigen::Vector3d               dir,
+                       float                         theta,
+                       std::vector<Eigen::Vector2d>* points);
 
-  bool get_project_point(Eigen::Matrix4d w2c, Eigen::Vector3d pc,
-                         Eigen::Vector2d *p2d);
+  bool get_project_point(Eigen::Matrix4d w2c, Eigen::Vector3d pc, Eigen::Vector2d* p2d);
 
-  void draw_line2d(const Eigen::Vector2d &p1, const Eigen::Vector2d &p2,
-                   int line_width, int r, int g, int b, int offset_x,
-                   int offset_y, int raw_image_width, int raw_image_height);
+  void draw_line2d(const Eigen::Vector2d& p1,
+                   const Eigen::Vector2d& p2,
+                   int                    line_width,
+                   int                    r,
+                   int                    g,
+                   int                    b,
+                   int                    offset_x,
+                   int                    offset_y,
+                   int                    raw_image_width,
+                   int                    raw_image_height);
 
-  void draw_camera_box2d(const std::vector<std::shared_ptr<Object>> &objects,
-                         Eigen::Matrix4d w2c, int offset_x, int offset_y,
-                         int image_width, int image_height);
+  void draw_camera_box2d(const std::vector<std::shared_ptr<Object>>& objects,
+                         Eigen::Matrix4d                             w2c,
+                         int                                         offset_x,
+                         int                                         offset_y,
+                         int                                         image_width,
+                         int                                         image_height);
 
-  void draw_camera_box3d(
-      const std::vector<std::shared_ptr<Object>> &camera_objects,
-      const std::vector<std::shared_ptr<Object>> &segmented_objects,
-      Eigen::Matrix4d w2c, int offset_x, int offset_y, int image_width,
-      int image_height);
+  void draw_camera_box3d(const std::vector<std::shared_ptr<Object>>& camera_objects,
+                         const std::vector<std::shared_ptr<Object>>& segmented_objects,
+                         Eigen::Matrix4d                             w2c,
+                         int                                         offset_x,
+                         int                                         offset_y,
+                         int                                         image_width,
+                         int                                         image_height);
 
-  void draw_rect2d(const Eigen::Vector2d &p1, const Eigen::Vector2d &p2,
-                   int line_width, int r, int g, int b, int offset_x,
-                   int offset_y, int image_width, int image_height);
+  void draw_rect2d(const Eigen::Vector2d& p1,
+                   const Eigen::Vector2d& p2,
+                   int                    line_width,
+                   int                    r,
+                   int                    g,
+                   int                    b,
+                   int                    offset_x,
+                   int                    offset_y,
+                   int                    image_width,
+                   int                    image_height);
 
-  void draw_8pts_box(const std::vector<Eigen::Vector2d> &points,
-                     const Eigen::Vector3f &color, int offset_x, int offset_y,
-                     int image_width, int image_height);
+  void draw_8pts_box(const std::vector<Eigen::Vector2d>& points,
+                     const Eigen::Vector3f&              color,
+                     int                                 offset_x,
+                     int                                 offset_y,
+                     int                                 image_width,
+                     int                                 image_height);
 
   bool draw_car_forward_dir();
-  void draw_objects(double timestamp,
-                    const std::vector<std::shared_ptr<Object>> &objects,
-                    const Eigen::Matrix4d &w2c, bool draw_cube,
-                    bool draw_velocity, const Eigen::Vector3f &color,
-                    bool use_class_color, bool use_track_color = true);
+  void draw_objects(double                                      timestamp,
+                    const std::vector<std::shared_ptr<Object>>& objects,
+                    const Eigen::Matrix4d&                      w2c,
+                    bool                                        draw_cube,
+                    bool                                        draw_velocity,
+                    const Eigen::Vector3f&                      color,
+                    bool                                        use_class_color,
+                    bool                                        use_track_color = true);
 
-  void draw_3d_classifications(FrameContent *content, bool show_fusion);
-  void draw_camera_box(const std::vector<std::shared_ptr<Object>> &objects,
-                       Eigen::Matrix4d w2c, Eigen::Matrix4d w2c_static,
-                       int offset_x, int offset_y,
-                       int image_width, int image_height);
+  void draw_3d_classifications(FrameContent* content, bool show_fusion);
+  void draw_camera_box(const std::vector<std::shared_ptr<Object>>& objects,
+                       Eigen::Matrix4d                             w2c,
+                       Eigen::Matrix4d                             w2c_static,
+                       int                                         offset_x,
+                       int                                         offset_y,
+                       int                                         image_width,
+                       int                                         image_height);
 
-  void draw_objects2d(const std::vector<std::shared_ptr<Object>> &objects,
-                      Eigen::Matrix4d w2c, std::string name, int offset_x,
-                      int offset_y, int image_width, int image_height);
+  void draw_objects2d(const std::vector<std::shared_ptr<Object>>& objects,
+                      Eigen::Matrix4d                             w2c,
+                      std::string                                 name,
+                      int                                         offset_x,
+                      int                                         offset_y,
+                      int                                         image_width,
+                      int                                         image_height);
 
  private:
   bool init_;
 
-  GLFWwindow *window_;
+  GLFWwindow* window_;
   //  Camera *pers_camera_;
-  Eigen::Vector3d scene_center_;
-  Eigen::Vector3d forward_dir_;
+  Eigen::Vector3d              scene_center_;
+  Eigen::Vector3d              forward_dir_;
   std::vector<Eigen::Vector3d> main_car_;
 
   Eigen::Vector3d bg_color_;
-  int win_width_;
-  int win_height_;
-  int mouse_prev_x_;
-  int mouse_prev_y_;
+  int             win_width_;
+  int             win_height_;
+  int             mouse_prev_x_;
+  int             mouse_prev_y_;
   Eigen::Matrix4d mode_mat_;
   Eigen::Matrix4d view_mat_;
 
-  FrameContent *frame_content_;
-  unsigned char *rgba_buffer_;
+  FrameContent*  frame_content_;
+  unsigned char* rgba_buffer_;
 
-  float vao_trans_x_;
-  float vao_trans_y_;
-  float vao_trans_z_;
-  float _Rotate_x;
-  float _Rotate_y;
-  float _Rotate_z;
-  float _Scale_x;
-  float _Scale_y;
-  float _Scale_z;
-  bool show_box;
-  bool show_velocity;
-  bool show_polygon;
-  bool show_text;
-  bool show_help_text;
+  float       vao_trans_x_;
+  float       vao_trans_y_;
+  float       vao_trans_z_;
+  float       _Rotate_x;
+  float       _Rotate_y;
+  float       _Rotate_z;
+  float       _Scale_x;
+  float       _Scale_y;
+  float       _Scale_z;
+  bool        show_box;
+  bool        show_velocity;
+  bool        show_polygon;
+  bool        show_text;
+  bool        show_help_text;
   std::string help_str;
 
   void get_class_color(int cls, float rgb[3]);
@@ -257,43 +281,46 @@ class GLFWFusionViewer {
   // cloud
   static const int VAO_cloud_num = 35;
   static const int VBO_cloud_num = 10000;
-  GLuint VAO_cloud[VAO_cloud_num];
-  GLuint buffers_cloud[VAO_cloud_num][NumVBOs];
-  GLfloat cloudVerts[VBO_cloud_num][3];
+  GLuint           VAO_cloud[VAO_cloud_num];
+  GLuint           buffers_cloud[VAO_cloud_num][NumVBOs];
+  GLfloat          cloudVerts[VBO_cloud_num][3];
 
-  bool draw_cloud(FrameContent *content);
+  bool draw_cloud(FrameContent* content);
 
   // circle
   static const int VAO_circle_num = 4;
   static const int VBO_circle_num = 360;
-  GLuint VAO_circle[VAO_circle_num];
-  vec3 get_velocity_src_position(FrameContent *content, int id);
+  GLuint           VAO_circle[VAO_circle_num];
+  vec3             get_velocity_src_position(FrameContent* content, int id);
 
   // fusion association
-  void draw_fusion_association(FrameContent *content);
+  void draw_fusion_association(FrameContent* content);
 
-  GLuint image_to_gl_texture(const cv::Mat &mat, GLenum min_filter,
-                             GLenum mag_filter, GLenum wrap_filter);
+  GLuint
+  image_to_gl_texture(const cv::Mat& mat, GLenum min_filter, GLenum mag_filter, GLenum wrap_filter);
 
   // @brief, draw 2d camera frame, show 2d or 3d classification
-  void draw_camera_frame(FrameContent *content, cv::Mat *image_mat,
-                         bool show_3d_class = false);
+  void draw_camera_frame(FrameContent* content, cv::Mat* image_mat, bool show_3d_class = false);
 
   // @brief: draw lane objects in ego-car ground (vehicle) space
   void draw_lane_objects_ground();
 
   // @brief: draw lane objects in image space
-  bool draw_lane_objects_image(cv::Mat *image_mat);
+  bool draw_lane_objects_image(cv::Mat* image_mat);
 
   // @brief draw vanishing point and ground plane on image
   // stat: static or not. decide colors
-  void draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat, int offset_x,
-                      int offset_y, int image_width, int image_height);
+  void draw_vp_ground(const Eigen::Matrix4d& v2c,
+                      bool                   stat,
+                      int                    offset_x,
+                      int                    offset_y,
+                      int                    image_width,
+                      int                    image_height);
 
   bool use_class_color_ = true;
 
   bool capture_screen_ = false;
-  bool capture_video_ = false;
+  bool capture_video_  = false;
 
   int scene_width_;
   int scene_height_;
@@ -317,33 +344,32 @@ class GLFWFusionViewer {
   bool show_trajectory_;
 
   static std::vector<std::vector<int>> s_color_table;
-  std::shared_ptr<GLRasterText> raster_text_;
+  std::shared_ptr<GLRasterText>        raster_text_;
 
   LaneObjectsPtr lane_objects_;
-  float lane_map_threshold_;
-  int lane_start_y_pos_;
-  float lane_map_scale_;
+  float          lane_map_threshold_;
+  int            lane_start_y_pos_;
+  float          lane_map_scale_;
 
-  LaneObjectsPtr lane_history_;
+  LaneObjectsPtr                  lane_history_;
   std::vector<std::vector<float>> z_history_;
   //  std::vector<LaneObjects> Lane_history_buffer_;
   const std::size_t lane_history_buffer_size_ = 300;
-  const std::size_t object_history_size_ = 100;
-  MotionType motion_matrix_;
+  const std::size_t object_history_size_      = 100;
+  MotionType        motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
 
   // frame count
   int frame_count_;
   // alpha_blending factor for visualization
-  float alpha_blending = 0.5;  // [0..1]
+  float alpha_blending  = 0.5;  // [0..1]
   float one_minus_alpha = 1.0 - alpha_blending;
   // object_trajectories
 
-  std::map<int, size_t> object_id_skip_count_;
-  std::map<int, boost::circular_buffer<std::pair<float, float>>>
-    object_trackjectories_;
-  std::map<int, std::vector<double>> object_timestamps_;
+  std::map<int, size_t>                                          object_id_skip_count_;
+  std::map<int, boost::circular_buffer<std::pair<float, float>>> object_trackjectories_;
+  std::map<int, std::vector<double>>                             object_timestamps_;
 };
 
 }  // namespace lowcostvisualizer

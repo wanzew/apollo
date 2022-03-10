@@ -19,11 +19,11 @@
  **/
 
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_CONSTANT_JERK_TRAJECTORY1D_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY1D_CONSTANT_JERK_TRAJECTORY1D_H_
+#  define MODULES_PLANNING_LATTICE_TRAJECTORY1D_CONSTANT_JERK_TRAJECTORY1D_H_
 
-#include <string>
+#  include <string>
 
-#include "modules/planning/math/curve1d/curve1d.h"
+#  include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {
@@ -31,13 +31,11 @@ namespace planning {
 class ConstantJerkTrajectory1d : public Curve1d {
  public:
   ConstantJerkTrajectory1d(
-      const double p0, const double v0, const double a0,
-      const double jerk, const double param);
+      const double p0, const double v0, const double a0, const double jerk, const double param);
 
   virtual ~ConstantJerkTrajectory1d() = default;
 
-  double Evaluate(const std::uint32_t order,
-                  const double param) const;
+  double Evaluate(const std::uint32_t order, const double param) const;
 
   double ParamLength() const;
 

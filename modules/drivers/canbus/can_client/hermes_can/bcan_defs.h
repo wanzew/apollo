@@ -18,19 +18,19 @@
 #define BCAN_DEFS_H
 
 #ifndef __KERNEL__
-#include <sys/time.h>
+#  include <sys/time.h>
 #else
-#include <linux/time.h>
+#  include <linux/time.h>
 #endif
 
 /*
  * Baidu CAN message definition
  */
 typedef struct bcan_msg {
-  unsigned int bcan_msg_id;       /* source CAN node id */
-  unsigned char bcan_msg_datalen; /* message data len */
-  unsigned char bcan_msg_rsv[3];
-  unsigned char bcan_msg_data[8]; /* message data */
+  unsigned int   bcan_msg_id;      /* source CAN node id */
+  unsigned char  bcan_msg_datalen; /* message data len */
+  unsigned char  bcan_msg_rsv[3];
+  unsigned char  bcan_msg_data[8]; /* message data */
   struct timeval bcan_msg_timestamp;
 } bcan_msg_t;
 

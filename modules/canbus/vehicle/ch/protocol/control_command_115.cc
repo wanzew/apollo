@@ -34,17 +34,14 @@ uint32_t Controlcommand115::GetPeriod() const {
   return PERIOD;
 }
 
-void Controlcommand115::UpdateData(uint8_t* data) {
-  set_p_ctrl_cmd(data, ctrl_cmd_);
-}
+void Controlcommand115::UpdateData(uint8_t* data) { set_p_ctrl_cmd(data, ctrl_cmd_); }
 
 void Controlcommand115::Reset() {
   // you should check this manually
   ctrl_cmd_ = Control_command_115::CTRL_CMD_OUT_OF_CONTROL;
 }
 
-Controlcommand115* Controlcommand115::set_ctrl_cmd(
-    Control_command_115::Ctrl_cmdType ctrl_cmd) {
+Controlcommand115* Controlcommand115::set_ctrl_cmd(Control_command_115::Ctrl_cmdType ctrl_cmd) {
   ctrl_cmd_ = ctrl_cmd;
   return this;
 }
@@ -54,8 +51,7 @@ Controlcommand115* Controlcommand115::set_ctrl_cmd(
 // 'len': 8, 'name': 'CTRL_CMD', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
-void Controlcommand115::set_p_ctrl_cmd(
-    uint8_t* data, Control_command_115::Ctrl_cmdType ctrl_cmd) {
+void Controlcommand115::set_p_ctrl_cmd(uint8_t* data, Control_command_115::Ctrl_cmdType ctrl_cmd) {
   int x = ctrl_cmd;
 
   Byte to_set(data + 0);

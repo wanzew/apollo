@@ -51,9 +51,9 @@ class BaseRecognizer {
    * @param  std::vector<Light>*: recognized light status
    * @return  bool
    */
-  virtual bool RecognizeStatus(const Image &image,
-                               const RecognizeOption &option,
-                               std::vector<LightPtr> *lights) = 0;
+  virtual bool RecognizeStatus(const Image&           image,
+                               const RecognizeOption& option,
+                               std::vector<LightPtr>* lights) = 0;
 
   virtual std::string name() const = 0;
 

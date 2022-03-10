@@ -38,12 +38,12 @@ float hard_sigmoid(const float x) {
 float relu(const float x) { return (x > 0.0) ? x : 0.0; }
 
 std::function<float(float)> serialize_to_function(const std::string& str) {
-  static const std::unordered_map<std::string, std::function<float(float)> >
-      func_map({{"linear", linear},
-                {"tanh", tanh},
-                {"sigmoid", sigmoid},
-                {"hard_sigmoid", hard_sigmoid},
-                {"relu", relu}});
+  static const std::unordered_map<std::string, std::function<float(float)>> func_map(
+      {{"linear", linear},
+       {"tanh", tanh},
+       {"sigmoid", sigmoid},
+       {"hard_sigmoid", hard_sigmoid},
+       {"relu", relu}});
   return func_map.at(str);
 }
 
@@ -60,14 +60,12 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::MatrixXf* matrix) {
     }
     return true;
   }
-  ADEBUG << "Load tensor size: (" << tensor_pb.shape(0) << ", "
-         << tensor_pb.shape(1) << ")";
+  ADEBUG << "Load tensor size: (" << tensor_pb.shape(0) << ", " << tensor_pb.shape(1) << ")";
   CHECK_EQ(tensor_pb.shape_size(), 2);
   matrix->resize(tensor_pb.shape(0), tensor_pb.shape(1));
   for (int i = 0; i < tensor_pb.shape(0); ++i) {
     for (int j = 0; j < tensor_pb.shape(1); ++j) {
-      (*matrix)(i, j) =
-          static_cast<float>(tensor_pb.data(i * tensor_pb.shape(1) + j));
+      (*matrix)(i, j) = static_cast<float>(tensor_pb.data(i * tensor_pb.shape(1) + j));
     }
   }
   return true;

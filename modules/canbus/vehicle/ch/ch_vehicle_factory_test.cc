@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
 #include "gtest/gtest.h"
-#include "modules/canbus/proto/vehicle_parameter.pb.h"
 
 namespace apollo {
 namespace canbus {

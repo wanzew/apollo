@@ -27,10 +27,9 @@ namespace hdmap {
 DEFINE_string(test_map_file,
               "modules/map/data/sunnyvale_loop/base_map_test.bin",
               "The test map file");
-DEFINE_string(
-    test_routing_file,
-    "modules/map/pnc_map/testdata/sample_sunnyvale_loop_routing.pb.txt",
-    "The test map file");
+DEFINE_string(test_routing_file,
+              "modules/map/pnc_map/testdata/sample_sunnyvale_loop_routing.pb.txt",
+              "The test map file");
 
 class RouteSegmentsTest : public ::testing::Test {
  public:
@@ -48,11 +47,11 @@ class RouteSegmentsTest : public ::testing::Test {
 hdmap::HDMap RouteSegmentsTest::hdmap_;
 
 TEST_F(RouteSegmentsTest, GetProjection) {
-  auto lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
+  auto          lane1 = hdmap_.GetLaneById(hdmap::MakeMapId("9_1_-1"));
   RouteSegments route_segments;
   route_segments.emplace_back(lane1, 5, 10);
-  LaneWaypoint waypoint;
-  auto point = lane1->GetSmoothPoint(3);
+  LaneWaypoint    waypoint;
+  auto            point = lane1->GetSmoothPoint(3);
   common::SLPoint sl;
   EXPECT_FALSE(route_segments.GetProjection(point, &sl, &waypoint));
   point = lane1->GetSmoothPoint(5);

@@ -87,10 +87,10 @@ class BaseSegmentation {
   // @param [in]: valid indices of points for segmentation.
   // @param [in]: segmentation options
   // @param [out]: segmented object.
-  virtual bool Segment(pcl_util::PointCloudPtr cloud,
-                       const pcl_util::PointIndices &valid_indices,
-                       const SegmentationOptions &options,
-                       std::vector<std::shared_ptr<Object>> *objects) = 0;
+  virtual bool Segment(pcl_util::PointCloudPtr               cloud,
+                       const pcl_util::PointIndices&         valid_indices,
+                       const SegmentationOptions&            options,
+                       std::vector<std::shared_ptr<Object>>* objects) = 0;
 
   virtual std::string name() const = 0;
 

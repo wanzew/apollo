@@ -17,8 +17,8 @@
 #include "modules/localization/rtk/rtk_localization.h"
 
 #include "google/protobuf/text_format.h"
-#include "gtest/gtest.h"
 #include "ros/include/ros/ros.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
@@ -42,7 +42,7 @@ class RTKLocalizationTest : public ::testing::Test {
     AdapterManagerConfig config;
     config.set_is_ros(false);
     {
-      auto *sub_config = config.add_config();
+      auto* sub_config = config.add_config();
       sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
       sub_config->set_type(AdapterConfig::LOCALIZATION);
     }
@@ -51,9 +51,8 @@ class RTKLocalizationTest : public ::testing::Test {
 
  protected:
   template <class T>
-  void load_data(const std::string &filename, T *data) {
-    CHECK(common::util::GetProtoFromFile(filename, data))
-        << "Failed to open file " << filename;
+  void load_data(const std::string& filename, T* data) {
+    CHECK(common::util::GetProtoFromFile(filename, data)) << "Failed to open file " << filename;
   }
 
   std::unique_ptr<RTKLocalization> rtk_localizatoin_;
@@ -69,11 +68,10 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &imu2);
 
     apollo::localization::CorrectedImu expected_result;
-    load_data("modules/localization/testdata/1_imu_result.pb.txt",
-              &expected_result);
+    load_data("modules/localization/testdata/1_imu_result.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
-    double timestamp = 1173545122.69;
+    double                             timestamp = 1173545122.69;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
@@ -88,11 +86,10 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/2_imu_2.pb.txt", &imu2);
 
     apollo::localization::CorrectedImu expected_result;
-    load_data("modules/localization/testdata/2_imu_result.pb.txt",
-              &expected_result);
+    load_data("modules/localization/testdata/2_imu_result.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
-    double timestamp = 1173545122.2001;
+    double                             timestamp = 1173545122.2001;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
@@ -110,7 +107,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
-    double timestamp = 1173545122;
+    double                             timestamp = 1173545122;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
@@ -128,7 +125,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
-    double timestamp = 1173545122.70;
+    double                             timestamp = 1173545122.70;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
@@ -147,8 +144,7 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
     load_data("modules/localization/testdata/3_imu_1.pb.txt", &imu);
 
     apollo::localization::LocalizationEstimate expected_result;
-    load_data("modules/localization/testdata/3_localization_result_1.pb.txt",
-              &expected_result);
+    load_data("modules/localization/testdata/3_localization_result_1.pb.txt", &expected_result);
 
     apollo::localization::LocalizationEstimate localization;
     rtk_localizatoin_->ComposeLocalizationMsg(gps, imu, &localization);
@@ -170,8 +166,7 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
     load_data("modules/localization/testdata/3_imu_1.pb.txt", &imu);
 
     apollo::localization::LocalizationEstimate expected_result;
-    load_data("modules/localization/testdata/3_localization_result_2.pb.txt",
-              &expected_result);
+    load_data("modules/localization/testdata/3_localization_result_2.pb.txt", &expected_result);
 
     apollo::localization::LocalizationEstimate localization;
     rtk_localizatoin_->ComposeLocalizationMsg(gps, imu, &localization);

@@ -43,9 +43,9 @@
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/canbus/sensor_gflags.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
+#include "modules/drivers/canbus/sensor_gflags.h"
 
 /**
  * @namespace apollo::drivers
@@ -55,19 +55,19 @@ namespace apollo {
 namespace drivers {
 
 /**
-* @class SensorCanbus
-*
-* @brief template of canbus-based sensor module main class (e.g., mobileye).
-*/
+ * @class SensorCanbus
+ *
+ * @brief template of canbus-based sensor module main class (e.g., mobileye).
+ */
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
 using apollo::common::time::Clock;
-using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SensorCanbusConf;
 
@@ -80,46 +80,46 @@ class SensorCanbus : public apollo::common::ApolloApp {
       : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
-  * @brief obtain module name
-  * @return module name
-  */
+   * @brief obtain module name
+   * @return module name
+   */
   std::string Name() const override;
 
   /**
-  * @brief module initialization function
-  * @return initialization status
-  */
+   * @brief module initialization function
+   * @return initialization status
+   */
   apollo::common::Status Init() override;
 
   /**
-  * @brief module start function
-  * @return start status
-  */
+   * @brief module start function
+   * @return start status
+   */
   apollo::common::Status Start() override;
 
   /**
-  * @brief module stop function
-  */
+   * @brief module stop function
+   */
   void Stop() override;
 
  private:
-  void PublishSensorData();
-  void OnTimer(const ros::TimerEvent &event);
-  void DataTrigger();
-  common::Status OnError(const std::string &error_msg);
-  void RegisterCanClients();
+  void           PublishSensorData();
+  void           OnTimer(const ros::TimerEvent& event);
+  void           DataTrigger();
+  common::Status OnError(const std::string& error_msg);
+  void           RegisterCanClients();
 
-  SensorCanbusConf canbus_conf_;
-  std::unique_ptr<CanClient> can_client_;
-  CanReceiver<SensorType> can_receiver_;
+  SensorCanbusConf                                    canbus_conf_;
+  std::unique_ptr<CanClient>                          can_client_;
+  CanReceiver<SensorType>                             can_receiver_;
   std::unique_ptr<canbus::MessageManager<SensorType>> sensor_message_manager_;
-  std::unique_ptr<std::thread> thread_;
+  std::unique_ptr<std::thread>                        thread_;
 
-  int64_t last_timestamp_ = 0;
-  ros::Timer timer_;
+  int64_t                        last_timestamp_ = 0;
+  ros::Timer                     timer_;
   common::monitor::MonitorLogger monitor_logger_;
-  std::mutex mutex_;
-  volatile bool data_trigger_running_ = false;
+  std::mutex                     mutex_;
+  volatile bool                  data_trigger_running_ = false;
 };
 
 // method implementations
@@ -136,26 +136,21 @@ Status SensorCanbus<SensorType>::Init() {
 
   // load conf
   if (!common::util::GetProtoFromFile(FLAGS_sensor_conf_file, &canbus_conf_)) {
-    return OnError("Unable to load canbus conf file: " +
-                   FLAGS_sensor_conf_file);
+    return OnError("Unable to load canbus conf file: " + FLAGS_sensor_conf_file);
   }
 
   AINFO << "The canbus conf file is loaded: " << FLAGS_sensor_conf_file;
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::instance();
+  auto* can_factory = CanClientFactory::instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(canbus_conf_.can_card_parameter());
-  if (!can_client_) {
-    return OnError("Failed to create can client.");
-  }
+  if (!can_client_) { return OnError("Failed to create can client."); }
   AINFO << "Can client is successfully created.";
 
   sensor_message_manager_.reset(new canbus::MessageManager<SensorType>());
-  if (sensor_message_manager_ == nullptr) {
-    return OnError("Failed to create message manager.");
-  }
+  if (sensor_message_manager_ == nullptr) { return OnError("Failed to create message manager."); }
   AINFO << "Sensor message manager is successfully created.";
 
   if (can_receiver_.Init(can_client_.get(), sensor_message_manager_.get(),
@@ -170,15 +165,11 @@ Status SensorCanbus<SensorType>::Init() {
 template <typename SensorType>
 Status SensorCanbus<SensorType>::Start() {
   // 1. init and start the can card hardware
-  if (can_client_->Start() != ErrorCode::OK) {
-    return OnError("Failed to start can client");
-  }
+  if (can_client_->Start() != ErrorCode::OK) { return OnError("Failed to start can client"); }
   AINFO << "Can client is started.";
 
   // 2. start receive first then send
-  if (can_receiver_.Start() != ErrorCode::OK) {
-    return OnError("Failed to start can receiver.");
-  }
+  if (can_receiver_.Start() != ErrorCode::OK) { return OnError("Failed to start can receiver."); }
   AINFO << "Can receiver is started.";
 
   // 3. set timer to trigger publish info periodically
@@ -186,8 +177,8 @@ Status SensorCanbus<SensorType>::Start() {
   // no need for timer.
   if (FLAGS_sensor_freq > 0) {
     const double duration = 1.0 / FLAGS_sensor_freq;
-    timer_ = AdapterManager::CreateTimer(
-        ros::Duration(duration), &SensorCanbus<SensorType>::OnTimer, this);
+    timer_                = AdapterManager::CreateTimer(ros::Duration(duration),
+                                         &SensorCanbus<SensorType>::OnTimer, this);
   } else {
     data_trigger_running_ = true;
     thread_.reset(new std::thread([this] { DataTrigger(); }));
@@ -205,7 +196,7 @@ Status SensorCanbus<SensorType>::Start() {
 }
 
 template <typename SensorType>
-void SensorCanbus<SensorType>::OnTimer(const ros::TimerEvent &) {
+void SensorCanbus<SensorType>::OnTimer(const ros::TimerEvent&) {
   PublishSensorData();
 }
 
@@ -240,7 +231,7 @@ void SensorCanbus<SensorType>::Stop() {
 
 // Send the error to monitor and return it
 template <typename SensorType>
-Status SensorCanbus<SensorType>::OnError(const std::string &error_msg) {
+Status SensorCanbus<SensorType>::OnError(const std::string& error_msg) {
   common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.ERROR(error_msg);
   return Status(ErrorCode::CANBUS_ERROR, error_msg);

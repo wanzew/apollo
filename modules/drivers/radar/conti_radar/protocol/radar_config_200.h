@@ -26,11 +26,10 @@ namespace conti_radar {
 
 using apollo::drivers::ContiRadar;
 using apollo::drivers::conti_radar::OutputType;
-using apollo::drivers::conti_radar::RcsThreshold;
 using apollo::drivers::conti_radar::RadarConf;
+using apollo::drivers::conti_radar::RcsThreshold;
 
-class RadarConfig200
-    : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
+class RadarConfig200 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
   RadarConfig200();
@@ -74,7 +73,7 @@ class RadarConfig200
   RadarConfig200* set_store_in_nvm(uint8_t data);
   RadarConfig200* set_rcs_threshold(RcsThreshold rcs_theshold);
   RadarConfig200* set_radar_conf(RadarConf radar_conf);
-  RadarConf radar_conf();
+  RadarConf       radar_conf();
 
   void set_max_distance_valid_p(uint8_t* data, bool valid);
   void set_sensor_id_valid_p(uint8_t* data, bool valid);

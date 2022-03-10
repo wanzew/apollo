@@ -25,7 +25,7 @@ namespace common {
 namespace math {
 
 TEST(AABox2dTest, GetAllCorners) {
-  AABox2d box1({0, 0}, 4, 2);
+  AABox2d            box1({0, 0}, 4, 2);
   std::vector<Vec2d> corners1;
   box1.GetAllCorners(&corners1);
   EXPECT_NEAR(corners1[0].x(), 2.0, 1e-5);
@@ -36,9 +36,8 @@ TEST(AABox2dTest, GetAllCorners) {
   EXPECT_NEAR(corners1[2].y(), 1.0, 1e-5);
   EXPECT_NEAR(corners1[3].x(), -2.0, 1e-5);
   EXPECT_NEAR(corners1[3].y(), -1.0, 1e-5);
-  EXPECT_EQ(
-      box1.DebugString(),
-      "aabox2d ( center = vec2d ( x = 0  y = 0 )  length = 4  width = 2 )");
+  EXPECT_EQ(box1.DebugString(),
+            "aabox2d ( center = vec2d ( x = 0  y = 0 )  length = 4  width = 2 )");
   std::vector<Vec2d> corners2;
 
   AABox2d box2({3, 1}, {7, 3});
@@ -51,9 +50,8 @@ TEST(AABox2dTest, GetAllCorners) {
   EXPECT_NEAR(corners2[2].y(), 3.0, 1e-5);
   EXPECT_NEAR(corners2[3].x(), 3.0, 1e-5);
   EXPECT_NEAR(corners2[3].y(), 1.0, 1e-5);
-  EXPECT_EQ(
-      box2.DebugString(),
-      "aabox2d ( center = vec2d ( x = 5  y = 2 )  length = 4  width = 2 )");
+  EXPECT_EQ(box2.DebugString(),
+            "aabox2d ( center = vec2d ( x = 5  y = 2 )  length = 4  width = 2 )");
 }
 
 TEST(AABox2dTest, CenterAndLengths) {

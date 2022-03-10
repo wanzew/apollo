@@ -41,10 +41,10 @@ namespace calibration {
 
 class RepublishMsg : public apollo::common::ApolloApp {
  public:
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
  private:
   // Upon receiving INS status data

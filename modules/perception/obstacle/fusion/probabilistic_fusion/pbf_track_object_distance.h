@@ -28,46 +28,46 @@ namespace apollo {
 namespace perception {
 
 struct TrackObjectDistanceOptions {
-  Eigen::Vector3d *ref_point = nullptr;
+  Eigen::Vector3d* ref_point = nullptr;
 };
 
 class PbfTrackObjectDistance {
  public:
-  PbfTrackObjectDistance() = default;
+  PbfTrackObjectDistance()          = default;
   virtual ~PbfTrackObjectDistance() = default;
 
-  float Compute(PbfTrackPtr fused_track,
-                const std::shared_ptr<PbfSensorObject> &sensor_object,
-                const TrackObjectDistanceOptions &options);
+  float Compute(PbfTrackPtr                             fused_track,
+                const std::shared_ptr<PbfSensorObject>& sensor_object,
+                const TrackObjectDistanceOptions&       options);
 
  protected:
-  float ComputeVelodyne64Velodyne64(
-      const std::shared_ptr<PbfSensorObject> &fused_object,
-      const std::shared_ptr<PbfSensorObject> &sensor_object,
-      const Eigen::Vector3d &ref_pos, int range = 3);
-  float ComputeVelodyne64Radar(
-      const std::shared_ptr<PbfSensorObject> &fused_object,
-      const std::shared_ptr<PbfSensorObject> &sensor_object,
-      const Eigen::Vector3d &ref_pos, int range = 3);
-  float ComputeRadarRadar(const std::shared_ptr<PbfSensorObject> &fused_object,
-                          const std::shared_ptr<PbfSensorObject> &sensor_object,
-                          const Eigen::Vector3d &ref_pos, int range = 3);
+  float ComputeVelodyne64Velodyne64(const std::shared_ptr<PbfSensorObject>& fused_object,
+                                    const std::shared_ptr<PbfSensorObject>& sensor_object,
+                                    const Eigen::Vector3d&                  ref_pos,
+                                    int                                     range = 3);
+  float ComputeVelodyne64Radar(const std::shared_ptr<PbfSensorObject>& fused_object,
+                               const std::shared_ptr<PbfSensorObject>& sensor_object,
+                               const Eigen::Vector3d&                  ref_pos,
+                               int                                     range = 3);
+  float ComputeRadarRadar(const std::shared_ptr<PbfSensorObject>& fused_object,
+                          const std::shared_ptr<PbfSensorObject>& sensor_object,
+                          const Eigen::Vector3d&                  ref_pos,
+                          int                                     range = 3);
 
-  float ComputeDistance3D(const std::shared_ptr<PbfSensorObject> &fused_object,
-                          const std::shared_ptr<PbfSensorObject> &sensor_object,
-                          const Eigen::Vector3d &ref_pos, const int range);
-  float ComputeEuclideanDistance(const Eigen::Vector3d &des,
-                                 const Eigen::Vector3d &src);
-  bool ComputePolygonCenter(const PolygonDType &polygon,
-                            Eigen::Vector3d *center);
-  bool ComputePolygonCenter(const PolygonDType &polygon,
-                            const Eigen::Vector3d &ref_pos, int range,
-                            Eigen::Vector3d *center);
-  float ComputeDistanceAngleMatchProb(
-      const std::shared_ptr<PbfSensorObject> &fused_object,
-      const std::shared_ptr<PbfSensorObject> &sensor_object);
+  float ComputeDistance3D(const std::shared_ptr<PbfSensorObject>& fused_object,
+                          const std::shared_ptr<PbfSensorObject>& sensor_object,
+                          const Eigen::Vector3d&                  ref_pos,
+                          const int                               range);
+  float ComputeEuclideanDistance(const Eigen::Vector3d& des, const Eigen::Vector3d& src);
+  bool  ComputePolygonCenter(const PolygonDType& polygon, Eigen::Vector3d* center);
+  bool  ComputePolygonCenter(const PolygonDType&    polygon,
+                             const Eigen::Vector3d& ref_pos,
+                             int                    range,
+                             Eigen::Vector3d*       center);
+  float ComputeDistanceAngleMatchProb(const std::shared_ptr<PbfSensorObject>& fused_object,
+                                      const std::shared_ptr<PbfSensorObject>& sensor_object);
 
-  float GetAngle(const std::shared_ptr<Object> &obj);
+  float GetAngle(const std::shared_ptr<Object>& obj);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);

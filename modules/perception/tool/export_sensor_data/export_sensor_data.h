@@ -43,30 +43,31 @@ namespace perception {
 
 class ExportSensorData {
  public:
-  std::string Name() const;
+  std::string    Name() const;
   common::Status Init();
 
  private:
-  void OnPointCloud(const sensor_msgs::PointCloud2 &message);
-  void OnRadar(const ContiRadar &radar_obs);
-  void OnLocalization(
-      const apollo::localization::LocalizationEstimate &localization);
-  bool GetCarLinearSpeed(double timestamp, Eigen::Vector3f *car_linear_speed);
-  void WriteRadar(const std::string &file_pre, const ContiRadar &radar_obs);
-  void WritePose(const std::string &file_pre, const double timestamp,
-                 const int seq_num, const Eigen::Matrix4d &pose);
-  void WriteVelocityInfo(const std::string &file_pre, const double timestamp,
-                         const int seq_num, const Eigen::Vector3f &velocity);
-  void WritePCD(const std::string &file_pre,
-                const sensor_msgs::PointCloud2 &in_msg);
-  void TransPointCloudToPCL(const sensor_msgs::PointCloud2 &in_msg,
-                            pcl_util::PointCloudPtr *out_cloud);
-  typedef std::pair<double, apollo::localization::LocalizationEstimate>
-      LocalizationPair;
-  boost::circular_buffer<LocalizationPair> localization_buffer_;
-  ContiRadarIDExpansion conti_id_expansion_;
-  Mutex mutex_;
-  Eigen::Matrix4d radar2velodyne_extrinsic_;
+  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+  void OnRadar(const ContiRadar& radar_obs);
+  void OnLocalization(const apollo::localization::LocalizationEstimate& localization);
+  bool GetCarLinearSpeed(double timestamp, Eigen::Vector3f* car_linear_speed);
+  void WriteRadar(const std::string& file_pre, const ContiRadar& radar_obs);
+  void WritePose(const std::string&     file_pre,
+                 const double           timestamp,
+                 const int              seq_num,
+                 const Eigen::Matrix4d& pose);
+  void WriteVelocityInfo(const std::string&     file_pre,
+                         const double           timestamp,
+                         const int              seq_num,
+                         const Eigen::Vector3f& velocity);
+  void WritePCD(const std::string& file_pre, const sensor_msgs::PointCloud2& in_msg);
+  void TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
+                            pcl_util::PointCloudPtr*        out_cloud);
+  typedef std::pair<double, apollo::localization::LocalizationEstimate> LocalizationPair;
+  boost::circular_buffer<LocalizationPair>                              localization_buffer_;
+  ContiRadarIDExpansion                                                 conti_id_expansion_;
+  Mutex                                                                 mutex_;
+  Eigen::Matrix4d                                                       radar2velodyne_extrinsic_;
 };
 
 }  // namespace perception

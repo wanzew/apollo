@@ -63,24 +63,24 @@ class ThreadPool {
   ~ThreadPool();
 
   template <class F, class... Args>
-  auto enqueue(F&& f, Args&&... args)
-      -> std::future<typename std::result_of<F(Args...)>::type>;
+  auto enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
   void Synchronize();
 
  private:
   // need to keep track of threads so we can join them
   std::vector<std::thread> workers;
   // the task queue
-  std::queue<std::function<void()> > tasks;
+  std::queue<std::function<void()>> tasks;
 
   // synchronization
-  std::mutex queue_mutex;
+  std::mutex              queue_mutex;
   std::condition_variable condition;
-  bool stop;
+  bool                    stop;
 };
 
 // the constructor just launches some amount of workers
-inline ThreadPool::ThreadPool(size_t threads) : stop(false) {
+inline ThreadPool::ThreadPool(size_t threads)
+    : stop(false) {
   for (size_t i = 0; i < threads; ++i)
     workers.emplace_back([this] {
       for (;;) {
@@ -88,8 +88,7 @@ inline ThreadPool::ThreadPool(size_t threads) : stop(false) {
 
         {
           std::unique_lock<std::mutex> lock(this->queue_mutex);
-          this->condition.wait(
-              lock, [this] { return this->stop || !this->tasks.empty(); });
+          this->condition.wait(lock, [this] { return this->stop || !this->tasks.empty(); });
           if (this->stop && this->tasks.empty()) return;
           task = std::move(this->tasks.front());
           this->tasks.pop();
@@ -106,7 +105,7 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
     -> std::future<typename std::result_of<F(Args...)>::type> {
   using return_type = typename std::result_of<F(Args...)>::type;
 
-  auto task = std::make_shared<std::packaged_task<return_type()> >(
+  auto task = std::make_shared<std::packaged_task<return_type()>>(
       std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
   std::future<return_type> res = task->get_future();
@@ -128,14 +127,13 @@ inline void ThreadPool::Synchronize() {
     stop = true;
   }
   condition.notify_all();
-  for (std::thread& worker : workers) worker.join();
+  for (std::thread& worker : workers)
+    worker.join();
 }
 
 // the destructor joins all threads
 inline ThreadPool::~ThreadPool() {
-  if (!stop) {
-    Synchronize();
-  }
+  if (!stop) { Synchronize(); }
 }
 
 }  // namespace util

@@ -34,8 +34,8 @@ using apollo::common::Quaternion;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::HeadingToQuaternion;
-using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::InterpolateUsingLinearApproximation;
+using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::QuaternionToHeading;
 using apollo::common::time::Clock;
@@ -45,18 +45,16 @@ using apollo::routing::RoutingResponse;
 
 namespace {
 
-void TransformToVRF(const Point3D& point_mrf, const Quaternion& orientation,
-                    Point3D* point_vrf) {
+void TransformToVRF(const Point3D& point_mrf, const Quaternion& orientation, Point3D* point_vrf) {
   Eigen::Vector3d v_mrf(point_mrf.x(), point_mrf.y(), point_mrf.z());
-  auto v_vrf = InverseQuaternionRotate(orientation, v_mrf);
+  auto            v_vrf = InverseQuaternionRotate(orientation, v_mrf);
   point_vrf->set_x(v_vrf.x());
   point_vrf->set_y(v_vrf.y());
   point_vrf->set_z(v_vrf.z());
 }
 
 bool IsSameHeader(const Header& lhs, const Header& rhs) {
-  return lhs.sequence_num() == rhs.sequence_num() &&
-         lhs.timestamp_sec() == rhs.timestamp_sec();
+  return lhs.sequence_num() == rhs.sequence_num() && lhs.timestamp_sec() == rhs.timestamp_sec();
 }
 
 }  // namespace
@@ -64,18 +62,15 @@ bool IsSameHeader(const Header& lhs, const Header& rhs) {
 SimControl::SimControl(const MapService* map_service)
     : map_service_(map_service) {}
 
-void SimControl::Init(bool set_start_point, double start_velocity,
-                      double start_acceleration) {
+void SimControl::Init(bool set_start_point, double start_velocity, double start_acceleration) {
   // Setup planning and routing result data callback.
   AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
-  AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
-                                             this);
-  AdapterManager::AddNavigationCallback(&SimControl::OnReceiveNavigationInfo,
-                                        this);
+  AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse, this);
+  AdapterManager::AddNavigationCallback(&SimControl::OnReceiveNavigationInfo, this);
 
   // Start timer to publish localization and chassis messages.
-  sim_control_timer_ = AdapterManager::CreateTimer(
-      ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
+  sim_control_timer_ = AdapterManager::CreateTimer(ros::Duration(kSimControlInterval),
+                                                   &SimControl::TimerCallback, this);
 
   if (set_start_point && !FLAGS_use_navigation_mode) {
     apollo::common::PointENU start_point;
@@ -92,33 +87,28 @@ void SimControl::Init(bool set_start_point, double start_velocity,
     SetStartPoint(point);
   }
 
-  start_velocity_ = start_velocity;
+  start_velocity_     = start_velocity;
   start_acceleration_ = start_acceleration;
 }
 
-void SimControl::OnReceiveNavigationInfo(
-    const relative_map::NavigationInfo& navigation_info) {
+void SimControl::OnReceiveNavigationInfo(const relative_map::NavigationInfo& navigation_info) {
   navigation_info_ = navigation_info;
   if (navigation_info_.navigation_path_size() > 0) {
     const auto& path = navigation_info_.navigation_path(0).path();
-    if (path.path_point_size() > 0) {
-      adc_position_ = path.path_point(0);
-    }
+    if (path.path_point_size() > 0) { adc_position_ = path.path_point(0); }
   }
 }
 
 void SimControl::SetStartPoint(const TrajectoryPoint& start_point) {
-  next_point_ = start_point;
+  next_point_       = start_point;
   prev_point_index_ = next_point_index_ = 0;
-  received_planning_ = false;
+  received_planning_                    = false;
 }
 
 void SimControl::ClearPlanning() {
   current_trajectory_.Clear();
   received_planning_ = false;
-  if (planning_count_ > 0) {
-    planning_count_ = 0;
-  }
+  if (planning_count_ > 0) { planning_count_ = 0; }
 }
 
 void SimControl::Reset() {
@@ -128,9 +118,7 @@ void SimControl::Reset() {
 }
 
 void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
-  if (!enabled_) {
-    return;
-  }
+  if (!enabled_) { return; }
 
   CHECK_GE(routing.routing_request().waypoint_size(), 2)
       << "routing should have at least two waypoints";
@@ -139,8 +127,7 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
   current_routing_header_ = routing.header();
 
   // If this is from a planning re-routing request, don't reset car's location.
-  re_routing_triggered_ =
-      routing.routing_request().header().module_name() == "planning";
+  re_routing_triggered_ = routing.routing_request().header().module_name() == "planning";
   if (!re_routing_triggered_) {
     ClearPlanning();
     TrajectoryPoint point;
@@ -149,9 +136,8 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
     point.set_a(0.0);
     point.set_v(0.0);
     double theta = 0.0;
-    double s = 0.0;
-    map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
-                                          &theta, &s);
+    double s     = 0.0;
+    map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(), &theta, &s);
     point.mutable_path_point()->set_theta(theta);
     SetStartPoint(point);
   }
@@ -177,23 +163,20 @@ void SimControl::Stop() {
 }
 
 void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
-  if (!enabled_) {
-    return;
-  }
+  if (!enabled_) { return; }
 
   // Reset current trajectory and the indices upon receiving a new trajectory.
   // The routing SimControl owns must match with the one Planning has.
-  if (re_routing_triggered_ ||
-      IsSameHeader(trajectory.routing_header(), current_routing_header_)) {
+  if (re_routing_triggered_ || IsSameHeader(trajectory.routing_header(), current_routing_header_)) {
     // Hold a few cycles until the position information is fully refreshed on
     // planning side. Don't wait for the very first planning received.
     ++planning_count_;
     if (planning_count_ == 0 || planning_count_ >= kPlanningCountToStart) {
-      planning_count_ = kPlanningCountToStart;
+      planning_count_     = kPlanningCountToStart;
       current_trajectory_ = trajectory;
-      prev_point_index_ = 0;
-      next_point_index_ = 0;
-      received_planning_ = true;
+      prev_point_index_   = 0;
+      next_point_index_   = 0;
+      received_planning_  = true;
     }
   } else {
     ClearPlanning();
@@ -220,23 +203,20 @@ void SimControl::RunOnce() {
 
 bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
   // Result of the interpolation.
-  auto relative_time =
-      Clock::NowInSeconds() - current_trajectory_.header().timestamp_sec();
-  const auto& trajectory = current_trajectory_.trajectory_point();
+  auto        relative_time = Clock::NowInSeconds() - current_trajectory_.header().timestamp_sec();
+  const auto& trajectory    = current_trajectory_.trajectory_point();
 
   if (!received_planning_) {
     prev_point_ = next_point_;
   } else {
-    if (current_trajectory_.estop().is_estop() ||
-        next_point_index_ >= trajectory.size()) {
+    if (current_trajectory_.estop().is_estop() || next_point_index_ >= trajectory.size()) {
       // Freeze the car when there's an estop or the current trajectory has
       // been exhausted.
       Freeze();
     } else {
       // Determine the status of the car based on received planning message.
       while (next_point_index_ < trajectory.size() &&
-             relative_time >
-                 trajectory.Get(next_point_index_).relative_time()) {
+             relative_time > trajectory.Get(next_point_index_).relative_time()) {
         ++next_point_index_;
       }
 
@@ -245,9 +225,7 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
         return false;
       }
 
-      if (next_point_index_ >= trajectory.size()) {
-        next_point_index_ = trajectory.size() - 1;
-      }
+      if (next_point_index_ >= trajectory.size()) { next_point_index_ = trajectory.size() - 1; }
       prev_point_index_ = next_point_index_ - 1;
 
       next_point_ = trajectory.Get(next_point_index_);
@@ -259,8 +237,7 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
     // Don't try to extrapolate if relative_time passes last point
     *point = next_point_;
   } else {
-    *point = InterpolateUsingLinearApproximation(prev_point_, next_point_,
-                                                 relative_time);
+    *point = InterpolateUsingLinearApproximation(prev_point_, next_point_, relative_time);
   }
   return true;
 }
@@ -285,8 +262,8 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   AdapterManager::FillLocalizationHeader("SimControl", &localization);
 
   auto* pose = localization.mutable_pose();
-  auto prev = prev_point_.path_point();
-  auto next = next_point_.path_point();
+  auto  prev = prev_point_.path_point();
+  auto  next = next_point_.path_point();
 
   // Set position
   pose->mutable_position()->set_x(point.path_point().x());
@@ -307,8 +284,7 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
     pose->mutable_position()->set_y(enu_y);
   }
 
-  Eigen::Quaternion<double> cur_orientation =
-      HeadingToQuaternion<double>(cur_theta);
+  Eigen::Quaternion<double> cur_orientation = HeadingToQuaternion<double>(cur_theta);
   pose->mutable_orientation()->set_qw(cur_orientation.w());
   pose->mutable_orientation()->set_qx(cur_orientation.x());
   pose->mutable_orientation()->set_qy(cur_orientation.y());
@@ -324,8 +300,7 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   // frame
   pose->mutable_angular_velocity()->set_x(0);
   pose->mutable_angular_velocity()->set_y(0);
-  pose->mutable_angular_velocity()->set_z(point.v() *
-                                          point.path_point().kappa());
+  pose->mutable_angular_velocity()->set_z(point.v() * point.path_point().kappa());
 
   TransformToVRF(pose->angular_velocity(), pose->orientation(),
                  pose->mutable_angular_velocity_vrf());

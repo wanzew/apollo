@@ -28,8 +28,7 @@ using apollo::common::Status;
 ObjectPriority::ObjectPriority(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-Status ObjectPriority::ApplyRule(Frame* const frame,
-                                 ReferenceLineInfo* const reference_line_info) {
+Status ObjectPriority::ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   return Status::OK();
 }
 

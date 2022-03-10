@@ -22,8 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_THROTTLEINFO_75_H_
 #define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_THROTTLEINFO_75_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -38,8 +38,8 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Throttleinfo75 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Throttleinfo75
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -49,8 +49,8 @@ class Throttleinfo75 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the input bytes
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const;
+  virtual void
+  Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const;
 
   /**
    * @brief calculate engine rpm based on byte array.
@@ -58,7 +58,7 @@ class Throttleinfo75 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of lateral acceleration
    */
-  double engine_rpm(const std::uint8_t *bytes, int32_t length) const;
+  double engine_rpm(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief calculate acc pedal percent based on byte array.
@@ -66,7 +66,7 @@ class Throttleinfo75 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of lateral acceleration
    */
-  double acc_pedal_percent(const std::uint8_t *bytes, int32_t length) const;
+  double acc_pedal_percent(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief calculate acc pedal rate based on byte array.
@@ -74,7 +74,7 @@ class Throttleinfo75 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of lateral acceleration
    */
-  double acc_pedal_rate(const std::uint8_t *bytes, int32_t length) const;
+  double acc_pedal_rate(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

@@ -28,8 +28,7 @@ PbfTrackManager::PbfTrackManager() {}
 int PbfTrackManager::RemoveLostTracks() {
   size_t original_size = tracks_.size();
   tracks_.erase(
-      std::remove_if(tracks_.begin(), tracks_.end(),
-                     [](PbfTrackPtr p) { return p->IsDead(); }),
+      std::remove_if(tracks_.begin(), tracks_.end(), [](PbfTrackPtr p) { return p->IsDead(); }),
       tracks_.end());
   ADEBUG << "Removed " << original_size - tracks_.size() << " tracks";
   return original_size - tracks_.size();

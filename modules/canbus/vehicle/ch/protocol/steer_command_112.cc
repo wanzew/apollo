@@ -42,7 +42,7 @@ void Steercommand112::UpdateData(uint8_t* data) {
 void Steercommand112::Reset() {
   // you should check this manually
   steer_angle_en_ctrl_ = Steer_command_112::STEER_ANGLE_EN_CTRL_DISABLE;
-  steer_angle_cmd_ = 0.0;
+  steer_angle_cmd_     = 0.0;
 }
 
 Steercommand112* Steercommand112::set_steer_angle_en_ctrl(
@@ -57,8 +57,7 @@ Steercommand112* Steercommand112::set_steer_angle_en_ctrl(
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
 // 'order': 'intel', 'physical_unit': ''}
 void Steercommand112::set_p_steer_angle_en_ctrl(
-    uint8_t* data,
-    Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl) {
+    uint8_t* data, Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl) {
   int x = steer_angle_en_ctrl;
 
   Byte to_set(data + 0);
@@ -74,11 +73,10 @@ Steercommand112* Steercommand112::set_steer_angle_cmd(double steer_angle_cmd) {
 // 0.0, 'precision': 0.001, 'len': 16, 'name': 'STEER_ANGLE_CMD',
 // 'is_signed_var': True, 'physical_range': '[-0.524|0.524]', 'bit': 8, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'radian'}
-void Steercommand112::set_p_steer_angle_cmd(uint8_t* data,
-                                            double steer_angle_cmd) {
+void Steercommand112::set_p_steer_angle_cmd(uint8_t* data, double steer_angle_cmd) {
   steer_angle_cmd = ProtocolData::BoundedValue(-0.524, 0.524, steer_angle_cmd);
-  int x = static_cast<int>(steer_angle_cmd / 0.001000);
-  uint8_t t = 0;
+  int     x       = static_cast<int>(steer_angle_cmd / 0.001000);
+  uint8_t t       = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 1);

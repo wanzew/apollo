@@ -31,7 +31,8 @@ namespace perception {
 namespace traffic_light {
 
 struct ProjectOption {
-  explicit ProjectOption(const CameraId &id) : camera_id(id) {}
+  explicit ProjectOption(const CameraId& id)
+      : camera_id(id) {}
 
   CameraId camera_id;
 };
@@ -54,10 +55,10 @@ class BaseProjection {
    * @params in:traffic light 's x,y,z
    *         out:map info & the region on the image.
    */
-  virtual bool Project(const CameraCoeffient &camera_coeffient,
-                       const Eigen::Matrix4d &pose,
-                       const apollo::hdmap::Signal &tl_info,
-                       Light *light) const = 0;
+  virtual bool Project(const CameraCoeffient&       camera_coeffient,
+                       const Eigen::Matrix4d&       pose,
+                       const apollo::hdmap::Signal& tl_info,
+                       Light*                       light) const = 0;
 };
 
 REGISTER_REGISTERER(BaseProjection);
@@ -66,14 +67,14 @@ REGISTER_REGISTERER(BaseProjection);
 /**
  * @brief load transformation_matrix from file
  */
-bool load_transformation_matrix_from_file(const std::string &file_name,
-                                          Eigen::Matrix4d *matrix4d);
+bool load_transformation_matrix_from_file(const std::string& file_name, Eigen::Matrix4d* matrix4d);
 
 /**
  * @brief load Matrix4d from file
  */
-bool load_matrix4d_from_file(const std::string &file_name,
-                             const std::string &key, Eigen::Matrix4d *matrix);
+bool load_matrix4d_from_file(const std::string& file_name,
+                             const std::string& key,
+                             Eigen::Matrix4d*   matrix);
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

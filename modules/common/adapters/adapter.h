@@ -130,11 +130,11 @@ class Adapter : public AdapterBase {
  public:
   /// The user can use Adapter::DataType to get the type of the
   /// underlying data.
-  typedef D DataType;
+  typedef D                          DataType;
   typedef boost::shared_ptr<D const> DataPtr;
 
   typedef typename std::list<DataPtr>::const_iterator Iterator;
-  typedef typename std::function<void(const D&)> Callback;
+  typedef typename std::function<void(const D&)>      Callback;
 
   /**
    * @brief Construct the \class Adapter object.
@@ -146,22 +146,22 @@ class Adapter : public AdapterBase {
    * adapter stores. Older messages will be removed upon calls to
    * Adapter::RosCallback().
    */
-  Adapter(const std::string& adapter_name, const std::string& topic_name,
-          size_t message_num, const std::string& dump_dir = "/tmp")
-      : topic_name_(topic_name),
-        message_num_(message_num),
-        enable_dump_(FLAGS_enable_adapter_dump),
-        dump_path_(dump_dir + "/" + adapter_name) {
+  Adapter(const std::string& adapter_name,
+          const std::string& topic_name,
+          size_t             message_num,
+          const std::string& dump_dir = "/tmp")
+      : topic_name_(topic_name)
+      , message_num_(message_num)
+      , enable_dump_(FLAGS_enable_adapter_dump)
+      , dump_path_(dump_dir + "/" + adapter_name) {
     if (HasSequenceNumber<D>()) {
       if (!apollo::common::util::EnsureDirectory(dump_path_)) {
-        AERROR << "Cannot enable dumping for '" << adapter_name
-               << "' adapter because the path " << dump_path_
-               << " cannot be created or is not a directory.";
+        AERROR << "Cannot enable dumping for '" << adapter_name << "' adapter because the path "
+               << dump_path_ << " cannot be created or is not a directory.";
         enable_dump_ = false;
       } else if (!apollo::common::util::RemoveAllFiles(dump_path_)) {
-        AERROR << "Cannot enable dumping for '" << adapter_name
-               << "' adapter because the path " << dump_path_
-               << " contains files that cannot be removed.";
+        AERROR << "Cannot enable dumping for '" << adapter_name << "' adapter because the path "
+               << dump_path_ << " contains files that cannot be removed.";
         enable_dump_ = false;
       }
     } else {
@@ -190,9 +190,7 @@ class Adapter : public AdapterBase {
    * the adapter.
    * @param data the input data.
    */
-  void FeedData(const D& data) {
-    EnqueueData(boost::make_shared<D const>(data));
-  }
+  void FeedData(const D& data) { EnqueueData(boost::make_shared<D const>(data)); }
 
   /**
    * @brief Data callback when receiving a message. Under the hood it calls
@@ -200,9 +198,7 @@ class Adapter : public AdapterBase {
    * behavior when there's not a ROS.
    * @param message the input data.
    */
-  void OnReceive(const D& message) {
-    RosCallback(boost::make_shared<D const>(message));
-  }
+  void OnReceive(const D& message) { RosCallback(boost::make_shared<D const>(message)); }
 
   /**
    * @brief copy the data_queue_ into the observing queue to create a
@@ -294,18 +290,14 @@ class Adapter : public AdapterBase {
    * message hits the adapter.
    * @param callback the callback with signature void(const D &).
    */
-  void AddCallback(Callback callback) {
-    receive_callbacks_.push_back(callback);
-  }
+  void AddCallback(Callback callback) { receive_callbacks_.push_back(callback); }
 
   /**
    * @brief Pops out the latest added callback.
    * @return false if there's no callback to pop out, true otherwise.
    */
   bool PopCallback() {
-    if (receive_callbacks_.empty()) {
-      return false;
-    }
+    if (receive_callbacks_.empty()) { return false; }
     receive_callbacks_.pop_back();
     return true;
   }
@@ -317,7 +309,7 @@ class Adapter : public AdapterBase {
   void FillHeader(const std::string& module_name, D* data) {
     static_assert(std::is_base_of<google::protobuf::Message, D>::value,
                   "Can only fill header to proto messages!");
-    auto* header = data->mutable_header();
+    auto*  header    = data->mutable_header();
     double timestamp = apollo::common::time::Clock::NowInSeconds();
     header->set_module_name(module_name);
     header->set_timestamp_sec(timestamp);
@@ -326,9 +318,7 @@ class Adapter : public AdapterBase {
 
   uint32_t GetSeqNum() const { return seq_num_; }
 
-  void SetLatestPublished(const D& data) {
-    latest_published_data_.reset(new D(data));
-  }
+  void SetLatestPublished(const D& data) { latest_published_data_.reset(new D(data)); }
 
   const D* GetLatestPublished() const { return latest_published_data_.get(); }
 
@@ -362,8 +352,7 @@ class Adapter : public AdapterBase {
       return DumpMessage<D>(msg);
     }
 
-    AWARN << "Unable to dump message with topic " << topic_name_
-          << ". No message received.";
+    AWARN << "Unable to dump message with topic " << topic_name_ << ". No message received.";
     return false;
   }
 
@@ -381,20 +370,16 @@ class Adapter : public AdapterBase {
     FeedData(data);
     return true;
   }
-  bool FeedFile(const std::string& message_file,
-                IdentifierType<::sensor_msgs::PointCloud2>) {
+  bool FeedFile(const std::string& message_file, IdentifierType<::sensor_msgs::PointCloud2>) {
     return false;
   }
-  bool FeedFile(const std::string& message_file,
-                IdentifierType<::sensor_msgs::CompressedImage>) {
+  bool FeedFile(const std::string& message_file, IdentifierType<::sensor_msgs::CompressedImage>) {
     return false;
   }
-  bool FeedFile(const std::string& message_file,
-                IdentifierType<::sensor_msgs::Image>) {
+  bool FeedFile(const std::string& message_file, IdentifierType<::sensor_msgs::Image>) {
     return false;
   }
-  bool FeedFile(const std::string& message_file,
-                IdentifierType<::std_msgs::String>) {
+  bool FeedFile(const std::string& message_file, IdentifierType<::std_msgs::String>) {
     return false;
   }
   bool FeedFile(const std::string& message_file,
@@ -404,25 +389,22 @@ class Adapter : public AdapterBase {
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
-      enable_if_t<
-          !std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>* message = nullptr) {
+      enable_if_t<!std::is_base_of<google::protobuf::Message, InputMessageType>::value,
+                  InputMessageType>* message = nullptr) {
     return false;
   }
 
   // HasSequenceNumber returns true if the data type is proto and has
   // header.sequence_num.
   template <typename InputMessageType>
-  static bool HasSequenceNumber(
-      enable_if_t<
-          std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>* message = nullptr) {
+  static bool
+  HasSequenceNumber(enable_if_t<std::is_base_of<google::protobuf::Message, InputMessageType>::value,
+                                InputMessageType>* message = nullptr) {
     using gpf = google::protobuf::FieldDescriptor;
     InputMessageType sample;
-    auto descriptor = sample.GetDescriptor();
-    auto header_descriptor = descriptor->FindFieldByName("header");
-    if (header_descriptor == nullptr ||
-        header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
+    auto             descriptor        = sample.GetDescriptor();
+    auto             header_descriptor = descriptor->FindFieldByName("header");
+    if (header_descriptor == nullptr || header_descriptor->cpp_type() != gpf::CPPTYPE_MESSAGE) {
       return false;
     }
 
@@ -434,9 +416,9 @@ class Adapter : public AdapterBase {
 
   // DumpMessage does nothing for non proto message data type.
   template <typename InputMessageType>
-  bool DumpMessage(const enable_if_t<!std::is_base_of<google::protobuf::Message,
-                                                      InputMessageType>::value,
-                                     InputMessageType>& message) {
+  bool DumpMessage(
+      const enable_if_t<!std::is_base_of<google::protobuf::Message, InputMessageType>::value,
+                        InputMessageType>& message) {
     return true;
   }
 
@@ -444,11 +426,11 @@ class Adapter : public AdapterBase {
   // /tmp/<adapter_name>/<name>.pb.txt, where the message is in ASCII
   // mode and <name> is the .header().sequence_num() of the message.
   template <typename InputMessageType>
-  bool DumpMessage(const enable_if_t<std::is_base_of<google::protobuf::Message,
-                                                     InputMessageType>::value,
-                                     InputMessageType>& message) {
+  bool
+  DumpMessage(const enable_if_t<std::is_base_of<google::protobuf::Message, InputMessageType>::value,
+                                InputMessageType>& message) {
     using google::protobuf::Message;
-    auto descriptor = message.GetDescriptor();
+    auto descriptor        = message.GetDescriptor();
     auto header_descriptor = descriptor->FindFieldByName("header");
     if (header_descriptor == nullptr) {
       ADEBUG << "Fail to find header field in pb.";
@@ -456,16 +438,14 @@ class Adapter : public AdapterBase {
     }
     const Message& header = message.GetReflection()->GetMessage(
         *static_cast<const Message*>(&message), header_descriptor);
-    auto seq_num_descriptor =
-        header.GetDescriptor()->FindFieldByName("sequence_num");
+    auto seq_num_descriptor = header.GetDescriptor()->FindFieldByName("sequence_num");
     if (seq_num_descriptor == nullptr) {
       ADEBUG << "Fail to find sequence_num field in pb.";
       return false;
     }
-    uint32_t sequence_num =
-        header.GetReflection()->GetUInt32(header, seq_num_descriptor);
-    return util::SetProtoToASCIIFile(
-        message, util::StrCat(dump_path_, "/", sequence_num, ".pb.txt"));
+    uint32_t sequence_num = header.GetReflection()->GetUInt32(header, seq_num_descriptor);
+    return util::SetProtoToASCIIFile(message,
+                                     util::StrCat(dump_path_, "/", sequence_num, ".pb.txt"));
   }
 
   /**
@@ -495,20 +475,14 @@ class Adapter : public AdapterBase {
    * the adapter.
    */
   void EnqueueData(DataPtr data) {
-    if (enable_dump_) {
-      DumpMessage<D>(*data);
-    }
+    if (enable_dump_) { DumpMessage<D>(*data); }
 
     // Don't try to copy data and enqueue if the message_num is 0
-    if (message_num_ == 0) {
-      return;
-    }
+    if (message_num_ == 0) { return; }
 
     // Lock the queue.
     std::lock_guard<std::mutex> lock(mutex_);
-    if (data_queue_.size() + 1 > message_num_) {
-      data_queue_.pop_back();
-    }
+    if (data_queue_.size() + 1 > message_num_) { data_queue_.pop_back(); }
     data_queue_.push_front(data);
   }
 

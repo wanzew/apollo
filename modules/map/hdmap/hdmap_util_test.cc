@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "modules/map/hdmap/hdmap_util.h"
 
-#include "gtest/gtest.h"
 #include "modules/common/time/time.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 
@@ -34,18 +34,18 @@ class HDMapUtilTestSuite : public ::testing::Test {
   virtual ~HDMapUtilTestSuite() {}
   virtual void SetUp() {}
   virtual void TearDown() {}
-  void InitMapProto(Map* map_proto);
+  void         InitMapProto(Map* map_proto);
 };
 
 void HDMapUtilTestSuite::InitMapProto(Map* map_proto) {
   auto* lane = map_proto->add_lane();
   lane->mutable_id()->set_id("lane_1");
   CurveSegment* curve_segment = lane->mutable_central_curve()->add_segment();
-  LineSegment* line_segment = curve_segment->mutable_line_segment();
-  double delta_s = 0.2;
-  double heading = M_PI / 2.0;
-  double x0 = 0.0;
-  double y0 = 0.0;
+  LineSegment*  line_segment  = curve_segment->mutable_line_segment();
+  double        delta_s       = 0.2;
+  double        heading       = M_PI / 2.0;
+  double        x0            = 0.0;
+  double        y0            = 0.0;
   for (double s = 0; s < 200; s += delta_s) {
     auto* pt = line_segment->add_point();
     pt->set_x(x0 + s * cos(heading));

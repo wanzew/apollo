@@ -46,26 +46,27 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
   bool Init(const PlanningConfig& config) override;
 
  private:
-  apollo::common::Status Process(const SLBoundary& adc_sl_boundary,
-                                 const PathData& path_data,
+  apollo::common::Status Process(const SLBoundary&              adc_sl_boundary,
+                                 const PathData&                path_data,
                                  const common::TrajectoryPoint& init_point,
-                                 const ReferenceLine& reference_line,
-                                 const SpeedData& reference_speed_data,
-                                 PathDecision* const path_decision,
-                                 SpeedData* const speed_data) override;
+                                 const ReferenceLine&           reference_line,
+                                 const SpeedData&               reference_speed_data,
+                                 PathDecision* const            path_decision,
+                                 SpeedData* const               speed_data) override;
 
-  bool SearchStGraph(const StBoundaryMapper& boundary_mapper,
-                     const SpeedLimitDecider& speed_limit_decider,
-                     const PathData& path_data, SpeedData* speed_data,
-                     PathDecision* path_decision,
+  bool SearchStGraph(const StBoundaryMapper&          boundary_mapper,
+                     const SpeedLimitDecider&         speed_limit_decider,
+                     const PathData&                  path_data,
+                     SpeedData*                       speed_data,
+                     PathDecision*                    path_decision,
                      planning_internal::STGraphDebug* debug) const;
 
  private:
   common::TrajectoryPoint init_point_;
-  const ReferenceLine* reference_line_ = nullptr;
-  SLBoundary adc_sl_boundary_;
-  DpStSpeedConfig dp_st_speed_config_;
-  StBoundaryConfig st_boundary_config_;
+  const ReferenceLine*    reference_line_ = nullptr;
+  SLBoundary              adc_sl_boundary_;
+  DpStSpeedConfig         dp_st_speed_config_;
+  StBoundaryConfig        st_boundary_config_;
 };
 
 }  // namespace planning

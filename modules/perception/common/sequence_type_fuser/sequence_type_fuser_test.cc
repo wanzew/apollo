@@ -31,21 +31,21 @@ class SequenceTypeFuserTest : public testing::Test {
     RegisterFactorySequenceTypeFuser();
     fuser_.reset(new SequenceTypeFuser);
   }
-  void TearDown() {}
-  void BuildObjects();
+  void        TearDown() {}
+  void        BuildObjects();
   std::size_t IdMap(size_t i);
-  void GenerateSmoothProb(std::vector<float>* prob, std::size_t id, float seed);
+  void        GenerateSmoothProb(std::vector<float>* prob, std::size_t id, float seed);
 
  protected:
-  std::shared_ptr<SequenceTypeFuser> fuser_;
+  std::shared_ptr<SequenceTypeFuser>                fuser_;
   std::vector<std::vector<std::shared_ptr<Object>>> objects_;
-  std::vector<double> timestamps_;
-  static const std::size_t s_sequence_length_;
-  static const std::size_t s_object_num_;
+  std::vector<double>                               timestamps_;
+  static const std::size_t                          s_sequence_length_;
+  static const std::size_t                          s_object_num_;
 };
 
 const std::size_t SequenceTypeFuserTest::s_sequence_length_ = 10;
-const std::size_t SequenceTypeFuserTest::s_object_num_ = 4;
+const std::size_t SequenceTypeFuserTest::s_object_num_      = 4;
 
 std::size_t SequenceTypeFuserTest::IdMap(std::size_t i) {
   if (i == 0) {
@@ -56,7 +56,8 @@ std::size_t SequenceTypeFuserTest::IdMap(std::size_t i) {
 }
 
 void SequenceTypeFuserTest::GenerateSmoothProb(std::vector<float>* prob,
-                                               std::size_t id, float seed) {
+                                               std::size_t         id,
+                                               float               seed) {
   float p = (1.f - seed) / (VALID_OBJECT_TYPE - 1);
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
     prob->at(IdMap(i)) = p;
@@ -72,8 +73,8 @@ void SequenceTypeFuserTest::BuildObjects() {
     objects_[i].resize(s_object_num_);
     for (size_t j = 0; j < s_object_num_; ++j) {
       objects_[i][j].reset(new Object);
-      objects_[i][j]->track_id = static_cast<int>(j);
-      objects_[i][j]->score = 0.95;
+      objects_[i][j]->track_id       = static_cast<int>(j);
+      objects_[i][j]->score          = 0.95;
       std::vector<float>& type_probs = objects_[i][j]->type_probs;
       type_probs.resize(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0.0);
       GenerateSmoothProb(&type_probs, j, 0.7);

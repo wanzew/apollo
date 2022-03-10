@@ -36,22 +36,22 @@ namespace planning {
 
 class SpeedProfileCost {
  public:
-  explicit SpeedProfileCost(const PolyStSpeedConfig &config,
-                            const std::vector<const PathObstacle *> &obstacles,
-                            const SpeedLimit &speed_limit,
-                            const common::TrajectoryPoint &init_point);
+  explicit SpeedProfileCost(const PolyStSpeedConfig&                config,
+                            const std::vector<const PathObstacle*>& obstacles,
+                            const SpeedLimit&                       speed_limit,
+                            const common::TrajectoryPoint&          init_point);
 
-  double Calculate(const QuarticPolynomialCurve1d &curve, const double end_time,
-                   const double curr_min_cost) const;
+  double Calculate(const QuarticPolynomialCurve1d& curve,
+                   const double                    end_time,
+                   const double                    curr_min_cost) const;
 
  private:
-  double CalculatePointCost(const QuarticPolynomialCurve1d &curve,
-                            const double t) const;
+  double CalculatePointCost(const QuarticPolynomialCurve1d& curve, const double t) const;
 
-  const PolyStSpeedConfig config_;
-  const std::vector<const PathObstacle *> &obstacles_;
-  const SpeedLimit &speed_limit_;
-  const common::TrajectoryPoint &init_point_;
+  const PolyStSpeedConfig                 config_;
+  const std::vector<const PathObstacle*>& obstacles_;
+  const SpeedLimit&                       speed_limit_;
+  const common::TrajectoryPoint&          init_point_;
 };
 
 }  // namespace planning

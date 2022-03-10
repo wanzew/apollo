@@ -41,11 +41,11 @@ namespace planning {
 
 class QpFrenetFrame {
  public:
-  QpFrenetFrame(const ReferenceLine& reference_line,
-                const SpeedData& speed_data,
+  QpFrenetFrame(const ReferenceLine&            reference_line,
+                const SpeedData&                speed_data,
                 const common::FrenetFramePoint& init_frenet_point,
-                const double time_resolution,
-                const std::vector<double>& evaluated_s);
+                const double                    time_resolution,
+                const std::vector<double>&      evaluated_s);
   virtual ~QpFrenetFrame() = default;
 
   bool Init(const std::vector<const PathObstacle*>& path_obstacles);
@@ -63,43 +63,43 @@ class QpFrenetFrame {
 
   bool MapStaticObstacleWithDecision(const PathObstacle& path_obstacle);
 
-  bool MapNudgePolygon(const common::math::Polygon2d& polygon,
-                       const ObjectNudge& nudge,
+  bool MapNudgePolygon(const common::math::Polygon2d&                polygon,
+                       const ObjectNudge&                            nudge,
                        std::vector<std::pair<double, double>>* const bound_map);
 
-  bool MapNudgeLine(const common::SLPoint& start, const common::SLPoint& end,
-                    const ObjectNudge::Type type,
+  bool MapNudgeLine(const common::SLPoint&                        start,
+                    const common::SLPoint&                        end,
+                    const ObjectNudge::Type                       type,
                     std::vector<std::pair<double, double>>* const constraint);
 
-  std::pair<double, double> MapLateralConstraint(
-      const common::SLPoint& start, const common::SLPoint& end,
-      const ObjectNudge::Type nudge_type, const double s_start,
-      const double s_end);
+  std::pair<double, double> MapLateralConstraint(const common::SLPoint&  start,
+                                                 const common::SLPoint&  end,
+                                                 const ObjectNudge::Type nudge_type,
+                                                 const double            s_start,
+                                                 const double            s_end);
 
-  std::pair<uint32_t, uint32_t> FindInterval(const double start,
-                                             const double end) const;
+  std::pair<uint32_t, uint32_t> FindInterval(const double start, const double end) const;
 
   bool CalculateHDMapBound();
 
-  bool CalculateObstacleBound(
-      const std::vector<const PathObstacle*>& path_obstacles);
+  bool CalculateObstacleBound(const std::vector<const PathObstacle*>& path_obstacles);
 
   uint32_t FindIndex(const double s) const;
 
  private:
   const ReferenceLine& reference_line_;
-  const SpeedData& speed_data_;
+  const SpeedData&     speed_data_;
 
-  common::VehicleParam vehicle_param_;
+  common::VehicleParam     vehicle_param_;
   common::FrenetFramePoint init_frenet_point_;
 
   double feasible_longitudinal_upper_bound_ = 0.0;
-  double start_s_ = 0.0;
-  double end_s_ = 0.0;
-  double time_resolution_ = 0.1;
+  double start_s_                           = 0.0;
+  double end_s_                             = 0.0;
+  double time_resolution_                   = 0.1;
 
-  std::vector<double> evaluated_s_;
-  std::vector<common::SpeedPoint> discretized_vehicle_location_;
+  std::vector<double>                    evaluated_s_;
+  std::vector<common::SpeedPoint>        discretized_vehicle_location_;
   std::vector<std::pair<double, double>> hdmap_bound_;
   std::vector<std::pair<double, double>> static_obstacle_bound_;
   std::vector<std::pair<double, double>> dynamic_obstacle_bound_;

@@ -20,10 +20,10 @@
 namespace apollo {
 namespace perception {
 
-const double RADAR_CYCLE = 0.074;
+const double RADAR_CYCLE          = 0.074;
 const double RADAR_TRACK_TIME_WIN = 0.06;
-const double RADAR_TRACK_THRES = 2.5;
-const int MAX_RADAR_IDX = 2147483647;
+const double RADAR_TRACK_THRES    = 2.5;
+const int    MAX_RADAR_IDX        = 2147483647;
 
 }  // namespace perception
 }  // namespace apollo

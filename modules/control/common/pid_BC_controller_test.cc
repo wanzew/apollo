@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/common/pid_BC_controller.h"
-#include <string>
-#include "gtest/gtest.h"
 #include "modules/common/util/file.h"
+#include "modules/control/common/pid_BC_controller.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pid_conf.pb.h"
+#include "gtest/gtest.h"
+#include <string>
 
 namespace apollo {
 namespace control {
@@ -27,20 +27,18 @@ namespace control {
 class PidBCControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string control_conf_file =
-        "modules/control/testdata/conf/lincoln.pb.txt";
-    CHECK(common::util::GetProtoFromFile(control_conf_file,
-                                                   &control_conf_));
+    std::string control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
+    CHECK(common::util::GetProtoFromFile(control_conf_file, &control_conf_));
     lon_controller_conf_ = control_conf_.lon_controller_conf();
   }
 
  protected:
-  ControlConf control_conf_;
+  ControlConf       control_conf_;
   LonControllerConf lon_controller_conf_;
 };
 
 TEST_F(PidBCControllerTest, StationPidController) {
-  PidConf pid_conf = lon_controller_conf_.station_pid_conf();
+  PidConf         pid_conf = lon_controller_conf_.station_pid_conf();
   PIDBCController pid_BC_controller;
   pid_BC_controller.Init(pid_conf);
   pid_BC_controller.Reset();
@@ -56,7 +54,7 @@ TEST_F(PidBCControllerTest, StationPidController) {
 }
 
 TEST_F(PidBCControllerTest, SpeedPidController) {
-  PidConf pid_conf = lon_controller_conf_.low_speed_pid_conf();
+  PidConf         pid_conf = lon_controller_conf_.low_speed_pid_conf();
   PIDBCController pid_BC_controller;
   pid_BC_controller.Init(pid_conf);
   pid_BC_controller.Reset();

@@ -38,11 +38,11 @@ namespace perception {
 struct alignas(16) Object {
   Object();
   // deep copy
-  void clone(const Object& rhs);
+  void        clone(const Object& rhs);
   std::string ToString() const;
-  void AddFourCorners(PerceptionObstacle* pb_obj) const;
-  void Serialize(PerceptionObstacle* pb_obj) const;
-  void Deserialize(const PerceptionObstacle& pb_obs);
+  void        AddFourCorners(PerceptionObstacle* pb_obj) const;
+  void        Serialize(PerceptionObstacle* pb_obj) const;
+  void        Deserialize(const PerceptionObstacle& pb_obs);
 
   // object id per frame
   int id = 0;
@@ -60,7 +60,7 @@ struct alignas(16) Object {
   Eigen::Vector3d center = Eigen::Vector3d::Zero();
   // size of the oriented bbox, length is the size in the main direction
   double length = 0.0;
-  double width = 0.0;
+  double width  = 0.0;
   double height = 0.0;
   // shape feature used for tracking
   std::vector<float> shape_features;
@@ -68,8 +68,7 @@ struct alignas(16) Object {
   // foreground score/probability
   float score = 0.0;
   // foreground score/probability type
-  PerceptionObstacle::ConfidenceType score_type =
-      PerceptionObstacle::CONFIDENCE_CNN;
+  PerceptionObstacle::ConfidenceType score_type = PerceptionObstacle::CONFIDENCE_CNN;
 
   // Object classification type.
   ObjectType type = ObjectType::UNKNOWN;
@@ -80,12 +79,12 @@ struct alignas(16) Object {
   bool is_background = false;
 
   // tracking information
-  int track_id = 0;
+  int             track_id = 0;
   Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
   // age of the tracked object
-  double tracking_time = 0.0;
+  double tracking_time       = 0.0;
   double latest_tracked_time = 0.0;
-  double timestamp = 0.0;
+  double timestamp           = 0.0;
 
   // stable anchor_point during time, e.g., barycenter
   Eigen::Vector3d anchor_point;
@@ -115,14 +114,14 @@ struct alignas(16) Object {
   double local_camera_track_ts = -1;
 
   // sensor particular suplplements, default nullptr
-  RadarSupplementPtr radar_supplement = nullptr;
+  RadarSupplementPtr  radar_supplement  = nullptr;
   CameraSupplementPtr camera_supplement = nullptr;
 };
 
 // Sensor single frame objects.
 struct SensorObjects {
   SensorObjects() {
-    sensor2world_pose = Eigen::Matrix4d::Zero();
+    sensor2world_pose        = Eigen::Matrix4d::Zero();
     sensor2world_pose_static = Eigen::Matrix4d::Zero();
   }
 
@@ -131,20 +130,20 @@ struct SensorObjects {
   // Transmit error_code to next subnode.
   common::ErrorCode error_code = common::ErrorCode::OK;
 
-  SensorType sensor_type = SensorType::UNKNOWN_SENSOR_TYPE;
-  std::string sensor_id;
-  double timestamp = 0.0;
-  SeqId seq_num = 0;
+  SensorType                           sensor_type = SensorType::UNKNOWN_SENSOR_TYPE;
+  std::string                          sensor_id;
+  double                               timestamp = 0.0;
+  SeqId                                seq_num   = 0;
   std::vector<std::shared_ptr<Object>> objects;
-  Eigen::Matrix4d sensor2world_pose;
-  Eigen::Matrix4d sensor2world_pose_static;
-  LaneObjectsPtr lane_objects;
+  Eigen::Matrix4d                      sensor2world_pose;
+  Eigen::Matrix4d                      sensor2world_pose_static;
+  LaneObjectsPtr                       lane_objects;
 
-  uint32_t cipv_index = -1;
+  uint32_t cipv_index    = -1;
   uint32_t cipv_track_id = -1;
 
   // sensor particular suplplements, default nullptr
-  RadarFrameSupplementPtr radar_frame_supplement = nullptr;
+  RadarFrameSupplementPtr  radar_frame_supplement  = nullptr;
   CameraFrameSupplementPtr camera_frame_supplement = nullptr;
 };
 

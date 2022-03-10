@@ -26,36 +26,32 @@ namespace perception {
 using common::math::ExtendedKalmanFilter;
 using ObjectFilter = ObjectCameraExtendedKalmanFilter::ObjectFilter;
 
-void ObjectCameraExtendedKalmanFilter::GetState(const int track_id,
-    const std::shared_ptr<VisualObject>& obj_ptr) {
-
-  const auto& filter = tracked_filters_[track_id].object_config_filter_;
-  Eigen::Vector4f mean = filter.GetStateMean();
+void ObjectCameraExtendedKalmanFilter::GetState(const int                            track_id,
+                                                const std::shared_ptr<VisualObject>& obj_ptr) {
+  const auto&     filter     = tracked_filters_[track_id].object_config_filter_;
+  Eigen::Vector4f mean       = filter.GetStateMean();
   Eigen::Matrix4f covariance = filter.GetStateCovariance();
 
-  obj_ptr->center.x() = mean[0];
+  obj_ptr->center.x()   = mean[0];
   obj_ptr->velocity.x() = mean[3] * std::cos(mean[2]);
 
-  obj_ptr->center.y() = mean[1];
+  obj_ptr->center.y()   = mean[1];
   obj_ptr->velocity.y() = mean[3] * std::sin(mean[2]);
 
-  obj_ptr->center.z() = 0.0f;
+  obj_ptr->center.z()   = 0.0f;
   obj_ptr->velocity.z() = 0.0f;
 
-  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << covariance(0, 0),
-      covariance(0, 1), covariance(1, 0), covariance(1, 1);
+  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << covariance(0, 0), covariance(0, 1),
+      covariance(1, 0), covariance(1, 1);
   // TODO(zhangyajia): set the covariance for other variables
 
-  obj_ptr->theta = mean[2];
-  obj_ptr->direction = Eigen::Vector3f(std::cos(obj_ptr->theta), 0.0f,
-      -std::sin(obj_ptr->theta));
+  obj_ptr->theta     = mean[2];
+  obj_ptr->direction = Eigen::Vector3f(std::cos(obj_ptr->theta), 0.0f, -std::sin(obj_ptr->theta));
 }
 
-bool ObjectCameraExtendedKalmanFilter::Filter(const double timestamp,
-    std::vector<std::shared_ptr<VisualObject> >* objects) {
-  if (!objects) {
-    return false;
-  }
+bool ObjectCameraExtendedKalmanFilter::Filter(const double                                timestamp,
+                                              std::vector<std::shared_ptr<VisualObject>>* objects) {
+  if (!objects) { return false; }
 
   // update lost_frame_count
   for (auto& p : tracked_filters_) {
@@ -70,8 +66,7 @@ bool ObjectCameraExtendedKalmanFilter::Filter(const double timestamp,
       Update(track_id, obj_ptr);
       GetState(track_id, obj_ptr);
     } else {
-      tracked_filters_[track_id] = CreateObjectFilter(track_id, timestamp,
-          obj_ptr);
+      tracked_filters_[track_id] = CreateObjectFilter(track_id, timestamp, obj_ptr);
     }
   }
 
@@ -79,24 +74,21 @@ bool ObjectCameraExtendedKalmanFilter::Filter(const double timestamp,
   return true;
 }
 
-void ObjectCameraExtendedKalmanFilter::Predict(const int track_id,
-    const double timestamp) {
+void ObjectCameraExtendedKalmanFilter::Predict(const int track_id, const double timestamp) {
   double time_diff = timestamp - tracked_filters_[track_id].last_timestamp_;
 
   // update transition model
-  auto f = [&time_diff](const Eigen::Vector4f& x,
-                        const Eigen::Matrix<float, 1, 1>& u) {
-        Eigen::Vector4f x_next;
-        x_next[0] = x[0] + x[3] * time_diff * std::cos(x[2]);
-        x_next[1] = x[1] + x[3] * time_diff * std::sin(x[2]);
-        x_next[2] = x[2];
-        x_next[3] = x[3];
-        return x_next;
-      };
+  auto f = [&time_diff](const Eigen::Vector4f& x, const Eigen::Matrix<float, 1, 1>& u) {
+    Eigen::Vector4f x_next;
+    x_next[0] = x[0] + x[3] * time_diff * std::cos(x[2]);
+    x_next[1] = x[1] + x[3] * time_diff * std::sin(x[2]);
+    x_next[2] = x[2];
+    x_next[3] = x[3];
+    return x_next;
+  };
 
-  Eigen::Vector4f state =
-      tracked_filters_[track_id].object_config_filter_.GetStateMean();
-  Eigen::Matrix4f F = UpdateTransitionMatrix(state[2], state[3], time_diff);
+  Eigen::Vector4f state = tracked_filters_[track_id].object_config_filter_.GetStateMean();
+  Eigen::Matrix4f F     = UpdateTransitionMatrix(state[2], state[3], time_diff);
   tracked_filters_[track_id].object_config_filter_.SetTransitionModel(f, F);
 
   tracked_filters_[track_id].object_config_filter_.Predict();
@@ -104,12 +96,12 @@ void ObjectCameraExtendedKalmanFilter::Predict(const int track_id,
   tracked_filters_[track_id].last_timestamp_ = timestamp;
 }
 
-void ObjectCameraExtendedKalmanFilter::Update(const int track_id,
-    const std::shared_ptr<VisualObject> &obj_ptr) {
-  auto x = obj_ptr->center.x();
-  auto y = obj_ptr->center.y();
+void ObjectCameraExtendedKalmanFilter::Update(const int                            track_id,
+                                              const std::shared_ptr<VisualObject>& obj_ptr) {
+  auto x     = obj_ptr->center.x();
+  auto y     = obj_ptr->center.y();
   auto theta = obj_ptr->theta;
-  tracked_filters_[track_id].object_config_filter_.Correct({x, y, theta });
+  tracked_filters_[track_id].object_config_filter_.Correct({x, y, theta});
 }
 
 std::string ObjectCameraExtendedKalmanFilter::Name() const {
@@ -117,32 +109,31 @@ std::string ObjectCameraExtendedKalmanFilter::Name() const {
 }
 
 ObjectFilter ObjectCameraExtendedKalmanFilter::CreateObjectFilter(
-    const int track_id, const float timestamp,
+    const int                            track_id,
+    const float                          timestamp,
     const std::shared_ptr<VisualObject>& ptr_object) const {
   ObjectFilter object_filter(track_id, timestamp);
 
-  auto x = ptr_object->center.x();
-  auto y = ptr_object->center.y();
-  auto theta = ptr_object->theta;
-  auto v = ptr_object->velocity.norm();
+  auto x                              = ptr_object->center.x();
+  auto y                              = ptr_object->center.y();
+  auto theta                          = ptr_object->theta;
+  auto v                              = ptr_object->velocity.norm();
   object_filter.object_config_filter_ = InitObjectFilter(x, y, theta, v);
 
   return object_filter;
 }
 
-ExtendedKalmanFilter<float, 4, 3, 1>
-ObjectCameraExtendedKalmanFilter::InitObjectFilter(const float x,
-    const float y, const float theta, const float v) const {
-
+ExtendedKalmanFilter<float, 4, 3, 1> ObjectCameraExtendedKalmanFilter::InitObjectFilter(
+    const float x, const float y, const float theta, const float v) const {
   ExtendedKalmanFilter<float, 4, 3, 1> filter;
-  Eigen::Vector4f state = { x, y, theta, v };
+  Eigen::Vector4f                      state = {x, y, theta, v};
 
   // initial guess of the believe space
   Eigen::Matrix4f P;
   P.setIdentity();
   P(0, 0) = P(1, 1) = 20.0f;
-  P(2, 2) = (M_PI / 3) * (M_PI / 3);
-  P(3, 3) = 20.0f;
+  P(2, 2)           = (M_PI / 3) * (M_PI / 3);
+  P(3, 3)           = 20.0f;
   filter.SetStateEstimate(state, P);
 
   // transition model will be set dynamically.
@@ -165,31 +156,28 @@ ObjectCameraExtendedKalmanFilter::InitObjectFilter(const float x,
   Eigen::Matrix<float, 3, 3> R;
   R.setIdentity();
   R(0, 0) = R(1, 1) = 9.0f;
-  R(2, 2) = (M_PI / 6) * (M_PI / 6);
+  R(2, 2)           = (M_PI / 6) * (M_PI / 6);
   filter.SetObservationNoise(R);
 
   return filter;
 }
 
-Eigen::Matrix4f ObjectCameraExtendedKalmanFilter::UpdateTransitionMatrix(
-    const double theta, const double v, const double dt) const {
+Eigen::Matrix4f ObjectCameraExtendedKalmanFilter::UpdateTransitionMatrix(const double theta,
+                                                                         const double v,
+                                                                         const double dt) const {
   Eigen::Matrix4f F;
-  F << 1.0, 0.0, v * dt * (-1.0) * std::sin(theta), dt * std::cos(theta),
-      0.0, 1.0, v * dt * std::cos(theta), dt * std::sin(theta),
-      0.0, 0.0, 1.0, 0.0,
-      0.0, 0.0, 0.0, 1.0;
+  F << 1.0, 0.0, v * dt * (-1.0) * std::sin(theta), dt * std::cos(theta), 0.0, 1.0,
+      v * dt * std::cos(theta), dt * std::sin(theta), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0;
   return F;
 }
 
 void ObjectCameraExtendedKalmanFilter::Destroy() {
   std::vector<int> id_to_destroy;
-  for (const auto &p : tracked_filters_) {
-    if (p.second.lost_frame_cnt_ > kMaxKeptFrameCnt) {
-      id_to_destroy.emplace_back(p.first);
-    }
+  for (const auto& p : tracked_filters_) {
+    if (p.second.lost_frame_cnt_ > kMaxKeptFrameCnt) { id_to_destroy.emplace_back(p.first); }
   }
 
-  for (const auto &id : id_to_destroy) {
+  for (const auto& id : id_to_destroy) {
     tracked_filters_.erase(id);
   }
 }

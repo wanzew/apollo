@@ -34,10 +34,10 @@ using apollo::relative_map::NavigationInfo;
 using apollo::relative_map::NavigationPath;
 using nlohmann::json;
 
-bool ParseNavigationLineFileNames(
-    int argc, char** argv, std::vector<std::string>* navigation_line_filenames);
-bool GetNavigationPathFromFile(const std::string& filename,
-                               NavigationPath* navigation_path);
+bool ParseNavigationLineFileNames(int                       argc,
+                                  char**                    argv,
+                                  std::vector<std::string>* navigation_line_filenames);
+bool GetNavigationPathFromFile(const std::string& filename, NavigationPath* navigation_path);
 
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
@@ -47,11 +47,9 @@ int main(int argc, char** argv) {
   if (!ParseNavigationLineFileNames(argc, argv, &navigation_line_filenames)) {
     AERROR << "Failed to get navigation file names.";
     AINFO << "Usage: \n"
-          << "\t" << argv[0]
-          << " navigation_filename_1 navigation_filename_2 ...\n"
+          << "\t" << argv[0] << " navigation_filename_1 navigation_filename_2 ...\n"
           << "For example: \n"
-          << "\t" << argv[0]
-          << " left.txt.smoothed right.txt.smoothed middle.txt.smoothed";
+          << "\t" << argv[0] << " left.txt.smoothed right.txt.smoothed middle.txt.smoothed";
     return -1;
   }
 
@@ -67,7 +65,7 @@ int main(int argc, char** argv) {
   ADEBUG << "AdapterManager is initialized.";
 
   NavigationInfo navigation_info;
-  int i = 0;
+  int            i = 0;
   for (const std::string& filename : navigation_line_filenames) {
     auto* navigation_path = navigation_info.add_navigation_path();
     if (!GetNavigationPathFromFile(filename, navigation_path)) {
@@ -107,9 +105,9 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-bool ParseNavigationLineFileNames(
-    int argc, char** argv,
-    std::vector<std::string>* navigation_line_filenames) {
+bool ParseNavigationLineFileNames(int                       argc,
+                                  char**                    argv,
+                                  std::vector<std::string>* navigation_line_filenames) {
   CHECK_NOTNULL(navigation_line_filenames);
   bool initialized = false;
   if (argc > 1) {
@@ -128,8 +126,7 @@ bool ParseNavigationLineFileNames(
   return initialized;
 }
 
-bool GetNavigationPathFromFile(const std::string& filename,
-                               NavigationPath* navigation_path) {
+bool GetNavigationPathFromFile(const std::string& filename, NavigationPath* navigation_path) {
   CHECK_NOTNULL(navigation_path);
 
   std::ifstream ifs(filename, std::ios::in);
@@ -140,8 +137,8 @@ bool GetNavigationPathFromFile(const std::string& filename,
   std::string line_str;
   while (std::getline(ifs, line_str)) {
     try {
-      auto json_obj = json::parse(line_str);
-      auto* point = navigation_path->mutable_path()->add_path_point();
+      auto  json_obj = json::parse(line_str);
+      auto* point    = navigation_path->mutable_path()->add_path_point();
       point->set_x(json_obj["x"]);
       point->set_y(json_obj["y"]);
       point->set_s(json_obj["s"]);

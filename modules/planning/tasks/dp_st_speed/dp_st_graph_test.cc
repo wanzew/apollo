@@ -41,8 +41,7 @@ class DpStGraphTest : public ::testing::Test {
     // dp_config_
     PlanningConfig config;
     FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
-    CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                                 &config));
+    CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file, &config));
     dp_config_ = config.em_planner_config().dp_st_speed_config();
 
     // speed_limit:
@@ -52,15 +51,15 @@ class DpStGraphTest : public ::testing::Test {
   }
 
   std::list<PathObstacle> path_obstacle_list_;
-  std::list<Obstacle> obstacle_list_;
+  std::list<Obstacle>     obstacle_list_;
 
   StGraphData st_graph_data_;
-  SpeedLimit speed_limit_;
+  SpeedLimit  speed_limit_;
 
   DpStSpeedConfig dp_config_;
 
   common::TrajectoryPoint init_point_;
-  SLBoundary adc_sl_boundary_;
+  SLBoundary              adc_sl_boundary_;
 };
 
 TEST_F(DpStGraphTest, simple) {
@@ -72,8 +71,8 @@ TEST_F(DpStGraphTest, simple) {
   std::vector<const PathObstacle*> obstacles_;
   obstacles_.emplace_back(&(path_obstacle_list_.back()));
 
-  std::vector<STPoint> upper_points;
-  std::vector<STPoint> lower_points;
+  std::vector<STPoint>                     upper_points;
+  std::vector<STPoint>                     lower_points;
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
 
   lower_points.emplace_back(30.0, 4.0);
@@ -98,8 +97,7 @@ TEST_F(DpStGraphTest, simple) {
 
   const float path_data_length = 120.0;
 
-  st_graph_data_ =
-      StGraphData(boundaries, init_point_, speed_limit_, path_data_length);
+  st_graph_data_ = StGraphData(boundaries, init_point_, speed_limit_, path_data_length);
 
   // adc_sl_boundary_
   adc_sl_boundary_.set_start_s(15.0);
@@ -107,11 +105,10 @@ TEST_F(DpStGraphTest, simple) {
   adc_sl_boundary_.set_start_l(-1.1);
   adc_sl_boundary_.set_end_l(1.1);
 
-  DpStGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_, init_point_,
-                        adc_sl_boundary_);
+  DpStGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_, init_point_, adc_sl_boundary_);
 
   SpeedData speed_data;
-  auto ret = dp_st_graph.Search(&speed_data);
+  auto      ret = dp_st_graph.Search(&speed_data);
   EXPECT_TRUE(ret.ok());
 }
 

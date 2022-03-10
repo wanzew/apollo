@@ -59,9 +59,8 @@ class RTKReplayPlanner : public Planner {
    * @param frame Current planning frame.
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+  apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
+                              Frame*                         frame) override;
 
   /**
    * @brief Override function Plan in parent class Planner.
@@ -70,9 +69,9 @@ class RTKReplayPlanner : public Planner {
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status PlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+  apollo::common::Status PlanOnReferenceLine(const common::TrajectoryPoint& planning_init_point,
+                                             Frame*                         frame,
+                                             ReferenceLineInfo* reference_line_info) override;
   /**
    * @brief Read the recorded trajectory file.
    * @param filename The name of the trajectory file.
@@ -80,9 +79,9 @@ class RTKReplayPlanner : public Planner {
   void ReadTrajectoryFile(const std::string& filename);
 
  private:
-  std::uint32_t QueryPositionMatchedPoint(
-      const common::TrajectoryPoint& start_point,
-      const std::vector<common::TrajectoryPoint>& trajectory) const;
+  std::uint32_t
+  QueryPositionMatchedPoint(const common::TrajectoryPoint&              start_point,
+                            const std::vector<common::TrajectoryPoint>& trajectory) const;
 
   std::vector<common::TrajectoryPoint> complete_rtk_trajectory_;
 };

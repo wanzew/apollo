@@ -27,26 +27,26 @@
 namespace apollo {
 namespace perception {
 
-using std::string;
 using std::map;
+using std::string;
 using std::vector;
 
 using google::protobuf::TextFormat;
 
-DEFINE_int32(max_allowed_congestion_value, 0,
+DEFINE_int32(max_allowed_congestion_value,
+             0,
              "When DAGStreaming event_queues max length greater than "
              "max_allowed_congestion_value, reset DAGStreaming."
              "(default is 0, disable this feature.)");
-DEFINE_bool(enable_timing_remove_stale_data, true,
-            "whether timing clean shared data");
+DEFINE_bool(enable_timing_remove_stale_data, true, "whether timing clean shared data");
 
-SubnodeMap DAGStreaming::subnode_map_;
+SubnodeMap                       DAGStreaming::subnode_map_;
 std::map<std::string, SubnodeID> DAGStreaming::subnode_name_map_;
 
 DAGStreaming::DAGStreaming()
-    : Thread(true, "DAGStreamingThread"),
-      inited_(false),
-      monitor_(new DAGStreamingMonitor(this)) {}
+    : Thread(true, "DAGStreamingThread")
+    , inited_(false)
+    , monitor_(new DAGStreamingMonitor(this)) {}
 
 DAGStreaming::~DAGStreaming() {}
 
@@ -57,7 +57,7 @@ bool DAGStreaming::Init(const string& dag_config_path) {
   }
 
   DAGConfig dag_config;
-  string content;
+  string    content;
   if (!apollo::common::util::GetContent(dag_config_path, &content)) {
     AERROR << "failed to laod DAGConfig file: " << dag_config_path;
     return false;
@@ -73,9 +73,7 @@ bool DAGStreaming::Init(const string& dag_config_path) {
     return false;
   }
 
-  if (!InitSharedData(dag_config.data_config()) || !InitSubnodes(dag_config)) {
-    return false;
-  }
+  if (!InitSharedData(dag_config.data_config()) || !InitSubnodes(dag_config)) { return false; }
 
   inited_ = true;
   AINFO << "DAGStreaming Init success.";
@@ -121,16 +119,15 @@ void DAGStreaming::Stop() {
 
 bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
   const DAGConfig::SubnodeConfig& subnode_config = dag_config.subnode_config();
-  const DAGConfig::EdgeConfig& edge_config = dag_config.edge_config();
+  const DAGConfig::EdgeConfig&    edge_config    = dag_config.edge_config();
 
   map<SubnodeID, DAGConfig::Subnode> subnode_config_map;
-  map<SubnodeID, vector<EventID>> subnode_sub_events_map;
-  map<SubnodeID, vector<EventID>> subnode_pub_events_map;
+  map<SubnodeID, vector<EventID>>    subnode_sub_events_map;
+  map<SubnodeID, vector<EventID>>    subnode_pub_events_map;
 
   for (auto& subnode_proto : subnode_config.subnodes()) {
-    std::pair<map<SubnodeID, DAGConfig::Subnode>::iterator, bool>
-        result = subnode_config_map.insert(
-            std::make_pair(subnode_proto.id(), subnode_proto));
+    std::pair<map<SubnodeID, DAGConfig::Subnode>::iterator, bool> result =
+        subnode_config_map.insert(std::make_pair(subnode_proto.id(), subnode_proto));
     if (!result.second) {
       AERROR << "duplicate SubnodeID: " << subnode_proto.id();
       return false;
@@ -139,12 +136,11 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
 
   for (auto& edge_proto : edge_config.edges()) {
     SubnodeID from = edge_proto.from_node();
-    SubnodeID to = edge_proto.to_node();
+    SubnodeID to   = edge_proto.to_node();
 
     if (subnode_config_map.find(from) == subnode_config_map.end() ||
         subnode_config_map.find(to) == subnode_config_map.end()) {
-      AERROR << "SubnodeID not exists in subnode_config. <" << from << ", "
-             << to << ">";
+      AERROR << "SubnodeID not exists in subnode_config. <" << from << ", " << to << ">";
       return false;
     }
 
@@ -157,20 +153,19 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
   // Generate Subnode instance.
   for (auto pair : subnode_config_map) {
     const DAGConfig::Subnode& subnode_config = pair.second;
-    const SubnodeID subnode_id = pair.first;
-    Subnode* inst = SubnodeRegisterer::GetInstanceByName(subnode_config.name());
+    const SubnodeID           subnode_id     = pair.first;
+    Subnode*                  inst = SubnodeRegisterer::GetInstanceByName(subnode_config.name());
 
-//    AINFO << "subnode_name: " << subnode_config.name();
-//    AINFO << "subnode_id: " << subnode_id;
+    //    AINFO << "subnode_name: " << subnode_config.name();
+    //    AINFO << "subnode_id: " << subnode_id;
     if (inst == NULL) {
-      AERROR << "failed to get subnode instance. name: "
-             << subnode_config.name();
+      AERROR << "failed to get subnode instance. name: " << subnode_config.name();
       return false;
     }
 
-    bool result = inst->Init(subnode_config, subnode_sub_events_map[subnode_id],
-                             subnode_pub_events_map[subnode_id],
-                             &event_manager_, &shared_data_manager_);
+    bool result =
+        inst->Init(subnode_config, subnode_sub_events_map[subnode_id],
+                   subnode_pub_events_map[subnode_id], &event_manager_, &shared_data_manager_);
     if (!result) {
       AERROR << "failed to Init subnode. name: " << inst->name();
       return false;
@@ -185,8 +180,7 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
   return true;
 }
 
-bool DAGStreaming::InitSharedData(
-    const DAGConfig::SharedDataConfig& data_config) {
+bool DAGStreaming::InitSharedData(const DAGConfig::SharedDataConfig& data_config) {
   return shared_data_manager_.Init(data_config);
 }
 
@@ -198,13 +192,10 @@ void DAGStreaming::Reset() {
   AINFO << "DAGStreaming RESET.";
 }
 
-size_t DAGStreaming::CongestionValue() const {
-  return event_manager_.MaxLenOfEventQueues();
-}
+size_t DAGStreaming::CongestionValue() const { return event_manager_.MaxLenOfEventQueues(); }
 
 void DAGStreamingMonitor::Run() {
-  if (FLAGS_max_allowed_congestion_value == 0 &&
-      !FLAGS_enable_timing_remove_stale_data) {
+  if (FLAGS_max_allowed_congestion_value == 0 && !FLAGS_enable_timing_remove_stale_data) {
     AINFO << "disable to check DAGStreaming congestion value,"
           << "disable timing delete stale shared data.";
     return;
@@ -218,24 +209,18 @@ void DAGStreamingMonitor::Run() {
         dag_streaming_->Reset();
         AERROR << "DAGStreaming has CONGESTION, reset it."
                << " congestion_value: " << congestion_value
-               << " max_allowed_congestion_value: "
-               << FLAGS_max_allowed_congestion_value;
+               << " max_allowed_congestion_value: " << FLAGS_max_allowed_congestion_value;
       }
     }
 
-    if (FLAGS_enable_timing_remove_stale_data) {
-      dag_streaming_->RemoveStaleData();
-    }
+    if (FLAGS_enable_timing_remove_stale_data) { dag_streaming_->RemoveStaleData(); }
     sleep(1);
   }
 }
 
-Subnode* DAGStreaming::GetSubnodeByName(const std::string &name) {
-  std::map<std::string, SubnodeID>::iterator iter =
-      subnode_name_map_.find(name);
-  if (iter != subnode_name_map_.end()) {
-    return subnode_map_[iter->second].get();
-  }
+Subnode* DAGStreaming::GetSubnodeByName(const std::string& name) {
+  std::map<std::string, SubnodeID>::iterator iter = subnode_name_map_.find(name);
+  if (iter != subnode_name_map_.end()) { return subnode_map_[iter->second].get(); }
   return nullptr;
 }
 

@@ -16,13 +16,13 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GL_FUSION_VISUALIZER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GL_FUSION_VISUALIZER_H_
+#include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
+#include "modules/perception/obstacle/camera/visualizer/frame_content.h"
+#include "modules/perception/obstacle/camera/visualizer/glfw_fusion_viewer.h"
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
-#include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
-#include "modules/perception/obstacle/camera/visualizer/frame_content.h"
-#include "modules/perception/obstacle/camera/visualizer/glfw_fusion_viewer.h"
 
 namespace apollo {
 namespace perception {
@@ -38,9 +38,9 @@ class GLFusionVisualizer : public BaseVisualizer {
 
   std::string name() const override { return name_; }
 
-  void update_camera_system(FrameContent *content) override;
+  void update_camera_system(FrameContent* content) override;
 
-  void render(FrameContent *content) override;
+  void render(FrameContent* content) override;
 
  private:
   void set_background_color(float r, float g, float b, float a);
@@ -49,21 +49,21 @@ class GLFusionVisualizer : public BaseVisualizer {
 
   void set_camera_position();
 
-  Eigen::Vector3d camera_center_velodyne_;
-  Eigen::Vector3d view_point_velodyne_;
-  Eigen::Vector3d up_velodyne_;
-  Eigen::Vector3d forward_velodyne_;
+  Eigen::Vector3d              camera_center_velodyne_;
+  Eigen::Vector3d              view_point_velodyne_;
+  Eigen::Vector3d              up_velodyne_;
+  Eigen::Vector3d              forward_velodyne_;
   std::vector<Eigen::Vector3d> main_car_;
 
-  Eigen::Vector3d camera_center_world_;
-  Eigen::Vector3d view_point_world_;
-  Eigen::Vector3d up_world_;
-  Eigen::Vector3d forward_world_;
+  Eigen::Vector3d              camera_center_world_;
+  Eigen::Vector3d              view_point_world_;
+  Eigen::Vector3d              up_world_;
+  Eigen::Vector3d              forward_world_;
   std::vector<Eigen::Vector3d> main_car_world_;
 
   std::shared_ptr<GLFWFusionViewer> opengl_vs_;
-  std::string name_;
-  bool init_ = false;
+  std::string                       name_;
+  bool                              init_ = false;
   DISALLOW_COPY_AND_ASSIGN(GLFusionVisualizer);
 
   //    boost::circular_buffer<VehicleStatus> motion_buffer_;

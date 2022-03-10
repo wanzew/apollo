@@ -18,8 +18,8 @@
 #define INCLUDE_PANDORA_PANDORA_H_
 
 #include <boost/function.hpp>
-#include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui_c.h>
+#include <opencv2/opencv.hpp>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pthread.h>
@@ -61,17 +61,19 @@ class Pandora {
    *        pandoraCameraPort The port of camera data
    *        cameraCallback    the call back for camera data
    */
-  Pandora(const std::string &device_ip, const uint16_t lidar_port,
-          const uint16_t gps_port,
-          boost::function<void(boost::shared_ptr<PPointCloud>, double)>
-              pcl_callback,
-          boost::function<void(double)> gps_callback, uint16_t start_angle,
-          const uint16_t pandoraCameraPort,
-          boost::function<void(boost::shared_ptr<cv::Mat> matp,
-                               double timestamp, int picid, bool distortion)>
-              cameraCallback,
-          bool enable_camera = true, int tz = 0,
-          std::string frame_id = std::string("hesai40"));
+  Pandora(const std::string&                                            device_ip,
+          const uint16_t                                                lidar_port,
+          const uint16_t                                                gps_port,
+          boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
+          boost::function<void(double)>                                 gps_callback,
+          uint16_t                                                      start_angle,
+          const uint16_t                                                pandoraCameraPort,
+          boost::function<
+              void(boost::shared_ptr<cv::Mat> matp, double timestamp, int picid, bool distortion)>
+                      cameraCallback,
+          bool        enable_camera = true,
+          int         tz            = 0,
+          std::string frame_id      = std::string("hesai40"));
   /**
    * @brief destructor
    */
@@ -81,7 +83,7 @@ class Pandora {
    * @brief load the lidar correction file
    * @param contents The correction contents of lidar correction
    */
-  int LoadLidarCorrectionFile(const std::string &contents);
+  int LoadLidarCorrectionFile(const std::string& contents);
 
   /**
    * @brief Reset Lidar's start angle.
@@ -119,7 +121,7 @@ class Pandora {
   void Stop();
 
  private:
-  Pandora_Internal *internal_;
+  Pandora_Internal* internal_;
 };
 
 }  // namespace hesai

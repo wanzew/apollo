@@ -33,10 +33,10 @@ using apollo::common::PathPoint;
 class FrenetFramePathTest : public ::testing::Test {
  public:
   void InitFrenetFramePath() {
-    std::vector<double> s{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    std::vector<double> l{1, 2, 1, 0, -1, -2, -1, 0, 1, 2};
-    std::vector<double> dl{1, 0, -1, 0, -1, 0, 1, 1, 1, 0};
-    std::vector<double> ddl{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::vector<double>           s{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    std::vector<double>           l{1, 2, 1, 0, -1, -2, -1, 0, 1, 2};
+    std::vector<double>           dl{1, 0, -1, 0, -1, 0, 1, 1, 1, 0};
+    std::vector<double>           ddl{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::vector<FrenetFramePoint> sl_points;
     for (std::size_t i = 0; i < s.size(); ++i) {
       sl_points.emplace_back();

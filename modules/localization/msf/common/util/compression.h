@@ -27,7 +27,7 @@ class CompressionStrategy {
  public:
   typedef std::vector<unsigned char> BufferStr;
   virtual ~CompressionStrategy() {}
-  virtual unsigned int Encode(BufferStr* buf, BufferStr* buf_compressed) = 0;
+  virtual unsigned int Encode(BufferStr* buf, BufferStr* buf_compressed)   = 0;
   virtual unsigned int Decode(BufferStr* buf, BufferStr* buf_uncompressed) = 0;
 
  protected:
@@ -40,8 +40,8 @@ class ZlibStrategy : public CompressionStrategy {
 
  protected:
   static const unsigned int zlib_chunk;
-  unsigned int ZlibCompress(BufferStr* src, BufferStr* dst);
-  unsigned int ZlibUncompress(BufferStr* src, BufferStr* dst);
+  unsigned int              ZlibCompress(BufferStr* src, BufferStr* dst);
+  unsigned int              ZlibUncompress(BufferStr* src, BufferStr* dst);
 };
 
 }  // namespace msf

@@ -51,44 +51,41 @@ class Velodyne : public apollo::common::ApolloApp {
   friend class VelodyneTestBase;
 
  public:
-  Velodyne() : monitor_logger_(common::monitor::MonitorMessageItem::CONTROL) {}
+  Velodyne()
+      : monitor_logger_(common::monitor::MonitorMessageItem::CONTROL) {}
 
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
   virtual ~Velodyne() = default;
 
  private:
-  typedef common::util::BlockingQueue<velodyne_msgs::VelodyneScanUnifiedPtr>
-      RawDataCache;
-  typedef common::util::BlockingQueue<sensor_msgs::PointCloud2Ptr>
-      PointCloudCache;
-  void Packet(RawDataCache* output, const VelodyneConf& conf);
-  void Convert(RawDataCache* input, PointCloudCache* output,
-               const VelodyneConf& conf);
-  void Compensate(PointCloudCache* input, const VelodyneConf& conf);
-  void PointCloudFusion(std::map<uint32_t, PointCloudCache*> fusion_cache);
-  void Notice();
-  bool CalcNpackets(VelodyneConfUnit* unit);
-  bool FusionCheckInit(const std::map<uint32_t, uint8_t>& velodyne_index_map);
+  typedef common::util::BlockingQueue<velodyne_msgs::VelodyneScanUnifiedPtr> RawDataCache;
+  typedef common::util::BlockingQueue<sensor_msgs::PointCloud2Ptr>           PointCloudCache;
+  void           Packet(RawDataCache* output, const VelodyneConf& conf);
+  void           Convert(RawDataCache* input, PointCloudCache* output, const VelodyneConf& conf);
+  void           Compensate(PointCloudCache* input, const VelodyneConf& conf);
+  void           PointCloudFusion(std::map<uint32_t, PointCloudCache*> fusion_cache);
+  void           Notice();
+  bool           CalcNpackets(VelodyneConfUnit* unit);
+  bool           FusionCheckInit(const std::map<uint32_t, uint8_t>& velodyne_index_map);
   inline int64_t GetTime() {
-    return apollo::common::time::AsInt64<common::time::micros>(
-        apollo::common::time::Clock::Now());
+    return apollo::common::time::AsInt64<common::time::micros>(apollo::common::time::Clock::Now());
   }
 
  private:
-  VelodyneConfUnit conf_unit_;
-  common::monitor::MonitorLogger monitor_logger_;
-  std::vector<RawDataCache*> packet_cache_vec_;
-  std::vector<PointCloudCache*> pointcloud_cache_vec_;
+  VelodyneConfUnit                     conf_unit_;
+  common::monitor::MonitorLogger       monitor_logger_;
+  std::vector<RawDataCache*>           packet_cache_vec_;
+  std::vector<PointCloudCache*>        pointcloud_cache_vec_;
   std::map<uint32_t, PointCloudCache*> fusion_cache_;
 
-  bool running_ = true;
-  std::vector<std::shared_ptr<std::thread> > threads_;
-  bool is_fusion_ = false;
-  std::map<uint32_t, uint8_t> fusion_index_map_;
+  bool                                      running_ = true;
+  std::vector<std::shared_ptr<std::thread>> threads_;
+  bool                                      is_fusion_ = false;
+  std::map<uint32_t, uint8_t>               fusion_index_map_;
 };
 
 }  // namespace lidar_velodyne

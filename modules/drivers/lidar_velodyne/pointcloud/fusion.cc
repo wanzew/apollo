@@ -28,17 +28,15 @@ namespace lidar_velodyne {
 
 using ::apollo::common::adapter::AdapterManager;
 
-bool Fusion::fusion(
-    const sensor_msgs::PointCloud2Ptr& major_point_cloud,
-    std::vector<sensor_msgs::PointCloud2Ptr> slave_point_cloud_vec,
-    sensor_msgs::PointCloud2Ptr point_cloud_fusion) {
-  Eigen::Affine3d pose;
+bool Fusion::fusion(const sensor_msgs::PointCloud2Ptr&       major_point_cloud,
+                    std::vector<sensor_msgs::PointCloud2Ptr> slave_point_cloud_vec,
+                    sensor_msgs::PointCloud2Ptr              point_cloud_fusion) {
+  Eigen::Affine3d             pose;
   pcl::PointCloud<PointXYZIT> pcl_major_point_cloud;
   pcl::fromROSMsg(*major_point_cloud, pcl_major_point_cloud);
   for (auto slave_point_cloud : slave_point_cloud_vec) {
     if (!query_pose_affine_from_tf2(major_point_cloud->header.frame_id,
-                                    slave_point_cloud->header.frame_id,
-                                    &pose)) {
+                                    slave_point_cloud->header.frame_id, &pose)) {
       return false;
     }
     pcl::PointCloud<PointXYZIT> pcl_slave_point_cloud;
@@ -50,11 +48,11 @@ bool Fusion::fusion(
 }
 bool Fusion::query_pose_affine_from_tf2(const std::string& target_frame_id,
                                         const std::string& child_frame_id,
-                                        Eigen::Affine3d* pose) {
-  std::string err_string;
+                                        Eigen::Affine3d*   pose) {
+  std::string            err_string;
   const tf2_ros::Buffer& tf2_buffer = AdapterManager::Tf2Buffer();
-  if (!tf2_buffer.canTransform(target_frame_id, child_frame_id, ros::Time(0),
-                               ros::Duration(0.02), &err_string)) {
+  if (!tf2_buffer.canTransform(target_frame_id, child_frame_id, ros::Time(0), ros::Duration(0.02),
+                               &err_string)) {
     AERROR << "Can not find transform. "
            << "target_id:" << target_frame_id << " frame_id:" << child_frame_id
            << " Error info: " << err_string;
@@ -64,8 +62,7 @@ bool Fusion::query_pose_affine_from_tf2(const std::string& target_frame_id,
   geometry_msgs::TransformStamped stamped_transform;
 
   try {
-    stamped_transform = tf2_buffer.lookupTransform(
-        target_frame_id, child_frame_id, ros::Time(0));
+    stamped_transform = tf2_buffer.lookupTransform(target_frame_id, child_frame_id, ros::Time(0));
   } catch (tf2::TransformException& ex) {
     AERROR << ex.what();
     return false;
@@ -75,7 +72,7 @@ bool Fusion::query_pose_affine_from_tf2(const std::string& target_frame_id,
 }
 void Fusion::append_point_cloud(pcl::PointCloud<PointXYZIT>* point_cloud,
                                 pcl::PointCloud<PointXYZIT>* point_cloud_add,
-                                const Eigen::Affine3d& pose) {
+                                const Eigen::Affine3d&       pose) {
   uint32_t origin_width = point_cloud->width;
   if (std::isnan(pose(0, 0))) {
     for (auto& point : point_cloud_add->points) {
@@ -90,22 +87,19 @@ void Fusion::append_point_cloud(pcl::PointCloud<PointXYZIT>* point_cloud,
         point_new.intensity = point.intensity;
         point_new.timestamp = point.timestamp;
         Eigen::Matrix<float, 3, 1> pt(point.x, point.y, point.z);
-        point_new.x = static_cast<float>(
-            pose(0, 0) * pt.coeffRef(0) + pose(0, 1) * pt.coeffRef(1) +
-            pose(0, 2) * pt.coeffRef(2) + pose(0, 3));
-        point_new.y = static_cast<float>(
-            pose(1, 0) * pt.coeffRef(0) + pose(1, 1) * pt.coeffRef(1) +
-            pose(1, 2) * pt.coeffRef(2) + pose(1, 3));
-        point_new.z = static_cast<float>(
-            pose(2, 0) * pt.coeffRef(0) + pose(2, 1) * pt.coeffRef(1) +
-            pose(2, 2) * pt.coeffRef(2) + pose(2, 3));
+        point_new.x = static_cast<float>(pose(0, 0) * pt.coeffRef(0) + pose(0, 1) * pt.coeffRef(1) +
+                                         pose(0, 2) * pt.coeffRef(2) + pose(0, 3));
+        point_new.y = static_cast<float>(pose(1, 0) * pt.coeffRef(0) + pose(1, 1) * pt.coeffRef(1) +
+                                         pose(1, 2) * pt.coeffRef(2) + pose(1, 3));
+        point_new.z = static_cast<float>(pose(2, 0) * pt.coeffRef(0) + pose(2, 1) * pt.coeffRef(1) +
+                                         pose(2, 2) * pt.coeffRef(2) + pose(2, 3));
         point_cloud->push_back(point_new);
       }
     }
   }
   // update height,TODO: more check
-  point_cloud->width = origin_width;
-  int new_height = point_cloud->size() / point_cloud->width;
+  point_cloud->width  = origin_width;
+  int new_height      = point_cloud->size() / point_cloud->width;
   point_cloud->height = new_height;
 }
 

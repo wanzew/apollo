@@ -30,8 +30,9 @@ using apollo::drivers::canbus::Byte;
 ObjectExtendedInfo60D::ObjectExtendedInfo60D() {}
 const uint32_t ObjectExtendedInfo60D::ID = 0x60D;
 
-void ObjectExtendedInfo60D::Parse(const std::uint8_t* bytes, int32_t length,
-                                  ContiRadar* conti_radar) const {
+void ObjectExtendedInfo60D::Parse(const std::uint8_t* bytes,
+                                  int32_t             length,
+                                  ContiRadar*         conti_radar) const {
   int obj_id = object_id(bytes, length);
   for (int i = 0; i < conti_radar->contiobs_size(); ++i) {
     if (conti_radar->contiobs(i).obstacle_id() == obj_id) {
@@ -48,21 +49,19 @@ void ObjectExtendedInfo60D::Parse(const std::uint8_t* bytes, int32_t length,
   // auto conti_obs = conti_radar->mutable_contiobs(object_id(bytes, length));
 }
 
-int ObjectExtendedInfo60D::object_id(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte t0(bytes);
+int ObjectExtendedInfo60D::object_id(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
   return ret;
 }
 
-double ObjectExtendedInfo60D::longitude_accel(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+double ObjectExtendedInfo60D::longitude_accel(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(5, 3);
 
   x <<= 3;
@@ -72,12 +71,11 @@ double ObjectExtendedInfo60D::longitude_accel(const std::uint8_t* bytes,
   return ret;
 }
 
-double ObjectExtendedInfo60D::lateral_accel(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 2);
+double ObjectExtendedInfo60D::lateral_accel(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 5);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(4, 4);
 
   x <<= 4;
@@ -87,21 +85,19 @@ double ObjectExtendedInfo60D::lateral_accel(const std::uint8_t* bytes,
   return ret;
 }
 
-int ObjectExtendedInfo60D::obstacle_class(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 3);
+int ObjectExtendedInfo60D::obstacle_class(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 3);
 
   int ret = x;
   return ret;
 }
 
-double ObjectExtendedInfo60D::oritation_angle(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 4);
+double ObjectExtendedInfo60D::oritation_angle(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(6, 2);
 
   x <<= 2;
@@ -111,18 +107,16 @@ double ObjectExtendedInfo60D::oritation_angle(const std::uint8_t* bytes,
   return ret;
 }
 
-double ObjectExtendedInfo60D::object_length(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 6);
+double ObjectExtendedInfo60D::object_length(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
   double ret = x * OBJECT_LENGTH_RES;
   return ret;
 }
 
-double ObjectExtendedInfo60D::object_width(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 7);
+double ObjectExtendedInfo60D::object_width(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   double ret = x * OBJECT_WIDTH_RES;

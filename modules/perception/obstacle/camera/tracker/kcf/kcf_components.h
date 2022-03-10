@@ -62,9 +62,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_COMPONENTS_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_COMPONENTS_H_
 
-#include <opencv2/opencv.hpp>
 #include <algorithm>
 #include <cmath>
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 #include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"
@@ -79,23 +79,20 @@ class KCFComponents {
   bool Init();
 
   // Get x_f or z_f
-  bool GetFeatures(const cv::Mat &img, const cv::Rect &box,
-                   std::vector<cv::Mat> *feature);
+  bool GetFeatures(const cv::Mat& img, const cv::Rect& box, std::vector<cv::Mat>* feature);
 
   // Get response score
-  bool Detect(const Tracked &tracked_obj, const std::vector<cv::Mat> &z_f,
-              float *score);
+  bool Detect(const Tracked& tracked_obj, const std::vector<cv::Mat>& z_f, float* score);
 
   // Get alpha_f
-  bool Train(const cv::Mat &img, Tracked *tracked_obj);
+  bool Train(const cv::Mat& img, Tracked* tracked_obj);
 
  private:
-  cv::Mat GaussianCorrelation(const std::vector<cv::Mat> &xf,
-                              const std::vector<cv::Mat> &yf);
+  cv::Mat GaussianCorrelation(const std::vector<cv::Mat>& xf, const std::vector<cv::Mat>& yf);
 
-  cv::Mat ComplexMultiplication(const cv::Mat &x1, const cv::Mat &x2);
+  cv::Mat ComplexMultiplication(const cv::Mat& x1, const cv::Mat& x2);
 
-  cv::Mat ComplexDivision(const cv::Mat &x1, const cv::Mat &x2);
+  cv::Mat ComplexDivision(const cv::Mat& x1, const cv::Mat& x2);
 
   // init only: Create Gaussian Peak as regression target
   cv::Mat CreateGaussianPeak(const int sizey, const int sizex);
@@ -104,14 +101,14 @@ class KCFComponents {
   cv::Mat FFTD(cv::Mat img);
 
   // init only: get hann window
-  cv::Mat CalculateHann(const cv::Size &sz);
+  cv::Mat CalculateHann(const cv::Size& sz);
 
   cv::Mat y_f_;
   cv::Mat cos_window_;
 
-  const int kWindowSize_ = 50;
+  const int   kWindowSize_  = 50;
   const float kKernelSigma_ = 0.5f;
-  const float kLambda_ = 0.0001f;
+  const float kLambda_      = 0.0001f;
 };
 
 }  // namespace perception

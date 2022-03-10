@@ -16,15 +16,13 @@
 
 #include "modules/perception/tool/data_generator/common/data_generator_gflags.h"
 
-DEFINE_string(
-    data_generator_adapter_config_filename,
-    "/apollo/modules/perception/tool/data_generator/conf/adapter.conf",
-    "The data generator adapter config filename.");
+DEFINE_string(data_generator_adapter_config_filename,
+              "/apollo/modules/perception/tool/data_generator/conf/adapter.conf",
+              "The data generator adapter config filename.");
 
-DEFINE_string(
-    data_generator_config_file,
-    "/apollo/modules/perception/tool/data_generator/conf/config.pb.txt",
-    "The data generator config file.");
+DEFINE_string(data_generator_config_file,
+              "/apollo/modules/perception/tool/data_generator/conf/config.pb.txt",
+              "The data generator config file.");
 
 DEFINE_string(data_file_prefix,
               "/apollo/modules/perception/tool/data_generator/data/",
@@ -32,5 +30,4 @@ DEFINE_string(data_file_prefix,
 DEFINE_string(data_file_name, "sensor_data", "The data file name.");
 
 DEFINE_string(novatel_frame_name, "novatel", "The frame name for novatel.");
-DEFINE_string(velodyne64_frame_name, "velodyne64",
-              "The frame name for velodyne64.");
+DEFINE_string(velodyne64_frame_name, "velodyne64", "The frame name for velodyne64.");

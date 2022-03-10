@@ -23,8 +23,8 @@ namespace perception {
 
 class BaseClass {
  public:
-  BaseClass() = default;
-  ~BaseClass() = default;
+  BaseClass()                      = default;
+  ~BaseClass()                     = default;
   virtual std::string name() const = 0;
 };
 REGISTER_REGISTERER(BaseClass);
@@ -32,21 +32,17 @@ REGISTER_REGISTERER(BaseClass);
 
 class DerivedClass1 : BaseClass {
  public:
-  DerivedClass1() = default;
+  DerivedClass1()  = default;
   ~DerivedClass1() = default;
-  virtual std::string name() const {
-    return "DerivedClass1";
-  }
+  virtual std::string name() const { return "DerivedClass1"; }
 };
 REGISTER_TEST(DerivedClass1);
 
 class DerivedClass2 : BaseClass {
  public:
-  DerivedClass2() = default;
+  DerivedClass2()  = default;
   ~DerivedClass2() = default;
-  virtual std::string name() const {
-    return "DerivedClass2";
-  }
+  virtual std::string name() const { return "DerivedClass2"; }
 };
 REGISTER_TEST(DerivedClass2);
 
@@ -54,7 +50,7 @@ TEST(RegistererTest, test) {
   RegisterFactoryDerivedClass1();
   RegisterFactoryDerivedClass2();
   BaseClass* ptr = nullptr;
-  ptr = BaseClassRegisterer::GetInstanceByName("DerivedClass1");
+  ptr            = BaseClassRegisterer::GetInstanceByName("DerivedClass1");
   ASSERT_TRUE(ptr != nullptr);
   EXPECT_EQ(ptr->name(), "DerivedClass1");
   ptr = BaseClassRegisterer::GetInstanceByName("DerivedClass2");
@@ -68,15 +64,13 @@ TEST(RegistererTest, test) {
   EXPECT_TRUE(GetRegisteredClasses("BaseClass", &derived_classes));
   EXPECT_FALSE(GetRegisteredClasses("NotExitstClass", &derived_classes));
   EXPECT_EQ(derived_classes.size(), 2u);
-  EXPECT_TRUE(derived_classes[0] == "DerivedClass1" ||
-              derived_classes[0] == "DerivedClass2");
-  EXPECT_TRUE(derived_classes[1] == "DerivedClass1" ||
-              derived_classes[1] == "DerivedClass2");
+  EXPECT_TRUE(derived_classes[0] == "DerivedClass1" || derived_classes[0] == "DerivedClass2");
+  EXPECT_TRUE(derived_classes[1] == "DerivedClass1" || derived_classes[1] == "DerivedClass2");
 }
 
 TEST(ObjectFactoryTest, test_ObjectFactory) {
   ObjectFactory obj_fac;
-  Any any = obj_fac.NewInstance();
+  Any           any = obj_fac.NewInstance();
   EXPECT_TRUE(any.content_ == NULL);
   int value = 100;
   Any any2(value);

@@ -28,7 +28,8 @@ namespace perception {
 namespace traffic_light {
 
 struct ReviseOption {
-  explicit ReviseOption(const double timestamp) : ts(timestamp) {}
+  explicit ReviseOption(const double timestamp)
+      : ts(timestamp) {}
   double ts;  // timestamp for lights
 };
 
@@ -55,8 +56,7 @@ class BaseReviser {
    * @param rectifed_result
    * @return true/false
    */
-  virtual bool Revise(const ReviseOption &option,
-                      std::vector<LightPtr> *lights) = 0;
+  virtual bool Revise(const ReviseOption& option, std::vector<LightPtr>* lights) = 0;
 
   /**
    * @brief Revise's name

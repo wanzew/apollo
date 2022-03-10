@@ -24,8 +24,7 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Wipercmd90 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+class Wipercmd90 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

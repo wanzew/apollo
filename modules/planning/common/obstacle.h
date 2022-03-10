@@ -46,15 +46,14 @@ class Obstacle {
  public:
   Obstacle() = default;
 
-  Obstacle(const std::string &id,
-           const perception::PerceptionObstacle &perception_obstacle);
+  Obstacle(const std::string& id, const perception::PerceptionObstacle& perception_obstacle);
 
-  Obstacle(const std::string &id,
-           const perception::PerceptionObstacle &perception,
-           const prediction::Trajectory &trajectory);
+  Obstacle(const std::string&                    id,
+           const perception::PerceptionObstacle& perception,
+           const prediction::Trajectory&         trajectory);
 
-  const std::string &Id() const;
-  void SetId(const std::string &id) { id_ = id; }
+  const std::string& Id() const;
+  void               SetId(const std::string& id) { id_ = id; }
 
   std::int32_t PerceptionId() const;
 
@@ -65,24 +64,23 @@ class Obstacle {
 
   common::TrajectoryPoint GetPointAtTime(const double time) const;
 
-  common::math::Box2d GetBoundingBox(
-      const common::TrajectoryPoint &point) const;
+  common::math::Box2d GetBoundingBox(const common::TrajectoryPoint& point) const;
   /**
    * @brief get the perception bounding box
    */
-  const common::math::Box2d &PerceptionBoundingBox() const;
+  const common::math::Box2d& PerceptionBoundingBox() const;
 
   /**
    * @brief get the perception polygon for the obstacle. It is more precise than
    * bounding box
    */
-  const common::math::Polygon2d &PerceptionPolygon() const;
+  const common::math::Polygon2d& PerceptionPolygon() const;
 
-  const prediction::Trajectory &Trajectory() const;
-  common::TrajectoryPoint *AddTrajectoryPoint();
-  bool HasTrajectory() const;
+  const prediction::Trajectory& Trajectory() const;
+  common::TrajectoryPoint*      AddTrajectoryPoint();
+  bool                          HasTrajectory() const;
 
-  const perception::PerceptionObstacle &Perception() const;
+  const perception::PerceptionObstacle& Perception() const;
 
   /**
    * @brief This is a helper function that can create obstacles from prediction
@@ -91,33 +89,31 @@ class Obstacle {
    * @param predictions The prediction results
    * @return obstacles The output obstacles saved in a list of unique_ptr.
    */
-  static std::list<std::unique_ptr<Obstacle>> CreateObstacles(
-      const prediction::PredictionObstacles &predictions);
+  static std::list<std::unique_ptr<Obstacle>>
+  CreateObstacles(const prediction::PredictionObstacles& predictions);
 
-  static std::unique_ptr<Obstacle> CreateStaticVirtualObstacles(
-      const std::string &id, const common::math::Box2d &obstacle_box);
+  static std::unique_ptr<Obstacle>
+  CreateStaticVirtualObstacles(const std::string& id, const common::math::Box2d& obstacle_box);
 
-  static bool IsStaticObstacle(
-      const perception::PerceptionObstacle &perception_obstacle);
+  static bool IsStaticObstacle(const perception::PerceptionObstacle& perception_obstacle);
 
-  static bool IsVirtualObstacle(
-      const perception::PerceptionObstacle &perception_obstacle);
+  static bool IsVirtualObstacle(const perception::PerceptionObstacle& perception_obstacle);
 
-  static bool IsValidTrajectoryPoint(const common::TrajectoryPoint &point);
+  static bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
 
  private:
-  std::string id_;
-  std::int32_t perception_id_ = 0;
-  bool is_static_ = false;
-  bool is_virtual_ = false;
-  double speed_ = 0.0;
-  prediction::Trajectory trajectory_;
+  std::string                    id_;
+  std::int32_t                   perception_id_ = 0;
+  bool                           is_static_     = false;
+  bool                           is_virtual_    = false;
+  double                         speed_         = 0.0;
+  prediction::Trajectory         trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
-  common::math::Box2d perception_bounding_box_;
-  common::math::Polygon2d perception_polygon_;
+  common::math::Box2d            perception_bounding_box_;
+  common::math::Polygon2d        perception_polygon_;
 };
 
-typedef IndexedList<std::string, Obstacle> IndexedObstacles;
+typedef IndexedList<std::string, Obstacle>           IndexedObstacles;
 typedef ThreadSafeIndexedList<std::string, Obstacle> ThreadSafeIndexedObstacles;
 
 }  // namespace planning

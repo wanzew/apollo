@@ -37,9 +37,9 @@ class OpenglVisualizer {
 
   virtual std::string Name() const { return name_; }
 
-  void UpdateCameraSystem(FrameContent *content);
+  void UpdateCameraSystem(FrameContent* content);
 
-  virtual void Render(const FrameContent &content);
+  virtual void Render(const FrameContent& content);
 
  private:
   void SetSize(int w, int h);
@@ -48,21 +48,21 @@ class OpenglVisualizer {
   void SetMainCarPoints();
   void SetCameraPosition();
 
-  float velodyne_height_;
-  pcl_util::Point camera_center_velodyne_;
-  pcl_util::Point view_point_velodyne_;
-  pcl_util::Point up_velodyne_;
-  pcl_util::Point forward_velodyne_;
+  float                velodyne_height_;
+  pcl_util::Point      camera_center_velodyne_;
+  pcl_util::Point      view_point_velodyne_;
+  pcl_util::Point      up_velodyne_;
+  pcl_util::Point      forward_velodyne_;
   pcl_util::PointCloud main_car_points_velodyne_;
 
-  pcl_util::Point camera_center_world_;
-  pcl_util::Point view_point_world_;
-  pcl_util::Point up_world_;
-  pcl_util::Point forward_world_;
+  pcl_util::Point      camera_center_world_;
+  pcl_util::Point      view_point_world_;
+  pcl_util::Point      up_world_;
+  pcl_util::Point      forward_world_;
   pcl_util::PointCloud main_car_points_world_;
 
   boost::shared_ptr<GLFWViewer> opengl_vs_;
-  std::string name_;
+  std::string                   name_;
 };
 
 }  // namespace perception

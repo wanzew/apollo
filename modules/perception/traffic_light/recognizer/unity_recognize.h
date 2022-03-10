@@ -46,8 +46,9 @@ class UnityRecognize : public BaseRecognizer {
    * @param  std::vector<Light>*: recognized light status
    * @return  bool
    */
-  bool RecognizeStatus(const Image &image, const RecognizeOption &option,
-                       std::vector<LightPtr> *lights) override;
+  bool RecognizeStatus(const Image&           image,
+                       const RecognizeOption& option,
+                       std::vector<LightPtr>* lights) override;
 
   virtual std::string name() const;
 

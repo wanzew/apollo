@@ -50,16 +50,14 @@ Status DataGenerator::Init() {
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_data_generator_config_file,
                                                &data_generator_info_))
-      << "failed to load data generator config file "
-      << FLAGS_data_generator_config_file;
+      << "failed to load data generator config file " << FLAGS_data_generator_config_file;
   sensor_configs_ = data_generator_info_.config();
 
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  CHECK(AdapterManager::GetLocalization())
-      << "Localization is not initialized.";
+  CHECK(AdapterManager::GetLocalization()) << "Localization is not initialized.";
 
-  const std::string file_name = FLAGS_data_file_prefix + FLAGS_data_file_name +
-                                "_" + std::to_string(num_data_frame_);
+  const std::string file_name =
+      FLAGS_data_file_prefix + FLAGS_data_file_name + "_" + std::to_string(num_data_frame_);
   data_file_ = new std::ofstream(file_name);
   CHECK(data_file_->is_open()) << file_name;
 
@@ -67,10 +65,9 @@ Status DataGenerator::Init() {
 }
 
 void DataGenerator::RegisterSensors() {
-  sensor_factory_.Register(SensorConfig::VELODYNE64,
-                           [](const SensorConfig& config) -> Sensor* {
-                             return new Velodyne64(config);
-                           });
+  sensor_factory_.Register(SensorConfig::VELODYNE64, [](const SensorConfig& config) -> Sensor* {
+    return new Velodyne64(config);
+  });
 }
 
 void DataGenerator::OnTimer(const ros::TimerEvent&) { RunOnce(); }
@@ -95,8 +92,7 @@ void DataGenerator::RunOnce() {
   }
 
   // Update VehicleState
-  const auto& localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
+  const auto& localization = AdapterManager::GetLocalization()->GetLatestObserved();
   ADEBUG << "Localization: " << localization.DebugString();
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Chassis: " << chassis.DebugString();
@@ -112,9 +108,7 @@ void DataGenerator::RunOnce() {
     for (int i = 0; i < obs.polygon_point_size(); ++i) {
       str += std::to_string(obs.polygon_point(i).x()) + ", " +
              std::to_string(obs.polygon_point(i).y());
-      if (i + 1 != obs.polygon_point_size()) {
-        str += "| ";
-      }
+      if (i + 1 != obs.polygon_point_size()) { str += "| "; }
     }
   }
   (*data_file_) << str << "; ";
@@ -125,24 +119,21 @@ void DataGenerator::RunOnce() {
 
 bool DataGenerator::Process() {
   for (const auto& sensor_config : sensor_configs_) {
-    auto sensor =
-        sensor_factory_.CreateObject(sensor_config.id(), sensor_config);
+    auto sensor = sensor_factory_.CreateObject(sensor_config.id(), sensor_config);
     if (!sensor) {
       AERROR << "Could not find sensor " << sensor_config.DebugString();
       continue;
     }
     sensor->Process();
-    ADEBUG << "Processed sensor "
-           << SensorConfig::SensorId_Name(sensor_config.id());
+    ADEBUG << "Processed sensor " << SensorConfig::SensorId_Name(sensor_config.id());
   }
   return true;
 }
 
 Status DataGenerator::Start() {
   constexpr double kDataGeneratorCycleDuration = 0.1;  // in seconds
-  timer_ =
-      AdapterManager::CreateTimer(ros::Duration(kDataGeneratorCycleDuration),
-                                  &DataGenerator::OnTimer, this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(kDataGeneratorCycleDuration),
+                                       &DataGenerator::OnTimer, this);
   AINFO << "DataGenerator started";
   return Status::OK();
 }

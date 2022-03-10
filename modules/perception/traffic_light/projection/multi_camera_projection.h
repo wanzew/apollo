@@ -35,13 +35,12 @@ class MultiCamerasProjection {
 
   virtual ~MultiCamerasProjection() = default;
   virtual bool Init();
-  virtual bool Project(const CarPose &pose, const ProjectOption &option,
-                       Light *light) const;
-  std::string name() const { return "TLPreprocessor"; }
+  virtual bool Project(const CarPose& pose, const ProjectOption& option, Light* light) const;
+  std::string  name() const { return "TLPreprocessor"; }
 
  private:
-  std::vector<CameraCoeffient> camera_coeffient_;
-  std::vector<std::string> camera_names_;
+  std::vector<CameraCoeffient>    camera_coeffient_;
+  std::vector<std::string>        camera_names_;
   std::unique_ptr<BaseProjection> projection_;
 
   traffic_light::multi_camera_projection_config::ModelConfigs config_;

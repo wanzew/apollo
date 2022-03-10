@@ -15,13 +15,13 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
-#include <gtest/gtest.h>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_matrix.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_node.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_pool.h"
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
+#include <gtest/gtest.h>
 
 namespace apollo {
 namespace localization {
@@ -38,15 +38,13 @@ class LosslessMapTestSuite : public ::testing::Test {
 /**@brief Test the binary I/O of the map node. */
 TEST_F(LosslessMapTestSuite, MapNodeTest) {
   // Delete map folder
-  boost::filesystem::remove_all(
-      "modules/localization/msf/local_map/test/test_data/temp_map");
+  boost::filesystem::remove_all("modules/localization/msf/local_map/test/test_data/temp_map");
 
   // Map save
   {
-    std::string map_base_folder =
-        "modules/localization/msf/local_map/test/test_data";
-    LosslessMapConfig config;
-    LosslessMap map(&config);
+    std::string         map_base_folder = "modules/localization/msf/local_map/test/test_data";
+    LosslessMapConfig   config;
+    LosslessMap         map(&config);
     LosslessMapNodePool lossless_map_node_pool(25, 8);
     lossless_map_node_pool.Initial(&config);
     map.InitThreadPool(1, 6);
@@ -67,11 +65,10 @@ TEST_F(LosslessMapTestSuite, MapNodeTest) {
 
   // Map load
   {
-    std::string map_base_folder =
-        "modules/localization/msf/local_map/test/test_data";
+    std::string map_base_folder = "modules/localization/msf/local_map/test/test_data";
 
-    LosslessMapConfig config;
-    LosslessMap map(&config);
+    LosslessMapConfig   config;
+    LosslessMap         map(&config);
     LosslessMapNodePool lossless_map_node_pool(25, 8);
     lossless_map_node_pool.Initial(&config);
     map.InitThreadPool(1, 6);
@@ -93,8 +90,7 @@ TEST_F(LosslessMapTestSuite, MapNodeTest) {
 }
 
 TEST_F(LosslessMapTestSuite, MapScheduleTest) {
-  std::string map_folder =
-      "modules/localization/msf/local_map/test/test_data/lossless_single_map";
+  std::string map_folder = "modules/localization/msf/local_map/test/test_data/lossless_single_map";
   LosslessMapConfig map_config("lossless_map");
 
   LosslessMapNodePool input_node_pool(25, 8);
@@ -108,7 +104,7 @@ TEST_F(LosslessMapTestSuite, MapScheduleTest) {
     return;
   }
 
-  int zone_id = 50;
+  int          zone_id       = 50;
   unsigned int resolution_id = 0;
 
   Eigen::Vector3d trans_diff;
@@ -119,7 +115,7 @@ TEST_F(LosslessMapTestSuite, MapScheduleTest) {
   index.m_ = 34635;
   index.n_ = 3437;
 
-  auto loc = LosslessMapNode::GetLeftTopCorner(map.GetConfig(), index);
+  auto            loc = LosslessMapNode::GetLeftTopCorner(map.GetConfig(), index);
   Eigen::Vector3d location;
   location[0] = loc[0];
   location[1] = loc[1];
@@ -130,8 +126,7 @@ TEST_F(LosslessMapTestSuite, MapScheduleTest) {
     location += trans_diff;
   }
 
-  LosslessMapNode* node =
-      static_cast<LosslessMapNode*>(map.GetMapNodeSafe(index));
+  LosslessMapNode* node = static_cast<LosslessMapNode*>(map.GetMapNodeSafe(index));
   node->SetLeftTopCorner(0.0, 0.0);
 
   std::vector<Eigen::Vector3d> pt3ds_global(200);
@@ -142,8 +137,8 @@ TEST_F(LosslessMapTestSuite, MapScheduleTest) {
   }
 
   for (size_t i = 0; i < pt3ds_global.size(); ++i) {
-    const Eigen::Vector3d& pt3d = pt3ds_global[i];
-    const unsigned char& intensity = 10 + i % 128;
+    const Eigen::Vector3d& pt3d      = pt3ds_global[i];
+    const unsigned char&   intensity = 10 + i % 128;
     node->SetValueIfInBound(pt3d, intensity);
     node->SetIsChanged(false);  // avoid changing origin data
   }

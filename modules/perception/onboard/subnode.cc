@@ -25,21 +25,19 @@ namespace perception {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using std::vector;
-using std::string;
 using std::ostringstream;
+using std::string;
+using std::vector;
 
-bool Subnode::Init(const DAGConfig::Subnode &subnode_config,
-                   const vector<EventID> &sub_events,
-                   const vector<EventID> &pub_events,
-                   EventManager *event_manager,
-                   SharedDataManager *shared_data_manager) {
-  name_ = subnode_config.name();
-  id_ = subnode_config.id();
+bool Subnode::Init(const DAGConfig::Subnode& subnode_config,
+                   const vector<EventID>&    sub_events,
+                   const vector<EventID>&    pub_events,
+                   EventManager*             event_manager,
+                   SharedDataManager*        shared_data_manager) {
+  name_    = subnode_config.name();
+  id_      = subnode_config.id();
   reserve_ = subnode_config.reserve();
-  if (subnode_config.has_type()) {
-    type_ = subnode_config.type();
-  }
+  if (subnode_config.has_type()) { type_ = subnode_config.type(); }
 
   CHECK(event_manager != nullptr) << "event_manager == nullptr";
   event_manager_ = event_manager;
@@ -48,14 +46,12 @@ bool Subnode::Init(const DAGConfig::Subnode &subnode_config,
 
   // fill sub and pub meta events.
   if (!event_manager_->GetEventMeta(sub_events, &sub_meta_events_)) {
-    AERROR << "failed to get Sub EventMeta. node: <" << name_ << ", " << id_
-           << ">";
+    AERROR << "failed to get Sub EventMeta. node: <" << name_ << ", " << id_ << ">";
     return false;
   }
 
   if (!event_manager_->GetEventMeta(pub_events, &pub_meta_events_)) {
-    AERROR << "failed to get Pub EventMeta. node: <" << id_ << ", " << name_
-           << ">";
+    AERROR << "failed to get Pub EventMeta. node: <" << id_ << ", " << name_ << ">";
     return false;
   }
 
@@ -70,8 +66,7 @@ bool Subnode::Init(const DAGConfig::Subnode &subnode_config,
 
 void Subnode::Run() {
   if (!inited_) {
-    AERROR << "Subnode not inited, run failed. node: <" << id_ << ", " << name_
-           << ">";
+    AERROR << "Subnode not inited, run failed. node: <" << id_ << ", " << name_ << ">";
     return;
   }
 
@@ -86,16 +81,14 @@ void Subnode::Run() {
     if (status.code() == ErrorCode::PERCEPTION_ERROR) {
       ++failed_count_;
       AWARN << "Subnode: " << name_ << " proc event failed. "
-            << " total_count: " << total_count_
-            << " failed_count: " << failed_count_;
+            << " total_count: " << total_count_ << " failed_count: " << failed_count_;
       continue;
     }
 
     // FATAL error, so exit thread.
     if (status.code() == ErrorCode::PERCEPTION_FATAL) {
       AERROR << "Subnode: " << name_ << " proc event FATAL error, EXIT. "
-             << " total_count: " << total_count_
-             << " failed_count: " << failed_count_;
+             << " total_count: " << total_count_ << " failed_count: " << failed_count_;
       break;
     }
   }
@@ -126,18 +119,17 @@ Status CommonSubnode::ProcEvents() {
 
   Event sub_event;
   if (!event_manager_->Subscribe(sub_meta_events_[0].event_id, &sub_event)) {
-    AERROR << "failed to subscribe. meta_event: <"
-           << sub_meta_events_[0].to_string() << ">";
+    AERROR << "failed to subscribe. meta_event: <" << sub_meta_events_[0].to_string() << ">";
     return Status(ErrorCode::PERCEPTION_ERROR, "Failed to subscribe event.");
   }
 
-  Event pub_event = sub_event;
+  Event pub_event    = sub_event;
   pub_event.event_id = pub_meta_events_[0].event_id;
 
   // user defined logic api.
   if (!HandleEvent(sub_event, &pub_event)) {
-    AWARN << "failed to call handle_event_. sub_event: <"
-          << sub_event.to_string() << "> pub_event: <" << pub_event.to_string();
+    AWARN << "failed to call handle_event_. sub_event: <" << sub_event.to_string()
+          << "> pub_event: <" << pub_event.to_string();
     return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call handle_event_.");
   }
 

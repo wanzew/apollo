@@ -33,28 +33,22 @@ using pcl_util::PointCloudPtr;
 using pcl_util::PointDCloud;
 
 static bool ConstructPointCloud(std::vector<pcl_util::PointCloudPtr>* clouds) {
-  std::string pcd_data(
-      "modules/perception/data/obstacle_common_test/"
-      "QB9178_3_1461381834_1461382134_30651.pcd");
+  std::string   pcd_data("modules/perception/data/obstacle_common_test/"
+                       "QB9178_3_1461381834_1461382134_30651.pcd");
   std::ifstream cluster_ifs(pcd_data.c_str(), std::ifstream::in);
-  std::string point_buf;
+  std::string   point_buf;
   while (cluster_ifs.good()) {
     getline(cluster_ifs, point_buf);
     std::vector<std::string> point_strs;
-    boost::algorithm::split(point_strs, point_buf,
-                            boost::algorithm::is_any_of(" "));
-    if (point_strs.size() <= 1 || (point_strs.size() - 1) % 4 != 0) {
-      continue;
-    }
+    boost::algorithm::split(point_strs, point_buf, boost::algorithm::is_any_of(" "));
+    if (point_strs.size() <= 1 || (point_strs.size() - 1) % 4 != 0) { continue; }
     std::stringstream ss;
     ss << point_buf;
     int point_num = 0;
     ss >> point_num;
     int exact_point_num = (point_strs.size() - 1) / 4;
-    if (point_num != exact_point_num) {
-      continue;
-    }
-    uint64_t intensity;
+    if (point_num != exact_point_num) { continue; }
+    uint64_t                intensity;
     pcl_util::PointCloudPtr cluster_cloud(new pcl_util::PointCloud);
     for (int i = 0; i < exact_point_num; ++i) {
       pcl_util::Point p;
@@ -74,10 +68,10 @@ TEST(ConvexHull2DXYTest, Reconstruct2dxy) {
   ConvexHull2DXY<pcl_util::Point> convex_hull;
   EXPECT_EQ(convex_hull.getClassName(), "ConvexHull2DXY");
   std::vector<pcl::Vertices> poly_vt;
-  PointCloudPtr plane_hull(new PointCloud);
+  PointCloudPtr              plane_hull(new PointCloud);
   // case 0
   pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
-  pcl_util::Point pt;
+  pcl_util::Point         pt;
   pt.x = 1.0;
   pt.y = 0.0;
   pt.z = 0.0;

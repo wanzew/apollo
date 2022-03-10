@@ -31,28 +31,28 @@ namespace perception {
 
 class DummyCameraDetector : public BaseCameraDetector {
  public:
-  DummyCameraDetector() : BaseCameraDetector() {}
+  DummyCameraDetector()
+      : BaseCameraDetector() {}
   virtual ~DummyCameraDetector() {}
 
-  bool Init(const CameraDetectorInitOptions& options =
-                CameraDetectorInitOptions()) override {
+  bool Init(const CameraDetectorInitOptions& options = CameraDetectorInitOptions()) override {
     return true;
   }
 
-  bool Detect(const cv::Mat& frame, const CameraDetectorOptions& options,
+  bool Detect(const cv::Mat&                              frame,
+              const CameraDetectorOptions&                options,
               std::vector<std::shared_ptr<VisualObject>>* objects) override {
     return true;
   }
 
-  bool Multitask(const cv::Mat& frame, const CameraDetectorOptions& options,
+  bool Multitask(const cv::Mat&                              frame,
+                 const CameraDetectorOptions&                options,
                  std::vector<std::shared_ptr<VisualObject>>* objects,
-                 cv::Mat* mask) override {
+                 cv::Mat*                                    mask) override {
     return true;
   }
 
-  bool Extract(std::vector<std::shared_ptr<VisualObject>>* objects) override {
-    return true;
-  }
+  bool Extract(std::vector<std::shared_ptr<VisualObject>>* objects) override { return true; }
 
   std::string Name() const override { return "DummyCameraDetector"; }
 
@@ -62,7 +62,8 @@ class DummyCameraDetector : public BaseCameraDetector {
 
 class DummyCameraTracker : public BaseCameraTracker {
  public:
-  DummyCameraTracker() : BaseCameraTracker() {}
+  DummyCameraTracker()
+      : BaseCameraTracker() {}
   virtual ~DummyCameraTracker() {}
 
   bool Init() override { return true; }
@@ -87,7 +88,8 @@ class DummyCameraTracker : public BaseCameraTracker {
   }
   */
 
-  bool Associate(const cv::Mat& img, const double timestamp,
+  bool Associate(const cv::Mat&                              img,
+                 const double                                timestamp,
                  std::vector<std::shared_ptr<VisualObject>>* objects) override {
     return true;
   }
@@ -100,22 +102,17 @@ class DummyCameraTracker : public BaseCameraTracker {
 
 class DummyCameraTransformer : public BaseCameraTransformer {
  public:
-  DummyCameraTransformer() : BaseCameraTransformer() {}
+  DummyCameraTransformer()
+      : BaseCameraTransformer() {}
   virtual ~DummyCameraTransformer() {}
 
   bool Init() override { return true; }
 
-  bool Transform(std::vector<std::shared_ptr<VisualObject>>* objects) override {
-    return true;
-  }
+  bool Transform(std::vector<std::shared_ptr<VisualObject>>* objects) override { return true; }
 
-  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) override {
-    return true;
-  }
+  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) override { return true; }
 
-  bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4>* extrinsics) override {
-    return true;
-  }
+  bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4>* extrinsics) override { return true; }
 
   std::string Name() const override { return "DummyCameraTransformer"; }
 

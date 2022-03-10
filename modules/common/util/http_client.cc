@@ -30,16 +30,14 @@ namespace util {
 
 using Json = nlohmann::json;
 
-Status HttpClient::Post(const std::string &url, const Json &json,
-                        std::string *result) {
+Status HttpClient::Post(const std::string& url, const Json& json, std::string* result) {
   try {
-    curlpp::Cleanup cleaner;
-    curlpp::Easy request;
+    curlpp::Cleanup    cleaner;
+    curlpp::Easy       request;
     std::ostringstream response;
 
     request.setOpt(new curlpp::options::Url(url));
-    request.setOpt(new curlpp::options::HttpHeader(
-        {"Content-Type: application/json"}));
+    request.setOpt(new curlpp::options::HttpHeader({"Content-Type: application/json"}));
     const std::string data = json.dump();
     request.setOpt(new curlpp::options::PostFields(data));
     request.setOpt(new curlpp::options::PostFieldSize(data.length()));
@@ -47,13 +45,11 @@ Status HttpClient::Post(const std::string &url, const Json &json,
 
     // Perform request and get response string.
     request.perform();
-    if (result != nullptr) {
-      *result = response.str();
-    }
-  } catch (curlpp::LogicError &e) {
+    if (result != nullptr) { *result = response.str(); }
+  } catch (curlpp::LogicError& e) {
     AERROR << e.what();
     return Status(ErrorCode::HTTP_LOGIC_ERROR, e.what());
-  } catch (curlpp::RuntimeError &e) {
+  } catch (curlpp::RuntimeError& e) {
     AERROR << e.what();
     return Status(ErrorCode::HTTP_RUNTIME_ERROR, e.what());
   }
@@ -61,19 +57,17 @@ Status HttpClient::Post(const std::string &url, const Json &json,
   return Status::OK();
 }
 
-Status HttpClient::Post(const std::string &url, const Json &json,
-                        Json *result) {
+Status HttpClient::Post(const std::string& url, const Json& json, Json* result) {
   if (!StartWith(url, "https://")) {
     return Status(ErrorCode::HTTP_LOGIC_ERROR, "Use HTTPS to post data!");
   }
   std::string response;
-  const auto status = Post(url, json, &response);
+  const auto  status = Post(url, json, &response);
   if (status.ok()) {
     try {
       *result = Json::parse(response.begin(), response.end());
     } catch (...) {
-      return Status(ErrorCode::HTTP_RUNTIME_ERROR,
-                    "Cannot parse response as json.");
+      return Status(ErrorCode::HTTP_RUNTIME_ERROR, "Cannot parse response as json.");
     }
   }
   return status;

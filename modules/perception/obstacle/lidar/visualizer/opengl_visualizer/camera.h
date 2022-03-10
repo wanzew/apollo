@@ -27,18 +27,12 @@ class Camera {
   Camera();
   ~Camera() = default;
 
-  void SetPosition(Eigen::Vector3d world_pos) {
-    t_c2w_ = world_pos;
-  }
+  void SetPosition(Eigen::Vector3d world_pos) { t_c2w_ = world_pos; }
   void SetUpDirection(Eigen::Vector3d world_vec);
-  void SetFov(double fov_deg) {
-    fov_ = fov_deg;
-  }
+  void SetFov(double fov_deg) { fov_ = fov_deg; }
   void SetScreenWidthHeight(int width, int height);
 
-  Eigen::Vector3d Position() {
-    return t_c2w_;
-  }
+  Eigen::Vector3d Position() { return t_c2w_; }
   Eigen::Vector3d UpDir();
 
   void LookAt(Eigen::Vector3d world_tgt);
@@ -51,9 +45,9 @@ class Camera {
  private:
   Eigen::Matrix3d rot_c2w_;
   Eigen::Vector3d t_c2w_;
-  double fov_;
-  int screen_width_;
-  int screen_height_;
+  double          fov_;
+  int             screen_width_;
+  int             screen_height_;
   Eigen::Matrix4d view_mat_;
   Eigen::Matrix4d proj_mat_;
 };

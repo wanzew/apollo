@@ -44,61 +44,49 @@ Status RelativeMap::Init() {
   if (!FLAGS_use_navigation_mode) {
     AERROR << "FLAGS_use_navigation_mode is false, system is not configured "
               "for relative map mode";
-    return Status(ErrorCode::RELATIVE_MAP_ERROR,
-                  "FLAGS_use_navigation_mode is not true.");
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, "FLAGS_use_navigation_mode is not true.");
   }
   adapter_conf_.Clear();
-  if (!common::util::GetProtoFromFile(
-          FLAGS_relative_map_adapter_config_filename, &adapter_conf_)) {
-    return Status(ErrorCode::RELATIVE_MAP_ERROR,
-                  "Unable to load adapter conf file: " +
-                      FLAGS_relative_map_adapter_config_filename);
+  if (!common::util::GetProtoFromFile(FLAGS_relative_map_adapter_config_filename, &adapter_conf_)) {
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, "Unable to load adapter conf file: " +
+                                                     FLAGS_relative_map_adapter_config_filename);
   } else {
-    ADEBUG << "Adapter config file is loaded into: "
-           << adapter_conf_.ShortDebugString();
+    ADEBUG << "Adapter config file is loaded into: " << adapter_conf_.ShortDebugString();
   }
 
   config_.Clear();
-  if (!common::util::GetProtoFromFile(FLAGS_relative_map_config_filename,
-                                      &config_)) {
+  if (!common::util::GetProtoFromFile(FLAGS_relative_map_config_filename, &config_)) {
     return Status(ErrorCode::RELATIVE_MAP_ERROR,
-                  "Unable to load relative map conf file: " +
-                      FLAGS_relative_map_config_filename);
+                  "Unable to load relative map conf file: " + FLAGS_relative_map_config_filename);
   }
 
   navigation_lane_.SetConfig(config_.navigation_lane());
   const auto& map_param = config_.map_param();
-  navigation_lane_.SetDefaultWidth(map_param.default_left_width(),
-                                   map_param.default_right_width());
+  navigation_lane_.SetDefaultWidth(map_param.default_left_width(), map_param.default_right_width());
 
   AdapterManager::Init(adapter_conf_);
   if (!AdapterManager::GetPerceptionObstacles()) {
-    std::string error_msg(
-        "Perception should be configured as dependency in adapter.conf");
+    std::string error_msg("Perception should be configured as dependency in adapter.conf");
     AERROR << error_msg;
     return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
   if (!AdapterManager::GetMonitor()) {
-    std::string error_msg(
-        "Monitor should be configured as dependency in adapter.conf");
+    std::string error_msg("Monitor should be configured as dependency in adapter.conf");
     AERROR << error_msg;
     return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
   if (AdapterManager::GetLocalization() == nullptr) {
-    std::string error_msg(
-        "Localization should be configured as dependency in adapter.conf");
+    std::string error_msg("Localization should be configured as dependency in adapter.conf");
     AERROR << error_msg;
     return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
   if (AdapterManager::GetChassis() == nullptr) {
-    std::string error_msg(
-        "Chassis should be configured as dependency in adapter.conf");
+    std::string error_msg("Chassis should be configured as dependency in adapter.conf");
     AERROR << error_msg;
     return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
   if (AdapterManager::GetNavigation() == nullptr) {
-    std::string error_msg(
-        "Navigation should be configured as dependency in adapter.conf");
+    std::string error_msg("Navigation should be configured as dependency in adapter.conf");
     AERROR << error_msg;
     return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
@@ -115,16 +103,12 @@ apollo::common::Status RelativeMap::Start() {
   MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("RelativeMap started");
 
-  timer_ = AdapterManager::CreateTimer(
-      ros::Duration(1.0 / FLAGS_relative_map_loop_rate), &RelativeMap::OnTimer,
-      this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(1.0 / FLAGS_relative_map_loop_rate),
+                                       &RelativeMap::OnTimer, this);
 
-  AdapterManager::AddNavigationCallback(&RelativeMap::OnReceiveNavigationInfo,
-                                        this);
+  AdapterManager::AddNavigationCallback(&RelativeMap::OnReceiveNavigationInfo, this);
 
-  if (AdapterManager::GetPerceptionObstacles()->Empty()) {
-    AWARN << "Perception is not ready.";
-  }
+  if (AdapterManager::GetPerceptionObstacles()->Empty()) { AWARN << "Perception is not ready."; }
 
   return Status::OK();
 }
@@ -142,8 +126,7 @@ void RelativeMap::RunOnce() {
   Publish(&map_msg);
 }
 
-void RelativeMap::OnReceiveNavigationInfo(
-    const NavigationInfo& navigation_info) {
+void RelativeMap::OnReceiveNavigationInfo(const NavigationInfo& navigation_info) {
   {
     std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
     navigation_lane_.UpdateNavigationInfo(navigation_info);
@@ -163,8 +146,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   }
 
   // update vehicle state from localization and chassis
-  const auto& localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
+  const auto& localization = AdapterManager::GetLocalization()->GetLatestObserved();
   ADEBUG << "Get localization:" << localization.DebugString();
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
@@ -173,8 +155,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
 
   // update navigation_lane from perception_obstacles (lane marker)
   if (!AdapterManager::GetPerceptionObstacles()->Empty()) {
-    const auto& perception =
-        AdapterManager::GetPerceptionObstacles()->GetLatestObserved();
+    const auto& perception = AdapterManager::GetPerceptionObstacles()->GetLatestObserved();
     navigation_lane_.UpdatePerception(perception);
     map_msg->mutable_lane_marker()->CopyFrom(perception.lane_marker());
   }

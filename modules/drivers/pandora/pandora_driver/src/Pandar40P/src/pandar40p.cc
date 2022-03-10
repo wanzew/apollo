@@ -30,14 +30,16 @@ namespace hesai {
  *        gps_callback      The callback of GPS structure
  *        start_angle       The start angle of every point cloud
  */
-Pandar40P::Pandar40P(
-    const std::string &device_ip, uint16_t lidar_port, uint16_t gps_port,
-    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
-    boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
-    std::string frame_id) {
-  internal_ =
-      new Pandar40P_Internal(device_ip, lidar_port, gps_port, pcl_callback,
-                             gps_callback, start_angle, tz, frame_id);
+Pandar40P::Pandar40P(const std::string&                                            device_ip,
+                     uint16_t                                                      lidar_port,
+                     uint16_t                                                      gps_port,
+                     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
+                     boost::function<void(double)>                                 gps_callback,
+                     uint16_t                                                      start_angle,
+                     int                                                           tz,
+                     std::string                                                   frame_id) {
+  internal_ = new Pandar40P_Internal(device_ip, lidar_port, gps_port, pcl_callback, gps_callback,
+                                     start_angle, tz, frame_id);
 }
 
 /**
@@ -49,7 +51,7 @@ Pandar40P::~Pandar40P() { delete internal_; }
  * @brief load the lidar correction file
  * @param contents The correction contents of lidar correction
  */
-int Pandar40P::LoadCorrectionFile(const std::string &file) {
+int Pandar40P::LoadCorrectionFile(const std::string& file) {
   return internal_->LoadCorrectionFile(file);
 }
 
@@ -57,9 +59,7 @@ int Pandar40P::LoadCorrectionFile(const std::string &file) {
  * @brief Reset Lidar's start angle.
  * @param angle The start angle
  */
-void Pandar40P::ResetStartAngle(uint16_t start_angle) {
-  internal_->ResetStartAngle(start_angle);
-}
+void Pandar40P::ResetStartAngle(uint16_t start_angle) { internal_->ResetStartAngle(start_angle); }
 
 /**
  * @brief Run SDK.

@@ -36,8 +36,7 @@ class MockProtocolData : public ProtocolData<::apollo::canbus::ChassisDetail> {
   MockProtocolData() {}
 };
 
-class MockMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+class MockMessageManager : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   MockMessageManager() {
     AddRecvProtocolData<MockProtocolData, true>();
@@ -46,12 +45,11 @@ class MockMessageManager
 };
 
 TEST(MessageManagerTest, GetMutableProtocolDataById) {
-  uint8_t mock_data = 1;
+  uint8_t            mock_data = 1;
   MockMessageManager manager;
   manager.Parse(MockProtocolData::ID, &mock_data, 8);
   manager.ResetSendMessages();
-  EXPECT_TRUE(manager.GetMutableProtocolDataById(MockProtocolData::ID) !=
-              nullptr);
+  EXPECT_TRUE(manager.GetMutableProtocolDataById(MockProtocolData::ID) != nullptr);
 
   ::apollo::canbus::ChassisDetail chassis_detail;
   chassis_detail.set_car_type(::apollo::canbus::ChassisDetail::QIRUI_EQ_15);

@@ -22,22 +22,18 @@
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_string(process_monitor_name, "ProcessMonitor",
-              "Name of the process monitor.");
+DEFINE_string(process_monitor_name, "ProcessMonitor", "Name of the process monitor.");
 
-DEFINE_double(process_monitor_interval, 1.5,
-              "Process status checking interval (s).");
+DEFINE_double(process_monitor_interval, 1.5, "Process status checking interval (s).");
 
 namespace apollo {
 namespace monitor {
 namespace {
 
 template <class Iterable>
-bool ContainsAll(const std::string &full, const Iterable &parts) {
-  for (const auto &part : parts) {
-    if (full.find(part) == std::string::npos) {
-      return false;
-    }
+bool ContainsAll(const std::string& full, const Iterable& parts) {
+  for (const auto& part : parts) {
+    if (full.find(part) == std::string::npos) { return false; }
   }
   return true;
 }
@@ -45,47 +41,43 @@ bool ContainsAll(const std::string &full, const Iterable &parts) {
 }  // namespace
 
 ProcessMonitor::ProcessMonitor()
-    : RecurrentRunner(FLAGS_process_monitor_name,
-                      FLAGS_process_monitor_interval) {
-}
+    : RecurrentRunner(FLAGS_process_monitor_name, FLAGS_process_monitor_interval) {}
 
 void ProcessMonitor::RunOnce(const double current_time) {
   // Get running processes.
   std::map<std::string, std::string> running_processes;
-  const auto procs = common::util::ListSubPaths("/proc");
-  for (const auto &proc : procs) {
+  const auto                         procs = common::util::ListSubPaths("/proc");
+  for (const auto& proc : procs) {
     // Get process command string.
     std::string cmd_string;
-    const auto cmd_file = common::util::StrCat("/proc/", proc, "/cmdline");
+    const auto  cmd_file = common::util::StrCat("/proc/", proc, "/cmdline");
     if (common::util::GetContent(cmd_file, &cmd_string)) {
       running_processes.emplace(proc, cmd_string);
     }
   }
 
-  for (const auto &module : MonitorManager::GetConfig().modules()) {
+  for (const auto& module : MonitorManager::GetConfig().modules()) {
     if (module.has_process_conf()) {
       UpdateModule(module.name(), module.process_conf(), running_processes);
     }
   }
 }
 
-void ProcessMonitor::UpdateModule(
-    const std::string &module_name, const ProcessConf &config,
-    const std::map<std::string, std::string> &running_processes) {
-  auto *status = MonitorManager::GetModuleStatus(module_name);
-  for (const auto &proc : running_processes) {
+void ProcessMonitor::UpdateModule(const std::string&                        module_name,
+                                  const ProcessConf&                        config,
+                                  const std::map<std::string, std::string>& running_processes) {
+  auto* status = MonitorManager::GetModuleStatus(module_name);
+  for (const auto& proc : running_processes) {
     if (ContainsAll(proc.second, config.process_cmd_keywords())) {
       status->mutable_process_status()->set_running(true);
-      ADEBUG << "Module " << module_name
-             << " is running on process " << proc.first;
+      ADEBUG << "Module " << module_name << " is running on process " << proc.first;
       return;
     }
   }
 
   if (status->process_status().running()) {
     // The process stopped. Send monitor log.
-    const std::string msg = apollo::common::util::StrCat(
-        module_name, " process stopped!");
+    const std::string msg = apollo::common::util::StrCat(module_name, " process stopped!");
     // In autonomous driving mode, it's a critical error. Or else just warn.
     if (MonitorManager::IsInAutonomousDriving()) {
       MonitorManager::LogBuffer().ERROR(msg);

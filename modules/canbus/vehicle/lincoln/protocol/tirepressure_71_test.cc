@@ -24,10 +24,10 @@ namespace lincoln {
 
 TEST(Tirepressure71Test, General) {
   uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
-  int32_t length = 8;
+  int32_t length  = 8;
 
   Tirepressure71 tire_pressure;
-  ChassisDetail cd;
+  ChassisDetail  cd;
   tire_pressure.Parse(data, length, &cd);
 
   EXPECT_EQ(cd.safety().front_left_tire_press(), 25191);

@@ -38,17 +38,16 @@ namespace perception {
 
 struct SensorFile {
   SensorFile() {}
-  SensorFile(const std::string& key, const std::string& path,
-             double times_tamp = 0.0)
-      : sensor_key(key), file_path(path), timestamp(times_tamp) {}
-  std::string sensor_key;
-  std::string file_path;
-  double timestamp;
-  friend std::ostream& operator<<(std::ostream& out,
-                                  const SensorFile& sensor_file) {
-    out << "sensor_key: " << sensor_file.sensor_key
-        << " file_path: " << sensor_file.file_path << std::setprecision(16)
-        << " timestamp: " << sensor_file.timestamp;
+  SensorFile(const std::string& key, const std::string& path, double times_tamp = 0.0)
+      : sensor_key(key)
+      , file_path(path)
+      , timestamp(times_tamp) {}
+  std::string          sensor_key;
+  std::string          file_path;
+  double               timestamp;
+  friend std::ostream& operator<<(std::ostream& out, const SensorFile& sensor_file) {
+    out << "sensor_key: " << sensor_file.sensor_key << " file_path: " << sensor_file.file_path
+        << std::setprecision(16) << " timestamp: " << sensor_file.timestamp;
     return out;
   }
 };
@@ -56,7 +55,8 @@ struct SensorFile {
 struct SensorFilesSource {
   SensorFilesSource() {}
   SensorFilesSource(const std::string& folder, const std::string& ext)
-      : folder_path(folder), extension(ext) {}
+      : folder_path(folder)
+      , extension(ext) {}
   std::string folder_path;
   std::string extension;
 };
@@ -78,9 +78,8 @@ bool LoadOdometry(const std::string& filepath, Eigen::Vector3f* velocity) {
     return false;
   }
   double timestamp = 0.0;
-  int frame_id;
-  fin >> frame_id >> timestamp >> (*velocity)(0) >> (*velocity)(1) >>
-      (*velocity)(2);
+  int    frame_id;
+  fin >> frame_id >> timestamp >> (*velocity)(0) >> (*velocity)(1) >> (*velocity)(2);
   bool state = true;
   if (!fin.good()) {
     state = false;
@@ -92,8 +91,7 @@ bool LoadOdometry(const std::string& filepath, Eigen::Vector3f* velocity) {
 
 class SequentialPerceptionTest {
  public:
-  typedef std::function<bool(const std::string&,
-                             std::shared_ptr<SensorRawFrame>*)>
+  typedef std::function<bool(const std::string&, std::shared_ptr<SensorRawFrame>*)>
       SensorFrameReconstructor;
 
   SequentialPerceptionTest() {}
@@ -105,22 +103,21 @@ class SequentialPerceptionTest {
       AERROR << "Failed to init ObstaclePerception";
       return false;
     }
-    sensor_frame_reconstructor_["pcd"] = std::bind(
-        &SequentialPerceptionTest::ReconstructPointcloudSensorRawFrame, this,
-        std::placeholders::_1, std::placeholders::_2);
+    sensor_frame_reconstructor_["pcd"] =
+        std::bind(&SequentialPerceptionTest::ReconstructPointcloudSensorRawFrame, this,
+                  std::placeholders::_1, std::placeholders::_2);
     sensor_frame_reconstructor_["radar"] =
-        std::bind(&SequentialPerceptionTest::ReconstructRadarSensorRawFrame,
-                  this, std::placeholders::_1, std::placeholders::_2);
-    sensors_files_sources_ = {
-        {"pcd", SensorFilesSource(FLAGS_lidar_path, "pcd")},
-        {"radar", SensorFilesSource(FLAGS_radar_path, "radar")}};
+        std::bind(&SequentialPerceptionTest::ReconstructRadarSensorRawFrame, this,
+                  std::placeholders::_1, std::placeholders::_2);
+    sensors_files_sources_ = {{"pcd", SensorFilesSource(FLAGS_lidar_path, "pcd")},
+                              {"radar", SensorFilesSource(FLAGS_radar_path, "radar")}};
     return true;
   }
 
-  bool ReconstructSensorRawFrame(const std::string& file_path,
+  bool ReconstructSensorRawFrame(const std::string&               file_path,
                                  std::shared_ptr<SensorRawFrame>* frame) {
-    std::string type = file_path.substr(file_path.find_last_of(".") + 1);
-    auto find_res = sensor_frame_reconstructor_.find(type);
+    std::string type     = file_path.substr(file_path.find_last_of(".") + 1);
+    auto        find_res = sensor_frame_reconstructor_.find(type);
     if (find_res == sensor_frame_reconstructor_.end()) {
       AERROR << "The file type: " << type << ", is not supported";
       return false;
@@ -128,8 +125,8 @@ class SequentialPerceptionTest {
     return (find_res->second)(file_path, frame);
   }
 
-  bool ReconstructPointcloudSensorRawFrame(
-      const std::string& file_path, std::shared_ptr<SensorRawFrame>* frame) {
+  bool ReconstructPointcloudSensorRawFrame(const std::string&               file_path,
+                                           std::shared_ptr<SensorRawFrame>* frame) {
     std::string type = file_path.substr(file_path.find_last_of(".") + 1);
     if (type != "pcd") {
       AERROR << "ReconstructPointcloudSensorRawFrame can only handle pcd file. "
@@ -140,45 +137,41 @@ class SequentialPerceptionTest {
 
     /// read pose and timestamp
     Eigen::Matrix4d pose;
-    int frame_id = 0;
-    double timestamp = 0.0;
-    std::string pose_filename =
-        FLAGS_lidar_path + "/" +
-        file_path.substr(0, file_path.find_last_of('.')) + ".pose";
+    int             frame_id  = 0;
+    double          timestamp = 0.0;
+    std::string     pose_filename =
+        FLAGS_lidar_path + "/" + file_path.substr(0, file_path.find_last_of('.')) + ".pose";
     if (!ReadPoseFile(pose_filename, &pose, &frame_id, &timestamp)) {
       AERROR << "Failed to read pose file: " << pose_filename;
       return false;
     }
 
     /// read pcd
-    pcl::PointCloud<pcl_util::PointXYZIT>::Ptr cloud_raw(
-        new pcl::PointCloud<pcl_util::PointXYZIT>);
-    std::string pcd_filename =
-        FLAGS_lidar_path + "/" +
-        file_path.substr(0, file_path.find_last_of('.')) + ".pcd";
+    pcl::PointCloud<pcl_util::PointXYZIT>::Ptr cloud_raw(new pcl::PointCloud<pcl_util::PointXYZIT>);
+    std::string                                pcd_filename =
+        FLAGS_lidar_path + "/" + file_path.substr(0, file_path.find_last_of('.')) + ".pcd";
     pcl::io::loadPCDFile<pcl_util::PointXYZIT>(pcd_filename, *cloud_raw);
     pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
     for (size_t i = 0; i < cloud_raw->points.size(); ++i) {
       pcl_util::Point p;
-      p.x = cloud_raw->points[i].x;
-      p.y = cloud_raw->points[i].y;
-      p.z = cloud_raw->points[i].z;
+      p.x         = cloud_raw->points[i].x;
+      p.y         = cloud_raw->points[i].y;
+      p.z         = cloud_raw->points[i].z;
       p.intensity = cloud_raw->points[i].intensity;
       cloud->points.push_back(p);
     }
 
     /// construct frame
     frame->reset(new VelodyneRawFrame);
-    VelodyneRawFrame* velodyne_frame =
-        dynamic_cast<VelodyneRawFrame*>(frame->get());
-    velodyne_frame->timestamp_ = timestamp;
-    velodyne_frame->pose_ = pose;
-    velodyne_frame->sensor_type_ = SensorType::VELODYNE_64;
-    velodyne_frame->cloud_ = cloud;
+    VelodyneRawFrame* velodyne_frame = dynamic_cast<VelodyneRawFrame*>(frame->get());
+    velodyne_frame->timestamp_       = timestamp;
+    velodyne_frame->pose_            = pose;
+    velodyne_frame->sensor_type_     = SensorType::VELODYNE_64;
+    velodyne_frame->cloud_           = cloud;
     return true;
   }
 
-  bool ReconstructRadarSensorRawFrame(const std::string& file_path,
+  bool ReconstructRadarSensorRawFrame(const std::string&               file_path,
                                       std::shared_ptr<SensorRawFrame>* frame) {
     std::string type = file_path.substr(file_path.find_last_of(".") + 1);
     if (type != "radar") {
@@ -190,33 +183,29 @@ class SequentialPerceptionTest {
 
     /// read pose and timestamp
     Eigen::Matrix4d pose;
-    int frame_id = 0;
-    double timestamp = 0.0;
-    std::string pose_filename =
-        FLAGS_radar_path + "/" +
-        file_path.substr(0, file_path.find_last_of('.')) + ".pose";
+    int             frame_id  = 0;
+    double          timestamp = 0.0;
+    std::string     pose_filename =
+        FLAGS_radar_path + "/" + file_path.substr(0, file_path.find_last_of('.')) + ".pose";
     if (!ReadPoseFile(pose_filename, &pose, &frame_id, &timestamp)) {
       AERROR << "Failed to read pose file: " << pose_filename;
       return false;
     }
 
     /// read radar obstacle
-    ContiRadar radar_obs_proto;
+    ContiRadar  radar_obs_proto;
     std::string radar_filename =
-        FLAGS_radar_path + "/" +
-        file_path.substr(0, file_path.find_last_of('.')) + ".radar";
+        FLAGS_radar_path + "/" + file_path.substr(0, file_path.find_last_of('.')) + ".radar";
     if (!LoadRadarProto(radar_filename, &radar_obs_proto)) {
       AERROR << "Failed to load radar proto " << radar_filename;
       return false;
     }
-    AINFO << "LoadRadarProto obstacle size: "
-          << radar_obs_proto.contiobs().size();
+    AINFO << "LoadRadarProto obstacle size: " << radar_obs_proto.contiobs().size();
 
     /// read host vehicle velocity
     Eigen::Vector3f velocity;
-    std::string odometry_filename =
-        FLAGS_radar_path + "/" +
-        file_path.substr(0, file_path.find_last_of('.')) + ".velocity";
+    std::string     odometry_filename =
+        FLAGS_radar_path + "/" + file_path.substr(0, file_path.find_last_of('.')) + ".velocity";
     if (!LoadOdometry(odometry_filename, &velocity)) {
       AERROR << "Failed to load odometry " << odometry_filename;
       return false;
@@ -224,56 +213,50 @@ class SequentialPerceptionTest {
 
     /// construct frame
     frame->reset(new RadarRawFrame);
-    RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame->get());
-    radar_frame->timestamp_ = timestamp;
-    radar_frame->pose_ = pose;
-    radar_frame->sensor_type_ = SensorType::RADAR;
-    radar_frame->raw_obstacles_ = radar_obs_proto;
+    RadarRawFrame* radar_frame     = dynamic_cast<RadarRawFrame*>(frame->get());
+    radar_frame->timestamp_        = timestamp;
+    radar_frame->pose_             = pose;
+    radar_frame->sensor_type_      = SensorType::RADAR;
+    radar_frame->raw_obstacles_    = radar_obs_proto;
     radar_frame->car_linear_speed_ = velocity;
     return true;
   }
 
   void GetSequentialSensorsDataFiles(std::vector<SensorFile>* sensors_files) {
     PERF_BLOCK_START();
-    std::map<std::string, std::vector<SensorFile> > sensors_files_lists;
-    size_t total_sensor_files_num = 0;
+    std::map<std::string, std::vector<SensorFile>> sensors_files_lists;
+    size_t                                         total_sensor_files_num = 0;
     for (const auto& sensor_files_source : sensors_files_sources_) {
-      std::string sensor_key = sensor_files_source.first;
-      const SensorFilesSource& source = sensor_files_source.second;
+      std::string              sensor_key = sensor_files_source.first;
+      const SensorFilesSource& source     = sensor_files_source.second;
       AINFO << "source folder_path: " << source.folder_path;
       if (!apollo::common::util::DirectoryExists(source.folder_path)) {
         AWARN << "No sensor files source: " << sensor_key;
         continue;
       }
       /// get files with specified extension
-      std::string ext = std::string(".") + source.extension;
+      std::string              ext = std::string(".") + source.extension;
       std::vector<std::string> files_list;
-      common::util::GetFileNamesInFolderById(source.folder_path, ext,
-                                             &files_list);
+      common::util::GetFileNamesInFolderById(source.folder_path, ext, &files_list);
       /// get sensor files
-      std::vector<SensorFile>& sensor_files_list =
-          sensors_files_lists[sensor_key];
+      std::vector<SensorFile>& sensor_files_list = sensors_files_lists[sensor_key];
       sensor_files_list.reserve(files_list.size());
       for (const auto& file_name : files_list) {
         /// get timestamp
-        std::string timestamp_str =
-            file_name.substr(0, file_name.find_last_of('.'));
-        double timestamp = 0.0;
+        std::string       timestamp_str = file_name.substr(0, file_name.find_last_of('.'));
+        double            timestamp     = 0.0;
         std::stringstream ss(timestamp_str);
         ss >> timestamp;
-        sensor_files_list.push_back(
-            SensorFile(sensor_key, file_name, timestamp));
+        sensor_files_list.push_back(SensorFile(sensor_key, file_name, timestamp));
       }
       total_sensor_files_num += sensor_files_list.size();
-      AINFO << "sensor_key: " << sensor_key
-            << " files num: " << sensor_files_list.size();
+      AINFO << "sensor_key: " << sensor_key << " files num: " << sensor_files_list.size();
     }
     /// sort all sensor files from different sensor type by timestamp
     sensors_files->clear();
     sensors_files->reserve(total_sensor_files_num);
     for (const auto& sensor_files_list : sensors_files_lists) {
-      sensors_files->insert(sensors_files->end(),
-                            sensor_files_list.second.begin(),
+      sensors_files->insert(sensors_files->end(), sensor_files_list.second.begin(),
                             sensor_files_list.second.end());
     }
     auto compare = [](const SensorFile& lhs, const SensorFile& rhs) {
@@ -295,7 +278,7 @@ class SequentialPerceptionTest {
  private:
   // reconstruct sensor raw frame function
   std::map<std::string, SensorFrameReconstructor> sensor_frame_reconstructor_;
-  std::map<std::string, SensorFilesSource> sensors_files_sources_;
+  std::map<std::string, SensorFilesSource>        sensors_files_sources_;
 
   ObstaclePerception obstacle_perception_;
 };
@@ -304,9 +287,8 @@ class SequentialPerceptionTest {
 }  // namespace apollo
 
 int main(int argc, char** argv) {
-  FLAGS_flagfile =
-      "./modules/perception/tool/offline_visualizer_tool/conf/"
-      "offline_sequential_obstacle_perception_test.flag";
+  FLAGS_flagfile = "./modules/perception/tool/offline_visualizer_tool/conf/"
+                   "offline_sequential_obstacle_perception_test.flag";
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   /// initialize SequentialPerceptionTest
@@ -330,10 +312,8 @@ int main(int argc, char** argv) {
     AINFO << "Process frame " << sensors_files[i];
     std::shared_ptr<apollo::perception::SensorRawFrame> raw_frame(
         new apollo::perception::SensorRawFrame);
-    if (!test.ReconstructSensorRawFrame(sensors_files[i].file_path,
-                                        &raw_frame)) {
-      AERROR << "Failed to ReconstructSensorRawFrame for file "
-             << sensors_files[i].file_path;
+    if (!test.ReconstructSensorRawFrame(sensors_files[i].file_path, &raw_frame)) {
+      AERROR << "Failed to ReconstructSensorRawFrame for file " << sensors_files[i].file_path;
       continue;
     }
     test.Run(raw_frame.get());

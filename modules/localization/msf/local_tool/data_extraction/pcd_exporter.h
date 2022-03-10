@@ -17,10 +17,10 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_PCD_EXPORTER_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_PCD_EXPORTER_H
 
-#include <sensor_msgs/PointCloud2.h>
-#include <memory>
-#include <string>
 #include "modules/localization/msf/local_tool/data_extraction/base_exporter.h"
+#include <memory>
+#include <sensor_msgs/PointCloud2.h>
+#include <string>
 
 namespace apollo {
 namespace localization {
@@ -32,20 +32,19 @@ namespace msf {
  */
 class PCDExporter : public BaseExporter {
  public:
-  typedef std::shared_ptr<PCDExporter> Ptr;
+  typedef std::shared_ptr<PCDExporter>       Ptr;
   typedef std::shared_ptr<PCDExporter const> ConstPtr;
 
-  explicit PCDExporter(const std::string &pcd_folder);
+  explicit PCDExporter(const std::string& pcd_folder);
   ~PCDExporter();
 
-  void CompensatedPcdCallback(const rosbag::MessageInstance &msg);
+  void CompensatedPcdCallback(const rosbag::MessageInstance& msg);
 
  private:
-  void WritePcdFile(const std::string &filename,
-                    sensor_msgs::PointCloud2::ConstPtr msg);
+  void WritePcdFile(const std::string& filename, sensor_msgs::PointCloud2::ConstPtr msg);
 
   std::string pcd_folder_;
-  FILE *stamp_file_handle_;
+  FILE*       stamp_file_handle_;
 };
 
 }  // namespace msf

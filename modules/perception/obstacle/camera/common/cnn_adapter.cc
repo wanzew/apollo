@@ -25,11 +25,12 @@ namespace apollo {
 namespace perception {
 
 // CNNCaffe
-bool CNNCaffe::init(const std::vector<std::string> &input_names,
-                    const std::vector<std::string> &output_names,
-                    const std::string &proto_file,
-                    const std::string &weight_file, int gpu_id,
-                    const std::string &model_root) {
+bool CNNCaffe::init(const std::vector<std::string>& input_names,
+                    const std::vector<std::string>& output_names,
+                    const std::string&              proto_file,
+                    const std::string&              weight_file,
+                    int                             gpu_id,
+                    const std::string&              model_root) {
   ADEBUG << "proto_file: " << proto_file;
   ADEBUG << "weight_file: " << weight_file;
   ADEBUG << "model_root: " << model_root;
@@ -52,8 +53,7 @@ bool CNNCaffe::init(const std::vector<std::string> &input_names,
 
 void CNNCaffe::forward() { net_->Forward(); }
 
-boost::shared_ptr<caffe::Blob<float>> CNNCaffe::get_blob_by_name(
-    const std::string &name) {
+boost::shared_ptr<caffe::Blob<float>> CNNCaffe::get_blob_by_name(const std::string& name) {
   return net_->blob_by_name(name);
 }
 // CNNCaffe END

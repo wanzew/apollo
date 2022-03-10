@@ -24,16 +24,16 @@ namespace traffic_light {
 class CropBoxTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    crop_scale_ = 3;
+    crop_scale_    = 3;
     min_crop_size_ = 270;
-    crop_local_ = new CropBox(crop_scale_, min_crop_size_);
+    crop_local_    = new CropBox(crop_scale_, min_crop_size_);
   }
   ~CropBoxTest() { delete (crop_local_); }
 
  protected:
-  IGetBox *crop_local_;
-  float crop_scale_;
-  int min_crop_size_;
+  IGetBox* crop_local_;
+  float    crop_scale_;
+  int      min_crop_size_;
 };
 
 TEST_F(CropBoxTest, crop0) {

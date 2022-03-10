@@ -16,12 +16,12 @@
 
 #include "modules/common/adapters/adapter.h"
 
-#include <cmath>
-#include <string>
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "gtest/gtest.h"
+#include <cmath>
+#include <string>
 
 namespace apollo {
 namespace common {
@@ -82,8 +82,7 @@ TEST(AdapterTest, History) {
   adapter.Observe();
   {
     // Currently the history contains [2, 1].
-    std::vector<IntegerAdapter::DataPtr> history(adapter.begin(),
-                                                 adapter.end());
+    std::vector<IntegerAdapter::DataPtr> history(adapter.begin(), adapter.end());
     EXPECT_EQ(2, history.size());
     EXPECT_EQ(2, *history[0]);
     EXPECT_EQ(1, *history[1]);
@@ -103,8 +102,7 @@ TEST(AdapterTest, History) {
   {
     // Although there are more messages, without calling Observe,
     // the history is still [2, 1].
-    std::vector<IntegerAdapter::DataPtr> history(adapter.begin(),
-                                                 adapter.end());
+    std::vector<IntegerAdapter::DataPtr> history(adapter.begin(), adapter.end());
     EXPECT_EQ(2, history.size());
     EXPECT_EQ(2, *history[0]);
     EXPECT_EQ(1, *history[1]);
@@ -116,8 +114,7 @@ TEST(AdapterTest, History) {
     // maintain 3 elements in this adapter, 1 and 2 will be thrown out.
     //
     // History should be 5, 4, 3.
-    std::vector<IntegerAdapter::DataPtr> history(adapter.begin(),
-                                                 adapter.end());
+    std::vector<IntegerAdapter::DataPtr> history(adapter.begin(), adapter.end());
     EXPECT_EQ(3, history.size());
     EXPECT_EQ(5, *history[0]);
     EXPECT_EQ(4, *history[1]);
@@ -142,23 +139,21 @@ using MyLocalizationAdapter = Adapter<localization::LocalizationEstimate>;
 
 TEST(AdapterTest, Dump) {
   FLAGS_enable_adapter_dump = true;
-  std::string temp_dir = std::getenv("TEST_TMPDIR");
+  std::string temp_dir      = std::getenv("TEST_TMPDIR");
 
-  MyLocalizationAdapter adapter("local", "local_topic", 3, temp_dir);
+  MyLocalizationAdapter              adapter("local", "local_topic", 3, temp_dir);
   localization::LocalizationEstimate loaded;
 
   localization::LocalizationEstimate msg;
 
   msg.mutable_header()->set_sequence_num(17);
   adapter.OnReceive(msg);
-  apollo::common::util::GetProtoFromASCIIFile(temp_dir + "/local/17.pb.txt",
-                                              &loaded);
+  apollo::common::util::GetProtoFromASCIIFile(temp_dir + "/local/17.pb.txt", &loaded);
   EXPECT_EQ(17, loaded.header().sequence_num());
 
   msg.mutable_header()->set_sequence_num(23);
   adapter.OnReceive(msg);
-  apollo::common::util::GetProtoFromASCIIFile(temp_dir + "/local/23.pb.txt",
-                                              &loaded);
+  apollo::common::util::GetProtoFromASCIIFile(temp_dir + "/local/23.pb.txt", &loaded);
   EXPECT_EQ(23, loaded.header().sequence_num());
   adapter.Observe();
   EXPECT_TRUE(adapter.DumpLatestMessage());

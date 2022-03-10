@@ -37,28 +37,28 @@ namespace traffic_light {
  */
 class Detection : public IRefine {
  public:
-  Detection(int min_crop_size, const std::string &refine_net,
-            const std::string &refine_model);
+  Detection(int min_crop_size, const std::string& refine_net, const std::string& refine_model);
 
-  void Init(const int resize_len, const std::string &refine_net,
-            const std::string &refine_model);
+  void Init(const int resize_len, const std::string& refine_net, const std::string& refine_model);
 
-  virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights);
+  virtual void Perform(const cv::Mat& ros_image, std::vector<LightPtr>* lights);
 
-  void SetCropBox(const cv::Rect &box) override;
+  void SetCropBox(const cv::Rect& box) override;
 
   ~Detection() = default;
 
  private:
-  bool SelectOutputBboxes(const cv::Size &img_size, int class_id,
-                          float inflate_col, float inflate_row,
-                          std::vector<LightPtr> *lights);
+  bool SelectOutputBboxes(const cv::Size&        img_size,
+                          int                    class_id,
+                          float                  inflate_col,
+                          float                  inflate_row,
+                          std::vector<LightPtr>* lights);
 
-  std::unique_ptr<caffe::Net<float>> refine_net_ptr_;
-  caffe::PyramidImageOnlineDataLayer<float> *refine_input_layer_ = nullptr;
-  caffe::ROIOutputSSDLayer<float> *refine_output_layer_ = nullptr;
+  std::unique_ptr<caffe::Net<float>>         refine_net_ptr_;
+  caffe::PyramidImageOnlineDataLayer<float>* refine_input_layer_  = nullptr;
+  caffe::ROIOutputSSDLayer<float>*           refine_output_layer_ = nullptr;
 
-  int resize_len_ = 0;
+  int      resize_len_ = 0;
   cv::Rect crop_box_;
 };
 

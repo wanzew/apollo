@@ -40,13 +40,15 @@ namespace lidar_velodyne {
 // save msg to file: file name is file_prefix_ + msg.seq + .msg
 class PointCloudTool : public apollo::common::ApolloApp {
  public:
-  PointCloudTool() : converter_(nullptr), compensator_(nullptr) {}
+  PointCloudTool()
+      : converter_(nullptr)
+      , compensator_(nullptr) {}
   virtual ~PointCloudTool() {}
 
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
  private:
   void pointcloud_dump(const sensor_msgs::PointCloud2& message);
@@ -54,8 +56,8 @@ class PointCloudTool : public apollo::common::ApolloApp {
   void pointcloud_convert(const velodyne_msgs::VelodyneScanUnified& message);
 
   VelodyneToolsConf conf_;
-  Converter* converter_;
-  Compensator* compensator_;
+  Converter*        converter_;
+  Compensator*      compensator_;
 };
 
 }  // namespace lidar_velodyne

@@ -29,21 +29,21 @@ namespace apollo {
 namespace planning {
 
 TEST(RTKReplayPlannerTest, ComputeTrajectory) {
-  FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
+  FLAGS_rtk_trajectory_filename    = "modules/planning/testdata/garage.csv";
   FLAGS_enable_map_reference_unify = false;
   RTKReplayPlanner planner;
 
-  TrajectoryPoint start_point;
+  TrajectoryPoint  start_point;
   common::PointENU point;
   point.set_x(586385.782842);
   point.set_y(4140674.76063);
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
 
-  ReferenceLine ref;
-  hdmap::RouteSegments segments;
+  ReferenceLine                      ref;
+  hdmap::RouteSegments               segments;
   localization::LocalizationEstimate localization;
-  canbus::Chassis chassis;
+  canbus::Chassis                    chassis;
   localization.mutable_pose()->mutable_position()->set_x(586385.782842);
   localization.mutable_pose()->mutable_position()->set_y(4140674.76063);
   localization.mutable_pose()->mutable_angular_velocity()->set_x(0.0);
@@ -58,13 +58,12 @@ TEST(RTKReplayPlannerTest, ComputeTrajectory) {
   state.set_y(point.y());
   state.set_z(point.z());
   ReferenceLineInfo info(state, start_point, ref, segments);
-  auto status = planner.PlanOnReferenceLine(start_point, nullptr, &info);
+  auto              status = planner.PlanOnReferenceLine(start_point, nullptr, &info);
 
   const auto& trajectory = info.trajectory();
   EXPECT_TRUE(status.ok());
   EXPECT_TRUE(!trajectory.trajectory_points().empty());
-  EXPECT_EQ(trajectory.trajectory_points().size(),
-            FLAGS_rtk_trajectory_forward);
+  EXPECT_EQ(trajectory.trajectory_points().size(), FLAGS_rtk_trajectory_forward);
 
   auto first_point = trajectory.trajectory_points().begin();
   EXPECT_DOUBLE_EQ(first_point->path_point().x(), 586385.782841);
@@ -76,20 +75,19 @@ TEST(RTKReplayPlannerTest, ComputeTrajectory) {
 }
 
 TEST(RTKReplayPlannerTest, ErrorTest) {
-  FLAGS_rtk_trajectory_filename =
-      "modules/planning/testdata/garage_no_file.csv";
+  FLAGS_rtk_trajectory_filename    = "modules/planning/testdata/garage_no_file.csv";
   FLAGS_enable_map_reference_unify = false;
   RTKReplayPlanner planner;
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage_error.csv";
   RTKReplayPlanner planner_with_error_csv;
-  TrajectoryPoint start_point;
+  TrajectoryPoint  start_point;
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
   common::PointENU point;
   point.set_x(586385.782842);
   point.set_y(4140674.76063);
   localization::LocalizationEstimate localization;
-  canbus::Chassis chassis;
+  canbus::Chassis                    chassis;
   localization.mutable_pose()->mutable_position()->set_x(586385.782842);
   localization.mutable_pose()->mutable_position()->set_y(4140674.76063);
   localization.mutable_pose()->mutable_angular_velocity()->set_x(0.0);
@@ -99,16 +97,14 @@ TEST(RTKReplayPlannerTest, ErrorTest) {
   localization.mutable_pose()->mutable_linear_acceleration()->set_y(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
   common::VehicleStateProvider::instance()->Update(localization, chassis);
-  ReferenceLine ref;
+  ReferenceLine        ref;
   hdmap::RouteSegments segments;
   common::VehicleState state;
   state.set_x(point.x());
   state.set_y(point.y());
   state.set_z(point.z());
   ReferenceLineInfo info(state, start_point, ref, segments);
-  EXPECT_TRUE(
-      !(planner_with_error_csv.PlanOnReferenceLine(start_point, nullptr, &info))
-           .ok());
+  EXPECT_TRUE(!(planner_with_error_csv.PlanOnReferenceLine(start_point, nullptr, &info)).ok());
 }
 
 }  // namespace planning

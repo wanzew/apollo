@@ -55,7 +55,7 @@ class PointCloudUpdater {
    * @param websocket Pointer of the websocket handler that has been attached to
    * the server.
    */
-  explicit PointCloudUpdater(WebSocketHandler *websocket);
+  explicit PointCloudUpdater(WebSocketHandler* websocket);
   ~PointCloudUpdater();
 
   /**
@@ -67,14 +67,13 @@ class PointCloudUpdater {
  private:
   void RegisterMessageHandlers();
 
-  void UpdatePointCloud(const sensor_msgs::PointCloud2 &point_cloud);
+  void UpdatePointCloud(const sensor_msgs::PointCloud2& point_cloud);
 
   void FilterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr);
 
-  void UpdateLocalizationTime(
-      const apollo::localization::LocalizationEstimate &localization);
+  void UpdateLocalizationTime(const apollo::localization::LocalizationEstimate& localization);
 
-  WebSocketHandler *websocket_;
+  WebSocketHandler* websocket_;
 
   bool enabled_ = false;
 
@@ -84,10 +83,10 @@ class PointCloudUpdater {
   // Mutex to protect concurrent access to point_cloud_str_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;
-  std::future<void> async_future_;
-  std::atomic<bool> future_ready_;
+  std::future<void>   async_future_;
+  std::atomic<bool>   future_ready_;
 
-  double last_point_cloud_time_ = 0.0;
+  double last_point_cloud_time_  = 0.0;
   double last_localization_time_ = 0.0;
 };
 

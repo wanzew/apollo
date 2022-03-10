@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <sys/time.h>
 #include <iomanip>
+#include <sys/time.h>
 
 #include "modules/common/macro.h"
 
@@ -25,8 +25,7 @@ namespace apollo {
 namespace common {
 namespace time {
 
-#define GLOG_TIMESTAMP(timestamp) \
-  std::fixed << std::setprecision(9) << timestamp
+#define GLOG_TIMESTAMP(timestamp) std::fixed << std::setprecision(9) << timestamp
 
 class TimeUtil {
  public:
@@ -34,9 +33,7 @@ class TimeUtil {
   template <typename T>
   static T Unix2gps(T unix_time) {
     T gps_time = unix_time - UNIX_GPS_DIFF;
-    if (unix_time < LEAP_SECOND_TIMESTAMP) {
-      gps_time -= 1.0;
-    }
+    if (unix_time < LEAP_SECOND_TIMESTAMP) { gps_time -= 1.0; }
     return static_cast<T>(gps_time);
   }
 
@@ -44,9 +41,7 @@ class TimeUtil {
   template <typename T>
   static T Gps2unix(T gps_time) {
     T unix_time = gps_time + UNIX_GPS_DIFF;
-    if (unix_time + 1 < LEAP_SECOND_TIMESTAMP) {
-      unix_time += 1.0;
-    }
+    if (unix_time + 1 < LEAP_SECOND_TIMESTAMP) { unix_time += 1.0; }
     return static_cast<T>(unix_time);
   }
 

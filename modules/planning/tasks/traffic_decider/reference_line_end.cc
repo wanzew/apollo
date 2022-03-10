@@ -35,42 +35,34 @@ using apollo::perception::TrafficLightDetection;
 ReferenceLineEnd::ReferenceLineEnd(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-Status ReferenceLineEnd::ApplyRule(
-    Frame* frame, ReferenceLineInfo* const reference_line_info) {
+Status ReferenceLineEnd::ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info) {
   const auto& reference_line = reference_line_info->reference_line();
   // check
-  double remain_s =
-      reference_line.Length() - reference_line_info->AdcSlBoundary().end_s();
-  if (remain_s >
-      config_.reference_line_end().min_reference_line_remain_length()) {
+  double remain_s = reference_line.Length() - reference_line_info->AdcSlBoundary().end_s();
+  if (remain_s > config_.reference_line_end().min_reference_line_remain_length()) {
     return Status::OK();
   }
 
   // create avirtual stop wall at the end of reference line to stop the adc
-  std::string virtual_obstacle_id =
-      REF_LINE_END_VO_ID_PREFIX + reference_line_info->Lanes().Id();
-  double obstacle_start_s =
-      reference_line.Length() - 2 * FLAGS_virtual_stop_wall_length;
-  auto* obstacle = frame->CreateStopObstacle(
-      reference_line_info, virtual_obstacle_id, obstacle_start_s);
+  std::string virtual_obstacle_id = REF_LINE_END_VO_ID_PREFIX + reference_line_info->Lanes().Id();
+  double      obstacle_start_s    = reference_line.Length() - 2 * FLAGS_virtual_stop_wall_length;
+  auto*       obstacle =
+      frame->CreateStopObstacle(reference_line_info, virtual_obstacle_id, obstacle_start_s);
   if (!obstacle) {
-    return Status(common::PLANNING_ERROR,
-                  "Failed to create reference line end obstacle");
+    return Status(common::PLANNING_ERROR, "Failed to create reference line end obstacle");
   }
   PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    return Status(
-        common::PLANNING_ERROR,
-        "Failed to create path obstacle for reference line end obstacle");
+    return Status(common::PLANNING_ERROR,
+                  "Failed to create path obstacle for reference line end obstacle");
   }
 
   // build stop decision
-  const double stop_line_s =
-      obstacle_start_s - config_.reference_line_end().stop_distance();
-  auto stop_point = reference_line.GetReferencePoint(stop_line_s);
+  const double stop_line_s = obstacle_start_s - config_.reference_line_end().stop_distance();
+  auto         stop_point  = reference_line.GetReferencePoint(stop_line_s);
 
   ObjectDecisionType stop;
-  auto stop_decision = stop.mutable_stop();
+  auto               stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
   stop_decision->set_distance_s(-config_.reference_line_end().stop_distance());
   stop_decision->set_stop_heading(stop_point.heading());
@@ -79,8 +71,8 @@ Status ReferenceLineEnd::ApplyRule(
   stop_decision->mutable_stop_point()->set_z(0.0);
 
   auto* path_decision = reference_line_info->path_decision();
-  path_decision->AddLongitudinalDecision(
-      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+  path_decision->AddLongitudinalDecision(TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                                         stop_wall->Id(), stop);
 
   return Status::OK();
 }

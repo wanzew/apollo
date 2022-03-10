@@ -34,14 +34,12 @@ namespace apollo {
 namespace planning {
 class NaviPathDeciderTest : public ::testing::Test {
  public:
-  static void SetUpTestCase() {
-    AINFO << "NaviPathDeciderTest : SetUpTestCase";
-  }
+  static void SetUpTestCase() { AINFO << "NaviPathDeciderTest : SetUpTestCase"; }
 };
 
 TEST_F(NaviPathDeciderTest, Init) {
   NaviPathDecider navi_path_decider;
-  PlanningConfig config;
+  PlanningConfig  config;
   EXPECT_TRUE(navi_path_decider.Init(config));
 }
 
@@ -49,13 +47,11 @@ TEST_F(NaviPathDeciderTest, Execute) {}
 
 TEST_F(NaviPathDeciderTest, SmoothInitY) {
   NaviPathDecider navi_path_decider;
-  PlanningConfig config;
-  double min_shift_y = config.navi_planner_config()
-                           .navi_path_decider_config()
-                           .default_min_smooth_init_y();
-  double max_shift_y = config.navi_planner_config()
-                           .navi_path_decider_config()
-                           .default_max_smooth_init_y();
+  PlanningConfig  config;
+  double          min_shift_y =
+      config.navi_planner_config().navi_path_decider_config().default_min_smooth_init_y();
+  double max_shift_y =
+      config.navi_planner_config().navi_path_decider_config().default_max_smooth_init_y();
   navi_path_decider.Init(config);
 
   // 1. target_path_init_y too small, can not need shift

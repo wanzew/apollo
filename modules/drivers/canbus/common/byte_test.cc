@@ -26,15 +26,15 @@ namespace canbus {
 
 TEST(ByteTest, CopyConstructor) {
   unsigned char byte_value = 0xFF;
-  Byte value(&byte_value);
-  Byte another_value(value);
+  Byte          value(&byte_value);
+  Byte          another_value(value);
   EXPECT_EQ(another_value.to_hex_string(), value.to_hex_string());
   EXPECT_EQ(another_value.to_binary_string(), value.to_binary_string());
 }
 
 TEST(ByteTest, SetBit) {
   unsigned char byte_value = 0xFF;
-  Byte value(&byte_value);
+  Byte          value(&byte_value);
   value.set_bit_0(1);
   EXPECT_EQ(0xFD, value.get_byte());
   value.set_bit_0(7);
@@ -54,7 +54,7 @@ TEST(ByteTest, SetBit) {
 
 TEST(ByteTest, SetValue) {
   unsigned char byte_value = 0x1A;
-  Byte value(&byte_value);
+  Byte          value(&byte_value);
   value.set_value(0x06, 3, 3);
   EXPECT_EQ(0x32, value.get_byte());
   value.set_value(0x1A);
@@ -76,7 +76,7 @@ TEST(ByteTest, SetValue) {
 
 TEST(ByteTest, GetValue) {
   unsigned char byte_value = 0x1A;
-  Byte value(&byte_value);
+  Byte          value(&byte_value);
   EXPECT_EQ(0x05, value.get_byte(1, 3));
   EXPECT_EQ(0x01, value.get_byte(1, 1));
   EXPECT_EQ(0x00, value.get_byte(8, 1));
@@ -86,7 +86,7 @@ TEST(ByteTest, GetValue) {
 
 TEST(ByteTest, SetGetHighLowBit) {
   unsigned char byte_value = 0x37;
-  Byte value(&byte_value);
+  Byte          value(&byte_value);
   value.set_value_high_4_bits(0x0B);
   EXPECT_EQ(0x0B, value.get_byte_high_4_bits());
   EXPECT_EQ(0x07, value.get_byte_low_4_bits());

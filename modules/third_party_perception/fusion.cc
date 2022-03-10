@@ -39,8 +39,7 @@ using apollo::common::math::Vec2d;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
-std::vector<Vec2d> PerceptionObstacleToVectorVec2d(
-    const PerceptionObstacle& obstacle) {
+std::vector<Vec2d> PerceptionObstacleToVectorVec2d(const PerceptionObstacle& obstacle) {
   std::vector<Vec2d> result;
   for (const auto& vertex : obstacle.polygon_point()) {
     result.emplace_back(vertex.x(), vertex.y());
@@ -48,39 +47,29 @@ std::vector<Vec2d> PerceptionObstacleToVectorVec2d(
   return result;
 }
 
-bool HasOverlap(const PerceptionObstacle& obstacle_1,
-                const PerceptionObstacle& obstacle_2) {
-  common::math::Polygon2d polygon_1(
-      PerceptionObstacleToVectorVec2d(obstacle_1));
-  common::math::Polygon2d polygon_2(
-      PerceptionObstacleToVectorVec2d(obstacle_2));
+bool HasOverlap(const PerceptionObstacle& obstacle_1, const PerceptionObstacle& obstacle_2) {
+  common::math::Polygon2d polygon_1(PerceptionObstacleToVectorVec2d(obstacle_1));
+  common::math::Polygon2d polygon_2(PerceptionObstacleToVectorVec2d(obstacle_2));
   return polygon_1.HasOverlap(polygon_2);
 }
 
-bool HasOverlap(const PerceptionObstacle& obstacle,
-                const PerceptionObstacles& obstacles) {
+bool HasOverlap(const PerceptionObstacle& obstacle, const PerceptionObstacles& obstacles) {
   for (const auto& current_obstacle : obstacles.perception_obstacle()) {
-    if (HasOverlap(obstacle, current_obstacle)) {
-      return true;
-    }
+    if (HasOverlap(obstacle, current_obstacle)) { return true; }
   }
   return false;
 }
 
-PerceptionObstacles MobileyeRadarFusion(
-    const PerceptionObstacles& mobileye_obstacles,
-    const PerceptionObstacles& radar_obstacles) {
+PerceptionObstacles MobileyeRadarFusion(const PerceptionObstacles& mobileye_obstacles,
+                                        const PerceptionObstacles& radar_obstacles) {
   PerceptionObstacles mobileye_obstacles_fusion = mobileye_obstacles;
-  PerceptionObstacles radar_obstacles_fusion = radar_obstacles;
+  PerceptionObstacles radar_obstacles_fusion    = radar_obstacles;
 
-  for (auto& mobileye_obstacle :
-       *(mobileye_obstacles_fusion.mutable_perception_obstacle())) {
-    for (auto& radar_obstacle :
-         *(radar_obstacles_fusion.mutable_perception_obstacle())) {
+  for (auto& mobileye_obstacle : *(mobileye_obstacles_fusion.mutable_perception_obstacle())) {
+    for (auto& radar_obstacle : *(radar_obstacles_fusion.mutable_perception_obstacle())) {
       if (HasOverlap(mobileye_obstacle, radar_obstacle)) {
         mobileye_obstacle.set_confidence(0.99);
-        mobileye_obstacle.mutable_velocity()->CopyFrom(
-            radar_obstacle.velocity());
+        mobileye_obstacle.mutable_velocity()->CopyFrom(radar_obstacle.velocity());
       }
     }
   }

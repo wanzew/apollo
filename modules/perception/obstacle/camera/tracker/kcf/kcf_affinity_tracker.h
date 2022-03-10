@@ -30,19 +30,21 @@ namespace perception {
 
 class KCFAffinityTracker : public BaseAffinityTracker {
  public:
-  KCFAffinityTracker() : BaseAffinityTracker() {}
+  KCFAffinityTracker()
+      : BaseAffinityTracker() {}
 
   virtual ~KCFAffinityTracker() {}
 
   bool Init() override;
 
-  bool GetAffinityMatrix(
-      const cv::Mat &img, const std::vector<Tracked> &tracked,
-      const std::vector<Detected> &detected,
-      std::vector<std::vector<float>> *affinity_matrix) override;
+  bool GetAffinityMatrix(const cv::Mat&                   img,
+                         const std::vector<Tracked>&      tracked,
+                         const std::vector<Detected>&     detected,
+                         std::vector<std::vector<float>>* affinity_matrix) override;
 
-  bool UpdateTracked(const cv::Mat &img, const std::vector<Detected> &detected,
-                     std::vector<Tracked> *tracked) override;
+  bool UpdateTracked(const cv::Mat&               img,
+                     const std::vector<Detected>& detected,
+                     std::vector<Tracked>*        tracked) override;
 
  private:
   // KCF module
@@ -52,7 +54,7 @@ class KCFAffinityTracker : public BaseAffinityTracker {
   std::unordered_map<int, std::vector<cv::Mat>> detected_features_;
 
   const float kKeepThreshold_ = 0.3f;
-  const float kScale_ = 2.5f;
+  const float kScale_         = 2.5f;
 };
 
 }  // namespace perception

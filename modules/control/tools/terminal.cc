@@ -30,15 +30,15 @@
 
 namespace {
 
+using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::AsInt64;
 using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
 using apollo::control::PadMessage;
-using apollo::canbus::Chassis;
 
-const int ROS_QUEUE_SIZE = 1;
-const int RESET_COMMAND = 1;
+const int ROS_QUEUE_SIZE     = 1;
+const int RESET_COMMAND      = 1;
 const int AUTO_DRIVE_COMMAND = 2;
 
 const int EMERGENCY_MODE_HOLD_TIME = 4 * 1000000;
@@ -67,23 +67,22 @@ void send(int cmd_type) {
   AINFO << "send pad_message OK";
 }
 
-void on_chassis(const Chassis &chassis) {
-  static bool is_first_emergency_mode = true;
-  static int64_t count_start = 0;
-  static bool waiting_reset = false;
+void on_chassis(const Chassis& chassis) {
+  static bool    is_first_emergency_mode = true;
+  static int64_t count_start             = 0;
+  static bool    waiting_reset           = false;
 
   // check if chassis enter security mode, if enter, after 10s should reset to
   // manual
   if (chassis.driving_mode() == Chassis::EMERGENCY_MODE) {
     if (is_first_emergency_mode == true) {
-      count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
+      count_start             = AsInt64<std::chrono::microseconds>(Clock::Now());
       is_first_emergency_mode = false;
       AINFO << "detect emergency mode.";
     } else {
-      int64_t diff =
-          AsInt64<std::chrono::microseconds>(Clock::Now()) - count_start;
+      int64_t diff = AsInt64<std::chrono::microseconds>(Clock::Now()) - count_start;
       if (diff > EMERGENCY_MODE_HOLD_TIME) {
-        count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
+        count_start   = AsInt64<std::chrono::microseconds>(Clock::Now());
         waiting_reset = true;
         // send a reset command to control
         send(RESET_COMMAND);
@@ -95,67 +94,57 @@ void on_chassis(const Chassis &chassis) {
   } else if (chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
     if (waiting_reset) {
       is_first_emergency_mode = true;
-      waiting_reset = false;
+      waiting_reset           = false;
       AINFO << "emergency mode reset to manual ok.";
     }
   }
 }
 
 void terminal_thread_func() {
-  int mode = 0;
+  int  mode        = 0;
   bool should_exit = false;
   while (std::cin >> mode) {
     switch (mode) {
-      case 0:
-        send(RESET_COMMAND);
-        break;
-      case 1:
-        send(AUTO_DRIVE_COMMAND);
-        break;
-      case 9:
-        should_exit = true;
-        break;
-      default:
-        help();
-        break;
+      case 0: send(RESET_COMMAND); break;
+      case 1: send(AUTO_DRIVE_COMMAND); break;
+      case 9: should_exit = true; break;
+      default: help(); break;
     }
-    if (should_exit) {
-      break;
-    }
+    if (should_exit) { break; }
   }
 }
 
 }  // namespace
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
-  FLAGS_v = 3;
+  FLAGS_v               = 3;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  using apollo::common::adapter::AdapterManagerConfig;
-  using apollo::common::adapter::AdapterManager;
   using apollo::common::adapter::AdapterConfig;
+  using apollo::common::adapter::AdapterManager;
+  using apollo::common::adapter::AdapterManagerConfig;
 
   ros::init(argc, argv, "terminal");
 
   AdapterManagerConfig config;
   config.set_is_ros(true);
   {
-    auto *sub_config = config.add_config();
+    auto* sub_config = config.add_config();
     sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
     sub_config->set_type(AdapterConfig::PAD);
   }
 
   {
-    auto *sub_config = config.add_config();
+    auto* sub_config = config.add_config();
     sub_config->set_mode(AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(AdapterConfig::CHASSIS);
   }
 
   {
-    auto *sub_config = config.add_config();
+    auto* sub_config = config.add_config();
     sub_config->set_mode(AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(AdapterConfig::LOCALIZATION);
   }

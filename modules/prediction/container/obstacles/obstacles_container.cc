@@ -34,31 +34,25 @@ ObstaclesContainer::ObstaclesContainer()
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   PerceptionObstacles perception_obstacles;
-  perception_obstacles.CopyFrom(
-      dynamic_cast<const PerceptionObstacles&>(message));
+  perception_obstacles.CopyFrom(dynamic_cast<const PerceptionObstacles&>(message));
 
   double timestamp = 0.0;
-  if (perception_obstacles.has_header() &&
-      perception_obstacles.header().has_timestamp_sec()) {
+  if (perception_obstacles.has_header() && perception_obstacles.header().has_timestamp_sec()) {
     timestamp = perception_obstacles.header().timestamp_sec();
   }
   if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap) {
-    if (FLAGS_prediction_offline_mode) {
-      FeatureOutput::Write();
-    }
+    if (FLAGS_prediction_offline_mode) { FeatureOutput::Write(); }
     obstacles_.Clear();
     ADEBUG << "Replay mode is enabled.";
   } else if (timestamp <= timestamp_) {
-    AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev ["
-           << timestamp_ << "].";
+    AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev [" << timestamp_ << "].";
     return;
   }
 
   timestamp_ = timestamp;
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
   ObstacleClusters::Init();
-  for (const PerceptionObstacle& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
+  for (const PerceptionObstacle& perception_obstacle : perception_obstacles.perception_obstacle()) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
            << "was detected";
     InsertPerceptionObstacle(perception_obstacle, timestamp_);
@@ -67,17 +61,15 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
 }
 
-Obstacle* ObstaclesContainer::GetObstacle(const int id) {
-  return obstacles_.GetSilently(id);
-}
+Obstacle* ObstaclesContainer::GetObstacle(const int id) { return obstacles_.GetSilently(id); }
 
 void ObstaclesContainer::Clear() {
   obstacles_.Clear();
   timestamp_ = -1.0;
 }
 
-void ObstaclesContainer::InsertPerceptionObstacle(
-    const PerceptionObstacle& perception_obstacle, const double timestamp) {
+void ObstaclesContainer::InsertPerceptionObstacle(const PerceptionObstacle& perception_obstacle,
+                                                  const double              timestamp) {
   const int id = perception_obstacle.id();
   if (id < -1) {
     AERROR << "Invalid ID [" << id << "]";
@@ -97,8 +89,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   }
 }
 
-bool ObstaclesContainer::IsPredictable(
-    const PerceptionObstacle& perception_obstacle) {
+bool ObstaclesContainer::IsPredictable(const PerceptionObstacle& perception_obstacle) {
   if (!perception_obstacle.has_type() ||
       perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
     return false;

@@ -48,10 +48,11 @@ typedef typename Bitmap2D::DirectionMajor MajorDirection;
  */
 class HdmapROIFilter : public BaseROIFilter {
  public:
-  HdmapROIFilter() : BaseROIFilter() {}
+  HdmapROIFilter()
+      : BaseROIFilter() {}
   ~HdmapROIFilter() {}
 
-  bool Init() override;
+  bool        Init() override;
   std::string name() const override { return "HdmapROIFilter"; }
 
   /**
@@ -69,7 +70,7 @@ class HdmapROIFilter : public BaseROIFilter {
   /**
    * @brief: Merge junction polygons and road boundaries in a vector.
    */
-  void MergeHdmapStructToPolygons(HdmapStructConstPtr hdmap_struct_ptr,
+  void MergeHdmapStructToPolygons(HdmapStructConstPtr        hdmap_struct_ptr,
                                   std::vector<PolygonDType>* polygons);
 
  protected:
@@ -77,42 +78,40 @@ class HdmapROIFilter : public BaseROIFilter {
    * @brief: Draw polygons into grids in bitmap and check each point whether
    * is in the grids within ROI.
    */
-  bool FilterWithPolygonMask(pcl_util::PointCloudPtr cloud,
+  bool FilterWithPolygonMask(pcl_util::PointCloudPtr         cloud,
                              const std::vector<PolygonType>& map_polygons,
-                             pcl_util::PointIndices* roi_indices);
+                             pcl_util::PointIndices*         roi_indices);
 
   /**
    * @brief: Transform polygon points and cloud points from world coordinates
    * system to local.
    */
-  void TransformFrame(pcl_util::PointCloudConstPtr cloud,
-                      const Eigen::Affine3d& vel_pose,
+  void TransformFrame(pcl_util::PointCloudConstPtr     cloud,
+                      const Eigen::Affine3d&           vel_pose,
                       const std::vector<PolygonDType>& polygons_world,
-                      std::vector<PolygonType>* polygons_local,
-                      pcl_util::PointCloudPtr cloud_local);
+                      std::vector<PolygonType>*        polygons_local,
+                      pcl_util::PointCloudPtr          cloud_local);
 
   /**
    * @brief: Get major direction. Transform polygons type to what we want.
    */
-  MajorDirection GetMajorDirection(
-      const std::vector<PolygonType>& map_polygons,
-      std::vector<PolygonScanConverter::Polygon>* polygons);
+  MajorDirection GetMajorDirection(const std::vector<PolygonType>&             map_polygons,
+                                   std::vector<PolygonScanConverter::Polygon>* polygons);
 
   /**
    * @brief: Merge left boundary and right boundary of each road into polygon
    * type.
    */
-  void MergeRoadBoundariesToPolygons(
-      const std::vector<RoadBoundary>& road_boundaries,
-      std::vector<PolygonDType>* polygons);
+  void MergeRoadBoundariesToPolygons(const std::vector<RoadBoundary>& road_boundaries,
+                                     std::vector<PolygonDType>*       polygons);
 
   /**
    * @brief: After drawing polygons into grids in bitmap. We check each point
    * whether is in the grids within ROI.
    */
-  bool Bitmap2dFilter(
-      const pcl::PointCloud<pcl_util::Point>::ConstPtr in_cloud_ptr,
-      const Bitmap2D& bitmap, pcl_util::PointIndices* roi_indices_ptr);
+  bool Bitmap2dFilter(const pcl::PointCloud<pcl_util::Point>::ConstPtr in_cloud_ptr,
+                      const Bitmap2D&                                  bitmap,
+                      pcl_util::PointIndices*                          roi_indices_ptr);
 
   // We only filter point with local coordinates x, y in [-range, range] in
   // meters

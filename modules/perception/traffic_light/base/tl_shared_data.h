@@ -27,11 +27,11 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-extern std::vector<int> image_border_size;
+extern std::vector<int>               image_border_size;
 extern std::map<TLColor, std::string> kColorStr;
-extern const int kCountCameraId;
-extern const int kLongFocusIdx;
-extern const int kShortFocusIdx;
+extern const int                      kCountCameraId;
+extern const int                      kLongFocusIdx;
+extern const int                      kShortFocusIdx;
 
 /**
  * @class TLPreprocessingData

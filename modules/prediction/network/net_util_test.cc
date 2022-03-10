@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <functional>
-#include <string>
 #include "Eigen/Dense"
 #include "gtest/gtest.h"
+#include <functional>
+#include <string>
 
 #include "modules/prediction/network/net_util.h"
 #include "modules/prediction/proto/network_layers.pb.h"
@@ -41,8 +41,7 @@ TEST(NetworkUtil, serialize_to_function_test) {
   EXPECT_FLOAT_EQ(sigm_func(0.0), 0.5);
   EXPECT_FLOAT_EQ(sigm_func(2.0), 0.88079707);
 
-  std::function<float(float)> hsigm_func =
-      serialize_to_function("hard_sigmoid");
+  std::function<float(float)> hsigm_func = serialize_to_function("hard_sigmoid");
   EXPECT_FLOAT_EQ(hsigm_func(-3.0), 0.0);
   EXPECT_FLOAT_EQ(hsigm_func(0.0), 0.5);
   EXPECT_FLOAT_EQ(hsigm_func(3.0), 1.0);

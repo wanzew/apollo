@@ -29,16 +29,15 @@ limitations under the License.
 
 DEFINE_string(output_dir, "/tmp", "output map directory");
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  const auto map_filename = FLAGS_map_dir + "/base_map.xml";
+  const auto         map_filename = FLAGS_map_dir + "/base_map.xml";
   apollo::hdmap::Map pb_map;
-  CHECK(
-      apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_filename, &pb_map))
+  CHECK(apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_filename, &pb_map))
       << "fail to load data from : " << map_filename;
 
   const std::string output_ascii_file = FLAGS_output_dir + "/base_map.txt";
@@ -50,8 +49,7 @@ int main(int argc, char **argv) {
       << "failed to output binary format base map";
 
   pb_map.Clear();
-  CHECK(apollo::common::util::GetProtoFromFile(output_bin_file, &pb_map))
-      << "failed to load map";
+  CHECK(apollo::common::util::GetProtoFromFile(output_bin_file, &pb_map)) << "failed to load map";
 
   AINFO << "load map success";
 

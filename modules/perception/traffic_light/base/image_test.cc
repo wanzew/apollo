@@ -32,13 +32,13 @@ class ImageTest : public ::testing::Test {
   void TearDown() override { delete image_; }
 
  protected:
-  Image *image_;
+  Image* image_;
 };
 
 TEST_F(ImageTest, test_all) {
-  cv::Mat img;
-  CameraId cam_id = CameraId::LONG_FOCUS;
-  double timestamp = 0.0;
+  cv::Mat  img;
+  CameraId cam_id    = CameraId::LONG_FOCUS;
+  double   timestamp = 0.0;
   {
     std::stringstream ss;
     ss << *image_;

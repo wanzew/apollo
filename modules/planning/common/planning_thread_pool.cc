@@ -28,11 +28,8 @@ namespace planning {
 PlanningThreadPool::PlanningThreadPool() {}
 
 void PlanningThreadPool::Init() {
-  if (is_initialized) {
-    return;
-  }
-  thread_pool_.reset(
-      new common::util::ThreadPool(FLAGS_num_thread_planning_thread_pool));
+  if (is_initialized) { return; }
+  thread_pool_.reset(new common::util::ThreadPool(FLAGS_num_thread_planning_thread_pool));
   is_initialized = true;
 }
 

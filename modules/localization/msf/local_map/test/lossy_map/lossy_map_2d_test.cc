@@ -15,12 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
-#include <gtest/gtest.h>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_matrix_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_node_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_pool_2d.h"
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
+#include <gtest/gtest.h>
 
 namespace apollo {
 namespace localization {
@@ -28,23 +28,21 @@ namespace msf {
 
 MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
   MapNodeIndex index;
-  char buf[100];
-  sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_,
-         buf, &index.zone_id_, &index.m_, &index.n_);
+  char         buf[100];
+  sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_, buf,
+         &index.zone_id_, &index.m_, &index.n_);
   std::string zone = buf;
   std::cout << zone << std::endl;
-  if (zone == "south") {
-    index.zone_id_ = -index.zone_id_;
-  }
+  if (zone == "south") { index.zone_id_ = -index.zone_id_; }
   std::cout << index << std::endl;
   return index;
 }
 
-bool GetAllMapIndex(const std::string& src_map_folder,
-                    const std::string& dst_map_folder,
+bool GetAllMapIndex(const std::string&       src_map_folder,
+                    const std::string&       dst_map_folder,
                     std::list<MapNodeIndex>* buf) {
-  std::string src_map_path = src_map_folder + "/map";
-  std::string dst_map_path = dst_map_folder + "/map";
+  std::string             src_map_path = src_map_folder + "/map";
+  std::string             dst_map_path = dst_map_folder + "/map";
   boost::filesystem::path src_map_path_boost(src_map_path);
   boost::filesystem::path dst_map_path_boost(dst_map_path);
 
@@ -52,9 +50,7 @@ bool GetAllMapIndex(const std::string& src_map_folder,
     boost::filesystem::create_directory(dst_map_path_boost);
   }
 
-  if (!boost::filesystem::exists(src_map_path)) {
-    return false;
-  }
+  if (!boost::filesystem::exists(src_map_path)) { return false; }
 
   buf->clear();
 
@@ -64,17 +60,15 @@ bool GetAllMapIndex(const std::string& src_map_folder,
     if (!boost::filesystem::is_directory(*iter)) {
       if (iter->path().extension() == "") {
         std::string tmp = iter->path().string();
-        tmp = tmp.substr(src_map_path.length(), tmp.length());
+        tmp             = tmp.substr(src_map_path.length(), tmp.length());
         buf->push_back(GetMapIndexFromMapFolder(tmp));
       }
     } else {
       std::string tmp = iter->path().string();
-      tmp = tmp.substr(src_map_path.length(), tmp.length());
-      tmp = dst_map_path + tmp;
+      tmp             = tmp.substr(src_map_path.length(), tmp.length());
+      tmp             = dst_map_path + tmp;
       boost::filesystem::path p(tmp);
-      if (!boost::filesystem::exists(p)) {
-        boost::filesystem::create_directory(p);
-      }
+      if (!boost::filesystem::exists(p)) { boost::filesystem::create_directory(p); }
     }
   }
 
@@ -90,21 +84,20 @@ class LossyMap2DTestSuite : public ::testing::Test {
 };
 
 TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
-  typedef LossyMap2D LossyMap;
-  typedef LossyMapNode2D LossyMapNode;
+  typedef LossyMap2D         LossyMap;
+  typedef LossyMapNode2D     LossyMapNode;
   typedef LossyMapNodePool2D LossyMapNodePool;
-  typedef LossyMapMatrix2D LossyMapMatrix;
-  typedef LossyMapConfig2D LossyMapConfig;
+  typedef LossyMapMatrix2D   LossyMapMatrix;
+  typedef LossyMapConfig2D   LossyMapConfig;
 
-  std::string src_map_folder =
-      "modules/localization/msf/local_map/test/test_data/lossy_single_map";
+  std::string src_map_folder = "modules/localization/msf/local_map/test/test_data/lossy_single_map";
   std::string dst_map_folder =
       "modules/localization/msf/local_map/test/test_data/temp_output_lossy_map";
   if (!boost::filesystem::exists(dst_map_folder)) {
     boost::filesystem::create_directory(dst_map_folder);
   }
 
-  LossyMapConfig input_config("lossy_map");
+  LossyMapConfig   input_config("lossy_map");
   LossyMapNodePool input_node_pool(25, 8);
   input_node_pool.Initial(&input_config);
   LossyMap input_map(&input_config);
@@ -117,15 +110,14 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
   }
 
   std::list<MapNodeIndex> buf;
-  bool success = GetAllMapIndex(src_map_folder, dst_map_folder, &buf);
+  bool                    success = GetAllMapIndex(src_map_folder, dst_map_folder, &buf);
   ASSERT_TRUE(success);
   std::cout << "index size: " << buf.size() << std::endl;
 
-  LossyMapConfig& input_map_config =
-      static_cast<LossyMapConfig&>(input_map.GetConfig());
+  LossyMapConfig& input_map_config = static_cast<LossyMapConfig&>(input_map.GetConfig());
   input_map_config.Save(dst_map_folder + "/config.xml");
 
-  LossyMapConfig lossy_config("lossy_map");
+  LossyMapConfig   lossy_config("lossy_map");
   LossyMapNodePool lossy_map_node_pool(25, 8);
   lossy_map_node_pool.Initial(&lossy_config);
   LossyMap lossy_map(&lossy_config);
@@ -136,36 +128,29 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
     std::cout << "lossy_map config xml not exist" << std::endl;
   }
 
-  int index = 0;
-  auto itr = buf.begin();
+  int  index = 0;
+  auto itr   = buf.begin();
   for (; itr != buf.end(); ++itr, ++index) {
-    LossyMapNode* node =
-        static_cast<LossyMapNode*>(input_map.GetMapNodeSafe(*itr));
+    LossyMapNode* node = static_cast<LossyMapNode*>(input_map.GetMapNodeSafe(*itr));
     if (node == NULL) {
       std::cerr << "index: " << index << " is a NULL pointer!" << std::endl;
       continue;
     }
-    LossyMapMatrix& input_matrix =
-        static_cast<LossyMapMatrix&>(node->GetMapCellMatrix());
+    LossyMapMatrix& input_matrix = static_cast<LossyMapMatrix&>(node->GetMapCellMatrix());
 
-    LossyMapNode* lossy_node =
-        static_cast<LossyMapNode*>(lossy_map.GetMapNodeSafe(*itr));
-    LossyMapMatrix& lossy_matrix =
-        static_cast<LossyMapMatrix&>(lossy_node->GetMapCellMatrix());
+    LossyMapNode*   lossy_node   = static_cast<LossyMapNode*>(lossy_map.GetMapNodeSafe(*itr));
+    LossyMapMatrix& lossy_matrix = static_cast<LossyMapMatrix&>(lossy_node->GetMapCellMatrix());
 
     int rows = input_map_config.map_node_size_y_;
     int cols = input_map_config.map_node_size_x_;
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
-        lossy_matrix[row][col].intensity = input_matrix[row][col].intensity;
-        lossy_matrix[row][col].intensity_var =
-            input_matrix[row][col].intensity_var;
-        lossy_matrix[row][col].count = input_matrix[row][col].count;
-        lossy_matrix[row][col].altitude = input_matrix[row][col].altitude;
-        lossy_matrix[row][col].altitude_ground =
-            input_matrix[row][col].altitude_ground;
-        lossy_matrix[row][col].is_ground_useful =
-            input_matrix[row][col].is_ground_useful;
+        lossy_matrix[row][col].intensity        = input_matrix[row][col].intensity;
+        lossy_matrix[row][col].intensity_var    = input_matrix[row][col].intensity_var;
+        lossy_matrix[row][col].count            = input_matrix[row][col].count;
+        lossy_matrix[row][col].altitude         = input_matrix[row][col].altitude;
+        lossy_matrix[row][col].altitude_ground  = input_matrix[row][col].altitude_ground;
+        lossy_matrix[row][col].is_ground_useful = input_matrix[row][col].is_ground_useful;
       }
     }
     lossy_node->SetIsChanged(true);
@@ -173,12 +158,11 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
 }
 
 TEST_F(LossyMap2DTestSuite, MapScheduleTest) {
-  typedef LossyMap2D LossyMap;
+  typedef LossyMap2D         LossyMap;
   typedef LossyMapNodePool2D LossyMapNodePool;
-  typedef LossyMapConfig2D LossyMapConfig;
+  typedef LossyMapConfig2D   LossyMapConfig;
 
-  std::string map_folder =
-      "modules/localization/msf/local_map/test/test_data/lossy_single_map";
+  std::string    map_folder = "modules/localization/msf/local_map/test/test_data/lossy_single_map";
   LossyMapConfig map_config("lossy_map");
 
   LossyMapNodePool input_node_pool(25, 8);
@@ -192,7 +176,7 @@ TEST_F(LossyMap2DTestSuite, MapScheduleTest) {
     return;
   }
 
-  unsigned int zone_id = 50;
+  unsigned int zone_id       = 50;
   unsigned int resolution_id = 0;
 
   MapNodeIndex index;
@@ -203,7 +187,7 @@ TEST_F(LossyMap2DTestSuite, MapScheduleTest) {
     trans_diff[0] = 10;
     trans_diff[1] = 10;
 
-    auto loc = BaseMapNode::GetLeftTopCorner(lossy_map.GetConfig(), index);
+    auto            loc = BaseMapNode::GetLeftTopCorner(lossy_map.GetConfig(), index);
     Eigen::Vector3d location;
     location[0] = loc[0];
     location[1] = loc[1];

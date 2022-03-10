@@ -34,13 +34,10 @@ TEST(basic_test, DiscretizedTrajectory) {
   const std::string path_of_standard_trajectory =
       "modules/planning/testdata/trajectory_data/standard_trajectory.pb.txt";
   ADCTrajectory trajectory;
-  EXPECT_TRUE(
-      common::util::GetProtoFromFile(path_of_standard_trajectory, &trajectory));
+  EXPECT_TRUE(common::util::GetProtoFromFile(path_of_standard_trajectory, &trajectory));
   DiscretizedTrajectory discretized_trajectory(trajectory);
-  EXPECT_DOUBLE_EQ(discretized_trajectory.GetTemporalLength(),
-                   7.9999999999999885);
-  EXPECT_DOUBLE_EQ(discretized_trajectory.GetSpatialLength(),
-                   44.752319202675167);
+  EXPECT_DOUBLE_EQ(discretized_trajectory.GetTemporalLength(), 7.9999999999999885);
+  EXPECT_DOUBLE_EQ(discretized_trajectory.GetSpatialLength(), 44.752319202675167);
   auto p1 = discretized_trajectory.Evaluate(4.0);
   EXPECT_DOUBLE_EQ(p1.path_point().x(), 587263.01182131236);
   EXPECT_DOUBLE_EQ(p1.path_point().y(), 4140966.5720794979);

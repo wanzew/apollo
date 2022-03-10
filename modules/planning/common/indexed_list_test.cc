@@ -60,7 +60,7 @@ TEST(IndexedList, Find) {
   auto* one = object.Find(1);
   ASSERT_EQ(*one, "one");
   ASSERT_NE(nullptr, one);
-  *one = "one_again";
+  *one                  = "one_again";
   const auto* one_again = object.Find(1);
   ASSERT_NE(nullptr, one_again);
   ASSERT_EQ("one_again", *one_again);

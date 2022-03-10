@@ -21,15 +21,15 @@ using apollo::drivers::hesai;
 FILE* lidarTimestampFile = fopen("lidar-timestamp.txt", "w");
 
 double pandoraToSysTimeGap = 0;
-int gpsTimestamp = 0;
+int    gpsTimestamp        = 0;
 
 void gpsCallback(int timestamp) {
   struct timeval ts;
   gettimeofday(&ts, NULL);
-  gpsTimestamp = timestamp;
-  double sec = static_cast<double>(ts.tv_sec);
-  double usec = static_cast<double>(ts.tv_usec);
-  double t = static_cast<timestamp>(timestamp);
+  gpsTimestamp        = timestamp;
+  double sec          = static_cast<double>(ts.tv_sec);
+  double usec         = static_cast<double>(ts.tv_usec);
+  double t            = static_cast<timestamp>(timestamp);
   pandoraToSysTimeGap = tv_sec + (tv_usec / 1000000.0) - timestamp;
   printf("gps: %d, gap: %f\n", timestamp, pandoraToSysTimeGap);
 }
@@ -44,11 +44,9 @@ void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
 }
 
 int main(int argc, char** argv) {
-  Pandar40P pandar40p(std::string("192.168.20.51"), 2368, 10110, lidarCallback,
-                      gpsCallback, 0);
+  Pandar40P pandar40p(std::string("192.168.20.51"), 2368, 10110, lidarCallback, gpsCallback, 0);
   pandar40p.Start();
   while (true) {
     sleep(100);
   }
 }
-

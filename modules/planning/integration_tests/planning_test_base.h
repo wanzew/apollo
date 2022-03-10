@@ -38,31 +38,29 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-#define RUN_GOLDEN_TEST(sub_case_num)                                      \
-  {                                                                        \
-    const ::testing::TestInfo* const test_info =                           \
-        ::testing::UnitTest::GetInstance()->current_test_info();           \
-    bool no_trajectory_point = false;                                      \
-    bool run_planning_success =                                            \
-        RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
-    EXPECT_TRUE(run_planning_success);                                     \
+#define RUN_GOLDEN_TEST(sub_case_num)                                                              \
+  {                                                                                                \
+    const ::testing::TestInfo* const test_info =                                                   \
+        ::testing::UnitTest::GetInstance()->current_test_info();                                   \
+    bool no_trajectory_point  = false;                                                             \
+    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
+    EXPECT_TRUE(run_planning_success);                                                             \
   }
 
-#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                             \
-  {                                                                        \
-    const ::testing::TestInfo* const test_info =                           \
-        ::testing::UnitTest::GetInstance()->current_test_info();           \
-    bool no_trajectory_point = true;                                       \
-    bool run_planning_success =                                            \
-        RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
-    EXPECT_TRUE(run_planning_success);                                     \
+#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                                                     \
+  {                                                                                                \
+    const ::testing::TestInfo* const test_info =                                                   \
+        ::testing::UnitTest::GetInstance()->current_test_info();                                   \
+    bool no_trajectory_point  = true;                                                              \
+    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
+    EXPECT_TRUE(run_planning_success);                                                             \
   }
 
-#define TMAIN                                            \
-  int main(int argc, char** argv) {                      \
-    ::testing::InitGoogleTest(&argc, argv);              \
-    ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    return RUN_ALL_TESTS();                              \
+#define TMAIN                                                                                      \
+  int main(int argc, char** argv) {                                                                \
+    ::testing::InitGoogleTest(&argc, argv);                                                        \
+    ::google::ParseCommandLineFlags(&argc, &argv, true);                                           \
+    return RUN_ALL_TESTS();                                                                        \
   }
 
 #define ENABLE_RULE(RULE_ID, ENABLED) this->rule_enabled_[RULE_ID] = ENABLED
@@ -89,20 +87,18 @@ class PlanningTestBase : public ::testing::Test {
    * @return true if planning is success. The ADCTrajectory will be used to
    * store the planing results.  Otherwise false.
    */
-  bool RunPlanning(const std::string& test_case_name, int case_num,
-                   bool no_trajectory_point);
+  bool RunPlanning(const std::string& test_case_name, int case_num, bool no_trajectory_point);
 
-  TrafficRuleConfig* GetTrafficRuleConfig(
-      const TrafficRuleConfig::RuleId& rule_id);
+  TrafficRuleConfig* GetTrafficRuleConfig(const TrafficRuleConfig::RuleId& rule_id);
 
  protected:
   void TrimPlanning(ADCTrajectory* origin, bool no_trajectory_point);
   bool SetUpAdapters();
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
-  Planning planning_;
+  Planning                                  planning_;
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
-  ADCTrajectory adc_trajectory_;
+  ADCTrajectory                             adc_trajectory_;
 };
 
 }  // namespace planning

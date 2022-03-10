@@ -38,12 +38,11 @@ class Projector {
  public:
   Projector();
 
-  bool Init(const cv::Rect &roi, const T &max_distance = 200.0,
-            bool visualize = false);
+  bool Init(const cv::Rect& roi, const T& max_distance = 200.0, bool visualize = false);
 
-  bool UvToXy(const T &u, const T &v, Eigen::Matrix<T, 2, 1> *p) const;
+  bool UvToXy(const T& u, const T& v, Eigen::Matrix<T, 2, 1>* p) const;
 
-  bool UvToXy(const int u, const int v, Eigen::Matrix<T, 2, 1> *p) const {
+  bool UvToXy(const int u, const int v, Eigen::Matrix<T, 2, 1>* p) const {
     return UvToXy(static_cast<T>(u), static_cast<T>(v), p);
   }
 
@@ -53,57 +52,56 @@ class Projector {
     return IsValidUv(static_cast<T>(x), static_cast<T>(y));
   }
 
-  bool IsValidUv(const T &x, const T &y) const;
+  bool IsValidUv(const T& x, const T& y) const;
 
-  bool IsValidXy(const T &x, const T &y) const {
+  bool IsValidXy(const T& x, const T& y) const {
     return x >= xy_xmin_ && x <= xy_xmax_ && y >= xy_ymin_ && y <= xy_ymax_;
   }
 
   bool is_vis() const { return is_vis_; }
-  T x_step() const { return x_step_; }
-  T y_step() const { return y_step_; }
-  T xy_image_xmin() const { return xy_image_xmin_; }
-  T xy_image_xmax() const { return xy_image_xmax_; }
-  T xy_image_ymin() const { return xy_image_ymin_; }
-  T xy_image_ymax() const { return xy_image_ymax_; }
+  T    x_step() const { return x_step_; }
+  T    y_step() const { return y_step_; }
+  T    xy_image_xmin() const { return xy_image_xmin_; }
+  T    xy_image_xmax() const { return xy_image_xmax_; }
+  T    xy_image_ymin() const { return xy_image_ymin_; }
+  T    xy_image_ymax() const { return xy_image_ymax_; }
 
-  bool IsValidXyInXyImage(const T &x, const T &y) const {
-    return x >= xy_image_xmin_ && x <= xy_image_xmax_ && y >= xy_image_ymin_ &&
-           y <= xy_image_ymax_;
+  bool IsValidXyInXyImage(const T& x, const T& y) const {
+    return x >= xy_image_xmin_ && x <= xy_image_xmax_ && y >= xy_image_ymin_ && y <= xy_image_ymax_;
   }
 
   int xy_image_cols() const { return xy_image_cols_; }
 
   int xy_image_rows() const { return xy_image_rows_; }
 
-  bool XyToXyImagePoint(const T &x, const T &y, cv::Point *p) const;
-  bool XyToXyImagePoint(const Eigen::Matrix<T, 2, 1> &pos, cv::Point *p) const {
+  bool XyToXyImagePoint(const T& x, const T& y, cv::Point* p) const;
+  bool XyToXyImagePoint(const Eigen::Matrix<T, 2, 1>& pos, cv::Point* p) const {
     return XyToXyImagePoint(pos.x(), pos.y(), p);
   }
 
-  bool UvToXyImagePoint(const T &u, const T &v, cv::Point *p) const;
+  bool UvToXyImagePoint(const T& u, const T& v, cv::Point* p) const;
 
-  bool UvToXyImagePoint(const int u, const int v, cv::Point *p) const {
+  bool UvToXyImagePoint(const int u, const int v, cv::Point* p) const {
     return UvToXyImagePoint(static_cast<T>(u), static_cast<T>(v), p);
   }
 
  protected:
-  bool Project(const T &u, const T &v, Eigen::Matrix<T, 2, 1> *xy_point);
+  bool Project(const T& u, const T& v, Eigen::Matrix<T, 2, 1>* xy_point);
 
  private:
   Eigen::Matrix<T, 3, 3> trans_mat_;
 
   // for visualizing IPM image
   std::vector<Eigen::Matrix<T, 2, 1>> xy_grid_;
-  std::vector<cv::Point> uv_2_xy_image_;
-  T x_step_;
-  T y_step_;
-  T xy_image_xmin_;
-  T xy_image_xmax_;
-  int xy_image_cols_;
-  T xy_image_ymin_;
-  T xy_image_ymax_;
-  int xy_image_rows_;
+  std::vector<cv::Point>              uv_2_xy_image_;
+  T                                   x_step_;
+  T                                   y_step_;
+  T                                   xy_image_xmin_;
+  T                                   xy_image_xmax_;
+  int                                 xy_image_cols_;
+  T                                   xy_image_ymin_;
+  T                                   xy_image_ymax_;
+  int                                 xy_image_rows_;
 
   // ROI limits in IPM space
   T xy_xmin_;
@@ -125,7 +123,7 @@ class Projector {
   int uv_roi_rows_;   // the row number of ROI in image space
   int uv_roi_count_;  // the count of ROI sample points
 
-  std::vector<bool> valid_xy_;
+  std::vector<bool>                   valid_xy_;
   std::vector<Eigen::Matrix<T, 2, 1>> uv_2_xy_;
 
   bool is_init_;
@@ -147,8 +145,8 @@ Projector<T>::Projector() {
   uv_roi_x_step_ = static_cast<T>(1);
   uv_roi_y_step_ = static_cast<T>(1);
 
-  uv_roi_cols_ = static_cast<int>((uv_xmax_ - uv_xmin_) / uv_roi_x_step_) + 1;
-  uv_roi_rows_ = static_cast<int>((uv_ymax_ - uv_ymin_) / uv_roi_y_step_) + 1;
+  uv_roi_cols_  = static_cast<int>((uv_xmax_ - uv_xmin_) / uv_roi_x_step_) + 1;
+  uv_roi_rows_  = static_cast<int>((uv_ymax_ - uv_ymin_) / uv_roi_y_step_) + 1;
   uv_roi_count_ = uv_roi_rows_ * uv_roi_cols_;
 
   is_vis_ = false;
@@ -159,13 +157,11 @@ Projector<T>::Projector() {
 }
 
 template <typename T>
-bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
-                        bool visualize) {
+bool Projector<T>::Init(const cv::Rect& roi, const T& max_distance, bool visualize) {
   AINFO << "Initialize projector ...";
 
   // read transformation matrix from calibration config manager
-  CalibrationConfigManager *calibration_config_manager =
-      Singleton<CalibrationConfigManager>::get();
+  CalibrationConfigManager* calibration_config_manager = Singleton<CalibrationConfigManager>::get();
 
   const CameraCalibrationPtr camera_calibration =
       calibration_config_manager->get_camera_calibration();
@@ -204,8 +200,8 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
         << "y_max=" << uv_ymax_ << ".";
   AINFO << "ROI width = " << roi.width << ", height = " << roi.height;
 
-  uv_roi_cols_ = static_cast<int>((uv_xmax_ - uv_xmin_) / uv_roi_x_step_) + 1;
-  uv_roi_rows_ = static_cast<int>((uv_ymax_ - uv_ymin_) / uv_roi_y_step_) + 1;
+  uv_roi_cols_  = static_cast<int>((uv_xmax_ - uv_xmin_) / uv_roi_x_step_) + 1;
+  uv_roi_rows_  = static_cast<int>((uv_ymax_ - uv_ymin_) / uv_roi_y_step_) + 1;
   uv_roi_count_ = uv_roi_rows_ * uv_roi_cols_;
   AINFO << "sampling step_x (u) = " << uv_roi_x_step_ << ", "
         << "sampling step_y (v) = " << uv_roi_y_step_;
@@ -215,9 +211,9 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
   // do point-wise transform of ROI from image space to ground space
   valid_xy_.assign(uv_roi_count_, true);
   uv_2_xy_.resize(uv_roi_count_);
-  int count_fail_points = 0;
+  int count_fail_points    = 0;
   int count_too_far_points = 0;
-  T v = uv_ymin_;
+  T   v                    = uv_ymin_;
   for (int i = 0; i < uv_roi_rows_; ++i) {
     T u = uv_xmin_;
     for (int j = 0; j < uv_roi_cols_; ++j) {
@@ -255,10 +251,8 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
     }
     v += uv_roi_y_step_;
   }
-  AINFO << "#failed points = " << count_fail_points << " (" << uv_roi_count_
-        << ").";
-  AINFO << "#too far points = " << count_too_far_points << " (" << uv_roi_count_
-        << ").";
+  AINFO << "#failed points = " << count_fail_points << " (" << uv_roi_count_ << ").";
+  AINFO << "#too far points = " << count_too_far_points << " (" << uv_roi_count_ << ").";
   AINFO << " xy limits: "
         << "x_min=" << xy_xmin_ << ", "
         << "x_max=" << xy_xmax_ << ", "
@@ -281,20 +275,13 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
     x_step_ = max_distance / static_cast<T>(1000);
     y_step_ = max_distance / static_cast<T>(1000);
 
-    xy_image_cols_ = static_cast<int>(std::ceil(
-                         (xy_image_xmax_ - xy_image_xmin_) / x_step_)) +
-                     1;
-    xy_image_rows_ = static_cast<int>(std::ceil(
-                         (xy_image_ymax_ - xy_image_ymin_) / y_step_)) +
-                     1;
-    AINFO << "xy_image_xmin = " << xy_image_xmin_
-          << ", xy_image_xmax = " << xy_image_xmax_
-          << ", xy_image_ymin = " << xy_image_ymin_
-          << ", xy_image_ymax = " << xy_image_ymax_;
+    xy_image_cols_ = static_cast<int>(std::ceil((xy_image_xmax_ - xy_image_xmin_) / x_step_)) + 1;
+    xy_image_rows_ = static_cast<int>(std::ceil((xy_image_ymax_ - xy_image_ymin_) / y_step_)) + 1;
+    AINFO << "xy_image_xmin = " << xy_image_xmin_ << ", xy_image_xmax = " << xy_image_xmax_
+          << ", xy_image_ymin = " << xy_image_ymin_ << ", xy_image_ymax = " << xy_image_ymax_;
     AINFO << "xy_image: step_x=" << x_step_ << ", "
           << "step_y=" << y_step_;
-    AINFO << "xy_image: #cols = " << xy_image_cols_
-          << ", #rows = " << xy_image_rows_;
+    AINFO << "xy_image: #cols = " << xy_image_cols_ << ", #rows = " << xy_image_rows_;
 
     xy_grid_.resize(xy_image_rows_ * xy_image_cols_);
     T y = xy_image_ymax_;
@@ -315,8 +302,7 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
       for (int j = 0; j < uv_roi_cols_; ++j) {
         int id = i * uv_roi_cols_ + j;
         if (valid_xy_[id]) {
-          XyToXyImagePoint(static_cast<T>(uv_2_xy_[id].x()),
-                           static_cast<T>(uv_2_xy_[id].y()),
+          XyToXyImagePoint(static_cast<T>(uv_2_xy_[id].x()), static_cast<T>(uv_2_xy_[id].y()),
                            &uv_2_xy_image_[id]);
         } else {
           uv_2_xy_image_[id].x = -1;
@@ -335,27 +321,16 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
 }
 
 template <typename T>
-bool Projector<T>::XyToXyImagePoint(const T &x, const T &y,
-                                    cv::Point *p) const {
-  if (!IsValidXyInXyImage(x, y)) {
-    return false;
-  }
+bool Projector<T>::XyToXyImagePoint(const T& x, const T& y, cv::Point* p) const {
+  if (!IsValidXyInXyImage(x, y)) { return false; }
 
   int j = static_cast<int>(std::round((x - xy_image_xmin_) / x_step_));
-  if (j < 0) {
-    return false;
-  }
-  if (j >= xy_image_cols_) {
-    return false;
-  }
+  if (j < 0) { return false; }
+  if (j >= xy_image_cols_) { return false; }
 
   int i = static_cast<int>(std::round((y - xy_image_ymin_) / y_step_));
-  if (i < 0) {
-    return false;
-  }
-  if (i >= xy_image_rows_) {
-    return false;
-  }
+  if (i < 0) { return false; }
+  if (i >= xy_image_rows_) { return false; }
 
   i = (xy_image_rows_ - 1) - i;
 
@@ -366,7 +341,7 @@ bool Projector<T>::XyToXyImagePoint(const T &x, const T &y,
 }
 
 template <typename T>
-bool Projector<T>::IsValidUv(const T &x, const T &y) const {
+bool Projector<T>::IsValidUv(const T& x, const T& y) const {
   if (!(x >= uv_xmin_ && x <= uv_xmax_ && y >= uv_ymin_ && y <= uv_ymax_)) {
     AINFO << "image point "
           << "(" << x << ", " << y << ")"
@@ -381,8 +356,7 @@ bool Projector<T>::IsValidUv(const T &x, const T &y) const {
 }
 
 template <typename T>
-bool Projector<T>::UvToXy(const T &u, const T &v,
-                          Eigen::Matrix<T, 2, 1> *p) const {
+bool Projector<T>::UvToXy(const T& u, const T& v, Eigen::Matrix<T, 2, 1>* p) const {
   if (p == nullptr) {
     AERROR << "point pointer is null.";
     return false;
@@ -392,12 +366,9 @@ bool Projector<T>::UvToXy(const T &u, const T &v,
     return false;
   }
 
-  if (!IsValidUv(u, v)) {
-    return false;
-  }
+  if (!IsValidUv(u, v)) { return false; }
 
-  int id = static_cast<int>(std::round((v - uv_ymin_) / uv_roi_y_step_)) *
-               uv_roi_cols_ +
+  int id = static_cast<int>(std::round((v - uv_ymin_) / uv_roi_y_step_)) * uv_roi_cols_ +
            static_cast<int>(std::round((u - uv_xmin_) / uv_roi_x_step_));
   if (id < 0 || id >= uv_roi_count_) {
     AERROR << "pixel id is not valid: " << id;
@@ -417,8 +388,7 @@ bool Projector<T>::UvToXy(const T &u, const T &v,
 }
 
 template <typename T>
-bool Projector<T>::UvToXyImagePoint(const T &u, const T &v,
-                                    cv::Point *p) const {
+bool Projector<T>::UvToXyImagePoint(const T& u, const T& v, cv::Point* p) const {
   if (p == nullptr) {
     AERROR << "point pointer is null.";
     return false;
@@ -435,8 +405,7 @@ bool Projector<T>::UvToXyImagePoint(const T &u, const T &v,
     return false;
   }
 
-  int id = static_cast<int>(std::round((v - uv_ymin_) / uv_roi_y_step_)) *
-               uv_roi_cols_ +
+  int id = static_cast<int>(std::round((v - uv_ymin_) / uv_roi_y_step_)) * uv_roi_cols_ +
            static_cast<int>(std::round((u - uv_xmin_) / uv_roi_x_step_));
   if (id < 0 || id >= uv_roi_count_) {
     AERROR << "pixel id is not valid: " << id;
@@ -456,16 +425,15 @@ bool Projector<T>::UvToXyImagePoint(const T &u, const T &v,
 }
 
 template <typename T>
-bool Projector<T>::Project(const T &u, const T &v,
-                           Eigen::Matrix<T, 2, 1> *xy_point) {
+bool Projector<T>::Project(const T& u, const T& v, Eigen::Matrix<T, 2, 1>* xy_point) {
   if (xy_point == nullptr) {
     AERROR << "xy_point is a null pointer.";
     return false;
   }
 
   auto trans_mat = Singleton<CalibrationConfigManager>::get()
-  ->get_camera_calibration()
-  ->get_camera2car_homography_mat();
+                       ->get_camera_calibration()
+                       ->get_camera2car_homography_mat();
 
   Eigen::Matrix<double, 3, 1> uv_point(u, v, 1.0);
   Eigen::Matrix<double, 3, 1> xy_p = trans_mat * uv_point;

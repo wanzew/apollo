@@ -34,17 +34,17 @@ namespace planning {
 
 class PathOptimizer : public Task {
  public:
-  explicit PathOptimizer(const std::string &name);
+  explicit PathOptimizer(const std::string& name);
   virtual ~PathOptimizer() = default;
-  apollo::common::Status Execute(
-      Frame *frame, ReferenceLineInfo *reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  protected:
-  virtual apollo::common::Status Process(
-      const SpeedData &speed_data, const ReferenceLine &reference_line,
-      const common::TrajectoryPoint &init_point, PathData *const path_data) = 0;
+  virtual apollo::common::Status Process(const SpeedData&               speed_data,
+                                         const ReferenceLine&           reference_line,
+                                         const common::TrajectoryPoint& init_point,
+                                         PathData* const                path_data) = 0;
 
-  void RecordDebugInfo(const PathData &path_data);
+  void RecordDebugInfo(const PathData& path_data);
 };
 
 }  // namespace planning

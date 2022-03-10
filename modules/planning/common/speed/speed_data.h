@@ -40,11 +40,10 @@ class SpeedData {
 
   void set_speed_vector(std::vector<common::SpeedPoint> speed_points);
 
-  void AppendSpeedPoint(const double s, const double time, const double v,
-                        const double a, const double da);
+  void AppendSpeedPoint(
+      const double s, const double time, const double v, const double a, const double da);
 
-  bool EvaluateByTime(const double time,
-                      common::SpeedPoint* const speed_point) const;
+  bool EvaluateByTime(const double time, common::SpeedPoint* const speed_point) const;
 
   double TotalTime() const;
 

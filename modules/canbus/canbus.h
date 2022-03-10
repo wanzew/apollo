@@ -85,23 +85,21 @@ class Canbus : public apollo::common::ApolloApp {
  private:
   void PublishChassis();
   void PublishChassisDetail();
-  void OnTimer(const ros::TimerEvent &event);
-  void OnControlCommand(const apollo::control::ControlCommand &control_command);
-  void OnGuardianCommand(
-      const apollo::guardian::GuardianCommand &guardian_command);
-  apollo::common::Status OnError(const std::string &error_msg);
-  void RegisterCanClients();
+  void OnTimer(const ros::TimerEvent& event);
+  void OnControlCommand(const apollo::control::ControlCommand& control_command);
+  void OnGuardianCommand(const apollo::guardian::GuardianCommand& guardian_command);
+  apollo::common::Status OnError(const std::string& error_msg);
+  void                   RegisterCanClients();
 
-  CanbusConf canbus_conf_;
-  std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
-  CanSender<ChassisDetail> can_sender_;
-  apollo::drivers::canbus::CanReceiver<ChassisDetail> can_receiver_;
-  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
-      message_manager_;
-  std::unique_ptr<VehicleController> vehicle_controller_;
+  CanbusConf                                                       canbus_conf_;
+  std::unique_ptr<apollo::drivers::canbus::CanClient>              can_client_;
+  CanSender<ChassisDetail>                                         can_sender_;
+  apollo::drivers::canbus::CanReceiver<ChassisDetail>              can_receiver_;
+  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>> message_manager_;
+  std::unique_ptr<VehicleController>                               vehicle_controller_;
 
-  int64_t last_timestamp_ = 0;
-  ros::Timer timer_;
+  int64_t                                last_timestamp_ = 0;
+  ros::Timer                             timer_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 

@@ -40,16 +40,13 @@ class ChangeLaneDecider {
   bool Apply(std::list<ReferenceLineInfo>* reference_line_info);
 
  private:
-  void UpdateStatus(ChangeLaneStatus::Status status_code,
-                    const std::string& path_id);
-  void UpdateStatus(double timestamp, ChangeLaneStatus::Status status_code,
-                    const std::string& path_id);
+  void UpdateStatus(ChangeLaneStatus::Status status_code, const std::string& path_id);
+  void
+  UpdateStatus(double timestamp, ChangeLaneStatus::Status status_code, const std::string& path_id);
 
-  void PrioritizeChangeLane(
-      std::list<ReferenceLineInfo>* reference_line_info) const;
+  void PrioritizeChangeLane(std::list<ReferenceLineInfo>* reference_line_info) const;
 
-  void RemoveChangeLane(
-      std::list<ReferenceLineInfo>* reference_line_info) const;
+  void RemoveChangeLane(std::list<ReferenceLineInfo>* reference_line_info) const;
 };
 
 }  // namespace planning

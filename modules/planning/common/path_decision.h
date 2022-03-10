@@ -46,32 +46,34 @@ class PathDecision {
  public:
   PathDecision() = default;
 
-  PathObstacle *AddPathObstacle(const PathObstacle &path_obstacle);
+  PathObstacle* AddPathObstacle(const PathObstacle& path_obstacle);
 
-  const IndexedList<std::string, PathObstacle> &path_obstacles() const;
+  const IndexedList<std::string, PathObstacle>& path_obstacles() const;
 
-  bool AddLateralDecision(const std::string &tag, const std::string &object_id,
-                          const ObjectDecisionType &decision);
-  bool AddLongitudinalDecision(const std::string &tag,
-                               const std::string &object_id,
-                               const ObjectDecisionType &decision);
+  bool AddLateralDecision(const std::string&        tag,
+                          const std::string&        object_id,
+                          const ObjectDecisionType& decision);
+  bool AddLongitudinalDecision(const std::string&        tag,
+                               const std::string&        object_id,
+                               const ObjectDecisionType& decision);
 
-  const PathObstacle *Find(const std::string &object_id) const;
+  const PathObstacle* Find(const std::string& object_id) const;
 
-  PathObstacle *Find(const std::string &object_id);
+  PathObstacle* Find(const std::string& object_id);
 
-  void SetStBoundary(const std::string &id, const StBoundary &boundary);
-  void EraseStBoundaries();
+  void     SetStBoundary(const std::string& id, const StBoundary& boundary);
+  void     EraseStBoundaries();
   MainStop main_stop() const { return main_stop_; }
-  double stop_reference_line_s() const { return stop_reference_line_s_; }
-  bool MergeWithMainStop(const ObjectStop &obj_stop, const std::string &obj_id,
-                         const ReferenceLine &ref_line,
-                         const SLBoundary &adc_sl_boundary);
+  double   stop_reference_line_s() const { return stop_reference_line_s_; }
+  bool     MergeWithMainStop(const ObjectStop&    obj_stop,
+                             const std::string&   obj_id,
+                             const ReferenceLine& ref_line,
+                             const SLBoundary&    adc_sl_boundary);
 
  private:
-  std::mutex obstacle_mutex_;
+  std::mutex                             obstacle_mutex_;
   IndexedList<std::string, PathObstacle> path_obstacles_;
-  MainStop main_stop_;
+  MainStop                               main_stop_;
   double stop_reference_line_s_ = std::numeric_limits<double>::max();
 };
 

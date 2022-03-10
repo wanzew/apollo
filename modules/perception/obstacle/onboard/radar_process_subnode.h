@@ -23,8 +23,8 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "gtest/gtest_prod.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "gtest/gtest_prod.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -48,22 +48,18 @@ namespace perception {
 
 class RadarProcessSubnode : public Subnode {
  public:
-  RadarProcessSubnode() = default;
+  RadarProcessSubnode()  = default;
   ~RadarProcessSubnode() = default;
 
-  apollo::common::Status ProcEvents() override {
-    return apollo::common::Status::OK();
-  }
+  apollo::common::Status ProcEvents() override { return apollo::common::Status::OK(); }
 
  private:
-  typedef std::pair<double, apollo::localization::LocalizationEstimate>
-      LocalizationPair;
-  bool InitInternal() override;
+  typedef std::pair<double, apollo::localization::LocalizationEstimate> LocalizationPair;
+  bool                                                                  InitInternal() override;
 
-  void OnRadar(const ContiRadar &radar_obs);
+  void OnRadar(const ContiRadar& radar_obs);
 
-  void OnLocalization(
-      const apollo::localization::LocalizationEstimate &localization);
+  void OnLocalization(const apollo::localization::LocalizationEstimate& localization);
 
   void RegistAllAlgorithm();
 
@@ -71,26 +67,25 @@ class RadarProcessSubnode : public Subnode {
 
   bool InitAlgorithmPlugin();
 
-  void PublishDataAndEvent(double timestamp,
-                           const SharedDataPtr<SensorObjects> &data);
+  void PublishDataAndEvent(double timestamp, const SharedDataPtr<SensorObjects>& data);
 
-  bool GetCarLinearSpeed(double timestamp, Eigen::Vector3f *car_linear_speed);
+  bool GetCarLinearSpeed(double timestamp, Eigen::Vector3f* car_linear_speed);
 
-  bool inited_ = false;
-  SeqId seq_num_ = 0;
+  bool              inited_     = false;
+  SeqId             seq_num_    = 0;
   common::ErrorCode error_code_ = common::OK;
-  RadarObjectData *radar_data_ = nullptr;
-  std::string device_id_;
-  Eigen::Matrix4d radar_extrinsic_;
-  Eigen::Matrix4d short_camera_extrinsic_;
+  RadarObjectData*  radar_data_ = nullptr;
+  std::string       device_id_;
+  Eigen::Matrix4d   radar_extrinsic_;
+  Eigen::Matrix4d   short_camera_extrinsic_;
 
   boost::circular_buffer<LocalizationPair> localization_buffer_;
-  ContiRadarIDExpansion conti_id_expansion_;
-  std::unique_ptr<BaseRadarDetector> radar_detector_;
-  HDMapInput *hdmap_input_ = nullptr;
+  ContiRadarIDExpansion                    conti_id_expansion_;
+  std::unique_ptr<BaseRadarDetector>       radar_detector_;
+  HDMapInput*                              hdmap_input_ = nullptr;
   // here we use HdmapROIFilter
   std::unique_ptr<HdmapROIFilter> roi_filter_;
-  Mutex mutex_;
+  Mutex                           mutex_;
 };
 
 REGISTER_SUBNODE(RadarProcessSubnode);

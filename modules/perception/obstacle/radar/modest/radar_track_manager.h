@@ -37,12 +37,12 @@ class RadarTrackManager {
   // @brief: process radar obstacles
   // @param [in]: built radar obstacles
   // @return nothing
-  void Process(const SensorObjects &radar_obs);
+  void Process(const SensorObjects& radar_obs);
 
   // @brief: update tracking state
   // @param [in]: built radar obstacles
   // @return nothing
-  void Update(SensorObjects *radar_obs);
+  void Update(SensorObjects* radar_obs);
 
   // @brief match observation obstacles to existed tracking states by
   //            tracking id
@@ -50,22 +50,21 @@ class RadarTrackManager {
   // @param [out]: indexs of unassigend tracking state
   // @param [out]: indexs of unassigned observation obstacles
   // @return nothing
-  void AssignTrackObsIdMatch(const SensorObjects &radar_obs,
-                             std::vector<std::pair<int, int>> *assignment,
-                             std::vector<int> *unassigned_track,
-                             std::vector<int> *unassigned_obs);
+  void AssignTrackObsIdMatch(const SensorObjects&              radar_obs,
+                             std::vector<std::pair<int, int>>* assignment,
+                             std::vector<int>*                 unassigned_track,
+                             std::vector<int>*                 unassigned_obs);
 
   // @brief update tracking state with assigned observation obstacle
   // @param [IN]: assigement index pairs of observations and tracking states
   // @return nothing
-  void UpdateAssignedTrack(const SensorObjects &radar_obs,
-                           const std::vector<std::pair<int, int>> &assignment);
+  void UpdateAssignedTrack(const SensorObjects&                    radar_obs,
+                           const std::vector<std::pair<int, int>>& assignment);
 
   // @brief update tracking state of unassigned tracking state
   // @param [IN]: indexs of unassigend tracking state
   // @return nothing
-  void UpdateUnassignedTrack(const double timestamp,
-                             const std::vector<int> &unassigned_track);
+  void UpdateUnassignedTrack(const double timestamp, const std::vector<int>& unassigned_track);
 
   // @brief delete stale tracking states
   // @return nothing
@@ -74,21 +73,20 @@ class RadarTrackManager {
   // @brief create a new tracking state with observation obstacles
   // @param [IN]: indexs of unassigend observation obstacles
   // @return nothing
-  void CreateNewTrack(const SensorObjects &radar_obs,
-                      const std::vector<int> &unassigned_obs);
+  void CreateNewTrack(const SensorObjects& radar_obs, const std::vector<int>& unassigned_obs);
 
   // @brief get radar obstacles
   // @return radar obstacles
-  SensorObjects &GetRadarObs() { return radar_obs_; }
+  SensorObjects& GetRadarObs() { return radar_obs_; }
 
   // @brief get tracking state
   // @return tracking states
-  std::vector<RadarTrack> &GetTracks() { return obs_tracks_; }
+  std::vector<RadarTrack>& GetTracks() { return obs_tracks_; }
 
  private:
-  double DistanceBetweenObs(const Object &obs1, double timestamp1,
-                            const Object &obs2, double timestamp2);
-  SensorObjects radar_obs_;
+  double
+                          DistanceBetweenObs(const Object& obs1, double timestamp1, const Object& obs2, double timestamp2);
+  SensorObjects           radar_obs_;
   std::vector<RadarTrack> obs_tracks_;
 };
 

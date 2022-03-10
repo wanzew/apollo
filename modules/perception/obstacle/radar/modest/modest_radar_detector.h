@@ -32,7 +32,8 @@ namespace perception {
 
 class ModestRadarDetector : public BaseRadarDetector {
  public:
-  ModestRadarDetector() : BaseRadarDetector() {}
+  ModestRadarDetector()
+      : BaseRadarDetector() {}
   ~ModestRadarDetector() = default;
 
   bool Init() override;
@@ -43,28 +44,28 @@ class ModestRadarDetector : public BaseRadarDetector {
   // @param [in]: options.
   // @param [out]: transformed objects.
   // return true if detect successfully, otherwise return false
-  bool Detect(const ContiRadar &raw_obstacles,
-              const std::vector<PolygonDType> &map_polygons,
-              const RadarDetectorOptions &options,
-              std::vector<std::shared_ptr<Object>> *objects) override;
+  bool Detect(const ContiRadar&                     raw_obstacles,
+              const std::vector<PolygonDType>&      map_polygons,
+              const RadarDetectorOptions&           options,
+              std::vector<std::shared_ptr<Object>>* objects) override;
 
   // @brief: collect radar result
   // @param [out]: radar objects
   // @return collection state
-  bool CollectRadarResult(std::vector<std::shared_ptr<Object>> *objects);
+  bool CollectRadarResult(std::vector<std::shared_ptr<Object>>* objects);
 
   std::string name() const override { return "ModestRadarDetector"; }
 
  private:
-  void RoiFilter(const std::vector<PolygonDType> &map_polygons,
-                 std::vector<std::shared_ptr<Object>> *filter_objects);
+  void RoiFilter(const std::vector<PolygonDType>&      map_polygons,
+                 std::vector<std::shared_ptr<Object>>* filter_objects);
 
   // for unit test
-  bool result_init_ = true;
+  bool result_init_   = true;
   bool result_detect_ = true;
 
-  ContiParams conti_params_;
-  ObjectBuilder object_builder_;
+  ContiParams                          conti_params_;
+  ObjectBuilder                        object_builder_;
   boost::shared_ptr<RadarTrackManager> radar_tracker_;
 
   modest_radar_detector_config::ModelConfigs config_;

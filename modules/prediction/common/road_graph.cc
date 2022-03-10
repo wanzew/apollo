@@ -30,14 +30,17 @@ using apollo::common::Status;
 using apollo::hdmap::Id;
 using apollo::hdmap::LaneInfo;
 
-RoadGraph::RoadGraph(const double start_s, const double length,
+RoadGraph::RoadGraph(const double                    start_s,
+                     const double                    length,
                      std::shared_ptr<const LaneInfo> lane_info_ptr)
-    : start_s_(start_s), length_(length), lane_info_ptr_(lane_info_ptr) {}
+    : start_s_(start_s)
+    , length_(length)
+    , lane_info_ptr_(lane_info_ptr) {}
 
 Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   if (length_ < 0.0 || lane_info_ptr_ == nullptr) {
-    const auto error_msg = common::util::StrCat(
-        "Invalid road graph settings. Road graph length = ", length_);
+    const auto error_msg =
+        common::util::StrCat("Invalid road graph settings. Road graph length = ", length_);
     AERROR << error_msg;
     return Status(ErrorCode::PREDICTION_ERROR, error_msg);
   }
@@ -49,23 +52,19 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   }
 
   std::vector<LaneSegment> lane_segments;
-  double accumulated_s = 0.0;
-  ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_, &lane_segments,
-                      lane_graph_ptr);
+  double                   accumulated_s = 0.0;
+  ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_, &lane_segments, lane_graph_ptr);
 
   return Status::OK();
 }
 
 bool RoadGraph::IsOnLaneGraph(std::shared_ptr<const LaneInfo> lane_info_ptr,
-                              const LaneGraph& lane_graph) {
-  if (!lane_graph.IsInitialized()) {
-    return false;
-  }
+                              const LaneGraph&                lane_graph) {
+  if (!lane_graph.IsInitialized()) { return false; }
 
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {
     for (const auto& lane_segment : lane_sequence.lane_segment()) {
-      if (lane_segment.has_lane_id() &&
-          lane_segment.lane_id() == lane_info_ptr->id().id()) {
+      if (lane_segment.has_lane_id() && lane_segment.lane_id() == lane_info_ptr->id().id()) {
         return true;
       }
     }
@@ -74,11 +73,11 @@ bool RoadGraph::IsOnLaneGraph(std::shared_ptr<const LaneInfo> lane_info_ptr,
   return false;
 }
 
-void RoadGraph::ComputeLaneSequence(
-    const double accumulated_s, const double start_s,
-    std::shared_ptr<const LaneInfo> lane_info_ptr,
-    std::vector<LaneSegment>* const lane_segments,
-    LaneGraph* const lane_graph_ptr) const {
+void RoadGraph::ComputeLaneSequence(const double                    accumulated_s,
+                                    const double                    start_s,
+                                    std::shared_ptr<const LaneInfo> lane_info_ptr,
+                                    std::vector<LaneSegment>* const lane_segments,
+                                    LaneGraph* const                lane_graph_ptr) const {
   if (lane_info_ptr == nullptr) {
     AERROR << "Invalid lane.";
     return;
@@ -87,8 +86,7 @@ void RoadGraph::ComputeLaneSequence(
   LaneSegment lane_segment;
   lane_segment.set_lane_id(lane_info_ptr->id().id());
   lane_segment.set_start_s(start_s);
-  lane_segment.set_lane_turn_type(
-      PredictionMap::LaneTurnType(lane_info_ptr->id().id()));
+  lane_segment.set_lane_turn_type(PredictionMap::LaneTurnType(lane_info_ptr->id().id()));
   if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_) {
     lane_segment.set_end_s(length_ - accumulated_s + start_s);
   } else {
@@ -100,17 +98,15 @@ void RoadGraph::ComputeLaneSequence(
 
   if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_ ||
       lane_info_ptr->lane().successor_id_size() == 0) {
-    LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
-    *sequence->mutable_lane_segment() = {lane_segments->begin(),
-                                         lane_segments->end()};
+    LaneSequence* sequence            = lane_graph_ptr->add_lane_sequence();
+    *sequence->mutable_lane_segment() = {lane_segments->begin(), lane_segments->end()};
     sequence->set_label(0);
   } else {
-    const double successor_accumulated_s =
-        accumulated_s + lane_info_ptr->total_length() - start_s;
+    const double successor_accumulated_s = accumulated_s + lane_info_ptr->total_length() - start_s;
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
       auto successor_lane = PredictionMap::LaneById(successor_lane_id.id());
-      ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
-                          lane_segments, lane_graph_ptr);
+      ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane, lane_segments,
+                          lane_graph_ptr);
     }
   }
   lane_segments->pop_back();

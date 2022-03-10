@@ -37,8 +37,7 @@ class ChangeLane : public TrafficRule {
   explicit ChangeLane(const TrafficRuleConfig& config);
   virtual ~ChangeLane() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   /**
@@ -52,15 +51,13 @@ class ChangeLane : public TrafficRule {
    *to make sure the vehicle is aware that it actually occupies the target lane,
    *even when it is not on the target lane yet.
    **/
-  bool CreateGuardObstacle(const ReferenceLineInfo* reference_line_info,
-                           Obstacle* obstacle);
+  bool CreateGuardObstacle(const ReferenceLineInfo* reference_line_info, Obstacle* obstacle);
 
   /**
    * @brief create overtake decision for the give path obstacle
    */
-  ObjectDecisionType CreateOvertakeDecision(
-      const ReferenceLine& reference_line,
-      const PathObstacle* path_obstacle) const;
+  ObjectDecisionType CreateOvertakeDecision(const ReferenceLine& reference_line,
+                                            const PathObstacle*  path_obstacle) const;
 
   std::vector<const PathObstacle*> guard_obstacles_;
   std::vector<const PathObstacle*> overtake_obstacles_;

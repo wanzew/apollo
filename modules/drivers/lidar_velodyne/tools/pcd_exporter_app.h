@@ -19,10 +19,10 @@
 
 #include <string>
 
-#include "modules/drivers/lidar_velodyne/tools/pcd_exporter.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
 #include "modules/common/apollo_app.h"
+#include "modules/common/log.h"
+#include "modules/drivers/lidar_velodyne/tools/pcd_exporter.h"
 #include "sensor_msgs/PointCloud2.h"
 
 namespace apollo {
@@ -31,17 +31,18 @@ namespace lidar_velodyne {
 
 class PcdApp : public apollo::common::ApolloApp {
  public:
-  PcdApp() : exporter_(nullptr) {}
+  PcdApp()
+      : exporter_(nullptr) {}
   virtual ~PcdApp() = default;
 
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
  private:
   PCDExporter* exporter_;
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+  void         OnPointCloud(const sensor_msgs::PointCloud2& message);
 };
 
 }  // namespace lidar_velodyne

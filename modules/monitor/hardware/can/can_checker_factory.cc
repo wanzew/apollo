@@ -21,7 +21,7 @@
 #include "modules/monitor/hardware/can/can_checker_factory.h"
 
 #if USE_ESD_CAN
-#include "modules/monitor/hardware/can/esdcan/esdcan_checker.h"
+#  include "modules/monitor/hardware/can/esdcan/esdcan_checker.h"
 #endif
 #include "modules/monitor/hardware/can/socketcan/socketcan_checker.h"
 
@@ -41,12 +41,11 @@ void CanCheckerFactory::RegisterCanCheckers() {
            []() -> HwCheckerInterface* { return new hw::SocketCanChecker(); });
 }
 
-std::unique_ptr<HwCheckerInterface> CanCheckerFactory::CreateCanChecker(
-    const CANCardParameter& parameter) {
+std::unique_ptr<HwCheckerInterface>
+CanCheckerFactory::CreateCanChecker(const CANCardParameter& parameter) {
   auto factory = CreateObjectOrNull(parameter.brand());
   if (!factory) {
-    AERROR_EVERY(10) << "Failed to create CAN checker with parameter: "
-                     << parameter.DebugString();
+    AERROR_EVERY(10) << "Failed to create CAN checker with parameter: " << parameter.DebugString();
   }
   return factory;
 }

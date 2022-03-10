@@ -23,29 +23,19 @@ namespace apollo {
 namespace common {
 namespace monitor {
 
-MonitorLogBuffer::MonitorLogBuffer(MonitorLogger *logger) : logger_(logger) {}
+MonitorLogBuffer::MonitorLogBuffer(MonitorLogger* logger)
+    : logger_(logger) {}
 
 void MonitorLogBuffer::PrintLog() {
-  if (monitor_msg_items_.empty()) {
-    return;
-  }
-  const auto level = monitor_msg_items_.back().first;
-  const auto &msg = monitor_msg_items_.back().second;
+  if (monitor_msg_items_.empty()) { return; }
+  const auto  level = monitor_msg_items_.back().first;
+  const auto& msg   = monitor_msg_items_.back().second;
   switch (level) {
-    case MonitorMessageItem::INFO:
-      AINFO << msg;
-      break;
-    case MonitorMessageItem::WARN:
-      AWARN << msg;
-      break;
-    case MonitorMessageItem::ERROR:
-      AERROR << msg;
-      break;
-    case MonitorMessageItem::FATAL:
-      AFATAL << msg;
-      break;
-    default:
-      AERROR << "[unknown monitor level]: " << msg;
+    case MonitorMessageItem::INFO: AINFO << msg; break;
+    case MonitorMessageItem::WARN: AWARN << msg; break;
+    case MonitorMessageItem::ERROR: AERROR << msg; break;
+    case MonitorMessageItem::FATAL: AFATAL << msg; break;
+    default: AERROR << "[unknown monitor level]: " << msg;
   }
 }
 
@@ -57,7 +47,7 @@ void MonitorLogBuffer::Publish() {
   }
 }
 
-MonitorLogBuffer &MonitorLogBuffer::operator<<(const std::string &msg) {
+MonitorLogBuffer& MonitorLogBuffer::operator<<(const std::string& msg) {
   if (monitor_msg_items_.empty() || monitor_msg_items_.back().first != level_) {
     AddMonitorMsgItem(level_, msg);
   } else {
@@ -66,10 +56,10 @@ MonitorLogBuffer &MonitorLogBuffer::operator<<(const std::string &msg) {
   return *this;
 }
 
-MonitorLogBuffer &MonitorLogBuffer::operator<<(const char *msg) {
+MonitorLogBuffer& MonitorLogBuffer::operator<<(const char* msg) {
   if (msg) {
     std::string msg_str(msg);
-    return operator<<(msg_str);
+    return      operator<<(msg_str);
   } else {
     return *this;
   }
@@ -77,8 +67,8 @@ MonitorLogBuffer &MonitorLogBuffer::operator<<(const char *msg) {
 
 MonitorLogBuffer::~MonitorLogBuffer() { Publish(); }
 
-void MonitorLogBuffer::AddMonitorMsgItem(
-    const MonitorMessageItem::LogLevel log_level, const std::string &msg) {
+void MonitorLogBuffer::AddMonitorMsgItem(const MonitorMessageItem::LogLevel log_level,
+                                         const std::string&                 msg) {
   level_ = log_level;
   monitor_msg_items_.push_back(std::make_pair(log_level, msg));
 }

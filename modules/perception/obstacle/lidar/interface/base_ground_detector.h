@@ -63,9 +63,9 @@ namespace perception {
 
 struct GroundDetectorOptions {
   GroundDetectorOptions() {
-    velodyne_position.x = 0.0;
-    velodyne_position.y = 0.0;
-    velodyne_position.z = 0.0;
+    velodyne_position.x        = 0.0;
+    velodyne_position.y        = 0.0;
+    velodyne_position.z        = 0.0;
     velodyne_ground_position.x = 0.0;
     velodyne_ground_position.y = 0.0;
     velodyne_ground_position.z = 0.0;
@@ -88,9 +88,9 @@ class BaseGroundDetector {
   // @param [in/out]: input point cloud.
   // @param [in]: options
   // @param [out]: non ground points index.
-  virtual bool Detect(const GroundDetectorOptions &options,
-                      pcl_util::PointCloudPtr cloud,
-                      pcl_util::PointIndicesPtr non_ground_indices) = 0;
+  virtual bool Detect(const GroundDetectorOptions& options,
+                      pcl_util::PointCloudPtr      cloud,
+                      pcl_util::PointIndicesPtr    non_ground_indices) = 0;
 
   virtual std::string name() const = 0;
 

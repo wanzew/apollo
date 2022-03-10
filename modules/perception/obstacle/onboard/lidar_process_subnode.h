@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "gtest/gtest_prod.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "gtest/gtest_prod.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
@@ -47,18 +47,16 @@ namespace perception {
 
 class LidarProcessSubnode : public Subnode {
  public:
-  LidarProcessSubnode() = default;
+  LidarProcessSubnode()  = default;
   ~LidarProcessSubnode() = default;
 
-  apollo::common::Status ProcEvents() override {
-    return apollo::common::Status::OK();
-  }
+  apollo::common::Status ProcEvents() override { return apollo::common::Status::OK(); }
 
   void OnPointCloud(const sensor_msgs::PointCloud2& message);
 
  protected:
   virtual SensorType GetSensorType() const = 0;
-  virtual void AddMessageCallback() = 0;
+  virtual void       AddMessageCallback()  = 0;
 
  private:
   bool InitInternal() override;
@@ -70,38 +68,37 @@ class LidarProcessSubnode : public Subnode {
   bool InitAlgorithmPlugin();
 
   void TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
-                            pcl_util::PointCloudPtr* out_cloud);
+                            pcl_util::PointCloudPtr*        out_cloud);
 
-  void PublishDataAndEvent(double timestamp,
-                           const SharedDataPtr<SensorObjects>& data);
+  void PublishDataAndEvent(double timestamp, const SharedDataPtr<SensorObjects>& data);
 
-  bool inited_ = false;
-  double timestamp_ = 0.0;
-  SeqId seq_num_ = 0;
-  common::ErrorCode error_code_ = common::OK;
-  LidarObjectData* processing_data_ = nullptr;
-  std::string device_id_;
+  bool              inited_          = false;
+  double            timestamp_       = 0.0;
+  SeqId             seq_num_         = 0;
+  common::ErrorCode error_code_      = common::OK;
+  LidarObjectData*  processing_data_ = nullptr;
+  std::string       device_id_;
 
-  HDMapInput* hdmap_input_ = nullptr;
-  std::unique_ptr<BaseROIFilter> roi_filter_;
-  std::unique_ptr<BaseSegmentation> segmentor_;
-  std::unique_ptr<BaseObjectFilter> object_filter_;
+  HDMapInput*                        hdmap_input_ = nullptr;
+  std::unique_ptr<BaseROIFilter>     roi_filter_;
+  std::unique_ptr<BaseSegmentation>  segmentor_;
+  std::unique_ptr<BaseObjectFilter>  object_filter_;
   std::unique_ptr<BaseObjectBuilder> object_builder_;
-  std::unique_ptr<BaseTracker> tracker_;
-  std::unique_ptr<BaseTypeFuser> type_fuser_;
-  pcl_util::PointIndicesPtr roi_indices_;
+  std::unique_ptr<BaseTracker>       tracker_;
+  std::unique_ptr<BaseTypeFuser>     type_fuser_;
+  pcl_util::PointIndicesPtr          roi_indices_;
 };
 
 class Lidar64ProcessSubnode : public LidarProcessSubnode {
  protected:
   SensorType GetSensorType() const override;
-  void AddMessageCallback() override;
+  void       AddMessageCallback() override;
 };
 
 class Lidar16ProcessSubnode : public LidarProcessSubnode {
  protected:
   SensorType GetSensorType() const override;
-  void AddMessageCallback() override;
+  void       AddMessageCallback() override;
 };
 
 REGISTER_SUBNODE(Lidar64ProcessSubnode);

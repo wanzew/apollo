@@ -27,7 +27,8 @@ namespace apollo {
 namespace planning {
 
 Spline2d::Spline2d(const std::vector<double>& t_knots, const uint32_t order)
-    : t_knots_(t_knots), spline_order_(order) {
+    : t_knots_(t_knots)
+    , spline_order_(order) {
   if (t_knots.size() > 1) {
     for (uint32_t i = 1; i < t_knots_.size(); ++i) {
       splines_.emplace_back(spline_order_);
@@ -36,87 +37,67 @@ Spline2d::Spline2d(const std::vector<double>& t_knots, const uint32_t order)
 }
 
 std::pair<double, double> Spline2d::operator()(const double t) const {
-  if (splines_.size() == 0) {
-    return std::make_pair(0.0, 0.0);
-  }
+  if (splines_.size() == 0) { return std::make_pair(0.0, 0.0); }
   uint32_t index = find_index(t);
   return splines_[index](t - t_knots_[index]);
 }
 
 double Spline2d::x(const double t) const {
-  if (splines_.size() == 0) {
-    return 0.0;
-  }
+  if (splines_.size() == 0) { return 0.0; }
   uint32_t index = find_index(t);
   return splines_[index].x(t - t_knots_[index]);
 }
 
 double Spline2d::y(const double t) const {
-  if (splines_.size() == 0) {
-    return 0.0;
-  }
+  if (splines_.size() == 0) { return 0.0; }
   uint32_t index = find_index(t);
   return splines_[index].y(t - t_knots_[index]);
 }
 
 double Spline2d::DerivativeX(const double t) const {
   // zero order spline
-  if (splines_.size() == 0) {
-    return 0.0;
-  }
+  if (splines_.size() == 0) { return 0.0; }
   uint32_t index = find_index(t);
   return splines_[index].DerivativeX(t - t_knots_[index]);
 }
 
 double Spline2d::DerivativeY(const double t) const {
   // zero order spline
-  if (splines_.size() == 0) {
-    return 0.0;
-  }
+  if (splines_.size() == 0) { return 0.0; }
   uint32_t index = find_index(t);
   return splines_[index].DerivativeY(t - t_knots_[index]);
 }
 
 double Spline2d::SecondDerivativeX(const double t) const {
-  if (splines_.size() == 0) {
-    return 0.0;
-  }
+  if (splines_.size() == 0) { return 0.0; }
   uint32_t index = find_index(t);
   return splines_[index].SecondDerivativeX(t - t_knots_[index]);
 }
 
 double Spline2d::SecondDerivativeY(const double t) const {
-  if (splines_.size() == 0) {
-    return 0.0;
-  }
+  if (splines_.size() == 0) { return 0.0; }
   uint32_t index = find_index(t);
   return splines_[index].SecondDerivativeY(t - t_knots_[index]);
 }
 
 double Spline2d::ThirdDerivativeX(const double t) const {
-  if (splines_.size() == 0) {
-    return 0.0;
-  }
+  if (splines_.size() == 0) { return 0.0; }
   uint32_t index = find_index(t);
   return splines_[index].ThirdDerivativeX(t - t_knots_[index]);
 }
 
 double Spline2d::ThirdDerivativeY(const double t) const {
-  if (splines_.size() == 0) {
-    return 0.0;
-  }
+  if (splines_.size() == 0) { return 0.0; }
   uint32_t index = find_index(t);
   return splines_[index].ThirdDerivativeY(t - t_knots_[index]);
 }
 /**
  *   @brief: set splines
  **/
-bool Spline2d::set_splines(const Eigen::MatrixXd& params,
-                           const uint32_t order) {
+bool Spline2d::set_splines(const Eigen::MatrixXd& params, const uint32_t order) {
   const uint32_t num_params = order + 1;
   // check if the parameter size fit
-  if (2 * t_knots_.size() * num_params !=
-      2 * num_params + static_cast<uint32_t>(params.rows())) {
+  if (2 * t_knots_.size() * num_params != 2 * num_params + static_cast<uint32_t>(params.rows())) {
     return false;
   }
   for (uint32_t i = 0; i < splines_.size(); ++i) {

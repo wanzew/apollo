@@ -50,16 +50,14 @@ namespace traffic_light {
  */
 class TLPreprocessorSubnode : public Subnode {
  public:
-  TLPreprocessorSubnode() = default;
+  TLPreprocessorSubnode()          = default;
   virtual ~TLPreprocessorSubnode() = default;
 
   /**
    * @brief as a subnode with type SUBNODE_IN
    *         we will use ros callback, so ignore subnode callback
    */
-  apollo::common::Status ProcEvents() override {
-    return apollo::common::Status::OK();
-  }
+  apollo::common::Status ProcEvents() override { return apollo::common::Status::OK(); }
 
  protected:
   /**
@@ -75,35 +73,34 @@ class TLPreprocessorSubnode : public Subnode {
 
   bool InitHdmap();
 
-  bool AddDataAndPublishEvent(const std::shared_ptr<ImageLights> &data,
-                              const CameraId &camera_id, double timestamp);
+  bool AddDataAndPublishEvent(const std::shared_ptr<ImageLights>& data,
+                              const CameraId&                     camera_id,
+                              double                              timestamp);
 
   // @brief sub long focus camera
-  void SubLongFocusCamera(const sensor_msgs::Image &msg);
+  void SubLongFocusCamera(const sensor_msgs::Image& msg);
 
   // @brief sub short focus camera
-  void SubShortFocusCamera(const sensor_msgs::Image &msg);
+  void SubShortFocusCamera(const sensor_msgs::Image& msg);
 
-  void SubCameraImage(boost::shared_ptr<const sensor_msgs::Image> msg,
-                      CameraId camera_id);
+  void SubCameraImage(boost::shared_ptr<const sensor_msgs::Image> msg, CameraId camera_id);
 
   void CameraSelection(double ts);
   bool VerifyLightsProjection(std::shared_ptr<ImageLights> image_lights);
-  bool GetSignals(double ts, CarPose *pose,
-                  std::vector<apollo::hdmap::Signal> *signals);
-  bool GetCarPose(const double ts, CarPose *pose);
+  bool GetSignals(double ts, CarPose* pose, std::vector<apollo::hdmap::Signal>* signals);
+  bool GetCarPose(const double ts, CarPose* pose);
 
  private:
-  TLPreprocessor preprocessor_;
-  TLPreprocessingData *preprocessing_data_ = nullptr;
+  TLPreprocessor       preprocessor_;
+  TLPreprocessingData* preprocessing_data_ = nullptr;
 
-  HDMapInput *hd_map_ = nullptr;
-  Mutex mutex_;
+  HDMapInput* hd_map_ = nullptr;
+  Mutex       mutex_;
 
   // signals
-  float last_signals_ts_ = -1.0;
+  float                              last_signals_ts_ = -1.0;
   std::vector<apollo::hdmap::Signal> last_signals_;
-  float valid_hdmap_interval_ = 1.5;
+  float                              valid_hdmap_interval_ = 1.5;
 
   // tf
   double last_query_tf_ts_ = 0.0;

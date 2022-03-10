@@ -54,32 +54,30 @@ Planning::~Planning() { Stop(); }
 
 std::string Planning::Name() const { return "planning"; }
 
-#define CHECK_ADAPTER(NAME)                                               \
-  if (AdapterManager::Get##NAME() == nullptr) {                           \
-    AERROR << #NAME << " is not registered";                              \
-    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
+#define CHECK_ADAPTER(NAME)                                                                        \
+  if (AdapterManager::Get##NAME() == nullptr) {                                                    \
+    AERROR << #NAME << " is not registered";                                                       \
+    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered");                          \
   }
 
-#define CHECK_ADAPTER_IF(CONDITION, NAME) \
+#define CHECK_ADAPTER_IF(CONDITION, NAME)                                                          \
   if (CONDITION) CHECK_ADAPTER(NAME)
 
 void Planning::RegisterPlanners() {
-  planner_factory_.Register(
-      PlanningConfig::RTK, []() -> Planner* { return new RTKReplayPlanner(); });
-  planner_factory_.Register(PlanningConfig::EM,
-                            []() -> Planner* { return new EMPlanner(); });
+  planner_factory_.Register(PlanningConfig::RTK,
+                            []() -> Planner* { return new RTKReplayPlanner(); });
+  planner_factory_.Register(PlanningConfig::EM, []() -> Planner* { return new EMPlanner(); });
   planner_factory_.Register(PlanningConfig::LATTICE,
                             []() -> Planner* { return new LatticePlanner(); });
-  planner_factory_.Register(PlanningConfig::NAVI,
-                            []() -> Planner* { return new NaviPlanner(); });
+  planner_factory_.Register(PlanningConfig::NAVI, []() -> Planner* { return new NaviPlanner(); });
 }
 
-Status Planning::InitFrame(const uint32_t sequence_num,
+Status Planning::InitFrame(const uint32_t         sequence_num,
                            const TrajectoryPoint& planning_start_point,
-                           const double start_time,
-                           const VehicleState& vehicle_state) {
-  frame_.reset(new Frame(sequence_num, planning_start_point, start_time,
-                         vehicle_state, reference_line_provider_.get()));
+                           const double           start_time,
+                           const VehicleState&    vehicle_state) {
+  frame_.reset(new Frame(sequence_num, planning_start_point, start_time, vehicle_state,
+                         reference_line_provider_.get()));
   auto status = frame_->Init();
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
@@ -89,16 +87,13 @@ Status Planning::InitFrame(const uint32_t sequence_num,
 }
 
 void Planning::ResetPullOver(const routing::RoutingResponse& response) {
-  auto* pull_over =
-      util::GetPlanningStatus()->mutable_planning_state()->mutable_pull_over();
+  auto* pull_over = util::GetPlanningStatus()->mutable_planning_state()->mutable_pull_over();
   if (!last_routing_.has_header()) {
     last_routing_ = response;
     pull_over->Clear();
     return;
   }
-  if (!pull_over->in_pull_over()) {
-    return;
-  }
+  if (!pull_over->in_pull_over()) { return; }
   if (hdmap::PncMap::IsNewRouting(last_routing_, response)) {
     pull_over->Clear();
     last_routing_ = response;
@@ -107,10 +102,8 @@ void Planning::ResetPullOver(const routing::RoutingResponse& response) {
 }
 
 void Planning::CheckPlanningConfig() {
-  if (config_.has_em_planner_config() &&
-      config_.em_planner_config().has_dp_st_speed_config()) {
-    const auto& dp_st_speed_config =
-        config_.em_planner_config().dp_st_speed_config();
+  if (config_.has_em_planner_config() && config_.em_planner_config().has_dp_st_speed_config()) {
+    const auto& dp_st_speed_config = config_.em_planner_config().dp_st_speed_config();
     CHECK(dp_st_speed_config.has_matrix_dimension_s());
     CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
     CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);
@@ -122,15 +115,13 @@ void Planning::CheckPlanningConfig() {
 }
 
 Status Planning::Init() {
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                               &config_))
+  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file, &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
   CheckPlanningConfig();
 
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
-      << "Failed to load traffic rule config file "
-      << FLAGS_traffic_rule_config_filename;
+  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_traffic_rule_config_filename,
+                                               &traffic_rule_configs_))
+      << "Failed to load traffic rule config file " << FLAGS_traffic_rule_config_filename;
 
   // initialize planning thread pool
   PlanningThreadPool::instance()->Init();
@@ -146,8 +137,7 @@ Status Planning::Init() {
   CHECK_ADAPTER(RoutingResponse);
   CHECK_ADAPTER(RoutingRequest);
   CHECK_ADAPTER_IF(FLAGS_use_navigation_mode, RelativeMap);
-  CHECK_ADAPTER_IF(FLAGS_use_navigation_mode && FLAGS_enable_prediction,
-                   PerceptionObstacles);
+  CHECK_ADAPTER_IF(FLAGS_use_navigation_mode && FLAGS_enable_prediction, PerceptionObstacles);
   CHECK_ADAPTER_IF(FLAGS_enable_prediction, Prediction);
   CHECK_ADAPTER(TrafficLightDetection);
 
@@ -162,9 +152,8 @@ Status Planning::Init() {
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
   if (!planner_) {
-    return Status(
-        ErrorCode::PLANNING_ERROR,
-        "planning is not initialized with config : " + config_.DebugString());
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "planning is not initialized with config : " + config_.DebugString());
   }
 
   return planner_->Init(config_);
@@ -173,8 +162,7 @@ Status Planning::Init() {
 bool Planning::IsVehicleStateValid(const VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
+      std::isnan(vehicle_state.kappa()) || std::isnan(vehicle_state.linear_velocity()) ||
       std::isnan(vehicle_state.linear_acceleration())) {
     return false;
   }
@@ -182,13 +170,11 @@ bool Planning::IsVehicleStateValid(const VehicleState& vehicle_state) {
 }
 
 Status Planning::Start() {
-  timer_ = AdapterManager::CreateTimer(
-      ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(1.0 / FLAGS_planning_loop_rate),
+                                       &Planning::OnTimer, this);
   // The "reference_line_provider_" may not be created yet in navigation mode.
   // It is necessary to check its existence.
-  if (reference_line_provider_) {
-    reference_line_provider_->Start();
-  }
+  if (reference_line_provider_) { reference_line_provider_->Start(); }
   start_time_ = Clock::NowInSeconds();
   AINFO << "Planning started";
   return Status::OK();
@@ -203,19 +189,16 @@ void Planning::OnTimer(const ros::TimerEvent&) {
   }
 }
 
-void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
-                                 double timestamp) {
+void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-  if (AdapterManager::GetRoutingResponse() &&
-      !AdapterManager::GetRoutingResponse()->Empty()) {
+  if (AdapterManager::GetRoutingResponse() && !AdapterManager::GetRoutingResponse()->Empty()) {
     trajectory_pb->mutable_routing_header()->CopyFrom(
         AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
   }
 
-  if (FLAGS_use_planning_fallback &&
-      trajectory_pb->trajectory_point_size() == 0) {
+  if (FLAGS_use_planning_fallback && trajectory_pb->trajectory_point_size() == 0) {
     SetFallbackTrajectory(trajectory_pb);
   }
 
@@ -241,15 +224,12 @@ void Planning::RunOnce() {
   const double start_timestamp = Clock::NowInSeconds();
 
   ADCTrajectory not_ready_pb;
-  auto* not_ready = not_ready_pb.mutable_decision()
-                        ->mutable_main_decision()
-                        ->mutable_not_ready();
+  auto* not_ready = not_ready_pb.mutable_decision()->mutable_main_decision()->mutable_not_ready();
   if (AdapterManager::GetLocalization()->Empty()) {
     not_ready->set_reason("localization not ready");
   } else if (AdapterManager::GetChassis()->Empty()) {
     not_ready->set_reason("chassis not ready");
-  } else if (!FLAGS_use_navigation_mode &&
-             AdapterManager::GetRoutingResponse()->Empty()) {
+  } else if (!FLAGS_use_navigation_mode && AdapterManager::GetRoutingResponse()->Empty()) {
     not_ready->set_reason("routing not ready");
   } else if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
@@ -269,16 +249,14 @@ void Planning::RunOnce() {
   }
 
   // localization
-  const auto& localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
+  const auto& localization = AdapterManager::GetLocalization()->GetLatestObserved();
   ADEBUG << "Get localization:" << localization.DebugString();
 
   // chassis
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
-  Status status =
-      VehicleStateProvider::instance()->Update(localization, chassis);
+  Status status = VehicleStateProvider::instance()->Update(localization, chassis);
 
   if (FLAGS_use_navigation_mode) {
     auto vehicle_config = ComputeVehicleConfigFromLocalization(localization);
@@ -295,23 +273,20 @@ void Planning::RunOnce() {
 
       auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
 
-      TrajectoryStitcher::TransformLastPublishedTrajectory(
-          x_diff_veh, y_diff_veh, theta_diff,
-          last_publishable_trajectory_.get());
+      TrajectoryStitcher::TransformLastPublishedTrajectory(x_diff_veh, y_diff_veh, theta_diff,
+                                                           last_publishable_trajectory_.get());
     }
     last_vehicle_config_ = vehicle_config;
   }
 
-  VehicleState vehicle_state =
-      VehicleStateProvider::instance()->vehicle_state();
+  VehicleState vehicle_state = VehicleStateProvider::instance()->vehicle_state();
 
   // estimate (x, y) at current timestamp
   // This estimate is only valid if the current time and vehicle state timestamp
   // differs only a small amount (20ms). When the different is too large, the
   // estimation is invalid.
   DCHECK_GE(start_timestamp, vehicle_state.timestamp());
-  if (FLAGS_estimate_current_vehicle_state &&
-      start_timestamp - vehicle_state.timestamp() < 0.020) {
+  if (FLAGS_estimate_current_vehicle_state && start_timestamp - vehicle_state.timestamp() < 0.020) {
     auto future_xy = VehicleStateProvider::instance()->EstimateFuturePosition(
         start_timestamp - vehicle_state.timestamp());
     vehicle_state.set_x(future_xy.x());
@@ -351,15 +326,14 @@ void Planning::RunOnce() {
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
-  bool is_replan = false;
+  bool                         is_replan = false;
   std::vector<TrajectoryPoint> stitching_trajectory;
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
-      vehicle_state, start_timestamp, planning_cycle_time,
-      last_publishable_trajectory_.get(), &is_replan);
+      vehicle_state, start_timestamp, planning_cycle_time, last_publishable_trajectory_.get(),
+      &is_replan);
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
-  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state);
+  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp, vehicle_state);
   if (!frame_) {
     std::string msg("Failed to init frame");
     AERROR << msg;
@@ -369,11 +343,9 @@ void Planning::RunOnce() {
     return;
   }
   auto* trajectory_pb = frame_->mutable_trajectory();
-  if (FLAGS_enable_record_debug) {
-    frame_->RecordInputDebug(trajectory_pb->mutable_debug());
-  }
-  trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
-      Clock::NowInSeconds() - start_timestamp);
+  if (FLAGS_enable_record_debug) { frame_->RecordInputDebug(trajectory_pb->mutable_debug()); }
+  trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(Clock::NowInSeconds() -
+                                                                 start_timestamp);
   if (!status.ok()) {
     AERROR << status.ToString();
     if (FLAGS_publish_estop) {
@@ -382,16 +354,14 @@ void Planning::RunOnce() {
       // estop_ = estop_ || trajectory_.estop().is_estop();
       // we should add more information to ensure the estop being triggered.
       ADCTrajectory estop_trajectory;
-      EStop* estop = estop_trajectory.mutable_estop();
+      EStop*        estop = estop_trajectory.mutable_estop();
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
       PublishPlanningPb(&estop_trajectory, start_timestamp);
     } else {
-      trajectory_pb->mutable_decision()
-          ->mutable_main_decision()
-          ->mutable_not_ready()
-          ->set_reason(status.ToString());
+      trajectory_pb->mutable_decision()->mutable_main_decision()->mutable_not_ready()->set_reason(
+          status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
       PublishPlanningPb(trajectory_pb, start_timestamp);
     }
@@ -408,8 +378,7 @@ void Planning::RunOnce() {
     auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
     if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
       ref_line_info.SetDrivable(false);
-      AWARN << "Reference line " << ref_line_info.Lanes().Id()
-            << " traffic decider failed";
+      AWARN << "Reference line " << ref_line_info.Lanes().Id() << " traffic decider failed";
       continue;
     }
   }
@@ -420,13 +389,10 @@ void Planning::RunOnce() {
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
   trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  ADEBUG << "Planning latency: "
-         << trajectory_pb->latency_stats().DebugString();
+  ADEBUG << "Planning latency: " << trajectory_pb->latency_stats().DebugString();
 
-  auto* ref_line_task =
-      trajectory_pb->mutable_latency_stats()->add_task_stats();
-  ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
-                             1000.0);
+  auto* ref_line_task = trajectory_pb->mutable_latency_stats()->add_task_stats();
+  ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() * 1000.0);
   ref_line_task->set_name("ReferenceLineProvider");
 
   if (!status.ok()) {
@@ -475,11 +441,11 @@ void Planning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
       const auto& traj = last_planning->GetLatestObserved();
 
       const double current_time_stamp = trajectory_pb->header().timestamp_sec();
-      const double pre_time_stamp = traj.header().timestamp_sec();
+      const double pre_time_stamp     = traj.header().timestamp_sec();
 
       for (int i = 0; i < traj.trajectory_point_size(); ++i) {
-        const double t = traj.trajectory_point(i).relative_time() +
-                         pre_time_stamp - current_time_stamp;
+        const double t =
+            traj.trajectory_point(i).relative_time() + pre_time_stamp - current_time_stamp;
         auto* p = trajectory_pb->add_trajectory_point();
         p->CopyFrom(traj.trajectory_point(i));
         p->set_relative_time(t);
@@ -491,24 +457,19 @@ void Planning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
 void Planning::Stop() {
   AERROR << "Planning Stop is called";
   // PlanningThreadPool::instance()->Stop();
-  if (reference_line_provider_) {
-    reference_line_provider_->Stop();
-  }
+  if (reference_line_provider_) { reference_line_provider_->Stop(); }
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::instance()->Clear();
 }
 
-void Planning::SetLastPublishableTrajectory(
-    const ADCTrajectory& adc_trajectory) {
+void Planning::SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory) {
   last_publishable_trajectory_.reset(new PublishableTrajectory(adc_trajectory));
 }
 
 void Planning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
-  if (!FLAGS_enable_record_debug) {
-    return;
-  }
+  if (!FLAGS_enable_record_debug) { return; }
   for (auto& reference_line_info : frame_->reference_line_info()) {
     auto rl_debug = debug->mutable_planning_data()->add_reference_line();
     rl_debug->set_id(reference_line_info.Lanes().Id());
@@ -521,13 +482,12 @@ void Planning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
   }
 }
 
-Status Planning::Plan(const double current_time_stamp,
+Status Planning::Plan(const double                        current_time_stamp,
                       const std::vector<TrajectoryPoint>& stitching_trajectory,
-                      ADCTrajectory* trajectory_pb) {
+                      ADCTrajectory*                      trajectory_pb) {
   auto* ptr_debug = trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
-    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
-        stitching_trajectory.back());
+    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(stitching_trajectory.back());
   }
 
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
@@ -538,14 +498,11 @@ Status Planning::Plan(const double current_time_stamp,
   if (!best_ref_info) {
     std::string msg("planner failed to make a driving plan");
     AERROR << msg;
-    if (last_publishable_trajectory_) {
-      last_publishable_trajectory_->Clear();
-    }
+    if (last_publishable_trajectory_) { last_publishable_trajectory_->Clear(); }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   ptr_debug->MergeFrom(best_ref_info->debug());
-  trajectory_pb->mutable_latency_stats()->MergeFrom(
-      best_ref_info->latency_stats());
+  trajectory_pb->mutable_latency_stats()->MergeFrom(best_ref_info->latency_stats());
   // set right of way status
   trajectory_pb->set_right_of_way_status(best_ref_info->GetRightOfWayStatus());
   for (const auto& id : best_ref_info->TargetLaneId()) {
@@ -558,12 +515,11 @@ Status Planning::Plan(const double current_time_stamp,
   if (FLAGS_enable_record_debug) {
     auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
     reference_line->set_name("planning_reference_line");
-    const auto& reference_points =
-        best_ref_info->reference_line().reference_points();
-    double s = 0.0;
-    double prev_x = 0.0;
-    double prev_y = 0.0;
-    bool empty_path = true;
+    const auto& reference_points = best_ref_info->reference_line().reference_points();
+    double      s                = 0.0;
+    double      prev_x           = 0.0;
+    double      prev_y           = 0.0;
+    bool        empty_path       = true;
     for (const auto& reference_point : reference_points) {
       auto* path_point = reference_line->add_path_point();
       path_point->set_x(reference_point.x());
@@ -585,21 +541,20 @@ Status Planning::Plan(const double current_time_stamp,
     }
   }
 
-  last_publishable_trajectory_.reset(new PublishableTrajectory(
-      current_time_stamp, best_ref_info->trajectory()));
+  last_publishable_trajectory_.reset(
+      new PublishableTrajectory(current_time_stamp, best_ref_info->trajectory()));
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  last_publishable_trajectory_->PrependTrajectoryPoints(
-      stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+  last_publishable_trajectory_->PrependTrajectoryPoints(stitching_trajectory.begin(),
+                                                        stitching_trajectory.end() - 1);
 
   for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
     if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
         FLAGS_trajectory_time_high_density_period) {
       break;
     }
-    ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i)
-                  .ShortDebugString();
+    ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i).ShortDebugString();
   }
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
@@ -613,9 +568,7 @@ Planning::VehicleConfig Planning::ComputeVehicleConfigFromLocalization(
     const localization::LocalizationEstimate& localization) const {
   Planning::VehicleConfig vehicle_config;
 
-  if (!localization.pose().has_position()) {
-    return vehicle_config;
-  }
+  if (!localization.pose().has_position()) { return vehicle_config; }
 
   vehicle_config.x_ = localization.pose().position().x();
   vehicle_config.y_ = localization.pose().position().y();
@@ -625,8 +578,8 @@ Planning::VehicleConfig Planning::ComputeVehicleConfigFromLocalization(
   if (localization.pose().has_heading()) {
     vehicle_config.theta_ = localization.pose().heading();
   } else {
-    vehicle_config.theta_ = common::math::QuaternionToHeading(
-        orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
+    vehicle_config.theta_ = common::math::QuaternionToHeading(orientation.qw(), orientation.qx(),
+                                                              orientation.qy(), orientation.qz());
   }
 
   vehicle_config.is_valid_ = true;

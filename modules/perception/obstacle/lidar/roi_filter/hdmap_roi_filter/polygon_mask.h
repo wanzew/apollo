@@ -32,19 +32,21 @@ namespace perception {
 typedef typename PolygonScanConverter::Interval Interval;
 
 void DrawPolygonInBitmap(const PolygonScanConverter::Polygon& polygon,
-                         const double extend_dist, Bitmap2D* bitmap);
+                         const double                         extend_dist,
+                         Bitmap2D*                            bitmap);
 
-void DrawPolygonInBitmap(
-    const std::vector<PolygonScanConverter::Polygon>& polygons,
-    const double extend_dist, Bitmap2D* bitmap);
+void DrawPolygonInBitmap(const std::vector<PolygonScanConverter::Polygon>& polygons,
+                         const double                                      extend_dist,
+                         Bitmap2D*                                         bitmap);
 
 /*
  * @brief: Get valid x range(Major direction range)
  */
-void GetValidXRange(const PolygonScanConverter::Polygon& polygon,
-                    const Bitmap2D& bitmap,
+void GetValidXRange(const PolygonScanConverter::Polygon&       polygon,
+                    const Bitmap2D&                            bitmap,
                     const PolygonScanConverter::DirectionMajor major_dir,
-                    const double major_dir_grid_size, Interval* valid_x_range);
+                    const double                               major_dir_grid_size,
+                    Interval*                                  valid_x_range);
 
 }  // namespace perception
 }  // namespace apollo

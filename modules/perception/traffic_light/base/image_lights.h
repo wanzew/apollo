@@ -33,24 +33,24 @@ namespace traffic_light {
  * @brief hold all data through traffic light pipeline
  */
 struct ImageLights {
-  std::shared_ptr<Image> image;
-  CarPose pose;
+  std::shared_ptr<Image>     image;
+  CarPose                    pose;
   std::shared_ptr<LightPtrs> lights;
   // record the lights outside the lights.
   std::shared_ptr<LightPtrs> lights_outside_image;
-  CameraId camera_id = UNKNOWN;
-  double timestamp = 0.0;  // image's timestamp
+  CameraId                   camera_id = UNKNOWN;
+  double                     timestamp = 0.0;  // image's timestamp
   // timestamp when received a image
   double preprocess_receive_timestamp = 0.0;
   // timestamp when PreprocessSubnode pub event
   double preprocess_send_timestamp = 0.0;
-  bool is_pose_valid = false;
+  bool   is_pose_valid             = false;
   // image' timestamp minus the most recently pose's timestamp
   double diff_image_pose_ts = 0.0;
   // image' timestamp system's timestamp
   double diff_image_sys_ts = 0.0;
   // offset size between hdmap bbox and detection bbox
-  int offset = 0;
+  int    offset      = 0;
   size_t num_signals = 0;
 };
 

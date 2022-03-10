@@ -22,23 +22,22 @@
 namespace apollo {
 namespace perception {
 
-bool ObjectSequence::AddTrackedFrameObjects(
-    const std::vector<std::shared_ptr<Object>>& objects, double timestamp) {
+bool ObjectSequence::AddTrackedFrameObjects(const std::vector<std::shared_ptr<Object>>& objects,
+                                            double                                      timestamp) {
   std::lock_guard<std::mutex> lock(mutex_);
   for (const auto& obj : objects) {
     int& track_id = obj->track_id;
-    auto iter = sequence_.find(track_id);
+    auto iter     = sequence_.find(track_id);
     if (iter == sequence_.end()) {
-      auto res = sequence_.insert(std::make_pair(
-          track_id, std::map<int64_t, std::shared_ptr<Object>>()));
+      auto res =
+          sequence_.insert(std::make_pair(track_id, std::map<int64_t, std::shared_ptr<Object>>()));
       if (!res.second) {
         AERROR << "Fail to insert track.";
         return false;
       }
       iter = res.first;
     }
-    auto res =
-        iter->second.insert(std::make_pair(DoubleToMapKey(timestamp), obj));
+    auto res = iter->second.insert(std::make_pair(DoubleToMapKey(timestamp), obj));
     if (!res.second) {
       AERROR << "Fail to insert object.";
       return false;
@@ -49,23 +48,17 @@ bool ObjectSequence::AddTrackedFrameObjects(
   return true;
 }
 
-bool ObjectSequence::GetTrackInTemporalWindow(
-    int track_id, std::map<int64_t, std::shared_ptr<Object>>* track,
-    double window_time) {
-  if (track == nullptr) {
-    return false;
-  }
+bool ObjectSequence::GetTrackInTemporalWindow(int                                         track_id,
+                                              std::map<int64_t, std::shared_ptr<Object>>* track,
+                                              double window_time) {
+  if (track == nullptr) { return false; }
   track->clear();
   std::lock_guard<std::mutex> lock(mutex_);
-  double start_time = current_ - window_time;
-  auto iter = sequence_.find(track_id);
-  if (iter == sequence_.end()) {
-    return false;
-  }
+  double                      start_time = current_ - window_time;
+  auto                        iter       = sequence_.find(track_id);
+  if (iter == sequence_.end()) { return false; }
   for (auto& tobj : iter->second) {
-    if (MapKeyToDouble(tobj.first) >= start_time) {
-      track->insert(tobj);
-    }
+    if (MapKeyToDouble(tobj.first) >= start_time) { track->insert(tobj); }
   }
   return true;
 }
@@ -74,8 +67,7 @@ void ObjectSequence::RemoveStaleTracks(double current_stamp) {
   for (auto outer_iter = sequence_.begin(); outer_iter != sequence_.end();) {
     CHECK(outer_iter->second.size() > 0) << "Find empty tracks.";
     auto& track = outer_iter->second;
-    if (current_stamp - MapKeyToDouble(track.rbegin()->first) >
-        s_max_time_out_) {
+    if (current_stamp - MapKeyToDouble(track.rbegin()->first) > s_max_time_out_) {
       sequence_.erase(outer_iter++);
       continue;
     }

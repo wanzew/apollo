@@ -37,27 +37,23 @@ class SignalLight : public TrafficRule {
 
   virtual ~SignalLight() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   void ReadSignals();
   bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
   apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
-  bool BuildStopDecision(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info,
+  void MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
+  bool BuildStopDecision(Frame* const              frame,
+                         ReferenceLineInfo* const  reference_line_info,
                          hdmap::PathOverlap* const signal_light);
-  void SetCreepForwardSignalDecision(
-      ReferenceLineInfo* const reference_line_info,
-      hdmap::PathOverlap* const signal_light) const;
+  void SetCreepForwardSignalDecision(ReferenceLineInfo* const  reference_line_info,
+                                     hdmap::PathOverlap* const signal_light) const;
 
  private:
   static constexpr char const* const SIGNAL_LIGHT_VO_ID_PREFIX = "SL_";
-  std::vector<hdmap::PathOverlap> signal_lights_from_path_;
-  std::unordered_map<std::string, const apollo::perception::TrafficLight*>
-      detected_signals_;
+  std::vector<hdmap::PathOverlap>    signal_lights_from_path_;
+  std::unordered_map<std::string, const apollo::perception::TrafficLight*> detected_signals_;
 };
 
 }  // namespace planning

@@ -22,8 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_FUELLEVEL_72_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_FUELLEVEL_72_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -38,8 +38,8 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Fuellevel72 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Fuellevel72
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -50,8 +50,8 @@ class Fuellevel72 : public ::apollo::drivers::canbus::ProtocolData<
    * @param timestamp the timestamp of input data
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const;
+  virtual void
+  Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const;
 
  private:
   /**
@@ -64,7 +64,7 @@ class Fuellevel72 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of fuel level
    */
-  double fuel_level(const std::uint8_t *bytes, int32_t length) const;
+  double fuel_level(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

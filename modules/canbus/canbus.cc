@@ -43,34 +43,26 @@ Status Canbus::Init() {
 
   // load conf
   if (!common::util::GetProtoFromFile(FLAGS_canbus_conf_file, &canbus_conf_)) {
-    return OnError("Unable to load canbus conf file: " +
-                   FLAGS_canbus_conf_file);
+    return OnError("Unable to load canbus conf file: " + FLAGS_canbus_conf_file);
   }
 
   AINFO << "The canbus conf file is loaded: " << FLAGS_canbus_conf_file;
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::instance();
+  auto* can_factory = CanClientFactory::instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(canbus_conf_.can_card_parameter());
-  if (!can_client_) {
-    return OnError("Failed to create can client.");
-  }
+  if (!can_client_) { return OnError("Failed to create can client."); }
   AINFO << "Can client is successfully created.";
 
   VehicleFactory vehicle_factory;
   vehicle_factory.RegisterVehicleFactory();
-  auto vehicle_object =
-      vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
-  if (!vehicle_object) {
-    return OnError("Failed to create vehicle:");
-  }
+  auto vehicle_object = vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
+  if (!vehicle_object) { return OnError("Failed to create vehicle:"); }
 
   message_manager_ = vehicle_object->CreateMessageManager();
-  if (message_manager_ == nullptr) {
-    return OnError("Failed to create message manager.");
-  }
+  if (message_manager_ == nullptr) { return OnError("Failed to create message manager."); }
   AINFO << "Message manager is successfully created.";
 
   if (can_receiver_.Init(can_client_.get(), message_manager_.get(),
@@ -79,16 +71,13 @@ Status Canbus::Init() {
   }
   AINFO << "The can receiver is successfully initialized.";
 
-  if (can_sender_.Init(can_client_.get(), canbus_conf_.enable_sender_log()) !=
-      ErrorCode::OK) {
+  if (can_sender_.Init(can_client_.get(), canbus_conf_.enable_sender_log()) != ErrorCode::OK) {
     return OnError("Failed to init can sender.");
   }
   AINFO << "The can sender is successfully initialized.";
 
   vehicle_controller_ = vehicle_object->CreateVehicleController();
-  if (vehicle_controller_ == nullptr) {
-    return OnError("Failed to create vehicle controller.");
-  }
+  if (vehicle_controller_ == nullptr) { return OnError("Failed to create vehicle controller."); }
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf_.vehicle_parameter(), &can_sender_,
@@ -111,21 +100,15 @@ Status Canbus::Init() {
 
 Status Canbus::Start() {
   // 1. init and start the can card hardware
-  if (can_client_->Start() != ErrorCode::OK) {
-    return OnError("Failed to start can client");
-  }
+  if (can_client_->Start() != ErrorCode::OK) { return OnError("Failed to start can client"); }
   AINFO << "Can client is started.";
 
   // 2. start receive first then send
-  if (can_receiver_.Start() != ErrorCode::OK) {
-    return OnError("Failed to start can receiver.");
-  }
+  if (can_receiver_.Start() != ErrorCode::OK) { return OnError("Failed to start can receiver."); }
   AINFO << "Can receiver is started.";
 
   // 3. start send
-  if (can_sender_.Start() != ErrorCode::OK) {
-    return OnError("Failed to start can sender.");
-  }
+  if (can_sender_.Start() != ErrorCode::OK) { return OnError("Failed to start can sender."); }
 
   // 4. start controller
   if (vehicle_controller_->Start() == false) {
@@ -134,8 +117,7 @@ Status Canbus::Start() {
 
   // 5. set timer to triger publish info periodly
   const double duration = 1.0 / FLAGS_chassis_freq;
-  timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
-                                       &Canbus::OnTimer, this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(duration), &Canbus::OnTimer, this);
 
   // last step: publish monitor messages
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
@@ -160,11 +142,9 @@ void Canbus::PublishChassisDetail() {
   AdapterManager::PublishChassisDetail(chassis_detail);
 }
 
-void Canbus::OnTimer(const ros::TimerEvent &) {
+void Canbus::OnTimer(const ros::TimerEvent&) {
   PublishChassis();
-  if (FLAGS_enable_chassis_detail_pub) {
-    PublishChassisDetail();
-  }
+  if (FLAGS_enable_chassis_detail_pub) { PublishChassisDetail(); }
 }
 
 void Canbus::Stop() {
@@ -176,9 +156,8 @@ void Canbus::Stop() {
   vehicle_controller_->Stop();
 }
 
-void Canbus::OnControlCommand(const ControlCommand &control_command) {
-  int64_t current_timestamp =
-      apollo::common::time::AsInt64<common::time::micros>(Clock::Now());
+void Canbus::OnControlCommand(const ControlCommand& control_command) {
+  int64_t current_timestamp = apollo::common::time::AsInt64<common::time::micros>(Clock::Now());
   // if command coming too soon, just ignore it.
   if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
     ADEBUG << "Control command comes too soon. Ignore.\n Required "
@@ -189,9 +168,8 @@ void Canbus::OnControlCommand(const ControlCommand &control_command) {
   }
 
   last_timestamp_ = current_timestamp;
-  ADEBUG << "Control_sequence_number:"
-         << control_command.header().sequence_num() << ", Time_of_delay:"
-         << current_timestamp - control_command.header().timestamp_sec();
+  ADEBUG << "Control_sequence_number:" << control_command.header().sequence_num()
+         << ", Time_of_delay:" << current_timestamp - control_command.header().timestamp_sec();
 
   if (vehicle_controller_->Update(control_command) != ErrorCode::OK) {
     AERROR << "Failed to process callback function OnControlCommand because "
@@ -201,14 +179,14 @@ void Canbus::OnControlCommand(const ControlCommand &control_command) {
   can_sender_.Update();
 }
 
-void Canbus::OnGuardianCommand(const GuardianCommand &guardian_command) {
+void Canbus::OnGuardianCommand(const GuardianCommand& guardian_command) {
   apollo::control::ControlCommand control_command;
   control_command.CopyFrom(guardian_command.control_command());
   OnControlCommand(control_command);
 }
 
 // Send the error to monitor and return it
-Status Canbus::OnError(const std::string &error_msg) {
+Status Canbus::OnError(const std::string& error_msg) {
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.ERROR(error_msg);
   return Status(ErrorCode::CANBUS_ERROR, error_msg);

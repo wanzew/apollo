@@ -35,8 +35,8 @@ TEST_F(RoadGraphTest, General) {
   auto lane = PredictionMap::LaneById("l9");
   EXPECT_TRUE(lane != nullptr);
 
-  double start_s = 99.0;
-  double length = 100.0;
+  double    start_s = 99.0;
+  double    length  = 100.0;
   RoadGraph road_graph(start_s, length, lane);
 
   LaneGraph lane_graph;
@@ -47,18 +47,14 @@ TEST_F(RoadGraphTest, General) {
   EXPECT_EQ("l18", lane_graph.lane_sequence(0).lane_segment(1).lane_id());
   EXPECT_EQ("l21", lane_graph.lane_sequence(0).lane_segment(2).lane_id());
 
-  EXPECT_TRUE(
-      road_graph.IsOnLaneGraph(PredictionMap::LaneById("l9"), lane_graph));
-  EXPECT_TRUE(
-      road_graph.IsOnLaneGraph(PredictionMap::LaneById("l18"), lane_graph));
-  EXPECT_TRUE(
-      road_graph.IsOnLaneGraph(PredictionMap::LaneById("l21"), lane_graph));
-  EXPECT_FALSE(
-      road_graph.IsOnLaneGraph(PredictionMap::LaneById("l30"), lane_graph));
+  EXPECT_TRUE(road_graph.IsOnLaneGraph(PredictionMap::LaneById("l9"), lane_graph));
+  EXPECT_TRUE(road_graph.IsOnLaneGraph(PredictionMap::LaneById("l18"), lane_graph));
+  EXPECT_TRUE(road_graph.IsOnLaneGraph(PredictionMap::LaneById("l21"), lane_graph));
+  EXPECT_FALSE(road_graph.IsOnLaneGraph(PredictionMap::LaneById("l30"), lane_graph));
 
-  for (const auto &lane_sequence : lane_graph.lane_sequence()) {
+  for (const auto& lane_sequence : lane_graph.lane_sequence()) {
     double total_length = 0.0;
-    for (const auto &lane_segment : lane_sequence.lane_segment()) {
+    for (const auto& lane_segment : lane_sequence.lane_segment()) {
       total_length += (lane_segment.end_s() - lane_segment.start_s());
     }
     EXPECT_DOUBLE_EQ(length, total_length);
@@ -69,8 +65,8 @@ TEST_F(RoadGraphTest, NegativeStartS) {
   auto lane = PredictionMap::LaneById("l9");
   EXPECT_TRUE(lane != nullptr);
 
-  double start_s = -10.0;
-  double length = 50.0;
+  double    start_s = -10.0;
+  double    length  = 50.0;
   RoadGraph road_graph(start_s, length, lane);
 
   LaneGraph lane_graph;
@@ -79,9 +75,9 @@ TEST_F(RoadGraphTest, NegativeStartS) {
   EXPECT_EQ(1, lane_graph.lane_sequence(0).lane_segment_size());
   EXPECT_EQ("l9", lane_graph.lane_sequence(0).lane_segment(0).lane_id());
 
-  for (const auto &lane_sequence : lane_graph.lane_sequence()) {
+  for (const auto& lane_sequence : lane_graph.lane_sequence()) {
     double total_length = 0.0;
-    for (const auto &lane_segment : lane_sequence.lane_segment()) {
+    for (const auto& lane_segment : lane_sequence.lane_segment()) {
       total_length += (lane_segment.end_s() - lane_segment.start_s());
     }
     EXPECT_DOUBLE_EQ(length, total_length);
@@ -92,8 +88,8 @@ TEST_F(RoadGraphTest, LengthLongerThanEnd) {
   auto lane = PredictionMap::LaneById("l22");
   EXPECT_TRUE(lane != nullptr);
 
-  double start_s = 200.0;
-  double length = 200.0;
+  double    start_s = 200.0;
+  double    length  = 200.0;
   RoadGraph road_graph(start_s, length, lane);
 
   LaneGraph lane_graph;
@@ -104,9 +100,9 @@ TEST_F(RoadGraphTest, LengthLongerThanEnd) {
   EXPECT_EQ("l100", lane_graph.lane_sequence(0).lane_segment(1).lane_id());
   EXPECT_EQ("l97", lane_graph.lane_sequence(0).lane_segment(2).lane_id());
 
-  for (const auto &lane_sequence : lane_graph.lane_sequence()) {
+  for (const auto& lane_sequence : lane_graph.lane_sequence()) {
     double total_length = 0.0;
-    for (const auto &lane_segment : lane_sequence.lane_segment()) {
+    for (const auto& lane_segment : lane_sequence.lane_segment()) {
       total_length += (lane_segment.end_s() - lane_segment.start_s());
     }
     EXPECT_LT(total_length, length);
@@ -117,8 +113,8 @@ TEST_F(RoadGraphTest, MultipleLaneSequence) {
   auto lane = PredictionMap::LaneById("l20");
   EXPECT_TRUE(lane != nullptr);
 
-  double start_s = 200.0;
-  double length = 200.0;
+  double    start_s = 200.0;
+  double    length  = 200.0;
   RoadGraph road_graph(start_s, length, lane);
 
   LaneGraph lane_graph;

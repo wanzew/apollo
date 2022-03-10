@@ -49,62 +49,60 @@ class FusionSubnode : public Subnode {
   FusionSubnode() = default;
   virtual ~FusionSubnode() {}
   apollo::common::Status ProcEvents() override;
-  bool GeneratePbMsg(PerceptionObstacles *obstacles);
+  bool                   GeneratePbMsg(PerceptionObstacles* obstacles);
 
  protected:
   bool InitInternal() override;
 
  private:
   bool InitOutputStream();
-  bool SubscribeEvents(const EventMeta &event_meta,
-                       std::vector<Event> *events) const;
-  bool BuildSensorObjs(const std::vector<Event> &events,
-                       std::vector<SensorObjects> *multi_sensor_objs);
-  bool ProducePbMsg(double timestamp, SeqId seq_num,
-                    const std::vector<std::shared_ptr<Object>> &fused_objs,
-                    std::string *pb_msg) const;
-  bool GetSharedData(const Event &event,
-                     std::shared_ptr<SensorObjects> *sensor_objects);
-  apollo::common::Status Process(const EventMeta &event_meta,
-                                 const std::vector<Event> &events);
-  void RegistAllAlgorithm();
+  bool SubscribeEvents(const EventMeta& event_meta, std::vector<Event>* events) const;
+  bool BuildSensorObjs(const std::vector<Event>&   events,
+                       std::vector<SensorObjects>* multi_sensor_objs);
+  bool ProducePbMsg(double                                      timestamp,
+                    SeqId                                       seq_num,
+                    const std::vector<std::shared_ptr<Object>>& fused_objs,
+                    std::string*                                pb_msg) const;
+  bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* sensor_objects);
+  apollo::common::Status Process(const EventMeta& event_meta, const std::vector<Event>& events);
+  void                   RegistAllAlgorithm();
 
-  void OnChassis(const apollo::canbus::Chassis &message);
+  void OnChassis(const apollo::canbus::Chassis& message);
 
-  void PublishDataAndEvent(const double timestamp,
-                           const std::string &device_id,
-                           const SharedDataPtr<FusionItem> &data);
-  double timestamp_;
+  void                                 PublishDataAndEvent(const double                     timestamp,
+                                                           const std::string&               device_id,
+                                                           const SharedDataPtr<FusionItem>& data);
+  double                               timestamp_;
   std::vector<std::shared_ptr<Object>> objects_;
-  common::ErrorCode error_code_ = common::OK;
-  std::unique_ptr<BaseFusion> fusion_;
-  LidarObjectData *lidar_object_data_ = nullptr;
-  RadarObjectData *radar_object_data_ = nullptr;
-  CameraObjectData *camera_object_data_ = nullptr;
-  FusionSharedData *fusion_data_ = nullptr;
-  LaneSharedData *lane_shared_data_ = nullptr;
-  std::shared_ptr<LaneObjects> lane_objects_;
+  common::ErrorCode                    error_code_ = common::OK;
+  std::unique_ptr<BaseFusion>          fusion_;
+  LidarObjectData*                     lidar_object_data_  = nullptr;
+  RadarObjectData*                     radar_object_data_  = nullptr;
+  CameraObjectData*                    camera_object_data_ = nullptr;
+  FusionSharedData*                    fusion_data_        = nullptr;
+  LaneSharedData*                      lane_shared_data_   = nullptr;
+  std::shared_ptr<LaneObjects>         lane_objects_;
   // CIPV related variables
   CIPVObjectData* cipv_object_data_ = nullptr;
-  Cipv cipv_;
-  MotionService* motion_service_ = nullptr;
-  MotionBuffer motion_buffer_;
+  Cipv            cipv_;
+  MotionService*  motion_service_ = nullptr;
+  MotionBuffer    motion_buffer_;
 
   // lidar perception subnode event controls the publishing behavior
-  EventID pub_driven_event_id_;
-  EventID lidar_event_id_;
-  EventID radar_event_id_;
-  EventID camera_event_id_;
-  EventID lane_event_id_;
-  EventID motion_event_id_;
-  std::mutex fusion_subnode_mutex_;
+  EventID                 pub_driven_event_id_;
+  EventID                 lidar_event_id_;
+  EventID                 radar_event_id_;
+  EventID                 camera_event_id_;
+  EventID                 lane_event_id_;
+  EventID                 motion_event_id_;
+  std::mutex              fusion_subnode_mutex_;
   apollo::canbus::Chassis chassis_;
-  volatile float chassis_speed_mps_;
+  volatile float          chassis_speed_mps_;
 
   uint64_t min_processing_time_ = UINT64_MAX;
   uint64_t max_processing_time_ = 0;
   uint64_t tot_processing_time_ = 0;
-  uint64_t seq_num_ = 0;
+  uint64_t seq_num_             = 0;
 
   DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
 };

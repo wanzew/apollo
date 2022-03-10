@@ -55,16 +55,15 @@ using Duration = std::chrono::nanoseconds;
  */
 using Timestamp = std::chrono::time_point<std::chrono::system_clock, Duration>;
 
-static_assert(
-    sizeof(std::chrono::nanoseconds) >= sizeof(int64_t),
-    "The underlying type of the nanoseconds should be at least 64 bits.");
+static_assert(sizeof(std::chrono::nanoseconds) >= sizeof(int64_t),
+              "The underlying type of the nanoseconds should be at least 64 bits.");
 
-using nanos = std::chrono::nanoseconds;
-using micros = std::chrono::microseconds;
-using millis = std::chrono::milliseconds;
+using nanos   = std::chrono::nanoseconds;
+using micros  = std::chrono::microseconds;
+using millis  = std::chrono::milliseconds;
 using seconds = std::chrono::seconds;
 using minutes = std::chrono::minutes;
-using hours = std::chrono::hours;
+using hours   = std::chrono::hours;
 
 /**
  * @brief converts the input duration (nanos) to a 64 bit integer, with
@@ -73,7 +72,7 @@ using hours = std::chrono::hours;
  * @return an integer representing the duration in the specified unit.
  */
 template <typename PrecisionDuration>
-int64_t AsInt64(const Duration &duration) {
+int64_t AsInt64(const Duration& duration) {
   return std::chrono::duration_cast<PrecisionDuration>(duration).count();
 }
 
@@ -84,7 +83,7 @@ int64_t AsInt64(const Duration &duration) {
  * @return an integer representing the timestamp in the specified unit.
  */
 template <typename PrecisionDuration>
-int64_t AsInt64(const Timestamp &timestamp) {
+int64_t AsInt64(const Timestamp& timestamp) {
   return AsInt64<PrecisionDuration>(timestamp.time_since_epoch());
 }
 
@@ -94,7 +93,7 @@ int64_t AsInt64(const Timestamp &timestamp) {
  * @param duration the input duration that needs to be converted.
  * @return a double in seconds.
  */
-inline double ToSecond(const Duration &duration) {
+inline double ToSecond(const Duration& duration) {
   return static_cast<double>(AsInt64<nanos>(duration)) * 1e-9;
 }
 
@@ -104,9 +103,8 @@ inline double ToSecond(const Duration &duration) {
  * @param timestamp the input timestamp that needs to be converted.
  * @return a double representing the same timestamp in seconds.
  */
-inline double ToSecond(const Timestamp &timestamp) {
-  return static_cast<double>(AsInt64<nanos>(timestamp.time_since_epoch())) *
-         1e-9;
+inline double ToSecond(const Timestamp& timestamp) {
+  return static_cast<double>(AsInt64<nanos>(timestamp.time_since_epoch())) * 1e-9;
 }
 
 /**
@@ -115,15 +113,14 @@ inline double ToSecond(const Timestamp &timestamp) {
  */
 template <typename PrecisionDuration>
 inline Timestamp FromInt64(int64_t timestamp_value) {
-  return Timestamp(
-      std::chrono::duration_cast<nanos>(PrecisionDuration(timestamp_value)));
+  return Timestamp(std::chrono::duration_cast<nanos>(PrecisionDuration(timestamp_value)));
 }
 
 /**
  * @brief converts the double to \class Timestamp. The input double has
  * a unit of seconds.
  * @return a Timestamp object.
-*/
+ */
 inline Timestamp From(double timestamp_value) {
   int64_t nanos_value = static_cast<int64_t>(timestamp_value * 1e9);
   return FromInt64<nanos>(nanos_value);
@@ -138,9 +135,8 @@ inline Timestamp From(double timestamp_value) {
  */
 class Clock {
  public:
-  static constexpr int64_t PRECISION =
-      std::chrono::system_clock::duration::period::den /
-      std::chrono::system_clock::duration::period::num;
+  static constexpr int64_t PRECISION = std::chrono::system_clock::duration::period::den /
+                                       std::chrono::system_clock::duration::period::num;
 
   /// PRECISION >= 1000000 means the precision is at least 1us.
   static_assert(PRECISION >= 1000000,
@@ -151,8 +147,8 @@ class Clock {
   // test only) or read from ROS.
   enum ClockMode {
     SYSTEM = 0,
-    MOCK = 1,
-    ROS = 2,
+    MOCK   = 1,
+    ROS    = 2,
   };
 
   /**
@@ -161,14 +157,10 @@ class Clock {
    */
   static Timestamp Now() {
     switch (mode()) {
-      case ClockMode::SYSTEM:
-        return SystemNow();
-      case ClockMode::MOCK:
-        return instance()->mock_now_;
-      case ClockMode::ROS:
-        return From(ros::Time::now().toSec());
-      default:
-        AFATAL << "Unsupported clock mode: " << mode();
+      case ClockMode::SYSTEM: return SystemNow();
+      case ClockMode::MOCK: return instance()->mock_now_;
+      case ClockMode::ROS: return From(ros::Time::now().toSec());
+      default: AFATAL << "Unsupported clock mode: " << mode();
     }
     return From(ros::Time::now().toSec());
   }
@@ -195,8 +187,8 @@ class Clock {
    * @brief This is for mock clock mode only. It will set the timestamp
    * for the mock clock.
    */
-  static void SetNow(const Duration &duration) {
-    Clock *clock = instance();
+  static void SetNow(const Duration& duration) {
+    Clock* clock = instance();
     if (clock->mode_ != ClockMode::MOCK) {
       AFATAL << "Cannot set now when clock mode is not MOCK!";
     }
@@ -208,7 +200,9 @@ class Clock {
    * @brief constructs the \class Clock instance
    * @param mode the desired clock mode
    */
-  explicit Clock(ClockMode mode) : mode_(mode), mock_now_(Timestamp()) {
+  explicit Clock(ClockMode mode)
+      : mode_(mode)
+      , mock_now_(Timestamp()) {
     ros::Time::init();
   }
 
@@ -217,8 +211,7 @@ class Clock {
    * @return the current timestamp based on the system clock.
    */
   static Timestamp SystemNow() {
-    return std::chrono::time_point_cast<Duration>(
-        std::chrono::system_clock::now());
+    return std::chrono::time_point_cast<Duration>(std::chrono::system_clock::now());
   }
 
   /// NOTE: Unless mode_ and mock_now_ are guarded by a
@@ -249,23 +242,20 @@ inline Clock::Clock()
 // only be spit out when the elapsed time of running the code block is greater
 // than it.
 #define GET_MACRO(_1, _2, NAME, ...) NAME
-#define PERF_BLOCK(...)                                                      \
-  GET_MACRO(__VA_ARGS__, PERF_BLOCK_WITH_THRESHOLD, PERF_BLOCK_NO_THRESHOLD) \
+#define PERF_BLOCK(...)                                                                            \
+  GET_MACRO(__VA_ARGS__, PERF_BLOCK_WITH_THRESHOLD, PERF_BLOCK_NO_THRESHOLD)                       \
   (__VA_ARGS__)
 
 #define PERF_BLOCK_NO_THRESHOLD(message) PERF_BLOCK_WITH_THRESHOLD(message, 0)
 
-#define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                         \
-  using apollo::common::time::Clock;                                          \
-  for (double block_start_time = 0;                                           \
-       (block_start_time == 0 ? (block_start_time = Clock::NowInSeconds())    \
-                              : false);                                       \
-       [&]() {                                                                \
-         double now = Clock::NowInSeconds();                                  \
-         if (now - block_start_time > (threshold)) {                          \
-           AINFO << std::fixed << (message) << ": " << now - block_start_time \
-                 << "s.";                                                     \
-         }                                                                    \
+#define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                                              \
+  using apollo::common::time::Clock;                                                               \
+  for (double block_start_time = 0;                                                                \
+       (block_start_time == 0 ? (block_start_time = Clock::NowInSeconds()) : false); [&]() {       \
+         double now = Clock::NowInSeconds();                                                       \
+         if (now - block_start_time > (threshold)) {                                               \
+           AINFO << std::fixed << (message) << ": " << now - block_start_time << "s.";             \
+         }                                                                                         \
        }())
 }  // namespace time
 }  // namespace common

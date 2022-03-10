@@ -14,21 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_    // NOLINT
+#  define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
 
-#include <Eigen/Eigenvalues>
-#include <map>
-#include <memory>
-#include <queue>
-#include <string>
-#include <utility>
-#include <vector>
+#  include <Eigen/Eigenvalues>
+#  include <map>
+#  include <memory>
+#  include <queue>
+#  include <string>
+#  include <utility>
+#  include <vector>
 
-#include "modules/common/macro.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
+#  include "modules/common/macro.h"
+#  include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
+#  include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
+#  include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
 namespace apollo {
 namespace perception {
@@ -42,8 +42,7 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   // @params[IN] anchor_point: initial anchor point for filtering
   // @params[IN] velocity: initial velocity for filtering
   // @return nothing
-  virtual void Initialize(const Eigen::Vector3d& anchor_point,
-                          const Eigen::Vector3d& velocity);
+  virtual void Initialize(const Eigen::Vector3d& anchor_point, const Eigen::Vector3d& velocity);
 
   // @brief initialize state of the filter
   // @params[IN] new_object: initial object for filtering
@@ -55,16 +54,15 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   // @params[OUT] velocity: predicted velocity
   // @params[IN] time_diff: time interval from last update
   // @return nothing
-  virtual void Predict(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity,
-                       const double time_diff);
+  virtual void
+  Predict(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity, const double time_diff);
 
   // @brief update with measurements
   // @params[IN] new_object: new object for current update
   // @params[IN] time_diff: time interval from last update;
   // @return nothing
-  virtual void UpdateWithObject(
-      const std::shared_ptr<PbfSensorObject> new_object,
-      const double time_diff);
+  virtual void UpdateWithObject(const std::shared_ptr<PbfSensorObject> new_object,
+                                const double                           time_diff);
 
   // @brief update without measurements
   // @params[IN] time_diff: time interval from last update
@@ -75,11 +73,9 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   // @params[OUT] anchor_point: current anchor_point
   // @params[OUT] velocity: current velocity
   // @return nothing
-  virtual void GetState(Eigen::Vector3d* anchor_point,
-                        Eigen::Vector3d* velocity);
+  virtual void GetState(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity);
 
-  void SetState(const Eigen::Vector3d& anchor_point,
-                const Eigen::Vector3d& velocity);
+  void SetState(const Eigen::Vector3d& anchor_point, const Eigen::Vector3d& velocity);
 
  protected:
   // @brief cache sensor objects in history
@@ -97,24 +93,22 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   // @return latest sensor object
   std::shared_ptr<PbfSensorObject> GetSensorLatestCache(const SensorType type);
 
-  void GetUncertainty(Eigen::Matrix3d* position_uncertainty,
-                      Eigen::Matrix3d* velocity_uncertainty);
+  void GetUncertainty(Eigen::Matrix3d* position_uncertainty, Eigen::Matrix3d* velocity_uncertainty);
 
   bool ObtainSensorPrediction(std::shared_ptr<Object> obj,
-                              double sensor_timestamp,
-                              const Eigen::Matrix4d& process_noise,
-                              const Eigen::Matrix4d& trans_matrix,
-                              Eigen::Vector4d* state_pre,
-                              Eigen::Matrix4d* cov_pre);
+                              double                  sensor_timestamp,
+                              const Eigen::Matrix4d&  process_noise,
+                              const Eigen::Matrix4d&  trans_matrix,
+                              Eigen::Vector4d*        state_pre,
+                              Eigen::Matrix4d*        cov_pre);
   bool AdjustCovMatrix();
   // global
-  Eigen::Vector3d belief_anchor_point_;
-  Eigen::Vector3d belief_velocity_;
-  Eigen::Vector3d belief_acceleration_;
-  Eigen::Matrix<double, 4, 1> priori_state_;
-  Eigen::Matrix<double, 4, 1> posteriori_state_;
-  std::map<SensorType, std::queue<std::shared_ptr<PbfSensorObject>>>
-      cached_sensor_objects_;
+  Eigen::Vector3d                                                    belief_anchor_point_;
+  Eigen::Vector3d                                                    belief_velocity_;
+  Eigen::Vector3d                                                    belief_acceleration_;
+  Eigen::Matrix<double, 4, 1>                                        priori_state_;
+  Eigen::Matrix<double, 4, 1>                                        posteriori_state_;
+  std::map<SensorType, std::queue<std::shared_ptr<PbfSensorObject>>> cached_sensor_objects_;
 
   // the omega matrix
   Eigen::Matrix<double, 4, 4> omega_matrix_;

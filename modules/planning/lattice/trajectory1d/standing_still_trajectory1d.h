@@ -21,9 +21,9 @@
 #ifndef MODULES_PLANNING_LATTICE_STANDING_STILL_TRAJECTORY1D_H_
 #define MODULES_PLANNING_LATTICE_STANDING_STILL_TRAJECTORY1D_H_
 
+#include "modules/planning/math/curve1d/curve1d.h"
 #include <stdint.h>
 #include <string>
-#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {

@@ -48,48 +48,36 @@ void Dreamview::TerminateProfilingMode(const ros::TimerEvent& event) {
 void Dreamview::CheckAdapters() {
   // Check the expected adapters are initialized.
   CHECK(AdapterManager::GetChassis()) << "ChassisAdapter is not initialized.";
-  CHECK(AdapterManager::GetControlCommand())
-      << "ControlCommandAdapter is not initialized.";
+  CHECK(AdapterManager::GetControlCommand()) << "ControlCommandAdapter is not initialized.";
   CHECK(AdapterManager::GetGps()) << "GpsAdapter is not initialized.";
   CHECK(AdapterManager::GetPlanning()) << "PlanningAdapter is not initialized.";
-  CHECK(AdapterManager::GetLocalization())
-      << "LocalizationAdapter is not initialized.";
+  CHECK(AdapterManager::GetLocalization()) << "LocalizationAdapter is not initialized.";
   CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
-  CHECK(AdapterManager::GetNavigation())
-      << "NavigationAdapter is not initialized.";
+  CHECK(AdapterManager::GetNavigation()) << "NavigationAdapter is not initialized.";
   CHECK(AdapterManager::GetPad()) << "PadAdapter is not initialized.";
-  CHECK(AdapterManager::GetPrediction())
-      << "PredictionAdapter is not initialized.";
+  CHECK(AdapterManager::GetPrediction()) << "PredictionAdapter is not initialized.";
   CHECK(AdapterManager::GetPerceptionObstacles())
       << "PerceptionObstaclesAdapter is not initialized.";
   CHECK(AdapterManager::GetTrafficLightDetection())
       << "TrafficLightDetectionAdapter is not initialized.";
-  CHECK(AdapterManager::GetRoutingRequest())
-      << "RoutingRequestAdapter is not initialized.";
-  CHECK(AdapterManager::GetRoutingResponse())
-      << "RoutingResponseAdapter is not initialized.";
-  CHECK(AdapterManager::GetImageFront())
-      << "ImageFrontAdapter is not initialized.";
-  CHECK(AdapterManager::GetImageShort())
-      << "ImageShortAdapter is not initialized.";
-  CHECK(AdapterManager::GetPointCloud())
-      << "PointCloudAdapter is not initialized.";
-  CHECK(AdapterManager::GetRelativeMap())
-      << "RelativeMapAdapter is not initialized.";
+  CHECK(AdapterManager::GetRoutingRequest()) << "RoutingRequestAdapter is not initialized.";
+  CHECK(AdapterManager::GetRoutingResponse()) << "RoutingResponseAdapter is not initialized.";
+  CHECK(AdapterManager::GetImageFront()) << "ImageFrontAdapter is not initialized.";
+  CHECK(AdapterManager::GetImageShort()) << "ImageShortAdapter is not initialized.";
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloudAdapter is not initialized.";
+  CHECK(AdapterManager::GetRelativeMap()) << "RelativeMapAdapter is not initialized.";
 }
 
 Status Dreamview::Init() {
   AdapterManager::Init(FLAGS_dreamview_adapter_config_filename);
   VehicleConfigHelper::Init();
 
-  if (FLAGS_dreamview_profiling_mode &&
-      FLAGS_dreamview_profiling_duration > 0.0) {
-    exit_timer_ = AdapterManager::CreateTimer(
-        ros::Duration(FLAGS_dreamview_profiling_duration),
-        &Dreamview::TerminateProfilingMode, this, true, true);
+  if (FLAGS_dreamview_profiling_mode && FLAGS_dreamview_profiling_duration > 0.0) {
+    exit_timer_ = AdapterManager::CreateTimer(ros::Duration(FLAGS_dreamview_profiling_duration),
+                                              &Dreamview::TerminateProfilingMode, this, true, true);
     AWARN << "============================================================";
-    AWARN << "| Dreamview running in profiling mode, exit in "
-          << FLAGS_dreamview_profiling_duration << " seconds |";
+    AWARN << "| Dreamview running in profiling mode, exit in " << FLAGS_dreamview_profiling_duration
+          << " seconds |";
     AWARN << "============================================================";
   }
 
@@ -97,16 +85,15 @@ Status Dreamview::Init() {
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
-  std::vector<std::string> options = {
-      "document_root",      FLAGS_static_file_dir,   "listening_ports",
-      FLAGS_server_ports,   "websocket_timeout_ms",  FLAGS_websocket_timeout_ms,
-      "request_timeout_ms", FLAGS_request_timeout_ms};
+  std::vector<std::string> options = {"document_root",        FLAGS_static_file_dir,
+                                      "listening_ports",      FLAGS_server_ports,
+                                      "websocket_timeout_ms", FLAGS_websocket_timeout_ms,
+                                      "request_timeout_ms",   FLAGS_request_timeout_ms};
   if (PathExists(FLAGS_ssl_certificate)) {
     options.push_back("ssl_certificate");
     options.push_back(FLAGS_ssl_certificate);
   } else if (FLAGS_ssl_certificate.size() > 0) {
-    AERROR << "Certificate file " << FLAGS_ssl_certificate
-           << " does not exist!";
+    AERROR << "Certificate file " << FLAGS_ssl_certificate << " does not exist!";
   }
   server_.reset(new CivetServer(options));
 
@@ -117,9 +104,9 @@ Status Dreamview::Init() {
   map_service_.reset(new MapService());
   sim_control_.reset(new SimControl(map_service_.get()));
 
-  sim_world_updater_.reset(new SimulationWorldUpdater(
-      websocket_.get(), map_ws_.get(), sim_control_.get(), map_service_.get(),
-      FLAGS_routing_from_file));
+  sim_world_updater_.reset(new SimulationWorldUpdater(websocket_.get(), map_ws_.get(),
+                                                      sim_control_.get(), map_service_.get(),
+                                                      FLAGS_routing_from_file));
   point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 

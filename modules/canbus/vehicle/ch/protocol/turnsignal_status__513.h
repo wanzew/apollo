@@ -23,13 +23,12 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Turnsignalstatus513 : public ::apollo::drivers::canbus::ProtocolData<
-                                ::apollo::canbus::ChassisDetail> {
+class Turnsignalstatus513
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Turnsignalstatus513();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Lighting control(Status)', 'enum': {0:
@@ -37,8 +36,8 @@ class Turnsignalstatus513 : public ::apollo::drivers::canbus::ProtocolData<
   // 'TURN_SIGNAL_STS_RIGHT'}, 'precision': 1.0, 'len': 8, 'name':
   // 'TURN_SIGNAL_STS', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
   // '[0|2]', 'bit': 0, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Turnsignal_status__513::Turn_signal_stsType turn_signal_sts(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Turnsignal_status__513::Turn_signal_stsType turn_signal_sts(const std::uint8_t* bytes,
+                                                              const int32_t       length) const;
 };
 
 }  // namespace ch

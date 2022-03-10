@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <unistd.h>
 #include <climits>
 #include <fstream>
 #include <sstream>
+#include <unistd.h>
 
 #include "google/protobuf/text_format.h"
 #include "modules/common/adapters/adapter_manager.h"
@@ -46,8 +46,7 @@ using apollo::control::PadMessage;
 uint32_t ControlTestBase::s_seq_num_ = 0;
 
 bool ControlTestBase::test_control() {
-  if (!common::util::GetProtoFromFile(FLAGS_control_conf_file,
-                                      &control_.control_conf_)) {
+  if (!common::util::GetProtoFromFile(FLAGS_control_conf_file, &control_.control_conf_)) {
     AERROR << "Unable to load control conf file: " << FLAGS_control_conf_file;
     exit(EXIT_FAILURE);
   }
@@ -64,8 +63,8 @@ bool ControlTestBase::test_control() {
   AdapterManager::Init(FLAGS_control_adapter_config_filename);
   if (!FLAGS_test_pad_file.empty()) {
     PadMessage pad_message;
-    if (!apollo::common::util::GetProtoFromFile(
-            FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message)) {
+    if (!apollo::common::util::GetProtoFromFile(FLAGS_test_data_dir + FLAGS_test_pad_file,
+                                                &pad_message)) {
       AERROR << "Failed to load PadMesssage from file " << FLAGS_test_data_dir
              << FLAGS_test_pad_file;
       return false;
@@ -73,32 +72,27 @@ bool ControlTestBase::test_control() {
     control_.OnPad(pad_message);
   }
   if (!FLAGS_test_localization_file.empty()) {
-    if (!AdapterManager::FeedLocalizationFile(FLAGS_test_data_dir +
-                                              FLAGS_test_localization_file)) {
+    if (!AdapterManager::FeedLocalizationFile(FLAGS_test_data_dir + FLAGS_test_localization_file)) {
       AERROR << "Failed to load localization file " << FLAGS_test_data_dir
              << FLAGS_test_localization_file;
       return false;
     }
   }
   if (!FLAGS_test_planning_file.empty()) {
-    if (!AdapterManager::FeedPlanningFile(FLAGS_test_data_dir +
-                                          FLAGS_test_planning_file)) {
-      AERROR << "Failed to load planning file " << FLAGS_test_data_dir
-             << FLAGS_test_planning_file;
+    if (!AdapterManager::FeedPlanningFile(FLAGS_test_data_dir + FLAGS_test_planning_file)) {
+      AERROR << "Failed to load planning file " << FLAGS_test_data_dir << FLAGS_test_planning_file;
       return false;
     }
   }
   if (!FLAGS_test_chassis_file.empty()) {
-    if (!AdapterManager::FeedChassisFile(FLAGS_test_data_dir +
-                                         FLAGS_test_chassis_file)) {
-      AERROR << "Failed to load chassis file " << FLAGS_test_data_dir
-             << FLAGS_test_chassis_file;
+    if (!AdapterManager::FeedChassisFile(FLAGS_test_data_dir + FLAGS_test_chassis_file)) {
+      AERROR << "Failed to load chassis file " << FLAGS_test_data_dir << FLAGS_test_chassis_file;
     }
   }
   if (!FLAGS_test_monitor_file.empty()) {
     MonitorMessage monitor_message;
-    apollo::common::util::GetProtoFromFile(
-        FLAGS_test_data_dir + FLAGS_test_monitor_file, &monitor_message);
+    apollo::common::util::GetProtoFromFile(FLAGS_test_data_dir + FLAGS_test_monitor_file,
+                                           &monitor_message);
     control_.OnMonitor(monitor_message);
   }
 
@@ -112,18 +106,17 @@ bool ControlTestBase::test_control() {
   return true;
 }
 
-void ControlTestBase::trim_control_command(ControlCommand *origin) {
+void ControlTestBase::trim_control_command(ControlCommand* origin) {
   origin->mutable_header()->clear_radar_timestamp();
   origin->mutable_header()->clear_lidar_timestamp();
   origin->mutable_header()->clear_timestamp_sec();
   origin->mutable_header()->clear_camera_timestamp();
 }
 
-bool ControlTestBase::test_control(const std::string &test_case_name,
-                                   int case_num) {
-  const std::string golden_result_file = apollo::common::util::StrCat(
-      "result_", test_case_name, "_", case_num, ".pb.txt");
-  std::string tmp_golden_path = "/tmp/" + golden_result_file;
+bool ControlTestBase::test_control(const std::string& test_case_name, int case_num) {
+  const std::string golden_result_file =
+      apollo::common::util::StrCat("result_", test_case_name, "_", case_num, ".pb.txt");
+  std::string tmp_golden_path  = "/tmp/" + golden_result_file;
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   control_command_.Clear();
 
@@ -140,16 +133,14 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
     common::util::SetProtoToASCIIFile(control_command_, golden_result_file);
   } else {
     ControlCommand golden_result;
-    bool load_success =
-        common::util::GetProtoFromASCIIFile(full_golden_path, &golden_result);
+    bool load_success = common::util::GetProtoFromASCIIFile(full_golden_path, &golden_result);
     if (!load_success) {
       AERROR << "Failed to load golden file: " << full_golden_path;
       common::util::SetProtoToASCIIFile(control_command_, tmp_golden_path);
       AINFO << "Current result is written to " << tmp_golden_path;
       return false;
     }
-    bool same_result =
-        common::util::IsProtoEqual(golden_result, control_command_);
+    bool same_result = common::util::IsProtoEqual(golden_result, control_command_);
     if (!same_result) {
       std::string tmp_planning_file = tmp_golden_path + ".tmp";
       common::util::SetProtoToASCIIFile(control_command_, tmp_planning_file);
@@ -161,15 +152,12 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
 
 void ControlTestBase::SetUpTestCase() {
   ros::Time::init();
-  FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
-  FLAGS_control_adapter_config_filename =
-      "modules/control/testdata/conf/adapter.conf";
-  FLAGS_is_control_test_mode = true;
+  FLAGS_control_conf_file               = "modules/control/testdata/conf/lincoln.pb.txt";
+  FLAGS_control_adapter_config_filename = "modules/control/testdata/conf/adapter.conf";
+  FLAGS_is_control_test_mode            = true;
 }
 
-void ControlTestBase::SetUp() {
-  ++s_seq_num_;
-}
+void ControlTestBase::SetUp() { ++s_seq_num_; }
 
 }  // namespace control
 }  // namespace apollo

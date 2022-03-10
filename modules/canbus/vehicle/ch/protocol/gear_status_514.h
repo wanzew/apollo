@@ -23,13 +23,12 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Gearstatus514 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+class Gearstatus514
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Gearstatus514();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'PRND control(Status)', 'enum': {1:
@@ -37,8 +36,7 @@ class Gearstatus514 : public ::apollo::drivers::canbus::ProtocolData<
   // 'GEAR_STS_DRIVE'}, 'precision': 1.0, 'len': 8, 'name': 'GEAR_STS',
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[1|4]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Gear_status_514::Gear_stsType gear_sts(const std::uint8_t* bytes,
-                                         const int32_t length) const;
+  Gear_status_514::Gear_stsType gear_sts(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ch

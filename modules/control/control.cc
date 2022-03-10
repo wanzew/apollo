@@ -65,8 +65,7 @@ Status Control::Init() {
 
   // lock it in case for after sub, init_vehicle not ready, but msg trigger
   // come
-  CHECK(AdapterManager::GetLocalization())
-      << "Localization is not initialized.";
+  CHECK(AdapterManager::GetLocalization()) << "Localization is not initialized.";
 
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
 
@@ -76,8 +75,7 @@ Status Control::Init() {
 
   CHECK(AdapterManager::GetMonitor()) << "Monitor is not initialized.";
 
-  CHECK(AdapterManager::GetControlCommand())
-      << "ControlCommand publisher is not initialized.";
+  CHECK(AdapterManager::GetControlCommand()) << "ControlCommand publisher is not initialized.";
 
   AdapterManager::AddPadCallback(&Control::OnPad, this);
   AdapterManager::AddMonitorCallback(&Control::OnMonitor, this);
@@ -95,12 +93,11 @@ Status Control::Start() {
   // should init_vehicle first, let car enter work status, then use status msg
   // trigger control
 
-  AINFO << "Control default driving action is "
-        << DrivingAction_Name(control_conf_.action());
+  AINFO << "Control default driving action is " << DrivingAction_Name(control_conf_.action());
   pad_msg_.set_action(control_conf_.action());
 
-  timer_ = AdapterManager::CreateTimer(
-      ros::Duration(control_conf_.control_period()), &Control::OnTimer, this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(control_conf_.control_period()),
+                                       &Control::OnTimer, this);
 
   AINFO << "Control init done!";
 
@@ -110,7 +107,7 @@ Status Control::Start() {
   return Status::OK();
 }
 
-void Control::OnPad(const PadMessage &pad) {
+void Control::OnPad(const PadMessage& pad) {
   pad_msg_ = pad;
   ADEBUG << "Received Pad Msg:" << pad.DebugString();
   AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
@@ -124,9 +121,8 @@ void Control::OnPad(const PadMessage &pad) {
   pad_received_ = true;
 }
 
-void Control::OnMonitor(
-    const common::monitor::MonitorMessage &monitor_message) {
-  for (const auto &item : monitor_message.item()) {
+void Control::OnMonitor(const common::monitor::MonitorMessage& monitor_message) {
+  for (const auto& item : monitor_message.item()) {
     if (item.log_level() == MonitorMessageItem::FATAL) {
       estop_ = true;
       return;
@@ -134,18 +130,16 @@ void Control::OnMonitor(
   }
 }
 
-Status Control::ProduceControlCommand(ControlCommand *control_command) {
+Status Control::ProduceControlCommand(ControlCommand* control_command) {
   Status status = CheckInput();
   // check data
 
   if (!status.ok()) {
-    AERROR_EVERY(100) << "Control input data failed: "
-                      << status.error_message();
+    AERROR_EVERY(100) << "Control input data failed: " << status.error_message();
     control_command->mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    control_command->mutable_engage_advice()->set_reason(
-        status.error_message());
-    estop_ = true;
+    control_command->mutable_engage_advice()->set_reason(status.error_message());
+    estop_        = true;
     estop_reason_ = status.error_message();
   } else {
     Status status_ts = CheckTimestamp();
@@ -153,12 +147,10 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
       AERROR << "Input messages timeout";
       // estop_ = true;
       status = status_ts;
-      if (chassis_.driving_mode() !=
-          apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+      if (chassis_.driving_mode() != apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
         control_command->mutable_engage_advice()->set_advice(
             apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-        control_command->mutable_engage_advice()->set_reason(
-            status.error_message());
+        control_command->mutable_engage_advice()->set_reason(status.error_message());
       }
     } else {
       control_command->mutable_engage_advice()->set_advice(
@@ -167,12 +159,10 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   }
 
   // check estop
-  estop_ = FLAGS_enable_persistent_estop ?
-    estop_ || trajectory_.estop().is_estop() : trajectory_.estop().is_estop();
+  estop_ = FLAGS_enable_persistent_estop ? estop_ || trajectory_.estop().is_estop() :
+                                           trajectory_.estop().is_estop();
 
-  if (trajectory_.estop().is_estop()) {
-    estop_reason_ = "estop from planning";
-  }
+  if (trajectory_.estop().is_estop()) { estop_reason_ = "estop from planning"; }
 
   // if planning set estop, then no control process triggered
   if (!estop_) {
@@ -186,8 +176,8 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
     debug->mutable_canbus_header()->CopyFrom(chassis_.header());
     debug->mutable_trajectory_header()->CopyFrom(trajectory_.header());
 
-    Status status_compute = controller_agent_.ComputeControlCommand(
-        &localization_, &chassis_, &trajectory_, control_command);
+    Status status_compute = controller_agent_.ComputeControlCommand(&localization_, &chassis_,
+                                                                    &trajectory_, control_command);
 
     if (!status_compute.ok()) {
       AERROR << "Control main function failed"
@@ -196,9 +186,9 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
              << " with trajectory: " << trajectory_.ShortDebugString()
              << " with cmd: " << control_command->ShortDebugString()
              << " status:" << status_compute.error_message();
-      estop_ = true;
+      estop_        = true;
       estop_reason_ = status_compute.error_message();
-      status = status_compute;
+      status        = status_compute;
     }
   }
 
@@ -212,13 +202,12 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   }
   // check signal
   if (trajectory_.decision().has_vehicle_signal()) {
-    control_command->mutable_signal()->CopyFrom(
-        trajectory_.decision().vehicle_signal());
+    control_command->mutable_signal()->CopyFrom(trajectory_.decision().vehicle_signal());
   }
   return status;
 }
 
-void Control::OnTimer(const ros::TimerEvent &) {
+void Control::OnTimer(const ros::TimerEvent&) {
   double start_timestamp = Clock::NowInSeconds();
 
   if (FLAGS_is_control_test_mode && FLAGS_control_test_duration > 0 &&
@@ -230,8 +219,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
   ControlCommand control_command;
 
   Status status = ProduceControlCommand(&control_command);
-  AERROR_IF(!status.ok()) << "Failed to produce control command:"
-                          << status.error_message();
+  AERROR_IF(!status.ok()) << "Failed to produce control command:" << status.error_message();
 
   double end_timestamp = Clock::NowInSeconds();
 
@@ -242,15 +230,13 @@ void Control::OnTimer(const ros::TimerEvent &) {
 
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  control_command.mutable_latency_stats()->set_total_time_exceeded(
-      time_diff_ms < control_conf_.control_period());
+  control_command.mutable_latency_stats()->set_total_time_exceeded(time_diff_ms <
+                                                                   control_conf_.control_period());
   ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 
   // forward estop reason among following control frames.
-  if (estop_) {
-    control_command.mutable_header()->mutable_status()->set_msg(estop_reason_);
-  }
+  if (estop_) { control_command.mutable_header()->mutable_status()->set_msg(estop_reason_); }
 
   SendCmd(&control_command);
 }
@@ -279,14 +265,12 @@ Status Control::CheckInput() {
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");
   }
   trajectory_ = trajectory_adapter->GetLatestObserved();
-  if (!trajectory_.estop().is_estop() &&
-      trajectory_.trajectory_point_size() == 0) {
+  if (!trajectory_.estop().is_estop() && trajectory_.trajectory_point_size() == 0) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
-                  "planning has no trajectory point.");
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "planning has no trajectory point.");
   }
 
-  for (auto &trajectory_point : *trajectory_.mutable_trajectory_point()) {
+  for (auto& trajectory_point : *trajectory_.mutable_trajectory_point()) {
     if (trajectory_point.v() < control_conf_.minimum_speed_resolution()) {
       trajectory_point.set_v(0.0);
       trajectory_point.set_a(0.0);
@@ -304,33 +288,25 @@ Status Control::CheckTimestamp() {
     return Status::OK();
   }
   double current_timestamp = Clock::NowInSeconds();
-  double localization_diff =
-      current_timestamp - localization_.header().timestamp_sec();
-  if (localization_diff >
-      (FLAGS_max_localization_miss_num * control_conf_.localization_period())) {
-    AERROR << "Localization msg lost for " << std::setprecision(6)
-           << localization_diff << "s";
+  double localization_diff = current_timestamp - localization_.header().timestamp_sec();
+  if (localization_diff > (FLAGS_max_localization_miss_num * control_conf_.localization_period())) {
+    AERROR << "Localization msg lost for " << std::setprecision(6) << localization_diff << "s";
     common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Localization msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
 
   double chassis_diff = current_timestamp - chassis_.header().timestamp_sec();
-  if (chassis_diff >
-      (FLAGS_max_chassis_miss_num * control_conf_.chassis_period())) {
-    AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
-           << "s";
+  if (chassis_diff > (FLAGS_max_chassis_miss_num * control_conf_.chassis_period())) {
+    AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff << "s";
     common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Chassis msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
   }
 
-  double trajectory_diff =
-      current_timestamp - trajectory_.header().timestamp_sec();
-  if (trajectory_diff >
-      (FLAGS_max_planning_miss_num * control_conf_.trajectory_period())) {
-    AERROR << "Trajectory msg lost for " << std::setprecision(6)
-           << trajectory_diff << "s";
+  double trajectory_diff = current_timestamp - trajectory_.header().timestamp_sec();
+  if (trajectory_diff > (FLAGS_max_planning_miss_num * control_conf_.trajectory_period())) {
+    AERROR << "Trajectory msg lost for " << std::setprecision(6) << trajectory_diff << "s";
     common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.ERROR("Trajectory msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
@@ -338,7 +314,7 @@ Status Control::CheckTimestamp() {
   return Status::OK();
 }
 
-void Control::SendCmd(ControlCommand *control_command) {
+void Control::SendCmd(ControlCommand* control_command) {
   // set header
   AdapterManager::FillControlCommandHeader(Name(), control_command);
 

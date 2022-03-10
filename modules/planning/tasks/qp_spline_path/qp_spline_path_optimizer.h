@@ -41,13 +41,13 @@ class QpSplinePathOptimizer : public PathOptimizer {
   bool Init(const PlanningConfig& config) override;
 
  private:
-  apollo::common::Status Process(const SpeedData& speed_data,
-                                 const ReferenceLine& reference_line,
+  apollo::common::Status Process(const SpeedData&               speed_data,
+                                 const ReferenceLine&           reference_line,
                                  const common::TrajectoryPoint& init_point,
-                                 PathData* const path_data) override;
+                                 PathData* const                path_data) override;
 
  private:
-  QpSplinePathConfig qp_spline_path_config_;
+  QpSplinePathConfig                 qp_spline_path_config_;
   std::unique_ptr<Spline1dGenerator> spline_generator_;
 };
 

@@ -44,13 +44,11 @@ class BaseCameraTransformer {
   // @brief: Transform 3D position of objects into targeted space
   // @param [in/out] objects : object lists with 3D positions in camera space,
   // which get transformed into targeted 3D space
-  virtual bool Transform(
-      std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
+  virtual bool Transform(std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
 
   virtual bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) = 0;
 
-  virtual bool GetAdjustedExtrinsics(
-    Eigen::Matrix<double, 4, 4>* extrinsics) = 0;
+  virtual bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4>* extrinsics) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -59,8 +57,7 @@ class BaseCameraTransformer {
 };
 
 REGISTER_REGISTERER(BaseCameraTransformer);
-#define REGISTER_CAMERA_TRANSFORMER(name) \
-  REGISTER_CLASS(BaseCameraTransformer, name)
+#define REGISTER_CAMERA_TRANSFORMER(name) REGISTER_CLASS(BaseCameraTransformer, name)
 
 }  // namespace perception
 }  // namespace apollo

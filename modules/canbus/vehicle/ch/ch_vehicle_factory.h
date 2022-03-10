@@ -57,8 +57,7 @@ class ChVehicleFactory : public AbstractVehicleFactory {
    * @brief create ch message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
-  CreateMessageManager() override;
+  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>> CreateMessageManager() override;
 };
 
 }  // namespace canbus

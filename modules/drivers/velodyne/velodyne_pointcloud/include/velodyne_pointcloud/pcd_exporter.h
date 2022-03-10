@@ -19,10 +19,10 @@
 
 #include "const_variables.h"
 
-#include <pcl/common/time.h>
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
+#include <pcl/common/time.h>
 
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
@@ -49,42 +49,40 @@ class PCDExporter {
   std::string pcd_folder_;
   // File name of stamp_file_;
   std::string stamp_file_;
-  FILE *stamp_file_handle_;
+  FILE*       stamp_file_handle_;
   // File name of pcd_pose file
-  std::string pose_file_;
-  FILE *pose_file_handle_;
+  std::string    pose_file_;
+  FILE*          pose_file_handle_;
   pcl::PCDWriter writer_;
   // Default "velodyne"
-  std::string child_frame_id_;
+  std::string     child_frame_id_;
   ros::Subscriber sub_;
 
-  boost::shared_ptr<tf2_ros::Buffer> tf_buffer_ptr_;
+  boost::shared_ptr<tf2_ros::Buffer>            tf_buffer_ptr_;
   boost::shared_ptr<tf2_ros::TransformListener> tf_listener_ptr_;
 
   bool skip_static_frames_;
   // use the seq of a message as index or not
-  bool use_seq_as_index_;
+  bool  use_seq_as_index_;
   float time_offset_;
   float loc_threshold_;
   // Message counter, use as index when use_seq_ = false
   unsigned int pc_msg_count_;
-  std::string topic_pointcloud_;
-  int queue_size_;
+  std::string  topic_pointcloud_;
+  int          queue_size_;
 
   std::list<sensor_msgs::PointCloud2ConstPtr> queue_;
 
   /**
    * @brief Query pose
    */
-  bool get_pose(const ros::Time &time, Eigen::Matrix4d &pose);
+  bool get_pose(const ros::Time& time, Eigen::Matrix4d& pose);
 
-  void write_pcd_file(sensor_msgs::PointCloud2::ConstPtr msg,
-                      const std::string &filename);
+  void write_pcd_file(sensor_msgs::PointCloud2::ConstPtr msg, const std::string& filename);
   /**
    * @brief Write pose info with the index of message to a file
    */
-  int write_pcd_pose_file(sensor_msgs::PointCloud2::ConstPtr msg,
-                          int index);
+  int write_pcd_pose_file(sensor_msgs::PointCloud2::ConstPtr msg, int index);
 };
 
 }  // namespace velodyne

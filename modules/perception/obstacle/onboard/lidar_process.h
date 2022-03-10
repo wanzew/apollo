@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "gtest/gtest_prod.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "gtest/gtest_prod.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
@@ -43,14 +43,15 @@ namespace perception {
 
 class LidarProcess {
  public:
-  LidarProcess() = default;
+  LidarProcess()  = default;
   ~LidarProcess() = default;
 
   bool Init();
   bool IsInit() { return inited_; }
   bool Process(const sensor_msgs::PointCloud2& message);
 
-  bool Process(const double timestamp, pcl_util::PointCloudPtr cloud,
+  bool Process(const double                     timestamp,
+               pcl_util::PointCloudPtr          cloud,
                std::shared_ptr<Eigen::Matrix4d> velodyne_trans);
 
   void GeneratePbMsg(PerceptionObstacles* obstacles);
@@ -65,21 +66,21 @@ class LidarProcess {
   bool InitAlgorithmPlugin();
 
   void TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
-                            pcl_util::PointCloudPtr* out_cloud);
+                            pcl_util::PointCloudPtr*        out_cloud);
   bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans);
 
-  bool inited_ = false;
-  double timestamp_ = 0.0;
-  common::ErrorCode error_code_ = common::OK;
+  bool                                 inited_     = false;
+  double                               timestamp_  = 0.0;
+  common::ErrorCode                    error_code_ = common::OK;
   std::vector<std::shared_ptr<Object>> objects_;
-  HDMapInput* hdmap_input_ = nullptr;
-  std::unique_ptr<BaseROIFilter> roi_filter_;
-  std::unique_ptr<BaseSegmentation> segmentor_;
-  std::unique_ptr<BaseObjectBuilder> object_builder_;
-  std::unique_ptr<BaseObjectFilter> object_filter_;
-  std::unique_ptr<BaseTracker> tracker_;
-  std::unique_ptr<BaseTypeFuser> type_fuser_;
-  pcl_util::PointIndicesPtr roi_indices_;
+  HDMapInput*                          hdmap_input_ = nullptr;
+  std::unique_ptr<BaseROIFilter>       roi_filter_;
+  std::unique_ptr<BaseSegmentation>    segmentor_;
+  std::unique_ptr<BaseObjectBuilder>   object_builder_;
+  std::unique_ptr<BaseObjectFilter>    object_filter_;
+  std::unique_ptr<BaseTracker>         tracker_;
+  std::unique_ptr<BaseTypeFuser>       type_fuser_;
+  pcl_util::PointIndicesPtr            roi_indices_;
 
   std::unique_ptr<OpenglVisualizer> visualizer_;
 

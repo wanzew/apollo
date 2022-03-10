@@ -50,10 +50,10 @@ class DataGenerator : public apollo::common::ApolloApp {
   DataGenerator() = default;
   ~DataGenerator() { delete data_file_; }
 
-  std::string Name() const override;
+  std::string            Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
-  void Stop() override;
+  void                   Stop() override;
 
  private:
   void RunOnce();
@@ -66,12 +66,11 @@ class DataGenerator : public apollo::common::ApolloApp {
 
   ros::Timer timer_;
 
-  std::ofstream* data_file_ = nullptr;
-  int num_data_frame_ = 0;
+  std::ofstream* data_file_      = nullptr;
+  int            num_data_frame_ = 0;
 
-  common::util::Factory<SensorConfig::SensorId, Sensor,
-                        Sensor* (*)(const SensorConfig& config)>
-      sensor_factory_;
+  common::util::Factory<SensorConfig::SensorId, Sensor, Sensor* (*)(const SensorConfig& config)>
+                                                   sensor_factory_;
   google::protobuf::RepeatedPtrField<SensorConfig> sensor_configs_;
 
   std::vector<Sensor*> sensors_;

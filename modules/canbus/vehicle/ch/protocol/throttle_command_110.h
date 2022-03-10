@@ -23,8 +23,8 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Throttlecommand110 : public ::apollo::drivers::canbus::ProtocolData<
-                               ::apollo::canbus::ChassisDetail> {
+class Throttlecommand110
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -59,8 +59,7 @@ class Throttlecommand110 : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
   void set_p_throttle_pedal_en_ctrl(
-      uint8_t* data,
-      Throttle_command_110::Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl);
+      uint8_t* data, Throttle_command_110::Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl);
 
   // config detail: {'description': 'Percentage of throttle pedal(Command)',
   // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'THROTTLE_PEDAL_CMD',
@@ -70,7 +69,7 @@ class Throttlecommand110 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   Throttle_command_110::Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl_;
-  int throttle_pedal_cmd_;
+  int                                              throttle_pedal_cmd_;
 };
 
 }  // namespace ch

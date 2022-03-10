@@ -24,7 +24,7 @@
 namespace apollo {
 namespace perception {
 
-void ConstructObject(std::vector<std::shared_ptr<Object> >* objects) {
+void ConstructObject(std::vector<std::shared_ptr<Object>>* objects) {
   objects->resize(10);
 
   for (size_t i = 0; i < objects->size(); ++i) {
@@ -33,7 +33,7 @@ void ConstructObject(std::vector<std::shared_ptr<Object> >* objects) {
     pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
     cloud->points.resize(10);
     for (size_t pi = 0; pi < 10; ++pi) {
-      double num = pi * 1.0;
+      double num          = pi * 1.0;
       cloud->points[pi].x = num * 1.5;
       cloud->points[pi].y = num + 3;
       if (i < 3 && i > 0) {
@@ -42,7 +42,7 @@ void ConstructObject(std::vector<std::shared_ptr<Object> >* objects) {
         cloud->points[pi].z = num / 2 - 3.5;
       }
     }
-    obj.cloud = cloud;
+    obj.cloud      = cloud;
     objects->at(i) = std::make_shared<Object>(obj);
   }
 }
@@ -50,9 +50,8 @@ void ConstructObject(std::vector<std::shared_ptr<Object> >* objects) {
 TEST(LowObjectFilterTest, test_object_filter) {
   LowObjectFilter filter;
 
-  ObjectFilterOptions object_filter_options;
-  std::vector<std::shared_ptr<Object> >* objects =
-      new std::vector<std::shared_ptr<Object> >();
+  ObjectFilterOptions                   object_filter_options;
+  std::vector<std::shared_ptr<Object>>* objects = new std::vector<std::shared_ptr<Object>>();
   ConstructObject(objects);
 
   EXPECT_EQ(10, objects->size());

@@ -29,34 +29,32 @@ bool CascadedCameraTracker::Init() {
   return init_flag;
 }
 
-bool CascadedCameraTracker::Associate(
-    const cv::Mat& img, const double timestamp,
-    std::vector<std::shared_ptr<VisualObject>>* objects) {
+bool CascadedCameraTracker::Associate(const cv::Mat&                              img,
+                                      const double                                timestamp,
+                                      std::vector<std::shared_ptr<VisualObject>>* objects) {
   if (!objects) return false;
   frame_idx_++;
 
-  float scale = 1.0f;
+  float                 scale = 1.0f;
   std::vector<Detected> detected;
   GetDetectedFromVO(img.size(), scale, *objects, &detected);
 
   // Affinity matrix
   std::vector<std::vector<float>> affinity_matrix;
-  affinity_matrix = std::vector<std::vector<float>>(
-      tracks_.size(), std::vector<float>(detected.size(), 1.0f));
+  affinity_matrix =
+      std::vector<std::vector<float>>(tracks_.size(), std::vector<float>(detected.size(), 1.0f));
 
   // cs2d
   std::vector<std::vector<float>> cs2d_affinity_matrix;
   cs2d_tracker_.SelectFull(tracks_.size(), detected.size());
-  cs2d_tracker_.GetAffinityMatrix(img, tracks_, detected,
-                                  &cs2d_affinity_matrix);
+  cs2d_tracker_.GetAffinityMatrix(img, tracks_, detected, &cs2d_affinity_matrix);
   MergeAffinityMatrix(cs2d_affinity_matrix, &affinity_matrix);
 
   // dlf
   if (dl_feature_) {
     std::vector<std::vector<float>> dlf_affinity_matrix;
     dlf_tracker_.SelectFull(tracks_.size(), detected.size());
-    dlf_tracker_.GetAffinityMatrix(img, tracks_, detected,
-                                   &dlf_affinity_matrix);
+    dlf_tracker_.GetAffinityMatrix(img, tracks_, detected, &dlf_affinity_matrix);
 
     // Merge
     MergeAffinityMatrix(dlf_affinity_matrix, &affinity_matrix);
@@ -73,21 +71,19 @@ bool CascadedCameraTracker::Associate(
   if (use_kcf_) {
     std::vector<std::vector<float>> kcf_affinity_matrix;
     kcf_tracker_.SelectEntries(affinity_matrix);
-    kcf_tracker_.GetAffinityMatrix(img, tracks_, detected,
-                                   &kcf_affinity_matrix);
+    kcf_tracker_.GetAffinityMatrix(img, tracks_, detected, &kcf_affinity_matrix);
     MergeAffinityMatrix(kcf_affinity_matrix, &affinity_matrix);
   }
 
   // Matching
   std::unordered_map<int, int> local_matching;
-  std::unordered_set<int> local_matched_detected;
+  std::unordered_set<int>      local_matched_detected;
   MatrixMatching(affinity_matrix, &local_matching, &local_matched_detected);
 
   // Tracker and ID: detect id to (track id, first_timestamp) mapping
   std::unordered_map<int, std::pair<int, double>> id_mapping;
-  ManageTrackerAndID(local_matching, local_matched_detected, detected,
-                     frame_idx_, timestamp, &tracks_, &next_track_id_,
-                     &id_mapping);
+  ManageTrackerAndID(local_matching, local_matched_detected, detected, frame_idx_, timestamp,
+                     &tracks_, &next_track_id_, &id_mapping);
 
   // Update information used in tracks for the next frame
   cs2d_tracker_.UpdateTracked(img, detected, &tracks_);
@@ -98,7 +94,7 @@ bool CascadedCameraTracker::Associate(
     obj_ptr->last_track_timestamp = timestamp;
 
     if (id_mapping.find(obj_ptr->id) != id_mapping.end()) {
-      obj_ptr->track_id = id_mapping[obj_ptr->id].first;
+      obj_ptr->track_id  = id_mapping[obj_ptr->id].first;
       obj_ptr->track_age = timestamp - id_mapping[obj_ptr->id].second;
     } else {  // Should not happen
       AWARN << "Det: " << obj_ptr->id << " has no tracking ID";
@@ -109,9 +105,7 @@ bool CascadedCameraTracker::Associate(
   return true;
 }
 
-std::string CascadedCameraTracker::Name() const {
-  return "CascadedCameraTracker";
-}
+std::string CascadedCameraTracker::Name() const { return "CascadedCameraTracker"; }
 
 }  // namespace perception
 }  // namespace apollo

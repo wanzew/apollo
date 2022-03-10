@@ -29,11 +29,10 @@ namespace lidar_velodyne {
 
 template <typename T>
 void dump_msg(const T& msg, const std::string& file_path) {
-  std::ofstream ofs(file_path.c_str(),
-                    std::ofstream::out | std::ofstream::binary);
-  uint32_t serial_size = ros::serialization::serializationLength(msg);
+  std::ofstream                ofs(file_path.c_str(), std::ofstream::out | std::ofstream::binary);
+  uint32_t                     serial_size = ros::serialization::serializationLength(msg);
   boost::shared_array<uint8_t> obuffer(new uint8_t[serial_size]);
-  ros::serialization::OStream ostream(obuffer.get(), serial_size);
+  ros::serialization::OStream  ostream(obuffer.get(), serial_size);
   ros::serialization::serialize(ostream, msg);
   ofs.write(reinterpret_cast<char*>(obuffer.get()), serial_size);
   ofs.close();
@@ -41,14 +40,13 @@ void dump_msg(const T& msg, const std::string& file_path) {
 
 template <class T>
 void load_msg(const std::string& file_path, T* msg) {
-  std::ifstream ifs(file_path.c_str(),
-                    std::ifstream::in | std::ifstream::binary);
+  std::ifstream ifs(file_path.c_str(), std::ifstream::in | std::ifstream::binary);
   ifs.seekg(0, std::ios::end);
   std::streampos end = ifs.tellg();
   ifs.seekg(0, std::ios::beg);
   std::streampos begin = ifs.tellg();
 
-  uint32_t file_size = end - begin;
+  uint32_t                     file_size = end - begin;
   boost::shared_array<uint8_t> ibuffer(new uint8_t[file_size]);
   ifs.read(reinterpret_cast<char*>(ibuffer.get()), file_size);
   ros::serialization::IStream istream(ibuffer.get(), file_size);
@@ -56,8 +54,10 @@ void load_msg(const std::string& file_path, T* msg) {
   ifs.close();
 }
 
-void init_sin_cos_rot_table(float* sin_rot_table, float* cos_rot_table,
-                            uint16_t rotation, float rotation_resolution);
+void init_sin_cos_rot_table(float*   sin_rot_table,
+                            float*   cos_rot_table,
+                            uint16_t rotation,
+                            float    rotation_resolution);
 
 }  // namespace lidar_velodyne
 }  // namespace drivers

@@ -34,22 +34,20 @@ class Crosswalk : public TrafficRule {
   explicit Crosswalk(const TrafficRuleConfig& config);
   virtual ~Crosswalk() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
+  void MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
   bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
-  bool CheckADCkStop(ReferenceLineInfo* const reference_line_info,
+  bool CheckADCkStop(ReferenceLineInfo* const  reference_line_info,
                      hdmap::PathOverlap* const crosswalk_overlap) const;
-  int BuildStopDecision(Frame* frame,
-                        ReferenceLineInfo* const reference_line_info,
-                        hdmap::PathOverlap* const crosswalk_overlap,
-                        std::vector<std::string> pedestrians);
+  int  BuildStopDecision(Frame*                    frame,
+                         ReferenceLineInfo* const  reference_line_info,
+                         hdmap::PathOverlap* const crosswalk_overlap,
+                         std::vector<std::string>  pedestrians);
 
  private:
-  static constexpr char const* const CROSSWALK_VO_ID_PREFIX = "CW_";
+  static constexpr char const* const     CROSSWALK_VO_ID_PREFIX = "CW_";
   std::vector<const hdmap::PathOverlap*> crosswalk_overlaps_;
 };
 

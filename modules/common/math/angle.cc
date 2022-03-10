@@ -28,12 +28,8 @@ float sin(Angle16 a) {
     idx += Angle16::RAW_PI;
     return -SIN_TABLE[idx % SIN_TABLE_SIZE];
   }
-  if (idx < 0) {
-    return -SIN_TABLE[(-idx) % SIN_TABLE_SIZE];
-  }
-  if (idx < Angle16::RAW_PI_2) {
-    return SIN_TABLE[idx % SIN_TABLE_SIZE];
-  }
+  if (idx < 0) { return -SIN_TABLE[(-idx) % SIN_TABLE_SIZE]; }
+  if (idx < Angle16::RAW_PI_2) { return SIN_TABLE[idx % SIN_TABLE_SIZE]; }
   idx = Angle16::RAW_PI - idx;
   return SIN_TABLE[idx % SIN_TABLE_SIZE];
 }

@@ -15,17 +15,17 @@
  *****************************************************************************/
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
+#  define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
 
-#include <deque>
-#include <memory>
-#include <utility>
-#include <vector>
+#  include <deque>
+#  include <memory>
+#  include <utility>
+#  include <vector>
 
-#include "modules/common/macro.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
+#  include "modules/common/macro.h"
+#  include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
+#  include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
+#  include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
 namespace apollo {
 namespace perception {
@@ -39,8 +39,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[IN] anchor_point: initial anchor point for filtering
   // @params[IN] velocity: initial velocity for filtering
   // @return nothing
-  void Initialize(const Eigen::Vector3d &anchor_point,
-                  const Eigen::Vector3d &velocity);
+  void Initialize(const Eigen::Vector3d& anchor_point, const Eigen::Vector3d& velocity);
 
   // @brief initialize state of the filter
   // @params[IN] new_object: initial object for filtering
@@ -52,15 +51,13 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[OUT] velocity: predicted velocity
   // @params[IN] time_diff: time interval from last update
   // @return nothing
-  void Predict(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity,
-               const double time_diff);
+  void Predict(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity, const double time_diff);
 
   // @brief update with measurements
   // @params[IN] new_object: new object for current update
   // @params[IN] time_diff: time interval from last update;
   // @return nothing
-  void UpdateWithObject(const std::shared_ptr<PbfSensorObject> new_object,
-                        const double time_diff);
+  void UpdateWithObject(const std::shared_ptr<PbfSensorObject> new_object, const double time_diff);
 
   // @brief update without measurements
   // @params[IN] time_diff: time interval from last update
@@ -71,14 +68,13 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[OUT] anchor_point: current anchor_point
   // @params[OUT] velocity: current velocity
   // @return nothing
-  void GetState(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity);
+  void GetState(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity);
 
   // @brief set current state of the filter
   // @params[IN] anchor_point: updated anchor_point
   // @params[IN] velocity: updated velocity
   // @return nothing
-  void SetState(const Eigen::Vector3d &anchor_point,
-                const Eigen::Vector3d &velocity);
+  void SetState(const Eigen::Vector3d& anchor_point, const Eigen::Vector3d& velocity);
 
  protected:
   int GetRadarHistoryLength();
@@ -89,10 +85,9 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
 
   int GetRadarHistoryIndex(const int history_seq);
 
-  double GetHistoryTimediff(const int history_index,
-                            const double current_timestamp);
+  double GetHistoryTimediff(const int history_index, const double current_timestamp);
 
-  void UpdateAcceleration(const Eigen::VectorXd &measured_acceleration);
+  void UpdateAcceleration(const Eigen::VectorXd& measured_acceleration);
 
   Eigen::Vector3d belief_anchor_point_;
   Eigen::Vector3d belief_velocity_;
@@ -115,10 +110,10 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // Optimal Kalman gain
   Eigen::Matrix4d k_matrix_;
 
-  std::deque<bool> history_lidar_radar_consistency_;
+  std::deque<bool>            history_lidar_radar_consistency_;
   std::deque<Eigen::Vector3d> history_velocity_;
-  std::deque<double> history_time_diff_;
-  std::deque<bool> history_velocity_is_radar_;
+  std::deque<double>          history_time_diff_;
+  std::deque<bool>            history_velocity_is_radar_;
 };
 
 }  // namespace perception
