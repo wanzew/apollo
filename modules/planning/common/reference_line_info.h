@@ -50,22 +50,22 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
-  explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
+  explicit ReferenceLineInfo(const common::VehicleState&    vehicle_state,
                              const common::TrajectoryPoint& adc_planning_point,
-                             const ReferenceLine& reference_line,
-                             const hdmap::RouteSegments& segments);
+                             const ReferenceLine&           reference_line,
+                             const hdmap::RouteSegments&    segments);
 
   bool Init(const std::vector<const Obstacle*>& obstacles);
 
   bool IsInited() const;
 
-  bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
+  bool          AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
-  void AddObstacleHelper(const Obstacle* obstacle, int* ret);
+  void          AddObstacleHelper(const Obstacle* obstacle, int* ret);
 
-  PathDecision* path_decision();
-  const PathDecision& path_decision() const;
-  const ReferenceLine& reference_line() const;
+  PathDecision*                  path_decision();
+  const PathDecision&            path_decision() const;
+  const ReferenceLine&           reference_line() const;
   const common::TrajectoryPoint& AdcPlanningPoint() const;
 
   bool ReachedDestination() const;
@@ -73,16 +73,16 @@ class ReferenceLineInfo {
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
 
   const DiscretizedTrajectory& trajectory() const;
-  double TrajectoryLength() const;
+  double                       TrajectoryLength() const;
 
   double Cost() const { return cost_; }
-  void AddCost(double cost) { cost_ += cost; }
-  void SetCost(double cost) { cost_ = cost; }
+  void   AddCost(double cost) { cost_ += cost; }
+  void   SetCost(double cost) { cost_ = cost; }
   double PriorityCost() const { return priority_cost_; }
-  void SetPriorityCost(double cost) { priority_cost_ = cost; }
+  void   SetPriorityCost(double cost) { priority_cost_ = cost; }
   // For lattice planner'speed planning target
-  void SetStopPoint(const StopPoint& stop_point);
-  void SetCruiseSpeed(double speed);
+  void                  SetStopPoint(const StopPoint& stop_point);
+  void                  SetCruiseSpeed(double speed);
   const PlanningTarget& planning_target() const { return planning_target_; }
 
   /**
@@ -94,22 +94,22 @@ class ReferenceLineInfo {
    **/
   bool IsStartFrom(const ReferenceLineInfo& previous_reference_line_info) const;
 
-  planning_internal::Debug* mutable_debug() { return &debug_; }
+  planning_internal::Debug*       mutable_debug() { return &debug_; }
   const planning_internal::Debug& debug() const { return debug_; }
-  LatencyStats* mutable_latency_stats() { return &latency_stats_; }
-  const LatencyStats& latency_stats() const { return latency_stats_; }
+  LatencyStats*                   mutable_latency_stats() { return &latency_stats_; }
+  const LatencyStats&             latency_stats() const { return latency_stats_; }
 
-  const PathData& path_data() const;
+  const PathData&  path_data() const;
   const SpeedData& speed_data() const;
-  PathData* mutable_path_data();
-  SpeedData* mutable_speed_data();
+  PathData*        mutable_path_data();
+  SpeedData*       mutable_speed_data();
   // aggregate final result together by some configuration
-  bool CombinePathAndSpeedProfile(
-      const double relative_time, const double start_s,
-      DiscretizedTrajectory* discretized_trajectory);
+  bool CombinePathAndSpeedProfile(const double           relative_time,
+                                  const double           start_s,
+                                  DiscretizedTrajectory* discretized_trajectory);
 
   const SLBoundary& AdcSlBoundary() const;
-  std::string PathSpeedDebugString() const;
+  std::string       PathSpeedDebugString() const;
 
   /**
    * Check if the current reference line is a change lane reference line, i.e.,
@@ -118,7 +118,7 @@ class ReferenceLineInfo {
   bool IsChangeLanePath() const;
 
   /**
-   * Check if the current reference line is the neighbor of the vehicle 
+   * Check if the current reference line is the neighbor of the vehicle
    * current position
    */
   bool IsNeighborLanePath() const;
@@ -135,7 +135,7 @@ class ReferenceLineInfo {
   bool IsSafeToChangeLane() const { return is_safe_to_change_lane_; }
 
   const hdmap::RouteSegments& Lanes() const;
-  const std::list<hdmap::Id> TargetLaneId() const;
+  const std::list<hdmap::Id>  TargetLaneId() const;
 
   void ExportDecision(DecisionResult* decision_result) const;
 
@@ -145,10 +145,8 @@ class ReferenceLineInfo {
 
   bool IsRightTurnPath() const;
 
-  double OffsetToOtherReferenceLine() const {
-    return offset_to_other_reference_line_;
-  }
-  void SetOffsetToOtherReferenceLine(const double offset) {
+  double OffsetToOtherReferenceLine() const { return offset_to_other_reference_line_; }
+  void   SetOffsetToOtherReferenceLine(const double offset) {
     offset_to_other_reference_line_ = offset;
   }
 
@@ -156,56 +154,39 @@ class ReferenceLineInfo {
 
  private:
   bool CheckChangeLane() const;
-
   void ExportTurnSignal(common::VehicleSignal* signal) const;
-
   bool IsUnrelaventObstacle(PathObstacle* path_obstacle);
-
   void MakeDecision(DecisionResult* decision_result) const;
-  int MakeMainStopDecision(DecisionResult* decision_result) const;
+  int  MakeMainStopDecision(DecisionResult* decision_result) const;
   void MakeMainMissionCompleteDecision(DecisionResult* decision_result) const;
   void MakeEStopDecision(DecisionResult* decision_result) const;
   void SetObjectDecisions(ObjectDecisions* object_decisions) const;
-  const common::VehicleState vehicle_state_;
+
+  const common::VehicleState    vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
-  ReferenceLine reference_line_;
+  ReferenceLine                 reference_line_;
 
   /**
    * @brief this is the number that measures the goodness of this reference
    * line. The lower the better.
    */
-  double cost_ = 0.0;
-
-  bool is_inited_ = false;
-
-  bool is_drivable_ = true;
-
-  PathDecision path_decision_;
-
-  PathData path_data_;
-  SpeedData speed_data_;
-
-  DiscretizedTrajectory discretized_trajectory_;
-
-  SLBoundary adc_sl_boundary_;
-
-  planning_internal::Debug debug_;
-  LatencyStats latency_stats_;
-
-  hdmap::RouteSegments lanes_;
-
-  bool is_on_reference_line_ = false;
-
-  bool is_safe_to_change_lane_ = false;
-
-  ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
-
-  double offset_to_other_reference_line_ = 0.0;
-
-  double priority_cost_ = 0.0;
-
-  PlanningTarget planning_target_;
-
+  double                          cost_        = 0.0;
+  bool                            is_inited_   = false;
+  bool                            is_drivable_ = true;
+  PathDecision                    path_decision_;
+  PathData                        path_data_;
+  SpeedData                       speed_data_;
+  DiscretizedTrajectory           discretized_trajectory_;
+  SLBoundary                      adc_sl_boundary_;
+  planning_internal::Debug        debug_;
+  LatencyStats                    latency_stats_;
+  hdmap::RouteSegments            lanes_;
+  bool                            is_on_reference_line_           = false;
+  bool                            is_safe_to_change_lane_         = false;
+  ADCTrajectory::RightOfWayStatus status_                         = ADCTrajectory::UNPROTECTED;
+  double                          offset_to_other_reference_line_ = 0.0;
+  double                          priority_cost_                  = 0.0;
+  PlanningTarget                  planning_target_;
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };
 
