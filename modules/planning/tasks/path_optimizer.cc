@@ -32,6 +32,7 @@ PathOptimizer::PathOptimizer(const std::string& name)
 
 apollo::common::Status PathOptimizer::Execute(Frame*                   frame,
                                               ReferenceLineInfo* const reference_line_info) {
+  // copy frame and reference_line_info to task::frame_ and task::reference_lin_info_
   Task::Execute(frame, reference_line_info);
   auto ret = Process(reference_line_info->speed_data(), reference_line_info->reference_line(),
                      frame->PlanningStartPoint(), reference_line_info->mutable_path_data());

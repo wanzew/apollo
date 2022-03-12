@@ -33,16 +33,13 @@ class PathDecider : public Task {
  public:
   PathDecider();
   ~PathDecider() = default;
-
   apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
   apollo::common::Status Process(const PathData& path_data, PathDecision* const path_decision);
 
   bool MakeObjectDecision(const PathData& path_data, PathDecision* const path_decision);
-
   bool MakeStaticObstacleDecision(const PathData& path_data, PathDecision* const path_decision);
-
   ObjectStop GenerateObjectStopDecision(const PathObstacle& path_obstacle) const;
 };
 

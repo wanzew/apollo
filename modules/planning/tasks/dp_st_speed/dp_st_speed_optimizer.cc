@@ -108,12 +108,8 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper&  boundary_mapper,
   DpStGraph st_graph(st_graph_data, dp_st_speed_config_,
                      reference_line_info_->path_decision()->path_obstacles().Items(), init_point_,
                      adc_sl_boundary_);
+  st_graph.Search(speed_data).ok();
 
-  if (!st_graph.Search(speed_data).ok()) {
-    AERROR << "failed to search graph with dynamic programming.";
-    RecordSTGraphDebug(st_graph_data, st_graph_debug);
-    return false;
-  }
   RecordSTGraphDebug(st_graph_data, st_graph_debug);
   return true;
 }
@@ -125,44 +121,23 @@ Status DpStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
                                    const SpeedData&       reference_speed_data,
                                    PathDecision* const    path_decision,
                                    SpeedData* const       speed_data) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before process DpStSpeedOptimizer.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
-  }
-  init_point_      = init_point;
-  adc_sl_boundary_ = adc_sl_boundary;
-  reference_line_  = &reference_line;
-
-  if (path_data.discretized_path().NumOfPoints() == 0) {
-    std::string msg("Empty path data");
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  if (!is_init_) { return Status(ErrorCode::PLANNING_ERROR, "Not inited."); }
+  init_point_                  = init_point;
+  adc_sl_boundary_             = adc_sl_boundary;
+  reference_line_              = &reference_line;
+  auto*         debug          = reference_line_info_->mutable_debug();
+  STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
   StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_, *reference_line_,
                                    path_data, dp_st_speed_config_.total_path_length(),
                                    dp_st_speed_config_.total_time(),
                                    reference_line_info_->IsChangeLanePath());
-
-  auto*         debug          = reference_line_info_->mutable_debug();
-  STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
-
   path_decision->EraseStBoundaries();
-  if (boundary_mapper.CreateStBoundary(path_decision).code() == ErrorCode::PLANNING_ERROR) {
-    const std::string msg = "Mapping obstacle for dp st speed optimizer failed.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
+  boundary_mapper.CreateStBoundary(path_decision);
   SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_, *reference_line_,
                                         path_data);
-
-  if (!SearchStGraph(boundary_mapper, speed_limit_decider, path_data, speed_data, path_decision,
-                     st_graph_debug)) {
-    const std::string msg(Name() + ":Failed to search graph with dynamic programming.");
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  SearchStGraph(boundary_mapper, speed_limit_decider, path_data, speed_data, path_decision,
+                st_graph_debug);
   return Status::OK();
 }
 

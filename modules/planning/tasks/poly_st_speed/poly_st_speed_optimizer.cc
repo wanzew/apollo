@@ -65,30 +65,21 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
                                      PathDecision* const    path_decision,
                                      SpeedData* const       speed_data) {
   if (reference_line_info_->ReachedDestination()) { return Status::OK(); }
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
-  }
 
-  if (path_data.discretized_path().NumOfPoints() == 0) {
-    std::string msg("Empty path data");
-    AERROR << msg;
+  if (path_data.discretized_path().NumOfPoints() == 0)
     return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
 
   StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_, reference_line, path_data,
-                                   poly_st_speed_config_.total_path_length(),
-                                   poly_st_speed_config_.total_time(),
-                                   reference_line_info_->IsChangeLanePath());
+                                   poly_st_speed_config_.total_path_length(),  // default 149 m
+                                   poly_st_speed_config_.total_time(),  // planning time 7.0 s
+                                   reference_line_info_->IsChangeLanePath());  //
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     DCHECK(path_obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
   path_decision->EraseStBoundaries();
-  if (boundary_mapper.CreateStBoundary(path_decision).code() == ErrorCode::PLANNING_ERROR) {
-    return Status(ErrorCode::PLANNING_ERROR, "Mapping obstacle for qp st speed optimizer failed!");
-  }
+  boundary_mapper.CreateStBoundary(path_decision);
 
   for (const auto* obstacle : path_decision->path_obstacles().Items()) {
     auto  id               = obstacle->Id();

@@ -78,73 +78,36 @@ class PathObstacle {
    * @brief return the merged longitudinal decision
    * Longitudinal decision is one of {Stop, Yield, Follow, Overtake, Ignore}
    **/
-  const ObjectDecisionType& LongitudinalDecision() const;
-
-  const std::string DebugString() const;
-
-  const SLBoundary& PerceptionSLBoundary() const;
-
-  const StBoundary& reference_line_st_boundary() const;
-
-  const StBoundary& st_boundary() const;
-
-  const std::vector<std::string>& decider_tags() const;
-
+  const ObjectDecisionType&              LongitudinalDecision() const;
+  const std::string                      DebugString() const;
+  const SLBoundary&                      PerceptionSLBoundary() const;
+  const StBoundary&                      reference_line_st_boundary() const;
+  const StBoundary&                      st_boundary() const;
+  const std::vector<std::string>&        decider_tags() const;
   const std::vector<ObjectDecisionType>& decisions() const;
 
   void AddLongitudinalDecision(const std::string& decider_tag, const ObjectDecisionType& decision);
-
+  bool HasLongitudinalDecision() const;
   void AddLateralDecision(const std::string& decider_tag, const ObjectDecisionType& decision);
   bool HasLateralDecision() const;
-
   void SetStBoundary(const StBoundary& boundary);
-
   void SetStBoundaryType(const StBoundary::BoundaryType type);
-
   void EraseStBoundary();
-
-  void SetReferenceLineStBoundary(const StBoundary& boundary);
-
-  void SetReferenceLineStBoundaryType(const StBoundary::BoundaryType type);
-
   void EraseReferenceLineStBoundary();
-
-  bool HasLongitudinalDecision() const;
-
+  void SetReferenceLineStBoundary(const StBoundary& boundary);
+  void SetReferenceLineStBoundaryType(const StBoundary::BoundaryType type);
   bool HasNonIgnoreDecision() const;
-
-  /**
-   * @brief Calculate stop distance with the obstacle using the ADC's minimum
-   * turning radius
-   */
-  double MinRadiusStopDistance(const common::VehicleParam& vehicle_param) const;
-
-  /**
-   * @brief Check if this object can be safely ignored.
-   * The object will be ignored if the lateral decision is ignore and the
-   * longitudinal decision is ignore
-   *  return longitudinal_decision_ == ignore && lateral_decision == ignore.
-   */
-  bool IsIgnore() const;
-  bool IsLongitudinalIgnore() const;
-  bool IsLateralIgnore() const;
-
-  void BuildReferenceLineStBoundary(const ReferenceLine& reference_line, const double adc_start_s);
-
-  void SetPerceptionSlBoundary(const SLBoundary& sl_boundary);
-
-  /**
-   * @brief check if a ObjectDecisionType is a longitudinal decision.
-   **/
+  // @brief Calculate stop distance with the obstacle using the ADC's minimum turning radius
+  double      MinRadiusStopDistance(const common::VehicleParam& vehicle_param) const;
+  void        SetPerceptionSlBoundary(const SLBoundary& sl_boundary);
   static bool IsLongitudinalDecision(const ObjectDecisionType& decision);
-
-  /**
-   * @brief check if a ObjectDecisionType is a lateral decision.
-   **/
   static bool IsLateralDecision(const ObjectDecisionType& decision);
-
-  void SetBlockingObstacle(bool blocking) { is_blocking_obstacle_ = blocking; }
-  bool IsBlockingObstacle() const { return is_blocking_obstacle_; }
+  void        SetBlockingObstacle(bool blocking) { is_blocking_obstacle_ = blocking; }
+  bool        IsBlockingObstacle() const { return is_blocking_obstacle_; }
+  bool        IsIgnore() const;
+  bool        IsLongitudinalIgnore() const;
+  bool        IsLateralIgnore() const;
+  void BuildReferenceLineStBoundary(const ReferenceLine& reference_line, const double adc_start_s);
 
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
@@ -154,25 +117,23 @@ class PathObstacle {
   static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
                                                  const ObjectDecisionType& rhs);
 
-  bool            BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
-                                            const double         adc_start_s,
-                                            StBoundary* const    st_boundary);
-  bool            IsValidObstacle(const perception::PerceptionObstacle& perception_obstacle);
-  std::string     id_;
-  const Obstacle* obstacle_ = nullptr;
+  bool BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
+                                 const double         adc_start_s,
+                                 StBoundary* const    st_boundary);
+
+  bool IsValidObstacle(const perception::PerceptionObstacle& perception_obstacle);
+
+  std::string                     id_;
+  const Obstacle*                 obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string>        decider_tags_;
   SLBoundary                      perception_sl_boundary_;
-
-  StBoundary reference_line_st_boundary_;
-  StBoundary st_boundary_;
-
-  ObjectDecisionType lateral_decision_;
-  ObjectDecisionType longitudinal_decision_;
-
-  bool is_blocking_obstacle_ = false;
-
-  double min_radius_stop_distance_ = -1.0;
+  StBoundary                      reference_line_st_boundary_;
+  StBoundary                      st_boundary_;
+  ObjectDecisionType              lateral_decision_;
+  ObjectDecisionType              longitudinal_decision_;
+  bool                            is_blocking_obstacle_     = false;
+  double                          min_radius_stop_distance_ = -1.0;
 
   struct ObjectTagCaseHash {
     std::size_t operator()(const planning::ObjectDecisionType::ObjectTagCase tag) const {

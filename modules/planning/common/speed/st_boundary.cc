@@ -32,6 +32,7 @@ namespace planning {
 using common::math::LineSegment2d;
 using common::math::Vec2d;
 
+// 构造函数
 StBoundary::StBoundary(const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
   CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
 
@@ -88,6 +89,7 @@ std::string StBoundary::TypeName(BoundaryType type) {
   return "UNKNOWN";
 }
 
+// 移除重复点
 void StBoundary::RemoveRedundantPoints(std::vector<std::pair<STPoint, STPoint>>* point_pairs) {
   if (!point_pairs || point_pairs->size() <= 2) { return; }
 
@@ -334,8 +336,13 @@ StBoundary StBoundary::GenerateStBoundary(const std::vector<STPoint>& lower_poin
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
   for (size_t i = 0; i < lower_points.size() && i < upper_points.size(); ++i) {
-    point_pairs.emplace_back(STPoint(lower_points.at(i).s(), lower_points.at(i).t()),
-                             STPoint(upper_points.at(i).s(), upper_points.at(i).t()));
+    auto stpoint_lower = STPoint(lower_points.at(i).s(), lower_points.at(i).t());
+    auto stpoint_upper = STPoint(upper_points.at(i).s(), upper_points.at(i).t());
+
+    std::pair<STPoint, STPoint> pair =
+        std::make_pair<STPoint, STPoint>(stpoint_lower, stpoint_upper);
+
+    point_pairs.emplace_back();
   }
   return StBoundary(point_pairs);
 }

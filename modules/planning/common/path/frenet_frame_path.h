@@ -36,6 +36,7 @@ class FrenetFramePath {
   virtual ~FrenetFramePath() = default;
 
   void set_points(const std::vector<common::FrenetFramePoint>& points);
+
   const std::vector<common::FrenetFramePoint>& points() const;
   std::uint32_t                                NumOfPoints() const;
   double                                       Length() const;

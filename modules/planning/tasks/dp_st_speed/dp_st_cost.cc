@@ -74,6 +74,7 @@ void DpStCost::SortAndMergeRange(std::vector<std::pair<float, float>>* keep_clea
   std::size_t i = 0;
   std::size_t j = i + 1;
   while (j < keep_clear_range->size()) {
+    //
     if (keep_clear_range->at(i).second < keep_clear_range->at(j).first) {
       ++i;
       ++j;
@@ -94,46 +95,68 @@ bool DpStCost::InKeepClearRange(float s) const {
   return false;
 }
 
-float DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
-  const float s = st_graph_point.point().s();
-  const float t = st_graph_point.point().t();
+// 对STGraph上的节点（Node），计算 obstacle cost
+// 所有的障碍物都需要和该节点 st_graph_node 进行障碍物成本计算
+float DpStCost::GetObstacleCost(const StGraphPoint& st_graph_node) {
+  const float s = st_graph_node.point().s();
+  const float t = st_graph_node.point().t();
 
   float cost = 0.0;
   for (const auto* obstacle : obstacles_) {
+    // 如果障碍物没有blocking，继续（对该障碍物不设置成本）下一障碍物cost计算
     if (!obstacle->IsBlockingObstacle()) { continue; }
 
-    auto        boundary        = obstacle->st_boundary();
-    const float kIgnoreDistance = 200.0;
-    if (boundary.min_s() > kIgnoreDistance) { continue; }
+    // 为啥不设置? 因为每个节点的默认cost是 std::numeric_limits<float>::infinity()
+    // modules/planning/tasks/dp_st_speed/st_graph_point.h
+
+    auto boundary = obstacle->st_boundary();
+
+    // 如果 障碍物距离很远，超出200m，那么也不设置障碍物成本，继续下一障碍物cost计算
+    if (boundary.min_s() > 200.0) { continue; }
+
+    // 如果 st boundary的 min_t min_s两侧，那么也不设置障碍物成本，继续下一障碍物cost计算
     if (t < boundary.min_t() || t > boundary.max_t()) { continue; }
+
+    // 如果障碍物是Blocking属性的，或者，该节点处在boundary内部，那么说明，该节点不可通行，设置无穷大的成本
     if (obstacle->IsBlockingObstacle() && boundary.IsPointInBoundary(STPoint(s, t))) {
       return kInf;
     }
+
     double s_upper = 0.0;
     double s_lower = 0.0;
 
     int boundary_index = boundary_map_[boundary.id()];
-    if (boundary_cost_[boundary_index][st_graph_point.index_t()].first < 0.0) {
+    // 因为 std::pair<float, float> 中的两个值都初始化成了-1，所以下面if会先执行
+    if (boundary_cost_[boundary_index][st_graph_node.index_t()].first < 0.0) {
+      // boundary 在 t 时刻上方，根据st图，找出 多边形上面边对应的s值和下面边对应的s值
       boundary.GetBoundarySRange(t, &s_upper, &s_lower);
-      boundary_cost_[boundary_index][st_graph_point.index_t()] = std::make_pair(s_upper, s_lower);
+      boundary_cost_[boundary_index][st_graph_node.index_t()] = std::make_pair(s_upper, s_lower);
     } else {
-      s_upper = boundary_cost_[boundary_index][st_graph_point.index_t()].first;
-      s_lower = boundary_cost_[boundary_index][st_graph_point.index_t()].second;
+      s_upper = boundary_cost_[boundary_index][st_graph_node.index_t()].first;
+      s_lower = boundary_cost_[boundary_index][st_graph_node.index_t()].second;
     }
+
+    // 如果查询的节点 在s_lower下面或者s_upper上方，说明
     if (s < s_lower) {
       constexpr float kSafeTimeBuffer = 3.0;
       const float     len             = obstacle->obstacle()->Speed() * kSafeTimeBuffer;
+      // 很安全，不设置cost成本
       if (s + len < s_lower) {
         continue;
-      } else {
+      }
+      // 没那么安全：
+      else {
         cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
                 std::pow((len - s_lower + s), 2);
       }
     } else if (s > s_upper) {
       const float kSafeDistance = 20.0;  // or calculated from velocity
+      // 很安全
       if (s > s_upper + kSafeDistance) {
         continue;
-      } else {
+      }
+      // 没那么安全
+      else {
         cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
                 std::pow((kSafeDistance + s_upper - s), 2);
       }

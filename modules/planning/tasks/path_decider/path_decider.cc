@@ -76,9 +76,7 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
   }
 
   const double half_width = common::VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
-
-  const double lateral_radius = half_width + FLAGS_lateral_ignore_buffer;
-
+  const double lateral_radius      = half_width + FLAGS_lateral_ignore_buffer;
   const double lateral_stop_radius = half_width + FLAGS_static_decision_nudge_l_buffer;
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
@@ -115,6 +113,7 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
 
     const auto& sl_boundary = path_obstacle->PerceptionSLBoundary();
 
+    // 在后方，或在远方
     if (sl_boundary.end_s() < frenet_points.front().s() ||
         sl_boundary.start_s() > frenet_points.back().s()) {
       path_decision->AddLongitudinalDecision("PathDecider/not-in-s", obstacle.Id(),
@@ -122,7 +121,7 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
       path_decision->AddLateralDecision("PathDecider/not-in-s", obstacle.Id(), object_decision);
       continue;
     }
-
+    // 在左方，或在右方
     const auto   frenet_point = frenet_path.GetNearestPoint(sl_boundary);
     const double curr_l       = frenet_point.l();
     if (curr_l - lateral_radius > sl_boundary.end_l() ||

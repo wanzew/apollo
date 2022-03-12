@@ -53,6 +53,7 @@ message Path {
   repeated PathPoint path_point = 2;
 }
 
+// PathPoint 只是包含位置和朝向信息，并不包含车速加速度以及时间的信息
 message TrajectoryPoint {
   // path point
   optional PathPoint path_point = 1;

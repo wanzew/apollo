@@ -31,13 +31,10 @@ class SpeedLimit {
  public:
   SpeedLimit() = default;
 
-  void AppendSpeedLimit(const double s, const double v);
-
   const std::vector<std::pair<double, double>>& speed_limit_points() const;
-
-  double GetSpeedLimitByS(const double s) const;
-
-  void Clear();
+  void                                          AppendSpeedLimit(const double s, const double v);
+  double                                        GetSpeedLimitByS(const double s) const;
+  void                                          Clear();
 
  private:
   // use a vector to represent speed limit

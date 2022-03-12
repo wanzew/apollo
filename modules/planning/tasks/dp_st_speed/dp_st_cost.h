@@ -44,11 +44,8 @@ class DpStCost {
                     const common::TrajectoryPoint&          init_point);
 
   float GetObstacleCost(const StGraphPoint& point);
-
   float GetReferenceCost(const STPoint& point, const STPoint& reference_point) const;
-
   float GetSpeedCost(const STPoint& first, const STPoint& second, const float speed_limit) const;
-
   float GetAccelCostByTwoPoints(const float pre_speed, const STPoint& first, const STPoint& second);
   float
   GetAccelCostByThreePoints(const STPoint& first, const STPoint& second, const STPoint& third);
@@ -57,6 +54,7 @@ class DpStCost {
                                const float    pre_acc,
                                const STPoint& pre_point,
                                const STPoint& curr_point);
+
   float GetJerkCostByThreePoints(const float    first_speed,
                                  const STPoint& first_point,
                                  const STPoint& second_point,
@@ -68,26 +66,22 @@ class DpStCost {
                                 const STPoint& fourth);
 
  private:
-  float GetAccelCost(const float accel);
-  float JerkCost(const float jerk);
-
+  float       GetAccelCost(const float accel);
+  float       JerkCost(const float jerk);
   void        AddToKeepClearRange(const std::vector<const PathObstacle*>& obstacles);
   static void SortAndMergeRange(std::vector<std::pair<float, float>>* keep_clear_range_);
   bool        InKeepClearRange(float s) const;
 
-  const DpStSpeedConfig&                  config_;
-  const std::vector<const PathObstacle*>& obstacles_;
-  const common::TrajectoryPoint&          init_point_;
-
-  float unit_t_ = 0.0;
-
-  std::unordered_map<std::string, int>              boundary_map_;
+  // std::pair<float, float> 里保存的是 s_upper 和 s_lower
   std::vector<std::vector<std::pair<float, float>>> boundary_cost_;
-
-  std::vector<std::pair<float, float>> keep_clear_range_;
-
-  std::array<float, 200> accel_cost_;
-  std::array<float, 400> jerk_cost_;
+  std::vector<std::pair<float, float>>              keep_clear_range_;
+  std::array<float, 200>                            accel_cost_;
+  std::array<float, 400>                            jerk_cost_;
+  float                                             unit_t_ = 0.0;
+  std::unordered_map<std::string, int>              boundary_map_;
+  const DpStSpeedConfig&                            config_;
+  const std::vector<const PathObstacle*>&           obstacles_;
+  const common::TrajectoryPoint&                    init_point_;
 };
 
 }  // namespace planning

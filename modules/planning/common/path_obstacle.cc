@@ -352,24 +352,16 @@ const Obstacle* PathObstacle::obstacle() const { return obstacle_; }
 
 void PathObstacle::AddLongitudinalDecision(const std::string&        decider_tag,
                                            const ObjectDecisionType& decision) {
-  DCHECK(IsLongitudinalDecision(decision))
-      << "Decision: " << decision.ShortDebugString() << " is not a longitudinal decision";
+  DCHECK(IsLongitudinalDecision(decision));
   longitudinal_decision_ = MergeLongitudinalDecision(longitudinal_decision_, decision);
-  ADEBUG << decider_tag << " added obstacle " << Id()
-         << " longitudinal decision: " << decision.ShortDebugString()
-         << ". The merged decision is: " << longitudinal_decision_.ShortDebugString();
   decisions_.push_back(decision);
   decider_tags_.push_back(decider_tag);
 }
 
 void PathObstacle::AddLateralDecision(const std::string&        decider_tag,
                                       const ObjectDecisionType& decision) {
-  DCHECK(IsLateralDecision(decision))
-      << "Decision: " << decision.ShortDebugString() << " is not a lateral decision";
+  DCHECK(IsLateralDecision(decision));
   lateral_decision_ = MergeLateralDecision(lateral_decision_, decision);
-  ADEBUG << decider_tag << " added obstacle " << Id()
-         << " a lateral decision: " << decision.ShortDebugString()
-         << ". The merged decision is: " << lateral_decision_.ShortDebugString();
   decisions_.push_back(decision);
   decider_tags_.push_back(decider_tag);
 }

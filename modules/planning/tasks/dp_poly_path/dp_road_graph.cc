@@ -74,10 +74,8 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint&          init_po
   }
 
   std::vector<DPRoadGraphNode> min_cost_path;
-  if (!GenerateMinCostPath(obstacles, &min_cost_path)) {
-    AERROR << "Fail to generate graph!";
-    return false;
-  }
+  if (!GenerateMinCostPath(obstacles, &min_cost_path) return false; 
+  
   std::vector<common::FrenetFramePoint> frenet_path;
   float                                 accumulated_s   = init_sl_point_.s();
   const float                           path_resolution = config_.path_resolution();
@@ -113,28 +111,56 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint&          init_po
   return true;
 }
 
+/*
+ *     |l  dim_t = 7
+ *     |__________________________________________________________________
+ *     |
+ *     |            *           *           *           *            *
+ *     |            *           *           *           *            *
+ *     |            *           *           *           *            *
+ *     |------------*-----------*-----------*-----------*------------*------------
+ *     |            *           *           *           *            *
+ *     *            *           *           *           *            *
+ *     |            *           *           *           *            *
+ *     |___________________________________________________________________
+ *     s0                                                                 s
+ */
+
+//
 bool DPRoadGraph::GenerateMinCostPath(const std::vector<const PathObstacle*>& obstacles,
                                       std::vector<DPRoadGraphNode>*           min_cost_path) {
   CHECK(min_cost_path != nullptr);
 
+  // SamplePathWaypoints: 建立 RoadGraph
   std::vector<std::vector<common::SLPoint>> path_waypoints;
   if (!SamplePathWaypoints(init_point_, &path_waypoints) || path_waypoints.size() < 1) {
     AERROR << "Fail to sample path waypoints! reference_line_length = " << reference_line_.Length();
     return false;
   }
+  // 第一层前加入起始点，起始点作为单独的一层
   path_waypoints.insert(path_waypoints.begin(), std::vector<common::SLPoint>{init_sl_point_});
   const auto& vehicle_config = common::VehicleConfigHelper::instance()->GetConfig();
 
+  // In the first E-step, obstacles are projected on the
+  // lane Frenet frame. This projection includes both
+  // static obstacle projection and dynamic obstacle pro-
+  // jection.
+  // TrajectoryCost 构造函数中会完成以下工作：
+  // 针对静态障碍物 生成 std::vector<SLBoundary> static_obstacle_sl_boundaries_
+  // 针对动态障碍物 生成 std::vector<std::vector<common::math::Box2d>>  dynamic_obstacle_boxes_
   TrajectoryCost trajectory_cost(config_, reference_line_, reference_line_info_.IsChangeLanePath(),
                                  obstacles, vehicle_config.vehicle_param(), speed_data_,
                                  init_sl_point_);
 
-  std::list<std::list<DPRoadGraphNode>> graph_nodes;
-  graph_nodes.emplace_back();
-  graph_nodes.back().emplace_back(init_sl_point_, nullptr, ComparableCost());
+  std::list<std::list<DPRoadGraphNode>> graph_nodes;  // 空的二维链表
+  graph_nodes.emplace_back();                         // 先插入一个一维链表
+  graph_nodes.back().emplace_back(init_sl_point_, nullptr,
+                                  ComparableCost());  // 向一维链表里插入节点
   auto&  front       = graph_nodes.front().front();
   size_t total_level = path_waypoints.size();
 
+  // 两个数据结构， path_waypoints 是二维数组， graph_nodes 是二维链表
+  // 遍历 层节点
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
     const auto& prev_dp_nodes = graph_nodes.back();
     const auto& level_points  = path_waypoints[level];
@@ -161,7 +187,7 @@ bool DPRoadGraph::GenerateMinCostPath(const std::vector<const PathObstacle*>& ob
   }
 
   // find best path
-  DPRoadGraphNode fake_head;
+  DPRoadGraphNode fake_head;  // fake_head: min_cost = infinity()
   for (const auto& cur_dp_node : graph_nodes.back()) {
     fake_head.UpdateCost(&cur_dp_node, cur_dp_node.min_cost_curve, cur_dp_node.min_cost);
   }
@@ -171,8 +197,10 @@ bool DPRoadGraph::GenerateMinCostPath(const std::vector<const PathObstacle*>& ob
     min_cost_node = min_cost_node->min_cost_prev_node;
     min_cost_path->push_back(*min_cost_node);
   }
+  // while结束后最后一个节点是起始点，否则返回false
   if (min_cost_node != &graph_nodes.front().front()) { return false; }
 
+  // 翻转, min_cost_path向量就是 DP path 结果
   std::reverse(min_cost_path->begin(), min_cost_path->end());
 
   for (const auto& node : *min_cost_path) {
@@ -203,14 +231,17 @@ void DPRoadGraph::UpdateNode(const std::list<DPRoadGraphNode>& prev_nodes,
       init_dl  = init_frenet_frame_point_.dl();
       init_ddl = init_frenet_frame_point_.ddl();
     }
+    // rough curve, not precise
     QuinticPolynomialCurve1d curve(prev_sl_point.l(), init_dl, init_ddl, cur_point.l(), 0.0, 0.0,
                                    cur_point.s() - prev_sl_point.s());
 
     if (!IsValidCurve(curve)) { continue; }
+    // 当前节点会和前面一层多有的节点逐个计算两点之间的轨迹cost，
+    // 当前点到起始点的cost = cost_prev_to_cur + prev_dp_node.min_cost
     const auto cost =
         trajectory_cost->Calculate(curve, prev_sl_point.s(), cur_point.s(), level, total_level) +
         prev_dp_node.min_cost;
-
+    //
     cur_node->UpdateCost(&prev_dp_node, curve, cost);
   }
 
@@ -232,19 +263,21 @@ bool DPRoadGraph::SamplePathWaypoints(const common::TrajectoryPoint&            
   CHECK_NOTNULL(points);
 
   const float kMinSampleDistance = 40.0;
+  // std::fmax(init_point.v() * 8.0
   const float total_length =
       std::fmin(init_sl_point_.s() + std::fmax(init_point.v() * 8.0, kMinSampleDistance),
                 reference_line_.Length());
-  const auto&  vehicle_config       = common::VehicleConfigHelper::instance()->GetConfig();
-  const float  half_adc_width       = vehicle_config.vehicle_param().width() / 2.0;
-  const size_t num_sample_per_level = FLAGS_use_navigation_mode ?
-                                          config_.navigator_sample_num_each_level() :
-                                          config_.sample_points_num_each_level();
+  const auto&  vehicle_config = common::VehicleConfigHelper::instance()->GetConfig();
+  const float  half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
+  const size_t num_sample_per_level =
+      FLAGS_use_navigation_mode ? config_.navigator_sample_num_each_level() :
+                                  config_.sample_points_num_each_level();  // 每层点数 default 9
 
   const bool has_sidepass = HasSidepass();
 
   constexpr float kSamplePointLookForwardTime = 4.0;
-  const float     step_length =
+  // step_length_min 8m, step_length_max 15m
+  const float step_length =
       common::math::Clamp(init_point.v() * kSamplePointLookForwardTime, config_.step_length_min(),
                           config_.step_length_max());
 
