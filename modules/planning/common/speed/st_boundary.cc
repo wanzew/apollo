@@ -334,8 +334,13 @@ StBoundary StBoundary::GenerateStBoundary(const std::vector<STPoint>& lower_poin
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
   for (size_t i = 0; i < lower_points.size() && i < upper_points.size(); ++i) {
-    point_pairs.emplace_back(STPoint(lower_points.at(i).s(), lower_points.at(i).t()),
-                             STPoint(upper_points.at(i).s(), upper_points.at(i).t()));
+    auto stpoint_lower = STPoint(lower_points.at(i).s(), lower_points.at(i).t());
+    auto stpoint_upper = STPoint(upper_points.at(i).s(), upper_points.at(i).t());
+
+    std::pair<STPoint, STPoint> pair =
+        std::make_pair<STPoint, STPoint>(stpoint_lower, stpoint_upper);
+
+    point_pairs.emplace_back();
   }
   return StBoundary(point_pairs);
 }

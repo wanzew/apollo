@@ -34,6 +34,7 @@ namespace planning {
 SpeedData::SpeedData(std::vector<common::SpeedPoint> speed_points)
     : speed_vector_(std::move(speed_points)) {}
 
+// 追加速度点
 void SpeedData::AppendSpeedPoint(
     const double s, const double time, const double v, const double a, const double da) {
   if (!speed_vector_.empty()) { CHECK(speed_vector_.back().t() < time); }
@@ -46,6 +47,7 @@ void SpeedData::set_speed_vector(std::vector<common::SpeedPoint> speed_points) {
   speed_vector_ = std::move(speed_points);
 }
 
+// 根据 时间 t 查找 t 时刻对应的速度点， 在第 [i, i+1) 之间差值，插值点以形参返回
 bool SpeedData::EvaluateByTime(const double t, common::SpeedPoint* const speed_point) const {
   if (speed_vector_.size() < 2) { return false; }
   if (!(speed_vector_.front().t() < t + 1.0e-6 && t - 1.0e-6 < speed_vector_.back().t())) {

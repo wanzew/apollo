@@ -161,7 +161,9 @@ Status EMPlanner::PlanOnReferenceLine(const TrajectoryPoint& planning_start_poin
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
-  auto  speed_profile        = GenerateInitSpeedProfile(planning_start_point, reference_line_info);
+  /// 生成初始速度
+  auto speed_profile = GenerateInitSpeedProfile(planning_start_point, reference_line_info);
+  /// 如果第一帧刚开始...
   if (speed_profile.empty()) {
     speed_profile = GenerateSpeedHotStart(planning_start_point);
     ADEBUG << "Using dummy hot start for speed vector";
@@ -254,6 +256,7 @@ Status EMPlanner::PlanOnReferenceLine(const TrajectoryPoint& planning_start_poin
   return Status::OK();
 }
 
+// 生成初始速度
 std::vector<SpeedPoint>
 EMPlanner::GenerateInitSpeedProfile(const TrajectoryPoint&   planning_init_point,
                                     const ReferenceLineInfo* reference_line_info) {
@@ -275,6 +278,7 @@ EMPlanner::GenerateInitSpeedProfile(const TrajectoryPoint&   planning_init_point
   const auto& last_speed_vector = last_reference_line_info->speed_data().speed_vector();
 
   if (!last_speed_vector.empty()) {
+    // 上一帧 起始点对应的 sl 位置
     const auto& last_init_point = last_frame->PlanningStartPoint().path_point();
     Vec2d       last_xy_point(last_init_point.x(), last_init_point.y());
     SLPoint     last_sl_point;
@@ -282,16 +286,19 @@ EMPlanner::GenerateInitSpeedProfile(const TrajectoryPoint&   planning_init_point
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }
 
+    // 当前帧 起始点对应的 sl 位置
     Vec2d   xy_point(planning_init_point.path_point().x(), planning_init_point.path_point().y());
     SLPoint sl_point;
     if (!last_reference_line_info->reference_line().XYToSL(xy_point, &sl_point)) {
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }
 
+    // 连续两帧 s 差异量
     double s_diff           = sl_point.s() - last_sl_point.s();
     double start_time       = 0.0;
     double start_s          = 0.0;
     bool   is_updated_start = false;
+
     for (const auto& speed_point : last_speed_vector) {
       if (speed_point.s() < s_diff) { continue; }
       if (!is_updated_start) {
@@ -299,6 +306,8 @@ EMPlanner::GenerateInitSpeedProfile(const TrajectoryPoint&   planning_init_point
         start_s          = speed_point.s();
         is_updated_start = true;
       }
+      // 第一个 start_s == speed_poin.s(), 下面第一个循环中speed_point.s()-speed_point.s()
+      // 会使refined_speed_point第一个点的s为0
       SpeedPoint refined_speed_point;
       refined_speed_point.set_s(speed_point.s() - start_s);
       refined_speed_point.set_t(speed_point.t() - start_time);
@@ -327,7 +336,7 @@ EMPlanner::GenerateSpeedHotStart(const TrajectoryPoint& planning_init_point) {
 
     hot_start_speed_profile.push_back(std::move(speed_point));
 
-    t += FLAGS_trajectory_time_min_interval;
+    t += FLAGS_trajectory_time_min_interval;  // 0.02s
     s += v * FLAGS_trajectory_time_min_interval;
   }
   return hot_start_speed_profile;

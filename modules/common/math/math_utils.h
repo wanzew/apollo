@@ -148,7 +148,7 @@ template <typename T>
 T Clamp(const T value, T bound1, T bound2) {
   if (bound1 > bound2) { std::swap(bound1, bound2); }
 
-  if (value < bound1) {
+  if (value < bound1) { 
     return bound1;
   } else if (value > bound2) {
     return bound2;

@@ -287,6 +287,7 @@ void ReferenceLineInfo::SetStopPoint(const StopPoint& stop_point) {
 
 void ReferenceLineInfo::SetCruiseSpeed(double speed) { planning_target_.set_cruise_speed(speed); }
 
+// 找到当前帧 ref-line 的起始点，把起始点映射到上一帧，检查起始点是否在上一帧的线上
 bool ReferenceLineInfo::IsStartFrom(const ReferenceLineInfo& previous_reference_line_info) const {
   if (reference_line_.reference_points().empty()) { return false; }
   auto            start_point         = reference_line_.reference_points().front();
@@ -311,13 +312,16 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   CHECK(ptr_discretized_trajectory != nullptr);
   // use varied resolution to reduce data load but also provide enough data
   // point for control module
-  const double kDenseTimeResoltuion  = FLAGS_trajectory_time_min_interval;
-  const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
-  const double kDenseTimeSec         = FLAGS_trajectory_time_high_density_period;
+  // 使用不同分辨率取点，以减少数据量，并且有足够的点给到控制模块
+  // 前1s，分辨率0.02s，后面分辨率0.1s
+  const double kDenseTimeResoltuion  = FLAGS_trajectory_time_min_interval;         // 0.02s
+  const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;         // 0.1s
+  const double kDenseTimeSec         = FLAGS_trajectory_time_high_density_period;  // 1.0s
   if (path_data_.discretized_path().NumOfPoints() == 0) {
     AWARN << "path data is empty";
     return false;
   }
+  //
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
        cur_rel_time +=
        (cur_rel_time < kDenseTimeSec ? kDenseTimeResoltuion : kSparseTimeResolution)) {

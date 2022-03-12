@@ -400,6 +400,7 @@ void ReferenceLine::GetLaneFromS(const double                          s,
   }
 }
 
+///
 bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {
   common::SLPoint sl_point;
   if (!XYToSL(vec2d_point, &sl_point)) { return false; }

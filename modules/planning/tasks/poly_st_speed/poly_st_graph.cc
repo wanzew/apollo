@@ -60,18 +60,11 @@ bool PolyStGraph::FindStTunnel(const common::TrajectoryPoint&          init_poin
 
   // sample end points
   std::vector<std::vector<STPoint>> points;
-  if (!SampleStPoints(&points)) {
-    AERROR << "Fail to sample st points.";
-    return false;
-  }
+  SampleStPoints(&points);
 
   PolyStGraphNode min_cost_node;
-  if (!GenerateMinCostSpeedProfile(points, obstacles, &min_cost_node)) {
-    AERROR << "Fail to search min cost speed profile.";
-    return false;
-  }
-  ADEBUG << "min_cost_node s = " << min_cost_node.st_point.s()
-         << ", t = " << min_cost_node.st_point.t();
+  GenerateMinCostSpeedProfile(points, obstacles, &min_cost_node);
+  
   speed_data->Clear();
   constexpr double delta_t = 0.1;  // output resolution, in seconds
   const auto       curve   = min_cost_node.speed_profile;

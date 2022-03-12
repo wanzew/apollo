@@ -114,34 +114,20 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
     return Status::OK();
   }
 
-  if (!InitCostTable().ok()) {
-    const std::string msg = "Initialize cost table failed.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  InitCostTable();
+  CalculateTotalCost();
+  RetrieveSpeedProfile(speed_data);
 
-  if (!CalculateTotalCost().ok()) {
-    const std::string msg = "Calculate total cost failed.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
-  if (!RetrieveSpeedProfile(speed_data).ok()) {
-    const std::string msg = "Retrieve best speed profile failed.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
   return Status::OK();
 }
 
 Status DpStGraph::InitCostTable() {
-  uint32_t dim_s = dp_st_speed_config_.matrix_dimension_s();
-  uint32_t dim_t = dp_st_speed_config_.matrix_dimension_t();
+  uint32_t dim_s = dp_st_speed_config_.matrix_dimension_s();  // 150 列
+  uint32_t dim_t = dp_st_speed_config_.matrix_dimension_t();  // 8 行
   DCHECK_GT(dim_s, 2);
   DCHECK_GT(dim_t, 2);
   cost_table_ = std::vector<std::vector<StGraphPoint>>(
       dim_t, std::vector<StGraphPoint>(dim_s, StGraphPoint()));
-
   float curr_t = 0.0;
   for (uint32_t i = 0; i < cost_table_.size(); ++i, curr_t += unit_t_) {
     auto& cost_table_i = cost_table_[i];
@@ -152,6 +138,72 @@ Status DpStGraph::InitCostTable() {
   }
   return Status::OK();
 }
+/*
+ *     |t  dim_t = 8
+ *     |
+ *   7 |    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *     |
+ *   6 |    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *     |
+ *   5 |    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *     |
+ *   4 |    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *     |
+ *   3 |    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *     |
+ *   2 |    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *     |
+ *   1 |    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *     |
+ *   0 |    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *     |_____________________________________________________________________________________
+ *     s0                                                                                   s
+ *
+ *  cost_table_ = std::vector<std::vector<StGraphPoint>>(
+ *      dim_t, std::vector<StGraphPoint>(dim_s, StGraphPoint()));
+ *
+ *
+ * s0  &----------*-----------*-----------*-----------*-----------*-----------*-----------*-> s
+ * t0 0s          1s          2s          3s          4s          5s          6s          7s
+ *
+ *     |s/m
+ *     |
+ * 149 |    *     *     *     *     *     *     *     *
+ * 148 |    *     *     *     *     *     *     *     *
+ * 147 |    *     *     *     *     *     *     *     *
+ * 146 |    *     *     *     *     *     *     *     *
+ * 145 |    *     *     *     *     *     *     *     *
+ * 144 |    *     *     *     *     *     *     *     *
+ *   . |    *     *     *     *     *     *     *     *
+ *   . |    *     *     *     *     *     *     *     *
+ *   . |    *     *     *     *     *     *     *     *
+ *   . |    *     *     *     *     *     *     *     *
+ *   . |    *     *     *     *     *     *     *     *
+ *   . |    *     *     *     *     *     *     *     *
+ *   . |    *     *     *     *     *     *     *     *
+ *   . |    *     *     *     *     *     *     *     *
+ *  20 |    *     *     *     *     *     *     *     *
+ *  19 |    *     *     *     *     *     *     *     *
+ *  18 |    *     *     *     *     *     *     *     *
+ *  17 |    *     *     *     *     *     *     *     *
+ *  16 |    *     *     *     *     *     *     *     *
+ *  15 |    *     *     *     *     *     *     *     *
+ *  14 |    *     *     *     *     *     *     *     *
+ *  13 |    *     *     *     *     *     *     *     *
+ *  12 |    *     *     *     *     *     *     *     *
+ *  11 |    *     *     *     *     *     *     *     *
+ *  10 |    *     *     *     *     *     *     *     *
+ *   9 |    *     *     *     *     *     *     *     *
+ *   8 |    *     *     *     *     *     *     *     *
+ *   6 |    *     *     *     *     *     *     *     *
+ *   5 |    *     *     *     *     *     *     *     *
+ *   4 |    *     *     *     *     *     *     *     *
+ *   3 |    *     *     *     *     *     *     *     *
+ *   2 |    *     *     *     *     *     *     *     *
+ *   1 |    *     *     *     *     *     *     *     *
+ *   0 *____________________________________________________
+ *          0     1     2     3     4     5     6     7  t/s
+ */
 
 Status DpStGraph::CalculateTotalCost() {
   // col and row are for STGraph
@@ -159,6 +211,16 @@ Status DpStGraph::CalculateTotalCost() {
   // s corresponding to row
   uint32_t next_highest_row = 0;
   uint32_t next_lowest_row  = 0;
+  // 首先定义了两个变量，这两个变量限定的是下一列的s范围。因为我们在初始化CostTable时，
+  // 每个时间点上的采样范围都是[0,total_s_]，在实际的计算过程中，并不需要每次都遍历所有的点，
+  // 因此，在通过函数CalculateCostAt()计算当前点的cost过后，需要通过函数GetRowRange()计算出下一列的s的范围
+  // [next_lowest_row,next_highest_row]。
+  //  CalculateTotalCost()的外层循环是
+  // for (size_t c = 0; c < cost_table_.size(); ++c)
+  // 内层循环是
+  // for (size_t r = next_lowest_row; r <= next_highest_row; ++r)
+  // 在这两层循环中，调用CalculateCostAt()，在每个时刻t，遍历该时刻所有的采样点，
+  // 采样点的s范围为[next_lowest_row,next_highest_row]。
 
   for (size_t c = 0; c < cost_table_.size(); ++c) {
     int highest_row = 0;
@@ -218,6 +280,27 @@ void DpStGraph::GetRowRange(const StGraphPoint& point,
   }
 }
 
+// 通过动态规划的方法进行速度规划就是在CalculateCostAt()中进行的。CalculateCostAt()输入的参数是(c,r)。
+// 注意这里的c和r指的是列和行的序号，而不是具体坐标。在Apollo的代码中，表示点的行列号用(c,r)，
+// 具体坐标用(curr_t,curr_s)。CalculateCostAt()中的输入参数是[c,r]，表示的是采样点的index。
+// 通过遍历cost_table_中所有采样点，在CalculateCostAt()中计算当前点cost_cr的TotalCost。
+// 首先，通过GetObstacleCost()计算采样点的obstacle_cost，如果obstacle_cost无穷大，则返回，计算下一个点。
+// 通过GetSpatialPotentialCost()计算SpatialPotentialCost，这部分反映的是当前点到终点的距离的cost。
+// const auto& cost_init = cost_table_[0][0];
+// 定义cost_table_的第一个点为起始点。
+// if (c == 0){...}
+// if (c == 1){...}
+// if (c == 2){...}
+// 这里是根据cost_table_的列数（即在采样的时刻的数目）的不同进行分类计算，而不是在判断cost的值。
+// 在这里有的博客解析的错误的，请大家注意！！！实际上是分了四类，c==2之后进行的是c>2的计算，只是代码中并没有具体标出来。
+// 具体来看：
+// if (c == 0) {
+//   DCHECK_EQ(r, 0) << "Incorrect. Row should be 0 with col = 0. row: " << r;
+//   cost_cr.SetTotalCost(0.0);//起点的cost设置为0
+//   return;
+// }
+//  当c==0，也就是cost_table_的第一列，t=0时刻，这里只有一个点——起始点cost_table_[0][0]。起始点的TotalCost自然设置为0。
+//
 void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   auto& cost_cr = cost_table_[c][r];
   cost_cr.SetObstacleCost(dp_st_cost_.GetObstacleCost(cost_cr));

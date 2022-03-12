@@ -37,10 +37,8 @@ StGraphData::StGraphData(const std::vector<const StBoundary*>& st_boundaries,
 const std::vector<const StBoundary*>& StGraphData::st_boundaries() const { return st_boundaries_; }
 
 const TrajectoryPoint& StGraphData::init_point() const { return init_point_; }
-
-const SpeedLimit& StGraphData::speed_limit() const { return speed_limit_; }
-
-double StGraphData::path_data_length() const { return path_data_length_; }
+const SpeedLimit&      StGraphData::speed_limit() const { return speed_limit_; }
+double                 StGraphData::path_data_length() const { return path_data_length_; }
 
 }  // namespace planning
 }  // namespace apollo

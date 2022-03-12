@@ -40,20 +40,16 @@ class StGraphData {
               const double                           path_data_length);
   StGraphData() = default;
 
-  const std::vector<const StBoundary*>& st_boundaries() const;
-
+  const std::vector<const StBoundary*>&  st_boundaries() const;
   const apollo::common::TrajectoryPoint& init_point() const;
-
-  const SpeedLimit& speed_limit() const;
-
-  double path_data_length() const;
+  const SpeedLimit&                      speed_limit() const;
+  double                                 path_data_length() const;
 
  private:
   std::vector<const StBoundary*>  st_boundaries_;
   apollo::common::TrajectoryPoint init_point_;
-
-  SpeedLimit speed_limit_;
-  double     path_data_length_ = 0.0;
+  SpeedLimit                      speed_limit_;
+  double                          path_data_length_ = 0.0;
 };
 
 }  // namespace planning

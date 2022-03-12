@@ -74,9 +74,7 @@ class StBoundaryMapper {
                                 std::vector<STPoint>*                         lower_points) const;
 
   apollo::common::Status MapWithoutDecision(PathObstacle* path_obstacle) const;
-
   bool MapStopDecision(PathObstacle* stop_obstacle, const ObjectDecisionType& decision) const;
-
   apollo::common::Status MapWithDecision(PathObstacle*             path_obstacle,
                                          const ObjectDecisionType& decision) const;
 

@@ -54,7 +54,7 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig&                 config,
     , heuristic_speed_data_(heuristic_speed_data)
     , init_sl_point_(init_sl_point) {
   const float total_time = std::min(heuristic_speed_data_.TotalTime(), FLAGS_prediction_total_time);
-
+  // eval_time_interval default = 0.1
   num_of_time_stamps_ = static_cast<uint32_t>(std::floor(total_time / config.eval_time_interval()));
 
   for (const auto* ptr_path_obstacle : obstacles) {

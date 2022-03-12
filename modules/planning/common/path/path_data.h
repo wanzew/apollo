@@ -59,6 +59,7 @@ class PathData {
    */
   bool SLToXY(const FrenetFramePath& frenet_path, DiscretizedPath* const discretized_path);
   bool XYToSL(const DiscretizedPath& discretized_path, FrenetFramePath* const frenet_path);
+
   const ReferenceLine*                                   reference_line_ = nullptr;
   DiscretizedPath                                        discretized_path_;
   FrenetFramePath                                        frenet_path_;

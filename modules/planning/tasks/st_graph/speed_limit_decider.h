@@ -53,9 +53,8 @@ class SpeedLimitDecider {
  private:
   FRIEND_TEST(SpeedLimitDeciderTest, get_centric_acc_limit);
   double GetCentricAccLimit(const double kappa) const;
-
-  void GetAvgKappa(const std::vector<common::PathPoint>& path_points,
-                   std::vector<double>*                  kappa) const;
+  void   GetAvgKappa(const std::vector<common::PathPoint>& path_points,
+                     std::vector<double>*                  kappa) const;
 
  private:
   const SLBoundary&                   adc_sl_boundary_;
