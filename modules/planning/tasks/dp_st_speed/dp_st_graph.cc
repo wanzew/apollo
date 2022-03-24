@@ -418,6 +418,13 @@ void DpStGraph::CalculateCostAt(const uint32_t t, const uint32_t s) {
   const uint32_t  s_low             = (max_s_diff < s ? s - max_s_diff : 0);
   const auto&     pre_t             = cost_table_[t - 1];
 
+  // https://blog.csdn.net/qq_41324346/article/details/105285029
+  // 在完成缩小前一列计算范围的工作之后，计算第三列采样点的TotalCost。遍历前一列[r_low,
+  // r]范围内的点，
+  // 计算，由起始点开始，经第二列的点，到达当前点的TotalCost，计算方法同上面的方法相同。
+  // 不同之处在于，由于当前点可经由第二列不同的点到达，因此，会得到几个TotalCost，从这些TotalCost中找到最小的一个，
+  // 并记录下对应的PrePoint，记为当前点的PrePoint。
+
   if (t == 2) {
     // 寻找前继节点
     for (uint32_t s_pre = s_low; s_pre <= s; ++s_pre) {
@@ -466,6 +473,13 @@ void DpStGraph::CalculateCostAt(const uint32_t t, const uint32_t s) {
      */
   }
 
+  // 当计算进行到第4列及以后，就会执行这部分代码。同样的，在计算之前，已经进行了缩小前一列范围的工作，
+  // 这里遍历前一列[r_low, r]范围内的点，计算当前点的cost。这一部分的计算方法与c=2时的是相同的，
+  // 之所以再写一遍是计算JerkCost时，这里会多计算一个点，仅此处不同而已。
+  // 同样的，在最后会找到当前列TotalCost最小的点，并记录下它的PrePoint。
+  // 以上就是CalculateCostAt()的全部内容。大家可以看到，在逐列计算的过程中，
+  // 我们已经找到每一列TotalCost最小的点，并且将它与前一列的点关联起来。
+  // 只要确定了终点，就可以拔出萝卜带出泥，找到从起点到终点所经过的所有采样点。
   if (t >= 3) {
     for (uint32_t s_pre = s_low; s_pre <= s; ++s_pre) {
       if (std::isinf(pre_t[s_pre].total_cost()) || pre_t[s_pre].pre_point() == nullptr) {
@@ -531,6 +545,9 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
    *
    */
   // 找到t=7时cost最小的节点
+  // 经过CalculateCostAt()的计算，我们得到了最后一列所有点的TotalCost，通过这个for循环，
+  // 我们可以找到最后一列TotalCost最小的采样点，将这个点暂定为最佳的终点，
+  // 记为best_end_point，并记下它的TotalCost为min_cost。
   for (const StGraphNode& cur_node : cost_table_.back()) {
     if (!std::isinf(cur_node.total_cost()) && cur_node.total_cost() < min_cost) {
       best_end_point = &cur_node;
@@ -559,6 +576,10 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
 
   // 设置最优终点的速度数据，并顺藤摸瓜找出其连接的倒数第二个、倒数第三个直到第一个时间节点
   // 分别设置这些时间节点的速度数据
+  // 这里需要插一句，为什么不直接将最后一列TotalCost最小的点定位最佳终点呢？
+  // 因为采样时间是我们估计的一个大概的时间，在这个时间之前，动态规划可能已经规划到了路径的终点，
+  // 只是因为还没有计算到cost_table_的最后一列，才一直进行计算。因此，我们在判断为最后一列之后，
+  // 需要继续判断每一列的最后一个点，是不是已经到达了路径的终点。
   std::vector<SpeedPoint> speed_profile;
   const StGraphNode*      cur_node = best_end_point;
   while (cur_node != nullptr) {
