@@ -45,8 +45,13 @@ const Eigen::MatrixXd& AffineConstraint::constraint_boundary() const {
   return constraint_boundary_;
 }
 
+//追加约束，是最底层的函数
 bool AffineConstraint::AddConstraint(const Eigen::MatrixXd& constraint_matrix,
                                      const Eigen::MatrixXd& constraint_boundary) {
+  // 假设添加的约束是 Ax=b，constraint_matrix就是A，constraint_boundary就是b，
+  // x就是未知的多项式系数
+  // 自然A的一行对应的Ax的计算结果就是b的一行，所以 A.rows==b.rows。
+  // b的元素就是目标方程的计算结果，是一个实数，自然 b.cols==1
   if (constraint_matrix.rows() != constraint_boundary.rows()) {
     AERROR << "Fail to add constraint because constraint matrix rows != "
               "constraint boundary rows.";

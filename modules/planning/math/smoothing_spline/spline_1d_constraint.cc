@@ -44,6 +44,9 @@ Spline1dConstraint::Spline1dConstraint(const std::vector<double>& x_knots,
   equality_constraint_.SetIsEquality(true);
 }
 
+// 从上往下看AddConstraint()，首先是spline_constraint->AddInequalityConstraint()。
+// 其中又内部调用了AffineConstraint::AddConstraint()。AffineConstraint::AddConstraint()是最底层的函数，简明清晰。
+// 其他函数之所以复杂，正在于要构造这个函数的2个输入参数：constraint_matrix 和 constraint_boundary。
 bool Spline1dConstraint::AddInequalityConstraint(const Eigen::MatrixXd& constraint_matrix,
                                                  const Eigen::MatrixXd& constraint_boundary) {
   return inequality_constraint_.AddConstraint(constraint_matrix, constraint_boundary);
@@ -69,30 +72,53 @@ bool Spline1dConstraint::AddBoundary(const std::vector<double>& x_coord,
     return false;
   }
   // emplace affine constraints
-  const uint32_t  num_params = spline_order_ + 1;
+  const uint32_t num_params = spline_order_ + 1;
+  // inequality_constraint矩阵中绝大多数元素都是0，
+  //只有x_coord坐落的一段curve对应元素有值
   Eigen::MatrixXd inequality_constraint =
+      //                                    //行              //列
       Eigen::MatrixXd::Zero(filtered_upper_bound.size() + filtered_lower_bound.size(),
                             (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd inequality_boundary =
       Eigen::MatrixXd::Zero(filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
+  //由AddPointConstraintInRange()推来，其实就是已知val=f(x0)，range>0，
+  // x_coord=filtered_lower_bound_x=filtered_upper_bound_x，
+  // filtered_lower_bound=lower_bound=val-range，
+  // filtered_upper_bound=upper_bound=val+range，
+  //由val-range<val<val+range ==> f(filtered_lower_bound_x) >= filtered_lower_bound
+  //且 f(filtered_upper_bound_x) <= filtered_upper_bound
+
+  //这个for循环对应f(filtered_lower_bound_x) >= filtered_lower_bound的情况，
+  //恰好符合QP中Ax>=b的形式
   for (uint32_t i = 0; i < filtered_lower_bound.size(); ++i) {
+    // FindIndex()返回x_knots_中第一个大于入参的元素的前一个位置，
+    //即入参位于index～index+1之间
     uint32_t index = FindIndex(filtered_lower_bound_x[i]);
 
+    // corrected_x是每一段的相对起点的x坐标
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double       coef        = 1.0;
+
+    // j=0~num_params，依次是corrected_x的0~num_params次项
+    //计算[1, x, x^2, x^3, x^4, x^5] * [a, b, c, d, e, f].T，
+    //[a, b, c, d, e, f]是5次curve的系数
     for (uint32_t j = 0; j < num_params; ++j) {
+      //对特定行、特定curve的参数列更新，因为给定一个s，其根据定义域只对应一段curve
       inequality_constraint(i, j + index * num_params) = coef;
       coef *= corrected_x;
     }
     inequality_boundary(i, 0) = filtered_lower_bound[i];
   }
 
+  //这个for循环对应f(filtered_upper_bound_x) <= filtered_upper_bound的情况，
+  //为符合QP中Ax>=b的形式,将Ax<=b ==> -Ax>=-b，故coef赋初值-1，与上部分比，全为负数
   for (uint32_t i = 0; i < filtered_upper_bound.size(); ++i) {
     uint32_t     index       = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double       coef        = -1.0;
     for (uint32_t j = 0; j < num_params; ++j) {
+      // 注意行列坐标
       inequality_constraint(i + filtered_lower_bound.size(), j + index * num_params) = coef;
       coef *= corrected_x;
     }
@@ -129,6 +155,8 @@ bool Spline1dConstraint::AddDerivativeBoundary(const std::vector<double>& x_coor
     uint32_t     index       = FindIndex(filtered_lower_bound_x[i]);
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double       coef        = 1.0;
+    //计算[0， 1, 2x, 3x^2, 4x^3, 5x^4] * [a, b, c, d, e, f].T，前者是f'(x)，
+    //后者是5次curve的系数
     for (uint32_t j = 1; j < num_params; ++j) {
       inequality_constraint(i, j + index * num_params) = coef * j;
       coef *= corrected_x;
@@ -176,6 +204,8 @@ bool Spline1dConstraint::AddSecondDerivativeBoundary(const std::vector<double>& 
     uint32_t     index       = FindIndex(filtered_lower_bound_x[i]);
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double       coef        = 1.0;
+    //计算[0, 0, 2, 6x, 12x^2, 20x^3] * [a, b, c, d, e, f].T，前者是f''(x),
+    //后者是5次curve的系数
     for (uint32_t j = 2; j < num_params; ++j) {
       inequality_constraint(i, j + index * num_params) = coef * j * (j - 1);
       coef *= corrected_x;
@@ -280,6 +310,9 @@ bool Spline1dConstraint::AddConstraintInRange(AddConstraintInRangeFunc func,
   return func(x_vec, lower_bound, upper_bound);
 }
 
+// 添加0阶不等式约束，即考察目标函数f(x)与 [fx-range, fx+range] 的不等式关系。
+// 间接调用的Spline1dConstraint::AddBoundary()是理解constraint的核心，
+// 它就是在构造QP形式中Ax>=b约束中的A和b
 bool Spline1dConstraint::AddPointConstraintInRange(const double x,
                                                    const double fx,
                                                    const double range) {
@@ -303,6 +336,9 @@ bool Spline1dConstraint::AddPointDerivativeConstraint(const double x, const doub
   return AddEqualityConstraint(equality_constraint, equality_boundary);
 }
 
+// 添加1阶不等式约束（angle），即考察目标函数f'(x)与 [dfx-range, dfx+range] 的不等式关系。
+// 间接调用的Spline1dConstraint::AddDerivativeBoundary()与Spline1dConstraint::AddBoundary()如出一辙。
+// 值得注意的是，此处的A是f(x)的一阶导。
 bool Spline1dConstraint::AddPointDerivativeConstraintInRange(const double x,
                                                              const double dfx,
                                                              const double range) {
@@ -326,6 +362,7 @@ bool Spline1dConstraint::AddPointSecondDerivativeConstraint(const double x, cons
   return AddEqualityConstraint(equality_constraint, equality_boundary);
 }
 
+// 添加2阶不等式约束（kappa）。间接调用的Spline1dConstraint::AddSecondDerivativeBoundary()的A是f(x)的二阶导。
 bool Spline1dConstraint::AddPointSecondDerivativeConstraintInRange(const double x,
                                                                    const double ddfx,
                                                                    const double range) {
@@ -455,6 +492,12 @@ bool Spline1dConstraint::AddSecondDerivativeSmoothConstraint() {
   return equality_constraint_.AddConstraint(equality_constraint, equality_boundary);
 }
 
+// 添加joint points处0~3阶导连续 等式约束，即
+// fl(xl)=fr(xr); fl'(xl)=fr'(xr); fl''(xl)=fr''(xr); fl'''(xl)=fr'''(xr)，
+// 转换为QP的形式，即
+// fl(xl)-fr(xr)=0; fl'(xl)-fr'(xr)=0; fl''(xl)-fr''(xr)=0; fl'''(xl)-fr'''(xr)=0
+// fl()和fr()是相邻的2段curve polynomial，
+// xl和xr是同一个点在不同的段不同的起点下的相对坐标
 bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
   if (x_knots_.size() < 3) { return false; }
 
@@ -463,7 +506,24 @@ bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
   Eigen::MatrixXd equality_constraint =
       Eigen::MatrixXd::Zero(n_constraint, (x_knots_.size() - 1) * num_params);
   Eigen::MatrixXd equality_boundary = Eigen::MatrixXd::Zero(n_constraint, 1);
+  //这里的2层for循环很不直观，其实是把不同阶导数、不同的joint point、不同的系数
+  //杂糅在一起计算了。虽高效，但太复杂抽象了，最终计算后应该是下面的形式
+  //每行左边6项是joint point左侧的curve参数，右边6项是joint point右侧的curve参数
+  // 0~3行是1个joint point的0~3阶导，每4行表示一个点
+  // | 1 xl xl^2 xl^3  xl^4   xl^5   -1 -xr -xr^2 -xr^3  -xr^4   -xr^5   |   | al | = | 0 |
+  // | 0 1  2xl  3xl^2 4xl^3  5xl^4   0 -1  -2xr  -3xr^2 -4xr^3  -5xr^4  |   | bl | = | 0 |
+  // | 0 0  2    6xl   12xl^2 20xl^3  0  0  -2    -6xr   -12xr^2 -20xr^3 | * | cl | = | 0 |
+  // | 0 0  0    6     24xl   60xl^2  0  0   0    -6     -24xr   -60xr^2 |   | dl | = | 0 |
+  // | . .  .    .     .      .       .  .   .     .      .       .      |   | el | = | 0 |
+  // | . .  .    .     .      .       .  .   .     .      .       .      |   | fl | = | 0 |
+  //                                                                         | ar | = | 0 |
+  //                                                                         | br | = | 0 |
+  //                                                                         | cr | = | 0 |
+  //                                                                         | dr | = | 0 |
+  //                                                                         | er | = | 0 |
+  //                                                                         | fr | = | 0 |
 
+  // i循环x_knots_.size())-2次
   for (uint32_t i = 0; i < n_constraint; i += 4) {
     double left_coef     = 1.0;
     double right_coef    = -1.0;

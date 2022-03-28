@@ -120,7 +120,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint&          init_po
  *     |            *           *           *           *            *
  *     |------------*-----------*-----------*-----------*------------*------------
  *     |            *           *           *           *            *
- *     *            *           *           *           *            *
+ *     @            *           *           *           *            *
  *     |            *           *           *           *            *
  *     |___________________________________________________________________
  *     s0                                                                 s
@@ -143,8 +143,7 @@ bool DPRoadGraph::GenerateMinCostPath(const std::vector<const PathObstacle*>& ob
 
   // In the first E-step, obstacles are projected on the
   // lane Frenet frame. This projection includes both
-  // static obstacle projection and dynamic obstacle pro-
-  // jection.
+  // static obstacle projection and dynamic obstacle projection.
   // TrajectoryCost 构造函数中会完成以下工作：
   // 针对静态障碍物 生成 std::vector<SLBoundary> static_obstacle_sl_boundaries_
   // 针对动态障碍物 生成 std::vector<std::vector<common::math::Box2d>>  dynamic_obstacle_boxes_

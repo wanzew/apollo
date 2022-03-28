@@ -66,20 +66,19 @@ QpFrenetFrame::QpFrenetFrame(const ReferenceLine&            reference_line,
 }
 
 bool QpFrenetFrame::Init(const std::vector<const PathObstacle*>& path_obstacles) {
-  if (!CalculateDiscretizedVehicleLocation()) {
-    AERROR << "Fail to calculate discretized vehicle location!";
-    return false;
-  }
+  // 根据SpeedData，计算自车纵向行经轨迹，存入vector<SpeedPoint>
+  // 即discretized_vehicle_location_
+  // calculate discretized vehicle location
+  CalculateDiscretizedVehicleLocation();
 
-  if (!CalculateHDMapBound()) {
-    AERROR << "Calculate HDMap bound failed.";
-    return false;
-  }
+  //根据HDMap和道路参考线，计算自车轨迹的横向约束
+  // Calculate HDMap bound
+  CalculateHDMapBound();
 
-  if (!CalculateObstacleBound(path_obstacles)) {
-    AERROR << "Calculate obstacle bound failed!";
-    return false;
-  }
+  // 计算静态、动态障碍物及相应的decision对自车轨迹的横向约束
+  // Calculate obstacle bound
+  CalculateObstacleBound(path_obstacles);
+
   return true;
 }
 
@@ -110,20 +109,26 @@ const std::vector<std::pair<double, double>>& QpFrenetFrame::GetDynamicObstacleB
   return dynamic_obstacle_bound_;
 }
 
+// 根据SpeedData，计算自车纵向行经轨迹，存入vector<SpeedPoint>
+// 即discretized_vehicle_location_
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
+  // 根据SpeedData按时间遍历计算了自车的纵向轨迹相关信息，
+  // 存入vector<SpeedPoint>，即discretized_vehicle_location_。
   for (double relative_time = 0.0; relative_time < speed_data_.TotalTime();
        relative_time += time_resolution_) {
     SpeedPoint veh_point;
-    if (!speed_data_.EvaluateByTime(relative_time, &veh_point)) {
-      AERROR << "Fail to get speed point at relative time " << relative_time;
-      return false;
-    }
+    // 此处的speed_data_是从 DP_SPEED 计算得到的结果，并不一定是匀速的了
+    speed_data_.EvaluateByTime(relative_time, &veh_point);
     veh_point.set_t(relative_time);
     discretized_vehicle_location_.push_back(std::move(veh_point));
   }
   return true;
 }
 
+// MapDynamicObstacleWithDecision()也是和静态障碍物大体相似的思路。
+// 根据由SpeedData求得的自车位置信息discretized_vehicle_location_，
+// 按照时间戳一一匹配动态障碍物的轨迹点（应该是预测轨迹），计算该点处的障碍物bounding
+// box对自车横向轨迹的影响。
 bool QpFrenetFrame::MapDynamicObstacleWithDecision(const PathObstacle& path_obstacle) {
   const Obstacle* ptr_obstacle = path_obstacle.obstacle();
   if (!path_obstacle.HasLateralDecision()) {
@@ -162,6 +167,8 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(const PathObstacle& path_obst
       common::SLPoint sl_second = sl_corners[(i + 1) % sl_corners.size()];
       if (sl_first.s() < sl_second.s()) { std::swap(sl_first, sl_second); }
 
+      // MapLateralConstraint()被调用4次，因为sl_corners由bounding box而来，有4个端点
+      //因为是考虑横向约束，bounding box的上下2条横向线段端点对于求bound没有影响
       std::pair<double, double> bound = MapLateralConstraint(
           sl_first, sl_second, nudge.type(), veh_point.s() - vehicle_param_.back_edge_to_center(),
           veh_point.s() + vehicle_param_.front_edge_to_center());
@@ -170,6 +177,7 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(const PathObstacle& path_obst
       double s_resolution    = std::fabs(veh_point.v() * time_resolution_);
       double updated_start_s = init_frenet_point_.s() + veh_point.s() - s_resolution;
       double updated_end_s   = init_frenet_point_.s() + veh_point.s() + s_resolution;
+      //纵向s超出考察范围
       if (updated_end_s > evaluated_s_.back() || updated_start_s < evaluated_s_.front()) {
         continue;
       }
@@ -177,7 +185,9 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(const PathObstacle& path_obst
           FindInterval(updated_start_s, updated_end_s);
 
       for (uint32_t j = update_index_range.first; j <= update_index_range.second; ++j) {
+        //可行驶区域的右边界bound，取max
         dynamic_obstacle_bound_[j].first = std::max(bound.first, dynamic_obstacle_bound_[j].first);
+        //可行驶区域的左边界bound，取min
         dynamic_obstacle_bound_[j].second =
             std::min(bound.second, dynamic_obstacle_bound_[j].second);
       }
@@ -186,6 +196,8 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(const PathObstacle& path_obst
   return true;
 }
 
+// 考虑了静态障碍物以及相应的横向避让措施对可行驶区域宽度的影响，
+// 处理结果static_obstacle_bound_保存了evaluated_s_中各采样点处的横向可行驶范围。
 bool QpFrenetFrame::MapStaticObstacleWithDecision(const PathObstacle& path_obstacle) {
   const auto ptr_obstacle = path_obstacle.obstacle();
   if (!path_obstacle.HasLateralDecision()) {
@@ -197,6 +209,8 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(const PathObstacle& path_obsta
     ADEBUG << "only support nudge decision now";
     return true;
   }
+  // 处理静态障碍物的主要思路是将其轮廓端点映射到Frenet坐标系，
+  // 结合nudge的方向计算障碍物占据的横向范围，由 MapNudgePolygon()和 MapNudgeLine()实现。
   if (!MapNudgePolygon(common::math::Polygon2d(ptr_obstacle->PerceptionBoundingBox()),
                        decision.nudge(), &static_obstacle_bound_)) {
     AERROR << "fail to map polygon with id " << path_obstacle.Id() << " in qp frenet frame";
@@ -205,6 +219,7 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(const PathObstacle& path_obsta
   return true;
 }
 
+//确定障碍物轮廓对纵向s范围内轨迹采样点的横向约束
 bool QpFrenetFrame::MapNudgePolygon(const common::math::Polygon2d&                polygon,
                                     const ObjectNudge&                            nudge,
                                     std::vector<std::pair<double, double>>* const bound_map) {
@@ -225,6 +240,9 @@ bool QpFrenetFrame::MapNudgePolygon(const common::math::Polygon2d&              
   }
 
   const auto corner_size = sl_corners.size();
+  // MapNudgePolygon()中循环调用MapNudgeLine()，
+  // 将障碍物的bounding box对自车轨迹的横向约束计算，转换为计算bounding
+  // box的4条边对自车轨迹的横向约束。
   for (uint32_t i = 0; i < corner_size; ++i) {
     if (!MapNudgeLine(sl_corners[i], sl_corners[(i + 1) % corner_size], nudge.type(), bound_map)) {
       AERROR << "Map box line (sl) " << sl_corners[i].DebugString() << "->"
@@ -235,16 +253,18 @@ bool QpFrenetFrame::MapNudgePolygon(const common::math::Polygon2d&              
   return true;
 }
 
+//确定障碍物轮廓的一条边所对应纵向s范围内轨迹采样点的横向约束
 bool QpFrenetFrame::MapNudgeLine(const common::SLPoint&                        start,
                                  const common::SLPoint&                        end,
                                  const ObjectNudge::Type                       nudge_type,
                                  std::vector<std::pair<double, double>>* const constraint) {
   DCHECK_NOTNULL(constraint);
 
-  const common::SLPoint&        near_point    = (start.s() < end.s() ? start : end);
-  const common::SLPoint&        further_point = (start.s() < end.s() ? end : start);
-  std::pair<uint32_t, uint32_t> impact_index  = FindInterval(near_point.s(), further_point.s());
-
+  const common::SLPoint& near_point    = (start.s() < end.s() ? start : end);
+  const common::SLPoint& further_point = (start.s() < end.s() ? end : start);
+  // impact_index表示evaluated_s_中受影响的区间范围，2个index可能是相等的
+  std::pair<uint32_t, uint32_t> impact_index = FindInterval(near_point.s(), further_point.s());
+  // s轴超出轨迹纵向范围
   if (further_point.s() < start_s_ - vehicle_param_.back_edge_to_center() ||
       near_point.s() > end_s_ + vehicle_param_.front_edge_to_center()) {
     return true;
@@ -261,12 +281,15 @@ bool QpFrenetFrame::MapNudgeLine(const common::SLPoint&                        s
 
     if (nudge_type == ObjectNudge::LEFT_NUDGE) {
       boundary += adc_half_width;
+      // first是lower bound，second是upper bound
+      // lower bound增大，即将自车可行驶区域向左移动，即left nudge
+      //而upper bound不变，其初始化为INF
       (*constraint)[i].first = std::max(boundary, (*constraint)[i].first);
     } else {
       boundary -= adc_half_width;
       (*constraint)[i].second = std::min(boundary, (*constraint)[i].second);
     }
-
+    //若可行驶区域宽度constraint太窄(<0.3m)，则收缩feasible_longitudinal_upper_bound_
     if ((*constraint)[i].second < (*constraint)[i].first + 0.3) {
       if (i > 0) {
         feasible_longitudinal_upper_bound_ =
@@ -287,6 +310,8 @@ bool QpFrenetFrame::MapNudgeLine(const common::SLPoint&                        s
   return true;
 }
 
+// 用来计算障碍物bounding box的一条边对自车横向轨迹的约束。
+//返回值pair.first表示可行驶区域的右边界限定，second表示左边界限定，first<second
 std::pair<double, double> QpFrenetFrame::MapLateralConstraint(const common::SLPoint&  start,
                                                               const common::SLPoint&  end,
                                                               const ObjectNudge::Type nudge_type,
@@ -295,6 +320,7 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(const common::SLPo
   constexpr double          inf    = std::numeric_limits<double>::infinity();
   std::pair<double, double> result = std::make_pair(-inf, inf);
 
+  //障碍物车在自车前方或后方，忽略，本函数只考虑横向影响
   if (start.s() > s_end || end.s() < s_start) { return result; }
   double s_front = std::max(start.s(), s_start);
   double s_back  = std::min(end.s(), s_end);
@@ -307,13 +333,18 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(const common::SLPo
     weight_front = (s_front - start.s()) / (end.s() - start.s());
   }
 
+  //将自车首尾点向障碍物车做映射，找对应点，以确定横向偏移
+  //我觉得只简单的利用障碍物车的bounding box就够了
+  // nudge的横向距离已经在调用该函数之前纳入障碍物车的start和end两点的l坐标了
   common::SLPoint front =
       common::math::InterpolateUsingLinearApproximation(start, end, weight_front);
   common::SLPoint back = common::math::InterpolateUsingLinearApproximation(start, end, weight_back);
 
   if (nudge_type == ObjectNudge::RIGHT_NUDGE) {
+    //确认自车横向左方限定，取min使可行驶范围偏右，故nudge right
     result.second = std::min(front.l(), back.l());
   } else {
+    //确认自车横向右方限定，取max使可行驶范围偏左，故nudge left
     result.first = std::max(front.l(), back.l());
   }
   return result;
@@ -331,7 +362,10 @@ std::pair<uint32_t, uint32_t> QpFrenetFrame::FindInterval(const double start,
   return std::make_pair(start_index, end_index);
 }
 
+// 计算了沿纵轴s均匀采样所得点集中 各个点的横向约束，即左右边界。
 bool QpFrenetFrame::CalculateHDMapBound() {
+  // 根据HDMap和道路参考线，计算自车轨迹的横向约束
+  // hdmap_bound_初始化为vector {evaluated_s_.size(), std::make_pair(-inf, inf)}
   const double adc_half_width = vehicle_param_.width() / 2.0;
   for (uint32_t i = 0; i < hdmap_bound_.size(); ++i) {
     double left_bound  = 0.0;
@@ -343,23 +377,21 @@ bool QpFrenetFrame::CalculateHDMapBound() {
       left_bound  = FLAGS_default_reference_line_width / 2;
     }
 
+    // 按照右手坐标系，自车前方为s轴正方向，
+    // hdmap_bound_[i].first是右侧边界，second是左侧边界， 左右各往里收半个车宽
     hdmap_bound_[i].first  = -right_bound + adc_half_width;
     hdmap_bound_[i].second = left_bound - adc_half_width;
 
+    // 如果右边界>左边界，不合理，则缩短纵向s上限
+    // feasible_longitudinal_upper_bound_到当前考察点
     if (hdmap_bound_[i].first >= hdmap_bound_[i].second) {
-      ADEBUG << "HD Map bound at " << evaluated_s_[i] << " is infeasible (" << hdmap_bound_[i].first
-             << ", " << hdmap_bound_[i].second << ") ";
-      ADEBUG << "left_bound: " << left_bound << ", right_bound: " << right_bound;
-
       feasible_longitudinal_upper_bound_ =
           std::min(evaluated_s_[i], feasible_longitudinal_upper_bound_);
       common::SLPoint sl;
       sl.set_s(evaluated_s_[i]);
+
       common::math::Vec2d xy;
-      if (!reference_line_.SLToXY(sl, &xy)) {
-        AERROR << "Fail to calculate HDMap bound at s: " << sl.s() << ", l: " << sl.l();
-        return false;
-      }
+      reference_line_.SLToXY(sl, &xy);
       ADEBUG << "evaluated point x: " << std::fixed << xy.x() << " y: " << xy.y();
       break;
     }
@@ -367,10 +399,16 @@ bool QpFrenetFrame::CalculateHDMapBound() {
   return true;
 }
 
+// CalculateObstacleBound()的处理分为2部分：静态障碍物和动态障碍物。
+// 首先判断障碍物是否有LateralDecision，若没有，则忽略，因为对path没有影响（这个阶段的path重点考虑横向运动）。
+// LateralDecision主要是指横向的nudge，
+// 具体decision相关信息可查阅apollo3_5/modules/planning/proto/decision.proto。
 bool QpFrenetFrame::CalculateObstacleBound(const std::vector<const PathObstacle*>& path_obstacles) {
   for (const auto ptr_path_obstacle : path_obstacles) {
+    // path是横向轨迹，若没有LateralDecision，就对path优化没有影响，主要指nudge
     if (!ptr_path_obstacle->HasLateralDecision()) { continue; }
     if (ptr_path_obstacle->obstacle()->IsStatic()) {
+      //计算静态、动态障碍物及相应的decision对自车轨迹的横向约束
       if (!MapStaticObstacleWithDecision(*ptr_path_obstacle)) {
         AERROR << "mapping obstacle with id [" << ptr_path_obstacle->Id()
                << "] failed in qp frenet frame.";

@@ -58,11 +58,8 @@ class QpFrenetFrame {
 
  private:
   bool CalculateDiscretizedVehicleLocation();
-
   bool MapDynamicObstacleWithDecision(const PathObstacle& path_obstacle);
-
   bool MapStaticObstacleWithDecision(const PathObstacle& path_obstacle);
-
   bool MapNudgePolygon(const common::math::Polygon2d&                polygon,
                        const ObjectNudge&                            nudge,
                        std::vector<std::pair<double, double>>* const bound_map);
@@ -80,24 +77,19 @@ class QpFrenetFrame {
 
   std::pair<uint32_t, uint32_t> FindInterval(const double start, const double end) const;
 
-  bool CalculateHDMapBound();
-
-  bool CalculateObstacleBound(const std::vector<const PathObstacle*>& path_obstacles);
-
+  bool     CalculateHDMapBound();
+  bool     CalculateObstacleBound(const std::vector<const PathObstacle*>& path_obstacles);
   uint32_t FindIndex(const double s) const;
 
  private:
-  const ReferenceLine& reference_line_;
-  const SpeedData&     speed_data_;
-
-  common::VehicleParam     vehicle_param_;
-  common::FrenetFramePoint init_frenet_point_;
-
-  double feasible_longitudinal_upper_bound_ = 0.0;
-  double start_s_                           = 0.0;
-  double end_s_                             = 0.0;
-  double time_resolution_                   = 0.1;
-
+  const ReferenceLine&                   reference_line_;
+  const SpeedData&                       speed_data_;
+  common::VehicleParam                   vehicle_param_;
+  common::FrenetFramePoint               init_frenet_point_;
+  double                                 feasible_longitudinal_upper_bound_ = 0.0;
+  double                                 start_s_                           = 0.0;
+  double                                 end_s_                             = 0.0;
+  double                                 time_resolution_                   = 0.1;
   std::vector<double>                    evaluated_s_;
   std::vector<common::SpeedPoint>        discretized_vehicle_location_;
   std::vector<std::pair<double, double>> hdmap_bound_;

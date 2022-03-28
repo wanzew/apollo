@@ -46,16 +46,13 @@ class Spline1d {
 
   // @brief: given x return f(x) value, derivative, second order derivative and
   // the third order;
-  double operator()(const double x) const;
-  double Derivative(const double x) const;
-  double SecondOrderDerivative(const double x) const;
-  double ThirdOrderDerivative(const double x) const;
-
-  // @brief: set spline segments
-  bool SetSplineSegs(const Eigen::MatrixXd& param_matrix, const uint32_t order);
-
+  double   operator()(const double x) const;
+  double   Derivative(const double x) const;
+  double   SecondOrderDerivative(const double x) const;
+  double   ThirdOrderDerivative(const double x) const;
+  bool     SetSplineSegs(const Eigen::MatrixXd& param_matrix, const uint32_t order);
+  uint32_t spline_order() const;
   const std::vector<double>& x_knots() const;
-  uint32_t                   spline_order() const;
 
  private:
   uint32_t FindIndex(const double x) const;

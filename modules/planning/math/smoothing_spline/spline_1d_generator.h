@@ -65,30 +65,20 @@ class Spline1dGenerator {
  public:
   Spline1dGenerator(const std::vector<double>& x_knots, const uint32_t order);
 
-  void Reset(const std::vector<double>& x_knots, const uint32_t order);
-
-  // add constraint through pss_constraint
-  Spline1dConstraint* mutable_spline_constraint();
-
-  // add kernel through pss_kernel
-  Spline1dKernel* mutable_spline_kernel();
-
-  // solve
-  bool Solve();
-
-  // output
-  const Spline1d& spline() const;
+  void                Reset(const std::vector<double>& x_knots, const uint32_t order);
+  Spline1dConstraint* mutable_spline_constraint();  // add constraint through pss_constraint
+  Spline1dKernel*     mutable_spline_kernel();      // add kernel through pss_kernel
+  bool                Solve();                      // solve
+  const Spline1d&     spline() const;               // output
 
  private:
-  Spline1d           spline_;
-  Spline1dConstraint spline_constraint_;
-  Spline1dKernel     spline_kernel_;
-
+  Spline1d                              spline_;
+  Spline1dConstraint                    spline_constraint_;
+  Spline1dKernel                        spline_kernel_;
   std::unique_ptr<::qpOASES::SQProblem> sqp_solver_;
-
-  int  last_num_constraint_  = 0;
-  int  last_num_param_       = 0;
-  bool last_problem_success_ = false;
+  int                                   last_num_constraint_  = 0;
+  int                                   last_num_param_       = 0;
+  bool                                  last_problem_success_ = false;
 };
 
 }  // namespace planning

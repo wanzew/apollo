@@ -30,8 +30,10 @@ namespace planning {
 
 Spline1d::Spline1d(const std::vector<double>& x_knots, const uint32_t order)
     : x_knots_(x_knots)
+    // 根据order, 生成一条n(order)阶的曲线
     , spline_order_(order) {
   for (uint32_t i = 1; i < x_knots_.size(); ++i) {
+    // 调用默认构造函数，根据阶数order, 生成一条n(order)阶的曲线
     splines_.emplace_back(spline_order_);
   }
 }
@@ -85,6 +87,7 @@ uint32_t Spline1d::spline_order() const { return spline_order_; }
 uint32_t Spline1d::FindIndex(const double x) const {
   auto           upper_bound = std::upper_bound(x_knots_.begin() + 1, x_knots_.end(), x);
   const uint32_t dis         = std::distance(x_knots_.begin(), upper_bound);
+
   if (dis < x_knots_.size()) {
     return dis - 1;
   } else {

@@ -78,6 +78,13 @@ void QpSplinePathGenerator::SetChangeLane(bool is_change_lane_path) {
   is_change_lane_path_ = is_change_lane_path;
 }
 
+// 主要有以下关键步骤：
+// 初始化样条曲线 InitSpline()，
+// 初始化用来计算自车轨迹横向约束的类 QpFrenetFrame::Init()，
+// 添加约束 AddConstraint()，
+// 添加目标函数 AddKernel()，
+// 优化问题求解器 Solve()，
+// 最后将求得的轨迹点封装成 DiscretizedPath。
 bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& path_obstacles,
                                      const SpeedData&                        speed_data,
                                      const common::TrajectoryPoint&          init_point,
@@ -90,10 +97,8 @@ bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& pat
   const auto& path_data_history = path_data->path_data_history();
   if (!path_data_history.empty()) { last_discretized_path_ = &path_data_history.back().first; }
 
-  if (!CalculateFrenetPoint(init_point, &init_frenet_point_)) {
-    AERROR << "Fail to map init point: " << init_point.ShortDebugString();
-    return false;
-  }
+  // calc init point
+  CalculateFrenetPoint(init_point, &init_frenet_point_);
 
   if (is_change_lane_path_) { ref_l_ = init_frenet_point_.l(); }
   double start_s = init_frenet_point_.s();
@@ -110,23 +115,22 @@ bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& pat
     return false;
   }
 
-  if (!InitSpline(start_s, end_s)) {
-    AERROR << "Init smoothing spline failed with (" << start_s << ",  end_s " << end_s;
-    return false;
-  }
+  // InitSpline()主要完成对spline segment和纵向s采样点的初始化。
+  InitSpline(start_s, end_s);
 
   QpFrenetFrame qp_frenet_frame(reference_line_, speed_data, init_frenet_point_,
                                 qp_spline_path_config_.time_resolution(), evaluated_s_);
-  if (!qp_frenet_frame.Init(path_obstacles)) {
-    AERROR << "Fail to initialize qp frenet frame";
-    return false;
-  }
+
+  // QpFrenetFrame::Init() 根据已知条件，计算对自车横向轨迹的约束。
+  // 1. HDMap和道路参考线对自车横向轨迹的约束
+  // 2. 静态动态障碍物及相应的decision对自车横向轨迹的约束
+  // initialize qp frenet frame
+  qp_frenet_frame.Init(path_obstacles);
+  // debug signal
   qp_frenet_frame.LogQpBound(planning_debug_);
 
-  if (!AddConstraint(qp_frenet_frame, boundary_extension)) {
-    AERROR << "Fail to setup pss path constraint.";
-    return false;
-  }
+  // setup pss path constraint
+  AddConstraint(qp_frenet_frame, boundary_extension);
 
   AddKernel();
 
@@ -226,6 +230,11 @@ bool QpSplinePathGenerator::CalculateFrenetPoint(
   return true;
 }
 
+// 将纵向区间[start_s, end_s] 按照qp_spline_path_config_.max_spline_length()和
+// qp_spline_path_config_.max_constraint_interval()的设置，均匀分割后存入knots_和evaluated_s_，
+// 每一段都会对应一条qp_spline_path_config_.spline_order()次多项式曲线。
+// 在这里，我认为knots_和evaluated_s_
+// 这2个记录s轴采样点的vector是应该完全相同的。不明白代码中为何有2种定义？
 bool QpSplinePathGenerator::InitSpline(const double start_s, const double end_s) {
   uint32_t number_of_spline =
       static_cast<uint32_t>((end_s - start_s) / qp_spline_path_config_.max_spline_length() + 1.0);
@@ -233,6 +242,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s, const double end_s)
   common::util::uniform_slice(start_s, end_s, number_of_spline, &knots_);
 
   // spawn a new spline generator
+  // 产生number_of_spline条order阶spline
   spline_generator_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
@@ -240,14 +250,19 @@ bool QpSplinePathGenerator::InitSpline(const double start_s, const double end_s)
       (end_s - start_s) / qp_spline_path_config_.max_constraint_interval() + 1;
   common::util::uniform_slice(start_s, end_s, constraint_num - 1, &evaluated_s_);
   return (knots_.size() > 1) && !evaluated_s_.empty();
+  //难道 max_spline_length 和 max_constraint_interval 可以不相等吗？
+  //难道 constraint_num 和 number_of_spline 可以不相等吗？
 }
 
 bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
                                           const double         boundary_extension) {
   Spline1dConstraint* spline_constraint = spline_generator_->mutable_spline_constraint();
 
+  // curve个数 * curve多项式参数个数
   const int        dim         = (knots_.size() - 1) * (qp_spline_path_config_.spline_order() + 1);
   constexpr double param_range = 1e-4;
+
+  //循环（curve个数）次，这是添加什么约束？待后面看看发挥什么作用？
   for (int i = qp_spline_path_config_.spline_order(); i < dim;
        i += qp_spline_path_config_.spline_order() + 1) {
     Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(1, dim);
@@ -261,12 +276,14 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   }
 
   // add init status constraint, equality constraint
+  //这里3个函数其实是添加了0，1，2阶导不等式约束 sample points for boundary
   const double kBoundaryEpsilon = 1e-4;
   spline_constraint->AddPointConstraintInRange(init_frenet_point_.s(),
                                                init_frenet_point_.l() - ref_l_, kBoundaryEpsilon);
   spline_constraint->AddPointDerivativeConstraintInRange(init_frenet_point_.s(),
                                                          init_frenet_point_.dl(), kBoundaryEpsilon);
 
+  // path二阶导其实是曲线的曲率kappa，U形急转弯不对kappa添加约束
   if (init_trajectory_point_.v() > qp_spline_path_config_.uturn_speed_limit()) {
     spline_constraint->AddPointSecondDerivativeConstraintInRange(
         init_frenet_point_.s(), init_frenet_point_.ddl(), kBoundaryEpsilon);
@@ -275,51 +292,54 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint, equality constraint
+  // lat_shift看不懂，为什么要与ref_l_反向？
+  //推测：换道时有参考线切换，自车横向坐标在目标车道参考线坐标系下是ref_l_，
+  //目标点应该在目标车道参考线上采样，所以目标点在当前车道参考线坐标系下
+  //横向坐标大概是fabs(ref_l_)，而正负一定相反
+  //如果不变道，ref_l_=0，如果变道，ref_l_=init_frenet_point_.l();
   double lat_shift = -ref_l_;
   if (is_change_lane_path_) {
     double lane_change_lateral_shift = GetLaneChangeLateralShift(init_trajectory_point_.v());
     lat_shift = std::copysign(std::fmin(std::fabs(ref_l_), lane_change_lateral_shift), -ref_l_);
   }
 
-  ADEBUG << "lat_shift = " << lat_shift;
   const double     kEndPointBoundaryEpsilon = 1e-2;
   constexpr double kReservedDistance        = 20.0;
   const double     target_s = std::fmin(qp_spline_path_config_.point_constraint_s_position(),
                                     kReservedDistance + init_frenet_point_.s() +
                                         init_trajectory_point_.v() * FLAGS_look_forward_time_sec);
   spline_constraint->AddPointConstraintInRange(target_s, lat_shift, kEndPointBoundaryEpsilon);
+  //如果是变道，则不约束一阶导即方向角，如果不是变道，则目标点的方向=0，即沿s轴
   if (!is_change_lane_path_) {
     spline_constraint->AddPointDerivativeConstraintInRange(evaluated_s_.back(), 0.0,
                                                            kEndPointBoundaryEpsilon);
   }
 
   // add first derivative bound to improve lane change smoothness
+  // dl_bound是0.1，arctan(0.1)=5.71度，这角度会不会太小了？
   std::vector<double> dl_lower_bound(evaluated_s_.size(), -FLAGS_dl_bound);
   std::vector<double> dl_upper_bound(evaluated_s_.size(), FLAGS_dl_bound);
 
-  if (!spline_constraint->AddDerivativeBoundary(evaluated_s_, dl_lower_bound, dl_upper_bound)) {
-    AERROR << "Fail to add second derivative boundary.";
-    return false;
-  }
+  // 添加不等式约束
+  // add derivative boundary
+  spline_constraint->AddDerivativeBoundary(evaluated_s_, dl_lower_bound, dl_upper_bound);
 
   // kappa bound is based on the inequality:
   // kappa = d(phi)/ds <= d(phi)/dx = d2y/dx2
+  // kappa = d(phi)/ds <= d(phi)/dx = d2y/dx2，此式如何得来？
+  // add second derivative boundary
   std::vector<double> kappa_lower_bound(evaluated_s_.size(), -FLAGS_kappa_bound);
   std::vector<double> kappa_upper_bound(evaluated_s_.size(), FLAGS_kappa_bound);
-  if (!spline_constraint->AddSecondDerivativeBoundary(evaluated_s_, kappa_lower_bound,
-                                                      kappa_upper_bound)) {
-    AERROR << "Fail to add second derivative boundary.";
-    return false;
-  }
+  spline_constraint->AddSecondDerivativeBoundary(evaluated_s_, kappa_lower_bound,
+                                                 kappa_upper_bound);
 
   // dkappa = d(kappa) / ds <= d3y/dx3
   std::vector<double> dkappa_lower_bound(evaluated_s_.size(), -FLAGS_dkappa_bound);
   std::vector<double> dkappa_upper_bound(evaluated_s_.size(), FLAGS_dkappa_bound);
-  if (!spline_constraint->AddThirdDerivativeBoundary(evaluated_s_, dkappa_lower_bound,
-                                                     dkappa_upper_bound)) {
-    AERROR << "Fail to add third derivative boundary.";
-    return false;
-  }
+
+  // add third derivative boundary
+  spline_constraint->AddThirdDerivativeBoundary(evaluated_s_, dkappa_lower_bound,
+                                                dkappa_upper_bound);
 
   // add map bound constraint
   double lateral_buf = boundary_extension;
@@ -334,45 +354,31 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
 
     if (evaluated_s_.at(i) - evaluated_s_.front() <
         qp_spline_path_config_.cross_lane_longitudinal_extension()) {
-      road_boundary.first  = std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
+      //扩宽边界约束
+      //右边界
+      road_boundary.first = std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
+      //左边界
       road_boundary.second = std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
     }
     boundary_low.emplace_back(common::util::MaxElement(std::vector<double>{
         road_boundary.first, static_obs_boundary.first, dynamic_obs_boundary.first}));
     boundary_high.emplace_back(common::util::MinElement(std::vector<double>{
         road_boundary.second, static_obs_boundary.second, dynamic_obs_boundary.second}));
-    ADEBUG << "s[" << evaluated_s_[i] << "] boundary_low[" << boundary_low.back()
-           << "] boundary_high[" << boundary_high.back() << "] road_boundary_low["
-           << road_boundary.first << "] road_boundary_high[" << road_boundary.second
-           << "] static_obs_boundary_low[" << static_obs_boundary.first
-           << "] static_obs_boundary_high[" << static_obs_boundary.second
-           << "] dynamic_obs_boundary_low[" << dynamic_obs_boundary.first
-           << "] dynamic_obs_boundary_high[" << dynamic_obs_boundary.second << "].";
   }
 
-  if (planning_debug_) {
-    apollo::planning_internal::SLFrameDebug* sl_frame =
-        planning_debug_->mutable_planning_data()->mutable_sl_frame()->Add();
-    for (size_t i = 0; i < evaluated_s_.size(); ++i) {
-      sl_frame->mutable_aggregated_boundary_s()->Add(evaluated_s_[i]);
-      sl_frame->mutable_aggregated_boundary_low()->Add(boundary_low[i]);
-      sl_frame->mutable_aggregated_boundary_high()->Add(boundary_high[i]);
-    }
-  }
-
+  //不等式约束
   const double start_l = ref_l_;
+
+  //求横向相对坐标
   std::for_each(boundary_low.begin(), boundary_low.end(), [start_l](double& d) { d -= start_l; });
   std::for_each(boundary_high.begin(), boundary_high.end(), [start_l](double& d) { d -= start_l; });
-  if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low, boundary_high)) {
-    AERROR << "Add boundary constraint failed";
-    return false;
-  }
 
-  // add spline joint third derivative constraint
-  if (knots_.size() >= 3 && !spline_constraint->AddThirdDerivativeSmoothConstraint()) {
-    AERROR << "Add spline joint derivative constraint failed!";
-    return false;
-  }
+  // Add boundary constraint
+  spline_constraint->AddBoundary(evaluated_s_, boundary_low, boundary_high);
+
+  // add spline joint third derivative constraint 等式约束
+  spline_constraint->AddThirdDerivativeSmoothConstraint();
+
   return true;
 }
 
@@ -443,16 +449,8 @@ void QpSplinePathGenerator::AddKernel() {
 }
 
 bool QpSplinePathGenerator::Solve() {
-  if (!spline_generator_->Solve()) {
-    for (size_t i = 0; i < knots_.size(); ++i) {
-      ADEBUG << "knots_[" << i << "]: " << knots_[i];
-    }
-    for (size_t i = 0; i < evaluated_s_.size(); ++i) {
-      ADEBUG << "evaluated_s_[" << i << "]: " << evaluated_s_[i];
-    }
-    AERROR << "Could not solve the qp problem in spline path generator.";
-    return false;
-  }
+  // solve the qp problem in spline path generator
+  spline_generator_->Solve();
   return true;
 }
 

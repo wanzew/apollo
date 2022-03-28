@@ -64,12 +64,9 @@ bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel, const double weigh
   return AddKernel(kernel, offset, weight);
 }
 
-Eigen::MatrixXd* Spline1dKernel::mutable_kernel_matrix() { return &kernel_matrix_; }
-
-Eigen::MatrixXd* Spline1dKernel::mutable_offset() { return &offset_; }
-
+Eigen::MatrixXd*       Spline1dKernel::mutable_kernel_matrix() { return &kernel_matrix_; }
+Eigen::MatrixXd*       Spline1dKernel::mutable_offset() { return &offset_; }
 const Eigen::MatrixXd& Spline1dKernel::kernel_matrix() const { return kernel_matrix_; }
-
 const Eigen::MatrixXd& Spline1dKernel::offset() const { return offset_; }
 
 // build-in kernel methods
