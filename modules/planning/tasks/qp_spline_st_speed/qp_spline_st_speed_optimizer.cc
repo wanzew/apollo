@@ -133,20 +133,37 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
   }
 
   // step 2 perform graph search
-  const auto&     veh_param = common::VehicleConfigHelper::GetConfig().vehicle_param();
-  QpSplineStGraph st_graph(spline_generator_.get(), qp_st_speed_config_, veh_param,
+  const auto& veh_param = common::VehicleConfigHelper::GetConfig().vehicle_param();
+  // clang-format off
+  QpSplineStGraph st_graph(spline_generator_.get(), 
+                           qp_st_speed_config_, 
+                           veh_param,
                            reference_line_info_->IsChangeLanePath());
 
-  StGraphData st_graph_data(boundaries, init_point, speed_limits,
+  StGraphData st_graph_data(boundaries, 
+                            init_point, 
+                            speed_limits,
                             path_data.discretized_path().Length());
 
-  STGraphDebug* st_graph_debug =
-      reference_line_info_->mutable_debug()->mutable_planning_data()->add_st_graph();
+  STGraphDebug* st_graph_debug = reference_line_info_   \
+                              ->mutable_debug()         \
+                              ->mutable_planning_data() \
+                              ->add_st_graph();
+  // clang-format on
 
   std::pair<double, double> accel_bound = {qp_st_speed_config_.preferred_min_deceleration(),
                                            qp_st_speed_config_.preferred_max_acceleration()};
   st_graph.SetDebugLogger(st_graph_debug);
-  auto ret = st_graph.Search(st_graph_data, accel_bound, reference_speed_data, speed_data);
+
+  // 速度规划进行了3次尝试，第2次相比第1次，放宽了加速度的上下限范围。
+  // 第3次使用了QpPiecewiseStGraph
+  // clang-format off
+  auto ret = st_graph.Search(st_graph_data, 
+                             accel_bound, 
+                             reference_speed_data, 
+                             speed_data);
+  // clang-format on
+
   if (ret != Status::OK()) {
     AERROR << "Failed to solve with ideal acceleration conditions. Use "
               "secondary choice instead.";

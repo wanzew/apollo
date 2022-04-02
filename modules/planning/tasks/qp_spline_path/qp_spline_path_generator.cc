@@ -289,8 +289,6 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
         init_frenet_point_.s(), init_frenet_point_.ddl(), kBoundaryEpsilon);
   }
 
-  ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
-
   // add end point constraint, equality constraint
   // lat_shift看不懂，为什么要与ref_l_反向？
   //推测：换道时有参考线切换，自车横向坐标在目标车道参考线坐标系下是ref_l_，
@@ -403,23 +401,36 @@ void QpSplinePathGenerator::AddHistoryPathKernel() {
                                               qp_spline_path_config_.history_path_weight());
 }
 
+// AddKernel()中，如果处在变道的过程中，则添加一项额外的cost，并且只作用于第一段spline。
+// AddDerivativeKernelMatrixForSplineK()与AddDerivativeKernelMatrix()如出一辙，
+// 唯一的区别是因为针对特定段的spline，没有对knots的循环。
+// 最底层同样都是调用SplineSegKernel::Instance()->NthDerivativeKernel()实现的。
 void QpSplinePathGenerator::AddKernel() {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
+  //只有在!is_change_lane_path_时才会进入，而!is_change_lane_path_会导致ref_l_=0
   if (init_trajectory_point_.v() < qp_spline_path_config_.uturn_speed_limit() &&
       !is_change_lane_path_ && qp_spline_path_config_.reference_line_weight() > 0.0) {
     std::vector<double> ref_l(evaluated_s_.size(), -ref_l_);
+
+    // 添加和参考线相关的kernel，推测应该是使轨迹尽可能贴近参考线，但我在代码中
+    // 没有理解这一点。而且每次ref_l元素全是0，会导致函数内offset_全是0，意义何在？
+    // 参考线或下面的历史轨迹，可以是DP输出的粗糙规划结果
     spline_kernel->AddReferenceLineKernelMatrix(evaluated_s_, ref_l,
                                                 qp_spline_path_config_.reference_line_weight());
   }
 
+  //添加和历史轨迹相关的kernel，推测应该是使轨迹尽可能近似延续之前的轨迹，
+  //但我在代码中没有理解这一点
   if (qp_spline_path_config_.history_path_weight() > 0.0) { AddHistoryPathKernel(); }
 
   if (qp_spline_path_config_.regularization_weight() > 0.0) {
+    // 添加正则项
     spline_kernel->AddRegularization(qp_spline_path_config_.regularization_weight());
   }
 
   if (qp_spline_path_config_.derivative_weight() > 0.0) {
+    // 添加1阶导kernel，(f'(x))^2积分
     spline_kernel->AddDerivativeKernelMatrix(qp_spline_path_config_.derivative_weight());
     if (std::fabs(init_frenet_point_.l()) > qp_spline_path_config_.lane_change_mid_l()) {
       spline_kernel->AddDerivativeKernelMatrixForSplineK(
@@ -429,6 +440,7 @@ void QpSplinePathGenerator::AddKernel() {
   }
 
   if (qp_spline_path_config_.second_derivative_weight() > 0.0) {
+    // 添加2阶导kernel，(f''(x))^2积分
     spline_kernel->AddSecondOrderDerivativeMatrix(
         qp_spline_path_config_.second_derivative_weight());
     if (std::fabs(init_frenet_point_.l()) > qp_spline_path_config_.lane_change_mid_l()) {
@@ -439,6 +451,7 @@ void QpSplinePathGenerator::AddKernel() {
   }
 
   if (qp_spline_path_config_.third_derivative_weight() > 0.0) {
+    // 添加3阶导kernel，(f'''(x))^2积分
     spline_kernel->AddThirdOrderDerivativeMatrix(qp_spline_path_config_.third_derivative_weight());
     if (std::fabs(init_frenet_point_.l()) > qp_spline_path_config_.lane_change_mid_l()) {
       spline_kernel->AddThirdOrderDerivativeMatrixForSplineK(

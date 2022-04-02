@@ -48,7 +48,8 @@ const Eigen::MatrixXd& AffineConstraint::constraint_boundary() const {
 //追加约束，是最底层的函数
 bool AffineConstraint::AddConstraint(const Eigen::MatrixXd& constraint_matrix,
                                      const Eigen::MatrixXd& constraint_boundary) {
-  // 假设添加的约束是 Ax=b，constraint_matrix就是A，constraint_boundary就是b，
+  // 假设添加的约束是 Ax=b， constraint_matrix 就是A，constraint_boundary 就是b，对5次多项式就是
+  //[1,p,p^2,p^3,p^4,p^5]，p是多项式曲线上某点的横坐标
   // x就是未知的多项式系数
   // 自然A的一行对应的Ax的计算结果就是b的一行，所以 A.rows==b.rows。
   // b的元素就是目标方程的计算结果，是一个实数，自然 b.cols==1
@@ -80,6 +81,7 @@ bool AffineConstraint::AddConstraint(const Eigen::MatrixXd& constraint_matrix,
                            constraint_matrix_.cols());
   Eigen::MatrixXd n_boundary(constraint_boundary_.rows() + constraint_boundary.rows(), 1);
 
+  // 追加约束
   n_matrix << constraint_matrix_, constraint_matrix;
   n_boundary << constraint_boundary_, constraint_boundary;
   constraint_matrix_   = n_matrix;

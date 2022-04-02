@@ -55,11 +55,17 @@ Eigen::MatrixXd SplineSegKernel::NthDerivativeKernel(const uint32_t n,
   }
 }
 
+// DerivativeKernel()的返回值，便是上述（1）式的中间矩阵。
+// kernel_derivative_在SplineSegKernel的构造函数中初始化，
+// 其实是中间矩阵的分数部分，而IntegratedTermMatrix()计算的term_matrix，
+// 则是中间矩阵的幂部分，通过cwiseProduct()相乘得到中间矩阵。
 Eigen::MatrixXd SplineSegKernel::DerivativeKernel(const uint32_t num_params,
                                                   const double   accumulated_x) {
+  // reserved_order_初始化为5，对于常用的3次、5次多项式，CalculateDerivative()不会执行
   if (num_params > reserved_order_ + 1) { CalculateDerivative(num_params); }
   Eigen::MatrixXd term_matrix;
   IntegratedTermMatrix(num_params, accumulated_x, "derivative", &term_matrix);
+  // cwiseProduct是对应元素逐一相乘
   return kernel_derivative_.block(0, 0, num_params, num_params).cwiseProduct(term_matrix);
 }
 

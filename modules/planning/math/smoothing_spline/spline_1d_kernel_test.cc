@@ -496,6 +496,7 @@ TEST(Spline1dKernel, add_reference_line_kernel_04) {
   double          d   = 0.5;
   for (int i = 0; i < 6; ++i) {
     res(0, i) = std::pow(d, i);
+    // res = {0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625}
   }
 
   Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(6, 6);

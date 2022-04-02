@@ -36,6 +36,7 @@ Spline1dKernel::Spline1dKernel(const Spline1d& spline1d)
 Spline1dKernel::Spline1dKernel(const std::vector<double>& x_knots, const uint32_t spline_order)
     : x_knots_(x_knots)
     , spline_order_(spline_order) {
+  // 所有curve方程的参数个数
   total_params_  = (x_knots.size() > 1 ? (x_knots.size() - 1) * (1 + spline_order_) : 0);
   kernel_matrix_ = Eigen::MatrixXd::Zero(total_params_, total_params_);
   offset_        = Eigen::MatrixXd::Zero(total_params_, 1);
@@ -70,13 +71,24 @@ const Eigen::MatrixXd& Spline1dKernel::kernel_matrix() const { return kernel_mat
 const Eigen::MatrixXd& Spline1dKernel::offset() const { return offset_; }
 
 // build-in kernel methods
+/* 由AddNthDerivativekernelMatrix()中kernel_matrix_更新元素的方式，我们可以看出kernel_matrix_一定是下面这种形式，n
+ * = spline order + 1，每一个n*n矩阵都对应着一段spline。
+ * | n*n  0   0   0 |
+ * |  0  n*n  0   0 |
+ * |  0  0   n*n  0 |
+ * |  0  0    0  n*n|
+ */
 void Spline1dKernel::AddNthDerivativekernelMatrix(const uint32_t n, const double weight) {
   const uint32_t num_params = spline_order_ + 1;
   for (uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
-    Eigen::MatrixXd cur_kernel = 2 *
-                                 SplineSegKernel::instance()->NthDerivativeKernel(
-                                     n, num_params, x_knots_[i + 1] - x_knots_[i]) *
-                                 weight;
+    // weight是公式中的权重，2不理解，对于所有的cost项都×2，相当于没有影响
+    // clang-format off
+    Eigen::MatrixXd cur_kernel = 2 * SplineSegKernel::instance()->NthDerivativeKernel(
+                                     n, 
+                                     num_params, 
+                                     x_knots_[i + 1] - x_knots_[i]) 
+                                  * weight;
+    // clang-format on
     kernel_matrix_.block(i * num_params, i * num_params, num_params, num_params) += cur_kernel;
   }
 }
@@ -124,10 +136,42 @@ void Spline1dKernel::AddThirdOrderDerivativeMatrixForSplineK(const uint32_t k,
   AddNthDerivativekernelMatrixForSplineK(3, k, weight);
 }
 
+// 基于参考线或历史轨迹的代价
 bool Spline1dKernel::AddReferenceLineKernelMatrix(const std::vector<double>& x_coord,
                                                   const std::vector<double>& ref_x,
                                                   const double               weight) {
   if (ref_x.size() != x_coord.size()) { return false; }
+
+  /*
+   * std::vector<double> x_coord     = {0,   5,   10,  20};
+   * std::vector<double> lower_bound = {0,   0,   0,   0};
+   * std::vector<double> upper_bound = {3.5, 3.5, 3.5, 3.5};
+   *
+   *    ^ d
+   *    |
+   *    | # knot point
+   *    | * evaluated_s point
+   *    |------------------------------------------ upper_bound
+   *    |
+   *    |0           5             10                20
+   *    |*--*--*--*--#--*--*--*--*--#--*--*--*--*--*--#--> s
+   *    |
+   *    |
+   *    |------------------------------------------ lower_bound
+   *
+   * Ax >= b
+   * cost:
+   * | 1, s0, s0^2, s0^3, s0^4, s0^5 |         >=  |l0|
+   * | 1, s1, s1^2, s1^3, s1^4, s1^5 |         >=  |l1|
+   * | 1, s2, s2^2, s2^3, s2^4, s2^5 |   |a0|  >=  |l2|
+   * | 1, s3, s3^2, s3^3, s3^4, s3^5 |   |a1|  >=  |l3|
+   * | 1, s4, s4^2, s4^3, s4^4, s4^5 | * |a2|  >=  |l4|
+   * | 1, s5, s5^2, s5^3, s5^4, s5^5 |   |a3|  >=  |..|
+   * | 1, s6, s6^2, s6^3, s6^4, s6^5 |   |a4|  >=  |..|
+   * | 1, s7, s7^2, s7^3, s7^4, s7^5 |   |a5|  >=  |..|
+   * | 1, s8, s8^2, s8^3, s8^4, s8^5 |         >=  |..|
+   * | 1, s9, s9^2, s9^3, s9^4, s9^5 |         >=  |ln|
+   */
 
   const uint32_t num_params = spline_order_ + 1;
   for (uint32_t i = 0; i < x_coord.size(); ++i) {
@@ -139,24 +183,75 @@ bool Spline1dKernel::AddReferenceLineKernelMatrix(const std::vector<double>& x_c
       offset_(j + cur_index * num_params, 0) += offset_coef;
       offset_coef *= cur_rel_x;
     }
+    /*
+     * 200 | 0
+     * 400 | 1
+     * 400 | 2
+     * .......
+     *     | 5
+     * 200 | 0
+     * 400 | 1
+     * 400 | 2
+     * .......
+     *     | 5
+     * 200 | 0
+     * 400 | 1
+     * 400 | 2
+     * .......
+     *     | 5
+     * ......6*knot
+     */
+
     // update kernel matrix
     Eigen::MatrixXd ref_kernel(num_params, num_params);
 
     double              cur_x = 1.0;
     std::vector<double> power_x;
+    // 循环11次 index: [0-10]
     for (uint32_t n = 0; n + 1 < 2 * num_params; ++n) {
       power_x.emplace_back(cur_x);
       cur_x *= cur_rel_x;
     }
-
+    /* power_x:
+     * [cur_x0, cur_x1, cur_x2, cur_x3, cur_x4, cur_x5, cur_x6, cur_x7, cur_x8, cur_x9, cur_x10]
+     * ref_kernel:
+     * | cur_x0 cur_x1 cur_x2 cur_x3 cur_x4 cur_x5 |
+     * | cur_x1 cur_x2 cur_x3 cur_x4 cur_x5 cur_x6 |
+     * | cur_x2 cur_x3 cur_x4 cur_x5 cur_x6 cur_x7 |
+     * | cur_x3 cur_x4 cur_x5 cur_x6 cur_x7 cur_x8 |
+     * | cur_x4 cur_x5 cur_x6 cur_x7 cur_x8 cur_x9 |
+     * | cur_x5 cur_x6 cur_x7 cur_x8 cur_x9 cur_x10|
+     *
+     * e.g.
+     * | 0       1       2       3       4       5 |
+     * | 1       2       3       4       5       6 |
+     * | 2       3       4       5       6       7 |
+     * | 3       4       5       6       7       8 |
+     * | 4       5       6       7       8       9 |
+     * | 5       6       7       8       9       10|
+     *
+     *
+     * 我在初次看这块代码的时候，就被csc_matrix这奇葩的矩阵构造方式折磨了好久，
+     * 并且我看网上许多讲解Apollo 二次规划的文章也都没有具体到矩阵的实际形式的。
+     * 我这里把代价函数P矩阵实际解构了出来，我觉得对于第一次接触这块代码的朋友，
+     * 能够直观的看到这个矩阵还是会对理解Apollo的算法思想有很大帮助的
+     */
     for (uint32_t r = 0; r < num_params; ++r) {
       for (uint32_t c = 0; c < num_params; ++c) {
+        // 可以注意到每个元素前都乘以了2，这是为了和二次优化问题的一般形式中的1/2进行抵消的
         ref_kernel(r, c) = 2.0 * power_x[r + c];
       }
     }
 
-    kernel_matrix_.block(cur_index * num_params, cur_index * num_params, num_params, num_params) +=
-        weight * ref_kernel;
+    // P.block(i, j, rows, cols)          // P(i+1 : i+rows, j+1 : j+cols)
+    // P.block<rows, cols>(i, j)          // P(i+1 : i+rows, j+1 : j+cols)
+    // clang-format off
+    kernel_matrix_.block(cur_index * num_params, 
+                         cur_index * num_params, 
+                         num_params, 
+                         num_params) 
+                         += weight * ref_kernel;
+    // clang-format on
   }
   return true;
 }

@@ -41,6 +41,12 @@
 namespace apollo {
 namespace planning {
 
+/*
+Apollo
+该算法的精妙之处就在于，将path和speed分别在SL和ST空间中进行考虑，
+使得两者的优化思想非常类似，很巧妙地完成两个维度的求解。但与此同时，
+我感觉这也限制了speed优化，对于动态障碍物的处理就不够完备，后面我会单独再写文章详细讲这一块。
+*/
 class QpSplineStGraph {
  public:
   QpSplineStGraph(Spline1dGenerator*                  spline_generator,
@@ -67,10 +73,7 @@ class QpSplineStGraph {
   // Add objective function
   common::Status AddKernel(const std::vector<const StBoundary*>& boundaries,
                            const SpeedLimit&                     speed_limit);
-
-  // solve
-  common::Status Solve();
-
+  common::Status Solve();  // solve
   // extract upper lower bound for constraint;
   common::Status GetSConstraintByTime(const std::vector<const StBoundary*>& boundaries,
                                       const double                          time,
@@ -86,9 +89,8 @@ class QpSplineStGraph {
                                               const double                          weight);
 
   // yield line kernel
-  common::Status AddYieldReferenceLineKernel(const std::vector<const StBoundary*>& boundaries,
-                                             const double                          weight);
-
+  common::Status  AddYieldReferenceLineKernel(const std::vector<const StBoundary*>& boundaries,
+                                              const double                          weight);
   const SpeedData GetHistorySpeed() const;
   common::Status  EstimateSpeedUpperBound(const common::TrajectoryPoint& init_point,
                                           const SpeedLimit&              speed_limit,
@@ -97,37 +99,18 @@ class QpSplineStGraph {
   bool AddDpStReferenceKernel(const double weight) const;
 
  private:
-  // solver
-  Spline1dGenerator* spline_generator_ = nullptr;
-
-  // qp st configuration
-  const QpStSpeedConfig qp_st_speed_config_;
-
-  // initial status
-  common::TrajectoryPoint init_point_;
-
-  // is change lane
-  bool is_change_lane_ = false;
-
-  // t knots resolution
-  double t_knots_resolution_ = 0.0;
-
-  // knots
-  std::vector<double> t_knots_;
-
-  // evaluated t resolution
-  double t_evaluated_resolution_ = 0.0;
-
-  // evaluated points
-  std::vector<double> t_evaluated_;
-
-  // reference line kernel
-  std::vector<double> cruise_;
-
+  Spline1dGenerator*               spline_generator_ = nullptr;    // solver
+  const QpStSpeedConfig            qp_st_speed_config_;            // qp st configuration
+  common::TrajectoryPoint          init_point_;                    // initial status
+  bool                             is_change_lane_     = false;    // is change lane
+  double                           t_knots_resolution_ = 0.0;      // t knots resolution
+  std::vector<double>              t_knots_;                       // knots
+  double                           t_evaluated_resolution_ = 0.0;  // evaluated t resolution
+  std::vector<double>              t_evaluated_;                   // evaluated points
+  std::vector<double>              cruise_;                        // reference line kernel
+  planning_internal::STGraphDebug* st_graph_debug_ = nullptr;
   // reference st points from dp optimizer
   std::vector<common::SpeedPoint> reference_dp_speed_points_;
-
-  planning_internal::STGraphDebug* st_graph_debug_ = nullptr;
 };
 
 }  // namespace planning

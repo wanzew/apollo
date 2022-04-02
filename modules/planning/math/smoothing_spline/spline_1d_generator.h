@@ -72,9 +72,9 @@ class Spline1dGenerator {
   const Spline1d&     spline() const;               // output
 
  private:
-  Spline1d                              spline_;
-  Spline1dConstraint                    spline_constraint_;
-  Spline1dKernel                        spline_kernel_;
+  Spline1d                              spline_;             // output
+  Spline1dConstraint                    spline_constraint_;  // constraint
+  Spline1dKernel                        spline_kernel_;      // kernel
   std::unique_ptr<::qpOASES::SQProblem> sqp_solver_;
   int                                   last_num_constraint_  = 0;
   int                                   last_num_param_       = 0;

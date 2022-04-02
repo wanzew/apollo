@@ -102,6 +102,7 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper&  boundary_mapper,
     return false;
   }
 
+  // DP Path data result
   const float path_length = path_data.discretized_path().Length();
   StGraphData st_graph_data(boundaries, init_point_, speed_limit, path_length);
 

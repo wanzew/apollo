@@ -29,6 +29,19 @@ TEST(Spline1dConstraint, add_boundary) {
   std::vector<double> x_knots      = {0.0, 1.0};
   int32_t             spline_order = 5;
   Spline1dConstraint  constraint(x_knots, spline_order);
+  /*
+   * ----------------------------------------------------------------------------
+   *
+   *
+   *
+   *
+   * *-------------------------------------*------------------------------------*
+   *
+   *
+   *
+   *
+   * ----------------------------------------------------------------------------
+   */
 
   std::vector<double> x_coord     = {0.0, 0.5, 1.0};
   std::vector<double> lower_bound = {1.0, 1.0, 1.0};

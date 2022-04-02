@@ -35,6 +35,8 @@
 namespace apollo {
 namespace planning {
 
+// SplineSegKernel s1, s2, s3;
+// 
 class SplineSegKernel {
  public:
   // generating kernel matrix
