@@ -25,6 +25,20 @@ namespace common {
 namespace math {
 
 TEST(LineSegment2dTest, Accessors) {
+  /*
+   * ^ y
+   * |
+   * |
+   * |
+   * |         (5,4)___
+   * 4           *   ^
+   * |           |   |
+   * |           |   2
+   * 2 *----------  _|_
+   * | <----4---->
+   * |
+   * --1---------5----------------------------> X
+   */
   const LineSegment2d ls({1, 2}, {5, 4});
   EXPECT_NEAR(ls.length(), std::sqrt(20.0), 1e-5);
   EXPECT_NEAR(ls.length_sqr(), 20.0, 1e-5);
@@ -38,6 +52,20 @@ TEST(LineSegment2dTest, Accessors) {
 }
 
 TEST(LineSegment2dTest, DistanceTo) {
+  /*
+   * ^ y
+   * |
+   * |
+   * |
+   * |         (5,4)
+   * 4           *
+   * |           |
+   * |           |
+   * 2 #----------
+   * |
+   * |
+   * --1---------5----------------------------> X
+   */
   const LineSegment2d ls({1, 2}, {5, 4});
   Vec2d               nearest_pt;
   EXPECT_NEAR(ls.DistanceTo({0, 0}, &nearest_pt), std::sqrt(5.0), 1e-5);
@@ -58,6 +86,20 @@ TEST(LineSegment2dTest, DistanceTo) {
 }
 
 TEST(LineSegment2dTest, GetPerpendicularFoot) {
+  /*
+   * ^ y
+   * |
+   * |
+   * |
+   * |         (5,4)
+   * 4           *
+   * |           |
+   * |           |
+   * 2 #----------
+   * |
+   * |
+   * --1---------5----------------------------> X
+   */
   const LineSegment2d ls({1, 2}, {5, 4});
   Vec2d               foot_pt;
   EXPECT_NEAR(ls.GetPerpendicularFoot({0, 0}, &foot_pt), 0.6 * std::sqrt(5.0), 1e-5);

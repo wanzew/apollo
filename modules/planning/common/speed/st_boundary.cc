@@ -31,8 +31,25 @@ namespace planning {
 
 using common::math::LineSegment2d;
 using common::math::Vec2d;
-
-// 构造函数
+/*
+ * 构造函数
+ * 每个pair包含两个点(t相同)，point_pairs 包含两个pair或多个pair
+ * 第一个元素包含的是 boundary(菱形)的左边的两个点(小t)
+ * 第二个元素包含的是 boundary(菱形)的右边的两个点(大t)
+ *
+ * ^s
+ * |
+ * |
+ * |---------*-----------------
+ * |       *                  |
+ * |     *   *                |
+ * |   *   *                  |
+ * | *   *                    |
+ * *   *                      |
+ * | *                        |
+ * *--------------------------*------------------------------------> t
+ *
+ */
 StBoundary::StBoundary(const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
   CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
 
@@ -65,6 +82,7 @@ StBoundary::StBoundary(const std::vector<std::pair<STPoint, STPoint>>& point_pai
   max_t_ = lower_points_.back().t();
 }
 
+// 是否 点距离线段的距离过近
 bool StBoundary::IsPointNear(const common::math::LineSegment2d& seg,
                              const Vec2d&                       point,
                              const double                       max_dist) {
@@ -96,7 +114,25 @@ void StBoundary::RemoveRedundantPoints(std::vector<std::pair<STPoint, STPoint>>*
   const double kMaxDist = 0.1;
   size_t       i        = 0;
   size_t       j        = 1;
-
+  /*
+   * 每个pair包含两个点(t相同)，point_pairs 包含两个pair或多个pair
+   * 第一个元素包含的是 boundary(菱形)的左边的两个点(小t)
+   * 第二个元素包含的是 boundary(菱形)的右边的两个点(大t)
+   *
+   * ^s
+   * |
+   * |
+   * |-------*------------------
+   * |     *                   |
+   * |   *   *                 |
+   * | *   *                   |
+   * |/  *                     |
+   * * *                       |
+   * |/                        |
+   * *--------------------------*------------------------------------> t
+   *point_pairs->at(i).first
+   */
+  // point_pairs 包含的边（当相于一个pair一个边，底边或顶边）
   while (i < point_pairs->size() && j + 1 < point_pairs->size()) {
     LineSegment2d lower_seg(point_pairs->at(i).first, point_pairs->at(j + 1).first);
     LineSegment2d upper_seg(point_pairs->at(i).second, point_pairs->at(j + 1).second);
@@ -314,6 +350,26 @@ bool StBoundary::GetIndexRange(const std::vector<STPoint>& points,
     AERROR << "t is out of range. t = " << t;
     return false;
   }
+  /*
+   * ^
+   * |                          upper_points[1]
+   * |                              *
+   * |
+   * |
+   * |
+   * |   lower_points[1]            *
+   * |        *                 upper_points[0]
+   * |
+   * |                          -517955.58587660792
+   * |
+   * |        *
+   * |   lower_points[0]
+   * |  -517957.08587679861
+   * |
+   * |
+   *  --------------------------------------------------------------> t
+   *
+   */
   auto   comp     = [](const STPoint& p, const double t) { return p.t() < t; };
   auto   first_ge = std::lower_bound(points.begin(), points.end(), t, comp);
   size_t index    = std::distance(points.begin(), first_ge);
@@ -339,10 +395,9 @@ StBoundary StBoundary::GenerateStBoundary(const std::vector<STPoint>& lower_poin
     auto stpoint_lower = STPoint(lower_points.at(i).s(), lower_points.at(i).t());
     auto stpoint_upper = STPoint(upper_points.at(i).s(), upper_points.at(i).t());
 
-    std::pair<STPoint, STPoint> pair =
-        std::make_pair<STPoint, STPoint>(stpoint_lower, stpoint_upper);
+    auto pair = std::make_pair<STPoint, STPoint>(stpoint_lower, stpoint_upper);
 
-    point_pairs.emplace_back();
+    point_pairs.emplace_back(pair);
   }
   return StBoundary(point_pairs);
 }

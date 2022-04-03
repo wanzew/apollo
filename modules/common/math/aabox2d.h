@@ -37,6 +37,13 @@ namespace math {
 
 /**
  * @class AABox2d
+ * align axis box，box2d的一种特定情况
+ * 在游戏中，为了简化物体之间的碰撞检测运算，通常会对物体创建一个规则的几何外形将其包围。
+ * 其中，AABB（axis-aligned bounding box）包围盒被称为轴对其包围盒。
+ *
+ * （1） 表现形式为四边形，即用四边形包围物体。
+ *
+ * （2） 四边形的每一条边，都会与坐标系的轴垂直。
  * @brief Implements a class of (undirected) axes-aligned bounding boxes in 2-D.
  * This class is referential-agnostic.
  */

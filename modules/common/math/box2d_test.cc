@@ -59,6 +59,25 @@ bool CheckBoxOverlapSlow(const Box2d& box1, const Box2d& box2, bool* const ambig
   return true;
 }
 
+/*
+ * ^ y
+ * |
+ * |
+ * |
+ * |
+ * |
+ * |
+ * |
+ * |        (
+ * |         *
+ * |
+ * ----------4----------------------------> X
+ * |
+ * |
+ * |
+ * |
+ */
+// Box2d(const Vec2d& center, const double heading, const double length, const double width)
 Box2d box1({0, 0}, 0, 4, 2);
 Box2d box2({5, 2}, 0, 4, 2);
 Box2d box3(LineSegment2d({2, 3}, {6, 3}), 2);

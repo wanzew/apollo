@@ -31,18 +31,29 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
 TEST(StBoundaryTest, basic_test) {
-  std::vector<STPoint> upper_points;
-  std::vector<STPoint> lower_points;
+  /* s
+   * ^
+   * |
+   * |
+   * |
+   * |
+   * |
+   * lower_point[1]      upper_point[1]
+   * *--------------------------*
+   * |                          |
+   * |                          |
+   * |                          |
+   * *--------------------------*------------------------------------> t
+   * lower_point[0]      upper_point[0]
+   */
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
 
-  lower_points.emplace_back(0.0, 0.0);
-  lower_points.emplace_back(0.0, 10.0);
-  upper_points.emplace_back(5.0, 0.0);
-  upper_points.emplace_back(5.0, 10.0);
-
-  point_pairs.emplace_back(lower_points[0], upper_points[0]);
-  point_pairs.emplace_back(lower_points[1], upper_points[1]);
+  // 每个pair包含两个点(t相同)，point_pairs 包含两个或多个元素元素
+  // 第一个元素包含的是 boundary(菱形)的左边的两个点(小t)
+  // 第二个元素包含的是 boundary(菱形)的右边的两个点(大t)
+  point_pairs.emplace_back(STPoint(1.0, 0.0), STPoint(5.0, 0.0));
+  point_pairs.emplace_back(STPoint(1.0, 10.0), STPoint(5.0, 10.0));
 
   StBoundary boundary(point_pairs);
 
@@ -55,18 +66,26 @@ TEST(StBoundaryTest, basic_test) {
 }
 
 TEST(StBoundaryTest, boundary_range) {
-  std::vector<STPoint> upper_points;
-  std::vector<STPoint> lower_points;
-
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
 
-  lower_points.emplace_back(1.0, 0.0);
-  lower_points.emplace_back(1.0, 10.0);
-  upper_points.emplace_back(5.0, 0.0);
-  upper_points.emplace_back(5.0, 10.0);
+  /* s
+   * ^
+   * |
+   * |(5.0, 0)               (5.0, 10.0)
+   * *--------------------------*
+   * |                          |
+   * |                          |
+   * |                          |
+   * |                          |
+   * |                          |
+   * *--------------------------*
+   * |(1.0, 0)               (1.0, 10.0)
+   * ---------------------------------------------------------------> t
+   *
+   */
 
-  point_pairs.emplace_back(lower_points[0], upper_points[0]);
-  point_pairs.emplace_back(lower_points[1], upper_points[1]);
+  point_pairs.emplace_back(STPoint(1.0, 0.0), STPoint(5.0, 0.0));
+  point_pairs.emplace_back(STPoint(1.0, 10.0), STPoint(5.0, 10.0));
 
   StBoundary boundary(point_pairs);
 
@@ -98,6 +117,21 @@ TEST(StBoundaryTest, get_index_range) {
   std::vector<STPoint> upper_points;
   std::vector<STPoint> lower_points;
 
+  /* s
+   * ^
+   * |
+   * |(5.0, 0)               (5.0, 10.0)
+   * *--------------------------*
+   * |                          |
+   * |                          |
+   * |                          |
+   * |                          |
+   * |                          |
+   * *--------------------------*
+   * |(1.0, 0)               (1.0, 10.0)
+   * ---------------------------------------------------------------> t
+   *
+   */
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
 
   lower_points.emplace_back(43.000164837720789, -517957.08587679861);
@@ -106,13 +140,30 @@ TEST(StBoundaryTest, get_index_range) {
   upper_points.emplace_back(52.200164801309178, -517957.08587679861);
   upper_points.emplace_back(55.6001647283625, -517955.58587660792);
 
-  point_pairs.emplace_back(lower_points[0], upper_points[0]);
-  point_pairs.emplace_back(lower_points[1], upper_points[1]);
-
   StBoundary boundary(point_pairs);
 
   size_t left  = 0;
   size_t right = 0;
+  /*
+   * ^
+   * |                          upper_points[1]
+   * |                              *
+   * |
+   * |
+   * |
+   * |   lower_points[1]            *
+   * |        *                 upper_points[0]
+   * |
+   * |                          -517955.58587660792
+   * |
+   * |        *
+   * |   lower_points[0]
+   * |  -517957.08587679861
+   * |
+   * |
+   *  --------------------------------------------------------------> t
+   *
+   */
 
   EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517957.08587679861, &left, &right));
   EXPECT_EQ(left, 0);
@@ -130,28 +181,42 @@ TEST(StBoundaryTest, get_index_range) {
 }
 
 TEST(StBoundaryTest, remove_redundant_points) {
-  std::vector<std::pair<STPoint, STPoint>> points;
-  points.emplace_back(STPoint(0.0, 0.0), STPoint(1.0, 0.0));
-  points.emplace_back(STPoint(0.1, 0.2), STPoint(1.1, 0.2));
-  points.emplace_back(STPoint(0.2, 0.3), STPoint(1.2, 0.3));
-  points.emplace_back(STPoint(0.3, 0.4), STPoint(1.3, 0.4));
-  points.emplace_back(STPoint(0.4, 0.5), STPoint(1.4, 0.5));
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+  point_pairs.emplace_back(STPoint(0.0, 0.0), STPoint(1.0, 0.0));
+  point_pairs.emplace_back(STPoint(0.1, 0.2), STPoint(1.1, 0.2));
+  point_pairs.emplace_back(STPoint(0.2, 0.3), STPoint(1.2, 0.3));
+  point_pairs.emplace_back(STPoint(0.3, 0.4), STPoint(1.3, 0.4));
+  point_pairs.emplace_back(STPoint(0.4, 0.5), STPoint(1.4, 0.5));
 
-  EXPECT_EQ(points.size(), 5);
+  /* s
+   * ^
+   * |
+   * |
+   * |---------*-----------------
+   * |       *                  |
+   * |     *   *                |
+   * |   *   *                  |
+   * | *   *                    |
+   * *   *                      |
+   * | *                        |
+   * *--------------------------*------------------------------------> t
+   *
+   */
+  EXPECT_EQ(point_pairs.size(), 5);
 
   StBoundary st_boundary;
-  st_boundary.RemoveRedundantPoints(&points);
+  st_boundary.RemoveRedundantPoints(&point_pairs);
 
-  EXPECT_EQ(points.size(), 2);
-  EXPECT_DOUBLE_EQ(points[0].first.s(), 0.0);
-  EXPECT_DOUBLE_EQ(points[0].first.t(), 0.0);
-  EXPECT_DOUBLE_EQ(points[0].second.s(), 1.0);
-  EXPECT_DOUBLE_EQ(points[0].second.t(), 0.0);
+  EXPECT_EQ(point_pairs.size(), 2);
+  EXPECT_DOUBLE_EQ(point_pairs[0].first.s(), 0.0);
+  EXPECT_DOUBLE_EQ(point_pairs[0].first.t(), 0.0);
+  EXPECT_DOUBLE_EQ(point_pairs[0].second.s(), 1.0);
+  EXPECT_DOUBLE_EQ(point_pairs[0].second.t(), 0.0);
 
-  EXPECT_DOUBLE_EQ(points[1].first.s(), 0.4);
-  EXPECT_DOUBLE_EQ(points[1].first.t(), 0.5);
-  EXPECT_DOUBLE_EQ(points[1].second.s(), 1.4);
-  EXPECT_DOUBLE_EQ(points[1].second.t(), 0.5);
+  EXPECT_DOUBLE_EQ(point_pairs[1].first.s(), 0.4);
+  EXPECT_DOUBLE_EQ(point_pairs[1].first.t(), 0.5);
+  EXPECT_DOUBLE_EQ(point_pairs[1].second.s(), 1.4);
+  EXPECT_DOUBLE_EQ(point_pairs[1].second.t(), 0.5);
 }
 
 }  // namespace planning

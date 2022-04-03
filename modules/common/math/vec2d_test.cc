@@ -25,6 +25,18 @@ namespace common {
 namespace math {
 
 TEST(Vec2dTest, NomralCases) {
+  /*
+   * ^ y
+   * |
+   * |
+   * |
+   * |
+   * |
+   * 3    * (2,3)
+   * |
+   * |
+   * -----2-----------------------------------> X
+   */
   Vec2d pt(2, 3);
   EXPECT_NEAR(pt.Length(), std::sqrt(13.0), 1e-5);
   EXPECT_NEAR(pt.LengthSquare(), 13.0, 1e-5);

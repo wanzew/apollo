@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-files=$(find  ./ -name "*.proto")
+files=$(find -name "*.proto")
 set done_files=0
 set total_files=0
 

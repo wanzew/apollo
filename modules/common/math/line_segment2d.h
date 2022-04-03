@@ -37,11 +37,9 @@ namespace math {
  * @class LineSegment2d
  * @brief Line segment in 2-D.
  */
+// 包含起点和终点的线段
 class LineSegment2d {
  public:
-  /**
-   * @brief Empty constructor.
-   */
   LineSegment2d();
 
   /**
@@ -110,6 +108,7 @@ class LineSegment2d {
    *        to a point in 2-D.
    * @param point The point to compute the distance to.
    * @return The shortest distance from points on the line segment to point.
+   * 计算point点距离线段上（一定是线段上，而非线段所在直线）的最短距离
    */
   double DistanceTo(const Vec2d& point) const;
 
@@ -121,6 +120,7 @@ class LineSegment2d {
    *        to the input point.
    * @return The shortest distance from points on the line segment
    *         to the input point.
+   * 计算point点距离线段上（一定是线段上，而非线段所在直线）的最短距离，并返回距离最近的点的坐标
    */
   double DistanceTo(const Vec2d& point, Vec2d* const nearest_pt) const;
 
@@ -197,6 +197,7 @@ class LineSegment2d {
    * @param foot_point The computed perpendicular foot from the input point to
    *        the straight line expanded from the line segment.
    * @return The distance from the input point to the perpendicular foot.
+   * point点到线段所在直线的垂足，并返回距离
    */
   double GetPerpendicularFoot(const Vec2d& point, Vec2d* const foot_point) const;
 
