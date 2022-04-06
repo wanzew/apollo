@@ -58,11 +58,8 @@ Status PathDecider::Process(const PathData& path_data, PathDecision* const path_
 
 bool PathDecider::MakeObjectDecision(const PathData& path_data, PathDecision* const path_decision) {
   DCHECK_NOTNULL(path_decision);
-  if (!MakeStaticObstacleDecision(path_data, path_decision)) {
-    AERROR << "Failed to make decisions for static obstacles";
-    return false;
-  }
-  return true;
+
+  return MakeStaticObstacleDecision(path_data, path_decision);
 }
 
 bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
@@ -88,7 +85,8 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
     if (!is_bycycle_or_pedestrain && !obstacle.IsStatic()) { continue; }
 
     if (path_obstacle->HasLongitudinalDecision() &&
-        path_obstacle->LongitudinalDecision().has_ignore() && path_obstacle->HasLateralDecision() &&
+        path_obstacle->LongitudinalDecision().has_ignore() &&  //
+        path_obstacle->HasLateralDecision() &&                 //
         path_obstacle->LateralDecision().has_ignore()) {
       continue;
     }
@@ -97,7 +95,8 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
       // STOP decision
       continue;
     }
-    if (path_obstacle->HasLateralDecision() && path_obstacle->LateralDecision().has_sidepass()) {
+    if (path_obstacle->HasLateralDecision() &&  //
+        path_obstacle->LateralDecision().has_sidepass()) {
       // SIDE_PASS decision
       continue;
     }
@@ -116,9 +115,12 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
     // 在后方，或在远方
     if (sl_boundary.end_s() < frenet_points.front().s() ||
         sl_boundary.start_s() > frenet_points.back().s()) {
-      path_decision->AddLongitudinalDecision("PathDecider/not-in-s", obstacle.Id(),
-                                             object_decision);
-      path_decision->AddLateralDecision("PathDecider/not-in-s", obstacle.Id(), object_decision);
+      path_decision->AddLongitudinalDecision("PathDecider/not-in-s",  //
+                                             obstacle.Id(),           //
+                                             object_decision);        //
+      path_decision->AddLateralDecision("PathDecider/not-in-s",       //
+                                        obstacle.Id(),                //
+                                        object_decision);
       continue;
     }
     // 在左方，或在右方
@@ -127,38 +129,52 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
     if (curr_l - lateral_radius > sl_boundary.end_l() ||
         curr_l + lateral_radius < sl_boundary.start_l()) {
       // ignore
-      path_decision->AddLateralDecision("PathDecider/not-in-l", obstacle.Id(), object_decision);
-    } else if (curr_l - lateral_stop_radius < sl_boundary.end_l() &&
-               curr_l + lateral_stop_radius > sl_boundary.start_l()) {
+      path_decision->AddLateralDecision("PathDecider/not-in-l",     //
+                                        obstacle.Id(),              //
+                                        object_decision);           //
+    }                                                               //
+    else if (curr_l - lateral_stop_radius < sl_boundary.end_l() &&  //
+             curr_l + lateral_stop_radius > sl_boundary.start_l())  //
+    {
       // stop
       *object_decision.mutable_stop() = GenerateObjectStopDecision(*path_obstacle);
 
-      if (path_decision->MergeWithMainStop(object_decision.stop(), obstacle.Id(),
-                                           reference_line_info_->reference_line(),
-                                           reference_line_info_->AdcSlBoundary())) {
-        path_decision->AddLongitudinalDecision("PathDecider/nearest-stop", obstacle.Id(),
-                                               object_decision);
-      } else {
-        ObjectDecisionType object_decision;
-        object_decision.mutable_ignore();
-        path_decision->AddLongitudinalDecision("PathDecider/not-nearest-stop", obstacle.Id(),
-                                               object_decision);
-      }
-    } else if (FLAGS_enable_nudge_decision) {
+      if (path_decision->MergeWithMainStop(object_decision.stop(),                  //
+                                           obstacle.Id(),                           //
+                                           reference_line_info_->reference_line(),  //
+                                           reference_line_info_->AdcSlBoundary()))  //
+      {                                                                             //
+        path_decision->AddLongitudinalDecision("PathDecider/nearest-stop",          //
+                                               obstacle.Id(),                       //
+                                               object_decision);                    //
+      }                                                                             //
+      else                                                                          //
+      {
+        ObjectDecisionType object_decision;                                     //
+        object_decision.mutable_ignore();                                       //
+        path_decision->AddLongitudinalDecision("PathDecider/not-nearest-stop",  //
+                                               obstacle.Id(),                   //
+                                               object_decision);                //
+      }                                                                         //
+    }                                                                           //
+    else if (FLAGS_enable_nudge_decision) {
       // nudge
       if (curr_l - lateral_stop_radius > sl_boundary.end_l()) {
         // LEFT_NUDGE
-        ObjectNudge* object_nudge_ptr = object_decision.mutable_nudge();
-        object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
-        object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
-        path_decision->AddLateralDecision("PathDecider/left-nudge", obstacle.Id(), object_decision);
+        ObjectNudge* object_nudge_ptr = object_decision.mutable_nudge();  //
+        object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);              //
+        object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);  //
+        path_decision->AddLateralDecision("PathDecider/left-nudge",       //
+                                          obstacle.Id(),                  //
+                                          object_decision);               //
       } else {
         // RIGHT_NUDGE
-        ObjectNudge* object_nudge_ptr = object_decision.mutable_nudge();
-        object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
-        object_nudge_ptr->set_distance_l(-FLAGS_nudge_distance_obstacle);
-        path_decision->AddLateralDecision("PathDecider/right-nudge", obstacle.Id(),
-                                          object_decision);
+        ObjectNudge* object_nudge_ptr = object_decision.mutable_nudge();   //
+        object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);              //
+        object_nudge_ptr->set_distance_l(-FLAGS_nudge_distance_obstacle);  //
+        path_decision->AddLateralDecision("PathDecider/right-nudge",       //
+                                          obstacle.Id(),                   //
+                                          object_decision);                //
       }
     }
   }
@@ -169,8 +185,8 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
 ObjectStop PathDecider::GenerateObjectStopDecision(const PathObstacle& path_obstacle) const {
   ObjectStop object_stop;
 
-  double stop_distance =
-      path_obstacle.MinRadiusStopDistance(VehicleConfigHelper::GetConfig().vehicle_param());
+  double stop_distance = path_obstacle.MinRadiusStopDistance(  //
+      VehicleConfigHelper::GetConfig().vehicle_param());
   object_stop.set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
   object_stop.set_distance_s(-stop_distance);
 

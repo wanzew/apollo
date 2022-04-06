@@ -71,13 +71,13 @@ const Eigen::MatrixXd& Spline1dKernel::kernel_matrix() const { return kernel_mat
 const Eigen::MatrixXd& Spline1dKernel::offset() const { return offset_; }
 
 // build-in kernel methods
-/* 由AddNthDerivativekernelMatrix()中kernel_matrix_更新元素的方式，我们可以看出kernel_matrix_一定是下面这种形式，n
+/** 由AddNthDerivativekernelMatrix()中kernel_matrix_更新元素的方式，我们可以看出kernel_matrix_一定是下面这种形式，n
  * = spline order + 1，每一个n*n矩阵都对应着一段spline。
  * | n*n  0   0   0 |
  * |  0  n*n  0   0 |
  * |  0  0   n*n  0 |
  * |  0  0    0  n*n|
- */
+ **/
 void Spline1dKernel::AddNthDerivativekernelMatrix(const uint32_t n, const double weight) {
   const uint32_t num_params = spline_order_ + 1;
   for (uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
@@ -142,7 +142,7 @@ bool Spline1dKernel::AddReferenceLineKernelMatrix(const std::vector<double>& x_c
                                                   const double               weight) {
   if (ref_x.size() != x_coord.size()) { return false; }
 
-  /*
+  /**
    * std::vector<double> x_coord     = {0,   5,   10,  20};
    * std::vector<double> lower_bound = {0,   0,   0,   0};
    * std::vector<double> upper_bound = {3.5, 3.5, 3.5, 3.5};
@@ -171,7 +171,7 @@ bool Spline1dKernel::AddReferenceLineKernelMatrix(const std::vector<double>& x_c
    * | 1, s7, s7^2, s7^3, s7^4, s7^5 |   |a5|  >=  |..|
    * | 1, s8, s8^2, s8^3, s8^4, s8^5 |         >=  |..|
    * | 1, s9, s9^2, s9^3, s9^4, s9^5 |         >=  |ln|
-   */
+   **/
 
   const uint32_t num_params = spline_order_ + 1;
   for (uint32_t i = 0; i < x_coord.size(); ++i) {
@@ -183,7 +183,7 @@ bool Spline1dKernel::AddReferenceLineKernelMatrix(const std::vector<double>& x_c
       offset_(j + cur_index * num_params, 0) += offset_coef;
       offset_coef *= cur_rel_x;
     }
-    /*
+    /**
      * 200 | 0
      * 400 | 1
      * 400 | 2
@@ -200,7 +200,7 @@ bool Spline1dKernel::AddReferenceLineKernelMatrix(const std::vector<double>& x_c
      * .......
      *     | 5
      * ......6*knot
-     */
+     **/
 
     // update kernel matrix
     Eigen::MatrixXd ref_kernel(num_params, num_params);

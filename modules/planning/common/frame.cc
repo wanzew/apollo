@@ -89,10 +89,11 @@ bool Frame::Rerouting() {
   auto request = adapter_manager->GetRoutingResponse()->GetLatestObserved().routing_request();
   request.clear_header();
   AdapterManager::FillRoutingRequestHeader("planning", &request);
-  auto point =
-      common::util::MakePointENU(vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
-  double                  s = 0.0;
-  double                  l = 0.0;
+  auto                    point = common::util::MakePointENU(vehicle_state_.x(),   //
+                                          vehicle_state_.y(),   //
+                                          vehicle_state_.z());  //
+  double                  s     = 0.0;
+  double                  l     = 0.0;
   hdmap::LaneInfoConstPtr lane;
   if (hdmap_->GetNearestLaneWithHeading(point, 5.0, vehicle_state_.heading(), M_PI / 3.0, &lane, &s,
                                         &l) != 0) {

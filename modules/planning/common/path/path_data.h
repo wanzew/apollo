@@ -39,19 +39,20 @@ class PathData {
   bool                   SetDiscretizedPath(const DiscretizedPath& path);
   bool                   SetFrenetPath(const FrenetFramePath& frenet_path);
   void                   SetReferenceLine(const ReferenceLine* reference_line);
-  const DiscretizedPath& discretized_path() const;
-  const FrenetFramePath& frenet_frame_path() const;
+  const DiscretizedPath& discretized_path() const { return discretized_path_; }
+  const FrenetFramePath& frenet_frame_path() const { return frenet_path_; }
+  void                   Clear();
+  bool                   Empty() const;
+  std::string            DebugString() const;
   bool GetPathPointWithPathS(const double s, common::PathPoint* const path_point) const;
-  std::list<std::pair<DiscretizedPath, FrenetFramePath>>& path_data_history();
-
+  std::list<std::pair<DiscretizedPath, FrenetFramePath>>& path_data_history() {
+    return path_data_history_;
+  }
   /*
    * brief: this function will find the path_point in discretized_path whose
    * projection to reference line has s value closest to ref_s.
    */
-  bool        GetPathPointWithRefS(const double ref_s, common::PathPoint* const path_point) const;
-  void        Clear();
-  bool        Empty() const;
-  std::string DebugString() const;
+  bool GetPathPointWithRefS(const double ref_s, common::PathPoint* const path_point) const;
 
  private:
   /*

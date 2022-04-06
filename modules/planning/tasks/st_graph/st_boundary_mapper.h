@@ -50,10 +50,8 @@ class StBoundaryMapper {
   virtual ~StBoundaryMapper() = default;
 
   apollo::common::Status CreateStBoundary(PathDecision* path_decision) const;
-
   apollo::common::Status CreateStBoundaryWithHistory(const ObjectDecisions& history_decisions,
                                                      PathDecision*          path_decision) const;
-
   apollo::common::Status CreateStBoundary(PathObstacle*             path_obstacle,
                                           const ObjectDecisionType& external_decision) const;
 

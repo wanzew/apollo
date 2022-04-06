@@ -58,9 +58,7 @@ class PlanningThreadPool {
  private:
   std::unique_ptr<common::util::ThreadPool> thread_pool_;
   bool                                      is_initialized = false;
-
-  std::vector<std::future<void>> futures_;
-
+  std::vector<std::future<void>>            futures_;
   DECLARE_SINGLETON(PlanningThreadPool);
 };
 

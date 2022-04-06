@@ -30,19 +30,23 @@ namespace planning {
 
 class DiscretizedPath {
  public:
-  DiscretizedPath() = default;
-
-  explicit DiscretizedPath(const std::vector<common::PathPoint>& path_points);
+  DiscretizedPath()          = default;
   virtual ~DiscretizedPath() = default;
-  void set_path_points(const std::vector<common::PathPoint>& path_points);
 
-  double                                Length() const;
-  const common::PathPoint&              StartPoint() const;
-  const common::PathPoint&              EndPoint() const;
-  common::PathPoint                     Evaluate(const double path_s) const;
-  const std::vector<common::PathPoint>& path_points() const;`
-  std::uint32_t                         NumOfPoints() const;
-  virtual void                          Clear();
+  explicit DiscretizedPath(const std::vector<common::PathPoint>& path_points) {
+    path_points_ = path_points;
+  }
+  void set_path_points(const std::vector<common::PathPoint>& path_points) {
+    path_points_ = path_points;
+  }
+  const std::vector<common::PathPoint>& path_points() const { return path_points_; }
+
+  double                   Length() const;
+  const common::PathPoint& StartPoint() const;
+  const common::PathPoint& EndPoint() const;
+  common::PathPoint        Evaluate(const double path_s) const;
+  std::uint32_t            NumOfPoints() const;
+  virtual void             Clear();
 
  protected:
   std::vector<common::PathPoint>::const_iterator QueryLowerBound(const double path_s) const;

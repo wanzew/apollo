@@ -90,7 +90,7 @@ class ComparableCost {
   bool operator>=(const ComparableCost& other) const { return this->CompareTo(other) >= 0; }
   bool operator<(const ComparableCost& other) const { return this->CompareTo(other) < 0; }
   bool operator<=(const ComparableCost& other) const { return this->CompareTo(other) <= 0; }
-  /*
+  /**
    * cost_items represents an array of factors that affect the cost,
    * The level is from most critical to less critical.
    * It includes:

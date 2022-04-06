@@ -22,11 +22,26 @@ namespace apollo {
 namespace common {
 namespace math {
 
+// clang-format off
 TEST(LinearInterpolationTest, LerpOneDim) {
-  double t0 = 0.0;
-  double t1 = 1.0;
-  double x0 = 2.0;
-  double x1 = 4.0;
+  /**
+   *              |           4
+   *              |         /
+   *              |       /
+   *              |     /
+   *              |   /
+   *              | /
+   *              2
+   *             /|
+   * --*-------/--*-----------*------------------------------------------------> s
+   *  -1     /    0           1
+   *       /      |
+   *     /        |
+   *   @
+   *
+   **/
+  double t0 = 0.0, t1 = 1.0;
+  double x0 = 2.0, x1 = 4.0;
 
   EXPECT_NEAR(lerp(x0, t0, x1, t1, 0.4), 2.8, 1e-6);
   EXPECT_NEAR(lerp(x0, t0, x1, t1, 0.9), 3.8, 1e-6);
@@ -35,30 +50,38 @@ TEST(LinearInterpolationTest, LerpOneDim) {
 }
 
 TEST(LinearInterpolationTest, LerpTwoDim) {
-  double t0 = 0.0;
-  double t1 = 1.0;
-
+  /**
+   * |
+   * |
+   * |
+   * |
+   * |--*-----------*------------------------------------------------> s
+   * |  t0          t1
+   * |
+   * |
+   **/
+  double          t0 = 0.0, t1 = 1.0;
   Eigen::Vector2d x0(2.0, 1.0);
   Eigen::Vector2d x1(4.0, 5.0);
 
-  Eigen::Vector2d x = lerp(x0, t0, x1, t1, 0.4);
-  EXPECT_NEAR(x.x(), 2.8, 1e-6);
-  EXPECT_NEAR(x.y(), 2.6, 1e-6);
+  Eigen::Vector2d point = lerp(x0, t0, x1, t1, 0.4);
+  EXPECT_NEAR(point.x(), 2.8, 1e-6);
+  EXPECT_NEAR(point.y(), 2.6, 1e-6);
 
-  x = lerp(x0, t0, x1, t1, 1.2);
-  EXPECT_NEAR(x.x(), 4.4, 1e-6);
-  EXPECT_NEAR(x.y(), 5.8, 1e-6);
+  point = lerp(x0, t0, x1, t1, 1.2);
+  EXPECT_NEAR(point.x(), 4.4, 1e-6);
+  EXPECT_NEAR(point.y(), 5.8, 1e-6);
 
-  x = lerp(x0, t0, x1, t1, -0.5);
-  EXPECT_NEAR(x.x(), 1.0, 1e-6);
-  EXPECT_NEAR(x.y(), -1.0, 1e-6);
+  point = lerp(x0, t0, x1, t1, -0.5);
+  EXPECT_NEAR(point.x(), 1.0, 1e-6);
+  EXPECT_NEAR(point.y(), -1.0, 1e-6);
 }
 
 TEST(LinearInterpolationTest, SlerpCaseOne) {
-  double t0 = 0.0;
-  double t1 = 1.0;
-  double a0 = -2.0;
-  double a1 = 8.5;
+  double t0 =  0.0, t1 = 1.0;
+  double a0 = -2.0, a1 = 8.5;
+  // 10.5 * 0.4 = 4.2
+  // 
 
   EXPECT_NEAR(slerp(a0, t0, a1, t1, 0.4), -2.827, 1e-3);
 }
@@ -71,6 +94,7 @@ TEST(LinearInterpolationTest, SlerpCaseTwo) {
 
   EXPECT_NEAR(slerp(a0, t0, a1, t1, 0.5001), -3.1416, 1e-3);
 }
+// clang-format on
 
 }  // namespace math
 }  // namespace common

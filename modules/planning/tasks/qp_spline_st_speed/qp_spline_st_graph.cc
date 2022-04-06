@@ -181,7 +181,7 @@ Status QpSplineStGraph::AddConstraint(const common::TrajectoryPoint&        init
   //添加lower_s <= f(t) <= upper_s取值范围约束
   constraint->AddBoundary(t_evaluated_, s_lower_bound, s_upper_bound);
 
-  /*
+  /**
    *     |s/m
    *     |
    * 149 |  (0，s) (1，s) (2，s) (3，s) (4，s) (5，s) (6，s) (7，s)

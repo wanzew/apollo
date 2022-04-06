@@ -53,55 +53,23 @@ class Planning : public apollo::common::ApolloApp {
  public:
   Planning() = default;
   virtual ~Planning();
-  /**
-   * @brief module name
-   * @return module name
-   */
-  std::string Name() const override;
 
-  /**
-   * @brief module initialization function
-   * @return initialization status
-   */
-  apollo::common::Status Init() override;
-
-  /**
-   * @brief module start function
-   * @return start status
-   */
-  apollo::common::Status Start() override;
-
-  /**
-   * @brief module stop function
-   */
-  void Stop() override;
-
-  /**
-   * @brief main logic of the planning module, runs periodically triggered by
-   * timer.
-   */
-  void RunOnce();
-
-  /**
-   * @brief record last planning trajectory
-   */
+  std::string            Name() const override;
+  apollo::common::Status Init() override;   // module initialization function
+  apollo::common::Status Start() override;  // module start function
+  void                   Stop() override;   // module stop function
+  void RunOnce();  // main logic of the planning module runs periodically triggered by timer
+  // record last planning trajectory
   void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
 
  private:
-  // Watch dog timer
-  void OnTimer(const ros::TimerEvent&);
-
+  void OnTimer(const ros::TimerEvent&);  // Watch dog timer
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
-
-  /**
-   * @brief Fill the header and publish the planning message.
-   */
-  void Publish(planning::ADCTrajectory* trajectory) {
-    using apollo::common::adapter::AdapterManager;
+  void Publish(planning::ADCTrajectory* trajectory) {  // Fill the header and
+    using apollo::common::adapter::AdapterManager;     // publish the planning message.
     AdapterManager::FillPlanningHeader(Name(), trajectory);
     AdapterManager::PublishPlanning(*trajectory);
   }
-
   void RegisterPlanners();
 
   /**
@@ -118,31 +86,10 @@ class Planning : public apollo::common::ApolloApp {
 
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
-
   void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory);
-
-  /**
-   * Reset pull over mode whenever received new routing
-   */
-  void ResetPullOver(const routing::RoutingResponse& response);
-
   void CheckPlanningConfig();
-
-  double start_time_ = 0.0;
-
-  common::util::Factory<PlanningConfig::PlannerType, Planner> planner_factory_;
-
-  PlanningConfig config_;
-
-  TrafficRuleConfigs traffic_rule_configs_;
-
-  const hdmap::HDMap* hdmap_ = nullptr;
-
-  std::unique_ptr<Frame> frame_;
-
-  std::unique_ptr<Planner> planner_;
-
-  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
+  // Reset pull over mode whenever received new routing
+  void ResetPullOver(const routing::RoutingResponse& response);
 
   class VehicleConfig {
    public:
@@ -151,16 +98,22 @@ class Planning : public apollo::common::ApolloApp {
     double theta_    = 0.0;
     bool   is_valid_ = false;
   };
-  VehicleConfig last_vehicle_config_;
 
   VehicleConfig ComputeVehicleConfigFromLocalization(
       const localization::LocalizationEstimate& localization) const;
 
-  std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
-
-  ros::Timer timer_;
-
-  routing::RoutingResponse last_routing_;
+  double                                                      start_time_ = 0.0;
+  common::util::Factory<PlanningConfig::PlannerType, Planner> planner_factory_;
+  PlanningConfig                                              config_;
+  TrafficRuleConfigs                                          traffic_rule_configs_;
+  const hdmap::HDMap*                                         hdmap_ = nullptr;
+  std::unique_ptr<Frame>                                      frame_;
+  std::unique_ptr<Planner>                                    planner_;
+  std::unique_ptr<PublishableTrajectory>                      last_publishable_trajectory_;
+  VehicleConfig                                               last_vehicle_config_;
+  std::unique_ptr<ReferenceLineProvider>                      reference_line_provider_;
+  ros::Timer                                                  timer_;
+  routing::RoutingResponse                                    last_routing_;
 };
 
 }  // namespace planning

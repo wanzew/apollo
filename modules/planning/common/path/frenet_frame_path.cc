@@ -35,16 +35,18 @@ FrenetFramePath::FrenetFramePath(const std::vector<FrenetFramePoint>& sl_points)
   points_ = sl_points;
 }
 
-void FrenetFramePath::set_points(const std::vector<FrenetFramePoint>& points) { points_ = points; }
-
-const std::vector<FrenetFramePoint>& FrenetFramePath::points() const { return points_; }
+void FrenetFramePath::set_points(const std::vector<FrenetFramePoint>& points) {  //
+  points_ = points;
+}
 
 double FrenetFramePath::Length() const {
   if (points_.empty()) { return 0.0; }
   return points_.back().s() - points_.front().s();
 }
 
-std::uint32_t FrenetFramePath::NumOfPoints() const { return points_.size(); }
+std::uint32_t FrenetFramePath::NumOfPoints() const {  //
+  return points_.size();
+}
 
 const FrenetFramePoint& FrenetFramePath::PointAt(const std::uint32_t index) const {
   CHECK_LT(index, points_.size());
@@ -93,9 +95,11 @@ FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
 
   FrenetFramePoint p;
   p.set_s(s);
-  p.set_l(common::math::lerp(p0.l(), s0, p1.l(), s1, s));
-  p.set_dl(common::math::lerp(p0.dl(), s0, p1.dl(), s1, s));
+  // clang-format off
+  p.set_l  (common::math::lerp(p0.l(),   s0, p1.l(),   s1, s));
+  p.set_dl (common::math::lerp(p0.dl(),  s0, p1.dl(),  s1, s));
   p.set_ddl(common::math::lerp(p0.ddl(), s0, p1.ddl(), s1, s));
+  // clang-format on
   return p;
 }
 

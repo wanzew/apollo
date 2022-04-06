@@ -66,10 +66,12 @@ std::string Planning::Name() const { return "planning"; }
 void Planning::RegisterPlanners() {
   planner_factory_.Register(PlanningConfig::RTK,
                             []() -> Planner* { return new RTKReplayPlanner(); });
-  planner_factory_.Register(PlanningConfig::EM, []() -> Planner* { return new EMPlanner(); });
+  planner_factory_.Register(PlanningConfig::EM,  //
+                            []() -> Planner* { return new EMPlanner(); });
   planner_factory_.Register(PlanningConfig::LATTICE,
                             []() -> Planner* { return new LatticePlanner(); });
-  planner_factory_.Register(PlanningConfig::NAVI, []() -> Planner* { return new NaviPlanner(); });
+  planner_factory_.Register(PlanningConfig::NAVI,  //
+                            []() -> Planner* { return new NaviPlanner(); });
 }
 
 Status Planning::InitFrame(const uint32_t         sequence_num,
@@ -102,26 +104,27 @@ void Planning::ResetPullOver(const routing::RoutingResponse& response) {
 }
 
 void Planning::CheckPlanningConfig() {
-  if (config_.has_em_planner_config() && config_.em_planner_config().has_dp_st_speed_config()) {
+  if (config_.has_em_planner_config() &&  //
+      config_.em_planner_config().has_dp_st_speed_config()) {
     const auto& dp_st_speed_config = config_.em_planner_config().dp_st_speed_config();
-    CHECK(dp_st_speed_config.has_matrix_dimension_s());
+    // clang-format off
+    CHECK(   dp_st_speed_config.has_matrix_dimension_s());
     CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
     CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);
-    CHECK(dp_st_speed_config.has_matrix_dimension_t());
+    CHECK(   dp_st_speed_config.has_matrix_dimension_t());
     CHECK_GT(dp_st_speed_config.matrix_dimension_t(), 3);
     CHECK_LT(dp_st_speed_config.matrix_dimension_t(), 10000);
+    // clang-format on
   }
   // TODO(All): check other config params
 }
 
 Status Planning::Init() {
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file, &config_))
-      << "failed to load planning config file " << FLAGS_planning_config_file;
+  apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file, &config_);
   CheckPlanningConfig();
 
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_traffic_rule_config_filename,
-                                               &traffic_rule_configs_))
-      << "Failed to load traffic rule config file " << FLAGS_traffic_rule_config_filename;
+  apollo::common::util::GetProtoFromFile(FLAGS_traffic_rule_config_filename,
+                                         &traffic_rule_configs_);
 
   // initialize planning thread pool
   PlanningThreadPool::instance()->Init();

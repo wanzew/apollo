@@ -29,6 +29,23 @@ namespace planning {
 
 using apollo::common::util::StringPrintf;
 
+/* s(y)
+ * ^
+ * |
+ * |
+ * |
+ * |
+ * |
+ * upper_point[0]      upper_point[1]
+ * *--------------------------*
+ * |                          |
+ * |                          |
+ * |                          |
+ * *--------------------------*------------------------------------> t(x)
+ * lower_point[0]      lower_point[1]
+ */
+
+// 把 s, t 赋值给 x, y
 STPoint::STPoint(const double s, const double t)
     : Vec2d(t, s) {}
 

@@ -40,8 +40,7 @@ namespace util {
  * @Warnning: this function is not thread safe.
  */
 PlanningStatus* GetPlanningStatus();
-
-void DumpPlanningContext();
+void            DumpPlanningContext();
 
 }  // namespace util
 }  // namespace planning

@@ -54,36 +54,27 @@ class ReferenceLineInfo {
                              const common::TrajectoryPoint& adc_planning_point,
                              const ReferenceLine&           reference_line,
                              const hdmap::RouteSegments&    segments);
-
-  bool Init(const std::vector<const Obstacle*>& obstacles);
-
-  bool IsInited() const;
-
-  bool          AddObstacles(const std::vector<const Obstacle*>& obstacles);
-  PathObstacle* AddObstacle(const Obstacle* obstacle);
-  void          AddObstacleHelper(const Obstacle* obstacle, int* ret);
-
+  bool                           Init(const std::vector<const Obstacle*>& obstacles);
+  bool                           IsInited() const;
+  bool                           AddObstacles(const std::vector<const Obstacle*>& obstacles);
+  PathObstacle*                  AddObstacle(const Obstacle* obstacle);
+  void                           AddObstacleHelper(const Obstacle* obstacle, int* ret);
   PathDecision*                  path_decision();
   const PathDecision&            path_decision() const;
   const ReferenceLine&           reference_line() const;
   const common::TrajectoryPoint& AdcPlanningPoint() const;
-
-  bool ReachedDestination() const;
-
-  void SetTrajectory(const DiscretizedTrajectory& trajectory);
-
-  const DiscretizedTrajectory& trajectory() const;
-  double                       TrajectoryLength() const;
-
-  double Cost() const { return cost_; }
-  void   AddCost(double cost) { cost_ += cost; }
-  void   SetCost(double cost) { cost_ = cost; }
-  double PriorityCost() const { return priority_cost_; }
-  void   SetPriorityCost(double cost) { priority_cost_ = cost; }
-  // For lattice planner'speed planning target
-  void                  SetStopPoint(const StopPoint& stop_point);
-  void                  SetCruiseSpeed(double speed);
-  const PlanningTarget& planning_target() const { return planning_target_; }
+  bool                           ReachedDestination() const;
+  void                           SetTrajectory(const DiscretizedTrajectory& trajectory);
+  const DiscretizedTrajectory&   trajectory() const;
+  double                         TrajectoryLength() const;
+  double                         Cost() const { return cost_; }
+  void                           AddCost(double cost) { cost_ += cost; }
+  void                           SetCost(double cost) { cost_ = cost; }
+  double                         PriorityCost() const { return priority_cost_; }
+  void                           SetPriorityCost(double cost) { priority_cost_ = cost; }
+  void                           SetCruiseSpeed(double speed);
+  const PlanningTarget&          planning_target() const { return planning_target_; }
+  void SetStopPoint(const StopPoint& stop_point);  // For lattice planner'speed planning target
 
   /**
    * @brief check if current reference line is started from another reference
@@ -93,23 +84,20 @@ class ReferenceLineInfo {
    *line, otherwise false.
    **/
   bool IsStartFrom(const ReferenceLineInfo& previous_reference_line_info) const;
-
   planning_internal::Debug*       mutable_debug() { return &debug_; }
   const planning_internal::Debug& debug() const { return debug_; }
   LatencyStats*                   mutable_latency_stats() { return &latency_stats_; }
   const LatencyStats&             latency_stats() const { return latency_stats_; }
-
-  const PathData&  path_data() const;
-  const SpeedData& speed_data() const;
-  PathData*        mutable_path_data();
-  SpeedData*       mutable_speed_data();
+  const PathData&                 path_data() const;
+  const SpeedData&                speed_data() const;
+  PathData*                       mutable_path_data();
+  SpeedData*                      mutable_speed_data();
+  const SLBoundary&               AdcSlBoundary() const;
+  std::string                     PathSpeedDebugString() const;
   // aggregate final result together by some configuration
   bool CombinePathAndSpeedProfile(const double           relative_time,
                                   const double           start_s,
                                   DiscretizedTrajectory* discretized_trajectory);
-
-  const SLBoundary& AdcSlBoundary() const;
-  std::string       PathSpeedDebugString() const;
 
   /**
    * Check if the current reference line is a change lane reference line, i.e.,
@@ -127,30 +115,25 @@ class ReferenceLineInfo {
    * Set if the vehicle can drive following this reference line
    * A planner need to set this value to true if the reference line is OK
    */
-  void SetDrivable(bool drivable);
-  bool IsDrivable() const;
-
-  void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
-
-  bool IsSafeToChangeLane() const { return is_safe_to_change_lane_; }
-
-  const hdmap::RouteSegments& Lanes() const;
-  const std::list<hdmap::Id>  TargetLaneId() const;
-
-  void ExportDecision(DecisionResult* decision_result) const;
-
-  void SetJunctionRightOfWay(double junction_s, bool is_protected);
-
+  void                            SetDrivable(bool drivable);
+  bool                            IsDrivable() const;
+  void                            ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
+  bool                            IsSafeToChangeLane() const { return is_safe_to_change_lane_; }
+  const hdmap::RouteSegments&     Lanes() const;
+  const std::list<hdmap::Id>      TargetLaneId() const;
+  void                            ExportDecision(DecisionResult* decision_result) const;
+  void                            SetJunctionRightOfWay(double junction_s, bool is_protected);
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
-
-  bool IsRightTurnPath() const;
-
-  double OffsetToOtherReferenceLine() const { return offset_to_other_reference_line_; }
-  void   SetOffsetToOtherReferenceLine(const double offset) {
+  bool                            IsRightTurnPath() const;
+  double                          OffsetToOtherReferenceLine() const {  //
+    return offset_to_other_reference_line_;
+  }
+  void SetOffsetToOtherReferenceLine(const double offset) {
     offset_to_other_reference_line_ = offset;
   }
-
-  void set_is_on_reference_line() { is_on_reference_line_ = true; }
+  void set_is_on_reference_line() {  //
+    is_on_reference_line_ = true;
+  }
 
  private:
   bool CheckChangeLane() const;

@@ -56,6 +56,22 @@ StBoundary::StBoundary(const std::vector<std::pair<STPoint, STPoint>>& point_pai
   std::vector<std::pair<STPoint, STPoint>> reduced_pairs(point_pairs);
   RemoveRedundantPoints(&reduced_pairs);
 
+  /* s(y)
+   * ^
+   * |
+   * |
+   * |
+   * |
+   * |
+   * upper_point[0]      upper_point[1]
+   * *--------------------------*
+   * |                          |
+   * |                          |
+   * |                          |
+   * *--------------------------*------------------------------------> t(x)
+   * lower_point[0]      lower_point[1]
+   */
+
   for (const auto& item : reduced_pairs) {
     // use same t for both points
     const double t = item.first.t();
@@ -63,6 +79,9 @@ StBoundary::StBoundary(const std::vector<std::pair<STPoint, STPoint>>& point_pai
     upper_points_.emplace_back(item.second.s(), t);
   }
 
+  // 为保证 加入 points_ 的点属于CCW(逆时针顺序)， BuildFromPoints要求逆时针的points
+  // lower_points_ 从前往后的顺序加入
+  // upper_points_ 从后往前的顺序加入
   for (auto it = lower_points_.begin(); it != lower_points_.end(); ++it) {
     points_.emplace_back(it->x(), it->y());
   }
@@ -70,6 +89,7 @@ StBoundary::StBoundary(const std::vector<std::pair<STPoint, STPoint>>& point_pai
     points_.emplace_back(rit->x(), rit->y());
   }
 
+  // 继承自 Polygon2d
   BuildFromPoints();
 
   for (const auto& point : lower_points_) {
@@ -132,7 +152,7 @@ void StBoundary::RemoveRedundantPoints(std::vector<std::pair<STPoint, STPoint>>*
    * *--------------------------*------------------------------------> t
    *point_pairs->at(i).first
    */
-  // point_pairs 包含的边（当相于一个pair一个边，底边或顶边）
+  // point_pairs 包含的边(当相于一个pair一个边，底边或顶边)
   while (i < point_pairs->size() && j + 1 < point_pairs->size()) {
     LineSegment2d lower_seg(point_pairs->at(i).first, point_pairs->at(j + 1).first);
     LineSegment2d upper_seg(point_pairs->at(i).second, point_pairs->at(j + 1).second);
@@ -221,6 +241,7 @@ StBoundary StBoundary::ExpandByS(const double s) const {
   return StBoundary(std::move(point_pairs));
 }
 
+// TODO:
 StBoundary StBoundary::ExpandByT(const double t) const {
   if (lower_points_.empty()) {
     AERROR << "The current st_boundary has NO points.";
@@ -258,14 +279,17 @@ StBoundary StBoundary::ExpandByT(const double t) const {
               lower_points_.back().x() + t),
       STPoint(upper_points_.back().y() + t * upper_right_delta_s / right_delta_t,
               upper_points_.back().x() + t));
-  point_pairs.back().second.set_s(
-      std::fmax(point_pairs.back().second.s(), point_pairs.back().first.s() + kMinSEpsilon));
+  point_pairs.back().second.set_s(std::fmax(point_pairs.back().second.s(),  //
+                                            point_pairs.back().first.s() + kMinSEpsilon));
 
   return StBoundary(std::move(point_pairs));
 }
 
-StBoundary::BoundaryType StBoundary::boundary_type() const { return boundary_type_; }
-void                     StBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
+StBoundary::BoundaryType StBoundary::boundary_type() const {  //
+  return boundary_type_;
+}
+
+void StBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
   boundary_type_ = boundary_type;
 }
 
@@ -279,6 +303,8 @@ void StBoundary::SetCharacteristicLength(const double characteristic_length) {
   characteristic_length_ = characteristic_length;
 }
 
+// 获取安全区域返回，如果boundary_type 是 STOP YIELD 或 FOLLOW
+// 返回 boundary lower_points 的s ，如果 boundary_type是 OVERTAKE ，返回 upper_points 的s
 bool StBoundary::GetUnblockSRange(const double curr_time, double* s_upper, double* s_lower) const {
   CHECK_NOTNULL(s_upper);
   CHECK_NOTNULL(s_lower);
@@ -357,8 +383,8 @@ bool StBoundary::GetIndexRange(const std::vector<STPoint>& points,
    * |
    * |
    * |
-   * |   lower_points[1]            *
-   * |        *                 upper_points[0]
+   * |   upper_points[0]            *
+   * |        *                 lower_points[1]
    * |
    * |                          -517955.58587660792
    * |

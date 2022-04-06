@@ -40,10 +40,8 @@ class PublishableTrajectory : public DiscretizedTrajectory {
    * Create a publishable trajectory based on a trajectory protobuf
    */
   explicit PublishableTrajectory(const ADCTrajectory& trajectory_pb);
-
   double header_time() const;
-
-  void PopulateTrajectoryProtobuf(ADCTrajectory* trajectory_pb) const;
+  void   PopulateTrajectoryProtobuf(ADCTrajectory* trajectory_pb) const;
 
  private:
   double header_time_ = 0.0;

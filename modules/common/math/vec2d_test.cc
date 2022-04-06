@@ -25,7 +25,7 @@ namespace common {
 namespace math {
 
 TEST(Vec2dTest, NomralCases) {
-  /*
+  /**
    * ^ y
    * |
    * |

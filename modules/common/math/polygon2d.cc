@@ -166,6 +166,7 @@ void Polygon2d::BuildFromPoints() {
   CHECK_GE(num_points_, 3);
 
   // Make sure the points are in ccw order.
+  // CW顺时针旋转Clock Wise的方向。与CW反方向旋转时为CCW:Counter Clock Wise
   area_ = 0.0;
   for (int i = 1; i < num_points_; ++i) {
     area_ += CrossProd(points_[0], points_[i - 1], points_[i]);
@@ -205,6 +206,9 @@ void Polygon2d::BuildFromPoints() {
   }
 }
 
+// 凸包（Convex Hull）是一个计算几何（图形学）中的概念
+// 在一个实数向量空间V中，对于给定集合X，所有包含X的凸集的交集S被称为X的凸包。X的凸包可以用X内所有点(X1，...Xn)的凸组合来构造.
+// 用不严谨的话来讲，给定二维平面上的点集，凸包就是将最外层的点连接起来构成的凸多边形，它能包含点集中所有的点。
 bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d>& points, Polygon2d* const polygon) {
   CHECK_NOTNULL(polygon);
   const int n = points.size();

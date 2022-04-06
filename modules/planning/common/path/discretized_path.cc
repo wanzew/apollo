@@ -30,14 +30,6 @@
 namespace apollo {
 namespace planning {
 
-DiscretizedPath::DiscretizedPath(const std::vector<common::PathPoint>& path_points) {
-  path_points_ = path_points;
-}
-
-void DiscretizedPath::set_path_points(const std::vector<common::PathPoint>& path_points) {
-  path_points_ = path_points;
-}
-
 double DiscretizedPath::Length() const {
   if (path_points_.empty()) { return 0.0; }
   return path_points_.back().s() - path_points_.front().s();
@@ -50,8 +42,6 @@ common::PathPoint DiscretizedPath::Evaluate(const double path_s) const {
   if (it_lower == path_points_.end()) { return path_points_.back(); }
   return common::math::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower, path_s);
 }
-
-const std::vector<common::PathPoint>& DiscretizedPath::path_points() const { return path_points_; }
 
 std::uint32_t DiscretizedPath::NumOfPoints() const { return path_points_.size(); }
 

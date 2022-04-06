@@ -67,7 +67,7 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
   if (reference_line_info_->ReachedDestination()) { return Status::OK(); }
 
   if (path_data.discretized_path().NumOfPoints() == 0)
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR, "PLANNING_ERROR");
 
   StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_, reference_line, path_data,
                                    poly_st_speed_config_.total_path_length(),  // default 149 m

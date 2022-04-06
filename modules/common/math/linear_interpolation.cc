@@ -25,7 +25,10 @@ namespace apollo {
 namespace common {
 namespace math {
 
-double slerp(const double a0, const double t0, const double a1, const double t1, const double t) {
+// clang-format off
+double slerp(const double a0, const double t0, 
+             const double a1, const double t1, 
+                              const double t) {
   if (std::abs(t1 - t0) <= kMathEpsilon) {
     AERROR << "input time difference is too small";
     return NormalizeAngle(a0);
@@ -44,7 +47,9 @@ double slerp(const double a0, const double t0, const double a1, const double t1,
   return NormalizeAngle(a);
 }
 
-SLPoint InterpolateUsingLinearApproximation(const SLPoint& p0, const SLPoint& p1, const double w) {
+SLPoint InterpolateUsingLinearApproximation(const SLPoint& p0, 
+                                            const SLPoint& p1, 
+                                            const double   w) {
   CHECK_GE(w, 0.0);
 
   SLPoint p;
@@ -54,7 +59,9 @@ SLPoint InterpolateUsingLinearApproximation(const SLPoint& p0, const SLPoint& p1
 }
 
 PathPoint
-InterpolateUsingLinearApproximation(const PathPoint& p0, const PathPoint& p1, const double s) {
+InterpolateUsingLinearApproximation(const PathPoint& p0, 
+                                    const PathPoint& p1, 
+                                    const double     s) {
   double s0 = p0.s();
   double s1 = p1.s();
   CHECK_LE(s0, s1);
@@ -106,6 +113,7 @@ TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint& tp0,
 
   return tp;
 }
+// clang-format on
 
 }  // namespace math
 }  // namespace common

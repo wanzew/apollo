@@ -39,48 +39,29 @@ using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::math::Vec2d;
 
 bool PathData::SetDiscretizedPath(const DiscretizedPath& path) {
-  if (reference_line_ == nullptr) {
-    AERROR << "Should NOT set discretized path when reference line is nullptr. "
-              "Please set reference line first.";
-    return false;
-  }
+  if (reference_line_ == nullptr) return false;
+
   discretized_path_ = path;
-  if (!XYToSL(discretized_path_, &frenet_path_)) {
-    AERROR << "Fail to transfer discretized path to frenet path.";
-    return false;
-  }
+  // transfer discretized path to frenet path
+  XYToSL(discretized_path_, &frenet_path_);
   DCHECK_EQ(discretized_path_.NumOfPoints(), frenet_path_.points().size());
   path_data_history_.push_back(std::make_pair(discretized_path_, frenet_path_));
   return true;
 }
 
 bool PathData::SetFrenetPath(const FrenetFramePath& frenet_path) {
-  if (reference_line_ == nullptr) {
-    AERROR << "Should NOT set frenet path when reference line is nullptr. "
-              "Please set reference line first.";
-    return false;
-  }
+  if (reference_line_ == nullptr) return false;
   frenet_path_ = frenet_path;
-  if (!SLToXY(frenet_path_, &discretized_path_)) {
-    AERROR << "Fail to transfer frenet path to discretized path.";
-    return false;
-  }
+  SLToXY(frenet_path_, &discretized_path_);
   DCHECK_EQ(discretized_path_.NumOfPoints(), frenet_path_.points().size());
   path_data_history_.push_back(std::make_pair(discretized_path_, frenet_path_));
   return true;
 }
 
-const DiscretizedPath& PathData::discretized_path() const { return discretized_path_; }
-
 bool PathData::Empty() const {
-  return discretized_path_.NumOfPoints() == 0 && frenet_path_.NumOfPoints() == 0;
+  return discretized_path_.NumOfPoints() == 0 &&  //
+         frenet_path_.NumOfPoints() == 0;
 }
-
-std::list<std::pair<DiscretizedPath, FrenetFramePath>>& PathData::path_data_history() {
-  return path_data_history_;
-}
-
-const FrenetFramePath& PathData::frenet_frame_path() const { return frenet_path_; }
 
 void PathData::SetReferenceLine(const ReferenceLine* reference_line) {
   Clear();
@@ -96,15 +77,7 @@ bool PathData::GetPathPointWithRefS(const double ref_s, common::PathPoint* const
   DCHECK_NOTNULL(reference_line_);
   DCHECK_NOTNULL(path_point);
   DCHECK_EQ(discretized_path_.path_points().size(), frenet_path_.points().size());
-  if (ref_s < 0) {
-    AERROR << "ref_s[" << ref_s << "] should be > 0";
-    return false;
-  }
-  if (ref_s > frenet_path_.points().back().s()) {
-    AERROR << "ref_s is larger than the length of frenet_path_ length ["
-           << frenet_path_.points().back().s() << "].";
-    return false;
-  }
+  if (ref_s < 0 || ref_s > frenet_path_.points().back().s()) return false;
 
   uint32_t     index            = 0;
   const double kDistanceEpsilon = 1e-3;
@@ -113,17 +86,21 @@ bool PathData::GetPathPointWithRefS(const double ref_s, common::PathPoint* const
       path_point->CopyFrom(discretized_path_.path_points().at(i));
       return true;
     }
-    if (frenet_path_.points().at(i).s() < ref_s && ref_s <= frenet_path_.points().at(i + 1).s()) {
+    if (ref_s >  frenet_path_.points().at(i).s() &&  //
+        ref_s <= frenet_path_.points().at(i + 1).s()) {
       index = i;
       break;
     }
   }
-  double r = (ref_s - frenet_path_.points().at(index).s()) /
-             (frenet_path_.points().at(index + 1).s() - frenet_path_.points().at(index).s());
+  // clang-format off
+  const double r                  = (ref_s - frenet_path_.points().at(index).s()) 
+                                  / (frenet_path_.points().at(index + 1).s() 
+                                   - frenet_path_.points().at(index).s());
 
-  const double discretized_path_s = discretized_path_.path_points().at(index).s() +
-                                    r * (discretized_path_.path_points().at(index + 1).s() -
-                                         discretized_path_.path_points().at(index).s());
+  const double discretized_path_s = discretized_path_.path_points().at(index).s() 
+                                  + r * (discretized_path_.path_points().at(index + 1).s() 
+                                       - discretized_path_.path_points().at(index).s());
+  // clang-format on               
   path_point->CopyFrom(discretized_path_.Evaluate(discretized_path_s));
 
   return true;

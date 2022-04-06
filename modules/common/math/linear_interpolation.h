@@ -45,8 +45,11 @@ namespace math {
  * @param x The coordinate of the interpolated point.
  * @return Interpolated point.
  */
+// clang-format off
 template <typename T>
-T lerp(const T& x0, const double t0, const T& x1, const double t1, const double t) {
+T lerp(const T& x0, const double t0, 
+       const T& x1, const double t1, 
+                    const double t) {
   if (std::abs(t1 - t0) <= 1.0e-6) {
     AERROR << "input time difference is too small";
     return x0;
@@ -57,6 +60,7 @@ T lerp(const T& x0, const double t0, const T& x1, const double t1, const double 
 }
 
 /**
+ * 在计算机图形学中，slerp是spherical linear interpolation（球面线性插值）的缩写
  * @brief Spherical linear interpolation between two angles.
  *        The two angles are within range [-M_PI, M_PI).
  * @param a0 The value of the first angle.
@@ -67,17 +71,24 @@ T lerp(const T& x0, const double t0, const T& x1, const double t1, const double 
  * @param a The value of the spherically interpolated angle.
  * @return Interpolated angle.
  */
-double slerp(const double a0, const double t0, const double a1, const double t1, const double t);
 
-SLPoint InterpolateUsingLinearApproximation(const SLPoint& p0, const SLPoint& p1, const double w);
+double          slerp(const double a0, const double t0, 
+                      const double a1, const double t1, 
+                                       const double t);
 
-PathPoint
-InterpolateUsingLinearApproximation(const PathPoint& p0, const PathPoint& p1, const double s);
+SLPoint         InterpolateUsingLinearApproximation(const SLPoint& p0, 
+                                                    const SLPoint& p1, 
+                                                    const double w);
+
+PathPoint       InterpolateUsingLinearApproximation(const PathPoint& p0, 
+                                                    const PathPoint& p1, 
+                                                    const double s);
 
 TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint& tp0,
                                                     const TrajectoryPoint& tp1,
                                                     const double           t);
 
+// clang-format on
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

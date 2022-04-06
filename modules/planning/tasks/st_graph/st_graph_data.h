@@ -49,7 +49,7 @@ class StGraphData {
   std::vector<const StBoundary*>  st_boundaries_;
   apollo::common::TrajectoryPoint init_point_;
   SpeedLimit                      speed_limit_;
-  double path_data_length_ = 0.0;  // 长度会从 DP PATH的结果中获取
+  double path_data_length_ = 0.0;  // 长度会从 DP PATH的结果中初始化
 };
 
 }  // namespace planning

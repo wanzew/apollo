@@ -76,7 +76,7 @@ StBoundaryMapper::StBoundaryMapper(const SLBoundary&       adc_sl_boundary,
 Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
   const auto& path_obstacles = path_decision->path_obstacles();
 
-  if (planning_time_ < 0.0) return Status(ErrorCode::PLANNING_ERROR, msg);
+  if (planning_time_ < 0.0) return Status(ErrorCode::PLANNING_ERROR, "ERROR");
   if (path_data_.discretized_path().NumOfPoints() < 2) return Status(ErrorCode::PLANNING_ERROR, "");
 
   PathObstacle*      stop_obstacle = nullptr;
@@ -276,8 +276,11 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
   std::vector<STPoint> upper_points;
 
   // 计算障碍物的边界框，当且仅当障碍物再某个时刻与无人车规划路径有重叠时，才被考虑。
+  // clang-format off
   GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
-                           *(path_obstacle->obstacle()), &upper_points, &lower_points);
+                           *(path_obstacle->obstacle()), 
+                           &upper_points, 
+                           &lower_points);
 
   auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
                       .ExpandByS(boundary_s_buffer)
@@ -296,6 +299,19 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
 }
 
 // 分别针对静止目标和运动目标，计算重叠点
+/**
+ *
+ * 判断overlap（是否碰撞）：
+ * 1. 对于静态障碍物，障碍物的boundary_box如果和 path_data上的任一点的 box 相交，则表示 有Overlap
+ * 
+ * 2. 对于动态障碍物，会对障碍物的预测轨迹点处的boundary_box和path_data上的任意点进行计算overlap，
+ * 如果有overlap，找出有overlap的 lower_point 和 upper_point 点
+ * lower_point 表示，在改点之前不会碰撞
+ * upper_point 表示，在改点之后也不会碰撞
+ * 
+ * 该函数的作用就是找到这样的 lower_point 和 upper_point
+ * 
+ **/
 bool StBoundaryMapper::GetOverlapBoundaryPoints(const std::vector<PathPoint>& path_points,
                                                 const Obstacle&               obstacle,
                                                 std::vector<STPoint>*         upper_points,
@@ -322,26 +338,52 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(const std::vector<PathPoint>& pa
       // 有重叠
       if (CheckOverlap(curr_point_on_path, obs_box, st_boundary_config_.boundary_buffer())) {
         const double backward_distance = -vehicle_param_.front_edge_to_center();
-        const double forward_distance =
-            vehicle_param_.length() + vehicle_param_.width() + obs_box.length() + obs_box.width();
+        const double forward_distance  =  vehicle_param_.length() 
+                                       +  vehicle_param_.width() 
+                                       +  obs_box.length() 
+                                       +  obs_box.width();
 
         double low_s  = std::fmax(0.0, curr_point_on_path.s() + backward_distance);
         double high_s = std::fmin(planning_distance_, curr_point_on_path.s() + forward_distance);
 
-        // 为啥 分别有两个？
+        /**
+         *                      ^ s                  ^ s              
+         *                    @ |                    |(high_s, 0.0)          (high_s, planning_time_)    
+         *                      |                    *----------------------------------*                
+         *                  @   |                    |                                  |
+         *      _______         |                    |                                  |
+         *     |       |  @     |                    |                                  |                        
+         *     |       |        |                    |                                  |                        
+         *     |_______|@       *                    |                                  |
+         *                      |   —————————        *----------------------------------*       
+         *             @        |  |         |       |(low_s, 0.0)           (low_s, planning_time_)
+         *                      |  |         |       |             
+         *              @       |  |         |       |             
+         *                      |  |_________|       |                 
+         *               @      |                    |    
+         *                      |                    |
+         *                 @    |                    |
+         *                      |                    |
+         *                   @  |                    |
+         *                      |                    |
+         *                    @ |                    |         
+         * l____________________|_____________       |------------------------------------------------t               
+         **/
         lower_points->emplace_back(low_s, 0.0);
-        upper_points->emplace_back(high_s, 0.0);
-
         lower_points->emplace_back(low_s, planning_time_);
+
+        upper_points->emplace_back(high_s, 0.0);
         upper_points->emplace_back(high_s, planning_time_);
         break;
       }
     }
-  } else {  // 动态障碍物
+  } 
+  // 动态障碍物
+  else {  
     const int       default_num_point = 50;
     DiscretizedPath discretized_path;
 
-    // 稀疏采样
+    // 超过100个点稀疏采样
     if (path_points.size() > 2 * default_num_point) {
       const int              ratio = path_points.size() / default_num_point;
       std::vector<PathPoint> sampled_path_points;
@@ -353,6 +395,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(const std::vector<PathPoint>& pa
       discretized_path.set_path_points(path_points);
     }
 
+    // 对动态障碍物的每一个 boundary_box 都要和 path_data 进行 Overlap 计算
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
       const Box2d obs_box          = obstacle.GetBoundingBox(trajectory_point);
@@ -362,14 +405,42 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(const std::vector<PathPoint>& pa
       if (trajectory_point_time < kNegtiveTimeThreshold) { continue; }
 
       const double step_length = vehicle_param_.front_edge_to_center();
-      for (double path_s = 0.0; path_s < discretized_path.Length(); path_s += step_length) {
-        const auto curr_adc_path_point =
-            discretized_path.Evaluate(path_s + discretized_path.StartPoint().s());
+
+      for (double path_s = 0.0; 
+                  path_s < discretized_path.Length(); 
+                  path_s += step_length) {
+        const auto curr_adc_path_point = discretized_path.Evaluate(
+                                        path_s + discretized_path.StartPoint().s());
+        /**
+         *                      ^ s                  ^ s              
+         *                    @ |                    |(high_s, 0.0)          (high_s, planning_time_)    
+         *                      |                    *----------------------------------*                
+         *                  @   |                    |                                  |
+         *      _______         |                    |                                  |
+         *     |       |  @     |                    |                                  |                        
+         *     |       |        |                    |                                  |                        
+         *     |_______|@       *                    |                                  |
+         *                      |   —————————        *----------------------------------*       
+         *             @        |  |         |       |(low_s, 0.0)           (low_s, planning_time_)
+         *                      |  |         |       |             
+         *              @       |  |         |       |             
+         *                      |  |_________|       |                 
+         *               @      |                    |    
+         *                      |                    |
+         *                 @    |                    |
+         *                      |                    |
+         *                   @  |                    |
+         *                      |                    |
+         *                    @ |                    |         
+         * l____________________|_____________       |------------------------------------------------t               
+         **/
         if (CheckOverlap(curr_adc_path_point, obs_box, st_boundary_config_.boundary_buffer())) {
           // found overlap, start searching with higher resolution
           const double backward_distance = -step_length;
-          const double forward_distance =
-              vehicle_param_.length() + vehicle_param_.width() + obs_box.length() + obs_box.width();
+          const double forward_distance = vehicle_param_.length() 
+                                        + vehicle_param_.width() 
+                                        + obs_box.length() 
+                                        + obs_box.width();
           const double default_min_step = 0.1;  // in meters
           const double fine_tuning_step_length =
               std::fmin(default_min_step, discretized_path.Length() / default_num_point);
@@ -414,6 +485,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(const std::vector<PathPoint>& pa
   DCHECK_EQ(lower_points->size(), upper_points->size());
   return (lower_points->size() > 1 && upper_points->size() > 1);
 }
+// clang-format on
 
 Status StBoundaryMapper::MapWithDecision(PathObstacle*             path_obstacle,
                                          const ObjectDecisionType& decision) const {

@@ -34,8 +34,8 @@ class STPoint : public common::math::Vec2d {
   STPoint(const double s, const double t);
   explicit STPoint(const common::math::Vec2d& vec2d_point);
 
-  double      s() const;
-  double      t() const;
+  double      s() const;  /// 对应着父类 Vec2d 中的y
+  double      t() const;  /// 对应着父类 Vec2d 中的x
   void        set_s(const double s);
   void        set_t(const double t);
   std::string DebugString() const;

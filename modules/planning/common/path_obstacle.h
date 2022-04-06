@@ -116,10 +116,9 @@ class PathObstacle {
   FRIEND_TEST(MergeLateralDecision, AllDecisions);
   static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
                                                  const ObjectDecisionType& rhs);
-
-  bool BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
-                                 const double         adc_start_s,
-                                 StBoundary* const    st_boundary);
+  bool                      BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
+                                                      const double         adc_start_s,
+                                                      StBoundary* const    st_boundary);
 
   bool IsValidObstacle(const perception::PerceptionObstacle& perception_obstacle);
 

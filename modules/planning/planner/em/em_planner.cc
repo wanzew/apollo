@@ -59,14 +59,17 @@ constexpr double kStraightForwardLineCost        = 10.0;
 }  // namespace
 
 void EMPlanner::RegisterTasks() {
-  task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
+  task_factory_.Register(DP_POLY_PATH_OPTIMIZER,  //
                          []() -> Task* { return new DpPolyPathOptimizer(); });
-  task_factory_.Register(PATH_DECIDER, []() -> Task* { return new PathDecider(); });
-  task_factory_.Register(DP_ST_SPEED_OPTIMIZER, []() -> Task* { return new DpStSpeedOptimizer(); });
-  task_factory_.Register(SPEED_DECIDER, []() -> Task* { return new SpeedDecider(); });
-  task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER,
+  task_factory_.Register(PATH_DECIDER,  //
+                         []() -> Task* { return new PathDecider(); });
+  task_factory_.Register(DP_ST_SPEED_OPTIMIZER,  //
+                         []() -> Task* { return new DpStSpeedOptimizer(); });
+  task_factory_.Register(SPEED_DECIDER,  //
+                         []() -> Task* { return new SpeedDecider(); });
+  task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER,  //
                          []() -> Task* { return new QpSplineStSpeedOptimizer(); });
-  task_factory_.Register(POLY_ST_SPEED_OPTIMIZER,
+  task_factory_.Register(POLY_ST_SPEED_OPTIMIZER,  //
                          []() -> Task* { return new PolyStSpeedOptimizer(); });
 }
 

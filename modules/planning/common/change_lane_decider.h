@@ -41,11 +41,10 @@ class ChangeLaneDecider {
 
  private:
   void UpdateStatus(ChangeLaneStatus::Status status_code, const std::string& path_id);
-  void
-  UpdateStatus(double timestamp, ChangeLaneStatus::Status status_code, const std::string& path_id);
-
+  void UpdateStatus(double                   timestamp,
+                    ChangeLaneStatus::Status status_code,  //
+                    const std::string&       path_id);
   void PrioritizeChangeLane(std::list<ReferenceLineInfo>* reference_line_info) const;
-
   void RemoveChangeLane(std::list<ReferenceLineInfo>* reference_line_info) const;
 };
 

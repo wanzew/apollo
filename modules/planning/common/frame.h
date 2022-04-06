@@ -62,27 +62,17 @@ class Frame {
                  const common::VehicleState&    vehicle_state,
                  ReferenceLineProvider*         reference_line_provider);
 
-  const common::TrajectoryPoint& PlanningStartPoint() const;
-  common::Status                 Init();
-
-  uint32_t SequenceNum() const;
-
-  std::string DebugString() const;
-
-  const PublishableTrajectory& ComputedTrajectory() const;
-
-  void RecordInputDebug(planning_internal::Debug* debug);
-
-  std::list<ReferenceLineInfo>& reference_line_info();
-
-  Obstacle* Find(const std::string& id);
-
-  const ReferenceLineInfo* FindDriveReferenceLineInfo();
-
-  const ReferenceLineInfo* DriveReferenceLineInfo() const;
-
+  const common::TrajectoryPoint&     PlanningStartPoint() const;
+  common::Status                     Init();
+  uint32_t                           SequenceNum() const;
+  std::string                        DebugString() const;
+  const PublishableTrajectory&       ComputedTrajectory() const;
+  void                               RecordInputDebug(planning_internal::Debug* debug);
+  std::list<ReferenceLineInfo>&      reference_line_info();
+  Obstacle*                          Find(const std::string& id);
+  const ReferenceLineInfo*           FindDriveReferenceLineInfo();
+  const ReferenceLineInfo*           DriveReferenceLineInfo() const;
   const std::vector<const Obstacle*> obstacles() const;
-
   const Obstacle* CreateStopObstacle(ReferenceLineInfo* const reference_line_info,
                                      const std::string&       obstacle_id,
                                      const double             obstacle_s);
@@ -96,18 +86,13 @@ class Frame {
                                        const double             obstacle_start_s,
                                        const double             obstacle_end_s);
 
-  bool Rerouting();
-
+  bool                        Rerouting();
+  ADCTrajectory*              mutable_trajectory() { return &trajectory_; }
+  const ADCTrajectory&        trajectory() const { return trajectory_; }
+  const bool                  is_near_destination() const { return is_near_destination_; }
   const common::VehicleState& vehicle_state() const;
-
-  static void AlignPredictionTime(const double                     planning_start_time,
-                                  prediction::PredictionObstacles* prediction_obstacles);
-
-  ADCTrajectory* mutable_trajectory() { return &trajectory_; }
-
-  const ADCTrajectory& trajectory() const { return trajectory_; }
-
-  const bool is_near_destination() const { return is_near_destination_; }
+  static void                 AlignPredictionTime(const double                     planning_start_time,
+                                                  prediction::PredictionObstacles* prediction_obstacles);
 
  private:
   bool CreateReferenceLineInfo();

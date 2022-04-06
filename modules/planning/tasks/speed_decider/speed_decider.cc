@@ -55,13 +55,13 @@ apollo::common::Status SpeedDecider::Execute(Frame* frame, ReferenceLineInfo* re
   init_point_      = frame_->PlanningStartPoint();
   adc_sl_boundary_ = reference_line_info_->AdcSlBoundary();
   reference_line_  = &reference_line_info_->reference_line();
-  if (!MakeObjectDecision(reference_line_info->speed_data(), reference_line_info->path_decision())
-           .ok()) {
-    const std::string msg = "Get object decision by speed profile failed.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-  return Status::OK();
+  // Get object decision by speed profile
+  const std::string msg = "Get object decision by speed profile failed.";
+  return MakeObjectDecision(reference_line_info->speed_data(),     //
+                            reference_line_info->path_decision())  //
+                 .ok() ?
+             Status::OK() :
+             Status(ErrorCode::PLANNING_ERROR, msg);
 }
 
 SpeedDecider::StPosition SpeedDecider::GetStPosition(const SpeedData&  speed_profile,
@@ -123,7 +123,9 @@ Status SpeedDecider::MakeObjectDecision(const SpeedData&    speed_profile,
     auto*       path_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary      = path_obstacle->st_boundary();
 
-    if (boundary.IsEmpty() || boundary.max_s() < 0.0 || boundary.max_t() < 0.0 ||
+    if (boundary.IsEmpty() ||      //
+        boundary.max_s() < 0.0 ||  //
+        boundary.max_t() < 0.0 ||  //
         boundary.min_t() > dp_st_speed_config_.total_time()) {
       AppendIgnoreDecision(path_obstacle);
       continue;

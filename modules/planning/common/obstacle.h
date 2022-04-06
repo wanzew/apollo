@@ -51,35 +51,24 @@ class Obstacle {
   Obstacle(const std::string&                    id,
            const perception::PerceptionObstacle& perception,
            const prediction::Trajectory&         trajectory);
-
-  const std::string& Id() const;
-  void               SetId(const std::string& id) { id_ = id; }
-
-  std::int32_t PerceptionId() const;
-
-  double Speed() const;
-
-  bool IsStatic() const;
-  bool IsVirtual() const;
-
-  common::TrajectoryPoint GetPointAtTime(const double time) const;
-
-  common::math::Box2d GetBoundingBox(const common::TrajectoryPoint& point) const;
-  /**
-   * @brief get the perception bounding box
-   */
-  const common::math::Box2d& PerceptionBoundingBox() const;
+  const std::string&         Id() const;
+  void                       SetId(const std::string& id) { id_ = id; }
+  std::int32_t               PerceptionId() const;
+  double                     Speed() const;
+  bool                       IsStatic() const;
+  bool                       IsVirtual() const;
+  common::TrajectoryPoint    GetPointAtTime(const double time) const;
+  common::math::Box2d        GetBoundingBox(const common::TrajectoryPoint& point) const;
+  const common::math::Box2d& PerceptionBoundingBox() const;  // get the perception bounding box
 
   /**
    * @brief get the perception polygon for the obstacle. It is more precise than
    * bounding box
    */
-  const common::math::Polygon2d& PerceptionPolygon() const;
-
-  const prediction::Trajectory& Trajectory() const;
-  common::TrajectoryPoint*      AddTrajectoryPoint();
-  bool                          HasTrajectory() const;
-
+  const common::math::Polygon2d&        PerceptionPolygon() const;
+  const prediction::Trajectory&         Trajectory() const;
+  common::TrajectoryPoint*              AddTrajectoryPoint();
+  bool                                  HasTrajectory() const;
   const perception::PerceptionObstacle& Perception() const;
 
   /**
@@ -90,15 +79,12 @@ class Obstacle {
    * @return obstacles The output obstacles saved in a list of unique_ptr.
    */
   static std::list<std::unique_ptr<Obstacle>>
-  CreateObstacles(const prediction::PredictionObstacles& predictions);
-
-  static std::unique_ptr<Obstacle>
-  CreateStaticVirtualObstacles(const std::string& id, const common::math::Box2d& obstacle_box);
-
+                                   CreateObstacles(const prediction::PredictionObstacles& predictions);
+  static std::unique_ptr<Obstacle> CreateStaticVirtualObstacles(  //
+      const std::string&         id,                              //
+      const common::math::Box2d& obstacle_box);                   //
   static bool IsStaticObstacle(const perception::PerceptionObstacle& perception_obstacle);
-
   static bool IsVirtualObstacle(const perception::PerceptionObstacle& perception_obstacle);
-
   static bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
 
  private:

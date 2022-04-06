@@ -38,17 +38,27 @@ TEST(StBoundaryTest, basic_test) {
    * |
    * |
    * |
-   * lower_point[1]      upper_point[1]
+   * upper_point[0]      upper_point[1]
    * *--------------------------*
    * |                          |
    * |                          |
    * |                          |
    * *--------------------------*------------------------------------> t
-   * lower_point[0]      upper_point[0]
+   * lower_point[0]      lower_point[1]
    */
 
-  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+  std::vector<STPoint> upper_points;
+  std::vector<STPoint> lower_points;
+  // STPoint(const double s, const double t)
+  lower_points.emplace_back(0.0, 0.0);
+  lower_points.emplace_back(0.0, 10.0);
+  upper_points.emplace_back(5.0, 0.0);
+  upper_points.emplace_back(5.0, 10.0);
 
+  point_pairs.emplace_back(lower_points[0], upper_points[0]);
+  point_pairs.emplace_back(lower_points[1], upper_points[1]);
+
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
   // 每个pair包含两个点(t相同)，point_pairs 包含两个或多个元素元素
   // 第一个元素包含的是 boundary(菱形)的左边的两个点(小t)
   // 第二个元素包含的是 boundary(菱形)的右边的两个点(大t)
@@ -83,7 +93,7 @@ TEST(StBoundaryTest, boundary_range) {
    * ---------------------------------------------------------------> t
    *
    */
-
+  // 每一个pair的两个点，对应的时间t相同
   point_pairs.emplace_back(STPoint(1.0, 0.0), STPoint(5.0, 0.0));
   point_pairs.emplace_back(STPoint(1.0, 10.0), STPoint(5.0, 10.0));
 
@@ -142,17 +152,17 @@ TEST(StBoundaryTest, get_index_range) {
 
   StBoundary boundary(point_pairs);
 
-  size_t left  = 0;
-  size_t right = 0;
-  /*
+  size_t left_index  = 0;
+  size_t right_index = 0;
+  /* s
    * ^
    * |                          upper_points[1]
    * |                              *
    * |
    * |
    * |
-   * |   lower_points[1]            *
-   * |        *                 upper_points[0]
+   * |   upper_points[0]            *
+   * |        *                 lower_points[1]
    * |
    * |                          -517955.58587660792
    * |
@@ -165,19 +175,19 @@ TEST(StBoundaryTest, get_index_range) {
    *
    */
 
-  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517957.08587679861, &left, &right));
-  EXPECT_EQ(left, 0);
-  EXPECT_EQ(right, 0);
+  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517957.08587679861, &left_index, &right_index));
+  EXPECT_EQ(left_index, 0);
+  EXPECT_EQ(right_index, 0);
 
-  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517955.58587660792, &left, &right));
-  EXPECT_EQ(left, 0);
-  EXPECT_EQ(right, 1);
+  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517955.58587660792, &left_index, &right_index));
+  EXPECT_EQ(left_index, 0);
+  EXPECT_EQ(right_index, 1);
 
-  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517955.58587660792, &left, &right));
-  EXPECT_EQ(left, 0);
-  EXPECT_EQ(right, 1);
+  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517955.58587660792, &left_index, &right_index));
+  EXPECT_EQ(left_index, 0);
+  EXPECT_EQ(right_index, 1);
 
-  EXPECT_FALSE(boundary.GetIndexRange(lower_points, 0.0, &left, &right));
+  EXPECT_FALSE(boundary.GetIndexRange(lower_points, 0.0, &left_index, &right_index));
 }
 
 TEST(StBoundaryTest, remove_redundant_points) {

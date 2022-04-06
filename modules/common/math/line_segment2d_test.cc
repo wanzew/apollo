@@ -25,7 +25,7 @@ namespace common {
 namespace math {
 
 TEST(LineSegment2dTest, Accessors) {
-  /*
+  /**
    * ^ y
    * |
    * |
@@ -52,7 +52,7 @@ TEST(LineSegment2dTest, Accessors) {
 }
 
 TEST(LineSegment2dTest, DistanceTo) {
-  /*
+  /**
    * ^ y
    * |
    * |
@@ -86,7 +86,7 @@ TEST(LineSegment2dTest, DistanceTo) {
 }
 
 TEST(LineSegment2dTest, GetPerpendicularFoot) {
-  /*
+  /**
    * ^ y
    * |
    * |

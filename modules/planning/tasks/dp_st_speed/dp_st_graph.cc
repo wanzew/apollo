@@ -239,7 +239,7 @@ Status DpStGraph::CalculateTotalCost() {
     }
     if (FLAGS_enable_multi_thread_in_dp_st_graph) { PlanningThreadPool::instance()->Synchronize(); }
 
-    /*
+    /**
      *     t  dim_t = 8
      *     |
      *     |
@@ -344,7 +344,7 @@ void DpStGraph::CalculateCostAt(const uint32_t t, const uint32_t s) {
     DCHECK_EQ(s, 0) << "Incorrect. s should be 0 with t = 0. row: " << s;
     cur_node.SetTotalCost(0.0);
     return;
-    /*
+    /**
      *     t  dim_t = 8
      *     |
      *     |
@@ -387,7 +387,7 @@ void DpStGraph::CalculateCostAt(const uint32_t t, const uint32_t s) {
     cur_node.SetPrePoint(cost_init);
     return;
 
-    /*
+    /**
      *     t  dim_t = 8
      *     |
      *     |
@@ -448,7 +448,7 @@ void DpStGraph::CalculateCostAt(const uint32_t t, const uint32_t s) {
       }
     }
     return;
-    /*
+    /**
      *     t  dim_t = 8
      *     |
      *     |
@@ -522,7 +522,7 @@ void DpStGraph::CalculateCostAt(const uint32_t t, const uint32_t s) {
 Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   float              min_cost       = std::numeric_limits<float>::infinity();
   const StGraphNode* best_end_point = nullptr;
-  /*
+  /**
    *     t  dim_t = 8
    *     |
    *   7 |    ****************************************************[************************@**]
