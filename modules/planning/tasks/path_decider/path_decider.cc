@@ -149,14 +149,15 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
                                                object_decision);                    //
       }                                                                             //
       else                                                                          //
-      {
-        ObjectDecisionType object_decision;                                     //
-        object_decision.mutable_ignore();                                       //
-        path_decision->AddLongitudinalDecision("PathDecider/not-nearest-stop",  //
-                                               obstacle.Id(),                   //
-                                               object_decision);                //
-      }                                                                         //
-    }                                                                           //
+      {                                                                             //
+        ObjectDecisionType object_decision;                                         //
+        object_decision.mutable_ignore();                                           //
+        path_decision->AddLongitudinalDecision("PathDecider/not-nearest-stop",      //
+                                               obstacle.Id(),                       //
+                                               object_decision);                    //
+      }                                                                             //
+    }                                                                               //
+    // 横向避让(nudge)
     else if (FLAGS_enable_nudge_decision) {
       // nudge
       if (curr_l - lateral_stop_radius > sl_boundary.end_l()) {
@@ -185,11 +186,12 @@ bool PathDecider::MakeStaticObstacleDecision(const PathData&     path_data,
 ObjectStop PathDecider::GenerateObjectStopDecision(const PathObstacle& path_obstacle) const {
   ObjectStop object_stop;
 
+  // 计算停车距离（刹车需要的距离）
   double stop_distance = path_obstacle.MinRadiusStopDistance(  //
       VehicleConfigHelper::GetConfig().vehicle_param());
   object_stop.set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
   object_stop.set_distance_s(-stop_distance);
-
+  // 根据距离，计算停车参考点
   const double stop_ref_s   = path_obstacle.PerceptionSLBoundary().start_s() - stop_distance;
   const auto stop_ref_point = reference_line_info_->reference_line().GetReferencePoint(stop_ref_s);
   object_stop.mutable_stop_point()->set_x(stop_ref_point.x());

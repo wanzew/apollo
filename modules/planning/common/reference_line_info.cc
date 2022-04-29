@@ -166,6 +166,7 @@ bool ReferenceLineInfo::CheckChangeLane() const {
         std::max(kBackwardMinSafeDistance,
                  static_cast<float>((path_obstacle->obstacle()->Speed() - adc_planning_point_.v()) *
                                     kSafeTime));
+    // 如果 速度差*3s
     if (sl_boundary.end_s() > adc_sl_boundary_.start_s() - kBackwardSafeDistance &&
         sl_boundary.start_s() < adc_sl_boundary_.end_s() + kForwardSafeDistance) {
       return false;

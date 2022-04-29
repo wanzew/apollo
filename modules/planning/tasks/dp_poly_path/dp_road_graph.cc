@@ -297,6 +297,7 @@ bool DPRoadGraph::SamplePathWaypoints(const common::TrajectoryPoint&            
     return false;
   }
 
+  // 是否处于靠边停车阶段！
   if (status->planning_state().has_pull_over() &&
       status->planning_state().pull_over().in_pull_over()) {
     status->mutable_planning_state()->mutable_pull_over()->set_status(PullOverStatus::IN_OPERATION);
@@ -339,7 +340,7 @@ bool DPRoadGraph::SamplePathWaypoints(const common::TrajectoryPoint&            
 
     // the heuristic shift of L for lane change scenarios
     const double delta_dl = 1.2 / 20.0;
-    // Delta L 限制在 1.2m-1.5m之间
+    // Delta L 限制在 1.2m-3.5m之间
     const double kChangeLaneDeltaL = common::math::Clamp(           //
         level_distance * (std::fabs(init_frenet_frame_point_.dl())  //
                           + delta_dl),                              //
@@ -372,7 +373,8 @@ bool DPRoadGraph::SamplePathWaypoints(const common::TrajectoryPoint&            
     }
 
     std::vector<float> sample_l;
-    // lane change
+    // lane change (一条车道不安全，往另外一条参考线上去采样)
+    // TODO:(zhenwei) reference_line_info_.OffsetToOtherReferenceLine()
     if (reference_line_info_.IsChangeLanePath() && !reference_line_info_.IsSafeToChangeLane()) {
       sample_l.push_back(reference_line_info_.OffsetToOtherReferenceLine());
     }

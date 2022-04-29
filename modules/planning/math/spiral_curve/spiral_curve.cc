@@ -39,22 +39,15 @@ void SpiralCurve::SetSpiralConfig(const SpiralCurveConfig& spiral_config) {
 }
 
 // output params
-const PathPoint& SpiralCurve::start_point() const { return *start_point_; }
-
-const PathPoint& SpiralCurve::end_point() const { return *end_point_; }
-
-double SpiralCurve::sg() const { return sg_; }
-
-double SpiralCurve::error() const { return error_; }
-
+const PathPoint&           SpiralCurve::start_point() const { return *start_point_; }
+const PathPoint&           SpiralCurve::end_point() const { return *end_point_; }
+double                     SpiralCurve::sg() const { return sg_; }
+double                     SpiralCurve::error() const { return error_; }
 const std::vector<double>& SpiralCurve::p_params() const { return p_params_; }
 const SpiralCurveConfig&   SpiralCurve::spiral_config() const { return spiral_config_; }
-
-void SpiralCurve::set_sg(const double sg) { sg_ = sg; }
-
-void SpiralCurve::set_error(const double error) { error_ = error; }
-
-bool SpiralCurve::ResultSanityCheck() const {
+void                       SpiralCurve::set_sg(const double sg) { sg_ = sg; }
+void                       SpiralCurve::set_error(const double error) { error_ = error; }
+bool                       SpiralCurve::ResultSanityCheck() const {
   for (const auto& p : p_params_) {
     if (std::isnan(p)) { return false; }
   }

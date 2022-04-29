@@ -84,6 +84,9 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig&                 config,
     } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception()) || is_bycycle_or_pedestrian) {
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
+      // 每个目标 按照 时间序列 产生一个 bbox
+      // sl_box(自车box) 会与每个bbox做碰撞检测，把"时空伴随者"也考虑进去了
+      // 可能这只是第DP path第一步的原因，并没有把"时空伴随者"排除在外
       std::vector<Box2d> box_by_time;
       for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
         TrajectoryPoint trajectory_point =
@@ -168,6 +171,9 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(const QuinticPolynom
                                                             const float end_s) const {
   ComparableCost obstacle_cost;
   float          time_stamp = 0.0;
+  // 对 时间序列 进行离散化，每个时间点，计算出自车会出现的位置， 每个位置产生一个box
+  // 该box会对 dynamic_obstacle_boxes_ 中 所有的bbox 进行 碰撞检测，
+  // 所以验证了 DP Path 并没有把 "时空伴随者" 作为一个安全目标
   for (size_t index = 0; index < num_of_time_stamps_;
        ++index, time_stamp += config_.eval_time_interval()) {
     common::SpeedPoint speed_point;

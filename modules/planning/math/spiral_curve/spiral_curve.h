@@ -83,7 +83,6 @@ class SpiralCurve {
  protected:
   void set_sg(const double sg);
   void set_error(const double error);
-
   bool ResultSanityCheck() const;
 
   template <typename T>
