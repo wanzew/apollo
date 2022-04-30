@@ -104,10 +104,13 @@ bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& pat
   double start_s = init_frenet_point_.s();
 
   constexpr double kDefaultPathLength = 50.0;
-  double           end_s              = std::fmin(
-      init_frenet_point_.s() +
-          std::fmax(kDefaultPathLength, init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
-      reference_line_.Length());
+
+  // clang-format off
+  double end_s = std::fmin(init_frenet_point_.s()  //
+                           + std::fmax(kDefaultPathLength, //
+                                       init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
+                           reference_line_.Length());
+  // clang-format on
 
   constexpr double kMinPathLength = 1.0e-6;
   if (start_s + kMinPathLength > end_s) {

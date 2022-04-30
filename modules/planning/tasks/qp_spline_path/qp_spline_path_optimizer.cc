@@ -49,8 +49,9 @@ Status QpSplinePathOptimizer::Process(const SpeedData&               speed_data,
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
-  QpSplinePathGenerator path_generator(spline_generator_.get(), reference_line,
-                                       qp_spline_path_config_,
+  QpSplinePathGenerator path_generator(spline_generator_.get(),  //
+                                       reference_line,           //
+                                       qp_spline_path_config_,   //
                                        reference_line_info_->AdcSlBoundary());
   path_generator.SetDebugLogger(reference_line_info_->mutable_debug());
   path_generator.SetChangeLane(reference_line_info_->IsChangeLanePath());
@@ -59,9 +60,13 @@ Status QpSplinePathOptimizer::Process(const SpeedData&               speed_data,
   bool   is_final_attempt   = false;
 
   //第一次调用Generate()时，boundary_extension=0.0。
-  bool ret = path_generator.Generate(
-      reference_line_info_->path_decision()->path_obstacles().Items(), speed_data, init_point,
-      boundary_extension, is_final_attempt, path_data);
+  bool ret =
+      path_generator.Generate(reference_line_info_->path_decision()->path_obstacles().Items(),  //
+                              speed_data,                                                       //
+                              init_point,                                                       //
+                              boundary_extension,                                               //
+                              is_final_attempt,                                                 //
+                              path_data);                                                       //
   if (!ret) {
     AERROR << "failed to generate spline path with boundary_extension = 0.";
 

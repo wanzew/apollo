@@ -62,6 +62,7 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper&  boundary_mapper,
   std::vector<const StBoundary*> boundaries;
   for (auto* obstacle : path_decision->path_obstacles().Items()) {
     auto id = obstacle->Id();
+    // 障碍物 st_boundary 非空
     if (!obstacle->st_boundary().IsEmpty()) {
       if (obstacle->st_boundary().boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
         path_decision->Find(id)->SetBlockingObstacle(false);
@@ -69,8 +70,9 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper&  boundary_mapper,
         path_decision->Find(id)->SetBlockingObstacle(true);
       }
       boundaries.push_back(&obstacle->st_boundary());
-    } else if (FLAGS_enable_side_vehicle_st_boundary &&
-               (adc_sl_boundary_.start_l() > 2.0 || adc_sl_boundary_.end_l() < -2.0)) {
+    }  //障碍物 st_boundary 为空， enable_side_vehicle_st_boundary 为false，下面逻辑默认不使用
+    else if (FLAGS_enable_side_vehicle_st_boundary &&
+             (adc_sl_boundary_.start_l() > 2.0 || adc_sl_boundary_.end_l() < -2.0)) {
       if (path_decision->Find(id)->reference_line_st_boundary().IsEmpty()) { continue; }
       ADEBUG << "obstacle " << id << " is NOT blocking.";
       auto st_boundary_copy = path_decision->Find(id)->reference_line_st_boundary();
@@ -106,9 +108,11 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper&  boundary_mapper,
   const float path_length = path_data.discretized_path().Length();
   StGraphData st_graph_data(boundaries, init_point_, speed_limit, path_length);
 
-  DpStGraph st_graph(st_graph_data, dp_st_speed_config_,
-                     reference_line_info_->path_decision()->path_obstacles().Items(), init_point_,
-                     adc_sl_boundary_);
+  DpStGraph st_graph(st_graph_data,                                                    //
+                     dp_st_speed_config_,                                              //
+                     reference_line_info_->path_decision()->path_obstacles().Items(),  //
+                     init_point_,                                                      //
+                     adc_sl_boundary_);                                                //
   st_graph.Search(speed_data).ok();
 
   RecordSTGraphDebug(st_graph_data, st_graph_debug);
@@ -129,16 +133,26 @@ Status DpStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
   auto*         debug          = reference_line_info_->mutable_debug();
   STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
-  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_, *reference_line_,
-                                   path_data, dp_st_speed_config_.total_path_length(),
-                                   dp_st_speed_config_.total_time(),
-                                   reference_line_info_->IsChangeLanePath());
-  path_decision->EraseStBoundaries();
+  StBoundaryMapper boundary_mapper(adc_sl_boundary,                            //
+                                   st_boundary_config_,                        //
+                                   *reference_line_,                           //
+                                   path_data,                                  //
+                                   dp_st_speed_config_.total_path_length(),    //
+                                   dp_st_speed_config_.total_time(),           //
+                                   reference_line_info_->IsChangeLanePath());  //
+  path_decision->EraseStBoundaries();  // 清除 st_boundaries
   boundary_mapper.CreateStBoundary(path_decision);
-  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_, *reference_line_,
+
+  SpeedLimitDecider speed_limit_decider(adc_sl_boundary,      //
+                                        st_boundary_config_,  //
+                                        *reference_line_,     //
                                         path_data);
-  SearchStGraph(boundary_mapper, speed_limit_decider, path_data, speed_data, path_decision,
-                st_graph_debug);
+
+  SearchStGraph(boundary_mapper,        //
+                speed_limit_decider,    //
+                path_data, speed_data,  //
+                path_decision,          //
+                st_graph_debug);        //
   return Status::OK();
 }
 

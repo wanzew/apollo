@@ -275,7 +275,7 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  // 计算障碍物的边界框，当且仅当障碍物再某个时刻与无人车规划路径有重叠时，才被考虑。
+  // 计算障碍物的边界框，当且仅当障碍物在某个时刻与无人车规划路径有重叠时，才被考虑。
   // clang-format off
   GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
                            *(path_obstacle->obstacle()), 
@@ -306,8 +306,8 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
  * 
  * 2. 对于动态障碍物，会对障碍物的预测轨迹点处的boundary_box和path_data上的任意点进行计算overlap，
  * 如果有overlap，找出有overlap的 lower_point 和 upper_point 点
- * lower_point 表示，在改点之前不会碰撞
- * upper_point 表示，在改点之后也不会碰撞
+ * lower_point 表示，在该点之前不会碰撞
+ * upper_point 表示，在该点之后也不会碰撞
  * 
  * 该函数的作用就是找到这样的 lower_point 和 upper_point
  * 
@@ -494,8 +494,10 @@ Status StBoundaryMapper::MapWithDecision(PathObstacle*             path_obstacle
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
-                           *(path_obstacle->obstacle()), &upper_points, &lower_points);
+  GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),  //
+                           *(path_obstacle->obstacle()),                 //
+                           &upper_points,                                //
+                           &lower_points);                               //
 
   if (decision.has_follow() && lower_points.back().t() < planning_time_) {
     const double diff_s = lower_points.back().s() - lower_points.front().s();
@@ -520,7 +522,9 @@ Status StBoundaryMapper::MapWithDecision(PathObstacle*             path_obstacle
   if (decision.has_follow()) {
     characteristic_length = std::fabs(decision.follow().distance_s());
     b_type                = StBoundary::BoundaryType::FOLLOW;
-  } else if (decision.has_yield()) {
+  }
+  // yield
+  else if (decision.has_yield()) {
     characteristic_length = std::fabs(decision.yield().distance_s());
     boundary =
         StBoundary::GenerateStBoundary(lower_points, upper_points).ExpandByS(characteristic_length);
