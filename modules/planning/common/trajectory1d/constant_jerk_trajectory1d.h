@@ -34,23 +34,15 @@ class ConstantJerkTrajectory1d : public Curve1d {
 
   virtual ~ConstantJerkTrajectory1d() = default;
 
-  double Evaluate(const std::uint32_t order, const double param) const;
-
-  double ParamLength() const;
-
+  double      Evaluate(const std::uint32_t order, const double param) const;
+  double      ParamLength() const;
   std::string ToString() const;
-
-  double start_position() const;
-
-  double start_velocity() const;
-
-  double start_acceleration() const;
-
-  double end_position() const;
-
-  double end_velocity() const;
-
-  double end_acceleration() const;
+  double      start_position() const;
+  double      start_velocity() const;
+  double      start_acceleration() const;
+  double      end_position() const;
+  double      end_velocity() const;
+  double      end_acceleration() const;
 
   double jerk() const;
 
@@ -58,13 +50,10 @@ class ConstantJerkTrajectory1d : public Curve1d {
   double p0_;
   double v0_;
   double a0_;
-
   double p1_;
   double v1_;
   double a1_;
-
   double param_;
-
   double jerk_;
 };
 

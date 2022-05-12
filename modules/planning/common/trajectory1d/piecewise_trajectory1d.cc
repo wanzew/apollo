@@ -50,11 +50,10 @@ void PiecewiseTrajectory1d::AppendSegment(const std::shared_ptr<Curve1d> traject
   if (trajectory_segments_.empty()) {
     trajectory_segments_.push_back(trajectory);
   } else {
-    double s1 = trajectory->Evaluate(0, 0.0);
-    double v1 = trajectory->Evaluate(1, 0.0);
-    double a1 = trajectory->Evaluate(2, 0.0);
-    double j1 = trajectory->Evaluate(3, 0.0);
-
+    double s1                = trajectory->Evaluate(0, 0.0);
+    double v1                = trajectory->Evaluate(1, 0.0);
+    double a1                = trajectory->Evaluate(2, 0.0);
+    double j1                = trajectory->Evaluate(3, 0.0);
     auto   last_trajectory   = trajectory_segments_.back();
     double last_param_length = last_trajectory->ParamLength();
     double s0                = last_trajectory->Evaluate(0, last_param_length);
@@ -63,11 +62,8 @@ void PiecewiseTrajectory1d::AppendSegment(const std::shared_ptr<Curve1d> traject
     double j0                = last_trajectory->Evaluate(3, last_param_length);
 
     if (std::fabs(s0 - s1) > 1.0e-4) { AWARN << "The appended segment is not smooth in order 0"; }
-
     if (std::fabs(v0 - v1) > 1.0e-4) { AWARN << "The appended segment is not smooth in order 1"; }
-
     if (std::fabs(a0 - a1) > 1.0e-4) { AWARN << "The appended segment is not smooth in order 2"; }
-
     if (std::fabs(j0 - j1) > 1.0e-4) { AWARN << "The appended segment is not smooth in order 3"; }
     trajectory_segments_.push_back(trajectory);
   }

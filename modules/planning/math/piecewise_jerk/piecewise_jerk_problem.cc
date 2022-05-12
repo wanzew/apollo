@@ -31,17 +31,11 @@ PiecewiseJerkProblem::PiecewiseJerkProblem(const size_t                 num_of_k
                                            const std::array<double, 3>& x_init) {
   CHECK_GE(num_of_knots, 2U);
   num_of_knots_ = num_of_knots;
-
-  x_init_ = x_init;
-
-  delta_s_ = delta_s;
-
+  x_init_       = x_init;
+  delta_s_      = delta_s;
   x_bounds_.resize(num_of_knots_, std::make_pair(-kMaxVariableRange, kMaxVariableRange));
-
   dx_bounds_.resize(num_of_knots_, std::make_pair(-kMaxVariableRange, kMaxVariableRange));
-
   ddx_bounds_.resize(num_of_knots_, std::make_pair(-kMaxVariableRange, kMaxVariableRange));
-
   weight_x_ref_vec_ = std::vector<double>(num_of_knots_, 0.0);
 }
 
@@ -89,8 +83,8 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   settings->max_iter     = max_iter;
 
   OSQPWorkspace* osqp_work = nullptr;
-  osqp_work                = osqp_setup(data, settings);
-  // osqp_setup(&osqp_work, data, settings);
+  // osqp_work                = osqp_setup(data, settings);
+  osqp_setup(&osqp_work, data, settings);
 
   osqp_solve(osqp_work);
 

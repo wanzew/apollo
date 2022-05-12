@@ -67,13 +67,10 @@ double ConstantDecelerationTrajectory1d::Evaluate_a(const double t) const {
   }
 }
 
-double ConstantDecelerationTrajectory1d::Evaluate_j(const double t) const { return 0.0; }
-
-double ConstantDecelerationTrajectory1d::ParamLength() const { return end_t_; }
-
+double      ConstantDecelerationTrajectory1d::Evaluate_j(const double t) const { return 0.0; }
+double      ConstantDecelerationTrajectory1d::ParamLength() const { return end_t_; }
 std::string ConstantDecelerationTrajectory1d::ToString() const { return ""; }
-
-double ConstantDecelerationTrajectory1d::Evaluate(const std::uint32_t order,
+double      ConstantDecelerationTrajectory1d::Evaluate(const std::uint32_t order,
                                                   const double        param) const {
   switch (order) {
     case 0: return Evaluate_s(param);

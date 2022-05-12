@@ -57,23 +57,15 @@ double ConstantJerkTrajectory1d::Evaluate(const std::uint32_t order, const doubl
   }
 }
 
-double ConstantJerkTrajectory1d::start_position() const { return p0_; }
-
-double ConstantJerkTrajectory1d::start_velocity() const { return v0_; }
-
-double ConstantJerkTrajectory1d::start_acceleration() const { return a0_; }
-
-double ConstantJerkTrajectory1d::end_position() const { return p1_; }
-
-double ConstantJerkTrajectory1d::end_velocity() const { return v1_; }
-
-double ConstantJerkTrajectory1d::end_acceleration() const { return a1_; }
-
-double ConstantJerkTrajectory1d::ParamLength() const { return param_; }
-
+double      ConstantJerkTrajectory1d::start_position() const { return p0_; }
+double      ConstantJerkTrajectory1d::start_velocity() const { return v0_; }
+double      ConstantJerkTrajectory1d::start_acceleration() const { return a0_; }
+double      ConstantJerkTrajectory1d::end_position() const { return p1_; }
+double      ConstantJerkTrajectory1d::end_velocity() const { return v1_; }
+double      ConstantJerkTrajectory1d::end_acceleration() const { return a1_; }
+double      ConstantJerkTrajectory1d::ParamLength() const { return param_; }
 std::string ConstantJerkTrajectory1d::ToString() const { return ""; }
-
-double ConstantJerkTrajectory1d::jerk() const { return jerk_; }
+double      ConstantJerkTrajectory1d::jerk() const { return jerk_; }
 
 }  // namespace planning
 }  // namespace apollo

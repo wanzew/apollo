@@ -43,11 +43,8 @@ double StandingStillTrajectory1d::Evaluate(const std::uint32_t order, const doub
 }
 
 double StandingStillTrajectory1d::Evaluate_s(const double t) const { return fixed_position_; }
-
 double StandingStillTrajectory1d::Evaluate_v(const double t) const { return 0.0; }
-
 double StandingStillTrajectory1d::Evaluate_a(const double t) const { return 0.0; }
-
 double StandingStillTrajectory1d::Evaluate_j(const double t) const { return 0.0; }
 
 }  // namespace planning
