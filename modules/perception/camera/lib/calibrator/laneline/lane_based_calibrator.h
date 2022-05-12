@@ -26,14 +26,16 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-const float kYawRateDefault = 0.0f;
+const float kYawRateDefault  = 0.0f;
 const float kVelocityDefault = 8.333f;  // m/s
 const float kTimeDiffDefault = 0.067f;  // in seconds, 15FPS
 
-void GetYawVelocityInfo(const float &time_diff, const double cam_coord_cur[3],
+void GetYawVelocityInfo(const float& time_diff,
+                        const double cam_coord_cur[3],
                         const double cam_coord_pre[3],
-                        const double cam_coord_pre_pre[3], float *yaw_rate,
-                        float *velocity);
+                        const double cam_coord_pre_pre[3],
+                        float*       yaw_rate,
+                        float*       velocity);
 
 struct CalibratorParams {
   CalibratorParams() { Init(); }
@@ -49,7 +51,7 @@ struct CalibratorParams {
 
   HistogramEstimatorParams hist_estimator_params;
 
-  void operator=(const CalibratorParams &params) {
+  void operator=(const CalibratorParams& params) {
     min_nr_pts_laneline = params.min_nr_pts_laneline;
 
     min_distance_to_update_calibration_in_meter =
@@ -64,12 +66,12 @@ struct CalibratorParams {
 };
 
 struct LocalCalibratorInitOptions {
-  int image_width = 0;
-  int image_height = 0;
-  float focal_x = 0.0f;
-  float focal_y = 0.0f;
-  float cx = 0.0f;
-  float cy = 0.0f;
+  int   image_width  = 0;
+  int   image_height = 0;
+  float focal_x      = 0.0f;
+  float focal_y      = 0.0f;
+  float cx           = 0.0f;
+  float cy           = 0.0f;
 };
 
 class LaneBasedCalibrator {
@@ -80,15 +82,16 @@ class LaneBasedCalibrator {
 
   ~LaneBasedCalibrator() { ClearUp(); }
 
-  void Init(const LocalCalibratorInitOptions &options,
-            const CalibratorParams *params = nullptr);
+  void Init(const LocalCalibratorInitOptions& options, const CalibratorParams* params = nullptr);
 
   void ClearUp();
 
   // Main function. process every frame, return true if get valid
   // estimation. suppose the points in lane are already sorted.
-  bool Process(const EgoLane &lane, const float &velocity,
-               const float &yaw_rate, const float &time_diff);
+  bool Process(const EgoLane& lane,
+               const float&   velocity,
+               const float&   yaw_rate,
+               const float&   time_diff);
 
   float get_pitch_estimation() const { return pitch_estimation_; }
 
@@ -103,51 +106,49 @@ class LaneBasedCalibrator {
   // }
 
  private:
-  bool is_in_image(const Eigen::Vector2f &point) const {
-    int x = common::IRound(point(0));
-    int y = common::IRound(point(1));
-    bool is_in_image =
-        x >= 0 && x < image_width_ && y >= 0 && y < image_height_;
+  bool is_in_image(const Eigen::Vector2f& point) const {
+    int  x           = common::IRound(point(0));
+    int  y           = common::IRound(point(1));
+    bool is_in_image = x >= 0 && x < image_width_ && y >= 0 && y < image_height_;
     return (is_in_image);
   }
 
-  bool IsTravelingStraight(const float &vehicle_yaw_changed) const {
+  bool IsTravelingStraight(const float& vehicle_yaw_changed) const {
     float abs_yaw = static_cast<float>(fabs(vehicle_yaw_changed));
     return abs_yaw < params_.max_allowed_yaw_angle_in_radian;
   }
 
-  bool GetVanishingPoint(const EgoLane &lane, VanishingPoint *v_point);
+  bool GetVanishingPoint(const EgoLane& lane, VanishingPoint* v_point);
 
-  int GetCenterIndex(const Eigen::Vector2f *points, int nr_pts) const;
+  int GetCenterIndex(const Eigen::Vector2f* points, int nr_pts) const;
 
-  bool SelectTwoPointsFromLineForVanishingPoint(const LaneLine &line,
-                                                float line_seg[4]);
+  bool SelectTwoPointsFromLineForVanishingPoint(const LaneLine& line, float line_seg[4]);
 
-  bool GetIntersectionFromTwoLineSegments(const float line_seg_l[4],
-                                          const float line_seg_r[4],
-                                          VanishingPoint *v_point);
+  bool GetIntersectionFromTwoLineSegments(const float     line_seg_l[4],
+                                          const float     line_seg_r[4],
+                                          VanishingPoint* v_point);
 
-  void PushVanishingPoint(const VanishingPoint &v_point);
+  void PushVanishingPoint(const VanishingPoint& v_point);
 
-  bool PopVanishingPoint(VanishingPoint *v_point);
+  bool PopVanishingPoint(VanishingPoint* v_point);
 
-  bool GetPitchFromVanishingPoint(const VanishingPoint &vp, float *pitch) const;
+  bool GetPitchFromVanishingPoint(const VanishingPoint& vp, float* pitch) const;
 
   bool AddPitchToHistogram(float pitch);
 
  private:
-  int image_width_ = 0;
-  int image_height_ = 0;
-  float k_mat_[9] = {0};
-  float pitch_cur_ = 0.0f;
-  float pitch_estimation_ = 0.0f;
-  float vanishing_row_ = 0.0f;
+  int   image_width_                           = 0;
+  int   image_height_                          = 0;
+  float k_mat_[9]                              = {0};
+  float pitch_cur_                             = 0.0f;
+  float pitch_estimation_                      = 0.0f;
+  float vanishing_row_                         = 0.0f;
   float accumulated_straight_driving_in_meter_ = 0.0f;
 
   // EgoLane lane_;
-  HistogramEstimator pitch_histogram_;
+  HistogramEstimator         pitch_histogram_;
   std::deque<VanishingPoint> vp_buffer_;
-  CalibratorParams params_;
+  CalibratorParams           params_;
 };
 
 }  // namespace camera

@@ -24,7 +24,7 @@ namespace planning {
 TEST(AllTrajectoryTests, GetCostFromObsSL) {
   // left nudge
   TrajectoryCost tc;
-  SLBoundary obs_sl_boundary;
+  SLBoundary     obs_sl_boundary;
   obs_sl_boundary.set_start_s(20.0);
   obs_sl_boundary.set_end_s(25.0);
   obs_sl_boundary.set_start_l(-1.5);
@@ -38,7 +38,7 @@ TEST(AllTrajectoryTests, GetCostFromObsSL) {
 
   // collisioned obstacle
   TrajectoryCost tc1;
-  SLBoundary obs_sl_boundary1;
+  SLBoundary     obs_sl_boundary1;
   obs_sl_boundary1.set_start_s(20.0);
   obs_sl_boundary1.set_end_s(25.0);
   obs_sl_boundary1.set_start_l(-1.5);

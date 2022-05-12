@@ -41,7 +41,8 @@ using apollo::cyber::common::WorkRoot;
 using apollo::cyber::croutine::RoutineState;
 
 SchedulerChoreography::SchedulerChoreography()
-    : choreography_processor_prio_(0), pool_processor_prio_(0) {
+    : choreography_processor_prio_(0)
+    , pool_processor_prio_(0) {
   std::string conf("conf/");
   conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
   auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
@@ -59,19 +60,17 @@ SchedulerChoreography::SchedulerChoreography()
 
     const apollo::cyber::proto::ChoreographyConf& choreography_conf =
         cfg.scheduler_conf().choreography_conf();
-    proc_num_ = choreography_conf.choreography_processor_num();
-    choreography_affinity_ = choreography_conf.choreography_affinity();
-    choreography_processor_policy_ =
-        choreography_conf.choreography_processor_policy();
+    proc_num_                      = choreography_conf.choreography_processor_num();
+    choreography_affinity_         = choreography_conf.choreography_affinity();
+    choreography_processor_policy_ = choreography_conf.choreography_processor_policy();
 
-    choreography_processor_prio_ =
-        choreography_conf.choreography_processor_prio();
+    choreography_processor_prio_ = choreography_conf.choreography_processor_prio();
     ParseCpuset(choreography_conf.choreography_cpuset(), &choreography_cpuset_);
 
-    task_pool_size_ = choreography_conf.pool_processor_num();
-    pool_affinity_ = choreography_conf.pool_affinity();
+    task_pool_size_        = choreography_conf.pool_processor_num();
+    pool_affinity_         = choreography_conf.pool_affinity();
     pool_processor_policy_ = choreography_conf.pool_processor_policy();
-    pool_processor_prio_ = choreography_conf.pool_processor_prio();
+    pool_processor_prio_   = choreography_conf.pool_processor_prio();
     ParseCpuset(choreography_conf.pool_cpuset(), &pool_cpuset_);
 
     for (const auto& task : choreography_conf.tasks()) {
@@ -81,8 +80,7 @@ SchedulerChoreography::SchedulerChoreography()
 
   if (proc_num_ == 0) {
     auto& global_conf = GlobalData::Instance()->Config();
-    if (global_conf.has_scheduler_conf() &&
-        global_conf.scheduler_conf().has_default_proc_num()) {
+    if (global_conf.has_scheduler_conf() && global_conf.scheduler_conf().has_default_proc_num()) {
       proc_num_ = global_conf.scheduler_conf().default_proc_num();
     } else {
       proc_num_ = 2;
@@ -96,25 +94,23 @@ SchedulerChoreography::SchedulerChoreography()
 void SchedulerChoreography::CreateProcessor() {
   for (uint32_t i = 0; i < proc_num_; i++) {
     auto proc = std::make_shared<Processor>();
-    auto ctx = std::make_shared<ChoreographyContext>();
+    auto ctx  = std::make_shared<ChoreographyContext>();
 
     proc->BindContext(ctx);
-    SetSchedAffinity(proc->Thread(), choreography_cpuset_,
-                     choreography_affinity_, i);
-    SetSchedPolicy(proc->Thread(), choreography_processor_policy_,
-                   choreography_processor_prio_, proc->Tid());
+    SetSchedAffinity(proc->Thread(), choreography_cpuset_, choreography_affinity_, i);
+    SetSchedPolicy(proc->Thread(), choreography_processor_policy_, choreography_processor_prio_,
+                   proc->Tid());
     pctxs_.emplace_back(ctx);
     processors_.emplace_back(proc);
   }
 
   for (uint32_t i = 0; i < task_pool_size_; i++) {
     auto proc = std::make_shared<Processor>();
-    auto ctx = std::make_shared<ClassicContext>();
+    auto ctx  = std::make_shared<ClassicContext>();
 
     proc->BindContext(ctx);
     SetSchedAffinity(proc->Thread(), pool_cpuset_, pool_affinity_, i);
-    SetSchedPolicy(proc->Thread(), pool_processor_policy_, pool_processor_prio_,
-                   proc->Tid());
+    SetSchedPolicy(proc->Thread(), pool_processor_policy_, pool_processor_prio_, proc->Tid());
     pctxs_.emplace_back(ctx);
     processors_.emplace_back(proc);
   }
@@ -140,16 +136,12 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     ChoreographyTask taskconf = cr_confs_[cr->name()];
     cr->set_priority(taskconf.prio());
 
-    if (taskconf.has_processor()) {
-      cr->set_processor_id(taskconf.processor());
-    }
+    if (taskconf.has_processor()) { cr->set_processor_id(taskconf.processor()); }
   }
 
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
-    if (id_cr_.find(cr->id()) != id_cr_.end()) {
-      return false;
-    }
+    if (id_cr_.find(cr->id()) != id_cr_.end()) { return false; }
     id_cr_[cr->id()] = cr;
   }
 
@@ -171,18 +163,14 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     {
       WriteLockGuard<AtomicRWLock> lk(
           ClassicContext::rq_locks_[DEFAULT_GROUP_NAME].at(cr->priority()));
-      ClassicContext::cr_group_[DEFAULT_GROUP_NAME]
-          .at(cr->priority())
-          .emplace_back(cr);
+      ClassicContext::cr_group_[DEFAULT_GROUP_NAME].at(cr->priority()).emplace_back(cr);
     }
   }
   return true;
 }
 
 bool SchedulerChoreography::RemoveTask(const std::string& name) {
-  if (cyber_unlikely(stop_)) {
-    return true;
-  }
+  if (cyber_unlikely(stop_)) { return true; }
 
   auto crid = GlobalData::GenerateHashId(name);
   return RemoveCRoutine(crid);
@@ -204,12 +192,12 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   std::lock_guard<std::mutex> lg(wrapper->Mutex());
 
   std::shared_ptr<CRoutine> cr = nullptr;
-  uint32_t pid;
+  uint32_t                  pid;
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
-    auto p = id_cr_.find(crid);
+    auto                         p = id_cr_.find(crid);
     if (p != id_cr_.end()) {
-      cr = p->second;
+      cr  = p->second;
       pid = cr->processor_id();
       id_cr_[crid]->Stop();
       id_cr_.erase(crid);
@@ -220,30 +208,26 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
 
   // rm cr from pool if rt not in choreo context
   if (pid < proc_num_) {
-    return static_cast<ChoreographyContext*>(pctxs_[pid].get())
-        ->RemoveCRoutine(crid);
+    return static_cast<ChoreographyContext*>(pctxs_[pid].get())->RemoveCRoutine(crid);
   } else {
     return ClassicContext::RemoveCRoutine(cr);
   }
 }
 
 bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
-  if (cyber_unlikely(stop_)) {
-    return true;
-  }
+  if (cyber_unlikely(stop_)) { return true; }
 
   std::shared_ptr<CRoutine> cr;
-  uint32_t pid;
+  uint32_t                  pid;
   // find cr from id_cr && Update cr Flag
   // policies will handle ready-state CRoutines
   {
     ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
-    auto it = id_cr_.find(crid);
+    auto                        it = id_cr_.find(crid);
     if (it != id_cr_.end()) {
-      cr = it->second;
+      cr  = it->second;
       pid = cr->processor_id();
-      if (cr->state() == RoutineState::DATA_WAIT ||
-          cr->state() == RoutineState::IO_WAIT) {
+      if (cr->state() == RoutineState::DATA_WAIT || cr->state() == RoutineState::IO_WAIT) {
         cr->SetUpdateFlag();
       }
     } else {

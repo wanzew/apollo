@@ -44,33 +44,28 @@ void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
   binary_name_ = std::string(basename(argv[0]));
   GetOptions(argc, argv);
 
-  if (process_group_.empty()) {
-    process_group_ = DEFAULT_process_group_;
-  }
+  if (process_group_.empty()) { process_group_ = DEFAULT_process_group_; }
 
-  if (sched_name_.empty()) {
-    sched_name_ = DEFAULT_sched_name_;
-  }
+  if (sched_name_.empty()) { sched_name_ = DEFAULT_sched_name_; }
 
   GlobalData::Instance()->SetProcessGroup(process_group_);
   GlobalData::Instance()->SetSchedName(sched_name_);
-  AINFO << "binary_name_ is " << binary_name_ << ", process_group_ is "
-        << process_group_ << ", has " << dag_conf_list_.size() << " dag conf";
+  AINFO << "binary_name_ is " << binary_name_ << ", process_group_ is " << process_group_
+        << ", has " << dag_conf_list_.size() << " dag conf";
   for (std::string& dag : dag_conf_list_) {
     AINFO << "dag_conf: " << dag;
   }
 }
 
 void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
-  opterr = 0;  // extern int opterr
-  int long_index = 0;
-  const std::string short_opts = "hd:p:s:";
-  static const struct option long_opts[] = {
-      {"help", no_argument, nullptr, 'h'},
-      {"dag_conf", required_argument, nullptr, 'd'},
-      {"process_name", required_argument, nullptr, 'p'},
-      {"sched_name", required_argument, nullptr, 's'},
-      {NULL, no_argument, nullptr, 0}};
+  opterr                                 = 0;  // extern int opterr
+  int                        long_index  = 0;
+  const std::string          short_opts  = "hd:p:s:";
+  static const struct option long_opts[] = {{"help", no_argument, nullptr, 'h'},
+                                            {"dag_conf", required_argument, nullptr, 'd'},
+                                            {"process_name", required_argument, nullptr, 'p'},
+                                            {"sched_name", required_argument, nullptr, 's'},
+                                            {NULL, no_argument, nullptr, 0}};
 
   // log command for info
   std::string cmd("");
@@ -86,11 +81,8 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
   }
 
   do {
-    int opt =
-        getopt_long(argc, argv, short_opts.c_str(), long_opts, &long_index);
-    if (opt == -1) {
-      break;
-    }
+    int opt = getopt_long(argc, argv, short_opts.c_str(), long_opts, &long_index);
+    if (opt == -1) { break; }
     switch (opt) {
       case 'd':
         dag_conf_list_.emplace_back(std::string(optarg));
@@ -102,17 +94,10 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
           }
         }
         break;
-      case 'p':
-        process_group_ = std::string(optarg);
-        break;
-      case 's':
-        sched_name_ = std::string(optarg);
-        break;
-      case 'h':
-        DisplayUsage();
-        exit(0);
-      default:
-        break;
+      case 'p': process_group_ = std::string(optarg); break;
+      case 's': sched_name_ = std::string(optarg); break;
+      case 'h': DisplayUsage(); exit(0);
+      default: break;
     }
   } while (true);
 

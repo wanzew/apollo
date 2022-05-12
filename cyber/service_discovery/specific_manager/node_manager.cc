@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/service_discovery/specific_manager/node_manager.h"
+
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/state.h"
@@ -26,7 +27,7 @@ namespace service_discovery {
 
 NodeManager::NodeManager() {
   allowed_role_ |= 1 << RoleType::ROLE_NODE;
-  change_type_ = ChangeType::CHANGE_NODE;
+  change_type_  = ChangeType::CHANGE_NODE;
   channel_name_ = "node_change_broadcast";
 }
 
@@ -57,8 +58,7 @@ void NodeManager::Dispose(const ChangeMsg& msg) {
   Notify(msg);
 }
 
-void NodeManager::OnTopoModuleLeave(const std::string& host_name,
-                                    int process_id) {
+void NodeManager::OnTopoModuleLeave(const std::string& host_name, int process_id) {
   RETURN_IF(!is_discovery_started_.load());
 
   RoleAttributes attr;
@@ -72,15 +72,14 @@ void NodeManager::OnTopoModuleLeave(const std::string& host_name,
 
   ChangeMsg msg;
   for (auto& node : nodes_to_remove) {
-    Convert(node->attributes(), RoleType::ROLE_NODE, OperateType::OPT_LEAVE,
-            &msg);
+    Convert(node->attributes(), RoleType::ROLE_NODE, OperateType::OPT_LEAVE, &msg);
     Notify(msg);
   }
 }
 
 void NodeManager::DisposeJoin(const ChangeMsg& msg) {
-  auto node = std::make_shared<RoleNode>(msg.role_attr(), msg.timestamp());
-  uint64_t key = node->attributes().node_id();
+  auto     node = std::make_shared<RoleNode>(msg.role_attr(), msg.timestamp());
+  uint64_t key  = node->attributes().node_id();
   // duplicated node
   if (!nodes_.Add(key, node, false)) {
     RolePtr existing_node;

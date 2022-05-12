@@ -27,9 +27,9 @@ namespace perception {
 namespace lidar {
 
 enum class MotionState {
-  STATIC = 0,
+  STATIC         = 0,
   SKEPTICAL_MOVE = 1,
-  TRUSTED_MOVE = 2,
+  TRUSTED_MOVE   = 2,
 };
 
 class TrackData {
@@ -38,28 +38,20 @@ class TrackData {
   TrackData(TrackedObjectPtr obj, int track_id);
   virtual ~TrackData();
   std::pair<double, TrackedObjectPtr> GetLatestObject() {
-    if (history_objects_.size() != 0) {
-      return *history_objects_.rbegin();
-    }
+    if (history_objects_.size() != 0) { return *history_objects_.rbegin(); }
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
   std::pair<double, TrackedObjectConstPtr> GetLatestObject() const {
-    if (history_objects_.size() != 0) {
-      return *history_objects_.rbegin();
-    }
+    if (history_objects_.size() != 0) { return *history_objects_.rbegin(); }
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
   std::pair<double, TrackedObjectPtr> GetOldestObject() {
-    if (history_objects_.size() != 0) {
-      return *history_objects_.begin();
-    }
+    if (history_objects_.size() != 0) { return *history_objects_.begin(); }
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
 
   std::pair<double, TrackedObjectConstPtr> GetOldestObject() const {
-    if (history_objects_.size() != 0) {
-      return *history_objects_.begin();
-    }
+    if (history_objects_.size() != 0) { return *history_objects_.begin(); }
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
 
@@ -76,18 +68,18 @@ class TrackData {
 
   virtual void PushTrackedObjectToTrack(TrackedObjectPtr obj, double time);
 
-  int track_id_ = -1;
-  int age_ = 0;
-  int consecutive_invisible_count_ = 0;
-  int total_visible_count_ = 0;
-  static const int kMaxHistorySize;
+  int                                track_id_                    = -1;
+  int                                age_                         = 0;
+  int                                consecutive_invisible_count_ = 0;
+  int                                total_visible_count_         = 0;
+  static const int                   kMaxHistorySize;
   std::map<double, TrackedObjectPtr> history_objects_;
-  int max_history_size_ = 40;
+  int                                max_history_size_ = 40;
   // motion state related
   // used for judge object is static or not
-  MotionState motion_state_ = MotionState::STATIC;
-  size_t continuous_motion_frames_ = 0;
-  size_t continuous_static_frames_ = 0;
+  MotionState motion_state_             = MotionState::STATIC;
+  size_t      continuous_motion_frames_ = 0;
+  size_t      continuous_static_frames_ = 0;
   // if currenet frame is evaluated as in motion (implemented in post_process),
   // then the next pub_remain_frames should not be set as static,
   // in order to improve sensibility from static to motion
@@ -101,7 +93,7 @@ class TrackData {
   std::deque<double> history_theta_variance_;
 };
 
-typedef std::shared_ptr<TrackData> TrackDataPtr;
+typedef std::shared_ptr<TrackData>       TrackDataPtr;
 typedef std::shared_ptr<const TrackData> TrackDataConstPtr;
 
 }  // namespace lidar

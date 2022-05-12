@@ -24,7 +24,7 @@ namespace planning {
 
 class AutotuningSpeedMLPModel : public AutotuningBaseModel {
  public:
-  AutotuningSpeedMLPModel() = default;
+  AutotuningSpeedMLPModel()  = default;
   ~AutotuningSpeedMLPModel() = default;
 
   /**
@@ -37,16 +37,14 @@ class AutotuningSpeedMLPModel : public AutotuningBaseModel {
    * @param : input trajectory feature proto
    * @return : the total value of reward / cost
    */
-  double Evaluate(
-      const autotuning::TrajectoryFeature& trajectory_feature) const override;
+  double Evaluate(const autotuning::TrajectoryFeature& trajectory_feature) const override;
 
   /**
    * @brief: evaluate by trajectory point
    * @param : trajectory pointwise input feature
    * @return : total value of reward / cost
    */
-  double Evaluate(const autotuning::TrajectoryPointwiseFeature& point_feature)
-      const override;
+  double Evaluate(const autotuning::TrajectoryPointwiseFeature& point_feature) const override;
 
  private:
   /**
@@ -55,11 +53,11 @@ class AutotuningSpeedMLPModel : public AutotuningBaseModel {
    * @param flat_feature [eigen matrix, row: time, col: traj point feature]
    */
   void FlattenFeatures(const autotuning::TrajectoryFeature& feature,
-                       Eigen::MatrixXd* const flat_feature) const;
+                       Eigen::MatrixXd* const               flat_feature) const;
 
-  void FlattenFeatures(
-      const autotuning::SpeedPointwiseFeature& speed_point_feature,
-      const int row, Eigen::MatrixXd* const flat_feature) const;
+  void FlattenFeatures(const autotuning::SpeedPointwiseFeature& speed_point_feature,
+                       const int                                row,
+                       Eigen::MatrixXd* const                   flat_feature) const;
 };
 
 }  // namespace planning

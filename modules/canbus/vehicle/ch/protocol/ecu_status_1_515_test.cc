@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/protocol/ecu_status_1_515.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -26,8 +27,8 @@ class Ecustatus1515Test : public ::testing::Test {
 };
 
 TEST_F(Ecustatus1515Test, General) {
-  uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x01, 0x12, 0x13, 0x14};
-  int32_t length = 8;
+  uint8_t       data[8] = {0x01, 0x02, 0x03, 0x04, 0x01, 0x12, 0x13, 0x14};
+  int32_t       length  = 8;
   ChassisDetail cd;
   Ecustatus1515 ecustatus;
   ecustatus.Parse(data, length, &cd);

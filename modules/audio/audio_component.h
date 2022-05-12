@@ -23,9 +23,10 @@
 #include <memory>
 #include <string>
 
+#include "modules/localization/proto/localization.pb.h"
+
 #include "cyber/component/component.h"
 #include "modules/audio/common/message_process.h"
-#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::audio
@@ -34,8 +35,7 @@
 namespace apollo {
 namespace audio {
 
-class AudioComponent
-    : public cyber::Component<apollo::drivers::microphone::config::AudioData> {
+class AudioComponent : public cyber::Component<apollo::drivers::microphone::config::AudioData> {
  public:
   ~AudioComponent();
 
@@ -43,22 +43,19 @@ class AudioComponent
 
   bool Init() override;
 
-  bool Proc(
-      const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&)
-      override;
+  bool Proc(const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&) override;
 
  private:
-  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
-      localization_reader_;
+  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>> localization_reader_;
 
   std::shared_ptr<cyber::Writer<AudioDetection>> audio_writer_;
 
   AudioInfo audio_info_;
 
   DirectionDetection direction_detection_;
-  MovingDetection moving_detection_;
-  SirenDetection siren_detection_;
-  std::string respeaker_extrinsics_file_;
+  MovingDetection    moving_detection_;
+  SirenDetection     siren_detection_;
+  std::string        respeaker_extrinsics_file_;
 };
 
 CYBER_REGISTER_COMPONENT(AudioComponent)

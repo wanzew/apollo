@@ -18,9 +18,8 @@
 #include <string>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -29,7 +28,7 @@ namespace camera {
 struct ObstaclePostprocessorInitOptions : public BaseInitOptions {};
 
 struct ObstaclePostprocessorOptions {
-  bool do_refinement_with_disp_map = false;
+  bool do_refinement_with_disp_map            = false;
   bool do_refinement_with_calibration_service = true;
 };
 
@@ -39,25 +38,23 @@ class BaseObstaclePostprocessor {
 
   virtual ~BaseObstaclePostprocessor() = default;
 
-  virtual bool Init(const ObstaclePostprocessorInitOptions& options =
-                        ObstaclePostprocessorInitOptions()) = 0;
+  virtual bool
+  Init(const ObstaclePostprocessorInitOptions& options = ObstaclePostprocessorInitOptions()) = 0;
 
   // @brief: refine 3D location of detected obstacles.
   // @param [in]: options
   // @param [in/out]: frame
   // 3D information of obstacle should be filled, required.
-  virtual bool Process(const ObstaclePostprocessorOptions& options,
-                       CameraFrame* frame) = 0;
+  virtual bool Process(const ObstaclePostprocessorOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
   BaseObstaclePostprocessor(const BaseObstaclePostprocessor&) = delete;
-  BaseObstaclePostprocessor& operator=(const BaseObstaclePostprocessor&) =
-      delete;
+  BaseObstaclePostprocessor& operator=(const BaseObstaclePostprocessor&) = delete;
 };  // class BaseObstaclePostprocessor
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstaclePostprocessor);
-#define REGISTER_OBSTACLE_POSTPROCESSOR(name) \
+#define REGISTER_OBSTACLE_POSTPROCESSOR(name)                                                      \
   PERCEPTION_REGISTER_CLASS(BaseObstaclePostprocessor, name)
 
 }  // namespace camera

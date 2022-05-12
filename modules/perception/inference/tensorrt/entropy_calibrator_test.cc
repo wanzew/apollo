@@ -27,18 +27,16 @@ namespace inference {
 TEST(Int8EntropyCalibratorTest, test_init) {
   // test empty batch_stream
   {
-    BatchStream batch_stream;
+    BatchStream                     batch_stream;
     nvinfer1::Int8EntropyCalibrator calibrator(batch_stream, 0, false, "");
     EXPECT_EQ(calibrator.getBatchSize(), 0);
   }
   // test valid batch_stream
   {
     BatchStream batch_stream(
-        1, 5,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 5, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, false,
-        "modules/perception/inference/inference_test_data/tensorrt");
+        batch_stream, 0, false, "modules/perception/inference/inference_test_data/tensorrt");
     EXPECT_EQ(calibrator.getBatchSize(), 1);
   }
 }
@@ -47,13 +45,11 @@ TEST(Int8EntropyCalibratorTest, test_cache) {
   // DONOT read cache
   {
     BatchStream batch_stream(
-        1, 5,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 5, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, false,
-        "modules/perception/inference/inference_test_data/tensorrt");
+        batch_stream, 0, false, "modules/perception/inference/inference_test_data/tensorrt");
     size_t length;
-    auto cache = calibrator.readCalibrationCache(length);
+    auto   cache = calibrator.readCalibrationCache(length);
     EXPECT_EQ(length, 0);
     EXPECT_EQ(cache, nullptr);
   }
@@ -61,13 +57,12 @@ TEST(Int8EntropyCalibratorTest, test_cache) {
   // DO read cache from BAD path
   {
     BatchStream batch_stream(
-        1, 5,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 5, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
         batch_stream, 0, true,
         "modules/perception/inference/inference_test_data/tensorrt-nonexists");
     size_t length;
-    auto cache = calibrator.readCalibrationCache(length);
+    auto   cache = calibrator.readCalibrationCache(length);
     EXPECT_EQ(length, 0);
     EXPECT_EQ(cache, nullptr);
   }
@@ -75,13 +70,11 @@ TEST(Int8EntropyCalibratorTest, test_cache) {
   // DO read cache
   {
     BatchStream batch_stream(
-        1, 5,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 5, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, true,
-        "modules/perception/inference/inference_test_data/tensorrt");
+        batch_stream, 0, true, "modules/perception/inference/inference_test_data/tensorrt");
     size_t length;
-    auto cache = calibrator.readCalibrationCache(length);
+    auto   cache = calibrator.readCalibrationCache(length);
     EXPECT_EQ(length, 1128);
     EXPECT_NE(cache, nullptr);
   }
@@ -91,18 +84,16 @@ TEST(Int8EntropyCalibratorTest, test_get_batch) {
   // DO read cache
   {
     BatchStream batch_stream(
-        1, 5,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 5, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, true,
-        "modules/perception/inference/inference_test_data/tensorrt");
+        batch_stream, 0, true, "modules/perception/inference/inference_test_data/tensorrt");
     size_t length;
-    auto cache = calibrator.readCalibrationCache(length);
+    auto   cache = calibrator.readCalibrationCache(length);
     EXPECT_EQ(length, 1128);
     EXPECT_NE(cache, nullptr);
-    void *bindings[1];
-    const char *names[] = {"haha"};
-    int nbBindings = 1;
+    void*       bindings[1];
+    const char* names[]    = {"haha"};
+    int         nbBindings = 1;
     EXPECT_TRUE(calibrator.getBatch(bindings, names, nbBindings));
     EXPECT_TRUE(calibrator.getBatch(bindings, names, nbBindings));
     EXPECT_TRUE(calibrator.getBatch(bindings, names, nbBindings));

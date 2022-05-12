@@ -15,9 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/ndt/ndt_localization.h"
+
 #include <memory>
-#include "cyber/init.h"
+
 #include "gtest/gtest.h"
+
+#include "cyber/init.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -42,8 +45,7 @@ TEST_F(NDTLocalizationTest, Init) {
   FLAGS_online_resolution = 0.25;
   ndt_localization_ptr_->Init();
   EXPECT_EQ(ndt_localization_ptr_->GetZoneId(), 10);
-  EXPECT_LE(std::abs(ndt_localization_ptr_->GetOnlineResolution() - 0.25),
-            0.01);
+  EXPECT_LE(std::abs(ndt_localization_ptr_->GetOnlineResolution() - 0.25), 0.01);
 }
 
 }  // namespace ndt

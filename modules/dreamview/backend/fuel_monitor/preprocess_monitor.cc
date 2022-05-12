@@ -39,16 +39,16 @@ using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
 PreprocessMonitor::PreprocessMonitor()
-    : FuelMonitor(FLAGS_preprocess_monitor_name),
-      node_(cyber::CreateNode("progress_monitor")) {
+    : FuelMonitor(FLAGS_preprocess_monitor_name)
+    , node_(cyber::CreateNode("progress_monitor")) {
   InitReaders();
   LoadConfiguration();
 }
 
 PreprocessMonitor::PreprocessMonitor(const std::string& task_name)
-    : FuelMonitor(FLAGS_preprocess_monitor_name),
-      task_name_(task_name),
-      node_(cyber::CreateNode(task_name + "_progress_monitor")) {
+    : FuelMonitor(FLAGS_preprocess_monitor_name)
+    , task_name_(task_name)
+    , node_(cyber::CreateNode(task_name + "_progress_monitor")) {
   InitReaders();
   LoadConfiguration();
 }
@@ -57,22 +57,20 @@ PreprocessMonitor::~PreprocessMonitor() { Stop(); }
 
 void PreprocessMonitor::InitReaders() {
   node_->CreateReader<Progress>(
-      FLAGS_progress_topic, [this](const std::shared_ptr<Progress>& progress) {
-        this->OnProgress(progress);
-      });
+      FLAGS_progress_topic,
+      [this](const std::shared_ptr<Progress>& progress) { this->OnProgress(progress); });
 }
 
 void PreprocessMonitor::LoadConfiguration() {
   if (!task_name_.empty()) {
-    const std::string& vehicle_dir =
-        VehicleManager::Instance()->GetVehicleDataPath();
-    std::string config_path = absl::StrCat(
-        vehicle_dir, "dreamview_conf/", task_name_, "_preprocess_table.pb.txt");
+    const std::string& vehicle_dir = VehicleManager::Instance()->GetVehicleDataPath();
+    std::string        config_path =
+        absl::StrCat(vehicle_dir, "dreamview_conf/", task_name_, "_preprocess_table.pb.txt");
     if (!PathExists(config_path)) {
       AWARN << "No corresponding preprocess table file found in " << vehicle_dir
             << ". Using default one instead.";
-      config_path = absl::StrCat("/apollo/modules/dreamview/conf/", task_name_,
-                                 "_preprocess_table.pb.txt");
+      config_path =
+          absl::StrCat("/apollo/modules/dreamview/conf/", task_name_, "_preprocess_table.pb.txt");
     }
 
     ACHECK(cyber::common::GetProtoFromFile(config_path, &preprocess_table_))
@@ -101,9 +99,7 @@ void PreprocessMonitor::Start() {
 void PreprocessMonitor::Stop() { enabled_ = false; }
 
 void PreprocessMonitor::OnProgress(const std::shared_ptr<Progress>& progress) {
-  if (!enabled_) {
-    return;
-  }
+  if (!enabled_) { return; }
 
   std::string json_string;
   MessageToJsonString(*progress, &json_string);

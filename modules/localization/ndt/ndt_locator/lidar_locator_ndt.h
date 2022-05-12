@@ -34,12 +34,12 @@
 #define USE_PRELOAD_MAP_NODE
 
 #ifdef VIS_USE_OPENCV
-#define VIS_USE_OPENCV_ON
+#  define VIS_USE_OPENCV_ON
 #endif
 #ifdef VIS_USE_OPENCV_ON
-#include <opencv2/opencv.hpp>
-void color_mapping(float value, float midvalue, unsigned char* r,
-                   unsigned char* g, unsigned char* b) {
+#  include <opencv2/opencv.hpp>
+void color_mapping(
+    float value, float midvalue, unsigned char* r, unsigned char* g, unsigned char* b) {
   if (value > 1.f) {
     value = 1.f;
   } else if (value < 0.f) {
@@ -47,9 +47,9 @@ void color_mapping(float value, float midvalue, unsigned char* r,
   }
   if (value > midvalue) {
     value = (value - midvalue) / (1.f - midvalue);
-    *r = value * 255.0;
-    *g = (1.0 - value) * 255.0;
-    *b = 0.0;
+    *r    = value * 255.0;
+    *g    = (1.0 - value) * 255.0;
+    *b    = 0.0;
   } else {
     value /= midvalue;
     *r = 0.0;
@@ -63,20 +63,21 @@ namespace apollo {
 namespace localization {
 namespace ndt {
 
-typedef apollo::localization::msf::pyramid_map::NdtMap NdtMap;
-typedef apollo::localization::msf::pyramid_map::NdtMapConfig NdtMapConfig;
-typedef apollo::localization::msf::pyramid_map::NdtMapNode NdtMapNode;
-typedef apollo::localization::msf::pyramid_map::NdtMapCells NdtMapCells;
+typedef apollo::localization::msf::pyramid_map::NdtMap         NdtMap;
+typedef apollo::localization::msf::pyramid_map::NdtMapConfig   NdtMapConfig;
+typedef apollo::localization::msf::pyramid_map::NdtMapNode     NdtMapNode;
+typedef apollo::localization::msf::pyramid_map::NdtMapCells    NdtMapCells;
 typedef apollo::localization::msf::pyramid_map::NdtMapNodePool NdtMapNodePool;
-typedef apollo::localization::msf::pyramid_map::NdtMapMatrix NdtMapMatrix;
-typedef apollo::localization::msf::pyramid_map::MapNodeIndex MapNodeIndex;
+typedef apollo::localization::msf::pyramid_map::NdtMapMatrix   NdtMapMatrix;
+typedef apollo::localization::msf::pyramid_map::MapNodeIndex   MapNodeIndex;
 
 struct LidarFrame {
-  LidarFrame() : measurement_time(0.0) {}
-  double measurement_time;  // unix time
-  std::vector<float> pt_xs;
-  std::vector<float> pt_ys;
-  std::vector<float> pt_zs;
+  LidarFrame()
+      : measurement_time(0.0) {}
+  double                     measurement_time;  // unix time
+  std::vector<float>         pt_xs;
+  std::vector<float>         pt_ys;
+  std::vector<float>         pt_zs;
   std::vector<unsigned char> intensities;
 };
 
@@ -88,11 +89,9 @@ class LidarLocatorNdt {
   ~LidarLocatorNdt();
 
   /**@brief Load map data. */
-  void LoadMap(const Eigen::Affine3d& init_location, unsigned int resolution_id,
-               int zone_id);
+  void LoadMap(const Eigen::Affine3d& init_location, unsigned int resolution_id, int zone_id);
   /**@brief Initialize the locator. */
-  void Init(const Eigen::Affine3d& init_location, unsigned int resolution_id,
-            int zone_id);
+  void Init(const Eigen::Affine3d& init_location, unsigned int resolution_id, int zone_id);
   /**@brief Set the map folder. */
   void SetMapFolderPath(const std::string folder_path);
   /**@brief Set the extrinsic calibration. */
@@ -101,8 +100,10 @@ class LidarLocatorNdt {
   void SetLidarHeight(double height);
 
   /**@brief Compose candidate map area. */
-  void ComposeMapCells(const Eigen::Vector2d& left_top_coord2d, int zone_id,
-                       unsigned int resolution_id, float map_pixel_resolution,
+  void ComposeMapCells(const Eigen::Vector2d& left_top_coord2d,
+                       int                    zone_id,
+                       unsigned int           resolution_id,
+                       float                  map_pixel_resolution,
                        const Eigen::Affine3d& inverse_transform);
 
   /**@brief Set online cloud resolution. */
@@ -111,8 +112,7 @@ class LidarLocatorNdt {
   /**@brief Update the histogram filter.
    * param <pose> The localization from the GPS.
    * param <pt3ds> The local 3D points from Velodyne. */
-  int Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
-             const LidarFrame& lidar_frame);
+  int Update(unsigned int frame_idx, const Eigen::Affine3d& pose, const LidarFrame& lidar_frame);
   /**@brief Get the current optimal pose result. */
   Eigen::Affine3d GetPose() const;
   /*@brief Get the predict location from the odometry motion model*/
@@ -180,9 +180,9 @@ class LidarLocatorNdt {
   double fitness_score_ = 0.0;
 
   /**@brief maximum iterations for ndt matching*/
-  int ndt_max_iterations_ = 10;
-  double ndt_target_resolution_ = 1.0;
-  double ndt_line_search_step_size_ = 0.1;
+  int    ndt_max_iterations_         = 10;
+  double ndt_target_resolution_      = 1.0;
+  double ndt_line_search_step_size_  = 0.1;
   double ndt_transformation_epsilon_ = 0.01;
 
  public:

@@ -55,13 +55,13 @@ class PostprocessCuda {
  private:
   const float float_min_;
   const float float_max_;
-  const int num_anchor_;
-  const int num_class_;
+  const int   num_anchor_;
+  const int   num_class_;
   const float score_threshold_;
-  const int num_threads_;
+  const int   num_threads_;
   const float nms_overlap_threshold_;
-  const int num_box_corners_;
-  const int num_output_box_feature_;
+  const int   num_box_corners_;
+  const int   num_output_box_feature_;
 
   std::unique_ptr<NmsCuda> nms_cuda_ptr_;
 
@@ -80,11 +80,15 @@ class PostprocessCuda {
    * @details Captital variables never change after the compile, non-capital
    * variables could be changed through rosparam
    */
-  PostprocessCuda(const float float_min, const float float_max,
-                  const int num_anchor, const int num_class,
-                  const float score_threshold, const int num_threads,
-                  const float nms_overlap_threshold, const int num_box_corners,
-                  const int num_output_box_feature);
+  PostprocessCuda(const float float_min,
+                  const float float_max,
+                  const int   num_anchor,
+                  const int   num_class,
+                  const float score_threshold,
+                  const int   num_threads,
+                  const float nms_overlap_threshold,
+                  const int   num_box_corners,
+                  const int   num_output_box_feature);
 
   /**
    * @brief Postprocessing for the network output
@@ -110,16 +114,25 @@ class PostprocessCuda {
    * @param[out] out_label Output labels of objects
    * @details dev_* represents device memory allocated variables
    */
-  void DoPostprocessCuda(
-      const float* rpn_box_output, const float* rpn_cls_output,
-      const float* rpn_dir_output, int* dev_anchor_mask,
-      const float* dev_anchors_px, const float* dev_anchors_py,
-      const float* dev_anchors_pz, const float* dev_anchors_dx,
-      const float* dev_anchors_dy, const float* dev_anchors_dz,
-      const float* dev_anchors_ro, float* dev_filtered_box,
-      float* dev_filtered_score, int* dev_filtered_label, int* dev_filtered_dir,
-      float* dev_box_for_nms, int* dev_filter_count,
-      std::vector<float>* out_detection, std::vector<int>* out_label);
+  void DoPostprocessCuda(const float*        rpn_box_output,
+                         const float*        rpn_cls_output,
+                         const float*        rpn_dir_output,
+                         int*                dev_anchor_mask,
+                         const float*        dev_anchors_px,
+                         const float*        dev_anchors_py,
+                         const float*        dev_anchors_pz,
+                         const float*        dev_anchors_dx,
+                         const float*        dev_anchors_dy,
+                         const float*        dev_anchors_dz,
+                         const float*        dev_anchors_ro,
+                         float*              dev_filtered_box,
+                         float*              dev_filtered_score,
+                         int*                dev_filtered_label,
+                         int*                dev_filtered_dir,
+                         float*              dev_box_for_nms,
+                         int*                dev_filter_count,
+                         std::vector<float>* out_detection,
+                         std::vector<int>*   out_label);
 };
 
 }  // namespace lidar

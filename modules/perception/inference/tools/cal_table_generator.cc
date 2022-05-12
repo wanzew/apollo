@@ -51,8 +51,8 @@ DEFINE_bool(hwc_input, true, "input blob is hwc order.");
 int evaluate_image_list() {
   CHECK_EQ(FLAGS_image_channel_num, 3);
   const int height = FLAGS_height;
-  const int width = FLAGS_width;
-  const int count = FLAGS_image_channel_num * width * height;
+  const int width  = FLAGS_width;
+  const int count  = FLAGS_image_channel_num * width * height;
 
   std::ifstream fin;
   fin.open(FLAGS_test_list, std::ifstream::in);
@@ -60,20 +60,18 @@ int evaluate_image_list() {
     AERROR << "Failed to open test list file: " << FLAGS_test_list;
     return -1;
   }
-  std::string image_name;
+  std::string              image_name;
   std::vector<std::string> img_list;
-  int i = 0;
+  int                      i = 0;
   while (fin >> image_name) {
     std::string image_path = FLAGS_image_root + '/' + image_name;
     img_list.push_back(image_path);
     ++i;
-    if (i >= FLAGS_max_batch * FLAGS_batch_size) {
-      break;
-    }
+    if (i >= FLAGS_max_batch * FLAGS_batch_size) { break; }
   }
   fin.close();
 
-  std::string out_file = FLAGS_batch_root + "/Batch0";
+  std::string   out_file = FLAGS_batch_root + "/Batch0";
   std::ofstream out_car(out_file, std::ofstream::out | std::ofstream::binary);
   // std::ofstream out_car(out_file, std::ofstream::out);
   if (!out_car.is_open()) {
@@ -84,13 +82,13 @@ int evaluate_image_list() {
   // Main loop
   for (size_t i = 0; i < img_list.size(); ++i) {
     std::string image_path = img_list[i] + FLAGS_image_ext;
-    cv::Mat img = cv::imread(image_path, cv::IMAGE_COLOR);
-    cv::Mat img_org;
+    cv::Mat     img        = cv::imread(image_path, cv::IMAGE_COLOR);
+    cv::Mat     img_org;
 
     img.copyTo(img_org);
 
     cv::Rect roi(0, FLAGS_offset_y, img.cols, img.rows - FLAGS_offset_y);
-    cv::Mat img_roi = img(roi);
+    cv::Mat  img_roi = img(roi);
     img_roi.copyTo(img);
     int image_c0 = FLAGS_mean_b;
     int image_c1 = FLAGS_mean_g;
@@ -118,41 +116,36 @@ int evaluate_image_list() {
         return -1;
       }
 
-      int num =
-          std::min(static_cast<int>(img_list.size() - i), FLAGS_batch_size);
+      int num      = std::min(static_cast<int>(img_list.size() - i), FLAGS_batch_size);
       int channels = img.channels();
-      int rows = img.rows;
-      int cols = img.cols;
-      out_car.write((const char *)&num, sizeof(int));
-      out_car.write((const char *)(&channels), sizeof(int));
-      out_car.write((const char *)(&rows), sizeof(int));
-      out_car.write((const char *)(&cols), sizeof(int));
+      int rows     = img.rows;
+      int cols     = img.cols;
+      out_car.write((const char*)&num, sizeof(int));
+      out_car.write((const char*)(&channels), sizeof(int));
+      out_car.write((const char*)(&rows), sizeof(int));
+      out_car.write((const char*)(&cols), sizeof(int));
     }
     if (FLAGS_hwc_input) {
-      for (int idxx = 0, idx = 0; idx < count / FLAGS_image_channel_num;
-           idx++) {
-        idxx = idx * FLAGS_image_channel_num;
-        cpu_data[idxx] = static_cast<float>(img.data[idxx] - image_c0);
+      for (int idxx = 0, idx = 0; idx < count / FLAGS_image_channel_num; idx++) {
+        idxx               = idx * FLAGS_image_channel_num;
+        cpu_data[idxx]     = static_cast<float>(img.data[idxx] - image_c0);
         cpu_data[idxx + 1] = static_cast<float>(img.data[idxx + 1] - image_c1);
         cpu_data[idxx + 2] = static_cast<float>(img.data[idxx + 2] - image_c2);
       }
     } else {
       for (int ri = 0; ri < height; ++ri) {
-        int row_idx0 = (0 * height + ri) * width;
-        int row_idx1 = (1 * height + ri) * width;
-        int row_idx2 = (2 * height + ri) * width;
-        auto img_ptr = img.ptr<cv::Vec3b>(ri);
+        int  row_idx0 = (0 * height + ri) * width;
+        int  row_idx1 = (1 * height + ri) * width;
+        int  row_idx2 = (2 * height + ri) * width;
+        auto img_ptr  = img.ptr<cv::Vec3b>(ri);
         for (int cj = 0; cj < width; ++cj) {
-          cpu_data[row_idx0 + cj] =
-              static_cast<float>(img_ptr[cj][0] - image_c0);
-          cpu_data[row_idx1 + cj] =
-              static_cast<float>(img_ptr[cj][1] - image_c1);
-          cpu_data[row_idx2 + cj] =
-              static_cast<float>(img_ptr[cj][2] - image_c2);
+          cpu_data[row_idx0 + cj] = static_cast<float>(img_ptr[cj][0] - image_c0);
+          cpu_data[row_idx1 + cj] = static_cast<float>(img_ptr[cj][1] - image_c1);
+          cpu_data[row_idx2 + cj] = static_cast<float>(img_ptr[cj][2] - image_c2);
         }
       }
     }
-    out_car.write((const char *)(cpu_data.data()), count * sizeof(float));
+    out_car.write((const char*)(cpu_data.data()), count * sizeof(float));
   }
 
   fin.clear();
@@ -160,25 +153,19 @@ int evaluate_image_list() {
   return 0;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  if (FLAGS_gen_batch) {
-    evaluate_image_list();
-  }
+  if (FLAGS_gen_batch) { evaluate_image_list(); }
   std::vector<std::string> outputs;
   std::vector<std::string> inputs = {"data"};
 
-  apollo::perception::inference::load_data<std::string>(FLAGS_names_file,
-                                                        &outputs);
-  apollo::perception::inference::BatchStream stream(2, FLAGS_max_batch,
-                                                    FLAGS_batch_root);
-  nvinfer1::Int8EntropyCalibrator *calibrator =
-      (new nvinfer1::Int8EntropyCalibrator(stream, 0, true,
-                                           FLAGS_cal_table_root));
-  apollo::perception::inference::RTNet *rt_net =
-      new apollo::perception::inference::RTNet(
-          FLAGS_proto_file, FLAGS_weight_file, outputs, inputs, calibrator);
+  apollo::perception::inference::load_data<std::string>(FLAGS_names_file, &outputs);
+  apollo::perception::inference::BatchStream stream(2, FLAGS_max_batch, FLAGS_batch_root);
+  nvinfer1::Int8EntropyCalibrator*           calibrator =
+      (new nvinfer1::Int8EntropyCalibrator(stream, 0, true, FLAGS_cal_table_root));
+  apollo::perception::inference::RTNet* rt_net = new apollo::perception::inference::RTNet(
+      FLAGS_proto_file, FLAGS_weight_file, outputs, inputs, calibrator);
   rt_net->Init(std::map<std::string, std::vector<int>>());
   rt_net->Infer();
   delete rt_net;

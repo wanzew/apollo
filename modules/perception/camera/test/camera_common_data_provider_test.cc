@@ -39,18 +39,17 @@ TEST(DataProvider, test_image_options) {
 TEST(DataProvider, test_nodistortion) {
   unsetenv("MODULE_PATH");
   unsetenv("CYBER_PATH");
-  cv::Mat img = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/common/img/test.jpg");
+  cv::Mat img = cv::imread("/apollo/modules/perception/testdata/"
+                           "camera/common/img/test.jpg");
 
-  DataProvider data_provider;
+  DataProvider              data_provider;
   DataProvider::InitOptions init_options;
   init_options.image_height = img.rows;
-  init_options.image_width = img.cols;
-  init_options.device_id = 0;
+  init_options.image_width  = img.cols;
+  init_options.device_id    = 0;
   data_provider.Init(init_options);
 
-  base::Image8U image;
+  base::Image8U              image;
   DataProvider::ImageOptions image_options;
 
   EXPECT_FALSE(data_provider.GetImage(image_options, nullptr));
@@ -62,8 +61,7 @@ TEST(DataProvider, test_nodistortion) {
   image_options.target_color = base::Color::RGB;
   EXPECT_FALSE(data_provider.GetImage(image_options, &image));
 
-  EXPECT_TRUE(
-      data_provider.FillImageData(img.rows, img.cols, img.data, "bgr8"));
+  EXPECT_TRUE(data_provider.FillImageData(img.rows, img.cols, img.data, "bgr8"));
 
   // test GetImage - correct color
   image_options.target_color = base::Color::GRAY;
@@ -79,7 +77,7 @@ TEST(DataProvider, test_nodistortion) {
   image_options.target_color = base::Color::NONE;
   EXPECT_FALSE(data_provider.GetImage(image_options, &image));
 
-  image_options.do_crop = true;
+  image_options.do_crop  = true;
   image_options.crop_roi = base::RectI(100, 100, 512, 512);
 
   // test GetImage - with crop
@@ -112,79 +110,65 @@ TEST(DataProvider, test_nodistortion) {
 TEST(DataProvider, test_fill_image_data) {
   unsetenv("MODULE_PATH");
   unsetenv("CYBER_PATH");
-  FLAGS_obs_sensor_meta_path =
-      "/apollo/modules/perception/testdata/"
-      "camera/common/conf/sensor_meta.config";
-  FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/"
-      "camera/common/params";
+  FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
+                               "camera/common/conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+                                    "camera/common/params";
 
   cv::Mat gray;
   cv::Mat rgb;
-  cv::Mat bgr = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/common/img/test.jpg");
+  cv::Mat bgr = cv::imread("/apollo/modules/perception/testdata/"
+                           "camera/common/img/test.jpg");
   cv::cvtColor(bgr, rgb, CV_BGR2RGB);
   cv::cvtColor(bgr, gray, cv::BGR2GRAY);
 
   DataProvider::InitOptions init_options;
   init_options.image_height = bgr.rows;
-  init_options.image_width = bgr.cols;
-  init_options.device_id = 0;
+  init_options.image_width  = bgr.cols;
+  init_options.device_id    = 0;
 
   // test fill without undistortion
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
-    EXPECT_TRUE(
-        data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
-    EXPECT_TRUE(
-        data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
-    EXPECT_FALSE(
-        data_provider.FillImageData(gray.rows, gray.cols, gray.data, "none"));
+    EXPECT_TRUE(data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
+    EXPECT_TRUE(data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
+    EXPECT_TRUE(data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
+    EXPECT_FALSE(data_provider.FillImageData(gray.rows, gray.cols, gray.data, "none"));
   }
 
   // test fill with undistortion
   init_options.do_undistortion = true;
-  init_options.sensor_name = "onsemi_obstacle";
+  init_options.sensor_name     = "onsemi_obstacle";
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
-    EXPECT_TRUE(
-        data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
-    EXPECT_TRUE(
-        data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
-    EXPECT_FALSE(
-        data_provider.FillImageData(gray.rows, gray.cols, gray.data, "none"));
+    EXPECT_TRUE(data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
+    EXPECT_TRUE(data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
+    EXPECT_TRUE(data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
+    EXPECT_FALSE(data_provider.FillImageData(gray.rows, gray.cols, gray.data, "none"));
   }
 }
 
 TEST(DataProvider, test_convert_color) {
   unsetenv("MODULE_PATH");
   unsetenv("CYBER_PATH");
-  FLAGS_obs_sensor_meta_path =
-      "/apollo/modules/perception/testdata/"
-      "camera/common/conf/sensor_meta.config";
-  FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/"
-      "camera/common/params";
+  FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
+                               "camera/common/conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+                                    "camera/common/params";
 
   cv::Mat gray;
   cv::Mat rgb;
-  cv::Mat bgr = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/common/img/test.jpg");
+  cv::Mat bgr = cv::imread("/apollo/modules/perception/testdata/"
+                           "camera/common/img/test.jpg");
   cv::cvtColor(bgr, rgb, CV_BGR2RGB);
   cv::cvtColor(bgr, gray, cv::BGR2GRAY);
 
   DataProvider::InitOptions init_options;
   init_options.image_height = bgr.rows;
-  init_options.image_width = bgr.cols;
-  init_options.device_id = 0;
+  init_options.image_width  = bgr.cols;
+  init_options.device_id    = 0;
 
   base::Image8U image;
 
@@ -201,24 +185,21 @@ TEST(DataProvider, test_convert_color) {
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
+    EXPECT_TRUE(data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
     EXPECT_TRUE(data_provider.to_bgr_image());
   }
   // fill bgr & to_rgb
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
+    EXPECT_TRUE(data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
     EXPECT_TRUE(data_provider.to_rgb_image());
   }
   // fill bgr & to_gray
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
+    EXPECT_TRUE(data_provider.FillImageData(bgr.rows, bgr.cols, bgr.data, "bgr8"));
     EXPECT_TRUE(data_provider.to_gray_image());
   }
 
@@ -226,24 +207,21 @@ TEST(DataProvider, test_convert_color) {
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
+    EXPECT_TRUE(data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
     EXPECT_TRUE(data_provider.to_bgr_image());
   }
   // fill rgb & to_rgb
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
+    EXPECT_TRUE(data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
     EXPECT_TRUE(data_provider.to_rgb_image());
   }
   // fill rgb & to_gray
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
+    EXPECT_TRUE(data_provider.FillImageData(rgb.rows, rgb.cols, rgb.data, "rgb8"));
     EXPECT_TRUE(data_provider.to_gray_image());
   }
 
@@ -251,24 +229,21 @@ TEST(DataProvider, test_convert_color) {
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
+    EXPECT_TRUE(data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
     EXPECT_TRUE(data_provider.to_bgr_image());
   }
   // fill gray & to_rgb
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
+    EXPECT_TRUE(data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
     EXPECT_TRUE(data_provider.to_rgb_image());
   }
   // fill gray & to_gray
   {
     DataProvider data_provider;
     EXPECT_TRUE(data_provider.Init(init_options));
-    EXPECT_TRUE(
-        data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
+    EXPECT_TRUE(data_provider.FillImageData(gray.rows, gray.cols, gray.data, "gray"));
     EXPECT_TRUE(data_provider.to_gray_image());
   }
 }
@@ -276,32 +251,28 @@ TEST(DataProvider, test_convert_color) {
 TEST(DataProvider, test_undistortion) {
   unsetenv("MODULE_PATH");
   unsetenv("CYBER_PATH");
-  FLAGS_obs_sensor_meta_path =
-      "/apollo/modules/perception/testdata/"
-      "camera/common/conf/sensor_meta.config";
-  FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/"
-      "camera/common/params";
+  FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
+                               "camera/common/conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+                                    "camera/common/params";
 
-  cv::Mat img = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/common/img/test.jpg");
+  cv::Mat img = cv::imread("/apollo/modules/perception/testdata/"
+                           "camera/common/img/test.jpg");
 
-  DataProvider data_provider;
+  DataProvider              data_provider;
   DataProvider::InitOptions init_options;
-  init_options.image_height = img.rows;
-  init_options.image_width = img.cols;
+  init_options.image_height    = img.rows;
+  init_options.image_width     = img.cols;
   init_options.do_undistortion = true;
-  init_options.sensor_name = "none_onsemi_obstacle";
-  init_options.device_id = 0;
+  init_options.sensor_name     = "none_onsemi_obstacle";
+  init_options.device_id       = 0;
   EXPECT_FALSE(data_provider.Init(init_options));
   init_options.sensor_name = "onsemi_obstacle";
   EXPECT_TRUE(data_provider.Init(init_options));
 
-  EXPECT_TRUE(
-      data_provider.FillImageData(img.rows, img.cols, img.data, "bgr8"));
+  EXPECT_TRUE(data_provider.FillImageData(img.rows, img.cols, img.data, "bgr8"));
 
-  base::Image8U image;
+  base::Image8U              image;
   DataProvider::ImageOptions image_options;
 
   image_options.target_color = base::Color::GRAY;
@@ -313,7 +284,7 @@ TEST(DataProvider, test_undistortion) {
   image_options.target_color = base::Color::RGB;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
 
-  image_options.do_crop = true;
+  image_options.do_crop  = true;
   image_options.crop_roi = base::RectI(100, 100, 512, 512);
 
   image_options.target_color = base::Color::GRAY;

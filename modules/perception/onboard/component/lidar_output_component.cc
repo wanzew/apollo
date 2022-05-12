@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/onboard/component/lidar_output_component.h"
+
 #include "modules/perception/onboard/msg_serializer/msg_serializer.h"
 
 namespace apollo {
@@ -21,13 +22,11 @@ namespace perception {
 namespace onboard {
 
 bool LidarOutputComponent::Init() {
-  writer_ =
-      node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
+  writer_ = node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
   return true;
 }
 
-bool LidarOutputComponent::Proc(
-    const std::shared_ptr<SensorFrameMessage>& message) {
+bool LidarOutputComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
   std::shared_ptr<PerceptionObstacles> out_message(new PerceptionObstacles);
 
   if (message->frame_ == nullptr) {
@@ -35,9 +34,9 @@ bool LidarOutputComponent::Proc(
     return false;
   }
 
-  if (!MsgSerializer::SerializeMsg(
-          message->timestamp_, message->lidar_timestamp_, message->seq_num_,
-          message->frame_->objects, message->error_code_, out_message.get())) {
+  if (!MsgSerializer::SerializeMsg(message->timestamp_, message->lidar_timestamp_,
+                                   message->seq_num_, message->frame_->objects,
+                                   message->error_code_, out_message.get())) {
     AERROR << "Failed to serialize PerceptionObstacles object.";
     return false;
   }

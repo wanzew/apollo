@@ -31,16 +31,14 @@
 
 using apollo::cyber::Clock;
 
-bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
-  if (count == 0) {
-    count = 10000;
-  }
-  float total = static_cast<float>(count);
+bool send(const std::string& remote_ip, uint16_t remote_port, uint32_t count) {
+  if (count == 0) { count = 10000; }
+  float total   = static_cast<float>(count);
   float hundred = 100.00;
   for (uint32_t i = 0; i < count; i++) {
-    double timestamp_ = Clock::NowInSeconds() + 2.0;
-    float coefficient = static_cast<float>(i);
-    auto pb_msg = std::make_shared<apollo::canbus::Chassis>();
+    double timestamp_  = Clock::NowInSeconds() + 2.0;
+    float  coefficient = static_cast<float>(i);
+    auto   pb_msg      = std::make_shared<apollo::canbus::Chassis>();
     pb_msg->mutable_header()->set_sequence_num(i);
     pb_msg->mutable_header()->set_timestamp_sec(timestamp_);
     pb_msg->set_engine_started(true);
@@ -65,15 +63,14 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
 
     struct sockaddr_in server_addr;
     server_addr.sin_addr.s_addr = inet_addr(remote_ip.c_str());
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(remote_port);
+    server_addr.sin_family      = AF_INET;
+    server_addr.sin_port        = htons(remote_port);
 
     ADEBUG << "connecting to server... ";
 
     int sock_fd = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
 
-    int res =
-        connect(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
+    int res = connect(sock_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
     if (res < 0) {
       ADEBUG << "connected server failed ";
       continue;
@@ -84,8 +81,8 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
     apollo::bridge::BridgeProtoSerializedBuf<apollo::canbus::Chassis> proto_buf;
     proto_buf.Serialize(pb_msg, "Chassis");
     for (size_t j = 0; j < proto_buf.GetSerializedBufCount(); j++) {
-      ssize_t nbytes = send(sock_fd, proto_buf.GetSerializedBuf(j),
-                            proto_buf.GetSerializedBufSize(j), 0);
+      ssize_t nbytes =
+          send(sock_fd, proto_buf.GetSerializedBuf(j), proto_buf.GetSerializedBufSize(j), 0);
       if (nbytes != static_cast<ssize_t>(proto_buf.GetSerializedBufSize(j))) {
         ADEBUG << "sent msg failed ";
         break;
@@ -100,7 +97,7 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
   return true;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   uint32_t count = 0;
   if (argc < 2) {
     count = 10000;

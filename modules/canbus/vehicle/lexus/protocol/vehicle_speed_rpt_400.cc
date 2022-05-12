@@ -30,24 +30,23 @@ using ::apollo::drivers::canbus::Byte;
 Vehiclespeedrpt400::Vehiclespeedrpt400() {}
 const int32_t Vehiclespeedrpt400::ID = 0x400;
 
-void Vehiclespeedrpt400::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
+void Vehiclespeedrpt400::Parse(const std::uint8_t* bytes,
+                               int32_t             length,
+                               ChassisDetail*      chassis) const {
   chassis->mutable_lexus()->mutable_vehicle_speed_rpt_400()->set_vehicle_speed(
       vehicle_speed(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_vehicle_speed_rpt_400()
-      ->set_vehicle_speed_valid(vehicle_speed_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_vehicle_speed_rpt_400()->set_vehicle_speed_valid(
+      vehicle_speed_valid(bytes, length));
 }
 
 // config detail: {'name': 'vehicle_speed', 'offset': 0.0, 'precision': 0.01,
 // 'len': 16, 'is_signed_var': True, 'physical_range': '[-327.68|327.67]',
 // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
-double Vehiclespeedrpt400::vehicle_speed(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 0);
+double Vehiclespeedrpt400::vehicle_speed(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -65,9 +64,8 @@ double Vehiclespeedrpt400::vehicle_speed(const std::uint8_t* bytes,
 // 'physical_range': '[0|1]', 'bit': 16, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
 Vehicle_speed_rpt_400::Vehicle_speed_validType
-Vehiclespeedrpt400::vehicle_speed_valid(const std::uint8_t* bytes,
-                                        int32_t length) const {
-  Byte t0(bytes + 2);
+Vehiclespeedrpt400::vehicle_speed_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 1);
 
   Vehicle_speed_rpt_400::Vehicle_speed_validType ret =

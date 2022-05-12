@@ -22,6 +22,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -36,8 +37,7 @@ class MockProtocolData : public ProtocolData<::apollo::canbus::ChassisDetail> {
   MockProtocolData() {}
 };
 
-class MockMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+class MockMessageManager : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   MockMessageManager() {
     AddRecvProtocolData<MockProtocolData, true>();
@@ -46,7 +46,7 @@ class MockMessageManager
 };
 
 TEST(MessageManagerTest, GetMutableProtocolDataById) {
-  uint8_t mock_data = 1;
+  uint8_t            mock_data = 1;
   MockMessageManager manager;
   manager.Parse(MockProtocolData::ID, &mock_data, 8);
   manager.ResetSendMessages();

@@ -40,13 +40,11 @@ using google::protobuf::util::JsonStringToMessage;
 using Json = WebSocketHandler::Json;
 
 HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
-    : hmi_worker_(new HMIWorker()),
-      monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
-      websocket_(websocket),
-      map_service_(map_service) {
-  if (websocket_) {
-    RegisterMessageHandlers();
-  }
+    : hmi_worker_(new HMIWorker())
+    , monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI)
+    , websocket_(websocket)
+    , map_service_(map_service) {
+  if (websocket_) { RegisterMessageHandlers(); }
 }
 
 void HMI::Start() { hmi_worker_->Start(); }
@@ -55,32 +53,28 @@ void HMI::Stop() { hmi_worker_->Stop(); }
 
 void HMI::RegisterMessageHandlers() {
   // Broadcast HMIStatus to clients when status changed.
-  hmi_worker_->RegisterStatusUpdateHandler(
-      [this](const bool status_changed, HMIStatus* status) {
-        if (!status_changed) {
-          // Status doesn't change, skip broadcasting.
-          return;
-        }
-        websocket_->BroadcastData(
-            JsonUtil::ProtoToTypedJson("HMIStatus", *status).dump());
-        if (status->current_map().empty()) {
-          monitor_log_buffer_.WARN("You haven't selected a map yet!");
-        }
-        if (status->current_vehicle().empty()) {
-          monitor_log_buffer_.WARN("You haven't selected a vehicle yet!");
-        }
-      });
+  hmi_worker_->RegisterStatusUpdateHandler([this](const bool status_changed, HMIStatus* status) {
+    if (!status_changed) {
+      // Status doesn't change, skip broadcasting.
+      return;
+    }
+    websocket_->BroadcastData(JsonUtil::ProtoToTypedJson("HMIStatus", *status).dump());
+    if (status->current_map().empty()) {
+      monitor_log_buffer_.WARN("You haven't selected a map yet!");
+    }
+    if (status->current_vehicle().empty()) {
+      monitor_log_buffer_.WARN("You haven't selected a vehicle yet!");
+    }
+  });
 
   // Send current status and vehicle param to newly joined client.
-  websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection* conn) {
-        SendStatus(conn);
-        SendVehicleParam(conn);
-      });
+  websocket_->RegisterConnectionReadyHandler([this](WebSocketHandler::Connection* conn) {
+    SendStatus(conn);
+    SendVehicleParam(conn);
+  });
 
   websocket_->RegisterMessageHandler(
-      "HMIAction",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
+      "HMIAction", [this](const Json& json, WebSocketHandler::Connection* conn) {
         // Run HMIWorker::Trigger(action) if json is {action: "<action>"}
         // Run HMIWorker::Trigger(action, value) if "value" field is provided.
         std::string action;
@@ -103,8 +97,7 @@ void HMI::RegisterMessageHandlers() {
         // Extra works for current Dreamview.
         if (hmi_action == HMIAction::CHANGE_MAP) {
           // Reload simulation map after changing map.
-          ACHECK(map_service_->ReloadMap(true))
-              << "Failed to load new simulation map: " << value;
+          ACHECK(map_service_->ReloadMap(true)) << "Failed to load new simulation map: " << value;
         } else if (hmi_action == HMIAction::CHANGE_VEHICLE) {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
@@ -114,25 +107,23 @@ void HMI::RegisterMessageHandlers() {
 
   // HMI client asks for adding new AudioEvent.
   websocket_->RegisterMessageHandler(
-      "SubmitAudioEvent",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
+      "SubmitAudioEvent", [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain event_time_ms, obstacle_id, audio_type,
         // moving_result, audio_direction and is_siren_on.
         uint64_t event_time_ms;
-        int obstacle_id;
-        int audio_type;
-        int moving_result;
-        int audio_direction;
-        bool is_siren_on;
+        int      obstacle_id;
+        int      audio_type;
+        int      moving_result;
+        int      audio_direction;
+        bool     is_siren_on;
         if (JsonUtil::GetNumber(json, "event_time_ms", &event_time_ms) &&
             JsonUtil::GetNumber(json, "obstacle_id", &obstacle_id) &&
             JsonUtil::GetNumber(json, "audio_type", &audio_type) &&
             JsonUtil::GetNumber(json, "moving_result", &moving_result) &&
             JsonUtil::GetNumber(json, "audio_direction", &audio_direction) &&
             JsonUtil::GetBoolean(json, "is_siren_on", &is_siren_on)) {
-          hmi_worker_->SubmitAudioEvent(event_time_ms, obstacle_id, audio_type,
-                                        moving_result, audio_direction,
-                                        is_siren_on);
+          hmi_worker_->SubmitAudioEvent(event_time_ms, obstacle_id, audio_type, moving_result,
+                                        audio_direction, is_siren_on);
           monitor_log_buffer_.INFO("Audio event added.");
         } else {
           AERROR << "Truncated SubmitAudioEvent request.";
@@ -142,19 +133,17 @@ void HMI::RegisterMessageHandlers() {
 
   // HMI client asks for adding new DriveEvent.
   websocket_->RegisterMessageHandler(
-      "SubmitDriveEvent",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
+      "SubmitDriveEvent", [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain event_time_ms and event_msg.
-        uint64_t event_time_ms;
-        std::string event_msg;
+        uint64_t                 event_time_ms;
+        std::string              event_msg;
         std::vector<std::string> event_types;
-        bool is_reportable;
+        bool                     is_reportable;
         if (JsonUtil::GetNumber(json, "event_time_ms", &event_time_ms) &&
             JsonUtil::GetString(json, "event_msg", &event_msg) &&
             JsonUtil::GetStringVector(json, "event_type", &event_types) &&
             JsonUtil::GetBoolean(json, "is_reportable", &is_reportable)) {
-          hmi_worker_->SubmitDriveEvent(event_time_ms, event_msg, event_types,
-                                        is_reportable);
+          hmi_worker_->SubmitDriveEvent(event_time_ms, event_msg, event_types, is_reportable);
           monitor_log_buffer_.INFO("Drive event added.");
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";
@@ -164,13 +153,10 @@ void HMI::RegisterMessageHandlers() {
 
   websocket_->RegisterMessageHandler(
       "HMIStatus",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
-        SendStatus(conn);
-      });
+      [this](const Json& json, WebSocketHandler::Connection* conn) { SendStatus(conn); });
 
   websocket_->RegisterMessageHandler(
-      "SensorCalibrationPreprocess",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
+      "SensorCalibrationPreprocess", [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain type and data.
         std::string current_mode = hmi_worker_->GetStatus().current_mode();
         std::string task_type;
@@ -190,37 +176,29 @@ void HMI::RegisterMessageHandlers() {
         }
         PreprocessTable preprocess_table;
         if (!JsonStringToMessage(json["data"].dump(), &preprocess_table).ok()) {
-          AERROR
-              << "Failed to get user configuration: invalid preprocess table."
-              << json.dump();
+          AERROR << "Failed to get user configuration: invalid preprocess table." << json.dump();
         }
 
         // Gernerate user-specified configuration and run the preprocess script
-        std::string output_file =
-            absl::StrCat("/apollo/modules/tools/sensor_calibration/config/",
-                         task_type, "_user.config");
+        std::string output_file = absl::StrCat("/apollo/modules/tools/sensor_calibration/config/",
+                                               task_type, "_user.config");
         if (!SetProtoToASCIIFile(preprocess_table, output_file)) {
           AERROR << "Failed to generate user configuration file";
         }
         hmi_worker_->SensorCalibrationPreprocess(task_type);
       });
 
-  websocket_->RegisterMessageHandler(
-      "VehicleCalibrationPreprocess",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
-        hmi_worker_->VehicleCalibrationPreprocess();
-      });
+  websocket_->RegisterMessageHandler("VehicleCalibrationPreprocess",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       hmi_worker_->VehicleCalibrationPreprocess();
+                                     });
 }
 
 void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {
-  if (websocket_ == nullptr) {
-    return;
-  }
+  if (websocket_ == nullptr) { return; }
 
-  const auto& vehicle_param =
-      apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
-  const std::string json_str =
-      JsonUtil::ProtoToTypedJson("VehicleParam", vehicle_param).dump();
+  const auto& vehicle_param  = apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
+  const std::string json_str = JsonUtil::ProtoToTypedJson("VehicleParam", vehicle_param).dump();
   if (conn != nullptr) {
     websocket_->SendData(conn, json_str);
   } else {
@@ -229,8 +207,7 @@ void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {
 }
 
 void HMI::SendStatus(WebSocketHandler::Connection* conn) {
-  const auto status_json =
-      JsonUtil::ProtoToTypedJson("HMIStatus", hmi_worker_->GetStatus());
+  const auto status_json = JsonUtil::ProtoToTypedJson("HMIStatus", hmi_worker_->GetStatus());
   websocket_->SendData(conn, status_json.dump());
 }
 

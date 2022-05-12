@@ -25,11 +25,11 @@ TEST(SlicePluginsTest, test) {
   slice_param.add_slice_point(3);
   nvinfer1::Dims in_dims;
   in_dims.nbDims = 5;
-  in_dims.d[0] = 8;
-  in_dims.d[1] = 10;
-  in_dims.d[2] = 20;
-  in_dims.d[3] = 30;
-  in_dims.d[4] = 40;
+  in_dims.d[0]   = 8;
+  in_dims.d[1]   = 10;
+  in_dims.d[2]   = 20;
+  in_dims.d[3]   = 30;
+  in_dims.d[4]   = 40;
 
   apollo::perception::inference::SLICEPlugin slice_plugin(slice_param, in_dims);
   auto out_dims = slice_plugin.getOutputDimensions(0, &in_dims, 5);
@@ -49,8 +49,7 @@ TEST(SlicePluginsTest, test) {
 
   slice_param.set_axis(2);
   slice_param.add_slice_point(5);
-  apollo::perception::inference::SLICEPlugin slice_plugin2(slice_param,
-                                                           in_dims);
+  apollo::perception::inference::SLICEPlugin slice_plugin2(slice_param, in_dims);
   out_dims = slice_plugin2.getOutputDimensions(0, &in_dims, 5);
   EXPECT_EQ(out_dims.d[0], 8);
   EXPECT_EQ(out_dims.d[1], 3);

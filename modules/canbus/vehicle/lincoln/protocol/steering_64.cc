@@ -33,7 +33,7 @@ uint32_t Steering64::GetPeriod() const {
   return PERIOD;
 }
 
-void Steering64::UpdateData(uint8_t *data) {
+void Steering64::UpdateData(uint8_t* data) {
   set_steering_angle_p(data, steering_angle_);
   set_enable_p(data, steering_enable_);
   set_clear_driver_override_flag_p(data, clear_driver_override_flag_);
@@ -44,31 +44,31 @@ void Steering64::UpdateData(uint8_t *data) {
 }
 
 void Steering64::Reset() {
-  steering_angle_ = 0.0;
-  steering_enable_ = false;
+  steering_angle_             = 0.0;
+  steering_enable_            = false;
   clear_driver_override_flag_ = false;
-  ignore_driver_override_ = false;
-  steering_angle_speed_ = 0.0;
-  watchdog_counter_ = 0;
-  disable_audible_warning_ = false;
+  ignore_driver_override_     = false;
+  steering_angle_speed_       = 0.0;
+  watchdog_counter_           = 0;
+  disable_audible_warning_    = false;
 }
 
-Steering64 *Steering64::set_steering_angle(double angle) {
+Steering64* Steering64::set_steering_angle(double angle) {
   steering_angle_ = angle;
   return this;
 }
 
-Steering64 *Steering64::set_enable() {
+Steering64* Steering64::set_enable() {
   steering_enable_ = true;
   return this;
 }
 
-Steering64 *Steering64::set_disable() {
+Steering64* Steering64::set_disable() {
   steering_enable_ = false;
   return this;
 }
 
-Steering64 *Steering64::set_steering_angle_speed(double angle_speed) {
+Steering64* Steering64::set_steering_angle_speed(double angle_speed) {
   steering_angle_speed_ = angle_speed;
   return this;
 }
@@ -76,17 +76,15 @@ Steering64 *Steering64::set_steering_angle_speed(double angle_speed) {
 // private
 
 // positive for left, negative for right
-void Steering64::set_steering_angle_p(uint8_t *data, double angle) {
-  angle = ProtocolData::BoundedValue(-470.0, 470.0, angle);
+void Steering64::set_steering_angle_p(uint8_t* data, double angle) {
+  angle     = ProtocolData::BoundedValue(-470.0, 470.0, angle);
   int32_t x = static_cast<int32_t>(angle / 0.100000);
 
   // add offset
-  if (x < 0) {
-    x += 0x10000;
-  }
+  if (x < 0) { x += 0x10000; }
 
   std::uint8_t t = 0;
-  t = static_cast<uint8_t>(x & 0xFF);  // low
+  t              = static_cast<uint8_t>(x & 0xFF);  // low
   Byte frame_low(data + 0);
   frame_low.set_value(t, 0, 8);
 
@@ -96,7 +94,7 @@ void Steering64::set_steering_angle_p(uint8_t *data, double angle) {
   frame_high.set_value(t, 0, 8);
 }
 
-void Steering64::set_enable_p(uint8_t *bytes, bool enable) {
+void Steering64::set_enable_p(uint8_t* bytes, bool enable) {
   Byte frame(bytes + 2);
   if (enable) {
     frame.set_bit_1(0);
@@ -105,7 +103,7 @@ void Steering64::set_enable_p(uint8_t *bytes, bool enable) {
   }
 }
 
-void Steering64::set_clear_driver_override_flag_p(uint8_t *bytes, bool clear) {
+void Steering64::set_clear_driver_override_flag_p(uint8_t* bytes, bool clear) {
   Byte frame(bytes + 2);
   if (clear) {
     frame.set_bit_1(1);
@@ -114,7 +112,7 @@ void Steering64::set_clear_driver_override_flag_p(uint8_t *bytes, bool clear) {
   }
 }
 
-void Steering64::set_ignore_driver_override_p(uint8_t *bytes, bool ignore) {
+void Steering64::set_ignore_driver_override_p(uint8_t* bytes, bool ignore) {
   Byte frame(bytes + 2);
   if (ignore) {
     frame.set_bit_1(2);
@@ -123,21 +121,21 @@ void Steering64::set_ignore_driver_override_p(uint8_t *bytes, bool ignore) {
   }
 }
 
-void Steering64::set_steering_angle_speed_p(uint8_t *data, double angle_speed) {
+void Steering64::set_steering_angle_speed_p(uint8_t* data, double angle_speed) {
   angle_speed = ProtocolData::BoundedValue(0.0, 500.0, angle_speed);
-  int32_t x = static_cast<int32_t>(angle_speed / 2.000000);
+  int32_t x   = static_cast<int32_t>(angle_speed / 2.000000);
 
   Byte frame(data + 3);
   frame.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
-void Steering64::set_watchdog_counter_p(uint8_t *data, int32_t count) {
+void Steering64::set_watchdog_counter_p(uint8_t* data, int32_t count) {
   count = ProtocolData::BoundedValue(0, 255, count);
   Byte frame(data + 7);
   frame.set_value(static_cast<uint8_t>(count), 0, 8);
 }
 
-void Steering64::set_disable_audible_warning_p(uint8_t *data, bool disable) {
+void Steering64::set_disable_audible_warning_p(uint8_t* data, bool disable) {
   Byte frame(data + 2);
   if (disable) {
     frame.set_bit_1(4);

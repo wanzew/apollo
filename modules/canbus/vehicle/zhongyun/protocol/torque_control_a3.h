@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class Torquecontrola3 : public ::apollo::drivers::canbus::ProtocolData<
-                            ::apollo::canbus::ChassisDetail> {
+class Torquecontrola3
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -46,8 +47,8 @@ class Torquecontrola3 : public ::apollo::drivers::canbus::ProtocolData<
   // 'DRIVEN_ENABLE_CONTROL_DRIVE_AUTO'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Torquecontrola3* set_driven_enable_control(
-      Torque_control_a3::Driven_enable_controlType driven_enable_control);
+  Torquecontrola3*
+  set_driven_enable_control(Torque_control_a3::Driven_enable_controlType driven_enable_control);
 
  private:
   // config detail: {'name': 'driven_torque', 'offset': 0.0, 'precision': 0.05,
@@ -60,12 +61,12 @@ class Torquecontrola3 : public ::apollo::drivers::canbus::ProtocolData<
   // 'DRIVEN_ENABLE_CONTROL_DRIVE_AUTO'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  void set_p_driven_enable_control(
-      uint8_t* data,
-      Torque_control_a3::Driven_enable_controlType driven_enable_control);
+  void
+  set_p_driven_enable_control(uint8_t*                                     data,
+                              Torque_control_a3::Driven_enable_controlType driven_enable_control);
 
  private:
-  double driven_torque_;
+  double                                       driven_torque_;
   Torque_control_a3::Driven_enable_controlType driven_enable_control_;
 };
 

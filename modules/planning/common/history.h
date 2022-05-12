@@ -25,8 +25,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "cyber/common/macros.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "cyber/common/macros.h"
 
 namespace apollo {
 namespace planning {
@@ -36,14 +37,13 @@ class HistoryObjectDecision {
   HistoryObjectDecision() = default;
 
   void Init(const ObjectDecision& object_decisions);
-  void Init(const std::string& id,
-            const std::vector<ObjectDecisionType>& object_decisions);
+  void Init(const std::string& id, const std::vector<ObjectDecisionType>& object_decisions);
 
-  const std::string& id() const { return id_; }
+  const std::string&                     id() const { return id_; }
   std::vector<const ObjectDecisionType*> GetObjectDecision() const;
 
  private:
-  std::string id_;
+  std::string                     id_;
   std::vector<ObjectDecisionType> object_decision_;
 };
 
@@ -58,14 +58,13 @@ class HistoryFrame {
   std::vector<const HistoryObjectDecision*> GetObjectDecisions() const;
   std::vector<const HistoryObjectDecision*> GetStopObjectDecisions() const;
 
-  const HistoryObjectDecision* GetObjectDecisionsById(
-      const std::string& id) const;
+  const HistoryObjectDecision* GetObjectDecisionsById(const std::string& id) const;
 
  private:
-  int seq_num_;
-  ADCTrajectory adc_trajactory_;
+  int                                                    seq_num_;
+  ADCTrajectory                                          adc_trajactory_;
   std::unordered_map<std::string, HistoryObjectDecision> object_decisions_map_;
-  std::vector<HistoryObjectDecision> object_decisions_;
+  std::vector<HistoryObjectDecision>                     object_decisions_;
 };
 
 class HistoryObjectStatus {
@@ -78,7 +77,7 @@ class HistoryObjectStatus {
   const ObjectStatus GetObjectStatus() const { return object_status_; }
 
  private:
-  std::string id_;
+  std::string  id_;
   ObjectStatus object_status_;
 };
 
@@ -86,11 +85,9 @@ class HistoryStatus {
  public:
   HistoryStatus() = default;
 
-  void SetObjectStatus(const std::string& id,
-                       const ObjectStatus& object_status);
+  void SetObjectStatus(const std::string& id, const ObjectStatus& object_status);
 
-  bool GetObjectStatus(const std::string& id,
-                       ObjectStatus* const object_status);
+  bool GetObjectStatus(const std::string& id, ObjectStatus* const object_status);
 
  private:
   std::unordered_map<std::string, ObjectStatus> object_id_to_status_;
@@ -100,14 +97,14 @@ class History {
  public:
   History() = default;
   const HistoryFrame* GetLastFrame() const;
-  int Add(const ADCTrajectory& adc_trajectory_pb);
-  void Clear();
-  size_t Size() const;
-  HistoryStatus* mutable_history_status() { return &history_status_; }
+  int                 Add(const ADCTrajectory& adc_trajectory_pb);
+  void                Clear();
+  size_t              Size() const;
+  HistoryStatus*      mutable_history_status() { return &history_status_; }
 
  private:
   std::list<HistoryFrame> history_frames_;
-  HistoryStatus history_status_;
+  HistoryStatus           history_status_;
 };
 
 }  // namespace planning

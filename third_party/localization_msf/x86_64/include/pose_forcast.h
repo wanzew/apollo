@@ -31,25 +31,24 @@ class PoseForcast {
   void SetMaxListNum(int n);
   void SetMaxAccelInput(double threshold);
   void SetMaxGyroInput(double threshold);
-  void SetWheelExtrinsic(double x, double y, double z,
-                         double qx, double qy, double qz, double qw);
+  void SetWheelExtrinsic(double x, double y, double z, double qx, double qy, double qz, double qw);
   void SetZoneId(int zone_id);
-  
+
   double GetLastestImuTime();
 
-  void PushInspvaData(const InsPva &data);
-  void PushImuData(const ImuData &data);
-  void PushWheelSpeedData(const WheelspeedData &data);
+  void PushInspvaData(const InsPva& data);
+  void PushImuData(const ImuData& data);
+  void PushWheelSpeedData(const WheelspeedData& data);
 
-  int GetBestForcastPose(double time, double init_time,
-                         const Pose &init_pose, Pose *forcast_pose);
+  int GetBestForcastPose(double time, double init_time, const Pose& init_pose, Pose* forcast_pose);
 
-  bool GetImuframeDeltaPose(const double& start_time, const double& end_time, TransformD& delta_pose);
+  bool
+  GetImuframeDeltaPose(const double& start_time, const double& end_time, TransformD& delta_pose);
 
  protected:
-  PoseForcastImpl *pose_forcast_impl_;
+  PoseForcastImpl* pose_forcast_impl_;
 };
 
-}
-}
-}
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

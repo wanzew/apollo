@@ -42,8 +42,7 @@ class RnnModel : public NetModel {
    * @param Inputs to the network
    * @param Output of the network will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) const override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) const override;
 
   /**
    * @brief Set the internal state of a network model

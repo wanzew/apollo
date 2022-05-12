@@ -17,19 +17,18 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ge3 {
 
-class Scueps311 : public ::apollo::drivers::canbus::ProtocolData<
-                      ::apollo::canbus::ChassisDetail> {
+class Scueps311 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Scueps311();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'EPS interrupt index', 'enum': {0:
@@ -37,15 +36,13 @@ class Scueps311 : public ::apollo::drivers::canbus::ProtocolData<
   // 'EPS_INTIDX_STEERINT'}, 'precision': 1.0, 'len': 3, 'name': 'EPS_IntIdx',
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 6,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Scu_eps_311::Eps_intidxType eps_intidx(const std::uint8_t* bytes,
-                                         const int32_t length) const;
+  Scu_eps_311::Eps_intidxType eps_intidx(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Steer angle speed', 'offset': 0.0,
   // 'precision': 4.0, 'len': 8, 'name': 'EPS_SteerAngleSpd', 'is_signed_var':
   // False, 'physical_range': '[0|1016]', 'bit': 15, 'type': 'double', 'order':
   // 'motorola', 'physical_unit': 'deg/s'}
-  double eps_steeranglespd(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double eps_steeranglespd(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Steer angle Left + right -', 'offset':
   // -780.0, 'precision': 0.1, 'len': 16, 'name': 'EPS_SteerAngle',
@@ -58,16 +55,14 @@ class Scueps311 : public ::apollo::drivers::canbus::ProtocolData<
   // 'name': 'EPS_FaultSt', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Scu_eps_311::Eps_faultstType eps_faultst(const std::uint8_t* bytes,
-                                           const int32_t length) const;
+  Scu_eps_311::Eps_faultstType eps_faultst(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'EPS drive mode', 'enum': {0:
   // 'EPS_DRVMODE_INVALID', 1: 'EPS_DRVMODE_MANUAL', 2: 'EPS_DRVMODE_INTERRUPT',
   // 3: 'EPS_DRVMODE_AUTO'}, 'precision': 1.0, 'len': 2, 'name': 'EPS_DrvMode',
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 1,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Scu_eps_311::Eps_drvmodeType eps_drvmode(const std::uint8_t* bytes,
-                                           const int32_t length) const;
+  Scu_eps_311::Eps_drvmodeType eps_drvmode(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ge3

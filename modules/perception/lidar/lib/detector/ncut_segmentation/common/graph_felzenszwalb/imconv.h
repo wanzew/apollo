@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #pragma once
 
 #include <limits>
+
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/image.h"
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/imutil.h"
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/misc.h"
@@ -39,26 +40,26 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 namespace apollo {
 namespace perception {
 namespace lidar {
-const double RED_WEIGHT = 0.299;
-const double GREEN_WEIGHT = 0.587;
-const double BLUE_WEIGHT = 0.114;
-Image<uchar> *image_rgb2gray(Image<rgb> *input) {
-  int width = input->width();
-  int height = input->height();
-  Image<uchar> *output = new Image<uchar>(width, height, false);
+const double  RED_WEIGHT   = 0.299;
+const double  GREEN_WEIGHT = 0.587;
+const double  BLUE_WEIGHT  = 0.114;
+Image<uchar>* image_rgb2gray(Image<rgb>* input) {
+  int           width  = input->width();
+  int           height = input->height();
+  Image<uchar>* output = new Image<uchar>(width, height, false);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      imRef(output, x, y) = (uchar)(imRef(input, x, y).r * RED_WEIGHT +
-                                    imRef(input, x, y).g * GREEN_WEIGHT +
-                                    imRef(input, x, y).b * BLUE_WEIGHT);
+      imRef(output, x, y) =
+          (uchar)(imRef(input, x, y).r * RED_WEIGHT + imRef(input, x, y).g * GREEN_WEIGHT +
+                  imRef(input, x, y).b * BLUE_WEIGHT);
     }
   }
   return output;
 }
-Image<rgb> *image_gray2rgb(Image<uchar> *input) {
-  int width = input->width();
-  int height = input->height();
-  Image<rgb> *output = new Image<rgb>(width, height, false);
+Image<rgb>* image_gray2rgb(Image<uchar>* input) {
+  int         width  = input->width();
+  int         height = input->height();
+  Image<rgb>* output = new Image<rgb>(width, height, false);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       imRef(output, x, y).r = imRef(input, x, y);
@@ -68,10 +69,10 @@ Image<rgb> *image_gray2rgb(Image<uchar> *input) {
   }
   return output;
 }
-Image<float> *image_uchar2float(Image<uchar> *input) {
-  int width = input->width();
-  int height = input->height();
-  Image<float> *output = new Image<float>(width, height, false);
+Image<float>* image_uchar2float(Image<uchar>* input) {
+  int           width  = input->width();
+  int           height = input->height();
+  Image<float>* output = new Image<float>(width, height, false);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       imRef(output, x, y) = imRef(input, x, y);
@@ -79,10 +80,10 @@ Image<float> *image_uchar2float(Image<uchar> *input) {
   }
   return output;
 }
-Image<float> *image_int2float(Image<int> *input) {
-  int width = input->width();
-  int height = input->height();
-  Image<float> *output = new Image<float>(width, height, false);
+Image<float>* image_int2float(Image<int>* input) {
+  int           width  = input->width();
+  int           height = input->height();
+  Image<float>* output = new Image<float>(width, height, false);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       imRef(output, x, y) = imRef(input, x, y);
@@ -90,32 +91,29 @@ Image<float> *image_int2float(Image<int> *input) {
   }
   return output;
 }
-Image<uchar> *image_float2uchar(Image<float> *input, float min, float max) {
-  int width = input->width();
-  int height = input->height();
-  Image<uchar> *output = new Image<uchar>(width, height, false);
-  if (max == min) {
-    return output;
-  }
+Image<uchar>* image_float2uchar(Image<float>* input, float min, float max) {
+  int           width  = input->width();
+  int           height = input->height();
+  Image<uchar>* output = new Image<uchar>(width, height, false);
+  if (max == min) { return output; }
   float scale = std::numeric_limits<unsigned char>::max() / (max - min);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      uchar val = (uchar)((imRef(input, x, y) - min) * scale);
-      imRef(output, x, y) = bound(
-          val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
+      uchar val           = (uchar)((imRef(input, x, y) - min) * scale);
+      imRef(output, x, y) = bound(val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
     }
   }
   return output;
 }
-Image<uchar> *image_float2uchar(Image<float> *input) {
+Image<uchar>* image_float2uchar(Image<float>* input) {
   float min, max;
   min_max(input, &min, &max);
   return image_float2uchar(input, min, max);
 }
-Image<uint32_t> *image_uchar2long(Image<uchar> *input) {
-  int width = input->width();
-  int height = input->height();
-  Image<uint32_t> *output = new Image<uint32_t>(width, height, false);
+Image<uint32_t>* image_uchar2long(Image<uchar>* input) {
+  int              width  = input->width();
+  int              height = input->height();
+  Image<uint32_t>* output = new Image<uint32_t>(width, height, false);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       imRef(output, x, y) = imRef(input, x, y);
@@ -123,50 +121,40 @@ Image<uint32_t> *image_uchar2long(Image<uchar> *input) {
   }
   return output;
 }
-Image<uchar> *image_long2uchar(Image<uint32_t> *input, uint32_t min,
-                               uint32_t max) {
-  int width = input->width();
-  int height = input->height();
-  Image<uchar> *output = new Image<uchar>(width, height, false);
-  if (max == min) {
-    return output;
-  }
-  float scale =
-      std::numeric_limits<unsigned char>::max() / static_cast<float>(max - min);
+Image<uchar>* image_long2uchar(Image<uint32_t>* input, uint32_t min, uint32_t max) {
+  int           width  = input->width();
+  int           height = input->height();
+  Image<uchar>* output = new Image<uchar>(width, height, false);
+  if (max == min) { return output; }
+  float scale = std::numeric_limits<unsigned char>::max() / static_cast<float>(max - min);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      uchar val = (uchar)((imRef(input, x, y) - min) * scale);
-      imRef(output, x, y) = bound(
-          val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
+      uchar val           = (uchar)((imRef(input, x, y) - min) * scale);
+      imRef(output, x, y) = bound(val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
     }
   }
   return output;
 }
-Image<uchar> *image_long2uchar(Image<uint32_t> *input) {
+Image<uchar>* image_long2uchar(Image<uint32_t>* input) {
   uint32_t min, max;
   min_max(input, &min, &max);
   return image_long2uchar(input, min, max);
 }
-Image<uchar> *image_short2uchar(Image<uint16_t> *input, uint16_t min,
-                                uint16_t max) {
-  int width = input->width();
-  int height = input->height();
-  Image<uchar> *output = new Image<uchar>(width, height, false);
-  if (max == min) {
-    return output;
-  }
-  float scale =
-      std::numeric_limits<unsigned char>::max() / static_cast<float>(max - min);
+Image<uchar>* image_short2uchar(Image<uint16_t>* input, uint16_t min, uint16_t max) {
+  int           width  = input->width();
+  int           height = input->height();
+  Image<uchar>* output = new Image<uchar>(width, height, false);
+  if (max == min) { return output; }
+  float scale = std::numeric_limits<unsigned char>::max() / static_cast<float>(max - min);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      uchar val = (uchar)((imRef(input, x, y) - min) * scale);
-      imRef(output, x, y) = bound(
-          val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
+      uchar val           = (uchar)((imRef(input, x, y) - min) * scale);
+      imRef(output, x, y) = bound(val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
     }
   }
   return output;
 }
-Image<uchar> *image_short2uchar(Image<uint16_t> *input) {
+Image<uchar>* image_short2uchar(Image<uint16_t>* input) {
   uint16_t min, max;
   min_max(input, &min, &max);
   return image_short2uchar(input, min, max);

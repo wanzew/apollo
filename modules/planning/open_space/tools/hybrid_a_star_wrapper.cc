@@ -27,8 +27,7 @@ namespace planning {
 class HybridAObstacleContainer {
  public:
   HybridAObstacleContainer() = default;
-  void AddVirtualObstacle(double* obstacle_x, double* obstacle_y,
-                          int vertice_num) {
+  void AddVirtualObstacle(double* obstacle_x, double* obstacle_y, int vertice_num) {
     std::vector<common::math::Vec2d> obstacle_vertices;
     for (int i = 0; i < vertice_num; i++) {
       common::math::Vec2d vertice(obstacle_x[i], obstacle_y[i]);
@@ -36,8 +35,7 @@ class HybridAObstacleContainer {
     }
     obstacles_list.emplace_back(obstacle_vertices);
   }
-  const std::vector<std::vector<common::math::Vec2d>>&
-  GetObstaclesVerticesVec() {
+  const std::vector<std::vector<common::math::Vec2d>>& GetObstaclesVerticesVec() {
     return obstacles_list;
   }
 
@@ -49,11 +47,11 @@ class HybridAResultContainer {
  public:
   HybridAResultContainer() = default;
   void LoadResult() {
-    x_ = std::move(result_.x);
-    y_ = std::move(result_.y);
-    phi_ = std::move(result_.phi);
-    v_ = std::move(result_.v);
-    a_ = std::move(result_.a);
+    x_     = std::move(result_.x);
+    y_     = std::move(result_.y);
+    phi_   = std::move(result_.phi);
+    v_     = std::move(result_.v);
+    a_     = std::move(result_.a);
     steer_ = std::move(result_.steer);
   }
   std::vector<double>* GetX() { return &x_; }
@@ -62,10 +60,10 @@ class HybridAResultContainer {
   std::vector<double>* GetV() { return &v_; }
   std::vector<double>* GetA() { return &a_; }
   std::vector<double>* GetSteer() { return &steer_; }
-  HybridAStartResult* PrepareResult() { return &result_; }
+  HybridAStartResult*  PrepareResult() { return &result_; }
 
  private:
-  HybridAStartResult result_;
+  HybridAStartResult  result_;
   std::vector<double> x_;
   std::vector<double> y_;
   std::vector<double> phi_;
@@ -78,45 +76,52 @@ extern "C" {
 HybridAStar* CreatePlannerPtr() {
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
 
-  ACHECK(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
-      << "Failed to load open space config file "
-      << FLAGS_planner_open_space_config_filename;
+  ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
+                                                 &planner_open_space_config_))
+      << "Failed to load open space config file " << FLAGS_planner_open_space_config_filename;
   return new HybridAStar(planner_open_space_config_);
 }
-HybridAObstacleContainer* CreateObstaclesPtr() {
-  return new HybridAObstacleContainer();
-}
-HybridAResultContainer* CreateResultPtr() {
-  return new HybridAResultContainer();
-}
-void AddVirtualObstacle(HybridAObstacleContainer* obstacles_ptr,
-                        double* obstacle_x, double* obstacle_y,
-                        int vertice_num) {
+HybridAObstacleContainer* CreateObstaclesPtr() { return new HybridAObstacleContainer(); }
+HybridAResultContainer*   CreateResultPtr() { return new HybridAResultContainer(); }
+void                      AddVirtualObstacle(HybridAObstacleContainer* obstacles_ptr,
+                                             double*                   obstacle_x,
+                                             double*                   obstacle_y,
+                                             int                       vertice_num) {
   obstacles_ptr->AddVirtualObstacle(obstacle_x, obstacle_y, vertice_num);
 }
-bool Plan(HybridAStar* planner_ptr, HybridAObstacleContainer* obstacles_ptr,
-          HybridAResultContainer* result_ptr, double sx, double sy, double sphi,
-          double ex, double ey, double ephi, double* XYbounds) {
+bool Plan(HybridAStar*              planner_ptr,
+          HybridAObstacleContainer* obstacles_ptr,
+          HybridAResultContainer*   result_ptr,
+          double                    sx,
+          double                    sy,
+          double                    sphi,
+          double                    ex,
+          double                    ey,
+          double                    ephi,
+          double*                   XYbounds) {
   std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
   return planner_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
-                           obstacles_ptr->GetObstaclesVerticesVec(),
-                           result_ptr->PrepareResult());
+                           obstacles_ptr->GetObstaclesVerticesVec(), result_ptr->PrepareResult());
 }
-void GetResult(HybridAResultContainer* result_ptr, double* x, double* y,
-               double* phi, double* v, double* a, double* steer,
-               size_t* output_size) {
+void GetResult(HybridAResultContainer* result_ptr,
+               double*                 x,
+               double*                 y,
+               double*                 phi,
+               double*                 v,
+               double*                 a,
+               double*                 steer,
+               size_t*                 output_size) {
   result_ptr->LoadResult();
   size_t size = result_ptr->GetX()->size();
   std::cout << "return size is " << size << std::endl;
   for (size_t i = 0; i < size; i++) {
-    x[i] = result_ptr->GetX()->at(i);
-    y[i] = result_ptr->GetY()->at(i);
+    x[i]   = result_ptr->GetX()->at(i);
+    y[i]   = result_ptr->GetY()->at(i);
     phi[i] = result_ptr->GetPhi()->at(i);
-    v[i] = result_ptr->GetV()->at(i);
+    v[i]   = result_ptr->GetV()->at(i);
   }
   for (size_t i = 0; i < size - 1; i++) {
-    a[i] = result_ptr->GetA()->at(i);
+    a[i]     = result_ptr->GetA()->at(i);
     steer[i] = result_ptr->GetSteer()->at(i);
   }
   *output_size = size;

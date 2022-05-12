@@ -21,7 +21,6 @@
 
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
-
 #include "modules/drivers/lidar/velodyne/compensator/compensator.h"
 
 namespace apollo {
@@ -40,10 +39,10 @@ class CompensatorComponent : public Component<PointCloud> {
   bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
 
  private:
-  std::unique_ptr<Compensator> compensator_ = nullptr;
-  int pool_size_ = 8;
-  int seq_ = 0;
-  std::shared_ptr<Writer<PointCloud>> writer_ = nullptr;
+  std::unique_ptr<Compensator>              compensator_      = nullptr;
+  int                                       pool_size_        = 8;
+  int                                       seq_              = 0;
+  std::shared_ptr<Writer<PointCloud>>       writer_           = nullptr;
   std::shared_ptr<CCObjectPool<PointCloud>> compensator_pool_ = nullptr;
 };
 

@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -36,17 +37,14 @@ class SpeedProfileGenerator {
  public:
   SpeedProfileGenerator() = delete;
 
-  static SpeedData GenerateFallbackSpeed(const EgoInfo* ego_info,
-                                         const double stop_distance = 0.0);
+  static SpeedData GenerateFallbackSpeed(const EgoInfo* ego_info, const double stop_distance = 0.0);
 
   static void FillEnoughSpeedPoints(SpeedData* const speed_data);
 
-  static SpeedData GenerateFixedDistanceCreepProfile(const double distance,
-                                                     const double max_speed);
+  static SpeedData GenerateFixedDistanceCreepProfile(const double distance, const double max_speed);
 
  private:
-  static SpeedData GenerateStopProfile(const double init_speed,
-                                       const double init_acc);
+  static SpeedData GenerateStopProfile(const double init_speed, const double init_acc);
 };
 
 }  // namespace planning

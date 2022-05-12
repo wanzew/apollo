@@ -33,18 +33,16 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::math::Vec2d;
 
-bool Smoother::IsCloseStop(const common::VehicleState& vehicle_state,
-                           const MainStop& main_stop) {
+bool Smoother::IsCloseStop(const common::VehicleState& vehicle_state, const MainStop& main_stop) {
   if (!main_stop.has_stop_point()) {
     ADEBUG << "not close for main stop:" << main_stop.DebugString();
     return false;
   }
   Vec2d current_car_pos(vehicle_state.x(), vehicle_state.y());
   Vec2d stop_pos(main_stop.stop_point().x(), main_stop.stop_point().y());
-  auto stop_distance = stop_pos.DistanceTo(current_car_pos);
+  auto  stop_distance = stop_pos.DistanceTo(current_car_pos);
   if (stop_distance > FLAGS_smoother_stop_distance) {
-    ADEBUG << "distance between ADC position and stop position:"
-           << stop_distance;
+    ADEBUG << "distance between ADC position and stop position:" << stop_distance;
     return false;
   }
   return true;
@@ -52,9 +50,9 @@ bool Smoother::IsCloseStop(const common::VehicleState& vehicle_state,
 
 // TODO(all): extend more smooth policies into different objects
 // when more use cases happens later.
-apollo::common::Status Smoother::Smooth(
-    const FrameHistory* frame_history, const Frame* current_frame,
-    ADCTrajectory* const current_trajectory_pb) {
+apollo::common::Status Smoother::Smooth(const FrameHistory*  frame_history,
+                                        const Frame*         current_frame,
+                                        ADCTrajectory* const current_trajectory_pb) {
   if (frame_history == nullptr) {
     const std::string msg = "frame history is null.";
     AERROR << msg;
@@ -77,7 +75,7 @@ apollo::common::Status Smoother::Smooth(
     return Status::OK();
   }
 
-  const auto& vehicle_state = current_frame->vehicle_state();
+  const auto&  vehicle_state      = current_frame->vehicle_state();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
@@ -100,17 +98,14 @@ apollo::common::Status Smoother::Smooth(
     AWARN << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  const auto& previous_planning =
-      previous_frame->current_frame_planned_trajectory();
-  auto header = current_trajectory_pb->header();
-  *current_trajectory_pb = previous_planning;
+  const auto& previous_planning = previous_frame->current_frame_planned_trajectory();
+  auto        header            = current_trajectory_pb->header();
+  *current_trajectory_pb        = previous_planning;
   current_trajectory_pb->mutable_header()->CopyFrom(header);
-  auto smoother_debug = current_trajectory_pb->mutable_debug()
-                            ->mutable_planning_data()
-                            ->mutable_smoother();
+  auto smoother_debug =
+      current_trajectory_pb->mutable_debug()->mutable_planning_data()->mutable_smoother();
   smoother_debug->set_is_smoothed(true);
-  smoother_debug->set_type(
-      planning_internal::SmootherDebug::SMOOTHER_CLOSE_STOP);
+  smoother_debug->set_type(planning_internal::SmootherDebug::SMOOTHER_CLOSE_STOP);
   return Status::OK();
 }
 

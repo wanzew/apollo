@@ -20,9 +20,10 @@
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 #include "modules/planning/scenarios/scenario_manager.h"
 
@@ -54,7 +55,7 @@ class Planner {
    */
   virtual ~Planner() = default;
 
-  virtual std::string Name() = 0;
+  virtual std::string            Name()                             = 0;
   virtual apollo::common::Status Init(const PlanningConfig& config) = 0;
 
   /**
@@ -63,16 +64,16 @@ class Planner {
    * @param frame Current planning frame.
    * @return OK if planning succeeds; error otherwise.
    */
-  virtual apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ADCTrajectory* ptr_computed_trajectory) = 0;
+  virtual apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
+                                      Frame*                         frame,
+                                      ADCTrajectory*                 ptr_computed_trajectory) = 0;
 
   virtual void Stop() = 0;
 
  protected:
-  PlanningConfig config_;
+  PlanningConfig            config_;
   scenario::ScenarioManager scenario_manager_;
-  scenario::Scenario* scenario_ = nullptr;
+  scenario::Scenario*       scenario_ = nullptr;
 };
 
 class PlannerWithReferenceLine : public Planner {
@@ -82,8 +83,7 @@ class PlannerWithReferenceLine : public Planner {
    */
   PlannerWithReferenceLine() = delete;
 
-  explicit PlannerWithReferenceLine(
-      const std::shared_ptr<DependencyInjector>& injector)
+  explicit PlannerWithReferenceLine(const std::shared_ptr<DependencyInjector>& injector)
       : Planner(injector) {}
 
   /**
@@ -98,9 +98,10 @@ class PlannerWithReferenceLine : public Planner {
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  virtual apollo::common::Status PlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) {
+  virtual apollo::common::Status
+  PlanOnReferenceLine(const common::TrajectoryPoint& planning_init_point,
+                      Frame*                         frame,
+                      ReferenceLineInfo*             reference_line_info) {
     CHECK_NOTNULL(frame);
     return apollo::common::Status::OK();
   }

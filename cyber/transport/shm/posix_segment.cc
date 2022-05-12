@@ -30,16 +30,15 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-PosixSegment::PosixSegment(uint64_t channel_id) : Segment(channel_id) {
+PosixSegment::PosixSegment(uint64_t channel_id)
+    : Segment(channel_id) {
   shm_name_ = std::to_string(channel_id);
 }
 
 PosixSegment::~PosixSegment() { Destroy(); }
 
 bool PosixSegment::OpenOrCreate() {
-  if (init_) {
-    return true;
-  }
+  if (init_) { return true; }
 
   // create managed_shm_
   int fd = shm_open(shm_name_.c_str(), O_RDWR | O_CREAT | O_EXCL, 0644);
@@ -60,8 +59,7 @@ bool PosixSegment::OpenOrCreate() {
   }
 
   // attach managed_shm_
-  managed_shm_ = mmap(nullptr, conf_.managed_shm_size(), PROT_READ | PROT_WRITE,
-                      MAP_SHARED, fd, 0);
+  managed_shm_ = mmap(nullptr, conf_.managed_shm_size(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
   if (managed_shm_ == MAP_FAILED) {
     AERROR << "attach shm failed:" << strerror(errno);
     close(fd);
@@ -84,8 +82,7 @@ bool PosixSegment::OpenOrCreate() {
   conf_.Update(state_->ceiling_msg_size());
 
   // create field blocks_
-  blocks_ = new (static_cast<char*>(managed_shm_) + sizeof(State))
-      Block[conf_.block_num()];
+  blocks_ = new (static_cast<char*>(managed_shm_) + sizeof(State)) Block[conf_.block_num()];
   if (blocks_ == nullptr) {
     AERROR << "create blocks failed.";
     state_->~State();
@@ -100,13 +97,10 @@ bool PosixSegment::OpenOrCreate() {
   uint32_t i = 0;
   for (; i < conf_.block_num(); ++i) {
     uint8_t* addr =
-        new (static_cast<char*>(managed_shm_) + sizeof(State) +
-             conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size())
-            uint8_t[conf_.block_buf_size()];
+        new (static_cast<char*>(managed_shm_) + sizeof(State) + conf_.block_num() * sizeof(Block) +
+             i * conf_.block_buf_size()) uint8_t[conf_.block_buf_size()];
 
-    if (addr == nullptr) {
-      break;
-    }
+    if (addr == nullptr) { break; }
 
     std::lock_guard<std::mutex> lg(block_buf_lock_);
     block_buf_addrs_[i] = addr;
@@ -115,7 +109,7 @@ bool PosixSegment::OpenOrCreate() {
   if (i != conf_.block_num()) {
     AERROR << "create block buf failed.";
     state_->~State();
-    state_ = nullptr;
+    state_  = nullptr;
     blocks_ = nullptr;
     {
       std::lock_guard<std::mutex> lg(block_buf_lock_);
@@ -133,9 +127,7 @@ bool PosixSegment::OpenOrCreate() {
 }
 
 bool PosixSegment::OpenOnly() {
-  if (init_) {
-    return true;
-  }
+  if (init_) { return true; }
 
   // get managed_shm_
   int fd = shm_open(shm_name_.c_str(), O_RDWR, 0644);
@@ -152,8 +144,7 @@ bool PosixSegment::OpenOnly() {
   }
 
   // attach managed_shm_
-  managed_shm_ = mmap(nullptr, file_attr.st_size, PROT_READ | PROT_WRITE,
-                      MAP_SHARED, fd, 0);
+  managed_shm_ = mmap(nullptr, file_attr.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
   if (managed_shm_ == MAP_FAILED) {
     AERROR << "attach shm failed: " << strerror(errno);
     close(fd);
@@ -173,8 +164,7 @@ bool PosixSegment::OpenOnly() {
   conf_.Update(state_->ceiling_msg_size());
 
   // get field blocks_
-  blocks_ = reinterpret_cast<Block*>(static_cast<char*>(managed_shm_) +
-                                     sizeof(State));
+  blocks_ = reinterpret_cast<Block*>(static_cast<char*>(managed_shm_) + sizeof(State));
   if (blocks_ == nullptr) {
     AERROR << "get blocks failed.";
     state_ = nullptr;
@@ -186,9 +176,9 @@ bool PosixSegment::OpenOnly() {
   // get block buf
   uint32_t i = 0;
   for (; i < conf_.block_num(); ++i) {
-    uint8_t* addr = reinterpret_cast<uint8_t*>(
-        static_cast<char*>(managed_shm_) + sizeof(State) +
-        conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size());
+    uint8_t* addr =
+        reinterpret_cast<uint8_t*>(static_cast<char*>(managed_shm_) + sizeof(State) +
+                                   conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size());
 
     std::lock_guard<std::mutex> lg(block_buf_lock_);
     block_buf_addrs_[i] = addr;
@@ -197,7 +187,7 @@ bool PosixSegment::OpenOnly() {
   if (i != conf_.block_num()) {
     AERROR << "open only failed.";
     state_->~State();
-    state_ = nullptr;
+    state_  = nullptr;
     blocks_ = nullptr;
     {
       std::lock_guard<std::mutex> lg(block_buf_lock_);
@@ -224,7 +214,7 @@ bool PosixSegment::Remove() {
 }
 
 void PosixSegment::Reset() {
-  state_ = nullptr;
+  state_  = nullptr;
   blocks_ = nullptr;
   {
     std::lock_guard<std::mutex> lg(block_buf_lock_);

@@ -27,11 +27,11 @@ namespace record {
 const uint64_t Player::kSleepIntervalMiliSec = 100;
 
 Player::Player(const PlayParam& play_param)
-    : is_initialized_(false),
-      is_stopped_(true),
-      consumer_(nullptr),
-      producer_(nullptr),
-      task_buffer_(nullptr) {
+    : is_initialized_(false)
+    , is_stopped_(true)
+    , consumer_(nullptr)
+    , producer_(nullptr)
+    , task_buffer_(nullptr) {
   task_buffer_ = std::make_shared<PlayTaskBuffer>();
   consumer_.reset(new PlayTaskConsumer(task_buffer_, play_param.play_rate));
   producer_.reset(new PlayTaskProducer(task_buffer_, play_param));
@@ -45,36 +45,26 @@ bool Player::Init() {
     return false;
   }
 
-  if (producer_->Init()) {
-    return true;
-  }
+  if (producer_->Init()) { return true; }
 
   is_initialized_.store(false);
   return false;
 }
 
 static char Getch() {
-  char buf = 0;
+  char           buf = 0;
   struct termios old = {0};
   fflush(stdout);
-  if (tcgetattr(0, &old) < 0) {
-    perror("tcsetattr()");
-  }
+  if (tcgetattr(0, &old) < 0) { perror("tcsetattr()"); }
   old.c_lflag &= ~ICANON;
   old.c_lflag &= ~ECHO;
-  old.c_cc[VMIN] = 0;
+  old.c_cc[VMIN]  = 0;
   old.c_cc[VTIME] = 1;
-  if (tcsetattr(0, TCSANOW, &old) < 0) {
-    perror("tcsetattr ICANON");
-  }
-  if (read(0, &buf, 1) < 0) {
-    perror("read()");
-  }
+  if (tcsetattr(0, TCSANOW, &old) < 0) { perror("tcsetattr ICANON"); }
+  if (read(0, &buf, 1) < 0) { perror("read()"); }
   old.c_lflag |= ICANON;
   old.c_lflag |= ECHO;
-  if (tcsetattr(0, TCSADRAIN, &old) < 0) {
-    perror("tcsetattr ~ICANON");
-  }
+  if (tcsetattr(0, TCSADRAIN, &old) < 0) { perror("tcsetattr ~ICANON"); }
   return buf;
 }
 
@@ -82,14 +72,9 @@ void Player::ThreadFunc_Term() {
   while (!is_stopped_.load()) {
     char ch = Getch();
     switch (ch) {
-      case 's':
-        is_playonce_ = true;
-        break;
-      case ' ':
-        is_paused_ = !is_paused_;
-        break;
-      default:
-        break;
+      case 's': is_playonce_ = true; break;
+      case ' ': is_paused_ = !is_paused_; break;
+      default: break;
     }
   }
 }
@@ -106,8 +91,7 @@ bool Player::Start() {
   }
 
   auto& play_param = producer_->play_param();
-  std::cout << "\nPlease wait " << play_param.preload_time_s
-            << " second(s) for loading...\n"
+  std::cout << "\nPlease wait " << play_param.preload_time_s << " second(s) for loading...\n"
             << "Hit Ctrl+C to stop, Space to pause, or 's' to step.\n"
             << std::endl;
   producer_->Start();
@@ -129,8 +113,7 @@ bool Player::Start() {
   std::ios::fmtflags before(std::cout.flags());
   std::cout << std::fixed;
   const double total_progress_time_s =
-      static_cast<double>(play_param.end_time_ns - play_param.begin_time_ns) /
-          1e9 +
+      static_cast<double>(play_param.end_time_ns - play_param.begin_time_ns) / 1e9 +
       static_cast<double>(play_param.start_time_s);
 
   term_thread_.reset(new std::thread(&Player::ThreadFunc_Term, this));
@@ -150,28 +133,24 @@ bool Player::Start() {
     double last_played_msg_real_time_s =
         static_cast<double>(consumer_->last_played_msg_real_time_ns()) / 1e9;
 
-    double progress_time_s =
-        static_cast<double>(producer_->play_param().start_time_s);
+    double progress_time_s = static_cast<double>(producer_->play_param().start_time_s);
     if (consumer_->last_played_msg_real_time_ns() > 0) {
-      progress_time_s +=
-          static_cast<double>(consumer_->last_played_msg_real_time_ns() -
-                              consumer_->base_msg_play_time_ns() +
-                              consumer_->base_msg_real_time_ns() -
-                              producer_->play_param().begin_time_ns) /
-          1e9;
+      progress_time_s += static_cast<double>(consumer_->last_played_msg_real_time_ns() -
+                                             consumer_->base_msg_play_time_ns() +
+                                             consumer_->base_msg_real_time_ns() -
+                                             producer_->play_param().begin_time_ns) /
+                         1e9;
     }
 
     std::cout << std::setprecision(3) << last_played_msg_real_time_s
-              << "    Progress: " << progress_time_s << " / "
-              << total_progress_time_s;
+              << "    Progress: " << progress_time_s << " / " << total_progress_time_s;
     std::cout.flush();
 
     if (producer_->is_stopped() && task_buffer_->Empty()) {
       consumer_->Stop();
       break;
     }
-    std::this_thread::sleep_for(
-        std::chrono::milliseconds(kSleepIntervalMiliSec));
+    std::this_thread::sleep_for(std::chrono::milliseconds(kSleepIntervalMiliSec));
   }
 
   std::cout << "\nplay finished." << std::endl;
@@ -180,9 +159,7 @@ bool Player::Start() {
 }
 
 bool Player::Stop() {
-  if (is_stopped_.exchange(true)) {
-    return false;
-  }
+  if (is_stopped_.exchange(true)) { return false; }
   producer_->Stop();
   consumer_->Stop();
   if (term_thread_ != nullptr && term_thread_->joinable()) {

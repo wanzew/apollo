@@ -32,12 +32,10 @@ class Select {
 
   bool Init(int rows, int cols);
 
-  void SelectTrafficLights(
-      const std::vector<base::TrafficLightPtr> &refined_bboxes,
-      std::vector<base::TrafficLightPtr> *hdmap_bboxes);
+  void SelectTrafficLights(const std::vector<base::TrafficLightPtr>& refined_bboxes,
+                           std::vector<base::TrafficLightPtr>*       hdmap_bboxes);
 
-  double Calc2dGaussianScore(base::Point2DI p1, base::Point2DI p2, float sigma1,
-                             float sigma2);
+  double Calc2dGaussianScore(base::Point2DI p1, base::Point2DI p2, float sigma1, float sigma2);
 
  private:
   common::HungarianOptimizer<float> munkres_;

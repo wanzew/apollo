@@ -26,10 +26,12 @@
 
 #include "esd_can/include/ntcan.h"
 #include "gflags/gflags.h"
+
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 
 /**
  * @namespace apollo::drivers::canbus::can
@@ -51,7 +53,7 @@ class EsdCanClient : public CanClient {
    * @param parameter CAN card parameters to initialize the CAN client.
    * @return If the initialization is successful.
    */
-  bool Init(const CANCardParameter &parameter) override;
+  bool Init(const CANCardParameter& parameter) override;
 
   /**
    * @brief Destructor
@@ -77,8 +79,8 @@ class EsdCanClient : public CanClient {
    * @return The status of the sending action which is defined by
    *         apollo::common::ErrorCode.
    */
-  apollo::common::ErrorCode Send(const std::vector<CanFrame> &frames,
-                                 int32_t *const frame_num) override;
+  apollo::common::ErrorCode Send(const std::vector<CanFrame>& frames,
+                                 int32_t* const               frame_num) override;
 
   /**
    * @brief Receive messages
@@ -87,8 +89,8 @@ class EsdCanClient : public CanClient {
    * @return The status of the receiving action which is defined by
    *         apollo::common::ErrorCode.
    */
-  apollo::common::ErrorCode Receive(std::vector<CanFrame> *const frames,
-                                    int32_t *const frame_num) override;
+  apollo::common::ErrorCode Receive(std::vector<CanFrame>* const frames,
+                                    int32_t* const               frame_num) override;
 
   /**
    * @brief Get the error string.
@@ -97,10 +99,10 @@ class EsdCanClient : public CanClient {
   std::string GetErrorString(const int32_t status) override;
 
  private:
-  NTCAN_HANDLE dev_handler_;
+  NTCAN_HANDLE                   dev_handler_;
   CANCardParameter::CANChannelId port_;
-  CMSG send_frames_[MAX_CAN_SEND_FRAME_LEN];
-  CMSG recv_frames_[MAX_CAN_RECV_FRAME_LEN];
+  CMSG                           send_frames_[MAX_CAN_SEND_FRAME_LEN];
+  CMSG                           recv_frames_[MAX_CAN_RECV_FRAME_LEN];
 };
 
 }  // namespace can

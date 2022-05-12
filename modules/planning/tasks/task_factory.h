@@ -23,8 +23,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "modules/common/util/factory.h"
 #include "modules/planning/proto/planning_config.pb.h"
+
+#include "modules/common/util/factory.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -32,25 +33,22 @@ namespace planning {
 
 class TaskFactory {
  public:
-  static void Init(const PlanningConfig &config,
-                   const std::shared_ptr<DependencyInjector> &injector);
-  static std::unique_ptr<Task> CreateTask(
-      const TaskConfig &task_config,
-      const std::shared_ptr<DependencyInjector> &injector);
+  static void                  Init(const PlanningConfig&                      config,
+                                    const std::shared_ptr<DependencyInjector>& injector);
+  static std::unique_ptr<Task> CreateTask(const TaskConfig&                          task_config,
+                                          const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   static apollo::common::util::Factory<
-      TaskConfig::TaskType, Task,
-      Task *(*)(const TaskConfig &config,
-                const std::shared_ptr<DependencyInjector> &injector),
-      std::unordered_map<
-          TaskConfig::TaskType,
-          Task *(*)(const TaskConfig &config,
-                    const std::shared_ptr<DependencyInjector> &injector),
-          std::hash<int>>>
-      task_factory_;
-  static std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
-      default_task_configs_;
+      TaskConfig::TaskType,
+      Task,
+      Task* (*)(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector),
+      std::unordered_map<TaskConfig::TaskType,
+                         Task* (*)(const TaskConfig&                          config,
+                                   const std::shared_ptr<DependencyInjector>& injector),
+                         std::hash<int>>>
+                                                                              task_factory_;
+  static std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>> default_task_configs_;
 };
 
 }  // namespace planning

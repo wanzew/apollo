@@ -40,12 +40,12 @@ class SysMo {
   void Checker();
 
   std::atomic<bool> shut_down_{false};
-  bool start_ = false;
+  bool              start_ = false;
 
-  int sysmo_interval_ms_ = 100;
+  int                     sysmo_interval_ms_ = 100;
   std::condition_variable cv_;
-  std::mutex lk_;
-  std::thread sysmo_;
+  std::mutex              lk_;
+  std::thread             sysmo_;
 
   DECLARE_SINGLETON(SysMo);
 };

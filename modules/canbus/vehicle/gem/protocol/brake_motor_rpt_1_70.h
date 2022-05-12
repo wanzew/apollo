@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Brakemotorrpt170 : public ::apollo::drivers::canbus::ProtocolData<
-                             ::apollo::canbus::ChassisDetail> {
+class Brakemotorrpt170
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Brakemotorrpt170();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'MOTOR_CURRENT', 'offset': 0.0, 'precision': 0.001,

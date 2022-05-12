@@ -25,17 +25,13 @@
 namespace apollo {
 namespace planning {
 
-LatticeTrajectory1d::LatticeTrajectory1d(
-    std::shared_ptr<Curve1d> ptr_trajectory1d) {
+LatticeTrajectory1d::LatticeTrajectory1d(std::shared_ptr<Curve1d> ptr_trajectory1d) {
   ptr_trajectory1d_ = ptr_trajectory1d;
 }
 
-double LatticeTrajectory1d::Evaluate(const std::uint32_t order,
-                                     const double param) const {
+double LatticeTrajectory1d::Evaluate(const std::uint32_t order, const double param) const {
   double param_length = ptr_trajectory1d_->ParamLength();
-  if (param < param_length) {
-    return ptr_trajectory1d_->Evaluate(order, param);
-  }
+  if (param < param_length) { return ptr_trajectory1d_->Evaluate(order, param); }
 
   // do constant acceleration extrapolation;
   // to align all the trajectories with time.
@@ -46,32 +42,20 @@ double LatticeTrajectory1d::Evaluate(const std::uint32_t order,
   double t = param - param_length;
 
   switch (order) {
-    case 0:
-      return p + v * t + 0.5 * a * t * t;
-    case 1:
-      return v + a * t;
-    case 2:
-      return a;
-    default:
-      return 0.0;
+    case 0: return p + v * t + 0.5 * a * t * t;
+    case 1: return v + a * t;
+    case 2: return a;
+    default: return 0.0;
   }
 }
 
-double LatticeTrajectory1d::ParamLength() const {
-  return ptr_trajectory1d_->ParamLength();
-}
+double LatticeTrajectory1d::ParamLength() const { return ptr_trajectory1d_->ParamLength(); }
 
-std::string LatticeTrajectory1d::ToString() const {
-  return ptr_trajectory1d_->ToString();
-}
+std::string LatticeTrajectory1d::ToString() const { return ptr_trajectory1d_->ToString(); }
 
-bool LatticeTrajectory1d::has_target_position() const {
-  return has_target_position_;
-}
+bool LatticeTrajectory1d::has_target_position() const { return has_target_position_; }
 
-bool LatticeTrajectory1d::has_target_velocity() const {
-  return has_target_velocity_;
-}
+bool LatticeTrajectory1d::has_target_velocity() const { return has_target_velocity_; }
 
 bool LatticeTrajectory1d::has_target_time() const { return has_target_time_; }
 
@@ -91,17 +75,17 @@ double LatticeTrajectory1d::target_time() const {
 }
 
 void LatticeTrajectory1d::set_target_position(double target_position) {
-  target_position_ = target_position;
+  target_position_     = target_position;
   has_target_position_ = true;
 }
 
 void LatticeTrajectory1d::set_target_velocity(double target_velocity) {
-  target_velocity_ = target_velocity;
+  target_velocity_     = target_velocity;
   has_target_velocity_ = true;
 }
 
 void LatticeTrajectory1d::set_target_time(double target_time) {
-  target_time_ = target_time;
+  target_time_     = target_time;
   has_target_time_ = true;
 }
 

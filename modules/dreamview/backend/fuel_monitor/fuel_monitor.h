@@ -41,7 +41,8 @@ class FuelMonitor {
   /**
    * @brief Constructor of FuelMonitor.
    */
-  explicit FuelMonitor(const std::string& name) : class_name_(name) {}
+  explicit FuelMonitor(const std::string& name)
+      : class_name_(name) {}
   virtual ~FuelMonitor() = default;
 
   bool IsEnabled() const { return enabled_; }
@@ -77,7 +78,7 @@ class FuelMonitor {
 
  protected:
   // Whether the fuel monitor is enabled.
-  bool enabled_ = false;
+  bool        enabled_ = false;
   std::string class_name_;
 };
 

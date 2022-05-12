@@ -37,11 +37,9 @@ using apollo::prediction::SemanticMap;
 using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 
 bool IsTrainable(const Feature& feature) {
-  if (feature.id() == FLAGS_ego_vehicle_id) {
-    return false;
-  }
-  if (feature.priority().priority() == ObstaclePriority::IGNORE ||
-      feature.is_still() || feature.type() != PerceptionObstacle::VEHICLE) {
+  if (feature.id() == FLAGS_ego_vehicle_id) { return false; }
+  if (feature.priority().priority() == ObstaclePriority::IGNORE || feature.is_still() ||
+      feature.type() != PerceptionObstacle::VEHICLE) {
     return false;
   }
   return true;
@@ -61,9 +59,7 @@ void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
   std::vector<Obstacle*> dynamic_env;
   for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
-    if (obstacle == nullptr) {
-      continue;
-    }
+    if (obstacle == nullptr) { continue; }
     if (obstacle->IsStill()) {
       ADEBUG << "Ignore still obstacle [" << id << "] in evaluator_manager";
       continue;
@@ -72,8 +68,8 @@ void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
   }
 }
 
-void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
-                                        ObstaclesContainer* obstacles_container,
+void EvaluatorManager::EvaluateObstacle(Obstacle*              obstacle,
+                                        ObstaclesContainer*    obstacles_container,
                                         std::vector<Obstacle*> dynamic_env) {
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
@@ -81,52 +77,43 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       evaluator_->Evaluate(obstacle, obstacles_container);
       break;
     }
-    default:
-      break;
+    default: break;
   }
 }
 
-void EvaluatorManager::EvaluateObstacle(
-    Obstacle* obstacle, ObstaclesContainer* obstacles_container) {
+void EvaluatorManager::EvaluateObstacle(Obstacle*           obstacle,
+                                        ObstaclesContainer* obstacles_container) {
   std::vector<Obstacle*> dummy_dynamic_env;
   EvaluateObstacle(obstacle, obstacles_container, dummy_dynamic_env);
 }
 
-void EvaluatorManager::BuildObstacleIdHistoryMap(
-    ObstaclesContainer* obstacles_container) {
+void EvaluatorManager::BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container) {
   obstacle_id_history_map_.clear();
-  std::vector<int> obstacle_ids =
-      obstacles_container->curr_frame_movable_obstacle_ids();
+  std::vector<int> obstacle_ids = obstacles_container->curr_frame_movable_obstacle_ids();
   obstacle_ids.push_back(FLAGS_ego_vehicle_id);
   for (int id : obstacle_ids) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
-    if (obstacle == nullptr || obstacle->history_size() == 0) {
-      continue;
-    }
-    size_t num_frames =
-        std::min(static_cast<size_t>(10), obstacle->history_size());
+    if (obstacle == nullptr || obstacle->history_size() == 0) { continue; }
+    size_t num_frames = std::min(static_cast<size_t>(10), obstacle->history_size());
     for (size_t i = 0; i < num_frames; ++i) {
       const Feature& obstacle_feature = obstacle->feature(i);
-      Feature feature;
+      Feature        feature;
       feature.set_id(obstacle_feature.id());
       feature.set_timestamp(obstacle_feature.timestamp());
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
       if (obstacle_feature.id() != FLAGS_ego_vehicle_id) {
-        feature.mutable_polygon_point()->CopyFrom(
-            obstacle_feature.polygon_point());
+        feature.mutable_polygon_point()->CopyFrom(obstacle_feature.polygon_point());
         feature.set_length(obstacle_feature.length());
         feature.set_width(obstacle_feature.width());
       } else {
-        const auto& vehicle_config =
-            common::VehicleConfigHelper::Instance()->GetConfig();
+        const auto& vehicle_config = common::VehicleConfigHelper::Instance()->GetConfig();
         feature.set_length(vehicle_config.vehicle_param().length());
         feature.set_width(vehicle_config.vehicle_param().width());
       }
       obstacle_id_history_map_[id].add_feature()->CopyFrom(feature);
     }
-    obstacle_id_history_map_[id].set_is_trainable(
-        IsTrainable(obstacle->latest_feature()));
+    obstacle_id_history_map_[id].set_is_trainable(IsTrainable(obstacle->latest_feature()));
   }
 }
 

@@ -33,9 +33,9 @@ class adc_motioncontrol1_10Test : public ::testing ::Test {
 
 TEST_F(adc_motioncontrol1_10Test, part1) {
   Adcmotioncontrol110 motion_ctrl_110_;
-  uint8_t data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-  double x = 0.0;
-  int i = 0;
+  uint8_t             data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  double              x       = 0.0;
+  int                 i       = 0;
   motion_ctrl_110_.set_p_adc_cmd_steerwheelangle(data, x);
   motion_ctrl_110_.set_p_adc_cmd_gear(data, motion_ctrl_110_.adc_cmd_gear_);
   motion_ctrl_110_.set_p_adc_motioncontrol1_checksum(data, i);
@@ -53,11 +53,11 @@ TEST_F(adc_motioncontrol1_10Test, part1) {
 
 TEST_F(adc_motioncontrol1_10Test, part2) {
   Adcmotioncontrol110 motion_ctrl_110_;
-  uint8_t data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-  double x = 0.0;
-  bool flag = false;
-  motion_ctrl_110_.set_p_adc_cmd_steeringcontrolmode(
-      data, motion_ctrl_110_.adc_cmd_steeringcontrolmode_);
+  uint8_t             data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  double              x       = 0.0;
+  bool                flag    = false;
+  motion_ctrl_110_.set_p_adc_cmd_steeringcontrolmode(data,
+                                                     motion_ctrl_110_.adc_cmd_steeringcontrolmode_);
   motion_ctrl_110_.set_p_adc_cmd_parkingbrake(data, flag);
   motion_ctrl_110_.set_p_adc_cmd_throttleposition(data, x);
 
@@ -73,11 +73,10 @@ TEST_F(adc_motioncontrol1_10Test, part2) {
 
 TEST_F(adc_motioncontrol1_10Test, part3) {
   Adcmotioncontrol110 motion_ctrl_110_;
-  uint8_t data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-  int i = 0;
+  uint8_t             data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  int                 i       = 0;
   motion_ctrl_110_.set_p_adc_motioncontrol1_counter(data, i);
-  motion_ctrl_110_.set_p_adc_cmd_autonomyrequest(
-      data, motion_ctrl_110_.adc_cmd_autonomyrequest_);
+  motion_ctrl_110_.set_p_adc_cmd_autonomyrequest(data, motion_ctrl_110_.adc_cmd_autonomyrequest_);
 
   EXPECT_EQ(data[0], 0xFC);
   EXPECT_EQ(data[1], 0xFF);
@@ -91,7 +90,7 @@ TEST_F(adc_motioncontrol1_10Test, part3) {
 
 TEST_F(adc_motioncontrol1_10Test, part4) {
   Adcmotioncontrol110 motion_ctrl_110_;
-  uint8_t data = 0xFF;
+  uint8_t             data = 0xFF;
   motion_ctrl_110_.set_p_adc_cmd_longitudinalcontrolmode(
       &data, motion_ctrl_110_.adc_cmd_longitudinalcontrolmode_);
 

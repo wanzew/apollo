@@ -29,13 +29,13 @@
 #include "modules/prediction/evaluator/cyclist/cyclist_keep_lane_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/jointly_prediction_planning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/junction_map_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/lane_aggregating_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/semantic_lstm_evaluator.h"
-#include "modules/prediction/evaluator/vehicle/jointly_prediction_planning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/vectornet_evaluator.h"
 
 namespace apollo {
@@ -47,21 +47,18 @@ using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 namespace {
 
 bool IsTrainable(const Feature& feature) {
-  if (feature.id() == FLAGS_ego_vehicle_id) {
-    return false;
-  }
-  if (feature.priority().priority() == ObstaclePriority::IGNORE ||
-      feature.is_still() || feature.type() != PerceptionObstacle::VEHICLE) {
+  if (feature.id() == FLAGS_ego_vehicle_id) { return false; }
+  if (feature.priority().priority() == ObstaclePriority::IGNORE || feature.is_still() ||
+      feature.type() != PerceptionObstacle::VEHICLE) {
     return false;
   }
   return true;
 }
 
 void GroupObstaclesByObstacleIds(ObstaclesContainer* const obstacles_container,
-                                 IdObstacleListMap* const id_obstacle_map) {
+                                 IdObstacleListMap* const  id_obstacle_map) {
   int caution_thread_idx = 0;
-  for (int obstacle_id :
-       obstacles_container->curr_frame_considered_obstacle_ids()) {
+  for (int obstacle_id : obstacles_container->curr_frame_considered_obstacle_ids()) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle [" << obstacle_id << "] found";
@@ -78,14 +75,11 @@ void GroupObstaclesByObstacleIds(ObstaclesContainer* const obstacles_container,
     } else if (feature.priority().priority() == ObstaclePriority::CAUTION) {
       caution_thread_idx = caution_thread_idx % FLAGS_max_caution_thread_num;
       (*id_obstacle_map)[caution_thread_idx].push_back(obstacle_ptr);
-      ADEBUG << "Cautioned obstacle [" << obstacle_id << "] for thread"
-             << caution_thread_idx;
+      ADEBUG << "Cautioned obstacle [" << obstacle_id << "] for thread" << caution_thread_idx;
       ++caution_thread_idx;
     } else {
-      int normal_thread_num =
-          FLAGS_max_thread_num - FLAGS_max_caution_thread_num;
-      int id_mod =
-          obstacle_id % normal_thread_num + FLAGS_max_caution_thread_num;
+      int normal_thread_num = FLAGS_max_thread_num - FLAGS_max_caution_thread_num;
+      int id_mod            = obstacle_id % normal_thread_num + FLAGS_max_caution_thread_num;
       (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
       ADEBUG << "Normal obstacle [" << obstacle_id << "] for thread" << id_mod;
     }
@@ -137,16 +131,14 @@ void EvaluatorManager::Init(const PredictionConf& config) {
         case PerceptionObstacle::VEHICLE: {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
             if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
-              vehicle_on_lane_caution_evaluator_ =
-                  obstacle_conf.evaluator_type();
+              vehicle_on_lane_caution_evaluator_ = obstacle_conf.evaluator_type();
             } else {
               vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
             }
           }
           if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
             if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
-              vehicle_in_junction_caution_evaluator_ =
-                  obstacle_conf.evaluator_type();
+              vehicle_in_junction_caution_evaluator_ = obstacle_conf.evaluator_type();
             } else {
               vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
             }
@@ -160,8 +152,7 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           break;
         }
         case PerceptionObstacle::PEDESTRIAN: {
-          if (FLAGS_prediction_offline_mode ==
-                  PredictionConstants::kDumpDataForLearning ||
+          if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpDataForLearning ||
               obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
             pedestrian_evaluator_ = obstacle_conf.evaluator_type();
             break;
@@ -182,34 +173,25 @@ void EvaluatorManager::Init(const PredictionConf& config) {
     }
   }
 
-  AINFO << "Defined vehicle on lane obstacle evaluator ["
-        << vehicle_on_lane_evaluator_ << "]";
-  AINFO << "Defined cyclist on lane obstacle evaluator ["
-        << cyclist_on_lane_evaluator_ << "]";
-  AINFO << "Defined default on lane obstacle evaluator ["
-        << default_on_lane_evaluator_ << "]";
+  AINFO << "Defined vehicle on lane obstacle evaluator [" << vehicle_on_lane_evaluator_ << "]";
+  AINFO << "Defined cyclist on lane obstacle evaluator [" << cyclist_on_lane_evaluator_ << "]";
+  AINFO << "Defined default on lane obstacle evaluator [" << default_on_lane_evaluator_ << "]";
 }
 
-Evaluator* EvaluatorManager::GetEvaluator(
-    const ObstacleConf::EvaluatorType& type) {
+Evaluator* EvaluatorManager::GetEvaluator(const ObstacleConf::EvaluatorType& type) {
   auto it = evaluators_.find(type);
   return it != evaluators_.end() ? it->second.get() : nullptr;
 }
 
-void EvaluatorManager::Run(
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    ObstaclesContainer* obstacles_container) {
+void EvaluatorManager::Run(const ADCTrajectoryContainer* adc_trajectory_container,
+                           ObstaclesContainer*           obstacles_container) {
   if (FLAGS_enable_semantic_map ||
       FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
     size_t max_num_frame = 10;
-    if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
-      max_num_frame = 20;
-    }
+    if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) { max_num_frame = 20; }
     BuildObstacleIdHistoryMap(obstacles_container, max_num_frame);
     DumpCurrentFrameEnv(obstacles_container);
-    if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
-      return;
-    }
+    if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) { return; }
     semantic_map_->RunCurrFrame(obstacle_id_history_map_);
   }
 
@@ -218,37 +200,32 @@ void EvaluatorManager::Run(
   if (FLAGS_enable_multi_thread) {
     IdObstacleListMap id_obstacle_map;
     GroupObstaclesByObstacleIds(obstacles_container, &id_obstacle_map);
-    PredictionThreadPool::ForEach(
-        id_obstacle_map.begin(), id_obstacle_map.end(),
-        [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
-          for (auto obstacle_ptr : obstacles_iter.second) {
-            EvaluateObstacle(adc_trajectory_container, obstacle_ptr,
-                             obstacles_container, dynamic_env);
-          }
-        });
+    PredictionThreadPool::ForEach(id_obstacle_map.begin(), id_obstacle_map.end(),
+                                  [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
+                                    for (auto obstacle_ptr : obstacles_iter.second) {
+                                      EvaluateObstacle(adc_trajectory_container, obstacle_ptr,
+                                                       obstacles_container, dynamic_env);
+                                    }
+                                  });
   } else {
     for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
       Obstacle* obstacle = obstacles_container->GetObstacle(id);
 
-      if (obstacle == nullptr) {
-        continue;
-      }
+      if (obstacle == nullptr) { continue; }
       if (obstacle->IsStill()) {
         ADEBUG << "Ignore still obstacle [" << id << "] in evaluator_manager";
         continue;
       }
 
-      EvaluateObstacle(adc_trajectory_container, obstacle,
-                       obstacles_container, dynamic_env);
+      EvaluateObstacle(adc_trajectory_container, obstacle, obstacles_container, dynamic_env);
     }
   }
 }
 
-void EvaluatorManager::EvaluateObstacle(
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container,
-    std::vector<Obstacle*> dynamic_env) {
+void EvaluatorManager::EvaluateObstacle(const ADCTrajectoryContainer* adc_trajectory_container,
+                                        Obstacle*                     obstacle,
+                                        ObstaclesContainer*           obstacles_container,
+                                        std::vector<Obstacle*>        dynamic_env) {
   Evaluator* evaluator = nullptr;
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
@@ -266,27 +243,24 @@ void EvaluatorManager::EvaluateObstacle(
         CHECK_NOTNULL(evaluator);
         // Evaluate and break if success
         if (evaluator->GetName() == "JOINTLY_PREDICTION_PLANNING_EVALUATOR") {
-          if (evaluator->Evaluate(adc_trajectory_container,
-                                  obstacle, obstacles_container)) {
+          if (evaluator->Evaluate(adc_trajectory_container, obstacle, obstacles_container)) {
             break;
           } else {
-            AERROR << "Obstacle: " << obstacle->id()
-                  << " interaction evaluator failed,"
-                  << " downgrade to normal level!";
+            AERROR << "Obstacle: " << obstacle->id() << " interaction evaluator failed,"
+                   << " downgrade to normal level!";
           }
         } else {
           if (evaluator->Evaluate(obstacle, obstacles_container)) {
             break;
           } else {
             AERROR << "Obstacle: " << obstacle->id()
-                  << " caution evaluator failed, downgrade to normal level!";
+                   << " caution evaluator failed, downgrade to normal level!";
           }
         }
       }
 
       // if obstacle is not caution or caution_evaluator run failed
-      if (obstacle->HasJunctionFeatureWithExits() &&
-          !obstacle->IsCloseToJunctionExit()) {
+      if (obstacle->HasJunctionFeatureWithExits() && !obstacle->IsCloseToJunctionExit()) {
         evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
       } else if (obstacle->IsOnLane()) {
         evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
@@ -312,10 +286,8 @@ void EvaluatorManager::EvaluateObstacle(
       break;
     }
     case PerceptionObstacle::PEDESTRIAN: {
-      if (FLAGS_prediction_offline_mode ==
-              PredictionConstants::kDumpDataForLearning ||
-          obstacle->latest_feature().priority().priority() ==
-              ObstaclePriority::CAUTION) {
+      if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpDataForLearning ||
+          obstacle->latest_feature().priority().priority() == ObstaclePriority::CAUTION) {
         evaluator = GetEvaluator(pedestrian_evaluator_);
         CHECK_NOTNULL(evaluator);
         evaluator->Evaluate(obstacle, obstacles_container);
@@ -333,75 +305,64 @@ void EvaluatorManager::EvaluateObstacle(
   }
 }
 
-void EvaluatorManager::EvaluateObstacle(
-    Obstacle* obstacle, ObstaclesContainer* obstacles_container) {
-  std::vector<Obstacle*> dummy_dynamic_env;
+void EvaluatorManager::EvaluateObstacle(Obstacle*           obstacle,
+                                        ObstaclesContainer* obstacles_container) {
+  std::vector<Obstacle*>  dummy_dynamic_env;
   ADCTrajectoryContainer* adc_trajectory_container = nullptr;
-  EvaluateObstacle(adc_trajectory_container, obstacle,
-                   obstacles_container, dummy_dynamic_env);
+  EvaluateObstacle(adc_trajectory_container, obstacle, obstacles_container, dummy_dynamic_env);
 }
 
-void EvaluatorManager::BuildObstacleIdHistoryMap(
-    ObstaclesContainer* obstacles_container, size_t max_num_frame) {
+void EvaluatorManager::BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container,
+                                                 size_t              max_num_frame) {
   obstacle_id_history_map_.clear();
-  std::vector<int> obstacle_ids =
-      obstacles_container->curr_frame_movable_obstacle_ids();
+  std::vector<int> obstacle_ids = obstacles_container->curr_frame_movable_obstacle_ids();
   obstacle_ids.push_back(FLAGS_ego_vehicle_id);
   for (int id : obstacle_ids) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
-    if (obstacle == nullptr || obstacle->history_size() == 0) {
-      continue;
-    }
+    if (obstacle == nullptr || obstacle->history_size() == 0) { continue; }
     size_t num_frames = std::min(max_num_frame, obstacle->history_size());
     for (size_t i = 0; i < num_frames; ++i) {
       const Feature& obstacle_feature = obstacle->feature(i);
-      Feature feature;
+      Feature        feature;
       feature.set_id(obstacle_feature.id());
       feature.set_timestamp(obstacle_feature.timestamp());
       feature.set_type(obstacle_feature.type());
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
-      feature.mutable_interactive_tag()->CopyFrom(
-          obstacle_feature.interactive_tag());
+      feature.mutable_interactive_tag()->CopyFrom(obstacle_feature.interactive_tag());
       feature.mutable_priority()->CopyFrom(obstacle_feature.priority());
 
       if (obstacle_feature.id() != FLAGS_ego_vehicle_id) {
-        feature.mutable_polygon_point()->CopyFrom(
-            obstacle_feature.polygon_point());
+        feature.mutable_polygon_point()->CopyFrom(obstacle_feature.polygon_point());
         feature.set_length(obstacle_feature.length());
         feature.set_width(obstacle_feature.width());
       } else {
-        const auto& vehicle_config =
-            common::VehicleConfigHelper::Instance()->GetConfig();
+        const auto& vehicle_config = common::VehicleConfigHelper::Instance()->GetConfig();
         feature.set_length(vehicle_config.vehicle_param().length());
         feature.set_width(vehicle_config.vehicle_param().width());
       }
       obstacle_id_history_map_[id].add_feature()->CopyFrom(feature);
     }
-    obstacle_id_history_map_[id].set_is_trainable(
-        IsTrainable(obstacle->latest_feature()));
+    obstacle_id_history_map_[id].set_is_trainable(IsTrainable(obstacle->latest_feature()));
   }
 }
 
-void EvaluatorManager::DumpCurrentFrameEnv(
-    ObstaclesContainer* obstacles_container) {
+void EvaluatorManager::DumpCurrentFrameEnv(ObstaclesContainer* obstacles_container) {
   FrameEnv curr_frame_env;
   curr_frame_env.set_timestamp(obstacles_container->timestamp());
   for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
     int id = obstacle_id_history_pair.first;
     if (id != FLAGS_ego_vehicle_id) {
-      curr_frame_env.add_obstacles_history()->CopyFrom(
-          obstacle_id_history_pair.second);
+      curr_frame_env.add_obstacles_history()->CopyFrom(obstacle_id_history_pair.second);
     } else {
-      curr_frame_env.mutable_ego_history()->CopyFrom(
-          obstacle_id_history_pair.second);
+      curr_frame_env.mutable_ego_history()->CopyFrom(obstacle_id_history_pair.second);
     }
   }
   FeatureOutput::InsertFrameEnv(curr_frame_env);
 }
 
-std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
-    const ObstacleConf::EvaluatorType& type) {
+std::unique_ptr<Evaluator>
+EvaluatorManager::CreateEvaluator(const ObstacleConf::EvaluatorType& type) {
   std::unique_ptr<Evaluator> evaluator_ptr(nullptr);
   switch (type) {
     case ObstacleConf::MLP_EVALUATOR: {
@@ -455,8 +416,7 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
   return evaluator_ptr;
 }
 
-void EvaluatorManager::RegisterEvaluator(
-    const ObstacleConf::EvaluatorType& type) {
+void EvaluatorManager::RegisterEvaluator(const ObstacleConf::EvaluatorType& type) {
   evaluators_[type] = CreateEvaluator(type);
   AINFO << "Evaluator [" << type << "] is registered.";
 }

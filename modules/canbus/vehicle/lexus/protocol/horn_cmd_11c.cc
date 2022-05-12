@@ -46,10 +46,10 @@ void Horncmd11c::UpdateData(uint8_t* data) {
 void Horncmd11c::Reset() {
   // TODO(QiL) : you should check this manually
   ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
-  clear_faults_ = false;
-  horn_cmd_ = Horn_cmd_11c::HORN_CMD_OFF;
+  enable_           = false;
+  clear_override_   = false;
+  clear_faults_     = false;
+  horn_cmd_         = Horn_cmd_11c::HORN_CMD_OFF;
 }
 
 Horncmd11c* Horncmd11c::set_ignore_overrides(bool ignore_overrides) {
@@ -121,8 +121,7 @@ Horncmd11c* Horncmd11c::set_horn_cmd(Horn_cmd_11c::Horn_cmdType horn_cmd) {
 // 'HORN_CMD_ON'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset':
 // 0.0, 'physical_range': '[0|1]', 'bit': 8, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
-void Horncmd11c::set_p_horn_cmd(uint8_t* data,
-                                Horn_cmd_11c::Horn_cmdType horn_cmd) {
+void Horncmd11c::set_p_horn_cmd(uint8_t* data, Horn_cmd_11c::Horn_cmdType horn_cmd) {
   uint8_t x = horn_cmd;
 
   Byte to_set(data + 1);

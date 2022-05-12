@@ -56,12 +56,16 @@ class NdtMapSingleCell {
   static void Reduce(NdtMapSingleCell* cell, const NdtMapSingleCell& cell_new);
 
   /**@brief Add an sample to the single 3d map cell. */
-  void AddSample(const float intensity, const float altitude,
-                 const Eigen::Vector3f& centroid, bool is_road = false);
+  void AddSample(const float            intensity,
+                 const float            altitude,
+                 const Eigen::Vector3f& centroid,
+                 bool                   is_road = false);
 
   /**@brief Merge two cells. */
-  void MergeCell(const float intensity, const float intensity_var,
-                 const unsigned int road_pt_count, const unsigned int count,
+  void MergeCell(const float            intensity,
+                 const float            intensity_var,
+                 const unsigned int     road_pt_count,
+                 const unsigned int     count,
                  const Eigen::Vector3f& centroid,
                  const Eigen::Matrix3f& centroid_cov);
 
@@ -101,9 +105,11 @@ class NdtMapCells {
   /**@brief Reset to default value. */
   void Reset();
   /**@brief Add an sample. */
-  int AddSample(const float intensity, const float altitude,
-                const float resolution, const Eigen::Vector3f& centroid,
-                bool is_road = false);
+  int AddSample(const float            intensity,
+                const float            altitude,
+                const float            resolution,
+                const Eigen::Vector3f& centroid,
+                bool                   is_road = false);
 
   /**@brief Load the map cell from a binary chunk.
    * @param <return> The size read (the real size of object).
@@ -171,8 +177,7 @@ class NdtMapMatrix : public BaseMapMatrix {
   virtual bool GetIntensityImg(cv::Mat* intensity_img) const;
 
   /**@brief Get a const map cell. */
-  inline const NdtMapCells& GetMapCell(unsigned int row,
-                                       unsigned int col) const {
+  inline const NdtMapCells& GetMapCell(unsigned int row, unsigned int col) const {
     assert(row < rows_);
     assert(col < cols_);
     return map3d_cells_[row * cols_ + col];

@@ -30,18 +30,17 @@ struct MlfTrackObjectDistanceInitOptions {};
 
 class MlfTrackObjectDistance {
  public:
-  MlfTrackObjectDistance() = default;
+  MlfTrackObjectDistance()  = default;
   ~MlfTrackObjectDistance() = default;
 
-  bool Init(const MlfTrackObjectDistanceInitOptions& options =
-                MlfTrackObjectDistanceInitOptions());
+  bool Init(const MlfTrackObjectDistanceInitOptions& options = MlfTrackObjectDistanceInitOptions());
 
   // @brief: compute object track distance
   // @params [in]: object
   // @params [in]: track data
   // @return: distance
   float ComputeDistance(const TrackedObjectConstPtr& object,
-                        const MlfTrackDataConstPtr& track) const;
+                        const MlfTrackDataConstPtr&  track) const;
 
   std::string Name() const { return "MlfTrackObjectDistance"; }
 

@@ -30,32 +30,36 @@ namespace apollo {
 namespace planning {
 
 DualVariableWarmStartOSQPInterface::DualVariableWarmStartOSQPInterface(
-    size_t horizon, double ts, const Eigen::MatrixXd& ego,
-    const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const Eigen::MatrixXd& xWS,
+    size_t                        horizon,
+    double                        ts,
+    const Eigen::MatrixXd&        ego,
+    const Eigen::MatrixXi&        obstacles_edges_num,
+    const size_t                  obstacles_num,
+    const Eigen::MatrixXd&        obstacles_A,
+    const Eigen::MatrixXd&        obstacles_b,
+    const Eigen::MatrixXd&        xWS,
     const PlannerOpenSpaceConfig& planner_open_space_config)
-    : ts_(ts),
-      ego_(ego),
-      obstacles_edges_num_(obstacles_edges_num),
-      obstacles_A_(obstacles_A),
-      obstacles_b_(obstacles_b),
-      xWS_(xWS) {
+    : ts_(ts)
+    , ego_(ego)
+    , obstacles_edges_num_(obstacles_edges_num)
+    , obstacles_A_(obstacles_A)
+    , obstacles_b_(obstacles_b)
+    , xWS_(xWS) {
   ACHECK(horizon < std::numeric_limits<int>::max())
       << "Invalid cast on horizon in open space planner";
   horizon_ = static_cast<int>(horizon);
   ACHECK(obstacles_num < std::numeric_limits<int>::max())
       << "Invalid cast on obstacles_num in open space planner";
-  obstacles_num_ = static_cast<int>(obstacles_num);
-  w_ev_ = ego_(1, 0) + ego_(3, 0);
-  l_ev_ = ego_(0, 0) + ego_(2, 0);
-  g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
-  offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
+  obstacles_num_       = static_cast<int>(obstacles_num);
+  w_ev_                = ego_(1, 0) + ego_(3, 0);
+  l_ev_                = ego_(0, 0) + ego_(2, 0);
+  g_                   = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
+  offset_              = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
   obstacles_edges_sum_ = obstacles_edges_num_.sum();
-  l_start_index_ = 0;
-  n_start_index_ = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
-  l_warm_up_ = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
-  n_warm_up_ = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
+  l_start_index_       = 0;
+  n_start_index_       = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
+  l_warm_up_           = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
+  n_warm_up_           = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
 
   // get_nlp_info
   lambda_horizon_ = obstacles_edges_sum_ * (horizon_ + 1);
@@ -68,27 +72,24 @@ DualVariableWarmStartOSQPInterface::DualVariableWarmStartOSQPInterface(
   num_of_constraints_ = 3 * obstacles_num_ * (horizon_ + 1) + num_of_variables_;
 
   min_safety_distance_ =
-      planner_open_space_config.dual_variable_warm_start_config()
-          .min_safety_distance();
-  check_mode_ =
-      planner_open_space_config.dual_variable_warm_start_config().debug_osqp();
-  osqp_config_ =
-      planner_open_space_config.dual_variable_warm_start_config().osqp_config();
+      planner_open_space_config.dual_variable_warm_start_config().min_safety_distance();
+  check_mode_  = planner_open_space_config.dual_variable_warm_start_config().debug_osqp();
+  osqp_config_ = planner_open_space_config.dual_variable_warm_start_config().osqp_config();
 }
 
-void printMatrix(const int r, const int c, const std::vector<c_float>& P_data,
-                 const std::vector<c_int>& P_indices,
-                 const std::vector<c_int>& P_indptr) {
+void printMatrix(const int                   r,
+                 const int                   c,
+                 const std::vector<c_float>& P_data,
+                 const std::vector<c_int>&   P_indices,
+                 const std::vector<c_int>&   P_indptr) {
   Eigen::MatrixXf tmp = Eigen::MatrixXf::Zero(r, c);
 
   for (size_t i = 0; i < P_indptr.size() - 1; ++i) {
-    if (P_indptr[i] < 0 || P_indptr[i] >= static_cast<int>(P_indices.size())) {
-      continue;
-    }
+    if (P_indptr[i] < 0 || P_indptr[i] >= static_cast<int>(P_indices.size())) { continue; }
 
     for (auto idx = P_indptr[i]; idx < P_indptr[i + 1]; ++idx) {
-      int tmp_c = static_cast<int>(i);
-      int tmp_r = static_cast<int>(P_indices[idx]);
+      int tmp_c         = static_cast<int>(i);
+      int tmp_r         = static_cast<int>(P_indices[idx]);
       tmp(tmp_r, tmp_c) = static_cast<float>(P_data[idx]);
     }
   }
@@ -101,19 +102,19 @@ void printMatrix(const int r, const int c, const std::vector<c_float>& P_data,
   }
 }
 
-void DualVariableWarmStartOSQPInterface::assembleA(
-    const int r, const int c, const std::vector<c_float>& P_data,
-    const std::vector<c_int>& P_indices, const std::vector<c_int>& P_indptr) {
+void DualVariableWarmStartOSQPInterface::assembleA(const int                   r,
+                                                   const int                   c,
+                                                   const std::vector<c_float>& P_data,
+                                                   const std::vector<c_int>&   P_indices,
+                                                   const std::vector<c_int>&   P_indptr) {
   constraint_A_ = Eigen::MatrixXf::Zero(r, c);
 
   for (size_t i = 0; i < P_indptr.size() - 1; ++i) {
-    if (P_indptr[i] < 0 || P_indptr[i] >= static_cast<int>(P_indices.size())) {
-      continue;
-    }
+    if (P_indptr[i] < 0 || P_indptr[i] >= static_cast<int>(P_indices.size())) { continue; }
 
     for (auto idx = P_indptr[i]; idx < P_indptr[i + 1]; ++idx) {
-      int tmp_c = static_cast<int>(i);
-      int tmp_r = static_cast<int>(P_indices[idx]);
+      int tmp_c                   = static_cast<int>(i);
+      int tmp_r                   = static_cast<int>(P_indices[idx]);
       constraint_A_(tmp_r, tmp_c) = static_cast<float>(P_data[idx]);
     }
   }
@@ -126,8 +127,8 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   bool succ = true;
   // assemble P, quadratic term in objective
   std::vector<c_float> P_data;
-  std::vector<c_int> P_indices;
-  std::vector<c_int> P_indptr;
+  std::vector<c_int>   P_indices;
+  std::vector<c_int>   P_indptr;
   assemble_P(&P_data, &P_indices, &P_indptr);
   if (check_mode_) {
     AINFO << "print P_data in whole: ";
@@ -141,8 +142,8 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
 
   // assemble A, linear term in constraints
   std::vector<c_float> A_data;
-  std::vector<c_int> A_indices;
-  std::vector<c_int> A_indptr;
+  std::vector<c_int>   A_indices;
+  std::vector<c_int>   A_indptr;
   assemble_constraint(&A_data, &A_indices, &A_indptr);
   if (check_mode_) {
     AINFO << "print A_data in whole: ";
@@ -155,8 +156,7 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   c_float ub[kNumConst];
   for (int i = 0; i < kNumConst; ++i) {
     lb[i] = 0.0;
-    if (i >= 2 * obstacles_num_ * (horizon_ + 1) &&
-        i < 3 * obstacles_num_ * (horizon_ + 1)) {
+    if (i >= 2 * obstacles_num_ * (horizon_ + 1) && i < 3 * obstacles_num_ * (horizon_ + 1)) {
       lb[i] = min_safety_distance_;
     }
     if (i < 2 * obstacles_num_ * (horizon_ + 1)) {
@@ -167,27 +167,26 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   }
 
   // Problem settings
-  OSQPSettings* settings =
-      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  OSQPSettings* settings = reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
 
   // Define Solver settings as default
   osqp_set_default_settings(settings);
-  settings->alpha = osqp_config_.alpha();  // Change alpha parameter
-  settings->eps_abs = osqp_config_.eps_abs();
-  settings->eps_rel = osqp_config_.eps_rel();
+  settings->alpha    = osqp_config_.alpha();  // Change alpha parameter
+  settings->eps_abs  = osqp_config_.eps_abs();
+  settings->eps_rel  = osqp_config_.eps_rel();
   settings->max_iter = osqp_config_.max_iter();
-  settings->polish = osqp_config_.polish();
-  settings->verbose = osqp_config_.osqp_debug_log();
+  settings->polish   = osqp_config_.polish();
+  settings->verbose  = osqp_config_.osqp_debug_log();
 
   // Populate data
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
-  data->n = kNumParam;
-  data->m = kNumConst;
-  data->P = csc_matrix(data->n, data->n, P_data.size(), P_data.data(),
-                       P_indices.data(), P_indptr.data());
+  data->n        = kNumParam;
+  data->m        = kNumConst;
+  data->P =
+      csc_matrix(data->n, data->n, P_data.size(), P_data.data(), P_indices.data(), P_indptr.data());
   data->q = q;
-  data->A = csc_matrix(data->m, data->n, A_data.size(), A_data.data(),
-                       A_indices.data(), A_indptr.data());
+  data->A =
+      csc_matrix(data->m, data->n, A_data.size(), A_data.data(), A_indices.data(), A_indptr.data());
   data->l = lb;
   data->u = ub;
 
@@ -237,8 +236,8 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   return succ;
 }
 
-void DualVariableWarmStartOSQPInterface::check_solution(
-    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up) {
+void DualVariableWarmStartOSQPInterface::check_solution(const Eigen::MatrixXd& l_warm_up,
+                                                        const Eigen::MatrixXd& n_warm_up) {
   Eigen::MatrixXf x(num_of_variables_, 1);
   Eigen::MatrixXf g(num_of_constraints_, 1);
 
@@ -261,7 +260,7 @@ void DualVariableWarmStartOSQPInterface::check_solution(
     }
   }
 
-  g = constraint_A_ * x;
+  g            = constraint_A_ * x;
   int r1_index = 0;
   int r2_index = 2 * obstacles_num_ * (horizon_ + 1);
   int r3_index = 3 * obstacles_num_ * (horizon_ + 1);
@@ -296,15 +295,15 @@ void DualVariableWarmStartOSQPInterface::check_solution(
   }
 }
 
-void DualVariableWarmStartOSQPInterface::assemble_P(
-    std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
-    std::vector<c_int>* P_indptr) {
+void DualVariableWarmStartOSQPInterface::assemble_P(std::vector<c_float>* P_data,
+                                                    std::vector<c_int>*   P_indices,
+                                                    std::vector<c_int>*   P_indptr) {
   // the objective function is norm(A' * lambda)
   std::vector<c_float> P_tmp;
-  int edges_counter = 0;
+  int                  edges_counter = 0;
 
   for (int j = 0; j < obstacles_num_; ++j) {
-    int current_edges_num = obstacles_edges_num_(j, 0);
+    int             current_edges_num = obstacles_edges_num_(j, 0);
     Eigen::MatrixXd Aj;
     Aj = obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
     // Eigen::MatrixXd AAj(current_edges_num, current_edges_num);
@@ -323,7 +322,7 @@ void DualVariableWarmStartOSQPInterface::assemble_P(
     edges_counter += current_edges_num;
   }
 
-  int l_index = l_start_index_;
+  int l_index            = l_start_index_;
   int first_row_location = 0;
   // the objective function is norm(A' * lambda)
   for (int i = 0; i < horizon_ + 1; ++i) {
@@ -359,9 +358,9 @@ void DualVariableWarmStartOSQPInterface::assemble_P(
   CHECK_EQ(P_indptr->size(), static_cast<size_t>(num_of_variables_) + 1);
 }
 
-void DualVariableWarmStartOSQPInterface::assemble_constraint(
-    std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
-    std::vector<c_int>* A_indptr) {
+void DualVariableWarmStartOSQPInterface::assemble_constraint(std::vector<c_float>* A_data,
+                                                             std::vector<c_int>*   A_indices,
+                                                             std::vector<c_int>*   A_indptr) {
   /*
    * The constraint matrix is as the form,
    *  |R' * A',   G'|, #: 2 * obstacles_num_ * (horizon_ + 1)
@@ -369,10 +368,10 @@ void DualVariableWarmStartOSQPInterface::assemble_constraint(
    *  |I,          0|, #: num_of_lambda
    *  |0,          I|, #: num_of_miu
    */
-  int r1_index = 0;
-  int r2_index = 2 * obstacles_num_ * (horizon_ + 1);
-  int r3_index = 3 * obstacles_num_ * (horizon_ + 1);
-  int r4_index = 3 * obstacles_num_ * (horizon_ + 1) + lambda_horizon_;
+  int r1_index           = 0;
+  int r2_index           = 2 * obstacles_num_ * (horizon_ + 1);
+  int r3_index           = 3 * obstacles_num_ * (horizon_ + 1);
+  int r4_index           = 3 * obstacles_num_ * (horizon_ + 1) + lambda_horizon_;
   int first_row_location = 0;
 
   // lambda variables
@@ -383,16 +382,13 @@ void DualVariableWarmStartOSQPInterface::assemble_constraint(
     R << cos(xWS_(2, i)), sin(xWS_(2, i)), sin(xWS_(2, i)), cos(xWS_(2, i));
 
     Eigen::MatrixXd t_trans(1, 2);
-    t_trans << (xWS_(0, i) + cos(xWS_(2, i)) * offset_),
-        (xWS_(1, i) + sin(xWS_(2, i)) * offset_);
+    t_trans << (xWS_(0, i) + cos(xWS_(2, i)) * offset_), (xWS_(1, i) + sin(xWS_(2, i)) * offset_);
 
     // assume: stationary obstacles
     for (int j = 0; j < obstacles_num_; ++j) {
-      int current_edges_num = obstacles_edges_num_(j, 0);
-      Eigen::MatrixXd Aj =
-          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-      Eigen::MatrixXd bj =
-          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+      int             current_edges_num = obstacles_edges_num_(j, 0);
+      Eigen::MatrixXd Aj = obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+      Eigen::MatrixXd bj = obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
       Eigen::MatrixXd r1_block(2, current_edges_num);
       r1_block = R * Aj.transpose();

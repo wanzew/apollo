@@ -34,10 +34,10 @@ namespace camera {
 // @param [max_object]: maximum num of objs for feature extractor. optional
 // @param [param]: feature
 struct FeatureExtractorInitOptions : public BaseInitOptions {
-  int input_width = 0;
-  int input_height = 0;
+  int                                input_width  = 0;
+  int                                input_height = 0;
   std::shared_ptr<base::Blob<float>> feat_blob;
-  int gpu_id = 0;
+  int                                gpu_id = 0;
 };
 
 struct FeatureExtractorOptions {
@@ -45,14 +45,13 @@ struct FeatureExtractorOptions {
 };
 class BaseFeatureExtractor {
  public:
-  BaseFeatureExtractor() = default;
-  virtual ~BaseFeatureExtractor() = default;
-  virtual bool Init(const FeatureExtractorInitOptions &init_options) = 0;
+  BaseFeatureExtractor()                                             = default;
+  virtual ~BaseFeatureExtractor()                                    = default;
+  virtual bool Init(const FeatureExtractorInitOptions& init_options) = 0;
   // @brief: extract feature for each detected object
   // @param [in/out]: objects with bounding boxes and feature vector.
-  virtual bool Extract(const FeatureExtractorOptions &options,
-                       CameraFrame *frame) = 0;
-  virtual std::string Name() const = 0;
+  virtual bool        Extract(const FeatureExtractorOptions& options, CameraFrame* frame) = 0;
+  virtual std::string Name() const                                                        = 0;
 
   void set_roi(int x, int y, int w, int h) {
     roi_x_ = x;
@@ -61,42 +60,41 @@ class BaseFeatureExtractor {
     roi_h_ = h;
   }
 
-  void decode_bbox(std::vector<std::shared_ptr<base::Object>> *objects) {
+  void decode_bbox(std::vector<std::shared_ptr<base::Object>>* objects) {
     for (auto obj : *objects) {
-      auto &xmin = obj->camera_supplement.box.xmin;
-      auto &ymin = obj->camera_supplement.box.ymin;
-      auto &xmax = obj->camera_supplement.box.xmax;
-      auto &ymax = obj->camera_supplement.box.ymax;
-      xmin = xmin * static_cast<float>(roi_w_) + static_cast<float>(roi_x_);
-      xmax = xmax * static_cast<float>(roi_w_) + static_cast<float>(roi_x_);
-      ymin = ymin * static_cast<float>(roi_h_) + static_cast<float>(roi_y_);
-      ymax = ymax * static_cast<float>(roi_h_) + static_cast<float>(roi_y_);
+      auto& xmin = obj->camera_supplement.box.xmin;
+      auto& ymin = obj->camera_supplement.box.ymin;
+      auto& xmax = obj->camera_supplement.box.xmax;
+      auto& ymax = obj->camera_supplement.box.ymax;
+      xmin       = xmin * static_cast<float>(roi_w_) + static_cast<float>(roi_x_);
+      xmax       = xmax * static_cast<float>(roi_w_) + static_cast<float>(roi_x_);
+      ymin       = ymin * static_cast<float>(roi_h_) + static_cast<float>(roi_y_);
+      ymax       = ymax * static_cast<float>(roi_h_) + static_cast<float>(roi_y_);
     }
   }
 
-  void encode_bbox(std::vector<std::shared_ptr<base::Object>> *objects) {
+  void encode_bbox(std::vector<std::shared_ptr<base::Object>>* objects) {
     for (auto obj : *objects) {
-      auto &xmin = obj->camera_supplement.box.xmin;
-      auto &ymin = obj->camera_supplement.box.ymin;
-      auto &xmax = obj->camera_supplement.box.xmax;
-      auto &ymax = obj->camera_supplement.box.ymax;
-      xmin = (xmin - static_cast<float>(roi_x_)) / static_cast<float>(roi_w_);
-      xmax = (xmax - static_cast<float>(roi_x_)) / static_cast<float>(roi_w_);
-      ymin = (ymin - static_cast<float>(roi_y_)) / static_cast<float>(roi_h_);
-      ymax = (ymax - static_cast<float>(roi_y_)) / static_cast<float>(roi_h_);
+      auto& xmin = obj->camera_supplement.box.xmin;
+      auto& ymin = obj->camera_supplement.box.ymin;
+      auto& xmax = obj->camera_supplement.box.xmax;
+      auto& ymax = obj->camera_supplement.box.ymax;
+      xmin       = (xmin - static_cast<float>(roi_x_)) / static_cast<float>(roi_w_);
+      xmax       = (xmax - static_cast<float>(roi_x_)) / static_cast<float>(roi_w_);
+      ymin       = (ymin - static_cast<float>(roi_y_)) / static_cast<float>(roi_h_);
+      ymax       = (ymax - static_cast<float>(roi_y_)) / static_cast<float>(roi_h_);
     }
   }
 
  protected:
   std::shared_ptr<base::Blob<float>> feat_blob_ = nullptr;
-  int roi_x_ = 0;
-  int roi_y_ = 0;
-  int roi_w_ = 0;
-  int roi_h_ = 0;
+  int                                roi_x_     = 0;
+  int                                roi_y_     = 0;
+  int                                roi_w_     = 0;
+  int                                roi_h_     = 0;
 };
 PERCEPTION_REGISTER_REGISTERER(BaseFeatureExtractor);
-#define REGISTER_FEATURE_EXTRACTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseFeatureExtractor, name)
+#define REGISTER_FEATURE_EXTRACTOR(name) PERCEPTION_REGISTER_CLASS(BaseFeatureExtractor, name)
 
 }  // namespace camera
 }  // namespace perception

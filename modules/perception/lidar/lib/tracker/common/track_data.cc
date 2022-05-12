@@ -32,20 +32,18 @@ std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
     AWARN << "no object in track";
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
-  int max_idx = std::abs(idx) >= static_cast<int>(history_objects_.size())
-                    ? static_cast<int>(history_objects_.size()) - 1
-                    : abs(idx);
+  int max_idx = std::abs(idx) >= static_cast<int>(history_objects_.size()) ?
+                    static_cast<int>(history_objects_.size()) - 1 :
+                    abs(idx);
   // from oldest
   if (idx > 0) {
-    std::map<double, TrackedObjectPtr>::iterator cur_obj =
-        history_objects_.begin();
+    std::map<double, TrackedObjectPtr>::iterator cur_obj = history_objects_.begin();
     for (int i = 0; i < max_idx; ++i) {
       ++cur_obj;
     }
     return *cur_obj;
   } else {
-    std::map<double, TrackedObjectPtr>::reverse_iterator cur_obj =
-        history_objects_.rbegin();
+    std::map<double, TrackedObjectPtr>::reverse_iterator cur_obj = history_objects_.rbegin();
     for (int i = 0; i < max_idx; ++i) {
       ++cur_obj;
     }
@@ -53,26 +51,23 @@ std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
   }
 }
 
-std::pair<double, TrackedObjectConstPtr> TrackData::GetHistoryObject(
-    int idx) const {
+std::pair<double, TrackedObjectConstPtr> TrackData::GetHistoryObject(int idx) const {
   if (history_objects_.empty()) {
     AINFO << "no object in track";
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
-  int max_idx = static_cast<size_t>(abs(idx)) >= history_objects_.size()
-                    ? static_cast<int>(history_objects_.size()) - 1
-                    : abs(idx);
+  int max_idx = static_cast<size_t>(abs(idx)) >= history_objects_.size() ?
+                    static_cast<int>(history_objects_.size()) - 1 :
+                    abs(idx);
   // from oldest
   if (idx > 0) {
-    std::map<double, TrackedObjectPtr>::const_iterator cur_obj =
-        history_objects_.cbegin();
+    std::map<double, TrackedObjectPtr>::const_iterator cur_obj = history_objects_.cbegin();
     for (int i = 0; i < max_idx; ++i) {
       ++cur_obj;
     }
     return *cur_obj;
   } else {
-    std::map<double, TrackedObjectPtr>::const_reverse_iterator cur_obj =
-        history_objects_.crbegin();
+    std::map<double, TrackedObjectPtr>::const_reverse_iterator cur_obj = history_objects_.crbegin();
     for (int i = 0; i < max_idx; ++i) {
       ++cur_obj;
     }
@@ -81,16 +76,16 @@ std::pair<double, TrackedObjectConstPtr> TrackData::GetHistoryObject(
 }
 
 void TrackData::Reset() {
-  track_id_ = -1;
-  age_ = 0;
+  track_id_                    = -1;
+  age_                         = 0;
   consecutive_invisible_count_ = 0;
-  total_visible_count_ = 0;
-  max_history_size_ = 40;
+  total_visible_count_         = 0;
+  max_history_size_            = 40;
   history_objects_.clear();
-  motion_state_ = MotionState::STATIC;
-  continuous_motion_frames_ = 0;
-  continuous_static_frames_ = 0;
-  pub_remain_frames_ = 0;
+  motion_state_                      = MotionState::STATIC;
+  continuous_motion_frames_          = 0;
+  continuous_static_frames_          = 0;
+  pub_remain_frames_                 = 0;
   should_check_velocity_consistency_ = true;
   history_norm_variance_.clear();
   history_theta_variance_.clear();
@@ -106,7 +101,7 @@ void TrackData::PushTrackedObjectToTrack(TrackedObjectPtr obj, double time) {
   if (history_objects_.find(time) == history_objects_.end()) {
     history_objects_.insert(std::make_pair(time, obj));
     age_++;
-    obj->track_id = track_id_;
+    obj->track_id      = track_id_;
     obj->tracking_time = time - history_objects_.begin()->first;
     if (obj->is_fake) {
       ++consecutive_invisible_count_;
@@ -118,8 +113,7 @@ void TrackData::PushTrackedObjectToTrack(TrackedObjectPtr obj, double time) {
       history_objects_.erase(history_objects_.begin());
     }
   } else {
-    AWARN << "push object time " << time
-          << " already exist in track, ignore insert.";
+    AWARN << "push object time " << time << " already exist in track, ignore insert.";
   }
 }
 

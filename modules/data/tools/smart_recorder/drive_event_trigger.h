@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
+
 #include "modules/data/tools/smart_recorder/trigger_base.h"
 
 namespace apollo {
@@ -31,9 +32,7 @@ class DriveEventTrigger : public TriggerBase {
   DriveEventTrigger();
 
   void Pull(const cyber::record::RecordMessage& msg) override;
-  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override {
-    return false;
-  };
+  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override { return false; };
 
   virtual ~DriveEventTrigger() = default;
 };

@@ -24,6 +24,7 @@
 #include <string>
 
 #include "modules/common/proto/geometry.pb.h"
+
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
@@ -35,16 +36,13 @@ namespace planning {
  */
 class Destination : public TrafficRule {
  public:
-  Destination(const TrafficRuleConfig& config,
-              const std::shared_ptr<DependencyInjector>& injector);
+  Destination(const TrafficRuleConfig& config, const std::shared_ptr<DependencyInjector>& injector);
   virtual ~Destination() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  int MakeDecisions(Frame* const frame,
-                    ReferenceLineInfo* const reference_line_info);
+  int MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning

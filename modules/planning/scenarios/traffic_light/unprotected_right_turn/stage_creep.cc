@@ -22,12 +22,13 @@
 
 #include <string>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -44,65 +45,51 @@ using apollo::common::TrajectoryPoint;
 using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 
-Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus
+TrafficLightUnprotectedRightTurnStageCreep::Process(const TrajectoryPoint& planning_init_point,
+                                                    Frame*                 frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  if (!config_.enabled()) {
-    return FinishStage();
-  }
+  if (!config_.enabled()) { return FinishStage(); }
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
-  }
+  if (!plan_ok) { AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error"; }
 
-  if (GetContext()->current_traffic_light_overlap_ids.empty()) {
-    return FinishScenario();
-  }
+  if (GetContext()->current_traffic_light_overlap_ids.empty()) { return FinishScenario(); }
 
-  const auto& reference_line_info = frame->reference_line_info().front();
-  const std::string traffic_light_overlap_id =
-      GetContext()->current_traffic_light_overlap_ids[0];
-  PathOverlap* current_traffic_light_overlap =
-      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
-                                                traffic_light_overlap_id,
-                                                ReferenceLineInfo::SIGNAL);
-  if (!current_traffic_light_overlap) {
-    return FinishScenario();
-  }
+  const auto&       reference_line_info      = frame->reference_line_info().front();
+  const std::string traffic_light_overlap_id = GetContext()->current_traffic_light_overlap_ids[0];
+  PathOverlap*      current_traffic_light_overlap = scenario::util::GetOverlapOnReferenceLine(
+      reference_line_info, traffic_light_overlap_id, ReferenceLineInfo::SIGNAL);
+  if (!current_traffic_light_overlap) { return FinishScenario(); }
 
   // set right_of_way_status
-  reference_line_info.SetJunctionRightOfWay(
-      current_traffic_light_overlap->start_s, false);
+  reference_line_info.SetJunctionRightOfWay(current_traffic_light_overlap->start_s, false);
 
   // creep
   // note: don't check traffic light color while creeping on right turn
-  const double wait_time =
-      Clock::NowInSeconds() - GetContext()->creep_start_time;
+  const double wait_time   = Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout_sec = scenario_config_.creep_timeout_sec();
-  auto* task = dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER));
+  auto*        task        = dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER));
   if (task == nullptr) {
     AERROR << "task is nullptr";
     return FinishStage();
   }
 
-  double creep_stop_s = current_traffic_light_overlap->end_s +
-                        task->FindCreepDistance(*frame, reference_line_info);
-  const double distance =
-      creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
+  double creep_stop_s =
+      current_traffic_light_overlap->end_s + task->FindCreepDistance(*frame, reference_line_info);
+  const double distance = creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
   if (distance <= 0.0) {
     auto& rfl_info = frame->mutable_reference_line_info()->front();
     *(rfl_info.mutable_speed_data()) =
         SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(0.0, 0);
   }
 
-  if (task->CheckCreepDone(*frame, reference_line_info,
-                           current_traffic_light_overlap->end_s, wait_time,
-                           timeout_sec)) {
+  if (task->CheckCreepDone(*frame, reference_line_info, current_traffic_light_overlap->end_s,
+                           wait_time, timeout_sec)) {
     return FinishStage();
   }
 
@@ -110,8 +97,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
 }
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::FinishStage() {
-  next_stage_ =
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
+  next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
 

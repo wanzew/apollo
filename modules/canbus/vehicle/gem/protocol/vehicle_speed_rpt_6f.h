@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Vehiclespeedrpt6f : public ::apollo::drivers::canbus::ProtocolData<
-                              ::apollo::canbus::ChassisDetail> {
+class Vehiclespeedrpt6f
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vehiclespeedrpt6f();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'VEHICLE_SPEED', 'offset': 0.0, 'precision': 0.01,
@@ -42,8 +42,8 @@ class Vehiclespeedrpt6f : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 16, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Vehicle_speed_rpt_6f::Vehicle_speed_validType vehicle_speed_valid(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vehicle_speed_rpt_6f::Vehicle_speed_validType vehicle_speed_valid(const std::uint8_t* bytes,
+                                                                    const int32_t length) const;
 };
 
 }  // namespace gem

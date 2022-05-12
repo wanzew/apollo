@@ -23,13 +23,13 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-std::pair<double, double> WorldCoordToObjCoord(
-    std::pair<double, double> input_world_coord,
-    std::pair<double, double> obj_world_coord, double obj_world_angle) {
+std::pair<double, double> WorldCoordToObjCoord(std::pair<double, double> input_world_coord,
+                                               std::pair<double, double> obj_world_coord,
+                                               double                    obj_world_angle) {
   double x_diff = input_world_coord.first - obj_world_coord.first;
   double y_diff = input_world_coord.second - obj_world_coord.second;
-  double rho = std::sqrt(x_diff * x_diff + y_diff * y_diff);
-  double theta = std::atan2(y_diff, x_diff) - obj_world_angle;
+  double rho    = std::sqrt(x_diff * x_diff + y_diff * y_diff);
+  double theta  = std::atan2(y_diff, x_diff) - obj_world_angle;
 
   return std::make_pair(std::cos(theta) * rho, std::sin(theta) * rho);
 }

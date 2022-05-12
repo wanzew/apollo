@@ -25,51 +25,42 @@ namespace apollo {
 namespace planning {
 
 Spline1d::Spline1d(const std::vector<double>& x_knots, const uint32_t order)
-    : x_knots_(x_knots), spline_order_(order) {
+    : x_knots_(x_knots)
+    , spline_order_(order) {
   for (uint32_t i = 1; i < x_knots_.size(); ++i) {
     splines_.emplace_back(spline_order_);
   }
 }
 
 double Spline1d::operator()(const double x) const {
-  if (splines_.empty()) {
-    return 0.0;
-  }
+  if (splines_.empty()) { return 0.0; }
   uint32_t index = FindIndex(x);
   return splines_[index](x - x_knots_[index]);
 }
 
 double Spline1d::Derivative(const double x) const {
   // zero order spline
-  if (splines_.empty()) {
-    return 0.0;
-  }
+  if (splines_.empty()) { return 0.0; }
   uint32_t index = FindIndex(x);
   return splines_[index].Derivative(x - x_knots_[index]);
 }
 
 double Spline1d::SecondOrderDerivative(const double x) const {
-  if (splines_.empty()) {
-    return 0.0;
-  }
+  if (splines_.empty()) { return 0.0; }
   uint32_t index = FindIndex(x);
   return splines_[index].SecondOrderDerivative(x - x_knots_[index]);
 }
 
 double Spline1d::ThirdOrderDerivative(const double x) const {
-  if (splines_.empty()) {
-    return 0.0;
-  }
+  if (splines_.empty()) { return 0.0; }
   uint32_t index = FindIndex(x);
   return splines_[index].ThirdOrderDerivative(x - x_knots_[index]);
 }
 
-bool Spline1d::SetSplineSegs(const Eigen::MatrixXd& param_matrix,
-                             const uint32_t order) {
+bool Spline1d::SetSplineSegs(const Eigen::MatrixXd& param_matrix, const uint32_t order) {
   const uint32_t num_params = order + 1;
   // check if the parameter size fit
-  if (x_knots_.size() * num_params !=
-      num_params + static_cast<uint32_t>(param_matrix.rows())) {
+  if (x_knots_.size() * num_params != num_params + static_cast<uint32_t>(param_matrix.rows())) {
     return false;
   }
   for (uint32_t i = 0; i < splines_.size(); ++i) {
@@ -90,9 +81,8 @@ uint32_t Spline1d::spline_order() const { return spline_order_; }
 const std::vector<Spline1dSeg>& Spline1d::splines() const { return splines_; }
 
 uint32_t Spline1d::FindIndex(const double x) const {
-  auto upper_bound = std::upper_bound(x_knots_.begin() + 1, x_knots_.end(), x);
-  const uint32_t dis =
-      static_cast<uint32_t>(std::distance(x_knots_.begin(), upper_bound));
+  auto           upper_bound = std::upper_bound(x_knots_.begin() + 1, x_knots_.end(), x);
+  const uint32_t dis         = static_cast<uint32_t>(std::distance(x_knots_.begin(), upper_bound));
   if (dis < x_knots_.size()) {
     return dis - 1;
   } else {

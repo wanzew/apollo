@@ -20,15 +20,12 @@ namespace localization {
 namespace msf {
 namespace pyramid_map {
 
-PyramidMapNodePool::PyramidMapNodePool(unsigned int pool_size,
-                                       unsigned int thread_size)
+PyramidMapNodePool::PyramidMapNodePool(unsigned int pool_size, unsigned int thread_size)
     : BaseMapNodePool(pool_size, thread_size) {}
 
 PyramidMapNodePool::~PyramidMapNodePool() {}
 
-BaseMapNode* PyramidMapNodePool::AllocNewMapNode() {
-  return new PyramidMapNode();
-}
+BaseMapNode* PyramidMapNodePool::AllocNewMapNode() { return new PyramidMapNode(); }
 
 }  // namespace pyramid_map
 }  // namespace msf

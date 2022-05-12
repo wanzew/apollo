@@ -28,22 +28,29 @@ namespace util {
 
 template <class K, class V>
 struct Node {
-  K key;
-  V val;
+  K     key;
+  V     val;
   Node* prev;
   Node* next;
-  Node() : prev(nullptr), next(nullptr) {}
+  Node()
+      : prev(nullptr)
+      , next(nullptr) {}
 
   template <typename VV>
   Node(const K& key, VV&& val)
-      : key(key), val(std::forward<VV>(val)), prev(nullptr), next(nullptr) {}
+      : key(key)
+      , val(std::forward<VV>(val))
+      , prev(nullptr)
+      , next(nullptr) {}
 };
 
 template <class K, class V>
 class LRUCache {
  public:
   explicit LRUCache(const size_t capacity = kDefaultCapacity)
-      : capacity_(capacity), head_(), tail_() {
+      : capacity_(capacity)
+      , head_()
+      , tail_() {
     Init();
   }
 
@@ -86,9 +93,7 @@ class LRUCache {
    */
   template <typename VV>
   bool Update(const K& key, VV&& val) {
-    if (!Contains(key)) {
-      return false;
-    }
+    if (!Contains(key)) { return false; }
     K tmp;
     return Update(key, std::forward<VV>(val), &tmp, true, false);
   }
@@ -98,9 +103,7 @@ class LRUCache {
    */
   template <typename VV>
   bool UpdateSilently(const K& key, VV* val) {
-    if (!Contains(key)) {
-      return false;
-    }
+    if (!Contains(key)) { return false; }
     K tmp;
     return Update(key, std::forward<VV>(*val), &tmp, true, true);
   }
@@ -128,9 +131,7 @@ class LRUCache {
 
   V* Get(const K& key) { return Get(key, false); }
 
-  bool GetCopySilently(const K& key, V* const val) {
-    return GetCopy(key, val, true);
-  }
+  bool GetCopySilently(const K& key, V* const val) { return GetCopy(key, val, true); }
 
   bool GetCopy(const K& key, V* const val) { return GetCopy(key, val, false); }
 
@@ -143,16 +144,12 @@ class LRUCache {
   size_t capacity() { return capacity_; }
 
   Node<K, V>* First() {
-    if (size()) {
-      return head_.next;
-    }
+    if (size()) { return head_.next; }
     return nullptr;
   }
 
   Node<K, V>* Last() {
-    if (size()) {
-      return tail_.prev;
-    }
+    if (size()) { return tail_.prev; }
     return nullptr;
   }
 
@@ -174,18 +171,14 @@ class LRUCache {
   }
 
   bool Remove(const K& key) {
-    if (!Contains(key)) {
-      return false;
-    }
+    if (!Contains(key)) { return false; }
     auto* node = &map_[key];
     Detach(node);
     return true;
   }
 
   bool ChangeCapacity(const size_t capacity) {
-    if (size() > capacity) {
-      return false;
-    }
+    if (size() > capacity) { return false; }
     capacity_ = capacity;
     return true;
   }
@@ -193,28 +186,24 @@ class LRUCache {
  private:
   static constexpr size_t kDefaultCapacity = 10;
 
-  const size_t capacity_;
-  size_t size_;
+  const size_t            capacity_;
+  size_t                  size_;
   std::map<K, Node<K, V>> map_;
-  Node<K, V> head_;
-  Node<K, V> tail_;
+  Node<K, V>              head_;
+  Node<K, V>              tail_;
 
   void Init() {
     head_.prev = nullptr;
     head_.next = &tail_;
     tail_.prev = &head_;
     tail_.next = nullptr;
-    size_ = 0;
+    size_      = 0;
     map_.clear();
   }
 
   void Detach(Node<K, V>* node) {
-    if (node->prev != nullptr) {
-      node->prev->next = node->next;
-    }
-    if (node->next != nullptr) {
-      node->next->prev = node->prev;
-    }
+    if (node->prev != nullptr) { node->prev->next = node->next; }
+    if (node->next != nullptr) { node->next->prev = node->prev; }
     node->prev = nullptr;
     node->next = nullptr;
     --size_;
@@ -224,18 +213,13 @@ class LRUCache {
     node->prev = &head_;
     node->next = head_.next;
     head_.next = node;
-    if (node->next != nullptr) {
-      node->next->prev = node;
-    }
+    if (node->next != nullptr) { node->next->prev = node; }
     ++size_;
   }
 
   template <typename VV>
-  bool Update(const K& key, VV&& val, K* obs, bool add_only,
-              bool silent_update) {
-    if (obs == nullptr) {
-      return false;
-    }
+  bool Update(const K& key, VV&& val, K* obs, bool add_only, bool silent_update) {
+    if (obs == nullptr) { return false; }
     if (Contains(key)) {
       if (!add_only) {
         map_[key].val = std::forward<VV>(val);
@@ -248,9 +232,7 @@ class LRUCache {
         }
       }
     } else {
-      if (Full() && !GetObsolete(obs)) {
-        return false;
-      }
+      if (Full() && !GetObsolete(obs)) { return false; }
 
       map_.emplace(key, Node<K, V>(key, std::forward<VV>(val)));
       Attach(&map_[key]);

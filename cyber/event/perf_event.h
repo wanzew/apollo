@@ -33,23 +33,23 @@ enum class EventType { SCHED_EVENT = 0, TRANS_EVENT = 1, TRY_FETCH_EVENT = 3 };
 
 enum class TransPerf {
   TRANSMIT_BEGIN = 0,
-  SERIALIZE = 1,
-  SEND = 2,
+  SERIALIZE      = 1,
+  SEND           = 2,
   MESSAGE_ARRIVE = 3,
-  OBTAIN = 4,  // only for shm
-  DESERIALIZE = 5,
-  DISPATCH = 6,
-  NOTIFY = 7,
-  FETCH = 8,
-  CALLBACK = 9,
+  OBTAIN         = 4,  // only for shm
+  DESERIALIZE    = 5,
+  DISPATCH       = 6,
+  NOTIFY         = 7,
+  FETCH          = 8,
+  CALLBACK       = 9,
   TRANS_END
 };
 
 enum class SchedPerf {
-  SWAP_IN = 1,
-  SWAP_OUT = 2,
+  SWAP_IN   = 1,
+  SWAP_OUT  = 2,
   NOTIFY_IN = 3,
-  NEXT_RT = 4,
+  NEXT_RT   = 4,
   RT_CREATE = 5,
 };
 
@@ -71,8 +71,8 @@ class EventBase {
   virtual void set_adder(const std::string& adder) { UNUSED(adder); }
 
  protected:
-  int etype_;
-  int eid_;
+  int      etype_;
+  int      eid_;
   uint64_t stamp_;
 };
 
@@ -101,9 +101,9 @@ class SchedEvent : public EventBase {
   void set_proc_id(int proc_id) override { proc_id_ = proc_id; }
 
  private:
-  int cr_state_ = 1;
-  int proc_id_ = 0;
-  uint64_t cr_id_ = 0;
+  int      cr_state_ = 1;
+  int      proc_id_  = 0;
+  uint64_t cr_id_    = 0;
 };
 
 // event_id = 1 transport
@@ -125,9 +125,7 @@ class TransportEvent : public EventBase {
   }
 
   void set_msg_seq(uint64_t msg_seq) override { msg_seq_ = msg_seq; }
-  void set_channel_id(uint64_t channel_id) override {
-    channel_id_ = channel_id;
-  }
+  void set_channel_id(uint64_t channel_id) override { channel_id_ = channel_id; }
   void set_adder(const std::string& adder) override { adder_ = adder; }
 
   static std::string ShowTransPerf(TransPerf type) {
@@ -156,9 +154,9 @@ class TransportEvent : public EventBase {
   }
 
  private:
-  std::string adder_ = "";
-  uint64_t msg_seq_ = 0;
-  uint64_t channel_id_ = std::numeric_limits<uint64_t>::max();
+  std::string adder_      = "";
+  uint64_t    msg_seq_    = 0;
+  uint64_t    channel_id_ = std::numeric_limits<uint64_t>::max();
 };
 
 }  // namespace event

@@ -36,17 +36,15 @@ class Vehiclelimits_24_test : public ::testing::Test {
 };
 
 TEST_F(Vehiclelimits_24_test, General) {
-  const uint8_t bytes[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const int32_t length_maxsteeringangle = 12;
-  const int32_t length_maxbrakepercent = 12;
-  const int equivalent_maxsteeringangle = 0xad9;
-  const int equivalent_maxbrakepercent = 0xe8f;
-  EXPECT_EQ(
-      vehiclelimits_.llc_fbk_maxsteeringangle(bytes, length_maxsteeringangle),
-      equivalent_maxsteeringangle);
-  EXPECT_EQ(
-      vehiclelimits_.llc_fbk_maxbrakepercent(bytes, length_maxbrakepercent),
-      equivalent_maxbrakepercent);
+  const uint8_t bytes[8]                    = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
+  const int32_t length_maxsteeringangle     = 12;
+  const int32_t length_maxbrakepercent      = 12;
+  const int     equivalent_maxsteeringangle = 0xad9;
+  const int     equivalent_maxbrakepercent  = 0xe8f;
+  EXPECT_EQ(vehiclelimits_.llc_fbk_maxsteeringangle(bytes, length_maxsteeringangle),
+            equivalent_maxsteeringangle);
+  EXPECT_EQ(vehiclelimits_.llc_fbk_maxbrakepercent(bytes, length_maxbrakepercent),
+            equivalent_maxbrakepercent);
 }
 
 }  // namespace transit

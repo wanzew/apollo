@@ -14,17 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_pool.h"
+
 #include <boost/filesystem.hpp>
 
 #include "gtest/gtest.h"
 
-#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
-#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
-#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_pool.h"
-
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
@@ -46,10 +46,9 @@ class PyramidMapPoolTestSuite : public ::testing::Test {
 
 TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_fixed) {
   // init config
-  std::unique_ptr<PyramidMapConfig> config(
-      new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  config->resolution_num_ = 1;
+  config->resolution_num_  = 1;
   config->map_folder_path_ = "test_map_pool";
 
   std::unique_ptr<PyramidMapNodePool> pool(new PyramidMapNodePool(2, 3));
@@ -74,10 +73,9 @@ TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_fixed) {
 
 TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_not_fixed) {
   // init config
-  std::unique_ptr<PyramidMapConfig> config(
-      new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  config->resolution_num_ = 1;
+  config->resolution_num_  = 1;
   config->map_folder_path_ = "test_map_pool";
 
   std::unique_ptr<PyramidMapNodePool> pool(new PyramidMapNodePool(2, 3));

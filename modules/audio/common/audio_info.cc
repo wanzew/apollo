@@ -38,31 +38,30 @@ void AudioInfo::Insert(const AudioData& audio_data) {
   }
 }
 
-void AudioInfo::InsertChannelData(const std::size_t index,
-                                  const ChannelData& channel_data,
+void AudioInfo::InsertChannelData(const std::size_t       index,
+                                  const ChannelData&      channel_data,
                                   const MicrophoneConfig& microphone_config) {
   while (index >= signals_.size()) {
     signals_.push_back(std::deque<double>());
   }
-  int width = microphone_config.sample_width();
-  const std::string& data = channel_data.data();
+  int                width = microphone_config.sample_width();
+  const std::string& data  = channel_data.data();
   for (std::size_t i = 0; i < data.length(); i += width) {
     int16_t signal = ((int16_t(data[i + 1])) << 8) | (0x00ff & data[i]);
     signals_[index].push_back(static_cast<double>(signal));
   }
-  std::size_t max_signal_length = static_cast<std::size_t>(
-      FLAGS_cache_signal_time * microphone_config.sample_rate());
+  std::size_t max_signal_length =
+      static_cast<std::size_t>(FLAGS_cache_signal_time * microphone_config.sample_rate());
   while (signals_[index].size() > max_signal_length) {
     signals_[index].pop_front();
   }
 }
 
-std::vector<std::vector<double>> AudioInfo::GetSignals(
-    const int signal_length) {
+std::vector<std::vector<double>> AudioInfo::GetSignals(const int signal_length) {
   std::vector<std::vector<double>> signals;
   for (std::size_t i = 0; i < signals_.size(); ++i) {
-    int start_index = static_cast<int>(signals_[i].size()) - signal_length;
-    start_index = std::max(0, start_index);
+    int start_index                   = static_cast<int>(signals_[i].size()) - signal_length;
+    start_index                       = std::max(0, start_index);
     std::deque<double>::iterator iter = signals_[i].begin();
     iter += start_index;
     std::vector<double> signal(iter, signals_[i].end());

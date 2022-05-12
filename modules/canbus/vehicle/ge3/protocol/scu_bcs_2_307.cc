@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_bcs_2_307.h"
+
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -28,14 +30,10 @@ using ::apollo::drivers::canbus::Byte;
 Scubcs2307::Scubcs2307() {}
 const int32_t Scubcs2307::ID = 0x307;
 
-void Scubcs2307::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehspdvd(
-      bcs_vehspdvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_yawrate(
-      bcs_yawrate(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehspd(
-      bcs_vehspd(bytes, length));
+void Scubcs2307::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
+  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehspdvd(bcs_vehspdvd(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_yawrate(bcs_yawrate(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehspd(bcs_vehspd(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehlongaccel(
       bcs_vehlongaccel(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehlataccel(
@@ -47,13 +45,12 @@ void Scubcs2307::Parse(const std::uint8_t* bytes, int32_t length,
 // 'name': 'bcs_vehspdvd', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 40, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcs_2_307::Bcs_vehspdvdType Scubcs2307::bcs_vehspdvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 5);
+Scu_bcs_2_307::Bcs_vehspdvdType Scubcs2307::bcs_vehspdvd(const std::uint8_t* bytes,
+                                                         int32_t             length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 1);
 
-  Scu_bcs_2_307::Bcs_vehspdvdType ret =
-      static_cast<Scu_bcs_2_307::Bcs_vehspdvdType>(x);
+  Scu_bcs_2_307::Bcs_vehspdvdType ret = static_cast<Scu_bcs_2_307::Bcs_vehspdvdType>(x);
   return ret;
 }
 
@@ -61,12 +58,11 @@ Scu_bcs_2_307::Bcs_vehspdvdType Scubcs2307::bcs_vehspdvd(
 // 0.0021326, 'len': 12, 'name': 'bcs_yawrate', 'is_signed_var': False,
 // 'physical_range': '[-2.2243|2.2243]', 'bit': 55, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'rad/s'}
-double Scubcs2307::bcs_yawrate(const std::uint8_t* bytes,
-                               int32_t length) const {
-  Byte t0(bytes + 6);
+double Scubcs2307::bcs_yawrate(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 7);
+  Byte    t1(bytes + 7);
   int32_t t = t1.get_byte(4, 4);
   x <<= 4;
   x |= t;
@@ -80,10 +76,10 @@ double Scubcs2307::bcs_yawrate(const std::uint8_t* bytes,
 // 'physical_range': '[0|240]', 'bit': 39, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'km/h'}
 double Scubcs2307::bcs_vehspd(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
@@ -96,12 +92,11 @@ double Scubcs2307::bcs_vehspd(const std::uint8_t* bytes, int32_t length) const {
 // -21.593, 'precision': 0.027126736, 'len': 12, 'name': 'bcs_vehlongaccel',
 // 'is_signed_var': False, 'physical_range': '[-21.593|21.593]', 'bit': 23,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
-double Scubcs2307::bcs_vehlongaccel(const std::uint8_t* bytes,
-                                    int32_t length) const {
-  Byte t0(bytes + 2);
+double Scubcs2307::bcs_vehlongaccel(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(4, 4);
   x <<= 4;
   x |= t;
@@ -114,12 +109,11 @@ double Scubcs2307::bcs_vehlongaccel(const std::uint8_t* bytes,
 // -21.593, 'precision': 0.027126736, 'len': 12, 'name': 'bcs_vehlataccel',
 // 'is_signed_var': False, 'physical_range': '[-21.593|21.593]', 'bit': 7,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
-double Scubcs2307::bcs_vehlataccel(const std::uint8_t* bytes,
-                                   int32_t length) const {
-  Byte t0(bytes + 0);
+double Scubcs2307::bcs_vehlataccel(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(4, 4);
   x <<= 4;
   x |= t;

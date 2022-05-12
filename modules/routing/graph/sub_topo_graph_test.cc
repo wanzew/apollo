@@ -17,6 +17,7 @@
 #include "modules/routing/graph/sub_topo_graph.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_test_utils.h"
 
@@ -76,15 +77,15 @@ TEST(SubTopoGraphTestSuit, one_sub_graph_all_valid) {
 
   double min_start_s = std::numeric_limits<double>::max();
   double max_start_s = 0.0;
-  double min_end_s = std::numeric_limits<double>::max();
-  double max_end_s = 0.0;
+  double min_end_s   = std::numeric_limits<double>::max();
+  double max_end_s   = 0.0;
   for (const auto* edge : sub_edges_1_2) {
     ASSERT_EQ(node_1, edge->FromNode());
     const auto* to_node = edge->ToNode();
-    min_start_s = std::min(to_node->StartS(), min_start_s);
-    max_start_s = std::max(to_node->StartS(), max_start_s);
-    min_end_s = std::min(to_node->EndS(), min_end_s);
-    max_end_s = std::max(to_node->EndS(), max_end_s);
+    min_start_s         = std::min(to_node->StartS(), min_start_s);
+    max_start_s         = std::max(to_node->StartS(), max_start_s);
+    min_end_s           = std::min(to_node->EndS(), min_end_s);
+    max_end_s           = std::max(to_node->EndS(), max_end_s);
   }
 
   ASSERT_DOUBLE_EQ(0.0, min_start_s);
@@ -238,7 +239,7 @@ TEST(SubTopoGraphTestSuit, two_sub_graph_nearby) {
     sub_topo_graph.GetSubInEdgesIntoSubGraph(edge_1_3, &sub_edges_1_3);
     ASSERT_EQ(1, sub_edges_1_3.size());
 
-    const auto* edge = *(sub_edges_1_3.begin());
+    const auto* edge    = *(sub_edges_1_3.begin());
     const auto* to_node = edge->ToNode();
     ASSERT_EQ(2, to_node->InFromAllEdge().size());
     ASSERT_EQ(1, to_node->InFromRightEdge().size());
@@ -253,7 +254,7 @@ TEST(SubTopoGraphTestSuit, two_sub_graph_nearby) {
     ASSERT_DOUBLE_EQ(TEST_LANE_LENGTH, to_node->Length());
     ASSERT_TRUE(to_node->IsSubNode());
 
-    const auto* right_edge = *(to_node->OutToRightEdge().begin());
+    const auto* right_edge    = *(to_node->OutToRightEdge().begin());
     const auto* right_to_node = right_edge->ToNode();
 
     ASSERT_EQ(3, right_to_node->InFromAllEdge().size());
@@ -310,7 +311,7 @@ TEST(SubTopoGraphTestSuit, two_sub_graph_nearby_one_out) {
     sub_topo_graph.GetSubInEdgesIntoSubGraph(edge_3_4, &sub_edges_3_4);
     // return origin edge when A has sub node, B has no sub node
     ASSERT_EQ(2, sub_edges_3_4.size());
-    const auto* one_edge = *(sub_edges_3_4.begin());
+    const auto* one_edge     = *(sub_edges_3_4.begin());
     const auto* one_sub_node = one_edge->ToNode();
     const auto* edge_4_sub_5 = one_sub_node->GetOutEdgeTo(node_5);
     ASSERT_TRUE(edge_4_sub_5 != nullptr);
@@ -496,13 +497,11 @@ TEST(SubTopoGraphTestSuit, one_sub_graph_whole_lane_block) {
 
   {
     std::unordered_map<const TopoNode*, std::vector<NodeSRange>> range_list;
-    range_list[node_1].push_back(
-        GetSRange(TEST_LANE_LENGTH / 2, TEST_LANE_LENGTH / 2));
+    range_list[node_1].push_back(GetSRange(TEST_LANE_LENGTH / 2, TEST_LANE_LENGTH / 2));
     range_list[node_3].push_back(GetSRange(0.0, TEST_LANE_LENGTH));
     SubTopoGraph sub_topo_graph(range_list);
 
-    const auto* sub_node_1 =
-        sub_topo_graph.GetSubNodeWithS(node_1, TEST_LANE_LENGTH / 2 + 0.1);
+    const auto* sub_node_1 = sub_topo_graph.GetSubNodeWithS(node_1, TEST_LANE_LENGTH / 2 + 0.1);
     ASSERT_TRUE(sub_node_1 != nullptr);
 
     ASSERT_EQ(2, sub_node_1->InFromAllEdge().size());
@@ -514,14 +513,11 @@ TEST(SubTopoGraphTestSuit, one_sub_graph_whole_lane_block) {
 
   {
     std::unordered_map<const TopoNode*, std::vector<NodeSRange>> range_list;
-    range_list[node_1].push_back(
-        GetSRange(TEST_LANE_LENGTH / 2, TEST_LANE_LENGTH / 2));
-    range_list[node_3].push_back(
-        GetSRange(TEST_LANE_LENGTH / 2, TEST_LANE_LENGTH));
+    range_list[node_1].push_back(GetSRange(TEST_LANE_LENGTH / 2, TEST_LANE_LENGTH / 2));
+    range_list[node_3].push_back(GetSRange(TEST_LANE_LENGTH / 2, TEST_LANE_LENGTH));
     SubTopoGraph sub_topo_graph(range_list);
 
-    const auto* sub_node_1 =
-        sub_topo_graph.GetSubNodeWithS(node_1, TEST_LANE_LENGTH / 2 + 0.1);
+    const auto* sub_node_1 = sub_topo_graph.GetSubNodeWithS(node_1, TEST_LANE_LENGTH / 2 + 0.1);
     ASSERT_TRUE(sub_node_1 != nullptr);
 
     ASSERT_EQ(2, sub_node_1->InFromAllEdge().size());
@@ -543,16 +539,12 @@ TEST(SubTopoGraphTestSuit, one_sub_graph_whole_lane_block) {
 
   {
     std::unordered_map<const TopoNode*, std::vector<NodeSRange>> range_list;
-    range_list[node_1].push_back(
-        GetSRange(TEST_LANE_LENGTH / 2, TEST_LANE_LENGTH / 2));
-    range_list[node_3].push_back(
-        GetSRange(TEST_LANE_LENGTH / 4, TEST_LANE_LENGTH / 2));
-    range_list[node_3].push_back(
-        GetSRange(TEST_LANE_LENGTH * 3 / 4, TEST_LANE_LENGTH));
+    range_list[node_1].push_back(GetSRange(TEST_LANE_LENGTH / 2, TEST_LANE_LENGTH / 2));
+    range_list[node_3].push_back(GetSRange(TEST_LANE_LENGTH / 4, TEST_LANE_LENGTH / 2));
+    range_list[node_3].push_back(GetSRange(TEST_LANE_LENGTH * 3 / 4, TEST_LANE_LENGTH));
     SubTopoGraph sub_topo_graph(range_list);
 
-    const auto* sub_node_1 =
-        sub_topo_graph.GetSubNodeWithS(node_1, TEST_LANE_LENGTH / 2 + 0.1);
+    const auto* sub_node_1 = sub_topo_graph.GetSubNodeWithS(node_1, TEST_LANE_LENGTH / 2 + 0.1);
     ASSERT_TRUE(sub_node_1 != nullptr);
 
     ASSERT_EQ(2, sub_node_1->InFromAllEdge().size());
@@ -562,8 +554,7 @@ TEST(SubTopoGraphTestSuit, one_sub_graph_whole_lane_block) {
     ASSERT_EQ(1, sub_node_1->OutToRightEdge().size());
     ASSERT_EQ(1, sub_node_1->OutToSucEdge().size());
 
-    const auto* sub_node_3 =
-        sub_topo_graph.GetSubNodeWithS(node_3, TEST_LANE_LENGTH / 2 + 0.1);
+    const auto* sub_node_3 = sub_topo_graph.GetSubNodeWithS(node_3, TEST_LANE_LENGTH / 2 + 0.1);
     ASSERT_TRUE(sub_node_3 != nullptr);
 
     ASSERT_EQ(1, sub_node_3->InFromAllEdge().size());

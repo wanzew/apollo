@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Parkingbrakestatusrpt80 : public ::apollo::drivers::canbus::ProtocolData<
-                                    ::apollo::canbus::ChassisDetail> {
+class Parkingbrakestatusrpt80
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Parkingbrakestatusrpt80();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'PARKING_BRAKE_ENABLED', 'enum': {0:
@@ -37,8 +37,8 @@ class Parkingbrakestatusrpt80 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Parking_brake_status_rpt_80::Parking_brake_enabledType parking_brake_enabled(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Parking_brake_status_rpt_80::Parking_brake_enabledType
+  parking_brake_enabled(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace gem

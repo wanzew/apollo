@@ -20,6 +20,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/eval/frame_statistics.h"
 #include "modules/perception/tool/benchmark/lidar/eval/lidar_option.h"
 #include "modules/perception/tool/benchmark/lidar/eval/sequence_self_statistics.h"
@@ -30,44 +31,46 @@ namespace perception {
 namespace benchmark {
 
 struct FrameMetrics {
-  std::string frame_name;
+  std::string         frame_name;
   std::vector<double> detection_recall_2017;
   std::vector<double> detection_precision_2017;
   std::vector<double> detection_visible_recall_2017;
   std::vector<double> aad_2017;
-  double jaccard_index_percentile = 0.0;
+  double              jaccard_index_percentile = 0.0;
 
   bool operator<(const FrameMetrics& rhs) const {
-    double score = std::accumulate(detection_recall_2017.begin(),
-                                   detection_recall_2017.end(), 0.0);
-    double score_right = std::accumulate(rhs.detection_recall_2017.begin(),
-                                         rhs.detection_recall_2017.end(), 0.0);
+    double score = std::accumulate(detection_recall_2017.begin(), detection_recall_2017.end(), 0.0);
+    double score_right =
+        std::accumulate(rhs.detection_recall_2017.begin(), rhs.detection_recall_2017.end(), 0.0);
     return score < score_right;
   }
 };
 
 class DetectionEvaluation {
  public:
-  DetectionEvaluation() = default;
-  ~DetectionEvaluation() = default;
+  DetectionEvaluation()                               = default;
+  ~DetectionEvaluation()                              = default;
   DetectionEvaluation(const DetectionEvaluation& rhs) = delete;
 
-  bool init(const std::string& clouds, const std::string& results,
-            const std::string& groundtruths, bool is_folder,
-            unsigned int loader_thread_num, unsigned int eval_thread_num,
-            unsigned int eval_parrallel_num, const std::string& reserve);
+  bool init(const std::string& clouds,
+            const std::string& results,
+            const std::string& groundtruths,
+            bool               is_folder,
+            unsigned int       loader_thread_num,
+            unsigned int       eval_thread_num,
+            unsigned int       eval_parrallel_num,
+            const std::string& reserve);
   void run_evaluation();
 
-  friend std::ostream& operator<<(std::ostream& out,
-                                  const DetectionEvaluation& rhs);
+  friend std::ostream& operator<<(std::ostream& out, const DetectionEvaluation& rhs);
 
  private:
-  bool _initialized = false;
-  std::unique_ptr<ctpl::thread_pool> _thread_pool;
+  bool                                     _initialized = false;
+  std::unique_ptr<ctpl::thread_pool>       _thread_pool;
   AsyncSequenceDataLoader<FrameStatistics> _loader;
 
   MetaStatistics _meta_stat;
-  unsigned int _eval_parrallel_num = 0;
+  unsigned int   _eval_parrallel_num = 0;
 
   SequenceSelfStatistics<unsigned int> _self_stat;
 
@@ -77,15 +80,15 @@ class DetectionEvaluation {
   std::vector<FrameMetrics> _frame_metrics;
   // OrientationSimilarityMetric _similarity_metric;
   // whole dataset
-  std::vector<double> _detection_precision_2017;
-  std::vector<double> _detection_recall_2017;
-  std::vector<double> _detection_visible_recall_2017;
-  std::vector<double> _detection_precision_2016;
-  std::vector<double> _detection_recall_2016;
-  double _detection_ap;
-  double _detection_aos;
-  std::vector<SPRCTuple> _detection_curve_samples;
-  std::vector<double> _detection_ap_per_type;
+  std::vector<double>                 _detection_precision_2017;
+  std::vector<double>                 _detection_recall_2017;
+  std::vector<double>                 _detection_visible_recall_2017;
+  std::vector<double>                 _detection_precision_2016;
+  std::vector<double>                 _detection_recall_2016;
+  double                              _detection_ap;
+  double                              _detection_aos;
+  std::vector<SPRCTuple>              _detection_curve_samples;
+  std::vector<double>                 _detection_ap_per_type;
   std::vector<std::vector<SPRCTuple>> _detection_curve_samples_per_type;
   // orientation
   std::vector<double> _aad_2017;
@@ -94,11 +97,10 @@ class DetectionEvaluation {
   std::vector<std::vector<double>> _classification_accuracy_2017;
   std::vector<std::vector<double>> _classification_confusion_matrix_gt_major;
   std::vector<std::vector<double>> _classification_confusion_matrix_det_major;
-  std::vector<std::vector<double>>
-      _classification_confusion_matrix_det_major_with_fp;
+  std::vector<std::vector<double>> _classification_confusion_matrix_det_major_with_fp;
   // self-evaluation
   std::vector<std::vector<double>> _classification_change_rate_per_class;
-  double _classification_change_rate;
+  double                           _classification_change_rate;
   // option
   LidarOption _lidar_option;
 };

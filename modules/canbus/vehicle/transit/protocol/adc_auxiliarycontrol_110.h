@@ -17,15 +17,17 @@
 #pragma once
 
 #include "gtest/gtest_prod.h"
+
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace transit {
 
-class Adcauxiliarycontrol110 : public ::apollo::drivers::canbus::ProtocolData<
-                                   ::apollo::canbus::ChassisDetail> {
+class Adcauxiliarycontrol110
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -43,23 +45,20 @@ class Adcauxiliarycontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   // 0.0, 'precision': 1.0, 'len': 2, 'name': 'ADC_AuxControl_Counter',
   // 'is_signed_var': False, 'physical_range': '[0|3]', 'bit': 54, 'type':
   // 'int', 'order': 'intel', 'physical_unit': ''}
-  Adcauxiliarycontrol110* set_adc_auxcontrol_counter(
-      int adc_auxcontrol_counter);
+  Adcauxiliarycontrol110* set_adc_auxcontrol_counter(int adc_auxcontrol_counter);
 
   // config detail: {'description': 'Aux control checksum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'name': 'ADC_AuxControl_Checksum',
   // 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type':
   // 'int', 'order': 'intel', 'physical_unit': ''}
-  Adcauxiliarycontrol110* set_adc_auxcontrol_checksum(
-      int adc_auxcontrol_checksum);
+  Adcauxiliarycontrol110* set_adc_auxcontrol_checksum(int adc_auxcontrol_checksum);
 
   // config detail: {'description': 'Control inverter override (default ON if
   // not overridden)', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name':
   // 'ADC_CMD_Inverter_ControlEnable', 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 1, 'type': 'bool', 'order': 'intel', 'physical_unit':
   // 'T/F'}
-  Adcauxiliarycontrol110* set_adc_cmd_inverter_controlenable(
-      bool adc_cmd_inverter_controlenable);
+  Adcauxiliarycontrol110* set_adc_cmd_inverter_controlenable(bool adc_cmd_inverter_controlenable);
 
   // config detail: {'description': 'Control inverter', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_Inverter', 'is_signed_var':
@@ -78,8 +77,7 @@ class Adcauxiliarycontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   // 'ADC_CMD_PDU_ControlEnable', 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 0, 'type': 'bool', 'order': 'intel', 'physical_unit':
   // 'T/F'}
-  Adcauxiliarycontrol110* set_adc_cmd_pdu_controlenable(
-      bool adc_cmd_pdu_controlenable);
+  Adcauxiliarycontrol110* set_adc_cmd_pdu_controlenable(bool adc_cmd_pdu_controlenable);
 
   // config detail: {'description': 'Control PDU Ch 8 (when override enabled)',
   // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch8',
@@ -159,8 +157,8 @@ class Adcauxiliarycontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 2, 'name': 'ADC_CMD_TurnSignal', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 24, 'type': 'enum',
   // 'order': 'intel', 'physical_unit': ''}
-  Adcauxiliarycontrol110* set_adc_cmd_turnsignal(
-      Adc_auxiliarycontrol_110::Adc_cmd_turnsignalType adc_cmd_turnsignal);
+  Adcauxiliarycontrol110*
+  set_adc_cmd_turnsignal(Adc_auxiliarycontrol_110::Adc_cmd_turnsignalType adc_cmd_turnsignal);
 
  private:
   // config detail: {'description': 'Aux control heartbeat counter', 'offset':
@@ -173,16 +171,14 @@ class Adcauxiliarycontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'name': 'ADC_AuxControl_Checksum',
   // 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type':
   // 'int', 'order': 'intel', 'physical_unit': ''}
-  void set_p_adc_auxcontrol_checksum(uint8_t* data,
-                                     int adc_auxcontrol_checksum);
+  void set_p_adc_auxcontrol_checksum(uint8_t* data, int adc_auxcontrol_checksum);
 
   // config detail: {'description': 'Control inverter override (default ON if
   // not overridden)', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name':
   // 'ADC_CMD_Inverter_ControlEnable', 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 1, 'type': 'bool', 'order': 'intel', 'physical_unit':
   // 'T/F'}
-  void set_p_adc_cmd_inverter_controlenable(
-      uint8_t* data, bool adc_cmd_inverter_controlenable);
+  void set_p_adc_cmd_inverter_controlenable(uint8_t* data, bool adc_cmd_inverter_controlenable);
 
   // config detail: {'description': 'Control inverter', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_Inverter', 'is_signed_var':
@@ -201,8 +197,7 @@ class Adcauxiliarycontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   // 'ADC_CMD_PDU_ControlEnable', 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 0, 'type': 'bool', 'order': 'intel', 'physical_unit':
   // 'T/F'}
-  void set_p_adc_cmd_pdu_controlenable(uint8_t* data,
-                                       bool adc_cmd_pdu_controlenable);
+  void set_p_adc_cmd_pdu_controlenable(uint8_t* data, bool adc_cmd_pdu_controlenable);
 
   // config detail: {'description': 'Control PDU Ch 8 (when override enabled)',
   // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch8',
@@ -282,29 +277,29 @@ class Adcauxiliarycontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 2, 'name': 'ADC_CMD_TurnSignal', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 24, 'type': 'enum',
   // 'order': 'intel', 'physical_unit': ''}
-  void set_p_adc_cmd_turnsignal(
-      uint8_t* data,
-      Adc_auxiliarycontrol_110::Adc_cmd_turnsignalType adc_cmd_turnsignal);
+  void
+  set_p_adc_cmd_turnsignal(uint8_t*                                         data,
+                           Adc_auxiliarycontrol_110::Adc_cmd_turnsignalType adc_cmd_turnsignal);
 
  private:
-  int adc_auxcontrol_counter_;
-  int adc_auxcontrol_checksum_;
-  bool adc_cmd_inverter_controlenable_;
-  bool adc_cmd_inverter_;
-  int adc_cmd_wiper_;
-  bool adc_cmd_pdu_controlenable_;
-  bool adc_cmd_pdu_ch8_;
-  bool adc_cmd_pdu_ch7_;
-  bool adc_cmd_pdu_ch6_;
-  bool adc_cmd_pdu_ch5_;
-  bool adc_cmd_pdu_ch4_;
-  bool adc_cmd_pdu_ch3_;
-  bool adc_cmd_pdu_ch2_;
-  bool adc_cmd_pdu_ch1_;
-  bool adc_cmd_hazardlights_;
-  bool adc_cmd_highbeam_;
-  bool adc_cmd_lowbeam_;
-  bool adc_cmd_horn_;
+  int                                              adc_auxcontrol_counter_;
+  int                                              adc_auxcontrol_checksum_;
+  bool                                             adc_cmd_inverter_controlenable_;
+  bool                                             adc_cmd_inverter_;
+  int                                              adc_cmd_wiper_;
+  bool                                             adc_cmd_pdu_controlenable_;
+  bool                                             adc_cmd_pdu_ch8_;
+  bool                                             adc_cmd_pdu_ch7_;
+  bool                                             adc_cmd_pdu_ch6_;
+  bool                                             adc_cmd_pdu_ch5_;
+  bool                                             adc_cmd_pdu_ch4_;
+  bool                                             adc_cmd_pdu_ch3_;
+  bool                                             adc_cmd_pdu_ch2_;
+  bool                                             adc_cmd_pdu_ch1_;
+  bool                                             adc_cmd_hazardlights_;
+  bool                                             adc_cmd_highbeam_;
+  bool                                             adc_cmd_lowbeam_;
+  bool                                             adc_cmd_horn_;
   Adc_auxiliarycontrol_110::Adc_cmd_turnsignalType adc_cmd_turnsignal_;
 };
 

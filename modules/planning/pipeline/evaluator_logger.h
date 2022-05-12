@@ -25,9 +25,8 @@ namespace planning {
 class EvaluatorLogger {
  public:
   static std::ofstream& GetStream() {
-    static std::ofstream log_file(
-        FLAGS_planning_data_dir + "/output_data_evaluated.log",
-        std::ios_base::out | std::ios_base::app);
+    static std::ofstream log_file(FLAGS_planning_data_dir + "/output_data_evaluated.log",
+                                  std::ios_base::out | std::ios_base::app);
     return log_file;
   }
 };

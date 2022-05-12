@@ -22,12 +22,11 @@ namespace perception {
 namespace common {
 
 TEST(CommonIoTest, read_pose_file) {
-  const std::string testdata_folder =
-      "/apollo/modules/perception/testdata/common/io/params/";
-  std::string filename;
-  Eigen::Affine3d pose;
-  int frame_id = 0;
-  double time_stamp = 0;
+  const std::string testdata_folder = "/apollo/modules/perception/testdata/common/io/params/";
+  std::string       filename;
+  Eigen::Affine3d   pose;
+  int               frame_id   = 0;
+  double            time_stamp = 0;
 
   EXPECT_FALSE(ReadPoseFile(filename, nullptr, nullptr, nullptr));
   EXPECT_FALSE(ReadPoseFile(filename, &pose, &frame_id, &time_stamp));
@@ -37,9 +36,8 @@ TEST(CommonIoTest, read_pose_file) {
 }
 
 TEST(CommonIoTest, load_camera_intrinsic) {
-  const std::string testdata_folder =
-      "/apollo/modules/perception/testdata/common/io/params/";
-  std::string yaml_file;
+  const std::string testdata_folder = "/apollo/modules/perception/testdata/common/io/params/";
+  std::string       yaml_file;
   base::BrownCameraDistortionModel model;
 
   EXPECT_FALSE(LoadBrownCameraIntrinsic(yaml_file, nullptr));
@@ -55,9 +53,8 @@ TEST(CommonIoTest, load_camera_intrinsic) {
 }
 
 TEST(CommonIoTest, load_ocamera_intrinsic) {
-  const std::string testdata_folder =
-      "/apollo/modules/perception/testdata/common/io/params/";
-  std::string yaml_file;
+  const std::string testdata_folder = "/apollo/modules/perception/testdata/common/io/params/";
+  std::string       yaml_file;
   base::OmnidirectionalCameraDistortionModel model;
 
   EXPECT_FALSE(LoadOmnidirectionalCameraIntrinsics(yaml_file, nullptr));
@@ -90,12 +87,11 @@ TEST(CommonIoTest, load_ocamera_intrinsic) {
 }
 
 TEST(CommonIoTest, GetFileList) {
-  std::string path = "/apollo/modules/perception/testdata/lib/data";
+  std::string              path = "/apollo/modules/perception/testdata/lib/data";
   std::vector<std::string> files;
   EXPECT_TRUE(GetFileList(path, "", &files));
   EXPECT_FALSE(GetFileList("/not_exist_path", "", &files));
-  EXPECT_TRUE(GetFileList("/apollo/modules/perception/testdata/lib/data", "txt",
-                          &files));
+  EXPECT_TRUE(GetFileList("/apollo/modules/perception/testdata/lib/data", "txt", &files));
 }
 
 }  // namespace common

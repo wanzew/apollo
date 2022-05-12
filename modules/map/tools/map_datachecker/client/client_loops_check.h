@@ -20,11 +20,12 @@
 #include <utility>
 #include <vector>
 
+#include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_common.h"
 #include "modules/map/tools/map_datachecker/client/client_gflags.h"
 #include "modules/map/tools/map_datachecker/client/exception_handler.h"
-#include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
 
 namespace apollo {
 namespace hdmap {
@@ -36,7 +37,7 @@ class LoopsChecker {
 
  private:
   std::vector<std::pair<double, double>> GetTimeRanges();
-  int PeriodicCheck(bool* reached);
+  int                                    PeriodicCheck(bool* reached);
   int GrpcStub(LoopsVerifyRequest* request, LoopsVerifyResponse* response);
   int Start(const std::vector<std::pair<double, double>>& time_ranges);
   int Check(double* progress, bool* reached);
@@ -44,8 +45,8 @@ class LoopsChecker {
 
  private:
   std::unique_ptr<CollectionCheckerService::Stub> service_stub_;
-  const std::string& time_flag_file_;
-  int check_period_;
+  const std::string&                              time_flag_file_;
+  int                                             check_period_;
 };
 
 }  // namespace hdmap

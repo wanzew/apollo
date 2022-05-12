@@ -50,10 +50,10 @@ class Vertice {
   virtual ~Vertice();
 
   Vertice& operator=(const Vertice& rhs);
-  bool operator==(const Vertice& rhs) const;
-  bool operator!=(const Vertice& rhs) const;
+  bool     operator==(const Vertice& rhs) const;
+  bool     operator!=(const Vertice& rhs) const;
 
-  bool IsDummy() const;
+  bool               IsDummy() const;
   const std::string& GetKey() const;
 
   const std::string& value() const { return value_; }
@@ -70,29 +70,29 @@ class Edge {
   virtual ~Edge();
 
   Edge& operator=(const Edge& rhs);
-  bool operator==(const Edge& rhs) const;
+  bool  operator==(const Edge& rhs) const;
 
-  bool IsValid() const;
+  bool        IsValid() const;
   std::string GetKey() const;
 
   const Vertice& src() const { return src_; }
-  void set_src(const Vertice& v) { src_ = v; }
+  void           set_src(const Vertice& v) { src_ = v; }
 
   const Vertice& dst() const { return dst_; }
-  void set_dst(const Vertice& v) { dst_ = v; }
+  void           set_dst(const Vertice& v) { dst_ = v; }
 
   const std::string& value() const { return value_; }
-  void set_value(const std::string& val) { value_ = val; }
+  void               set_value(const std::string& val) { value_ = val; }
 
  private:
-  Vertice src_;
-  Vertice dst_;
+  Vertice     src_;
+  Vertice     dst_;
   std::string value_;
 };
 
 class Graph {
  public:
-  using VerticeSet = std::unordered_map<std::string, Vertice>;
+  using VerticeSet    = std::unordered_map<std::string, Vertice>;
   using AdjacencyList = std::unordered_map<std::string, VerticeSet>;
 
   Graph();
@@ -101,7 +101,7 @@ class Graph {
   void Insert(const Edge& e);
   void Delete(const Edge& e);
 
-  uint32_t GetNumOfEdge();
+  uint32_t      GetNumOfEdge();
   FlowDirection GetDirectionOf(const Vertice& lhs, const Vertice& rhs);
 
  private:
@@ -121,8 +121,8 @@ class Graph {
   void DeleteCompleteEdge(const Edge& e);
   bool LevelTraverse(const Vertice& start, const Vertice& end);
 
-  EdgeInfo edges_;
-  AdjacencyList list_;
+  EdgeInfo           edges_;
+  AdjacencyList      list_;
   base::AtomicRWLock rw_lock_;
 };
 

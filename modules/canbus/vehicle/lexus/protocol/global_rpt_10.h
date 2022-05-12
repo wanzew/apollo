@@ -17,42 +17,40 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Globalrpt10 : public ::apollo::drivers::canbus::ProtocolData<
-                        ::apollo::canbus::ChassisDetail> {
+class Globalrpt10
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Globalrpt10();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'CONFIG_FAULT_ACTIVE', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 15, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool config_fault_active(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  bool config_fault_active(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'PACMOD_SUBSYSTEM_TIMEOUT', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 5, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool pacmod_subsystem_timeout(const std::uint8_t* bytes,
-                                const int32_t length) const;
+  bool pacmod_subsystem_timeout(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'PACMOD_SYSTEM_ENABLED', 'enum': {0:
   // 'PACMOD_SYSTEM_ENABLED_CONTROL_DISABLED', 1:
   // 'PACMOD_SYSTEM_ENABLED_CONTROL_ENABLED'}, 'precision': 1.0, 'len': 1,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Global_rpt_10::Pacmod_system_enabledType pacmod_system_enabled(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Global_rpt_10::Pacmod_system_enabledType pacmod_system_enabled(const std::uint8_t* bytes,
+                                                                 const int32_t       length) const;
 
   // config detail: {'name': 'PACMOD_SYSTEM_OVERRIDE_ACTIVE', 'enum': {0:
   // 'PACMOD_SYSTEM_OVERRIDE_ACTIVE_NOT_OVERRIDDEN', 1:
@@ -60,15 +58,13 @@ class Globalrpt10 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Global_rpt_10::Pacmod_system_override_activeType
-  pacmod_system_override_active(const std::uint8_t* bytes,
-                                const int32_t length) const;
+  pacmod_system_override_active(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'PACMOD_SYSTEM_FAULT_ACTIVE', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 7, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool pacmod_system_fault_active(const std::uint8_t* bytes,
-                                  const int32_t length) const;
+  bool pacmod_system_fault_active(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VEH_CAN_TIMEOUT', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 6,
@@ -85,8 +81,8 @@ class Globalrpt10 : public ::apollo::drivers::canbus::ProtocolData<
   // 'BRK_CAN_TIMEOUT_ACTIVE_CAN_TIMEOUT'}, 'precision': 1.0, 'len': 1,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 4,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Global_rpt_10::Brk_can_timeoutType brk_can_timeout(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Global_rpt_10::Brk_can_timeoutType brk_can_timeout(const std::uint8_t* bytes,
+                                                     const int32_t       length) const;
 
   // config detail: {'name': 'USR_CAN_TIMEOUT', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 2,
@@ -97,8 +93,7 @@ class Globalrpt10 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 16, 'is_signed_var': False, 'physical_range':
   // '[0|65535]', 'bit': 55, 'type': 'int', 'order': 'motorola',
   // 'physical_unit': ''}
-  int usr_can_read_errors(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  int usr_can_read_errors(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace lexus

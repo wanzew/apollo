@@ -16,10 +16,10 @@
 
 #include "modules/audio/inference/siren_detection.h"
 
+#include <omp.h>
+
 #include <utility>
 #include <vector>
-
-#include <omp.h>
 
 #include "cyber/common/log.h"
 #include "modules/audio/common/audio_gflags.h"
@@ -27,7 +27,8 @@
 namespace apollo {
 namespace audio {
 
-SirenDetection::SirenDetection() : device_(torch::kCPU) {
+SirenDetection::SirenDetection()
+    : device_(torch::kCPU) {
   LoadModel();
 }
 
@@ -47,7 +48,7 @@ bool SirenDetection::Evaluate(const std::vector<std::vector<double>>& signals) {
     return false;
   }
   torch::Tensor audio_tensor = torch::empty(4 * 1 * 72000);
-  float* data = audio_tensor.data_ptr<float>();
+  float*        data         = audio_tensor.data_ptr<float>();
 
   for (const auto& channel : signals) {
     for (const auto& i : channel) {
@@ -55,25 +56,23 @@ bool SirenDetection::Evaluate(const std::vector<std::vector<double>>& signals) {
     }
   }
 
-  torch::Tensor torch_input = torch::from_blob(audio_tensor.data_ptr<float>(),
-                                               {4, 1, 72000});
+  torch::Tensor torch_input = torch::from_blob(audio_tensor.data_ptr<float>(), {4, 1, 72000});
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(torch_input.to(device_));
 
-  auto start_time = std::chrono::system_clock::now();
-  at::Tensor torch_output_tensor = torch_model_.forward(torch_inputs).toTensor()
-                                               .to(torch::kCPU);
+  auto       start_time          = std::chrono::system_clock::now();
+  at::Tensor torch_output_tensor = torch_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
 
-  auto end_time = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time - start_time;
+  auto                          end_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff     = end_time - start_time;
   AINFO << "SirenDetection used time: " << diff.count() * 1000 << " ms.";
   auto torch_output = torch_output_tensor.accessor<float, 2>();
 
   // majority vote with 4 channels
-  float neg_score = torch_output[0][0] + torch_output[1][0] +
-                    torch_output[2][0] + torch_output[3][0];
-  float pos_score = torch_output[0][1] + torch_output[1][1] +
-                    torch_output[2][1] + torch_output[3][1];
+  float neg_score =
+      torch_output[0][0] + torch_output[1][0] + torch_output[2][0] + torch_output[3][0];
+  float pos_score =
+      torch_output[0][1] + torch_output[1][1] + torch_output[2][1] + torch_output[3][1];
   ADEBUG << "neg_score = " << neg_score << ", pos_score = " << pos_score;
   if (neg_score < pos_score) {
     return true;

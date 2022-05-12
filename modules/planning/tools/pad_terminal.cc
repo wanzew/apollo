@@ -14,6 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/proto/pad_msg.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
@@ -22,8 +25,6 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/pad_msg.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace {
 
@@ -37,16 +38,16 @@ using apollo::planning::PlanningConfig;
 
 class PadTerminal {
  public:
-  PadTerminal() : node_(CreateNode("planning_pad_terminal")) {}
+  PadTerminal()
+      : node_(CreateNode("planning_pad_terminal")) {}
   void init() {
-    const std::string planning_config_file =
-        "/apollo/modules/planning/conf/planning_config.pb.txt";
-    PlanningConfig planning_config;
+    const std::string planning_config_file = "/apollo/modules/planning/conf/planning_config.pb.txt";
+    PlanningConfig    planning_config;
     ACHECK(GetProtoFromFile(planning_config_file, &planning_config))
         << "failed to load planning config file " << planning_config_file;
 
-    pad_writer_ = node_->CreateWriter<PadMessage>(
-        planning_config.topic_config().planning_pad_topic());
+    pad_writer_ =
+        node_->CreateWriter<PadMessage>(planning_config.topic_config().planning_pad_topic());
     terminal_thread_.reset(new std::thread([this] { terminal_thread_func(); }));
   }
   void help() {
@@ -83,54 +84,36 @@ class PadTerminal {
   }
 
   void terminal_thread_func() {
-    int mode = 0;
+    int  mode        = 0;
     bool should_exit = false;
     while (std::cin >> mode) {
       switch (mode) {
-        case 0:
-          send(DrivingAction::FOLLOW);
-          break;
-        case 1:
-          send(DrivingAction::CHANGE_LEFT);
-          break;
-        case 2:
-          send(DrivingAction::CHANGE_RIGHT);
-          break;
-        case 3:
-          send(DrivingAction::PULL_OVER);
-          break;
-        case 4:
-          send(DrivingAction::STOP);
-          break;
-        case 5:
-          send(DrivingAction::RESUME_CRUISE);
-          break;
-        case 10:
-          should_exit = true;
-          break;
-        default:
-          help();
-          break;
+        case 0: send(DrivingAction::FOLLOW); break;
+        case 1: send(DrivingAction::CHANGE_LEFT); break;
+        case 2: send(DrivingAction::CHANGE_RIGHT); break;
+        case 3: send(DrivingAction::PULL_OVER); break;
+        case 4: send(DrivingAction::STOP); break;
+        case 5: send(DrivingAction::RESUME_CRUISE); break;
+        case 10: should_exit = true; break;
+        default: help(); break;
       }
-      if (should_exit) {
-        break;
-      }
+      if (should_exit) { break; }
     }
   }
   void stop() { terminal_thread_->join(); }
 
  private:
-  std::unique_ptr<std::thread> terminal_thread_;
+  std::unique_ptr<std::thread>        terminal_thread_;
   std::shared_ptr<Writer<PadMessage>> pad_writer_;
-  std::shared_ptr<Node> node_;
+  std::shared_ptr<Node>               node_;
 };
 
 }  // namespace
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   apollo::cyber::Init("planning_pad_terminal");
   FLAGS_alsologtostderr = true;
-  FLAGS_v = 3;
+  FLAGS_v               = 3;
   google::ParseCommandLineFlags(&argc, &argv, true);
   PadTerminal pad_terminal;
   pad_terminal.init();

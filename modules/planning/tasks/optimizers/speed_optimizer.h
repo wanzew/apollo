@@ -33,16 +33,15 @@ class SpeedOptimizer : public Task {
   explicit SpeedOptimizer(const TaskConfig& config);
 
   virtual ~SpeedOptimizer() = default;
-  common::Status Execute(Frame* frame,
-                         ReferenceLineInfo* reference_line_info) override;
+  common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  protected:
-  virtual common::Status Process(const PathData& path_data,
+  virtual common::Status Process(const PathData&                path_data,
                                  const common::TrajectoryPoint& init_point,
-                                 SpeedData* const speed_data) = 0;
+                                 SpeedData* const               speed_data) = 0;
 
   void RecordDebugInfo(const SpeedData& speed_data);
-  void RecordDebugInfo(const SpeedData& speed_data,
+  void RecordDebugInfo(const SpeedData&                 speed_data,
                        planning_internal::STGraphDebug* st_graph_debug);
 };
 

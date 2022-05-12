@@ -27,7 +27,7 @@ namespace cyber {
 namespace message {
 
 class Data {
-  uint64_t timestamp;
+  uint64_t    timestamp;
   std::string content;
 };
 
@@ -38,10 +38,7 @@ class Message {
   std::size_t ByteSizeLong() const { return content.size(); }
 
   bool SerializeToArray(void* data, int size) const {
-    if (data == nullptr || size < 0 ||
-        static_cast<size_t>(size) < ByteSizeLong()) {
-      return false;
-    }
+    if (data == nullptr || size < 0 || static_cast<size_t>(size) < ByteSizeLong()) { return false; }
 
     memcpy(data, content.data(), content.size());
     return true;
@@ -53,9 +50,7 @@ class Message {
   }
 
   bool ParseFromArray(const void* data, int size) {
-    if (data == nullptr || size <= 0) {
-      return false;
-    }
+    if (data == nullptr || size <= 0) { return false; }
     content.assign(static_cast<const char*>(data), size);
     return true;
   }
@@ -65,9 +60,7 @@ class Message {
     return true;
   }
 
-  static void GetDescriptorString(const std::string&, std::string* str) {
-    *str = "message";
-  }
+  static void GetDescriptorString(const std::string&, std::string* str) { *str = "message"; }
 
   std::string TypeName() const { return "type"; }
 };
@@ -130,8 +123,8 @@ TEST(MessageTraitsTest, byte_size) {
 }
 
 TEST(MessageTraitsTest, serialize_to_array) {
-  const int kArraySize = 256;
-  char array[kArraySize] = {0};
+  const int kArraySize        = 256;
+  char      array[kArraySize] = {0};
 
   proto::UnitTest ut;
   ut.set_class_name("MessageTraits");
@@ -191,9 +184,9 @@ TEST(MessageTraitsTest, serialize_to_string) {
 }
 
 TEST(MessageTraitsTest, parse_from_array) {
-  const int kArraySize = 256;
-  const char array[kArraySize] = "\n\rMessageTraits\x12\x11parse_from_string";
-  const int arr_str_len = static_cast<int>(strlen(array));
+  const int         kArraySize        = 256;
+  const char        array[kArraySize] = "\n\rMessageTraits\x12\x11parse_from_string";
+  const int         arr_str_len       = static_cast<int>(strlen(array));
   const std::string arr_str(array);
 
   proto::UnitTest ut;
@@ -215,7 +208,7 @@ TEST(MessageTraitsTest, parse_from_array) {
 
 TEST(MessageTraitsTest, parse_from_string) {
   proto::UnitTest ut;
-  std::string str("\n\rMessageTraits\x12\x11parse_from_string");
+  std::string     str("\n\rMessageTraits\x12\x11parse_from_string");
   EXPECT_TRUE(ParseFromString(str, &ut));
   EXPECT_EQ(ut.class_name(), "MessageTraits");
   EXPECT_EQ(ut.case_name(), "parse_from_string");
@@ -238,31 +231,26 @@ TEST(MessageTraitsTest, serialize_parse_hc) {
   msg->set_seq(1);
   msg->set_content("chatter msg");
 
-  const int size = ByteSize(*msg) + static_cast<int>(sizeof(MessageHeader));
+  const int   size = ByteSize(*msg) + static_cast<int>(sizeof(MessageHeader));
   std::string buffer;
   buffer.resize(size);
   EXPECT_TRUE(SerializeToHC(*msg, const_cast<char*>(buffer.data()), size));
 
-  auto pb_msg = std::make_shared<proto::Chatter>();
+  auto pb_msg  = std::make_shared<proto::Chatter>();
   auto raw_msg = std::make_shared<RawMessage>();
 
-  EXPECT_TRUE(
-      ParseFromHC(const_cast<char*>(buffer.data()), size, pb_msg.get()));
-  EXPECT_TRUE(
-      ParseFromHC(const_cast<char*>(buffer.data()), size, raw_msg.get()));
+  EXPECT_TRUE(ParseFromHC(const_cast<char*>(buffer.data()), size, pb_msg.get()));
+  EXPECT_TRUE(ParseFromHC(const_cast<char*>(buffer.data()), size, raw_msg.get()));
 
   std::string new_buffer;
   new_buffer.resize(size);
-  EXPECT_TRUE(
-      SerializeToHC(*pb_msg, const_cast<char*>(new_buffer.data()), size));
+  EXPECT_TRUE(SerializeToHC(*pb_msg, const_cast<char*>(new_buffer.data()), size));
   EXPECT_EQ(new_buffer, buffer);
   new_buffer.clear();
 
   new_buffer.resize(size);
-  EXPECT_TRUE(
-      SerializeToHC(*raw_msg, const_cast<char*>(new_buffer.data()), size));
-  EXPECT_TRUE(
-      ParseFromHC(const_cast<char*>(new_buffer.data()), size, pb_msg.get()));
+  EXPECT_TRUE(SerializeToHC(*raw_msg, const_cast<char*>(new_buffer.data()), size));
+  EXPECT_TRUE(ParseFromHC(const_cast<char*>(new_buffer.data()), size, pb_msg.get()));
   EXPECT_EQ(pb_msg->timestamp(), 12345);
   EXPECT_EQ(pb_msg->seq(), 1);
   EXPECT_EQ(pb_msg->content(), "chatter msg");

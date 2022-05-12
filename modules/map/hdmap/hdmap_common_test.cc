@@ -14,6 +14,7 @@ limitations under the License.
 =========================================================================*/
 
 #include "gtest/gtest.h"
+
 #include "modules/map/hdmap/hdmap_impl.h"
 
 namespace apollo {
@@ -25,23 +26,23 @@ class HDMapCommonTestSuite : public ::testing::Test {
   virtual ~HDMapCommonTestSuite() {}
   virtual void SetUp() {}
   virtual void TearDown() {}
-  void InitLaneObj(Lane* lane);
-  void InitJunctionObj(Junction* junction);
-  void InitSignalObj(Signal* signal);
-  void InitCrosswalkObj(Crosswalk* crosswalk);
-  void InitStopSignObj(StopSign* stop_sign);
-  void InitYieldSignObj(YieldSign* yield_sign);
-  void InitClearAreaObj(ClearArea* clear_area);
-  void InitSpeedBumpObj(SpeedBump* speed_bump);
-  void InitRoadObj(Road* road);
-  void InitParkingSpaceObj(ParkingSpace* parking_space);
+  void         InitLaneObj(Lane* lane);
+  void         InitJunctionObj(Junction* junction);
+  void         InitSignalObj(Signal* signal);
+  void         InitCrosswalkObj(Crosswalk* crosswalk);
+  void         InitStopSignObj(StopSign* stop_sign);
+  void         InitYieldSignObj(YieldSign* yield_sign);
+  void         InitClearAreaObj(ClearArea* clear_area);
+  void         InitSpeedBumpObj(SpeedBump* speed_bump);
+  void         InitRoadObj(Road* road);
+  void         InitParkingSpaceObj(ParkingSpace* parking_space);
 };
 
 void HDMapCommonTestSuite::InitLaneObj(Lane* lane) {
   lane->mutable_id()->set_id("lane_1");
-  CurveSegment* curve_segment = lane->mutable_central_curve()->add_segment();
-  LineSegment* line_segment = curve_segment->mutable_line_segment();
-  apollo::common::PointENU* pt = line_segment->add_point();
+  CurveSegment*             curve_segment = lane->mutable_central_curve()->add_segment();
+  LineSegment*              line_segment  = curve_segment->mutable_line_segment();
+  apollo::common::PointENU* pt            = line_segment->add_point();
   pt->set_x(170001.0);
   pt->set_y(1.0);
   pt = line_segment->add_point();
@@ -93,8 +94,8 @@ void HDMapCommonTestSuite::InitLaneObj(Lane* lane) {
 
 void HDMapCommonTestSuite::InitJunctionObj(Junction* junction) {
   junction->mutable_id()->set_id("junction_1");
-  Polygon* polygon = junction->mutable_polygon();
-  apollo::common::PointENU* pt = polygon->add_point();
+  Polygon*                  polygon = junction->mutable_polygon();
+  apollo::common::PointENU* pt      = polygon->add_point();
   pt->set_x(170001.0);
   pt->set_y(170001.0);
   pt = polygon->add_point();
@@ -125,8 +126,8 @@ void HDMapCommonTestSuite::InitJunctionObj(Junction* junction) {
 
 void HDMapCommonTestSuite::InitSignalObj(Signal* signal) {
   signal->mutable_id()->set_id("signal_1");
-  Polygon* polygon = signal->mutable_boundary();
-  apollo::common::PointENU* pt = polygon->add_point();
+  Polygon*                  polygon = signal->mutable_boundary();
+  apollo::common::PointENU* pt      = polygon->add_point();
   pt->set_x(170001.0);
   pt->set_y(1.0);
   pt->set_z(1.0);
@@ -163,8 +164,8 @@ void HDMapCommonTestSuite::InitSignalObj(Signal* signal) {
   pt->set_z(2.0);
 
   CurveSegment* curve_segment = signal->add_stop_line()->add_segment();
-  LineSegment* line_segment = curve_segment->mutable_line_segment();
-  pt = line_segment->add_point();
+  LineSegment*  line_segment  = curve_segment->mutable_line_segment();
+  pt                          = line_segment->add_point();
   pt->set_x(170000.0);
   pt->set_y(4.0);
   pt->set_z(0.0);
@@ -178,8 +179,8 @@ void HDMapCommonTestSuite::InitSignalObj(Signal* signal) {
   pt->set_z(0.0);
 
   curve_segment = signal->add_stop_line()->add_segment();
-  line_segment = curve_segment->mutable_line_segment();
-  pt = line_segment->add_point();
+  line_segment  = curve_segment->mutable_line_segment();
+  pt            = line_segment->add_point();
   pt->set_x(170002.0);
   pt->set_y(4.0);
   pt->set_z(0.0);
@@ -194,8 +195,8 @@ void HDMapCommonTestSuite::InitSignalObj(Signal* signal) {
 }
 void HDMapCommonTestSuite::InitCrosswalkObj(Crosswalk* crosswalk) {
   crosswalk->mutable_id()->set_id("crosswalk_1");
-  Polygon* polygon = crosswalk->mutable_polygon();
-  apollo::common::PointENU* pt = polygon->add_point();
+  Polygon*                  polygon = crosswalk->mutable_polygon();
+  apollo::common::PointENU* pt      = polygon->add_point();
   pt->set_x(170000.0);
   pt->set_y(170000.0);
   pt->set_z(0.0);
@@ -214,9 +215,9 @@ void HDMapCommonTestSuite::InitCrosswalkObj(Crosswalk* crosswalk) {
 }
 void HDMapCommonTestSuite::InitStopSignObj(StopSign* stop_sign) {
   stop_sign->mutable_id()->set_id("stop_sign_1");
-  CurveSegment* curve_segment = stop_sign->add_stop_line()->add_segment();
-  LineSegment* line_segment = curve_segment->mutable_line_segment();
-  apollo::common::PointENU* pt = line_segment->add_point();
+  CurveSegment*             curve_segment = stop_sign->add_stop_line()->add_segment();
+  LineSegment*              line_segment  = curve_segment->mutable_line_segment();
+  apollo::common::PointENU* pt            = line_segment->add_point();
   pt->set_x(170000.0);
   pt->set_y(0.0);
   pt->set_z(0.0);
@@ -231,9 +232,9 @@ void HDMapCommonTestSuite::InitStopSignObj(StopSign* stop_sign) {
 }
 void HDMapCommonTestSuite::InitYieldSignObj(YieldSign* yield_sign) {
   yield_sign->mutable_id()->set_id("yield_sign_1");
-  CurveSegment* curve_segment = yield_sign->add_stop_line()->add_segment();
-  LineSegment* line_segment = curve_segment->mutable_line_segment();
-  apollo::common::PointENU* pt = line_segment->add_point();
+  CurveSegment*             curve_segment = yield_sign->add_stop_line()->add_segment();
+  LineSegment*              line_segment  = curve_segment->mutable_line_segment();
+  apollo::common::PointENU* pt            = line_segment->add_point();
   pt->set_x(170000.0);
   pt->set_y(0.0);
   pt->set_z(0.0);
@@ -248,8 +249,8 @@ void HDMapCommonTestSuite::InitYieldSignObj(YieldSign* yield_sign) {
 }
 void HDMapCommonTestSuite::InitClearAreaObj(ClearArea* clear_area) {
   clear_area->mutable_id()->set_id("clear_area_1");
-  Polygon* polygon = clear_area->mutable_polygon();
-  apollo::common::PointENU* pt = polygon->add_point();
+  Polygon*                  polygon = clear_area->mutable_polygon();
+  apollo::common::PointENU* pt      = polygon->add_point();
   pt->set_x(170000.0);
   pt->set_y(170000.0);
   pt->set_z(0.0);
@@ -268,9 +269,9 @@ void HDMapCommonTestSuite::InitClearAreaObj(ClearArea* clear_area) {
 }
 void HDMapCommonTestSuite::InitSpeedBumpObj(SpeedBump* speed_bump) {
   speed_bump->mutable_id()->set_id("speed_bump_1");
-  CurveSegment* curve_segment = speed_bump->add_position()->add_segment();
-  LineSegment* line_segment = curve_segment->mutable_line_segment();
-  apollo::common::PointENU* pt = line_segment->add_point();
+  CurveSegment*             curve_segment = speed_bump->add_position()->add_segment();
+  LineSegment*              line_segment  = curve_segment->mutable_line_segment();
+  apollo::common::PointENU* pt            = line_segment->add_point();
   pt->set_x(170000.0);
   pt->set_y(0.0);
   pt->set_z(0.0);
@@ -285,8 +286,8 @@ void HDMapCommonTestSuite::InitSpeedBumpObj(SpeedBump* speed_bump) {
 }
 void HDMapCommonTestSuite::InitParkingSpaceObj(ParkingSpace* parking_space) {
   parking_space->mutable_id()->set_id("parking_space_1");
-  Polygon* polygon = parking_space->mutable_polygon();
-  apollo::common::PointENU* pt = polygon->add_point();
+  Polygon*                  polygon = parking_space->mutable_polygon();
+  apollo::common::PointENU* pt      = polygon->add_point();
   pt->set_x(170000.0);
   pt->set_y(170000.0);
   pt->set_z(0.0);
@@ -323,8 +324,7 @@ TEST_F(HDMapCommonTestSuite, TestLaneInfo) {
   InitLaneObj(&lane);
   LaneInfo lane_info(lane);
   EXPECT_EQ(lane.id().id(), lane_info.id().id());
-  EXPECT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
-            lane_info.points().size());
+  EXPECT_EQ(lane.central_curve().segment(0).line_segment().point_size(), lane_info.points().size());
   for (int i = 0; i < static_cast<int>(lane_info.points().size()); ++i) {
     EXPECT_NEAR(lane.central_curve().segment(0).line_segment().point(i).x(),
                 lane_info.points()[i].x(), 1E-5);
@@ -336,25 +336,21 @@ TEST_F(HDMapCommonTestSuite, TestLaneInfo) {
   for (const auto& segment : lane_info.segments()) {
     EXPECT_NEAR(1.0, segment.length(), 1E-4);
   }
-  EXPECT_EQ(lane_info.unit_directions().size(),
-            lane_info.segments().size() + 1);
+  EXPECT_EQ(lane_info.unit_directions().size(), lane_info.segments().size() + 1);
   for (size_t i = 0; i < lane_info.segments().size(); ++i) {
-    EXPECT_EQ(lane_info.segments()[i].unit_direction(),
-              lane_info.unit_directions()[i]);
+    EXPECT_EQ(lane_info.segments()[i].unit_direction(), lane_info.unit_directions()[i]);
   }
   EXPECT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
             lane_info.accumulate_s().size());
   for (size_t i = 0; i < lane_info.accumulate_s().size(); ++i) {
-    EXPECT_NEAR(static_cast<double>(i) * 1.0,
-                lane_info.accumulate_s()[static_cast<int>(i)], 1E-4);
+    EXPECT_NEAR(static_cast<double>(i) * 1.0, lane_info.accumulate_s()[static_cast<int>(i)], 1E-4);
   }
   EXPECT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
             lane_info.headings().size());
   for (size_t i = 0; i < lane_info.headings().size(); ++i) {
-    EXPECT_NEAR(lane_info.unit_directions()[i].Angle(), lane_info.headings()[i],
-                1E-3);
+    EXPECT_NEAR(lane_info.unit_directions()[i].Angle(), lane_info.headings()[i], 1E-3);
   }
-  double left_width = 0.0;
+  double left_width  = 0.0;
   double right_width = 0.0;
   lane_info.GetWidth(2.0, &left_width, &right_width);
   EXPECT_NEAR(1.5, left_width, 1E-3);
@@ -434,17 +430,15 @@ TEST_F(HDMapCommonTestSuite, DistanceToWithMoreInfo) {
   LaneInfo lane_info(lane);
 
   apollo::common::math::Vec2d foot_point;
-  double s_offset = 0.0;
-  int s_offset_index = 0;
-  double distance = lane_info.DistanceTo({170002.5, 3.0}, &foot_point,
-                                         &s_offset, &s_offset_index);
+  double                      s_offset       = 0.0;
+  int                         s_offset_index = 0;
+  double distance = lane_info.DistanceTo({170002.5, 3.0}, &foot_point, &s_offset, &s_offset_index);
   EXPECT_NEAR(distance, 2.0, 1E-3);
   EXPECT_NEAR(foot_point.x(), 170002.5, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
   EXPECT_NEAR(s_offset, 1.5, 1E-3);
 
-  distance = lane_info.DistanceTo({170000.5, 3.0}, &foot_point, &s_offset,
-                                  &s_offset_index);
+  distance = lane_info.DistanceTo({170000.5, 3.0}, &foot_point, &s_offset, &s_offset_index);
   EXPECT_NEAR(distance, 2.06155, 1E-3);
   EXPECT_NEAR(foot_point.x(), 170001.0, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
@@ -456,8 +450,8 @@ TEST_F(HDMapCommonTestSuite, GetNearestPoint) {
   InitLaneObj(&lane);
   LaneInfo lane_info(lane);
 
-  double distance = 0.0;
-  auto nearest_point = lane_info.GetNearestPoint({170002.4, 3.0}, &distance);
+  double distance      = 0.0;
+  auto   nearest_point = lane_info.GetNearestPoint({170002.4, 3.0}, &distance);
   EXPECT_NEAR(nearest_point.x(), 170002.4, 1E-3);
   EXPECT_NEAR(nearest_point.y(), 1.0, 1E-3);
 
@@ -476,9 +470,8 @@ TEST_F(HDMapCommonTestSuite, GetProjection) {
   LaneInfo lane_info(lane);
 
   double accumulate_s = 0.0;
-  double lateral = 0.0;
-  bool success =
-      lane_info.GetProjection({170002.4, 3.0}, &accumulate_s, &lateral);
+  double lateral      = 0.0;
+  bool   success      = lane_info.GetProjection({170002.4, 3.0}, &accumulate_s, &lateral);
   EXPECT_TRUE(success);
   EXPECT_NEAR(accumulate_s, 1.4, 1E-3);
   EXPECT_NEAR(lateral, 2.0, 1E-3);
@@ -501,8 +494,8 @@ TEST_F(HDMapCommonTestSuite, TestJunctionInfo) {
   EXPECT_EQ(junction.id().id(), junction_info.id().id());
   EXPECT_EQ(7, junction_info.polygon().points().size());
   for (size_t i = 0; i < 5; ++i) {
-    EXPECT_NEAR(static_cast<double>(i + 170001) * 1.0,
-                junction_info.polygon().points()[i].x(), 1E-3);
+    EXPECT_NEAR(static_cast<double>(i + 170001) * 1.0, junction_info.polygon().points()[i].x(),
+                1E-3);
   }
   EXPECT_NEAR(170005.0, junction_info.polygon().points()[5].x(), 1E-3);
   EXPECT_NEAR(170002.0, junction_info.polygon().points()[5].y(), 1E-3);

@@ -32,11 +32,11 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion_smartereye {
 
-apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
-    const apollo::drivers::SmartereyeObstacles& smartereye_obstacles,
-    const apollo::drivers::SmartereyeLanemark& smartereye_lanemark,
-    const apollo::localization::LocalizationEstimate& localization,
-    const apollo::canbus::Chassis& chassis);
+apollo::perception::PerceptionObstacles
+SmartereyeToPerceptionObstacles(const apollo::drivers::SmartereyeObstacles& smartereye_obstacles,
+                                const apollo::drivers::SmartereyeLanemark&  smartereye_lanemark,
+                                const apollo::localization::LocalizationEstimate& localization,
+                                const apollo::canbus::Chassis&                    chassis);
 
 }  // namespace conversion_smartereye
 }  // namespace third_party_perception

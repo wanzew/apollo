@@ -21,6 +21,7 @@
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
 
 namespace apollo {
@@ -39,16 +40,16 @@ class SpiralReferenceLineSmootherTest : public ::testing::Test {
     config_.mutable_spiral()->set_weight_dkappa(100.0);
 
     raw_points_.resize(21);
-    raw_points_[0] = {4.946317773, 0.08436953512};
-    raw_points_[1] = {5.017218975, 0.7205757236};
-    raw_points_[2] = {4.734635316, 1.642930209};
-    raw_points_[3] = {4.425064575, 2.365356462};
-    raw_points_[4] = {3.960102096, 2.991632152};
-    raw_points_[5] = {3.503172702, 3.44091492};
-    raw_points_[6] = {2.989950824, 3.9590821};
-    raw_points_[7] = {2.258523535, 4.554377368};
-    raw_points_[8] = {1.562447892, 4.656801472};
-    raw_points_[9] = {0.8764776599, 4.971705856};
+    raw_points_[0]  = {4.946317773, 0.08436953512};
+    raw_points_[1]  = {5.017218975, 0.7205757236};
+    raw_points_[2]  = {4.734635316, 1.642930209};
+    raw_points_[3]  = {4.425064575, 2.365356462};
+    raw_points_[4]  = {3.960102096, 2.991632152};
+    raw_points_[5]  = {3.503172702, 3.44091492};
+    raw_points_[6]  = {2.989950824, 3.9590821};
+    raw_points_[7]  = {2.258523535, 4.554377368};
+    raw_points_[8]  = {1.562447892, 4.656801472};
+    raw_points_[9]  = {0.8764776599, 4.971705856};
     raw_points_[10] = {0.09899323097, 4.985845841};
     raw_points_[11] = {-0.7132021974, 5.010851105};
     raw_points_[12] = {-1.479055426, 4.680181989};
@@ -62,7 +63,7 @@ class SpiralReferenceLineSmootherTest : public ::testing::Test {
     raw_points_[20] = {-5.09947597, -0.01022405467};
   }
 
-  ReferenceLineSmootherConfig config_;
+  ReferenceLineSmootherConfig  config_;
   std::vector<Eigen::Vector2d> raw_points_;
 };
 
@@ -75,8 +76,7 @@ TEST_F(SpiralReferenceLineSmootherTest, smooth_stand_alone) {
   std::vector<double> y;
 
   SpiralReferenceLineSmoother spiral_smoother(config_);
-  int res = spiral_smoother.SmoothStandAlone(raw_points_, &theta, &kappa,
-                                             &dkappa, &s, &x, &y);
+  int res = spiral_smoother.SmoothStandAlone(raw_points_, &theta, &kappa, &dkappa, &s, &x, &y);
   // TODO(Yajia): fix this test.
   EXPECT_LT(res, 100000);
 }

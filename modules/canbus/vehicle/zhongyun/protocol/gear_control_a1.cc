@@ -42,13 +42,12 @@ void Gearcontrola1::UpdateData(uint8_t* data) {
 
 void Gearcontrola1::Reset() {
   // TODO(ChaoM) :  you should check this manually
-  gear_state_target_ = Gear_control_a1::GEAR_STATE_TARGET_P;
-  gear_enable_control_ =
-      Gear_control_a1::GEAR_ENABLE_CONTROL_GEAR_MANUALCONTROL;
+  gear_state_target_   = Gear_control_a1::GEAR_STATE_TARGET_P;
+  gear_enable_control_ = Gear_control_a1::GEAR_ENABLE_CONTROL_GEAR_MANUALCONTROL;
 }
 
-Gearcontrola1* Gearcontrola1::set_gear_state_target(
-    Gear_control_a1::Gear_state_targetType gear_state_target) {
+Gearcontrola1*
+Gearcontrola1::set_gear_state_target(Gear_control_a1::Gear_state_targetType gear_state_target) {
   gear_state_target_ = gear_state_target;
   return this;
 }
@@ -78,8 +77,7 @@ Gearcontrola1* Gearcontrola1::set_gear_enable_control(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 void Gearcontrola1::set_p_gear_enable_control(
-    uint8_t* data,
-    Gear_control_a1::Gear_enable_controlType gear_enable_control) {
+    uint8_t* data, Gear_control_a1::Gear_enable_controlType gear_enable_control) {
   int x = gear_enable_control;
 
   Byte to_set(data + 0);

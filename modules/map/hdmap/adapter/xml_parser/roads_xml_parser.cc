@@ -12,11 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
+#include "modules/map/hdmap/adapter/xml_parser/roads_xml_parser.h"
+
 #include <string>
 
 #include "modules/map/hdmap/adapter/xml_parser/lanes_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
-#include "modules/map/hdmap/adapter/xml_parser/roads_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/signals_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
@@ -32,7 +33,7 @@ namespace hdmap {
 namespace adapter {
 
 Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
-                             std::vector<RoadInternal>* roads) {
+                             std::vector<RoadInternal>*  roads) {
   CHECK_NOTNULL(roads);
 
   auto road_node = xml_node.FirstChildElement("road");
@@ -40,9 +41,8 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     // road attributes
     std::string id;
     std::string junction_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*road_node, "id", &id);
-    checker += UtilXmlParser::QueryStringAttribute(*road_node, "junction",
-                                                   &junction_id);
+    int         checker = UtilXmlParser::QueryStringAttribute(*road_node, "id", &id);
+    checker += UtilXmlParser::QueryStringAttribute(*road_node, "junction", &junction_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parsing road attributes";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -66,8 +66,7 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     road_internal.road.set_type(pb_road_type);
 
     // lanes
-    RETURN_IF_ERROR(LanesXmlParser::Parse(*road_node, road_internal.id,
-                                          &road_internal.sections));
+    RETURN_IF_ERROR(LanesXmlParser::Parse(*road_node, road_internal.id, &road_internal.sections));
 
     // objects
     Parse_road_objects(*road_node, &road_internal);
@@ -82,7 +81,7 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
 }
 
 void RoadsXmlParser::Parse_road_objects(const tinyxml2::XMLElement& xml_node,
-                                        RoadInternal* road_info) {
+                                        RoadInternal*               road_info) {
   CHECK_NOTNULL(road_info);
 
   // objects
@@ -104,7 +103,7 @@ void RoadsXmlParser::Parse_road_objects(const tinyxml2::XMLElement& xml_node,
 }
 
 void RoadsXmlParser::Parse_road_signals(const tinyxml2::XMLElement& xml_node,
-                                        RoadInternal* road_info) {
+                                        RoadInternal*               road_info) {
   CHECK_NOTNULL(road_info);
 
   // signals
@@ -119,8 +118,7 @@ void RoadsXmlParser::Parse_road_signals(const tinyxml2::XMLElement& xml_node,
   }
 }
 
-Status RoadsXmlParser::to_pb_road_type(const std::string& type,
-                                       PbRoadType* pb_road_type) {
+Status RoadsXmlParser::to_pb_road_type(const std::string& type, PbRoadType* pb_road_type) {
   CHECK_NOTNULL(pb_road_type);
 
   std::string upper_type = UtilXmlParser::ToUpper(type);

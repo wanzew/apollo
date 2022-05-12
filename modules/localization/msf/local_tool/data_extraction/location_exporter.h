@@ -28,13 +28,13 @@ namespace msf {
  */
 class LocationExporter {
  public:
-  explicit LocationExporter(const std::string &loc_file_folder);
+  explicit LocationExporter(const std::string& loc_file_folder);
   ~LocationExporter();
 
-  void GnssLocCallback(const std::string &msg);
-  void LidarLocCallback(const std::string &msg);
-  void FusionLocCallback(const std::string &msg);
-  void OdometryLocCallback(const std::string &msg);
+  void GnssLocCallback(const std::string& msg);
+  void LidarLocCallback(const std::string& msg);
+  void FusionLocCallback(const std::string& msg);
+  void OdometryLocCallback(const std::string& msg);
 
  private:
   std::string gnss_loc_file_;
@@ -42,10 +42,10 @@ class LocationExporter {
   std::string fusion_loc_file_;
   std::string odometry_loc_file_;
 
-  FILE *gnss_loc_file_handle_;
-  FILE *lidar_loc_file_handle_;
-  FILE *fusion_loc_file_handle_;
-  FILE *odometry_loc_file_handle_;
+  FILE* gnss_loc_file_handle_;
+  FILE* lidar_loc_file_handle_;
+  FILE* fusion_loc_file_handle_;
+  FILE* odometry_loc_file_handle_;
 };
 
 }  // namespace msf

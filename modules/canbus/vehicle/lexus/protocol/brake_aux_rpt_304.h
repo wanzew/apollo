@@ -17,27 +17,26 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Brakeauxrpt304 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Brakeauxrpt304
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Brakeauxrpt304();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'BRAKE_ON_OFF_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 60, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool brake_on_off_is_valid(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool brake_on_off_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'BRAKE_ON_OFF', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 49,
@@ -48,8 +47,7 @@ class Brakeauxrpt304 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 59, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool user_interaction_is_valid(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+  bool user_interaction_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'USER_INTERACTION', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
@@ -61,22 +59,19 @@ class Brakeauxrpt304 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 58, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool raw_brake_pressure_is_valid(const std::uint8_t* bytes,
-                                   const int32_t length) const;
+  bool raw_brake_pressure_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'RAW_BRAKE_PRESSURE', 'offset': 0.0,
   // 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
   // '[-32.768|32.767]', 'bit': 39, 'type': 'double', 'order': 'motorola',
   // 'physical_unit': ''}
-  double raw_brake_pressure(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  double raw_brake_pressure(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'RAW_PEDAL_FORCE_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 57, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool raw_pedal_force_is_valid(const std::uint8_t* bytes,
-                                const int32_t length) const;
+  bool raw_pedal_force_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'RAW_PEDAL_FORCE', 'offset': 0.0, 'precision': 1.0,
   // 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
@@ -87,8 +82,7 @@ class Brakeauxrpt304 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 56, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool raw_pedal_pos_is_valid(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  bool raw_pedal_pos_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'RAW_PEDAL_POS', 'offset': 0.0, 'precision': 1.0,
   // 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',

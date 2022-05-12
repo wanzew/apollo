@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+
 #include "modules/common/util/testdata/simple.pb.h"
 
 namespace apollo {
@@ -29,13 +30,12 @@ TEST(MessageUtilTest, DumpMessage) {
   auto simple_msg = std::make_shared<test::SimpleMessage>();
   FillHeader("test", simple_msg.get());
   EXPECT_TRUE(DumpMessage(simple_msg));
-  EXPECT_TRUE(cyber::common::PathExists(
-      "/tmp/apollo.common.util.test.SimpleMessage/0.pb.txt"));
+  EXPECT_TRUE(cyber::common::PathExists("/tmp/apollo.common.util.test.SimpleMessage/0.pb.txt"));
 }
 
 TEST(MessageUtilTest, MessageFingerprint) {
   test::SimpleMessage msg;
-  const size_t fp0 = MessageFingerprint(msg);
+  const size_t        fp0 = MessageFingerprint(msg);
 
   msg.set_integer(1);
   const size_t fp1 = MessageFingerprint(msg);

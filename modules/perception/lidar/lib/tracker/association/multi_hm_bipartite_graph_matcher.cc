@@ -27,19 +27,16 @@ MultiHmBipartiteGraphMatcher::MultiHmBipartiteGraphMatcher() {
   cost_matrix_ = optimizer_.mutable_global_costs();
 }
 
-MultiHmBipartiteGraphMatcher::~MultiHmBipartiteGraphMatcher() {
-  cost_matrix_ = nullptr;
-}
+MultiHmBipartiteGraphMatcher::~MultiHmBipartiteGraphMatcher() { cost_matrix_ = nullptr; }
 
-void MultiHmBipartiteGraphMatcher::Match(
-    const BipartiteGraphMatcherOptions &options,
-    std::vector<NodeNodePair> *assignments,
-    std::vector<size_t> *unassigned_rows,
-    std::vector<size_t> *unassigned_cols) {
+void MultiHmBipartiteGraphMatcher::Match(const BipartiteGraphMatcherOptions& options,
+                                         std::vector<NodeNodePair>*          assignments,
+                                         std::vector<size_t>*                unassigned_rows,
+                                         std::vector<size_t>*                unassigned_cols) {
   common::GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       common::GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
-  optimizer_.Match(options.cost_thresh, options.bound_value, opt_flag,
-                   assignments, unassigned_rows, unassigned_cols);
+  optimizer_.Match(options.cost_thresh, options.bound_value, opt_flag, assignments, unassigned_rows,
+                   unassigned_cols);
 }
 
 PERCEPTION_REGISTER_BIPARTITEGRAPHMATCHER(MultiHmBipartiteGraphMatcher);

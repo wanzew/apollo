@@ -26,9 +26,7 @@ TimerComponent::TimerComponent() {}
 TimerComponent::~TimerComponent() {}
 
 bool TimerComponent::Process() {
-  if (is_shutdown_.load()) {
-    return true;
-  }
+  if (is_shutdown_.load()) { return true; }
   return Proc();
 }
 
@@ -39,9 +37,7 @@ bool TimerComponent::Initialize(const TimerComponentConfig& config) {
   }
   node_.reset(new Node(config.name()));
   LoadConfigFiles(config);
-  if (!Init()) {
-    return false;
-  }
+  if (!Init()) { return false; }
 
   std::shared_ptr<TimerComponent> self =
       std::dynamic_pointer_cast<TimerComponent>(shared_from_this());

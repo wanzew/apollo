@@ -28,20 +28,22 @@ namespace apollo {
 namespace perception {
 namespace common {
 
-bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
-                  int *frame_id, double *time_stamp);
+bool ReadPoseFile(const std::string& filename,
+                  Eigen::Affine3d*   pose,
+                  int*               frame_id,
+                  double*            time_stamp);
 
-bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
-                              base::BrownCameraDistortionModel *model);
+bool LoadBrownCameraIntrinsic(const std::string&                yaml_file,
+                              base::BrownCameraDistortionModel* model);
 
 // @brief: load ocam parameters
 //         https://sites.google.com/site/scarabotix/ocamcalib-toolbox
-bool LoadOmnidirectionalCameraIntrinsics(
-    const std::string &yaml_file,
-    base::OmnidirectionalCameraDistortionModel *model);
+bool LoadOmnidirectionalCameraIntrinsics(const std::string&                          yaml_file,
+                                         base::OmnidirectionalCameraDistortionModel* model);
 
-bool GetFileList(const std::string &path, const std::string &suffix,
-                 std::vector<std::string> *files);
+bool GetFileList(const std::string&        path,
+                 const std::string&        suffix,
+                 std::vector<std::string>* files);
 
 }  // namespace common
 }  // namespace perception

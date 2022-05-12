@@ -32,9 +32,7 @@ constexpr bool is_zero(T value) {
 
 }  // namespace
 
-Parser *Parser::CreateRtcmV3(bool is_base_station) {
-  return new Rtcm3Parser(is_base_station);
-}
+Parser* Parser::CreateRtcmV3(bool is_base_station) { return new Rtcm3Parser(is_base_station); }
 
 Rtcm3Parser::Rtcm3Parser(bool is_base_station) {
   if (1 != init_rtcm(&rtcm_)) {
@@ -61,8 +59,8 @@ bool Rtcm3Parser::SetStationPosition() {
   return true;
 }
 
-void Rtcm3Parser::FillKepplerOrbit(
-    const eph_t &eph, apollo::drivers::gnss::KepplerOrbit *keppler_orbit) {
+void Rtcm3Parser::FillKepplerOrbit(const eph_t&                         eph,
+                                   apollo::drivers::gnss::KepplerOrbit* keppler_orbit) {
   keppler_orbit->set_week_num(eph.week);
 
   keppler_orbit->set_af0(eph.f0);
@@ -104,8 +102,7 @@ void Rtcm3Parser::FillKepplerOrbit(
   keppler_orbit->set_sat_prn(prn);
 }
 
-void Rtcm3Parser::FillGlonassOrbit(const geph_t &eph,
-                                   apollo::drivers::gnss::GlonassOrbit *orbit) {
+void Rtcm3Parser::FillGlonassOrbit(const geph_t& eph, apollo::drivers::gnss::GlonassOrbit* orbit) {
   orbit->set_position_x(eph.pos[0]);
   orbit->set_position_y(eph.pos[1]);
   orbit->set_position_z(eph.pos[2]);
@@ -145,17 +142,15 @@ void Rtcm3Parser::FillGlonassOrbit(const geph_t &eph,
 }
 
 void Rtcm3Parser::SetObservationTime() {
-  int week = 0;
+  int    week   = 0;
   double second = time2gpst(rtcm_.time, &week);
   observation_.set_gnss_time_type(apollo::drivers::gnss::GPS_TIME);
   observation_.set_gnss_week(week);
   observation_.set_gnss_second_s(second);
 }
 
-Parser::MessageType Rtcm3Parser::GetMessage(MessagePtr *message_ptr) {
-  if (data_ == nullptr) {
-    return MessageType::NONE;
-  }
+Parser::MessageType Rtcm3Parser::GetMessage(MessagePtr* message_ptr) {
+  if (data_ == nullptr) { return MessageType::NONE; }
 
   while (data_ < data_end_) {
     const int status = input_rtcm3(&rtcm_, *data_++);  // parse data use rtklib
@@ -175,13 +170,10 @@ Parser::MessageType Rtcm3Parser::GetMessage(MessagePtr *message_ptr) {
         }
         break;
 
-      case 5:
-        ProcessStationParameters();
-        break;
+      case 5: ProcessStationParameters(); break;
 
       case 10:  // ssr messages
-      default:
-        break;
+      default: break;
     }
   }
 
@@ -189,9 +181,7 @@ Parser::MessageType Rtcm3Parser::GetMessage(MessagePtr *message_ptr) {
 }
 
 bool Rtcm3Parser::ProcessObservation() {
-  if (rtcm_.obs.n == 0) {
-    AWARN << "Obs is zero.";
-  }
+  if (rtcm_.obs.n == 0) { AWARN << "Obs is zero."; }
 
   observation_.Clear();
   SetStationPosition();
@@ -217,9 +207,7 @@ bool Rtcm3Parser::ProcessObservation() {
     apollo::drivers::gnss::GnssType gnss_type;
 
     // transform sys to local sys type
-    if (!gnss_sys_type(sys, &gnss_type)) {
-      return false;
-    }
+    if (!gnss_sys_type(sys, &gnss_type)) { return false; }
 
     auto sat_obs = observation_.add_sat_obs();  // create obj
     sat_obs->set_sat_prn(prn);
@@ -228,22 +216,16 @@ bool Rtcm3Parser::ProcessObservation() {
     int j = 0;
 
     for (j = 0; j < NFREQ + NEXOBS; ++j) {
-      if (is_zero(rtcm_.obs.data[i].L[j])) {
-        break;
-      }
+      if (is_zero(rtcm_.obs.data[i].L[j])) { break; }
 
       apollo::drivers::gnss::GnssBandID baud_id;
-      if (!gnss_baud_id(gnss_type, j, &baud_id)) {
-        break;
-      }
+      if (!gnss_baud_id(gnss_type, j, &baud_id)) { break; }
 
       auto band_obs = sat_obs->add_band_obs();
       if (rtcm_.obs.data[i].code[i] == CODE_L1C) {
-        band_obs->set_pseudo_type(
-            apollo::drivers::gnss::PseudoType::CORSE_CODE);
+        band_obs->set_pseudo_type(apollo::drivers::gnss::PseudoType::CORSE_CODE);
       } else if (rtcm_.obs.data[i].code[i] == CODE_L1P) {
-        band_obs->set_pseudo_type(
-            apollo::drivers::gnss::PseudoType::PRECISION_CODE);
+        band_obs->set_pseudo_type(apollo::drivers::gnss::PseudoType::PRECISION_CODE);
       } else {
         // AINFO << "Message type " << rtcm_.message_type;
       }

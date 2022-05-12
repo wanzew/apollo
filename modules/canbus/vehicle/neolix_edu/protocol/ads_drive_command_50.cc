@@ -42,18 +42,17 @@ void Adsdrivecommand50::UpdateData(uint8_t* data) {
   ++auto_drivercmd_alivecounter_;
   auto_drivercmd_alivecounter_ = (auto_drivercmd_alivecounter_) % 16;
   set_p_auto_drivercmd_alivecounter(data, auto_drivercmd_alivecounter_);
-  auto_drivercmd_checksum_ =
-      data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
+  auto_drivercmd_checksum_ = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
   set_p_auto_drivercmd_checksum(data, auto_drivercmd_checksum_);
 }
 
 void Adsdrivecommand50::Reset() {
   // TODO(All) :  you should check this manually
-  drive_enable_ = false;
-  auto_shift_command_ = Ads_drive_command_50::AUTO_SHIFT_COMMAND_N;
-  auto_drive_torque_ = 0.0;
+  drive_enable_                = false;
+  auto_shift_command_          = Ads_drive_command_50::AUTO_SHIFT_COMMAND_N;
+  auto_drive_torque_           = 0.0;
   auto_drivercmd_alivecounter_ = 0;
-  auto_drivercmd_checksum_ = 0;
+  auto_drivercmd_checksum_     = 0;
 }
 
 Adsdrivecommand50* Adsdrivecommand50::set_drive_enable(bool drive_enable) {
@@ -85,16 +84,14 @@ Adsdrivecommand50* Adsdrivecommand50::set_auto_shift_command(
 // 0.0, 'physical_range': '[0|3]', 'bit': 9, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
 void Adsdrivecommand50::set_p_auto_shift_command(
-    uint8_t* data,
-    Ads_drive_command_50::Auto_shift_commandType auto_shift_command) {
+    uint8_t* data, Ads_drive_command_50::Auto_shift_commandType auto_shift_command) {
   int x = auto_shift_command;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 0, 2);
 }
 
-Adsdrivecommand50* Adsdrivecommand50::set_auto_drive_torque(
-    double auto_drive_torque) {
+Adsdrivecommand50* Adsdrivecommand50::set_auto_drive_torque(double auto_drive_torque) {
   auto_drive_torque_ = auto_drive_torque;
   return this;
 }
@@ -102,11 +99,10 @@ Adsdrivecommand50* Adsdrivecommand50::set_auto_drive_torque(
 // config detail: {'name': 'AUTO_Drive_Torque', 'offset': -665.0, 'precision':
 // 0.02, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
 // 23, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-void Adsdrivecommand50::set_p_auto_drive_torque(uint8_t* data,
-                                                double auto_drive_torque) {
+void Adsdrivecommand50::set_p_auto_drive_torque(uint8_t* data, double auto_drive_torque) {
   auto_drive_torque = ProtocolData::BoundedValue(0.0, 50.0, auto_drive_torque);
-  int x = (auto_drive_torque - -665.000000) / 0.020000;
-  uint8_t t = 0;
+  int     x         = (auto_drive_torque - -665.000000) / 0.020000;
+  uint8_t t         = 0;
 
   t = x & 0xFF;
   Byte to_set0(data + 3);
@@ -118,8 +114,8 @@ void Adsdrivecommand50::set_p_auto_drive_torque(uint8_t* data,
   to_set1.set_value(t, 0, 8);
 }
 
-Adsdrivecommand50* Adsdrivecommand50::set_auto_drivercmd_alivecounter(
-    int auto_drivercmd_alivecounter) {
+Adsdrivecommand50*
+Adsdrivecommand50::set_auto_drivercmd_alivecounter(int auto_drivercmd_alivecounter) {
   auto_drivercmd_alivecounter_ = auto_drivercmd_alivecounter;
   return this;
 }
@@ -127,18 +123,16 @@ Adsdrivecommand50* Adsdrivecommand50::set_auto_drivercmd_alivecounter(
 // config detail: {'name': 'AUTO_DriverCmd_AliveCounter', 'offset': 0.0,
 // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adsdrivecommand50::set_p_auto_drivercmd_alivecounter(
-    uint8_t* data, int auto_drivercmd_alivecounter) {
-  auto_drivercmd_alivecounter =
-      ProtocolData::BoundedValue(0, 15, auto_drivercmd_alivecounter);
-  int x = auto_drivercmd_alivecounter;
+void Adsdrivecommand50::set_p_auto_drivercmd_alivecounter(uint8_t* data,
+                                                          int      auto_drivercmd_alivecounter) {
+  auto_drivercmd_alivecounter = ProtocolData::BoundedValue(0, 15, auto_drivercmd_alivecounter);
+  int x                       = auto_drivercmd_alivecounter;
 
   Byte to_set(data + 6);
   to_set.set_value(x, 0, 4);
 }
 
-Adsdrivecommand50* Adsdrivecommand50::set_auto_drivercmd_checksum(
-    int auto_drivercmd_checksum) {
+Adsdrivecommand50* Adsdrivecommand50::set_auto_drivercmd_checksum(int auto_drivercmd_checksum) {
   auto_drivercmd_checksum_ = auto_drivercmd_checksum;
   return this;
 }
@@ -146,11 +140,9 @@ Adsdrivecommand50* Adsdrivecommand50::set_auto_drivercmd_checksum(
 // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adsdrivecommand50::set_p_auto_drivercmd_checksum(
-    uint8_t* data, int auto_drivercmd_checksum) {
-  auto_drivercmd_checksum =
-      ProtocolData::BoundedValue(0, 255, auto_drivercmd_checksum);
-  int x = auto_drivercmd_checksum;
+void Adsdrivecommand50::set_p_auto_drivercmd_checksum(uint8_t* data, int auto_drivercmd_checksum) {
+  auto_drivercmd_checksum = ProtocolData::BoundedValue(0, 255, auto_drivercmd_checksum);
+  int x                   = auto_drivercmd_checksum;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);

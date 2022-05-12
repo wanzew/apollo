@@ -30,14 +30,13 @@
 
 namespace apollo {
 namespace planning {
-FemPosDeviationSmoother::FemPosDeviationSmoother(
-    const FemPosDeviationSmootherConfig& config)
+FemPosDeviationSmoother::FemPosDeviationSmoother(const FemPosDeviationSmootherConfig& config)
     : config_(config) {}
 
-bool FemPosDeviationSmoother::Solve(
-    const std::vector<std::pair<double, double>>& raw_point2d,
-    const std::vector<double>& bounds, std::vector<double>* opt_x,
-    std::vector<double>* opt_y) {
+bool FemPosDeviationSmoother::Solve(const std::vector<std::pair<double, double>>& raw_point2d,
+                                    const std::vector<double>&                    bounds,
+                                    std::vector<double>*                          opt_x,
+                                    std::vector<double>*                          opt_y) {
   if (config_.apply_curvature_constraint()) {
     if (config_.use_sqp()) {
       return SqpWithOsqp(raw_point2d, bounds, opt_x, opt_y);
@@ -50,10 +49,10 @@ bool FemPosDeviationSmoother::Solve(
   return true;
 }
 
-bool FemPosDeviationSmoother::QpWithOsqp(
-    const std::vector<std::pair<double, double>>& raw_point2d,
-    const std::vector<double>& bounds, std::vector<double>* opt_x,
-    std::vector<double>* opt_y) {
+bool FemPosDeviationSmoother::QpWithOsqp(const std::vector<std::pair<double, double>>& raw_point2d,
+                                         const std::vector<double>&                    bounds,
+                                         std::vector<double>*                          opt_x,
+                                         std::vector<double>*                          opt_y) {
   if (opt_x == nullptr || opt_y == nullptr) {
     AERROR << "opt_x or opt_y is nullptr";
     return false;
@@ -74,19 +73,17 @@ bool FemPosDeviationSmoother::QpWithOsqp(
   solver.set_ref_points(raw_point2d);
   solver.set_bounds_around_refs(bounds);
 
-  if (!solver.Solve()) {
-    return false;
-  }
+  if (!solver.Solve()) { return false; }
 
   *opt_x = solver.opt_x();
   *opt_y = solver.opt_y();
   return true;
 }
 
-bool FemPosDeviationSmoother::SqpWithOsqp(
-    const std::vector<std::pair<double, double>>& raw_point2d,
-    const std::vector<double>& bounds, std::vector<double>* opt_x,
-    std::vector<double>* opt_y) {
+bool FemPosDeviationSmoother::SqpWithOsqp(const std::vector<std::pair<double, double>>& raw_point2d,
+                                          const std::vector<double>&                    bounds,
+                                          std::vector<double>*                          opt_x,
+                                          std::vector<double>*                          opt_y) {
   if (opt_x == nullptr || opt_y == nullptr) {
     AERROR << "opt_x or opt_y is nullptr";
     return false;
@@ -97,8 +94,7 @@ bool FemPosDeviationSmoother::SqpWithOsqp(
   solver.set_weight_fem_pos_deviation(config_.weight_fem_pos_deviation());
   solver.set_weight_path_length(config_.weight_path_length());
   solver.set_weight_ref_deviation(config_.weight_ref_deviation());
-  solver.set_weight_curvature_constraint_slack_var(
-      config_.weight_curvature_constraint_slack_var());
+  solver.set_weight_curvature_constraint_slack_var(config_.weight_curvature_constraint_slack_var());
 
   solver.set_curvature_constraint(config_.curvature_constraint());
 
@@ -116,9 +112,7 @@ bool FemPosDeviationSmoother::SqpWithOsqp(
   solver.set_ref_points(raw_point2d);
   solver.set_bounds_around_refs(bounds);
 
-  if (!solver.Solve()) {
-    return false;
-  }
+  if (!solver.Solve()) { return false; }
 
   std::vector<std::pair<double, double>> opt_xy = solver.opt_xy();
 
@@ -134,15 +128,15 @@ bool FemPosDeviationSmoother::SqpWithOsqp(
 
 bool FemPosDeviationSmoother::NlpWithIpopt(
     const std::vector<std::pair<double, double>>& raw_point2d,
-    const std::vector<double>& bounds, std::vector<double>* opt_x,
-    std::vector<double>* opt_y) {
+    const std::vector<double>&                    bounds,
+    std::vector<double>*                          opt_x,
+    std::vector<double>*                          opt_y) {
   if (opt_x == nullptr || opt_y == nullptr) {
     AERROR << "opt_x or opt_y is nullptr";
     return false;
   }
 
-  FemPosDeviationIpoptInterface* smoother =
-      new FemPosDeviationIpoptInterface(raw_point2d, bounds);
+  FemPosDeviationIpoptInterface* smoother = new FemPosDeviationIpoptInterface(raw_point2d, bounds);
 
   smoother->set_weight_fem_pos_deviation(config_.weight_fem_pos_deviation());
   smoother->set_weight_path_length(config_.weight_path_length());
@@ -156,13 +150,10 @@ bool FemPosDeviationSmoother::NlpWithIpopt(
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  app->Options()->SetIntegerValue("print_level",
-                                  static_cast<int>(config_.print_level()));
-  app->Options()->SetIntegerValue(
-      "max_iter", static_cast<int>(config_.max_num_of_iterations()));
-  app->Options()->SetIntegerValue(
-      "acceptable_iter",
-      static_cast<int>(config_.acceptable_num_of_iterations()));
+  app->Options()->SetIntegerValue("print_level", static_cast<int>(config_.print_level()));
+  app->Options()->SetIntegerValue("max_iter", static_cast<int>(config_.max_num_of_iterations()));
+  app->Options()->SetIntegerValue("acceptable_iter",
+                                  static_cast<int>(config_.acceptable_num_of_iterations()));
   app->Options()->SetNumericValue("tol", config_.tol());
   app->Options()->SetNumericValue("acceptable_tol", config_.acceptable_tol());
 
@@ -174,8 +165,7 @@ bool FemPosDeviationSmoother::NlpWithIpopt(
 
   status = app->OptimizeTNLP(problem);
 
-  if (status == Ipopt::Solve_Succeeded ||
-      status == Ipopt::Solved_To_Acceptable_Level) {
+  if (status == Ipopt::Solve_Succeeded || status == Ipopt::Solved_To_Acceptable_Level) {
     // Retrieve some statistics about the solve
     Ipopt::Index iter_count = app->Statistics()->IterationCount();
     ADEBUG << "*** The problem solved in " << iter_count << " iterations!";

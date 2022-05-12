@@ -28,15 +28,13 @@ namespace inference {
 template <typename Dtype>
 class Layer {
  public:
-  virtual void ForwardGPU(
-      const std::vector<std::shared_ptr<base::Blob<Dtype>>> &bottom,
-      const std::vector<std::shared_ptr<base::Blob<Dtype>>> &top) = 0;
-  virtual void ForwardCPU(
-      const std::vector<std::shared_ptr<base::Blob<Dtype>>> &bottom,
-      const std::vector<std::shared_ptr<base::Blob<Dtype>>> &top) = 0;
-  Layer() = default;
-  virtual ~Layer() = default;
-  void set_gpu_id(const int &gpu_id) { gpu_id_ = gpu_id; }
+  virtual void ForwardGPU(const std::vector<std::shared_ptr<base::Blob<Dtype>>>& bottom,
+                          const std::vector<std::shared_ptr<base::Blob<Dtype>>>& top) = 0;
+  virtual void ForwardCPU(const std::vector<std::shared_ptr<base::Blob<Dtype>>>& bottom,
+                          const std::vector<std::shared_ptr<base::Blob<Dtype>>>& top) = 0;
+  Layer()                                                                             = default;
+  virtual ~Layer()                                                                    = default;
+  void set_gpu_id(const int& gpu_id) { gpu_id_ = gpu_id; }
 
  protected:
   int gpu_id_ = 0;

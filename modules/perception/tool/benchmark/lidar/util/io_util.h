@@ -17,35 +17,36 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 
 namespace apollo {
 namespace perception {
 namespace benchmark {
 
-bool load_pcl_pcds(const std::string& filename, PointCloudPtr cloud_out,
+bool load_pcl_pcds(const std::string& filename,
+                   PointCloudPtr      cloud_out,
                    const std::string& cloud_type = "xyzit");
 
 bool load_pcl_pcds_xyzit(const std::string& filename, PointCloudPtr cloud_out);
 
 bool load_pcl_pcds_xyzl(const std::string& filename, PointCloudPtr cloud_out);
 
-bool load_frame_objects(const std::string& filename,
+bool load_frame_objects(const std::string&           filename,
                         const std::set<std::string>& black_list,
-                        std::vector<ObjectPtr>* objects_out,
-                        std::vector<PointCloud>* left_boundary = nullptr,
-                        std::vector<PointCloud>* right_boundary = nullptr,
-                        std::vector<PointCloud>* road_polygon = nullptr,
-                        std::vector<PointCloud>* left_lane_boundary = nullptr,
-                        std::vector<PointCloud>* right_lane_boundary = nullptr,
-                        PointCloud* cloud = nullptr);
+                        std::vector<ObjectPtr>*      objects_out,
+                        std::vector<PointCloud>*     left_boundary       = nullptr,
+                        std::vector<PointCloud>*     right_boundary      = nullptr,
+                        std::vector<PointCloud>*     road_polygon        = nullptr,
+                        std::vector<PointCloud>*     left_lane_boundary  = nullptr,
+                        std::vector<PointCloud>*     right_lane_boundary = nullptr,
+                        PointCloud*                  cloud               = nullptr);
 
-bool load_sensor2world_pose(const std::string& filename,
-                            Eigen::Matrix4d* pose_out);
+bool load_sensor2world_pose(const std::string& filename, Eigen::Matrix4d* pose_out);
 
-bool save_frame_objects(const std::string& filename,
+bool save_frame_objects(const std::string&            filename,
                         const std::vector<ObjectPtr>& objects,
-                        const int frame_id = 0);
+                        const int                     frame_id = 0);
 
 }  // namespace benchmark
 }  // namespace perception

@@ -25,50 +25,37 @@ namespace benchmark {
 
 bool OrientationSimilarityMetric::penalize_pi = false;
 
-void OrientationSimilarityMetric::cal_orientation_similarity(
-    const ObjectPtr& object, const ObjectPtr& gt_object) {
-  if (object.get() == nullptr || gt_object.get() == nullptr) {
-    return;
-  }
+void OrientationSimilarityMetric::cal_orientation_similarity(const ObjectPtr& object,
+                                                             const ObjectPtr& gt_object) {
+  if (object.get() == nullptr || gt_object.get() == nullptr) { return; }
   // yaw range is (-PI, PI]
-  double gt_theta = gt_object->yaw;
-  double theta = object->yaw;
+  double gt_theta   = gt_object->yaw;
+  double theta      = object->yaw;
   double theta_diff = fabs(gt_theta - theta);
-  delta = theta_diff > M_PI ? 2 * M_PI - theta_diff : theta_diff;
+  delta             = theta_diff > M_PI ? 2 * M_PI - theta_diff : theta_diff;
   if (penalize_pi) {
     similarity = (1.0 + cos(delta)) / 2.0;
   } else {
-    delta = delta > M_PI / 2 ? M_PI - delta : delta;
+    delta      = delta > M_PI / 2 ? M_PI - delta : delta;
     similarity = (1 - sin(delta));
   }
 }
 
-std::unique_ptr<BaseRangeInterface> MetaStatistics::_s_range_interface(
-    new DistanceBasedRangeInterface);
+std::unique_ptr<BaseRangeInterface>
+             MetaStatistics::_s_range_interface(new DistanceBasedRangeInterface);
 unsigned int MetaStatistics::_s_recall_dim = 41;
 
 void MetaStatistics::set_range_type(RangeType type) {
   switch (type) {
-    case VIEW:
-      _s_range_interface.reset(new ViewBasedRangeInterface);
-      break;
-    case DISTANCE:
-      _s_range_interface.reset(new DistanceBasedRangeInterface);
-      break;
-    case BOX:
-      _s_range_interface.reset(new BoxBasedRangeInterface);
-      break;
-    case ROI:
-      _s_range_interface.reset(new RoiDistanceBasedRangeInterface);
-      break;
-    default:
-      _s_range_interface.reset(new DistanceBasedRangeInterface);
+    case VIEW: _s_range_interface.reset(new ViewBasedRangeInterface); break;
+    case DISTANCE: _s_range_interface.reset(new DistanceBasedRangeInterface); break;
+    case BOX: _s_range_interface.reset(new BoxBasedRangeInterface); break;
+    case ROI: _s_range_interface.reset(new RoiDistanceBasedRangeInterface); break;
+    default: _s_range_interface.reset(new DistanceBasedRangeInterface);
   }
 }
 
-void MetaStatistics::set_recall_dim(unsigned int recall_dim) {
-  _s_recall_dim = recall_dim;
-}
+void MetaStatistics::set_recall_dim(unsigned int recall_dim) { _s_recall_dim = recall_dim; }
 
 unsigned int MetaStatistics::get_type_index(const ObjectType& type) {
   unsigned index = translate_type_to_index(type);
@@ -88,9 +75,7 @@ unsigned int MetaStatistics::get_type_dim() {
   return 4;  // should be sync with get_type_index and object.h!
 }
 
-unsigned int MetaStatistics::get_range_dim() {
-  return _s_range_interface->get_dim();
-}
+unsigned int MetaStatistics::get_range_dim() { return _s_range_interface->get_dim(); }
 
 unsigned int MetaStatistics::get_confidence_dim() {
   return 10001;  // should be sync with get_confidence_index!
@@ -130,22 +115,18 @@ void MetaStatistics::reset() {
   _total_ji_sum.assign(get_range_dim(), 0.0);
   _total_yaw_angle_diff.assign(get_range_dim(), 0.0);
 
-  _cumulated_match_num_per_conf.assign(
-      get_type_dim(), std::vector<unsigned int>(get_confidence_dim(), 0));
-  _cumulated_det_alone_per_conf.assign(
-      get_type_dim(), std::vector<unsigned int>(get_confidence_dim(), 0));
-  _cumulated_orientation_similarity_sum_per_conf.assign(get_confidence_dim(),
-                                                        0);
+  _cumulated_match_num_per_conf.assign(get_type_dim(),
+                                       std::vector<unsigned int>(get_confidence_dim(), 0));
+  _cumulated_det_alone_per_conf.assign(get_type_dim(),
+                                       std::vector<unsigned int>(get_confidence_dim(), 0));
+  _cumulated_orientation_similarity_sum_per_conf.assign(get_confidence_dim(), 0);
 
-  _confusion_matrix.assign(
-      get_range_dim(),
-      std::vector<std::vector<unsigned int>>(
-          get_type_dim(), std::vector<unsigned int>(get_type_dim(), 0)));
+  _confusion_matrix.assign(get_range_dim(),
+                           std::vector<std::vector<unsigned int>>(
+                               get_type_dim(), std::vector<unsigned int>(get_type_dim(), 0)));
 
-  _det_alone.assign(get_range_dim(),
-                    std::vector<unsigned int>(get_type_dim(), 0));
-  _gt_alone.assign(get_range_dim(),
-                   std::vector<unsigned int>(get_type_dim(), 0));
+  _det_alone.assign(get_range_dim(), std::vector<unsigned int>(get_type_dim(), 0));
+  _gt_alone.assign(get_range_dim(), std::vector<unsigned int>(get_type_dim(), 0));
 
   _underseg_gt_num.assign(get_type_dim(), 0);
 }
@@ -158,8 +139,7 @@ void vec_add1(std::vector<T>* dst, const std::vector<T>& src) {
 }
 
 template <typename T>
-void vec_add2(std::vector<std::vector<T>>* dst,
-              const std::vector<std::vector<T>>& src) {
+void vec_add2(std::vector<std::vector<T>>* dst, const std::vector<std::vector<T>>& src) {
   for (std::size_t i = 0; i < dst->size(); ++i) {
     for (std::size_t j = 0; j < dst->at(0).size(); ++j) {
       dst->at(i)[j] += src[i][j];
@@ -168,7 +148,7 @@ void vec_add2(std::vector<std::vector<T>>* dst,
 }
 
 template <typename T>
-void vec_add3(std::vector<std::vector<std::vector<T>>>* dst,
+void vec_add3(std::vector<std::vector<std::vector<T>>>*       dst,
               const std::vector<std::vector<std::vector<T>>>& src) {
   for (std::size_t i = 0; i < dst->size(); ++i) {
     for (std::size_t j = 0; j < dst->at(0).size(); ++j) {
@@ -179,48 +159,42 @@ void vec_add3(std::vector<std::vector<std::vector<T>>>* dst,
   }
 }
 
-void compute_ap_aos(
-    const std::vector<unsigned int>& cumulated_match_num_per_conf,
-    const std::vector<unsigned int>& cumulated_detection_num_per_conf,
-    const unsigned int total_gt_num, const unsigned int recall_dim, double* ap,
-    std::vector<SPRCTuple>* tuples,
-    const std::vector<double>& cumulated_orientation_similarity_per_conf,
-    double* aos) {
-  if (ap == nullptr || tuples == nullptr || aos == nullptr) {
-    return;
-  }
+void compute_ap_aos(const std::vector<unsigned int>& cumulated_match_num_per_conf,
+                    const std::vector<unsigned int>& cumulated_detection_num_per_conf,
+                    const unsigned int               total_gt_num,
+                    const unsigned int               recall_dim,
+                    double*                          ap,
+                    std::vector<SPRCTuple>*          tuples,
+                    const std::vector<double>&       cumulated_orientation_similarity_per_conf,
+                    double*                          aos) {
+  if (ap == nullptr || tuples == nullptr || aos == nullptr) { return; }
   *ap = 0.0;
   tuples->assign(recall_dim, SPRCTuple());
 
-  unsigned int confidence_dim =
-      static_cast<unsigned int>(cumulated_match_num_per_conf.size());
+  unsigned int confidence_dim = static_cast<unsigned int>(cumulated_match_num_per_conf.size());
 
   bool with_aos = false;
-  if (aos != nullptr &&
-      cumulated_orientation_similarity_per_conf.size() == confidence_dim) {
+  if (aos != nullptr && cumulated_orientation_similarity_per_conf.size() == confidence_dim) {
     with_aos = true;
-    *aos = 0.0;
+    *aos     = 0.0;
   }
 
-  if (total_gt_num == 0) {
-    return;
-  }
+  if (total_gt_num == 0) { return; }
   int total_det_num = 0;
-  int total_tp_num = 0;
+  int total_tp_num  = 0;
 
   // calculate SPRC tuples
-  double recall_step = 1.0 / (recall_dim - 1);
-  double confidence_step = 1.0 / (confidence_dim - 1);
-  unsigned int prc_id = 0;
-  double current_recall = 0.0;
+  double       recall_step     = 1.0 / (recall_dim - 1);
+  double       confidence_step = 1.0 / (confidence_dim - 1);
+  unsigned int prc_id          = 0;
+  double       current_recall  = 0.0;
   for (int i = confidence_dim - 1; i >= 0; --i) {
-    total_det_num = cumulated_detection_num_per_conf[i];
-    total_tp_num = cumulated_match_num_per_conf[i];
-    double left_recall = static_cast<double>(total_tp_num) / total_gt_num;
+    total_det_num       = cumulated_detection_num_per_conf[i];
+    total_tp_num        = cumulated_match_num_per_conf[i];
+    double left_recall  = static_cast<double>(total_tp_num) / total_gt_num;
     double right_recall = 0.0;
     if (i > 0) {
-      right_recall = static_cast<double>(cumulated_match_num_per_conf[i - 1]) /
-                     total_gt_num;
+      right_recall = static_cast<double>(cumulated_match_num_per_conf[i - 1]) / total_gt_num;
     } else {
       right_recall = left_recall;
     }
@@ -229,38 +203,28 @@ void compute_ap_aos(
     //     right_recall = 0.0;
     // }
 
-    if ((right_recall - current_recall) < (current_recall - left_recall) &&
-        i > 0) {
-      continue;
-    }
+    if ((right_recall - current_recall) < (current_recall - left_recall) && i > 0) { continue; }
 
     if (with_aos) {
       tuples->at(prc_id).similarity =
-          total_det_num > 0
-              ? cumulated_orientation_similarity_per_conf[i] / total_det_num
-              : 1.0;
+          total_det_num > 0 ? cumulated_orientation_similarity_per_conf[i] / total_det_num : 1.0;
     }
 
-    double precision = total_det_num > 0
-                           ? static_cast<double>(total_tp_num) / total_det_num
-                           : 1.0;
+    double precision = total_det_num > 0 ? static_cast<double>(total_tp_num) / total_det_num : 1.0;
     tuples->at(prc_id).precision = precision;
     *ap += precision;
-    tuples->at(prc_id).recall = current_recall;
+    tuples->at(prc_id).recall     = current_recall;
     tuples->at(prc_id).confidence = confidence_step * i;
 
     prc_id++;
     current_recall += recall_step;
-    if (prc_id == recall_dim) {
-      break;
-    }
+    if (prc_id == recall_dim) { break; }
   }
   if (with_aos) {
     // smooth the similarity values
     *aos += tuples->at(prc_id - 1).similarity;
     for (int i = prc_id - 2; i >= 0; --i) {
-      tuples->at(i).similarity =
-          std::max(tuples->at(i).similarity, tuples->at(i + 1).similarity);
+      tuples->at(i).similarity = std::max(tuples->at(i).similarity, tuples->at(i + 1).similarity);
       *aos += tuples->at(i).similarity;
     }
     *aos /= recall_dim;
@@ -300,25 +264,21 @@ MetaStatistics& MetaStatistics::operator+=(const MetaStatistics& rhs) {
   return *this;
 }
 
-void MetaStatistics::get_2017_detection_precision_and_recall(
-    std::vector<double>* precisions, std::vector<double>* recalls) const {
-  if (precisions == nullptr || recalls == nullptr) {
-    return;
-  }
+void MetaStatistics::get_2017_detection_precision_and_recall(std::vector<double>* precisions,
+                                                             std::vector<double>* recalls) const {
+  if (precisions == nullptr || recalls == nullptr) { return; }
   precisions->resize(get_range_dim() + 1, 0.0);
   recalls->resize(get_range_dim() + 1, 0.0);
-  unsigned int total_detection_num_sum = 0;
+  unsigned int total_detection_num_sum   = 0;
   unsigned int total_groundtruth_num_sum = 0;
-  unsigned int total_match_num_sum = 0;
+  unsigned int total_match_num_sum       = 0;
   for (std::size_t i = 0; i < get_range_dim(); ++i) {
-    precisions->at(i) = _total_detection_num[i] > 0
-                            ? static_cast<double>(_total_ji_match_num[i]) /
-                                  _total_detection_num[i]
-                            : 0;
-    recalls->at(i) = _total_groundtruth_num[i] > 0
-                         ? static_cast<double>(_total_ji_match_num[i]) /
-                               _total_groundtruth_num[i]
-                         : 0;
+    precisions->at(i) = _total_detection_num[i] > 0 ?
+                            static_cast<double>(_total_ji_match_num[i]) / _total_detection_num[i] :
+                            0;
+    recalls->at(i) = _total_groundtruth_num[i] > 0 ?
+                         static_cast<double>(_total_ji_match_num[i]) / _total_groundtruth_num[i] :
+                         0;
     if (i != get_range_dim() - 1) {  // ignore the last range (DontCare)
                                      // if (i != get_range_dim()) {
       total_detection_num_sum += _total_detection_num[i];
@@ -326,86 +286,71 @@ void MetaStatistics::get_2017_detection_precision_and_recall(
       total_match_num_sum += _total_ji_match_num[i];
     }
   }
-  precisions->back() =
-      total_detection_num_sum > 0
-          ? static_cast<double>(total_match_num_sum) / total_detection_num_sum
-          : 0;
-  recalls->back() =
-      total_groundtruth_num_sum > 0
-          ? static_cast<double>(total_match_num_sum) / total_groundtruth_num_sum
-          : 0;
+  precisions->back() = total_detection_num_sum > 0 ?
+                           static_cast<double>(total_match_num_sum) / total_detection_num_sum :
+                           0;
+  recalls->back() = total_groundtruth_num_sum > 0 ?
+                        static_cast<double>(total_match_num_sum) / total_groundtruth_num_sum :
+                        0;
 }
 
-void MetaStatistics::get_2017_detection_visible_recall(
-    std::vector<double>* recalls) const {
-  if (recalls == nullptr) {
-    return;
-  }
+void MetaStatistics::get_2017_detection_visible_recall(std::vector<double>* recalls) const {
+  if (recalls == nullptr) { return; }
   recalls->resize(get_range_dim() + 1, 0.0);
   unsigned int total_groundtruth_num_sum = 0;
-  unsigned int total_match_num_sum = 0;
+  unsigned int total_match_num_sum       = 0;
   for (std::size_t i = 0; i < get_range_dim(); ++i) {
-    recalls->at(i) = _total_visible_groundtruth_num[i] > 0
-                         ? static_cast<double>(_total_visible_ji_match_num[i]) /
-                               _total_visible_groundtruth_num[i]
-                         : 0;
+    recalls->at(i) = _total_visible_groundtruth_num[i] > 0 ?
+                         static_cast<double>(_total_visible_ji_match_num[i]) /
+                             _total_visible_groundtruth_num[i] :
+                         0;
     if (i != get_range_dim() - 1) {  // ignore the last range (DontCare)
       total_groundtruth_num_sum += _total_visible_groundtruth_num[i];
       total_match_num_sum += _total_visible_ji_match_num[i];
     }
   }
-  recalls->back() =
-      total_groundtruth_num_sum > 0
-          ? static_cast<double>(total_match_num_sum) / total_groundtruth_num_sum
-          : 0;
+  recalls->back() = total_groundtruth_num_sum > 0 ?
+                        static_cast<double>(total_match_num_sum) / total_groundtruth_num_sum :
+                        0;
 }
 
 void MetaStatistics::get_2017_aad(std::vector<double>* aad) const {
-  if (aad == nullptr) {
-    return;
-  }
+  if (aad == nullptr) { return; }
   unsigned int total_yaw_angle_diff_sum = 0;
-  unsigned int total_match_num_sum = 0;
+  unsigned int total_match_num_sum      = 0;
   aad->resize(get_range_dim() + 1, 0.0);
   for (size_t i = 0; i < get_range_dim(); ++i) {
-    aad->at(i) = _total_ji_match_num[i] > 0
-                     ? static_cast<double>(_total_yaw_angle_diff[i]) /
-                           _total_ji_match_num[i]
-                     : 0;
+    aad->at(i) = _total_ji_match_num[i] > 0 ?
+                     static_cast<double>(_total_yaw_angle_diff[i]) / _total_ji_match_num[i] :
+                     0;
     if (i != get_range_dim() - 1) {
       // if (i != get_range_dim()) {
-      total_yaw_angle_diff_sum +=
-          static_cast<unsigned int>(_total_yaw_angle_diff[i]);
+      total_yaw_angle_diff_sum += static_cast<unsigned int>(_total_yaw_angle_diff[i]);
       total_match_num_sum += _total_ji_match_num[i];
     }
   }
-  aad->back() =
-      total_match_num_sum > 0
-          ? static_cast<double>(total_yaw_angle_diff_sum) / total_match_num_sum
-          : 0.0;
+  aad->back() = total_match_num_sum > 0 ?
+                    static_cast<double>(total_yaw_angle_diff_sum) / total_match_num_sum :
+                    0.0;
 }
 
-void MetaStatistics::get_2016_detection_precision_and_recall(
-    std::vector<double>* precisions, std::vector<double>* recalls) const {
+void MetaStatistics::get_2016_detection_precision_and_recall(std::vector<double>* precisions,
+                                                             std::vector<double>* recalls) const {
   precisions->resize(get_range_dim(), 0.0);
   recalls->resize(get_range_dim(), 0.0);
   for (std::size_t i = 0; i < get_range_dim(); ++i) {
-    precisions->at(i) =
-        _total_groundtruth_num[i] > 0
-            ? static_cast<double>(_total_ji_sum[i]) / _total_groundtruth_num[i]
-            : 0;
-    recalls->at(i) = _total_groundtruth_num[i] > 0
-                         ? static_cast<double>(_total_hit_match_num[i]) /
-                               _total_groundtruth_num[i]
-                         : 0;
+    precisions->at(i) = _total_groundtruth_num[i] > 0 ?
+                            static_cast<double>(_total_ji_sum[i]) / _total_groundtruth_num[i] :
+                            0;
+    recalls->at(i) = _total_groundtruth_num[i] > 0 ?
+                         static_cast<double>(_total_hit_match_num[i]) / _total_groundtruth_num[i] :
+                         0;
   }
 }
 
-void MetaStatistics::get_2017_detection_ap_per_type(
-    std::vector<double>* ap, std::vector<std::vector<SPRCTuple>>* tuples) {
-  if (ap == nullptr || tuples == nullptr) {
-    return;
-  }
+void MetaStatistics::get_2017_detection_ap_per_type(std::vector<double>*                 ap,
+                                                    std::vector<std::vector<SPRCTuple>>* tuples) {
+  if (ap == nullptr || tuples == nullptr) { return; }
   ap->assign(get_type_dim(), 0.0);
   tuples->assign(get_type_dim(), std::vector<SPRCTuple>());
 
@@ -413,51 +358,38 @@ void MetaStatistics::get_2017_detection_ap_per_type(
   for (unsigned int t = 0; t < get_type_dim(); ++t) {
     int gt_num = 0;
     for (unsigned int r = 0; r < get_range_dim() - 1; ++r) {
-      gt_num += std::accumulate(_confusion_matrix[r][t].begin(),
-                                _confusion_matrix[r][t].end(), 0);
+      gt_num += std::accumulate(_confusion_matrix[r][t].begin(), _confusion_matrix[r][t].end(), 0);
       gt_num += _gt_alone[r][t];
     }
-    std::vector<unsigned int> cumulated_detection_num_per_conf =
-        _cumulated_match_num_per_conf[t];
-    vec_add1(&cumulated_detection_num_per_conf,
-             _cumulated_det_alone_per_conf[t]);
-    compute_ap_aos(_cumulated_match_num_per_conf[t],
-                   cumulated_detection_num_per_conf, gt_num, _s_recall_dim,
-                   &(ap->at(t)), &(tuples->at(t)));
+    std::vector<unsigned int> cumulated_detection_num_per_conf = _cumulated_match_num_per_conf[t];
+    vec_add1(&cumulated_detection_num_per_conf, _cumulated_det_alone_per_conf[t]);
+    compute_ap_aos(_cumulated_match_num_per_conf[t], cumulated_detection_num_per_conf, gt_num,
+                   _s_recall_dim, &(ap->at(t)), &(tuples->at(t)));
   }
 }
 
-void MetaStatistics::get_2017_detection_ap_aos(
-    double* ap, double* aos, std::vector<SPRCTuple>* tuples) const {
-  if (ap == nullptr || aos == nullptr || tuples == nullptr) {
-    return;
-  }
+void MetaStatistics::get_2017_detection_ap_aos(double*                 ap,
+                                               double*                 aos,
+                                               std::vector<SPRCTuple>* tuples) const {
+  if (ap == nullptr || aos == nullptr || tuples == nullptr) { return; }
 
-  std::vector<unsigned int> cumulated_match_num_per_conf(get_confidence_dim(),
-                                                         0);
-  std::vector<unsigned int> cumulated_detection_num_per_conf(
-      get_confidence_dim(), 0);
+  std::vector<unsigned int> cumulated_match_num_per_conf(get_confidence_dim(), 0);
+  std::vector<unsigned int> cumulated_detection_num_per_conf(get_confidence_dim(), 0);
   for (unsigned int t = 0; t < get_type_dim(); ++t) {
     vec_add1(&cumulated_match_num_per_conf, _cumulated_match_num_per_conf[t]);
-    vec_add1(&cumulated_detection_num_per_conf,
-             _cumulated_match_num_per_conf[t]);
-    vec_add1(&cumulated_detection_num_per_conf,
-             _cumulated_det_alone_per_conf[t]);
+    vec_add1(&cumulated_detection_num_per_conf, _cumulated_match_num_per_conf[t]);
+    vec_add1(&cumulated_detection_num_per_conf, _cumulated_det_alone_per_conf[t]);
   }
-  int total_gt_num = static_cast<int>(std::accumulate(
-      _total_groundtruth_num.begin(), _total_groundtruth_num.end() - 1, 0.0));
-  compute_ap_aos(cumulated_match_num_per_conf, cumulated_detection_num_per_conf,
-                 total_gt_num, _s_recall_dim, ap, tuples,
-                 _cumulated_orientation_similarity_sum_per_conf, aos);
+  int total_gt_num = static_cast<int>(
+      std::accumulate(_total_groundtruth_num.begin(), _total_groundtruth_num.end() - 1, 0.0));
+  compute_ap_aos(cumulated_match_num_per_conf, cumulated_detection_num_per_conf, total_gt_num,
+                 _s_recall_dim, ap, tuples, _cumulated_orientation_similarity_sum_per_conf, aos);
 }
 
 void MetaStatistics::get_2017_classification_accuracy(
     std::vector<std::vector<double>>* accuracys) const {
-  if (accuracys == nullptr) {
-    return;
-  }
-  accuracys->resize(get_type_dim(),
-                    std::vector<double>(get_range_dim() + 1, 0));
+  if (accuracys == nullptr) { return; }
+  accuracys->resize(get_type_dim(), std::vector<double>(get_range_dim() + 1, 0));
   std::vector<double> numerator_sum(get_type_dim(), 0.0);
   std::vector<double> denominator_sum(get_type_dim(), 0.0);
   for (size_t range_id = 0; range_id < get_range_dim(); ++range_id) {
@@ -469,13 +401,10 @@ void MetaStatistics::get_2017_classification_accuracy(
       for (size_t type_id_r = 0; type_id_r < get_type_dim(); ++type_id_r) {
         col_sum += _confusion_matrix[range_id][type_id_r][type_id];
       }
-      unsigned int numerator = _confusion_matrix[range_id][type_id][type_id];
-      unsigned int denominator =
-          row_sum + col_sum - numerator + _det_alone[range_id][type_id];
-      accuracys->at(type_id)[range_id] =
-          static_cast<double>(numerator) / denominator;
-      if (range_id !=
-          get_range_dim() - 1) {  // ignore the last range (DontCare)
+      unsigned int numerator   = _confusion_matrix[range_id][type_id][type_id];
+      unsigned int denominator = row_sum + col_sum - numerator + _det_alone[range_id][type_id];
+      accuracys->at(type_id)[range_id] = static_cast<double>(numerator) / denominator;
+      if (range_id != get_range_dim() - 1) {  // ignore the last range (DontCare)
         numerator_sum[type_id] += numerator;
         denominator_sum[type_id] += denominator;
       }
@@ -489,19 +418,17 @@ void MetaStatistics::get_2017_classification_accuracy(
 
 void MetaStatistics::get_2016_classification_accuracy(
     std::vector<std::vector<double>>* accuracys) const {
-  if (accuracys == nullptr) {
-    return;
-  }
+  if (accuracys == nullptr) { return; }
   accuracys->resize(get_type_dim(), std::vector<double>(get_range_dim(), 0.0));
 
-  size_t range_num = _confusion_matrix.size();
+  size_t range_num   = _confusion_matrix.size();
   size_t gt_type_num = _confusion_matrix[0].size();
   for (size_t range_id = 0; range_id < range_num; ++range_id) {
     for (size_t gt_type_id = 0; gt_type_id < gt_type_num; ++gt_type_id) {
       const std::vector<unsigned int>& gt_type_confusion_vector =
           _confusion_matrix[range_id][gt_type_id];
-      unsigned int gt_num = std::accumulate(gt_type_confusion_vector.begin(),
-                                            gt_type_confusion_vector.end(), 0);
+      unsigned int gt_num =
+          std::accumulate(gt_type_confusion_vector.begin(), gt_type_confusion_vector.end(), 0);
       accuracys->at(gt_type_id)[range_id] =
           static_cast<double>(gt_type_confusion_vector[gt_type_id]) / gt_num;
     }
@@ -512,32 +439,25 @@ void MetaStatistics::get_classification_confusion_matrix(
     std::vector<std::vector<double>>* matrix_gt_major,
     std::vector<std::vector<double>>* matrix_det_major,
     std::vector<std::vector<double>>* matrix_det_major_with_fp) const {
-  if (matrix_gt_major == nullptr || matrix_det_major == nullptr) {
-    return;
-  }
-  matrix_gt_major->resize(get_type_dim(),
-                          std::vector<double>(get_type_dim(), 0.0));
-  matrix_det_major->resize(get_type_dim(),
-                           std::vector<double>(get_type_dim(), 0.0));
-  matrix_det_major_with_fp->resize(get_type_dim(),
-                                   std::vector<double>(get_type_dim(), 0.0));
+  if (matrix_gt_major == nullptr || matrix_det_major == nullptr) { return; }
+  matrix_gt_major->resize(get_type_dim(), std::vector<double>(get_type_dim(), 0.0));
+  matrix_det_major->resize(get_type_dim(), std::vector<double>(get_type_dim(), 0.0));
+  matrix_det_major_with_fp->resize(get_type_dim(), std::vector<double>(get_type_dim(), 0.0));
 
   // get sum confusion matrix through different range
-  size_t range_num = _confusion_matrix.size();
-  size_t gt_type_num = _confusion_matrix[0].size();
-  size_t det_type_num = _confusion_matrix[0][0].size();
+  size_t                                 range_num    = _confusion_matrix.size();
+  size_t                                 gt_type_num  = _confusion_matrix[0].size();
+  size_t                                 det_type_num = _confusion_matrix[0][0].size();
   std::vector<std::vector<unsigned int>> sum_confusion_matrix;
-  sum_confusion_matrix.resize(gt_type_num,
-                              std::vector<unsigned int>(det_type_num, 0));
+  sum_confusion_matrix.resize(gt_type_num, std::vector<unsigned int>(det_type_num, 0));
   for (size_t range_id = 0; range_id < range_num; ++range_id) {
     vec_add2<unsigned int>(&sum_confusion_matrix, _confusion_matrix[range_id]);
   }
   // normalize through ground truth type
   for (size_t gt_type_id = 0; gt_type_id < gt_type_num; ++gt_type_id) {
-    const std::vector<unsigned int>& gt_type_confusion_vector =
-        sum_confusion_matrix[gt_type_id];
-    unsigned int gt_num = std::accumulate(gt_type_confusion_vector.begin(),
-                                          gt_type_confusion_vector.end(), 0);
+    const std::vector<unsigned int>& gt_type_confusion_vector = sum_confusion_matrix[gt_type_id];
+    unsigned int                     gt_num =
+        std::accumulate(gt_type_confusion_vector.begin(), gt_type_confusion_vector.end(), 0);
     for (size_t det_type_id = 0; det_type_id < det_type_num; ++det_type_id) {
       matrix_gt_major->at(gt_type_id)[det_type_id] =
           static_cast<double>(gt_type_confusion_vector[det_type_id]) / gt_num;
@@ -551,8 +471,7 @@ void MetaStatistics::get_classification_confusion_matrix(
     }
     for (size_t gt_type_id = 0; gt_type_id < gt_type_num; ++gt_type_id) {
       matrix_det_major->at(det_type_id)[gt_type_id] =
-          static_cast<double>(sum_confusion_matrix[gt_type_id][det_type_id]) /
-          det_num;
+          static_cast<double>(sum_confusion_matrix[gt_type_id][det_type_id]) / det_num;
     }
   }
   // add fp to confusion matrix, assume the corresponding type is the first
@@ -569,49 +488,41 @@ void MetaStatistics::get_classification_confusion_matrix(
     }
     for (size_t gt_type_id = 0; gt_type_id < gt_type_num; ++gt_type_id) {
       matrix_det_major_with_fp->at(det_type_id)[gt_type_id] =
-          static_cast<double>(sum_confusion_matrix[gt_type_id][det_type_id]) /
-          det_num;
+          static_cast<double>(sum_confusion_matrix[gt_type_id][det_type_id]) / det_num;
     }
   }
 }
 
 std::ostream& operator<<(std::ostream& out, const MetaStatistics& rhs) {
-  out << "===========================Meta Statistics========================="
-      << std::endl;
+  out << "===========================Meta Statistics=========================" << std::endl;
   out << "** Total detection num: " << std::endl;
   for (unsigned int i = 0; i < MetaStatistics::get_range_dim(); ++i) {
-    out << MetaStatistics::get_range(i) << ": " << rhs._total_detection_num[i]
-        << "\t";
+    out << MetaStatistics::get_range(i) << ": " << rhs._total_detection_num[i] << "\t";
   }
   out << std::endl;
   out << "** Total groundtruth num: " << std::endl;
   for (unsigned int i = 0; i < MetaStatistics::get_range_dim(); ++i) {
-    out << MetaStatistics::get_range(i) << ": " << rhs._total_groundtruth_num[i]
-        << "\t";
+    out << MetaStatistics::get_range(i) << ": " << rhs._total_groundtruth_num[i] << "\t";
   }
   out << std::endl;
   out << "** Total ji match num: " << std::endl;
   for (unsigned int i = 0; i < MetaStatistics::get_range_dim(); ++i) {
-    out << MetaStatistics::get_range(i) << ": " << rhs._total_ji_match_num[i]
-        << "\t";
+    out << MetaStatistics::get_range(i) << ": " << rhs._total_ji_match_num[i] << "\t";
   }
   out << std::endl;
   out << "** Total visible groundtruth num: " << std::endl;
   for (unsigned int i = 0; i < MetaStatistics::get_range_dim(); ++i) {
-    out << MetaStatistics::get_range(i) << ": "
-        << rhs._total_visible_groundtruth_num[i] << "\t";
+    out << MetaStatistics::get_range(i) << ": " << rhs._total_visible_groundtruth_num[i] << "\t";
   }
   out << std::endl;
   out << "** Total visible ji match num: " << std::endl;
   for (unsigned int i = 0; i < MetaStatistics::get_range_dim(); ++i) {
-    out << MetaStatistics::get_range(i) << ": "
-        << rhs._total_visible_ji_match_num[i] << "\t";
+    out << MetaStatistics::get_range(i) << ": " << rhs._total_visible_ji_match_num[i] << "\t";
   }
   out << std::endl;
   out << "** Total hit match num: " << std::endl;
   for (unsigned int i = 0; i < MetaStatistics::get_range_dim(); ++i) {
-    out << MetaStatistics::get_range(i) << ": " << rhs._total_hit_match_num[i]
-        << "\t";
+    out << MetaStatistics::get_range(i) << ": " << rhs._total_hit_match_num[i] << "\t";
   }
   out << std::endl;
   out << "** Total ji sum: " << std::endl;
@@ -636,8 +547,7 @@ std::ostream& operator<<(std::ostream& out, const MetaStatistics& rhs) {
     out << MetaStatistics::get_range(r) << ": " << std::endl;
     for (unsigned int i = 0; i < MetaStatistics::get_type_dim(); ++i) {
       for (unsigned int j = 0; j < MetaStatistics::get_type_dim(); ++j) {
-        out << MetaStatistics::get_type(i) << "--"
-            << MetaStatistics::get_type(j) << ": "
+        out << MetaStatistics::get_type(i) << "--" << MetaStatistics::get_type(j) << ": "
             << rhs._confusion_matrix[r][i][j] << "\t";
       }
       out << std::endl;
@@ -647,8 +557,7 @@ std::ostream& operator<<(std::ostream& out, const MetaStatistics& rhs) {
   for (unsigned int r = 0; r < MetaStatistics::get_range_dim(); ++r) {
     out << MetaStatistics::get_range(r) << ": " << std::endl;
     for (unsigned int i = 0; i < MetaStatistics::get_type_dim(); ++i) {
-      out << MetaStatistics::get_type(i) << ": " << rhs._det_alone[r][i]
-          << "\t";
+      out << MetaStatistics::get_type(i) << ": " << rhs._det_alone[r][i] << "\t";
     }
     out << std::endl;
   }
@@ -664,11 +573,9 @@ std::ostream& operator<<(std::ostream& out, const MetaStatistics& rhs) {
   for (unsigned int r = 0; r < MetaStatistics::get_range_dim(); ++r) {
     out << MetaStatistics::get_range(r) << ": " << std::endl;
     for (unsigned int i = 0; i < MetaStatistics::get_type_dim(); ++i) {
-      unsigned int tp_num =
-          std::accumulate(rhs._confusion_matrix[r][i].begin(),
-                          rhs._confusion_matrix[r][i].end(), 0);
-      out << MetaStatistics::get_type(i) << ": " << tp_num + rhs._gt_alone[r][i]
-          << ";\t";
+      unsigned int tp_num = std::accumulate(rhs._confusion_matrix[r][i].begin(),
+                                            rhs._confusion_matrix[r][i].end(), 0);
+      out << MetaStatistics::get_type(i) << ": " << tp_num + rhs._gt_alone[r][i] << ";\t";
     }
     std::cout << std::endl;
   }
@@ -676,25 +583,20 @@ std::ostream& operator<<(std::ostream& out, const MetaStatistics& rhs) {
   for (unsigned int r = 0; r < MetaStatistics::get_range_dim(); ++r) {
     out << MetaStatistics::get_range(r) << ": " << std::endl;
     for (unsigned int i = 0; i < MetaStatistics::get_type_dim(); ++i) {
-      unsigned int tp_num =
-          std::accumulate(rhs._confusion_matrix[r][i].begin(),
-                          rhs._confusion_matrix[r][i].end(), 0);
+      unsigned int tp_num = std::accumulate(rhs._confusion_matrix[r][i].begin(),
+                                            rhs._confusion_matrix[r][i].end(), 0);
       out << MetaStatistics::get_type(i) << ":\trecall = "
-          << static_cast<float>(tp_num) /
-                 static_cast<float>((tp_num + rhs._gt_alone[r][i]))
+          << static_cast<float>(tp_num) / static_cast<float>((tp_num + rhs._gt_alone[r][i]))
           << ",\tprecision = "
-          << static_cast<float>(tp_num) /
-                 static_cast<float>((tp_num + rhs._det_alone[r][i]))
+          << static_cast<float>(tp_num) / static_cast<float>((tp_num + rhs._det_alone[r][i]))
           << std::endl;
     }
   }
   out << "** under-segmented gt num: " << std::endl;
   for (unsigned int i = 0; i < MetaStatistics::get_type_dim(); ++i) {
-    out << MetaStatistics::get_type(i) << ":\t" << rhs._underseg_gt_num[i]
-        << std::endl;
+    out << MetaStatistics::get_type(i) << ":\t" << rhs._underseg_gt_num[i] << std::endl;
   }
-  out << "==================================================================="
-      << std::endl;
+  out << "===================================================================" << std::endl;
 
   return out;
 }

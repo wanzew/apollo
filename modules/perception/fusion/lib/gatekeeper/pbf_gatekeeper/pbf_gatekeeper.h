@@ -24,21 +24,21 @@ namespace perception {
 namespace fusion {
 
 struct PbfGatekeeperParams {
-  bool publish_if_has_lidar = true;
-  bool publish_if_has_radar = true;
+  bool publish_if_has_lidar  = true;
+  bool publish_if_has_radar  = true;
   bool publish_if_has_camera = true;
-  bool use_camera_3d = true;
+  bool use_camera_3d         = true;
 
   double min_radar_confident_distance = 40;
-  double max_radar_confident_angle = 20;
-  double min_camera_publish_distance = 50;
-  double invisible_period_threshold = 0.001;
-  double toic_threshold = 0.8;
-  double existence_threshold = 0.7;
-  double radar_existence_threshold = 0.9;
+  double max_radar_confident_angle    = 20;
+  double min_camera_publish_distance  = 50;
+  double invisible_period_threshold   = 0.001;
+  double toic_threshold               = 0.8;
+  double existence_threshold          = 0.7;
+  double radar_existence_threshold    = 0.9;
 
   bool use_track_time_pub_strategy = true;
-  int pub_track_time_thresh = 3;
+  int  pub_track_time_thresh       = 3;
 };
 
 class PbfGatekeeper : public BaseGatekeeper {

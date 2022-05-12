@@ -16,9 +16,10 @@
 
 #include "cyber/examples/timer_component_example/timer_component_example.h"
 
+#include "cyber/examples/proto/examples.pb.h"
+
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
-#include "cyber/examples/proto/examples.pb.h"
 
 bool TimerComponentSample::Init() {
   driver_writer_ = node_->CreateWriter<Driver>("/carstatus/channel");
@@ -26,11 +27,10 @@ bool TimerComponentSample::Init() {
 }
 
 bool TimerComponentSample::Proc() {
-  static int i = 0;
-  auto out_msg = std::make_shared<Driver>();
+  static int i       = 0;
+  auto       out_msg = std::make_shared<Driver>();
   out_msg->set_msg_id(i++);
   driver_writer_->Write(out_msg);
-  AINFO << "timer_component_example: Write drivermsg->"
-        << out_msg->ShortDebugString();
+  AINFO << "timer_component_example: Write drivermsg->" << out_msg->ShortDebugString();
   return true;
 }

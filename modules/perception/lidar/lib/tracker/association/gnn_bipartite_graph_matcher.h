@@ -37,13 +37,13 @@ class MatchCost {
   // @brief access Cost
   double Cost() const;
 
-  friend bool operator<(const MatchCost& m1, const MatchCost& m2);
+  friend bool          operator<(const MatchCost& m1, const MatchCost& m2);
   friend std::ostream& operator<<(std::ostream& os, const MatchCost& m);
 
  private:
   size_t row_idx_ = 0;
   size_t col_idx_ = 0;
-  double cost_ = 0.0;
+  double cost_    = 0.0;
 };
 
 class GnnBipartiteGraphMatcher : public BaseBipartiteGraphMatcher {
@@ -57,9 +57,9 @@ class GnnBipartiteGraphMatcher : public BaseBipartiteGraphMatcher {
   // @params [out]: unmatched rows
   // @params [out]: unmatched cols
   void Match(const BipartiteGraphMatcherOptions& options,
-             std::vector<NodeNodePair>* assignments,
-             std::vector<size_t>* unassigned_rows,
-             std::vector<size_t>* unassigned_cols);
+             std::vector<NodeNodePair>*          assignments,
+             std::vector<size_t>*                unassigned_rows,
+             std::vector<size_t>*                unassigned_cols);
 
   std::string Name() const { return "GnnBipartiteGraphMatcher"; }
 

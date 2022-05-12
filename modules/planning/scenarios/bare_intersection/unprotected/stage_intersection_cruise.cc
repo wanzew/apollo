@@ -35,21 +35,15 @@ Stage::StageStatus BareIntersectionUnprotectedStageIntersectionCruise::Process(
   CHECK_NOTNULL(frame);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StopSignUnprotectedStageIntersectionCruise plan error";
-  }
+  if (!plan_ok) { AERROR << "StopSignUnprotectedStageIntersectionCruise plan error"; }
 
-  bool stage_done = stage_impl_.CheckDone(
-      *frame, ScenarioConfig::BARE_INTERSECTION_UNPROTECTED, config_,
-      injector_->planning_context(), false);
-  if (stage_done) {
-    return FinishStage();
-  }
+  bool stage_done = stage_impl_.CheckDone(*frame, ScenarioConfig::BARE_INTERSECTION_UNPROTECTED,
+                                          config_, injector_->planning_context(), false);
+  if (stage_done) { return FinishStage(); }
   return Stage::RUNNING;
 }
 
-Stage::StageStatus
-BareIntersectionUnprotectedStageIntersectionCruise::FinishStage() {
+Stage::StageStatus BareIntersectionUnprotectedStageIntersectionCruise::FinishStage() {
   return FinishScenario();
 }
 

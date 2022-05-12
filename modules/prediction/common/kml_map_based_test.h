@@ -26,7 +26,7 @@ namespace prediction {
 class KMLMapBasedTest : public ::testing::Test {
  public:
   KMLMapBasedTest() {
-    FLAGS_map_dir = "modules/prediction/testdata";
+    FLAGS_map_dir           = "modules/prediction/testdata";
     FLAGS_base_map_filename = "kml_map.bin";
   }
 };

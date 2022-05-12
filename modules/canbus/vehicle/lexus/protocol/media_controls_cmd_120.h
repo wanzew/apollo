@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Mediacontrolscmd120 : public ::apollo::drivers::canbus::ProtocolData<
-                                ::apollo::canbus::ChassisDetail> {
+class Mediacontrolscmd120
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Mediacontrolscmd120();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'MEDIA_CONTROLS_CMD', 'enum': {0:
@@ -42,8 +42,8 @@ class Mediacontrolscmd120 : public ::apollo::drivers::canbus::ProtocolData<
   // 'MEDIA_CONTROLS_CMD_MEDIA_CONTROL_VOL_DOWN'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Media_controls_cmd_120::Media_controls_cmdType media_controls_cmd(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Media_controls_cmd_120::Media_controls_cmdType media_controls_cmd(const std::uint8_t* bytes,
+                                                                    const int32_t length) const;
 
   // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':

@@ -26,7 +26,7 @@ namespace scheduler {
 class MutexWrapper {
  public:
   MutexWrapper& operator=(const MutexWrapper& other) = delete;
-  std::mutex& Mutex() { return mutex_; }
+  std::mutex&   Mutex() { return mutex_; }
 
  private:
   mutable std::mutex mutex_;

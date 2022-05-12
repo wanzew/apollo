@@ -23,10 +23,11 @@
 
 #include <vector>
 
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -54,8 +55,8 @@ class Predictor {
    * @return If predicted successfully
    */
   virtual bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
-                       Obstacle* obstacle,
-                       ObstaclesContainer* obstacles_container) = 0;
+                       Obstacle*                     obstacle,
+                       ObstaclesContainer*           obstacles_container) = 0;
 
   /**
    * @brief Get trajectory size
@@ -73,8 +74,7 @@ class Predictor {
    * @param ADC trajectory container
    * @param obstacle,
    */
-  void TrimTrajectories(const ADCTrajectoryContainer& adc_trajectory_container,
-                        Obstacle* obstacle);
+  void TrimTrajectories(const ADCTrajectoryContainer& adc_trajectory_container, Obstacle* obstacle);
 
   /**
    * @brief get the predictor type
@@ -88,8 +88,7 @@ class Predictor {
    * @param A vector of trajectory points
    * @return Generated trajectory
    */
-  static Trajectory GenerateTrajectory(
-      const std::vector<apollo::common::TrajectoryPoint>& points);
+  static Trajectory GenerateTrajectory(const std::vector<apollo::common::TrajectoryPoint>& points);
 
   /**
    * @brief Set equal probability to prediction trajectories
@@ -97,8 +96,7 @@ class Predictor {
    * @param start_index The start index to set equal probability
    * @param obstacle
    */
-  void SetEqualProbability(const double probability, const int start_index,
-                           Obstacle* obstacle_ptr);
+  void SetEqualProbability(const double probability, const int start_index, Obstacle* obstacle_ptr);
 
   /**
    * @brief Trim a single prediction trajectory,
@@ -109,7 +107,8 @@ class Predictor {
    * @return If the prediction trajectory is trimed
    */
   bool TrimTrajectory(const ADCTrajectoryContainer& adc_trajectory_container,
-                      Obstacle* obstacle, Trajectory* trajectory);
+                      Obstacle*                     obstacle,
+                      Trajectory*                   trajectory);
 
   /**
    * @brief Determine if an obstacle is supposed to stop within a distance
@@ -118,8 +117,7 @@ class Predictor {
    * @param The output param of acceleration
    * @return If the obstacle is supposed to stop within a distance
    */
-  bool SupposedToStop(const Feature& feature, const double stop_distance,
-                      double* acceleration);
+  bool SupposedToStop(const Feature& feature, const double stop_distance, double* acceleration);
 
  protected:
   ObstacleConf::PredictorType predictor_type_;

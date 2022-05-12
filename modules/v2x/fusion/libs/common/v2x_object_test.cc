@@ -24,18 +24,18 @@ namespace base {
 
 TEST(Object, operators) {
   std::vector<Object> objects;
-  Object object;
+  Object              object;
   object.timestamp = 4.1;
-  object.track_id = 0;
+  object.track_id  = 0;
   objects.push_back(object);
   object.timestamp = 3.2;
-  object.track_id = 1;
+  object.track_id  = 1;
   objects.push_back(object);
   object.timestamp = 2.3;
-  object.track_id = 2;
+  object.track_id  = 2;
   objects.push_back(object);
   object.timestamp = 1.4;
-  object.track_id = 3;
+  object.track_id  = 3;
   objects.push_back(object);
   sort(objects.begin(), objects.end(), std::less<Object>());
   EXPECT_EQ(objects.at(0).track_id, 3);

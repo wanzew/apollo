@@ -14,28 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/radar/lib/preprocessor/conti_ars_preprocessor/conti_ars_preprocessor.h"
+
 #include "modules/common/util/perf_util.h"
 
 namespace apollo {
 namespace perception {
 namespace radar {
 
-int ContiArsPreprocessor::current_idx_ = 0;
+int                          ContiArsPreprocessor::current_idx_ = 0;
 std::unordered_map<int, int> ContiArsPreprocessor::local2global_;
 
 bool ContiArsPreprocessor::Init() {
-  std::string model_name = "ContiArsPreprocessor";
+  std::string             model_name   = "ContiArsPreprocessor";
   const lib::ModelConfig* model_config = nullptr;
-  ACHECK(lib::ConfigManager::Instance()->GetModelConfig(model_name,
-                                                        &model_config));
+  ACHECK(lib::ConfigManager::Instance()->GetModelConfig(model_name, &model_config));
   ACHECK(model_config->get_value("delay_time", &delay_time_));
   return true;
 }
 
-bool ContiArsPreprocessor::Preprocess(
-    const drivers::ContiRadar& raw_obstacles,
-    const PreprocessorOptions& options,
-    drivers::ContiRadar* corrected_obstacles) {
+bool ContiArsPreprocessor::Preprocess(const drivers::ContiRadar& raw_obstacles,
+                                      const PreprocessorOptions& options,
+                                      drivers::ContiRadar*       corrected_obstacles) {
   PERF_FUNCTION();
   SkipObjects(raw_obstacles, corrected_obstacles);
   ExpandIds(corrected_obstacles);
@@ -43,21 +42,17 @@ bool ContiArsPreprocessor::Preprocess(
   return true;
 }
 
-std::string ContiArsPreprocessor::Name() const {
-  return "ContiArsPreprocessor";
-}
+std::string ContiArsPreprocessor::Name() const { return "ContiArsPreprocessor"; }
 
-void ContiArsPreprocessor::SkipObjects(
-    const drivers::ContiRadar& raw_obstacles,
-    drivers::ContiRadar* corrected_obstacles) {
+void ContiArsPreprocessor::SkipObjects(const drivers::ContiRadar& raw_obstacles,
+                                       drivers::ContiRadar*       corrected_obstacles) {
   corrected_obstacles->mutable_header()->CopyFrom(raw_obstacles.header());
   double timestamp = raw_obstacles.header().timestamp_sec() - 1e-6;
   for (const auto& contiobs : raw_obstacles.contiobs()) {
     double object_timestamp = contiobs.header().timestamp_sec();
-    if (object_timestamp > timestamp &&
-        object_timestamp < timestamp + CONTI_ARS_INTERVAL) {
+    if (object_timestamp > timestamp && object_timestamp < timestamp + CONTI_ARS_INTERVAL) {
       drivers::ContiRadarObs* obs = corrected_obstacles->add_contiobs();
-      *obs = contiobs;
+      *obs                        = contiobs;
     }
   }
   if (raw_obstacles.contiobs_size() > corrected_obstacles->contiobs_size()) {
@@ -68,14 +63,14 @@ void ContiArsPreprocessor::SkipObjects(
 
 void ContiArsPreprocessor::ExpandIds(drivers::ContiRadar* corrected_obstacles) {
   for (int iobj = 0; iobj < corrected_obstacles->contiobs_size(); ++iobj) {
-    const auto& contiobs = corrected_obstacles->contiobs(iobj);
-    int id = contiobs.obstacle_id();
-    int corrected_id = 0;
-    auto ob = local2global_.find(id);
+    const auto& contiobs     = corrected_obstacles->contiobs(iobj);
+    int         id           = contiobs.obstacle_id();
+    int         corrected_id = 0;
+    auto        ob           = local2global_.find(id);
     if (ob != local2global_.end()) {
       if (CONTI_NEW == contiobs.meas_state()) {
         corrected_id = GetNextId();
-        ob->second = corrected_id;
+        ob->second   = corrected_id;
       } else {
         corrected_id = ob->second;
       }
@@ -87,18 +82,14 @@ void ContiArsPreprocessor::ExpandIds(drivers::ContiRadar* corrected_obstacles) {
   }
 }
 
-void ContiArsPreprocessor::CorrectTime(
-    drivers::ContiRadar* corrected_obstacles) {
-  double correct_timestamp =
-      corrected_obstacles->header().timestamp_sec() - delay_time_;
+void ContiArsPreprocessor::CorrectTime(drivers::ContiRadar* corrected_obstacles) {
+  double correct_timestamp = corrected_obstacles->header().timestamp_sec() - delay_time_;
   corrected_obstacles->mutable_header()->set_timestamp_sec(correct_timestamp);
 }
 
 int ContiArsPreprocessor::GetNextId() {
   ++current_idx_;
-  if (MAX_RADAR_IDX == current_idx_) {
-    current_idx_ = 1;
-  }
+  if (MAX_RADAR_IDX == current_idx_) { current_idx_ = 1; }
   return current_idx_;
 }
 

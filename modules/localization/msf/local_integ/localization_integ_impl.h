@@ -61,8 +61,7 @@ class LocalizationIntegImpl {
   void RawImuProcessRfu(const ImuData& imu_data);
 
   // Gnss Info process.
-  void RawObservationProcess(
-      const drivers::gnss::EpochObservation& raw_obs_msg);
+  void RawObservationProcess(const drivers::gnss::EpochObservation& raw_obs_msg);
   void RawEphemerisProcess(const drivers::gnss::GnssEphemeris& gnss_orbit_msg);
 
   // gnss best pose process
@@ -84,22 +83,19 @@ class LocalizationIntegImpl {
 
   void ImuProcessImpl(const ImuData& imu_data);
 
-  void RawObservationProcessImpl(
-      const drivers::gnss::EpochObservation& raw_obs_msg);
-  void RawEphemerisProcessImpl(
-      const drivers::gnss::GnssEphemeris& gnss_orbit_msg);
-  void GnssBestPoseProcessImpl(
-      const drivers::gnss::GnssBestPose& bestgnsspos_msg);
+  void RawObservationProcessImpl(const drivers::gnss::EpochObservation& raw_obs_msg);
+  void RawEphemerisProcessImpl(const drivers::gnss::GnssEphemeris& gnss_orbit_msg);
+  void GnssBestPoseProcessImpl(const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
   void GnssHeadingProcessImpl(const drivers::gnss::Heading& gnssheading_msg);
 
-  void TransferGnssMeasureToLocalization(const MeasureData& measure,
+  void TransferGnssMeasureToLocalization(const MeasureData&    measure,
                                          LocalizationEstimate* localization);
 
  private:
-  MeasureRepublishProcess* republish_process_;
+  MeasureRepublishProcess*  republish_process_;
   LocalizationIntegProcess* integ_process_;
-  LocalizationGnssProcess* gnss_process_;
+  LocalizationGnssProcess*  gnss_process_;
   LocalizationLidarProcess* lidar_process_;
 
   LocalizationResult lastest_lidar_localization_;
@@ -108,11 +104,11 @@ class LocalizationIntegImpl {
 
   bool is_use_gnss_bestpose_ = true;
 
-  double imu_altitude_from_lidar_localization_ = 0.0;
-  bool imu_altitude_from_lidar_localization_available_ = false;
+  double imu_altitude_from_lidar_localization_           = 0.0;
+  bool   imu_altitude_from_lidar_localization_available_ = false;
 
-  bool enable_lidar_localization_ = true;
-  Eigen::Affine3d gnss_antenna_extrinsic_;
+  bool                     enable_lidar_localization_ = true;
+  Eigen::Affine3d          gnss_antenna_extrinsic_;
   OnlineLocalizationExpert expert_;
 };
 

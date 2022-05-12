@@ -23,13 +23,13 @@
 #include <memory>
 #include <string>
 
-#include "cyber/time/time.h"
+#include "modules/storytelling/proto/story.pb.h"
 
 #include "cyber/component/component.h"
+#include "cyber/time/time.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/submodules/submodule_output.h"
-#include "modules/storytelling/proto/story.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -38,8 +38,7 @@
 namespace apollo {
 namespace prediction {
 
-class PredictionComponent
-    : public cyber::Component<perception::PerceptionObstacles> {
+class PredictionComponent : public cyber::Component<perception::PerceptionObstacles> {
  public:
   /**
    * @brief Destructor
@@ -71,11 +70,9 @@ class PredictionComponent
   void OfflineProcessFeatureProtoFile(const std::string& features_proto_file);
 
  private:
-  bool ContainerSubmoduleProcess(
-      const std::shared_ptr<perception::PerceptionObstacles>&);
+  bool ContainerSubmoduleProcess(const std::shared_ptr<perception::PerceptionObstacles>&);
 
-  bool PredictionEndToEndProc(
-      const std::shared_ptr<perception::PerceptionObstacles>&);
+  bool PredictionEndToEndProc(const std::shared_ptr<perception::PerceptionObstacles>&);
 
   double component_start_time_ = 0.0;
 
@@ -83,8 +80,7 @@ class PredictionComponent
 
   std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> planning_reader_;
 
-  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
-      localization_reader_;
+  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>> localization_reader_;
 
   std::shared_ptr<cyber::Reader<storytelling::Stories>> storytelling_reader_;
 
@@ -94,8 +90,7 @@ class PredictionComponent
 
   std::shared_ptr<cyber::Writer<ADCTrajectoryContainer>> adc_container_writer_;
 
-  std::shared_ptr<cyber::Writer<perception::PerceptionObstacles>>
-      perception_obstacles_writer_;
+  std::shared_ptr<cyber::Writer<perception::PerceptionObstacles>> perception_obstacles_writer_;
 
   std::shared_ptr<ContainerManager> container_manager_;
 

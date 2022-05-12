@@ -15,11 +15,12 @@
  *****************************************************************************/
 #include "modules/dreamview/backend/fuel_monitor/fuel_monitor_gflags.h"
 
-DEFINE_string(data_collection_monitor_name, "DataCollectionMonitor",
+DEFINE_string(data_collection_monitor_name,
+              "DataCollectionMonitor",
               "Name of the data collection monitor");
 
-DEFINE_string(preprocess_monitor_name, "PreprocessMonitor",
-              "Name of the preprocess monitor");
+DEFINE_string(preprocess_monitor_name, "PreprocessMonitor", "Name of the preprocess monitor");
 
-DEFINE_string(progress_topic, "/apollo/dreamview/progress",
+DEFINE_string(progress_topic,
+              "/apollo/dreamview/progress",
               "Sensor calibration preprocess progress topic name.");

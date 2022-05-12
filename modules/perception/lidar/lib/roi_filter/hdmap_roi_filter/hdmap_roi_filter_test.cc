@@ -17,6 +17,7 @@
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/polygon_scan_cvter.h"
@@ -26,22 +27,22 @@ namespace perception {
 namespace lidar {
 
 typedef Bitmap2D::DirectionMajor DirectionMajor;
-typedef Bitmap2D::Vec2ui Vec2ui;
+typedef Bitmap2D::Vec2ui         Vec2ui;
 
 typedef PolygonScanCvter<double>::DirectionMajor PolyDirMajor;
-typedef PolygonScanCvter<double>::Polygon Polygon;
-typedef PolygonScanCvter<double>::Edge Edge;
-typedef PolygonScanCvter<double>::Point Point;
-typedef std::pair<double, double> IntervalOut;
-typedef std::pair<double, double> IntervalIn;
+typedef PolygonScanCvter<double>::Polygon        Polygon;
+typedef PolygonScanCvter<double>::Edge           Edge;
+typedef PolygonScanCvter<double>::Point          Point;
+typedef std::pair<double, double>                IntervalOut;
+typedef std::pair<double, double>                IntervalIn;
 
 //  bitmap2d test
 TEST(hdmap_roi_filter_bitmap2d_test, test_bitmap) {
-  Bitmap2D bitmap;
+  Bitmap2D        bitmap;
   Eigen::Vector2d min_range(0.0, 0.0);
   Eigen::Vector2d max_range(70.0, 70.0);
   Eigen::Vector2d cell_size(1.0, 1.0);
-  DirectionMajor major_dir = DirectionMajor::XMAJOR;
+  DirectionMajor  major_dir = DirectionMajor::XMAJOR;
   bitmap.Init(min_range, max_range, cell_size);
   EXPECT_EQ(bitmap.min_range()[0], min_range[0]);
   EXPECT_EQ(bitmap.max_range()[0], max_range[0]);
@@ -103,9 +104,9 @@ TEST(hdmap_roi_filter_bitmap2d_test, test_polygon_scan_cvter) {
   EXPECT_EQ(poly_scan_cvter.polygon().size(), polygon.size());
 
   std::vector<std::vector<IntervalOut>> scans_intervals;
-  double beg = 0.0, end = 12.0, step = 1.0;
-  size_t scan_size = static_cast<int>((end - beg) / step);
-  const size_t result_edge_table[] = {0, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 0};
+  double                                beg = 0.0, end = 12.0, step = 1.0;
+  size_t                                scan_size           = static_cast<int>((end - beg) / step);
+  const size_t                          result_edge_table[] = {0, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 0};
   // const size_t result_no_edge_table[] = {0, 1, 1, 1, 1, 1, 2, 2, 1, 1, 0, 0};
   scans_intervals.resize(scan_size);
   for (double i = beg; i < end; i += step) {
@@ -128,10 +129,9 @@ TEST(hdmap_roi_filter_bitmap2d_test, test_polygon_scan_cvter) {
 
 bool LoadFrameData(LidarFrame* frame) {
   std::ifstream fin;
-  fin.open(
-      "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
-      "hdmap_roi_filter/data/"
-      "poly_mask_ut.poly");
+  fin.open("/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
+           "hdmap_roi_filter/data/"
+           "poly_mask_ut.poly");
   CHECK_EQ(fin.fail(), false);
   size_t polygons_num = 0;
   fin >> polygons_num;
@@ -147,10 +147,9 @@ bool LoadFrameData(LidarFrame* frame) {
   }
   fin.close();
 
-  fin.open(
-      "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
-      "hdmap_roi_filter/data/"
-      "poly_mask_ut.pcd");
+  fin.open("/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
+           "hdmap_roi_filter/data/"
+           "poly_mask_ut.pcd");
   CHECK_EQ(fin.fail(), false);
   size_t cloud_size = 0;
   fin >> cloud_size;
@@ -164,15 +163,15 @@ bool LoadFrameData(LidarFrame* frame) {
 
 class HdmapROIFilterTest : public ::testing::Test {
  public:
-  HdmapROIFilterTest() : hdmap_roi_filter_ptr_(new HdmapROIFilter) {
+  HdmapROIFilterTest()
+      : hdmap_roi_filter_ptr_(new HdmapROIFilter) {
     // prepare test data
     char cyber_path[50] = "CYBER_PATH=";
     putenv(cyber_path);
     char module_path[50] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root =
-        "/apollo/modules/perception/testdata/"
-        "lidar/lib/roi_filter/hdmap_roi_filter";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+                      "lidar/lib/roi_filter/hdmap_roi_filter";
   }
 
  protected:
@@ -265,19 +264,19 @@ class HdmapROIFilterTest : public ::testing::Test {
 
   void FilterWithEdgeTable() {
     hdmap_roi_filter_ptr_->set_roi_service_ = false;
-    hdmap_roi_filter_ptr_->no_edge_table_ = false;
+    hdmap_roi_filter_ptr_->no_edge_table_   = false;
     Filter();
   }
 
   void FilterWithParallel() {
     hdmap_roi_filter_ptr_->set_roi_service_ = true;
-    hdmap_roi_filter_ptr_->no_edge_table_ = true;
+    hdmap_roi_filter_ptr_->no_edge_table_   = true;
     Filter();
   }
 
   // input data
-  LidarFrame frame_;
-  ROIFilterOptions options_;
+  LidarFrame           frame_;
+  ROIFilterOptions     options_;
   ROIFilterInitOptions opts_;
 
   // algorithm member
@@ -288,13 +287,9 @@ class HdmapROIFilterTest : public ::testing::Test {
 TEST_F(HdmapROIFilterTest, init) { HdmapROIFilterTest::Init(); }
 
 // test the filter function
-TEST_F(HdmapROIFilterTest, filter_with_edge_table) {
-  HdmapROIFilterTest::FilterWithEdgeTable();
-}
+TEST_F(HdmapROIFilterTest, filter_with_edge_table) { HdmapROIFilterTest::FilterWithEdgeTable(); }
 
-TEST_F(HdmapROIFilterTest, filter_with_parallel) {
-  HdmapROIFilterTest::FilterWithParallel();
-}
+TEST_F(HdmapROIFilterTest, filter_with_parallel) { HdmapROIFilterTest::FilterWithParallel(); }
 
 TEST_F(HdmapROIFilterTest, filter_with_simple_case) {
   // TODO(perception): fix the test.

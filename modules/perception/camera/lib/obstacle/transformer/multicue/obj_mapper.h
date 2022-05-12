@@ -28,12 +28,12 @@ namespace perception {
 namespace camera {
 
 struct ObjMapperOptions {
-  float hwl[3] = {0};
-  float bbox[4] = {0};
-  float ry = 0.0f;
-  bool is_veh = true;
-  bool check_dimension = true;
-  int type_min_vol_index = 0;
+  float hwl[3]             = {0};
+  float bbox[4]            = {0};
+  float ry                 = 0.0f;
+  bool  is_veh             = true;
+  bool  check_dimension    = true;
+  int   type_min_vol_index = 0;
 };
 
 // hyper parameters
@@ -68,7 +68,9 @@ class ObjMapper {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  ObjMapper() : width_(0), height_(0) {
+  ObjMapper()
+      : width_(0)
+      , height_(0) {
     memset(k_mat_, 0, sizeof(float) * 9);
     resize_ry_score(params_.nr_bins_ry);
     set_default_variance();
@@ -82,10 +84,10 @@ class ObjMapper {
     position_uncertainty_ << 1, 0, 0, 0, 0, 0, 0, 0, 1;
   }
 
-  void Init(const float *k_mat, int width, int height) {
+  void Init(const float* k_mat, int width, int height) {
     memcpy(k_mat_, k_mat, sizeof(float) * 9);
-    width_ = width;
-    height_ = height;
+    width_                   = width;
+    height_                  = height;
     object_template_manager_ = ObjectTemplateManager::Instance();
   }
 
@@ -103,48 +105,54 @@ class ObjMapper {
   Eigen::Matrix3d get_position_uncertainty() { return position_uncertainty_; }
 
   // main interface, center is the bottom-face center ("center" for short)
-  bool Solve3dBbox(const ObjMapperOptions &options, float center[3],
-                   float hwl[3], float *ry);
+  bool Solve3dBbox(const ObjMapperOptions& options, float center[3], float hwl[3], float* ry);
 
  private:
-  bool Solve3dBboxGivenOneFullBboxDimensionOrientation(const float *bbox,
-                                                       const float *hwl,
-                                                       float *ry,
-                                                       float *center);
+  bool Solve3dBboxGivenOneFullBboxDimensionOrientation(const float* bbox,
+                                                       const float* hwl,
+                                                       float*       ry,
+                                                       float*       center);
 
-  bool SolveCenterFromNearestVerticalEdge(const float *bbox, const float *hwl,
-                                          float ry, float *center,
-                                          float *center_2d) const;
+  bool SolveCenterFromNearestVerticalEdge(
+      const float* bbox, const float* hwl, float ry, float* center, float* center_2d) const;
 
-  void UpdateCenterViaBackProjectZ(const float *bbox, const float *hwl,
-                                   const float *center_2d,
-                                   float *center) const {
+  void UpdateCenterViaBackProjectZ(const float* bbox,
+                                   const float* hwl,
+                                   const float* center_2d,
+                                   float*       center) const {
     float z = center[2];
     common::IBackprojectCanonical(center_2d, k_mat_, z, center);
     center[1] += hwl[0] / 2;
   }
 
-  float GetProjectionScore(float ry, const float *bbox, const float *hwl,
-                           const float *center, bool check_truncation = false,
-                           float *bbox_res = nullptr) const {
+  float GetProjectionScore(float        ry,
+                           const float* bbox,
+                           const float* hwl,
+                           const float* center,
+                           bool         check_truncation = false,
+                           float*       bbox_res         = nullptr) const {
     float rot[9] = {0};
     GenRotMatrix(ry, rot);
-    float *bbox_near = nullptr;
-    float score = GetScoreViaRotDimensionCenter(
-        &k_mat_[0], width_, height_, bbox, rot, hwl, center, check_truncation,
-        bbox_res, bbox_near);
+    float* bbox_near = nullptr;
+    float score = GetScoreViaRotDimensionCenter(&k_mat_[0], width_, height_, bbox, rot, hwl, center,
+                                                check_truncation, bbox_res, bbox_near);
     return score;
   }
 
-  void PostRefineZ(const float *bbox, const float *hwl, const float *center2d,
-                   float ry, float *center, float dz = 0.2f, float rz = 1.0f,
-                   bool fix_proj = true) const {
-    float z = center[2];
-    float score_best = 0.0f;
-    float x[2] = {center2d[0], center2d[1]};
+  void PostRefineZ(const float* bbox,
+                   const float* hwl,
+                   const float* center2d,
+                   float        ry,
+                   float*       center,
+                   float        dz       = 0.2f,
+                   float        rz       = 1.0f,
+                   bool         fix_proj = true) const {
+    float z              = center[2];
+    float score_best     = 0.0f;
+    float x[2]           = {center2d[0], center2d[1]};
     float center_best[3] = {center[0], center[1], center[2]};
     for (float offset = -rz; offset <= rz; offset += dz) {
-      float z_test = std::max(z + offset, params_.depth_min);
+      float z_test         = std::max(z + offset, params_.depth_min);
       float center_test[3] = {center[0], center[1], z_test};
       if (fix_proj) {
         common::IBackprojectCanonical(x, k_mat_, z_test, center_test);
@@ -159,29 +167,31 @@ class ObjMapper {
     memcpy(center, center_best, sizeof(float) * 3);
   }
 
-  void PostRefineOrientation(const float *bbox, const float *hwl,
-                             const float *center, float *ry);
+  void PostRefineOrientation(const float* bbox, const float* hwl, const float* center, float* ry);
 
-  void GetCenter(const float *bbox, const float &z_ref, const float &ry,
-                 const float *hwl, float *center,
-                 float *x /*init outside*/) const;
+  void GetCenter(const float* bbox,
+                 const float& z_ref,
+                 const float& ry,
+                 const float* hwl,
+                 float*       center,
+                 float*       x /*init outside*/) const;
 
-  void FillRyScoreSingleBin(const float &ry) {
+  void FillRyScoreSingleBin(const float& ry) {
     int nr_bins_ry = static_cast<int>(ry_score_.size());
     memset(ry_score_.data(), 0, sizeof(float) * nr_bins_ry);
     const float PI = common::Constant<float>::PI();
-    int index = static_cast<int>(
-        std::floor((ry + PI) * static_cast<float>(nr_bins_ry) / (2.0f * PI)));
+    int         index =
+        static_cast<int>(std::floor((ry + PI) * static_cast<float>(nr_bins_ry) / (2.0f * PI)));
     ry_score_[index % nr_bins_ry] = 1.0f;
   }
 
  private:
   // canonical camera: p_matrix = k_matrix [I 0]
-  float k_mat_[9] = {0};
-  int width_ = 0;
-  int height_ = 0;
+  float              k_mat_[9] = {0};
+  int                width_    = 0;
+  int                height_   = 0;
   std::vector<float> ry_score_ = {};
-  ObjMapperParams params_;
+  ObjMapperParams    params_;
 
   // per-dimension variance of the orientation [yaw, pitch, roll]
   Eigen::Vector3d orientation_variance_;
@@ -192,7 +202,7 @@ class ObjMapper {
   // DISALLOW_COPY_AND_ASSIGN(ObjMapper);
 
  protected:
-  ObjectTemplateManager *object_template_manager_ = nullptr;
+  ObjectTemplateManager* object_template_manager_ = nullptr;
 };
 
 }  // namespace camera

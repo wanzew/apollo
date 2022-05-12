@@ -14,15 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/routing/proto/routing.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/cyber.h"
 #include "cyber/time/rate.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/routing/proto/routing.pb.h"
 
-DEFINE_bool(enable_remove_lane_id, true,
-            "True to remove lane id in routing request");
+DEFINE_bool(enable_remove_lane_id, true, "True to remove lane id in routing request");
 
 DEFINE_string(routing_test_file,
               "modules/routing/tools/routing_tester/routing_test.pb.txt",
@@ -30,7 +29,7 @@ DEFINE_string(routing_test_file,
 
 using apollo::cyber::Rate;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   // init cyber framework
@@ -38,8 +37,7 @@ int main(int argc, char *argv[]) {
   FLAGS_alsologtostderr = true;
 
   apollo::routing::RoutingRequest routing_request;
-  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_routing_test_file,
-                                               &routing_request)) {
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_routing_test_file, &routing_request)) {
     AERROR << "failed to load file: " << FLAGS_routing_test_file;
     return -1;
   }
@@ -51,10 +49,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::shared_ptr<apollo::cyber::Node> node(
-      apollo::cyber::CreateNode("routing_tester"));
-  auto writer = node->CreateWriter<apollo::routing::RoutingRequest>(
-      FLAGS_routing_request_topic);
+  std::shared_ptr<apollo::cyber::Node> node(apollo::cyber::CreateNode("routing_tester"));
+  auto writer = node->CreateWriter<apollo::routing::RoutingRequest>(FLAGS_routing_request_topic);
 
   Rate rate(1.0);
   while (apollo::cyber::OK()) {

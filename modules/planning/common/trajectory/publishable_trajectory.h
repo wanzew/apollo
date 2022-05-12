@@ -20,8 +20,9 @@
 
 #pragma once
 
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {
@@ -30,7 +31,7 @@ class PublishableTrajectory : public DiscretizedTrajectory {
  public:
   PublishableTrajectory() = default;
 
-  PublishableTrajectory(const double header_time,
+  PublishableTrajectory(const double                 header_time,
                         const DiscretizedTrajectory& discretized_trajectory);
   /**
    * Create a publishable trajectory based on a trajectory protobuf

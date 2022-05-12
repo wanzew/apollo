@@ -25,12 +25,14 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/navi/decider/navi_obstacle_decider.h"
 #include "modules/planning/navi/decider/navi_speed_ts_graph.h"
 #include "modules/planning/navi/decider/navi_task.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -61,8 +63,7 @@ class NaviSpeedDecider : public NaviTask {
    * @param reference_line_info Currently available reference line information.
    * @return Status::OK() if a suitable path is created; error otherwise.
    */
-  apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
   /**
@@ -76,13 +77,14 @@ class NaviSpeedDecider : public NaviTask {
    * @param speed_data Output.
    * @return Status::OK() if a suitable speed-data is created; error otherwise.
    */
-  apollo::common::Status MakeSpeedDecision(
-      double start_v, double start_a, double start_da,
-      const std::vector<common::PathPoint>& path_points,
-      const std::vector<const Obstacle*>& obstacles,
-      const std::function<const Obstacle*(const std::string& id)>&
-          find_obstacle,
-      SpeedData* const speed_data);
+  apollo::common::Status
+  MakeSpeedDecision(double                                                       start_v,
+                    double                                                       start_a,
+                    double                                                       start_da,
+                    const std::vector<common::PathPoint>&                        path_points,
+                    const std::vector<const Obstacle*>&                          obstacles,
+                    const std::function<const Obstacle*(const std::string& id)>& find_obstacle,
+                    SpeedData* const                                             speed_data);
 
   /**
    * @brief Add t-s constraints base on range of perception.
@@ -100,11 +102,11 @@ class NaviSpeedDecider : public NaviTask {
    * @return Status::OK() if success; error otherwise.
    */
   apollo::common::Status AddObstaclesConstraints(
-      double vehicle_speed, double path_length,
-      const std::vector<common::PathPoint>& path_points,
-      const std::vector<const Obstacle*>& obstacles,
-      const std::function<const Obstacle*(const std::string& id)>&
-          find_obstacle);
+      double                                                       vehicle_speed,
+      double                                                       path_length,
+      const std::vector<common::PathPoint>&                        path_points,
+      const std::vector<const Obstacle*>&                          obstacles,
+      const std::function<const Obstacle*(const std::string& id)>& find_obstacle);
 
   /**
    * @brief Add t-s constraints base on traffic decision.
@@ -117,8 +119,8 @@ class NaviSpeedDecider : public NaviTask {
    * @param path_points Current path data.
    * @return Status::OK() if success; error otherwise.
    */
-  apollo::common::Status AddCentricAccelerationConstraints(
-      const std::vector<common::PathPoint>& path_points);
+  apollo::common::Status
+  AddCentricAccelerationConstraints(const std::vector<common::PathPoint>& path_points);
 
   /**
    * @brief Add t-s constraints base on configs, which has max-speed etc.
@@ -144,16 +146,16 @@ class NaviSpeedDecider : public NaviTask {
   double hard_centric_accel_limit_;
   double hard_speed_limit_;
   double hard_accel_limit_;
-  bool enable_safe_path_;
-  bool enable_planning_start_point_;
-  bool enable_accel_auto_compensation_;
+  bool   enable_safe_path_;
+  bool   enable_planning_start_point_;
+  bool   enable_accel_auto_compensation_;
   double kappa_preview_;
   double kappa_threshold_;
 
   NaviObstacleDecider obstacle_decider_;
-  NaviSpeedTsGraph ts_graph_;
+  NaviSpeedTsGraph    ts_graph_;
 
-  double prev_v_ = 0.0;
+  double prev_v_                   = 0.0;
   double accel_compensation_ratio_ = 1.0;
   double decel_compensation_ratio_ = 1.0;
 

@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace wey {
 
-class Adsshifter115 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+class Adsshifter115
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -41,16 +42,14 @@ class Adsshifter115 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 4, 'name': 'ADS_ShiftMode', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Adsshifter115* set_ads_shiftmode(
-      Ads_shifter_115::Ads_shiftmodeType ads_shiftmode);
+  Adsshifter115* set_ads_shiftmode(Ads_shifter_115::Ads_shiftmodeType ads_shiftmode);
 
   // config detail: {'description': 'ADS Target Gear', 'enum': {0:
   // 'ADS_TARGETGEAR_N', 1: 'ADS_TARGETGEAR_R', 2: 'ADS_TARGETGEAR_P', 3:
   // 'ADS_TARGETGEAR_D'}, 'precision': 1.0, 'len': 2, 'name': 'ADS_TargetGear',
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]',
   // 'bit': 38, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Adsshifter115* set_ads_targetgear(
-      Ads_shifter_115::Ads_targetgearType ads_targetgear);
+  Adsshifter115* set_ads_targetgear(Ads_shifter_115::Ads_targetgearType ads_targetgear);
 
  private:
   // config detail: {'description': 'ADS Shift Mode', 'enum': {0:
@@ -58,19 +57,17 @@ class Adsshifter115 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 4, 'name': 'ADS_ShiftMode', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_ads_shiftmode(uint8_t* data,
-                           Ads_shifter_115::Ads_shiftmodeType ads_shiftmode);
+  void set_p_ads_shiftmode(uint8_t* data, Ads_shifter_115::Ads_shiftmodeType ads_shiftmode);
 
   // config detail: {'description': 'ADS Target Gear', 'enum': {0:
   // 'ADS_TARGETGEAR_N', 1: 'ADS_TARGETGEAR_R', 2: 'ADS_TARGETGEAR_P', 3:
   // 'ADS_TARGETGEAR_D'}, 'precision': 1.0, 'len': 2, 'name': 'ADS_TargetGear',
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]',
   // 'bit': 38, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_ads_targetgear(uint8_t* data,
-                            Ads_shifter_115::Ads_targetgearType ads_targetgear);
+  void set_p_ads_targetgear(uint8_t* data, Ads_shifter_115::Ads_targetgearType ads_targetgear);
 
  private:
-  Ads_shifter_115::Ads_shiftmodeType ads_shiftmode_;
+  Ads_shifter_115::Ads_shiftmodeType  ads_shiftmode_;
   Ads_shifter_115::Ads_targetgearType ads_targetgear_;
 };
 

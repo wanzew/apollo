@@ -21,6 +21,7 @@
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -38,14 +39,13 @@ class PathBoundsDeciderTest : public ::testing::Test {
   virtual void TearDown() {}
 
  protected:
-  TaskConfig config_;
+  TaskConfig                          config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(PathBoundsDeciderTest, Init) {
   PathBoundsDecider path_bounds_decider(config_, injector_);
-  EXPECT_EQ(path_bounds_decider.Name(),
-            TaskConfig::TaskType_Name(config_.task_type()));
+  EXPECT_EQ(path_bounds_decider.Name(), TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 TEST_F(PathBoundsDeciderTest, InitPathBoundary) {
@@ -67,9 +67,9 @@ TEST_F(PathBoundsDeciderTest, GetBoundaryFromLanesAndADC) {
 }
 
 TEST_F(PathBoundsDeciderTest, GetBoundaryFromStaticObstacles) {
-  PathBoundsDecider path_bounds_decider(config_, injector_);
+  PathBoundsDecider                               path_bounds_decider(config_, injector_);
   std::vector<std::tuple<double, double, double>> path_bound;
-  PathDecision path_decision;
+  PathDecision                                    path_decision;
 }
 
 }  // namespace planning

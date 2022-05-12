@@ -26,36 +26,30 @@ using ::apollo::drivers::canbus::Byte;
 
 const int32_t Gyro6c::ID = 0x6C;
 
-void Gyro6c::Parse(const std::uint8_t *bytes, int32_t length,
-                   ChassisDetail *chassis_detail) const {
-  chassis_detail->mutable_vehicle_spd()->set_roll_rate(
-      roll_rate(bytes, length));
+void Gyro6c::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_vehicle_spd()->set_roll_rate(roll_rate(bytes, length));
   chassis_detail->mutable_vehicle_spd()->set_yaw_rate(yaw_rate(bytes, length));
   // why
   chassis_detail->mutable_vehicle_spd()->set_is_yaw_rate_valid(true);
 }
 
-double Gyro6c::roll_rate(const std::uint8_t *bytes, int32_t length) const {
-  Byte high_frame(bytes + 1);
+double Gyro6c::roll_rate(const std::uint8_t* bytes, int32_t length) const {
+  Byte    high_frame(bytes + 1);
   int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 0);
-  int32_t low = low_frame.get_byte(0, 8);
+  Byte    low_frame(bytes + 0);
+  int32_t low   = low_frame.get_byte(0, 8);
   int32_t value = (high << 8) | low;
-  if (value > 0x7FFF) {
-    value -= 0x10000;
-  }
+  if (value > 0x7FFF) { value -= 0x10000; }
   return value * 0.000200;
 }
 
-double Gyro6c::yaw_rate(const std::uint8_t *bytes, int32_t length) const {
-  Byte high_frame(bytes + 3);
+double Gyro6c::yaw_rate(const std::uint8_t* bytes, int32_t length) const {
+  Byte    high_frame(bytes + 3);
   int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 2);
-  int32_t low = low_frame.get_byte(0, 8);
+  Byte    low_frame(bytes + 2);
+  int32_t low   = low_frame.get_byte(0, 8);
   int32_t value = (high << 8) | low;
-  if (value > 0x7FFF) {
-    value -= 0x10000;
-  }
+  if (value > 0x7FFF) { value -= 0x10000; }
   return value * 0.000200;
 }
 

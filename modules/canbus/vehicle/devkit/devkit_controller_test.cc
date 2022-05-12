@@ -16,14 +16,16 @@
 
 #include "modules/canbus/vehicle/devkit/devkit_controller.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
+
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
-#include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
@@ -36,8 +38,7 @@ using apollo::control::ControlCommand;
 class DevkitControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string canbus_conf_file =
-        "modules/canbus/testdata/conf/devkit_canbus_conf_test.pb.txt";
+    std::string canbus_conf_file = "modules/canbus/testdata/conf/devkit_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
     control_cmd_.set_throttle(20.0);
@@ -47,13 +48,13 @@ class DevkitControllerTest : public ::testing::Test {
   }
 
  protected:
-  DevkitController controller_;
-  ControlCommand control_cmd_;
-  VehicleSignal vehicle_signal_;
+  DevkitController                           controller_;
+  ControlCommand                             control_cmd_;
+  VehicleSignal                              vehicle_signal_;
   CanSender<::apollo::canbus::ChassisDetail> sender_;
-  DevkitMessageManager msg_manager_;
-  CanbusConf canbus_conf_;
-  VehicleParameter params_;
+  DevkitMessageManager                       msg_manager_;
+  CanbusConf                                 canbus_conf_;
+  VehicleParameter                           params_;
 };
 
 TEST_F(DevkitControllerTest, Init) {
@@ -84,10 +85,8 @@ TEST_F(DevkitControllerTest, Status) {
 TEST_F(DevkitControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
-            ErrorCode::OK);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_AUTO_DRIVE),
-            ErrorCode::CANBUS_ERROR);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL), ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_AUTO_DRIVE), ErrorCode::CANBUS_ERROR);
 }
 
 }  // namespace devkit

@@ -21,6 +21,8 @@
 #pragma once
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
@@ -28,7 +30,6 @@
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/tasks/optimizers/road_graph/trajectory_cost.h"
 
@@ -37,28 +38,25 @@ namespace planning {
 
 class WaypointSampler {
  public:
-  explicit WaypointSampler(const WaypointSamplerConfig &config)
+  explicit WaypointSampler(const WaypointSamplerConfig& config)
       : config_(config) {}
   virtual ~WaypointSampler() = default;
 
-  virtual void Init(const ReferenceLineInfo *reference_line_info,
-                    const common::SLPoint &init_sl_point_,
-                    const common::FrenetFramePoint &init_frenet_frame_point);
+  virtual void Init(const ReferenceLineInfo*        reference_line_info,
+                    const common::SLPoint&          init_sl_point_,
+                    const common::FrenetFramePoint& init_frenet_frame_point);
 
-  virtual void SetDebugLogger(apollo::planning_internal::Debug *debug) {
-    planning_debug_ = debug;
-  }
+  virtual void SetDebugLogger(apollo::planning_internal::Debug* debug) { planning_debug_ = debug; }
 
-  virtual bool SamplePathWaypoints(
-      const common::TrajectoryPoint &init_point,
-      std::vector<std::vector<common::SLPoint>> *const points);
+  virtual bool SamplePathWaypoints(const common::TrajectoryPoint&                   init_point,
+                                   std::vector<std::vector<common::SLPoint>>* const points);
 
  protected:
-  const WaypointSamplerConfig &config_;
-  const ReferenceLineInfo *reference_line_info_ = nullptr;
-  common::SLPoint init_sl_point_;
-  common::FrenetFramePoint init_frenet_frame_point_;
-  apollo::planning_internal::Debug *planning_debug_ = nullptr;
+  const WaypointSamplerConfig&      config_;
+  const ReferenceLineInfo*          reference_line_info_ = nullptr;
+  common::SLPoint                   init_sl_point_;
+  common::FrenetFramePoint          init_frenet_frame_point_;
+  apollo::planning_internal::Debug* planning_debug_ = nullptr;
 };
 
 }  // namespace planning

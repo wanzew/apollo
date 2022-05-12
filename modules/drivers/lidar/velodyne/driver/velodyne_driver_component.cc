@@ -30,18 +30,12 @@ namespace velodyne {
 bool VelodyneDriverComponent::Init() {
   AINFO << "Velodyne driver component init";
   Config velodyne_config;
-  if (!GetProtoConfig(&velodyne_config)) {
-    return false;
-  }
+  if (!GetProtoConfig(&velodyne_config)) { return false; }
   AINFO << "Velodyne config: " << velodyne_config.DebugString();
   // start the driver
-  std::shared_ptr<::apollo::cyber::Node> node =
-      apollo::cyber::CreateNode("lidar_drivers");
-  VelodyneDriver *driver =
-      VelodyneDriverFactory::CreateDriver(node, velodyne_config);
-  if (driver == nullptr) {
-    return false;
-  }
+  std::shared_ptr<::apollo::cyber::Node> node = apollo::cyber::CreateNode("lidar_drivers");
+  VelodyneDriver* driver = VelodyneDriverFactory::CreateDriver(node, velodyne_config);
+  if (driver == nullptr) { return false; }
   dvr_.reset(driver);
   dvr_->Init();
   // spawn device poll thread

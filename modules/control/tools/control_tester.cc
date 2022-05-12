@@ -16,38 +16,34 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/time/rate.h"
 #include "cyber/time/time.h"
-
-#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/proto/pad_msg.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/planning/proto/planning.pb.h"
 
-DEFINE_string(
-    chassis_test_file,
-    "/apollo/modules/control/testdata/control_tester/chassis.pb.txt",
-    "Used for sending simulated Chassis content to the control node.");
-DEFINE_string(
-    localization_test_file,
-    "/apollo/modules/control/testdata/control_tester/localization.pb.txt",
-    "Used for sending simulated localization to the control node.");
+DEFINE_string(chassis_test_file,
+              "/apollo/modules/control/testdata/control_tester/chassis.pb.txt",
+              "Used for sending simulated Chassis content to the control node.");
+DEFINE_string(localization_test_file,
+              "/apollo/modules/control/testdata/control_tester/localization.pb.txt",
+              "Used for sending simulated localization to the control node.");
 DEFINE_string(pad_msg_test_file,
               "/apollo/modules/control/testdata/control_tester/pad_msg.pb.txt",
               "Used for sending simulated PadMsg content to the control node.");
-DEFINE_string(
-    planning_test_file,
-    "/apollo/modules/control/testdata/control_tester/planning.pb.txt",
-    "Used for sending simulated Planning content to the control node.");
+DEFINE_string(planning_test_file,
+              "/apollo/modules/control/testdata/control_tester/planning.pb.txt",
+              "Used for sending simulated Planning content to the control node.");
 DEFINE_int32(num_seconds, 10, "Length of execution.");
-DEFINE_int32(feed_frequency, 10,
-             "Frequency with which protos are fed to control.");
+DEFINE_int32(feed_frequency, 10, "Frequency with which protos are fed to control.");
 
 int main(int argc, char** argv) {
   using apollo::canbus::Chassis;
@@ -86,14 +82,11 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  std::shared_ptr<apollo::cyber::Node> node(
-      apollo::cyber::CreateNode("control_tester"));
-  auto chassis_writer = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
-  auto localization_writer =
-      node->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
-  auto pad_msg_writer = node->CreateWriter<PadMessage>(FLAGS_pad_topic);
-  auto planning_writer =
-      node->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
+  std::shared_ptr<apollo::cyber::Node> node(apollo::cyber::CreateNode("control_tester"));
+  auto chassis_writer      = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
+  auto localization_writer = node->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
+  auto pad_msg_writer      = node->CreateWriter<PadMessage>(FLAGS_pad_topic);
+  auto planning_writer     = node->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
 
   for (int i = 0; i < FLAGS_num_seconds * FLAGS_feed_frequency; ++i) {
     chassis_writer->Write(chassis);

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
-
 #include "modules/perception/radar/lib/roi_filter/hdmap_radar_roi_filter/hdmap_radar_roi_filter.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -23,11 +23,11 @@ namespace radar {
 
 TEST(HdmapRadarRoiFilterTest, roi_filter) {
   HdmapRadarRoiFilter roi_filter;
-  bool init_result = roi_filter.Init();
+  bool                init_result = roi_filter.Init();
   EXPECT_TRUE(init_result);
   RoiFilterOptions options;
-  base::FramePtr radar_frame(new base::Frame);
-  base::ObjectPtr obj(new base::Object);
+  base::FramePtr   radar_frame(new base::Frame);
+  base::ObjectPtr  obj(new base::Object);
   obj->center = Eigen::Vector3d(0, 0, 0);
   radar_frame->objects.push_back(obj);
   roi_filter.RoiFilter(options, radar_frame);

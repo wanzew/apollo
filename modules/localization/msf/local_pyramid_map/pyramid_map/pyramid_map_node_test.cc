@@ -44,13 +44,13 @@ TEST_F(PyramidMapNodeTestSuite, init) {
   // create index
   MapNodeIndex index;
   index.resolution_id_ = 0;
-  index.zone_id_ = 50;
-  index.m_ = 0;
-  index.n_ = 0;
+  index.zone_id_       = 50;
+  index.m_             = 0;
+  index.n_             = 0;
 
   // init config
   PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
-  config->map_version_ = "pyramid_lossy_map";
+  config->map_version_     = "pyramid_lossy_map";
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 2;
 
@@ -77,9 +77,9 @@ TEST_F(PyramidMapNodeTestSuite, pyramid_map_node_function) {
   // create index
   MapNodeIndex index;
   index.resolution_id_ = 0;
-  index.zone_id_ = 50;
-  index.m_ = 0;
-  index.n_ = 0;
+  index.zone_id_       = 50;
+  index.m_             = 0;
+  index.n_             = 0;
 
   // init config
   PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
@@ -92,9 +92,9 @@ TEST_F(PyramidMapNodeTestSuite, pyramid_map_node_function) {
   node->SetMapNodeIndex(index);
 
   // check global coordinate to local coordinate transformation
-  double data[] = {0.125, 0.125, 1.0};
-  unsigned int x = 0;
-  unsigned int y = 0;
+  double          data[] = {0.125, 0.125, 1.0};
+  unsigned int    x      = 0;
+  unsigned int    y      = 0;
   Eigen::Vector2d vector_2d_data(data);
   node->GetCoordinate(vector_2d_data, 0, &x, &y);
   EXPECT_EQ(x, 1);
@@ -181,21 +181,21 @@ TEST_F(PyramidMapNodeTestSuite, test_get_set_bad_case) {
   // create index
   MapNodeIndex index;
   index.resolution_id_ = 0;
-  index.zone_id_ = 50;
-  index.m_ = 0;
-  index.n_ = 0;
+  index.zone_id_       = 50;
+  index.m_             = 0;
+  index.n_             = 0;
 
   // init config
   PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
   config->SetMapNodeSize(2, 2);
-  config->resolution_num_ = 1;
-  config->has_intensity_ = false;
-  config->has_intensity_var_ = false;
-  config->has_altitude_ = false;
-  config->has_altitude_var_ = false;
+  config->resolution_num_      = 1;
+  config->has_intensity_       = false;
+  config->has_intensity_var_   = false;
+  config->has_altitude_        = false;
+  config->has_altitude_var_    = false;
   config->has_ground_altitude_ = false;
-  config->has_ground_count_ = false;
-  config->has_count_ = false;
+  config->has_ground_count_    = false;
+  config->has_count_           = false;
 
   // create map node
   PyramidMapNode* node = new PyramidMapNode();
@@ -203,7 +203,7 @@ TEST_F(PyramidMapNodeTestSuite, test_get_set_bad_case) {
   node->SetMapNodeIndex(index);
 
   // check global coordinate to local coordinate transformation
-  double data[] = {0.125, 0.125, 1.0};
+  double          data[] = {0.125, 0.125, 1.0};
   Eigen::Vector3d vector_3d_data(data);
   EXPECT_FLOAT_EQ(node->GetIntensitySafe(vector_3d_data, 0), 0.f);
   EXPECT_FLOAT_EQ(node->GetIntensityVarSafe(vector_3d_data, 0), 0.f);
@@ -218,14 +218,14 @@ TEST_F(PyramidMapNodeTestSuite, test_base_map_node_save_load) {
   // create index
   MapNodeIndex index;
   index.resolution_id_ = 0;
-  index.zone_id_ = 50;
-  index.m_ = 0;
-  index.n_ = 1;
+  index.zone_id_       = 50;
+  index.m_             = 0;
+  index.n_             = 1;
 
   // init config
   PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
   config->SetMapNodeSize(2, 2);
-  config->resolution_num_ = 1;
+  config->resolution_num_  = 1;
   config->map_folder_path_ = "wrong_path";
 
   // create map node
@@ -253,9 +253,9 @@ TEST_F(PyramidMapNodeTestSuite, test_base_map_node) {
   // create index
   MapNodeIndex index;
   index.resolution_id_ = 0;
-  index.zone_id_ = 50;
-  index.m_ = 0;
-  index.n_ = 1;
+  index.zone_id_       = 50;
+  index.m_             = 0;
+  index.n_             = 1;
 
   // init config
   PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
@@ -270,7 +270,7 @@ TEST_F(PyramidMapNodeTestSuite, test_base_map_node) {
   EXPECT_EQ(node->GetMapNodeIndex().n_, 1);
 
   // add value
-  double data[] = {0.125, 0.125, 1.0};
+  double          data[] = {0.125, 0.125, 1.0};
   Eigen::Vector3d vector_3d_data(data);
   EXPECT_FALSE(node->AddValueIfInBound(vector_3d_data, 10, 0));
   vector_3d_data[0] = 0.375;
@@ -291,19 +291,17 @@ TEST_F(PyramidMapNodeTestSuite, test_base_map_node) {
   EXPECT_FLOAT_EQ(left_top_corner[1], 0.0);
 
   // check Get map cell matrix
-  const BaseMapMatrix& map_matrix_const = node->GetMapCellMatrix();
+  const BaseMapMatrix&    map_matrix_const = node->GetMapCellMatrix();
   const PyramidMapMatrix& pyramid_matrix_const =
       dynamic_cast<const PyramidMapMatrix&>(map_matrix_const);
   EXPECT_FLOAT_EQ(*pyramid_matrix_const.GetIntensitySafe(1, 1, 0), 10.f);
-  BaseMapMatrix& map_matrix = node->GetMapCellMatrix();
-  PyramidMapMatrix& pyramid_matrix =
-      dynamic_cast<PyramidMapMatrix&>(map_matrix);
+  BaseMapMatrix&    map_matrix     = node->GetMapCellMatrix();
+  PyramidMapMatrix& pyramid_matrix = dynamic_cast<PyramidMapMatrix&>(map_matrix);
   EXPECT_FLOAT_EQ(*pyramid_matrix.GetIntensitySafe(1, 1, 0), 10.f);
 
   // check Get the map config
-  const BaseMapConfig& bm_config = node->GetMapConfig();
-  const PyramidMapConfig& pm_config =
-      dynamic_cast<const PyramidMapConfig&>(bm_config);
+  const BaseMapConfig&    bm_config = node->GetMapConfig();
+  const PyramidMapConfig& pm_config = dynamic_cast<const PyramidMapConfig&>(bm_config);
   EXPECT_EQ(pm_config.resolution_num_, 1);
 
   // check Get the map node config

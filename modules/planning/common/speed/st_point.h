@@ -37,10 +37,10 @@ class STPoint : public common::math::Vec2d {
   double x() const = delete;
   double y() const = delete;
 
-  double s() const;
-  double t() const;
-  void set_s(const double s);
-  void set_t(const double t);
+  double      s() const;
+  double      t() const;
+  void        set_s(const double s);
+  void        set_t(const double t);
   std::string DebugString() const;
 };
 

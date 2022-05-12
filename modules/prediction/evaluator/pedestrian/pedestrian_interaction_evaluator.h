@@ -54,16 +54,14 @@ class PedestrianInteractionEvaluator : public Evaluator {
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
-                ObstaclesContainer* obstacles_container) override;
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Extract features for learning model's input
    * @param Obstacle pointer
    * @param To be filled up with extracted features
    */
-  bool ExtractFeatures(const Obstacle* obstacle_ptr,
-                       std::vector<double>* feature_values);
+  bool ExtractFeatures(const Obstacle* obstacle_ptr, std::vector<double>* feature_values);
 
   /**
    * @brief Get the name of evaluator.
@@ -72,10 +70,10 @@ class PedestrianInteractionEvaluator : public Evaluator {
 
  private:
   struct LSTMState {
-    double timestamp;
+    double        timestamp;
     torch::Tensor ct;
     torch::Tensor ht;
-    int frame_count = 0;
+    int           frame_count = 0;
   };
 
   // void Clear();
@@ -86,15 +84,15 @@ class PedestrianInteractionEvaluator : public Evaluator {
 
  private:
   std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
-  torch::jit::script::Module torch_position_embedding_;
-  torch::jit::script::Module torch_social_embedding_;
-  torch::jit::script::Module torch_single_lstm_;
-  torch::jit::script::Module torch_prediction_layer_;
-  torch::Device device_;
+  torch::jit::script::Module         torch_position_embedding_;
+  torch::jit::script::Module         torch_social_embedding_;
+  torch::jit::script::Module         torch_single_lstm_;
+  torch::jit::script::Module         torch_prediction_layer_;
+  torch::Device                      device_;
 
-  static const int kGridSize = 2;
+  static const int kGridSize      = 2;
   static const int kEmbeddingSize = 64;
-  static const int kHiddenSize = 128;
+  static const int kHiddenSize    = 128;
 };
 
 }  // namespace prediction

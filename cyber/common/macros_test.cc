@@ -26,7 +26,7 @@ class ClassWithShutdown {
  public:
   void Shutdown() { set_foo(1); }
 
-  static int foo() { return foo_; }
+  static int  foo() { return foo_; }
   static void set_foo(int val) { foo_ = val; }
 
  private:

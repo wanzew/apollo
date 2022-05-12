@@ -27,6 +27,8 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/planning/proto/decision.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/history.h"
 #include "modules/planning/common/obstacle.h"
@@ -34,24 +36,25 @@
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/proto/decision.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
 
-constexpr double kADCSafetyLBuffer = 0.1;
-constexpr double kSIgnoreThreshold = 0.01;
-constexpr double kTIgnoreThreshold = 0.1;
+constexpr double kADCSafetyLBuffer        = 0.1;
+constexpr double kSIgnoreThreshold        = 0.01;
+constexpr double kTIgnoreThreshold        = 0.1;
 constexpr double kOvertakenObsCautionTime = 0.5;
 
 class STObstaclesProcessor {
  public:
   STObstaclesProcessor() {}
 
-  void Init(const double planning_distance, const double planning_time,
-            const PathData& path_data, PathDecision* const path_decision,
-            History* const history);
+  void Init(const double        planning_distance,
+            const double        planning_time,
+            const PathData&     path_data,
+            PathDecision* const path_decision,
+            History* const      history);
 
   virtual ~STObstaclesProcessor() = default;
 
@@ -70,10 +73,9 @@ class STObstaclesProcessor {
    * @return Whether we can get valid s-bounds.
    */
   bool GetSBoundsFromDecisions(
-      double t,
+      double                                        t,
       std::vector<std::pair<double, double>>* const available_s_bounds,
-      std::vector<
-          std::vector<std::pair<std::string, ObjectDecisionType>>>* const
+      std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>* const
           available_obs_decisions);
 
   /** @brief Provided that decisions for all existing obstacles are made, get
@@ -82,19 +84,16 @@ class STObstaclesProcessor {
    * @param The actual limiting speed-info: (lower, upper)
    * @return True if there is speed limiting info; otherwise, false.
    */
-  bool GetLimitingSpeedInfo(
-      double t, std::pair<double, double>* const limiting_speed_info);
+  bool GetLimitingSpeedInfo(double t, std::pair<double, double>* const limiting_speed_info);
 
   /** @brief Set the decision for a given obstacle.
    */
-  void SetObstacleDecision(const std::string& obs_id,
-                           const ObjectDecisionType& obs_decision);
+  void SetObstacleDecision(const std::string& obs_id, const ObjectDecisionType& obs_decision);
 
   /** @brief Set the decision for a list of obstacles.
    */
   void SetObstacleDecision(
-      const std::vector<std::pair<std::string, ObjectDecisionType>>&
-          obstacle_decisions);
+      const std::vector<std::pair<std::string, ObjectDecisionType>>& obstacle_decisions);
 
  private:
   /** @brief Given a single obstacle, compute its ST-boundary.
@@ -103,11 +102,11 @@ class STObstaclesProcessor {
    * @param A vector to be filled with upper edge of ST-polygon.
    * @return If appears on ST-graph, return true; otherwise, false.
    */
-  bool ComputeObstacleSTBoundary(const Obstacle& obstacle,
+  bool ComputeObstacleSTBoundary(const Obstacle&             obstacle,
                                  std::vector<STPoint>* const lower_points,
                                  std::vector<STPoint>* const upper_points,
-                                 bool* const is_caution_obstacle,
-                                 double* const obs_caution_end_t);
+                                 bool* const                 is_caution_obstacle,
+                                 double* const               obs_caution_end_t);
 
   /** @brief Given ADC's path and an obstacle instance at a certain timestep,
    * get the upper and lower s that ADC might overlap with the obs instance.
@@ -118,9 +117,9 @@ class STObstaclesProcessor {
    * @return Whether there is an overlap or not.
    */
   bool GetOverlappingS(const std::vector<common::PathPoint>& adc_path_points,
-                       const common::math::Box2d& obstacle_instance,
-                       const double adc_l_buffer,
-                       std::pair<double, double>* const overlapping_s);
+                       const common::math::Box2d&            obstacle_instance,
+                       const double                          adc_l_buffer,
+                       std::pair<double, double>* const      overlapping_s);
 
   /** @brief Over the s-dimension, find the last point that is before the
    * obstacle instance of the first point that is after the obstacle.
@@ -133,10 +132,12 @@ class STObstaclesProcessor {
    * @param The end-idx
    * @return Whether there is overlapping or not.
    */
-  int GetSBoundingPathPointIndex(
-      const std::vector<common::PathPoint>& adc_path_points,
-      const common::math::Box2d& obstacle_instance, const double s_thresh,
-      const bool is_before, const int start_idx, const int end_idx);
+  int GetSBoundingPathPointIndex(const std::vector<common::PathPoint>& adc_path_points,
+                                 const common::math::Box2d&            obstacle_instance,
+                                 const double                          s_thresh,
+                                 const bool                            is_before,
+                                 const int                             start_idx,
+                                 const int                             end_idx);
 
   /** @brief Over the s-dimension, check if the path-point is away
    * from the projected obstacle in the given direction.
@@ -148,10 +149,11 @@ class STObstaclesProcessor {
    *        before the obstacle.
    * @return whether the path-point is away in the indicated direction.
    */
-  bool IsPathPointAwayFromObstacle(const common::PathPoint& path_point,
-                                   const common::PathPoint& direction_point,
+  bool IsPathPointAwayFromObstacle(const common::PathPoint&   path_point,
+                                   const common::PathPoint&   direction_point,
                                    const common::math::Box2d& obs_box,
-                                   const double s_thresh, const bool is_before);
+                                   const double               s_thresh,
+                                   const bool                 is_before);
 
   /** @brief Check if ADC is overlapping with the given obstacle box.
    * @param ADC's position.
@@ -160,9 +162,9 @@ class STObstaclesProcessor {
    * @return Whether ADC at that position is overlapping with the given
    * obstacle box.
    */
-  bool IsADCOverlappingWithObstacle(const common::PathPoint& adc_path_point,
+  bool IsADCOverlappingWithObstacle(const common::PathPoint&   adc_path_point,
                                     const common::math::Box2d& obs_box,
-                                    const double l_buffer) const;
+                                    const double               l_buffer) const;
 
   /** @brief Find the vertical (s) gaps of the st-graph.
    * @param Vector of obstacle-t-edges
@@ -171,9 +173,9 @@ class STObstaclesProcessor {
    * @return A list of available s gaps for ADC to go.
    */
   std::vector<std::pair<double, double>> FindSGaps(
-      const std::vector<std::tuple<int, double, double, double, std::string>>&
-          obstacle_t_edges,
-      double s_min, double s_max);
+      const std::vector<std::tuple<int, double, double, double, std::string>>& obstacle_t_edges,
+      double                                                                   s_min,
+      double                                                                   s_max);
 
   /** @brief Based on obstacle position and prospective ADC position,
    * determine the obstacle decision.
@@ -182,9 +184,8 @@ class STObstaclesProcessor {
    * @param ADC's prospective position.
    * @return The decision for the given obstacle.
    */
-  ObjectDecisionType DetermineObstacleDecision(const double obs_s_min,
-                                               const double obs_s_max,
-                                               const double s) const;
+  ObjectDecisionType
+  DetermineObstacleDecision(const double obs_s_min, const double obs_s_max, const double s) const;
 
   /** @brief Check if a given s falls within adc's low road right segment.
    * @param A certain S.
@@ -193,27 +194,24 @@ class STObstaclesProcessor {
   bool IsSWithinADCLowRoadRightSegment(const double s) const;
 
  private:
-  double planning_time_;
-  double planning_distance_;
-  PathData path_data_;
+  double               planning_time_;
+  double               planning_distance_;
+  PathData             path_data_;
   common::VehicleParam vehicle_param_;
-  double adc_path_init_s_;
-  PathDecision* path_decision_;
+  double               adc_path_init_s_;
+  PathDecision*        path_decision_;
 
   // A vector of sorted obstacle's t-edges:
   //  (is_starting_t, t, s_min, s_max, obs_id).
-  std::vector<std::tuple<int, double, double, double, std::string>>
-      obs_t_edges_;
-  int obs_t_edges_idx_;
+  std::vector<std::tuple<int, double, double, double, std::string>> obs_t_edges_;
+  int                                                               obs_t_edges_idx_;
 
-  std::unordered_map<std::string, STBoundary> obs_id_to_st_boundary_;
+  std::unordered_map<std::string, STBoundary>         obs_id_to_st_boundary_;
   std::unordered_map<std::string, ObjectDecisionType> obs_id_to_decision_;
 
-  std::vector<std::tuple<std::string, STBoundary, Obstacle*>>
-      candidate_clear_zones_;
+  std::vector<std::tuple<std::string, STBoundary, Obstacle*>> candidate_clear_zones_;
 
-  std::unordered_map<std::string, STBoundary>
-      obs_id_to_alternative_st_boundary_;
+  std::unordered_map<std::string, STBoundary> obs_id_to_alternative_st_boundary_;
 
   std::vector<std::pair<double, double>> adc_low_road_right_segments_;
 

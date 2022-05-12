@@ -28,7 +28,9 @@ typedef Eigen::Vector3d Vector3d;
 
 /**@brief the UTM coordinate struct including x and y. */
 struct UTMCoor {
-  UTMCoor() : x(0.0), y(0.0) {}
+  UTMCoor()
+      : x(0.0)
+      , y(0.0) {}
   double x;
   double y;
 };
@@ -36,18 +38,19 @@ struct UTMCoor {
 /**@brief the WGS84 coordinate struct */
 /* including log(longitude) and lat(latitude). */
 struct WGS84Corr {
-  WGS84Corr() : log(0.0), lat(0.0) {}
+  WGS84Corr()
+      : log(0.0)
+      , lat(0.0) {}
   double log;  // longitude
   double lat;  // latitude
 };
 
 class FrameTransform {
  public:
-  static bool LatlonToUtmXY(double lon, double lat, UTMCoor *utm_xy);
-  static bool UtmXYToLatlon(double x, double y, int zone, bool southhemi,
-                            WGS84Corr *latlon);
-  static bool XYZToBlh(const Vector3d &xyz, Vector3d *blh);
-  static bool BlhToXYZ(const Vector3d &blh, Vector3d *xyz);
+  static bool LatlonToUtmXY(double lon, double lat, UTMCoor* utm_xy);
+  static bool UtmXYToLatlon(double x, double y, int zone, bool southhemi, WGS84Corr* latlon);
+  static bool XYZToBlh(const Vector3d& xyz, Vector3d* blh);
+  static bool BlhToXYZ(const Vector3d& blh, Vector3d* xyz);
 
   //  static bool XyzToBlh(const Vector3d& xyz, Position *blh);
   //  static bool BlhToXyz(const Position& blh, Vector3d *xyz);

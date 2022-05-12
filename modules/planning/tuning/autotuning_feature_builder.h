@@ -16,9 +16,10 @@
 
 #pragma once
 
-#include "modules/common/status/status.h"
 #include "modules/planning/proto/auto_tuning_model_input.pb.h"
 #include "modules/planning/proto/auto_tuning_raw_feature.pb.h"
+
+#include "modules/common/status/status.h"
 
 namespace apollo {
 namespace planning {
@@ -32,24 +33,23 @@ class AutotuningFeatureBuilder {
   /**
    * @brief: constructor
    */
-  AutotuningFeatureBuilder() = default;
+  AutotuningFeatureBuilder()          = default;
   virtual ~AutotuningFeatureBuilder() = default;
 
   /**
    * @param: raw feature function input
    * @param: generated model input feature from raw feature, function output
    */
-  virtual common::Status BuildFeature(
-      const autotuning::TrajectoryRawFeature& raw_feature,
-      autotuning::TrajectoryFeature* const input_feature) const = 0;
+  virtual common::Status BuildFeature(const autotuning::TrajectoryRawFeature& raw_feature,
+                                      autotuning::TrajectoryFeature* const input_feature) const = 0;
 
   /**
    * @param: pointwise raw feature, function input
    * @param: generated model input feature, function output
    */
-  virtual common::Status BuildPointFeature(
-      const autotuning::TrajectoryPointRawFeature& raw_point_feature,
-      autotuning::TrajectoryPointwiseFeature* const point_feature) const = 0;
+  virtual common::Status
+  BuildPointFeature(const autotuning::TrajectoryPointRawFeature&  raw_point_feature,
+                    autotuning::TrajectoryPointwiseFeature* const point_feature) const = 0;
 };
 
 }  // namespace planning

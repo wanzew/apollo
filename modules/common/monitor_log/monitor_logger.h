@@ -26,8 +26,9 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/cyber.h"
 #include "modules/common/monitor_log/proto/monitor_log.pb.h"
+
+#include "cyber/cyber.h"
 #include "modules/common/util/message_util.h"
 
 /**
@@ -56,14 +57,14 @@ class MonitorLogger {
    * @brief Publish the messages.
    * @param messages a list of messages for
    */
-  virtual void Publish(const MonitorMessageItem::MessageSource &source,
-                       const std::vector<MessageItem> &messages) const;
+  virtual void Publish(const MonitorMessageItem::MessageSource& source,
+                       const std::vector<MessageItem>&          messages) const;
 
  private:
-  virtual void DoPublish(MonitorMessage *message) const;
+  virtual void DoPublish(MonitorMessage* message) const;
 
-  MonitorMessageItem::MessageSource source_;
-  std::unique_ptr<cyber::Node> node_;
+  MonitorMessageItem::MessageSource              source_;
+  std::unique_ptr<cyber::Node>                   node_;
   std::shared_ptr<cyber::Writer<MonitorMessage>> monitor_msg_writer_;
 
   DECLARE_SINGLETON(MonitorLogger)

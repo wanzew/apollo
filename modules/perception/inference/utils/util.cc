@@ -15,37 +15,34 @@
  *****************************************************************************/
 
 #include "modules/perception/inference/utils/util.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
 
-std::shared_ptr<float> load_binary_data(const std::string &filename) {
+std::shared_ptr<float> load_binary_data(const std::string& filename) {
   std::ifstream ifs(filename, std::ifstream::binary);
-  if (!ifs) {
-    return nullptr;
-  }
+  if (!ifs) { return nullptr; }
 
   ifs.seekg(0, ifs.end);
   int length = static_cast<int>(ifs.tellg() / sizeof(float));
   ifs.seekg(0, ifs.beg);
   std::shared_ptr<float> outputs;
   outputs.reset(new float[length]);
-  ifs.read(reinterpret_cast<char *>(outputs.get()), sizeof(float) * length);
+  ifs.read(reinterpret_cast<char*>(outputs.get()), sizeof(float) * length);
   ifs.close();
   return outputs;
 }
 
-bool write_result(const std::string &out_path,
-                  const std::vector<float> &results) {
+bool write_result(const std::string& out_path, const std::vector<float>& results) {
   std::ofstream outf(out_path, std::ios::binary | std::ios::out);
   if (!outf.is_open()) {
     AINFO << "Cannot open output file: " << out_path;
     return false;
   }
-  outf.write(reinterpret_cast<const char *>(results.data()),
-             sizeof(float) * results.size());
+  outf.write(reinterpret_cast<const char*>(results.data()), sizeof(float) * results.size());
   outf.close();
   return true;
 }

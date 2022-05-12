@@ -34,10 +34,10 @@ typedef std::pair<size_t, size_t> TrackMeasurmentPair;
 
 struct AssociationResult {
   std::vector<TrackMeasurmentPair> assignments;
-  std::vector<size_t> unassigned_tracks;
-  std::vector<size_t> unassigned_measurements;
-  std::vector<double> track2measurements_dist;
-  std::vector<double> measurement2track_dist;
+  std::vector<size_t>              unassigned_tracks;
+  std::vector<size_t>              unassigned_measurements;
+  std::vector<double>              track2measurements_dist;
+  std::vector<double>              measurement2track_dist;
 };
 
 class BaseDataAssociation {
@@ -55,8 +55,9 @@ class BaseDataAssociation {
   // @param [in]: scene
   // @param [out]: association_result
   virtual bool Associate(const AssociationOptions& options,
-                         SensorFramePtr sensor_measurements, ScenePtr scene,
-                         AssociationResult* association_result) = 0;
+                         SensorFramePtr            sensor_measurements,
+                         ScenePtr                  scene,
+                         AssociationResult*        association_result) = 0;
 
   virtual std::string Name() const = 0;
 };

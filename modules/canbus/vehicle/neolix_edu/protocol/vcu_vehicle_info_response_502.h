@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,21 +25,18 @@ namespace canbus {
 namespace neolix_edu {
 
 class Vcuvehicleinforesponse502
-    : public ::apollo::drivers::canbus::ProtocolData<
-          ::apollo::canbus::ChassisDetail> {
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vcuvehicleinforesponse502();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'Vehicle_Softwareversion_Indicati', 'offset': 0.0,
   // 'precision': 1.0, 'len': 24, 'is_signed_var': False, 'physical_range':
   // '[0|16777215]', 'bit': 7, 'type': 'int', 'order': 'motorola',
   // 'physical_unit': ''}
-  int vehicle_softwareversion_indicati(const std::uint8_t* bytes,
-                                       const int32_t length) const;
+  int vehicle_softwareversion_indicati(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'Project', 'offset': 0.0, 'precision': 1.0, 'len':
   // 4, 'is_signed_var': False, 'physical_range': '[0|15]', 'bit': 27, 'type':
@@ -69,8 +67,7 @@ class Vcuvehicleinforesponse502
   // 'precision': 1.0, 'len': 15, 'is_signed_var': False, 'physical_range':
   // '[0|32767]', 'bit': 54, 'type': 'int', 'order': 'motorola',
   // 'physical_unit': ''}
-  int vehicle_serial_number(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  int vehicle_serial_number(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace neolix_edu

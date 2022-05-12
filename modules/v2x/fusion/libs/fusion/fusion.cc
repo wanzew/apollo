@@ -28,20 +28,11 @@ Fusion::Fusion() {
 
   score_params_ = ft_config_manager_ptr_->fusion_params_.params.score_params();
   switch (score_params_.confidence_level()) {
-    case fusion::ConfidenceLevel::C90P:
-      m_matched_dis_limit_ = std::sqrt(4.605);
-      break;
-    case fusion::ConfidenceLevel::C95P:
-      m_matched_dis_limit_ = std::sqrt(5.991);
-      break;
-    case fusion::ConfidenceLevel::C975P:
-      m_matched_dis_limit_ = std::sqrt(7.378);
-      break;
-    case fusion::ConfidenceLevel::C99P:
-      m_matched_dis_limit_ = std::sqrt(9.210);
-      break;
-    default:
-      break;
+    case fusion::ConfidenceLevel::C90P: m_matched_dis_limit_ = std::sqrt(4.605); break;
+    case fusion::ConfidenceLevel::C95P: m_matched_dis_limit_ = std::sqrt(5.991); break;
+    case fusion::ConfidenceLevel::C975P: m_matched_dis_limit_ = std::sqrt(7.378); break;
+    case fusion::ConfidenceLevel::C99P: m_matched_dis_limit_ = std::sqrt(9.210); break;
+    default: break;
   }
 }
 
@@ -50,9 +41,8 @@ bool Fusion::Init() {
   return true;
 }
 
-bool Fusion::Proc(
-    const std::vector<std::vector<base::Object>> &input_objectlists,
-    double timestamp) {
+bool Fusion::Proc(const std::vector<std::vector<base::Object>>& input_objectlists,
+                  double                                        timestamp) {
   fusion_result_.clear();
   updated_objects_.clear();
   for (unsigned int i = 0; i < input_objectlists.size(); ++i) {
@@ -61,17 +51,14 @@ bool Fusion::Proc(
   return true;
 }
 
-bool Fusion::CombineNewResource(const std::vector<base::Object> &new_objects) {
+bool Fusion::CombineNewResource(const std::vector<base::Object>& new_objects) {
   return CombineNewResource(new_objects, &updated_objects_, &fusion_result_);
 }
 
-bool Fusion::CombineNewResource(
-    const std::vector<base::Object> &new_objects,
-    std::vector<base::Object> *fused_objects,
-    std::vector<std::vector<base::Object>> *fusion_result) {
-  if (new_objects.empty()) {
-    return false;
-  }
+bool Fusion::CombineNewResource(const std::vector<base::Object>&        new_objects,
+                                std::vector<base::Object>*              fused_objects,
+                                std::vector<std::vector<base::Object>>* fusion_result) {
+  if (new_objects.empty()) { return false; }
   if (fused_objects->size() < 1) {
     fused_objects->assign(new_objects.begin(), new_objects.end());
     for (unsigned int j = 0; j < new_objects.size(); ++j) {
@@ -81,8 +68,8 @@ bool Fusion::CombineNewResource(
     }
     return true;
   }
-  int u_num = fused_objects->size();
-  int v_num = new_objects.size();
+  int             u_num = fused_objects->size();
+  int             v_num = new_objects.size();
   Eigen::MatrixXf association_mat(u_num, v_num);
   ComputeAssociateMatrix(*fused_objects, new_objects, &association_mat);
   std::vector<std::pair<int, int>> match_cps;
@@ -106,10 +93,9 @@ bool Fusion::CombineNewResource(
   return true;
 }
 
-bool Fusion::GetV2xFusionObjects(
-    const std::vector<std::vector<base::Object>> &fusion_result,
-    std::vector<base::Object> *fused_objects) {
-  for (const auto &objects : fusion_result) {
+bool Fusion::GetV2xFusionObjects(const std::vector<std::vector<base::Object>>& fusion_result,
+                                 std::vector<base::Object>*                    fused_objects) {
+  for (const auto& objects : fusion_result) {
     if (objects.size() == 1) {
       fused_objects->push_back(objects.at(0));
       if (objects.at(0).frame_id == "V2X") {
@@ -120,95 +106,83 @@ bool Fusion::GetV2xFusionObjects(
     } else {
       fused_objects->push_back(objects.at(0));
       host_vehicle_ = false;
-      zom_vehicle_ = false;
-      for (const auto &object : objects) {
+      zom_vehicle_  = false;
+      for (const auto& object : objects) {
         if (object.v2x_type == base::V2xType::HOST_VEHICLE) {
           host_vehicle_ = true;
         } else if (object.v2x_type == base::V2xType::ZOMBIES_CAR) {
           zom_vehicle_ = true;
         }
       }
-      if (zom_vehicle_ == true) {
-        fused_objects->back().v2x_type = base::V2xType::ZOMBIES_CAR;
-      }
-      if (host_vehicle_ == true) {
-        fused_objects->back().v2x_type = base::V2xType::HOST_VEHICLE;
-      }
+      if (zom_vehicle_ == true) { fused_objects->back().v2x_type = base::V2xType::ZOMBIES_CAR; }
+      if (host_vehicle_ == true) { fused_objects->back().v2x_type = base::V2xType::HOST_VEHICLE; }
     }
   }
   return true;
 }
 
-double Fusion::CheckOdistance(const base::Object &in1_ptr,
-                              const base::Object &in2_ptr) {
-  double xi = in1_ptr.position.x();
-  double yi = in1_ptr.position.y();
-  double xj = in2_ptr.position.x();
-  double yj = in2_ptr.position.y();
+double Fusion::CheckOdistance(const base::Object& in1_ptr, const base::Object& in2_ptr) {
+  double xi       = in1_ptr.position.x();
+  double yi       = in1_ptr.position.y();
+  double xj       = in2_ptr.position.x();
+  double yj       = in2_ptr.position.y();
   double distance = std::hypot(xi - xj, yi - yj);
   return distance;
 }
 
-bool Fusion::CheckDisScore(const base::Object &in1_ptr,
-                           const base::Object &in2_ptr, double *score) {
+bool Fusion::CheckDisScore(const base::Object& in1_ptr,
+                           const base::Object& in2_ptr,
+                           double*             score) {
   double dis = CheckOdistance(in1_ptr, in2_ptr);
-  *score = 2.5 * std::max(0.0, score_params_.max_match_distance() - dis);
+  *score     = 2.5 * std::max(0.0, score_params_.max_match_distance() - dis);
   return true;
 }
 
-bool Fusion::CheckTypeScore(const base::Object &in1_ptr,
-                            const base::Object &in2_ptr, double *score) {
+bool Fusion::CheckTypeScore(const base::Object& in1_ptr,
+                            const base::Object& in2_ptr,
+                            double*             score) {
   double same_prob = 0;
   if (in1_ptr.sub_type == in2_ptr.sub_type) {
-    same_prob =
-        1 - (1 - in1_ptr.sub_type_probs[0]) * (1 - in2_ptr.sub_type_probs[0]);
-  } else if (in1_ptr.type == in2_ptr.type ||
-             in1_ptr.type == v2x::ft::base::ObjectType::UNKNOWN ||
+    same_prob = 1 - (1 - in1_ptr.sub_type_probs[0]) * (1 - in2_ptr.sub_type_probs[0]);
+  } else if (in1_ptr.type == in2_ptr.type || in1_ptr.type == v2x::ft::base::ObjectType::UNKNOWN ||
              in2_ptr.type == v2x::ft::base::ObjectType::UNKNOWN) {
-    same_prob =
-        (1 - in1_ptr.sub_type_probs.at(0)) * in2_ptr.sub_type_probs.at(0) +
-        (1 - in2_ptr.sub_type_probs.at(0)) * in1_ptr.sub_type_probs.at(0);
+    same_prob = (1 - in1_ptr.sub_type_probs.at(0)) * in2_ptr.sub_type_probs.at(0) +
+                (1 - in2_ptr.sub_type_probs.at(0)) * in1_ptr.sub_type_probs.at(0);
     same_prob *= score_params_.prob_scale();
   }
   *score *= same_prob;
   return true;
 }
 
-bool Fusion::ComputeAssociateMatrix(
-    const std::vector<base::Object> &in1_objects,  // fused
-    const std::vector<base::Object> &in2_objects,  // new
-    Eigen::MatrixXf *association_mat) {
+bool Fusion::ComputeAssociateMatrix(const std::vector<base::Object>& in1_objects,  // fused
+                                    const std::vector<base::Object>& in2_objects,  // new
+                                    Eigen::MatrixXf*                 association_mat) {
   for (unsigned int i = 0; i < in1_objects.size(); ++i) {
     for (unsigned int j = 0; j < in2_objects.size(); ++j) {
-      const base::Object &obj1_ptr = in1_objects[i];
-      const base::Object &obj2_ptr = in2_objects[j];
-      double score = 0;
+      const base::Object& obj1_ptr = in1_objects[i];
+      const base::Object& obj2_ptr = in2_objects[j];
+      double              score    = 0;
       if (!CheckDisScore(obj1_ptr, obj2_ptr, &score)) {
         AERROR << "V2X Fusion: check dis score failed";
       }
-      if (score_params_.check_type() &&
-          !CheckTypeScore(obj1_ptr, obj2_ptr, &score)) {
+      if (score_params_.check_type() && !CheckTypeScore(obj1_ptr, obj2_ptr, &score)) {
         AERROR << "V2X Fusion: check type failed";
       }
-      (*association_mat)(i, j) =
-          (score >= score_params_.min_score()) ? score : 0;
+      (*association_mat)(i, j) = (score >= score_params_.min_score()) ? score : 0;
     }
   }
   return true;
 }
 
-int Fusion::DeleteRedundant(std::vector<base::Object> *objects) {
+int Fusion::DeleteRedundant(std::vector<base::Object>* objects) {
   std::vector<unsigned int> to_be_deleted;
   for (unsigned int i = 0; i < objects->size(); ++i) {
     for (unsigned int j = i + 1; j < objects->size(); ++j) {
       double distance = CheckOdistance(objects->at(i), objects->at(j));
-      if (distance < 1) {
-        to_be_deleted.push_back(j);
-      }
+      if (distance < 1) { to_be_deleted.push_back(j); }
     }
   }
-  for (auto iter = to_be_deleted.rbegin(); iter != to_be_deleted.rend();
-       ++iter) {
+  for (auto iter = to_be_deleted.rbegin(); iter != to_be_deleted.rend(); ++iter) {
     objects->erase(objects->begin() + *iter);
   }
   return to_be_deleted.size();

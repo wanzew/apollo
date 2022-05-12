@@ -30,16 +30,14 @@ namespace planning {
 namespace scenario {
 namespace pull_over {
 
-apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
-               const std::shared_ptr<DependencyInjector>& injector)>
+apollo::common::util::Factory<ScenarioConfig::StageType,
+                              Stage,
+                              Stage* (*)(const ScenarioConfig::StageConfig&         stage_config,
+                                         const std::shared_ptr<DependencyInjector>& injector)>
     PullOverScenario::s_stage_factory_;
 
 void PullOverScenario::Init() {
-  if (init_) {
-    return;
-  }
+  if (init_) { return; }
 
   Scenario::Init();
 
@@ -52,40 +50,30 @@ void PullOverScenario::Init() {
 }
 
 void PullOverScenario::RegisterStages() {
-  if (!s_stage_factory_.Empty()) {
-    s_stage_factory_.Clear();
-  }
-  s_stage_factory_.Register(
-      ScenarioConfig::PULL_OVER_APPROACH,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new PullOverStageApproach(config, injector);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new PullOverStageRetryApproachParking(config, injector);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::PULL_OVER_RETRY_PARKING,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new PullOverStageRetryParking(config, injector);
-      });
+  if (!s_stage_factory_.Empty()) { s_stage_factory_.Clear(); }
+  s_stage_factory_.Register(ScenarioConfig::PULL_OVER_APPROACH,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new PullOverStageApproach(config, injector);
+                            });
+  s_stage_factory_.Register(ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new PullOverStageRetryApproachParking(config, injector);
+                            });
+  s_stage_factory_.Register(ScenarioConfig::PULL_OVER_RETRY_PARKING,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new PullOverStageRetryParking(config, injector);
+                            });
 }
 
-std::unique_ptr<Stage> PullOverScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
-  if (s_stage_factory_.Empty()) {
-    RegisterStages();
-  }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config, injector);
-  if (ptr) {
-    ptr->SetContext(&context_);
-  }
+std::unique_ptr<Stage>
+PullOverScenario::CreateStage(const ScenarioConfig::StageConfig&         stage_config,
+                              const std::shared_ptr<DependencyInjector>& injector) {
+  if (s_stage_factory_.Empty()) { RegisterStages(); }
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(), stage_config, injector);
+  if (ptr) { ptr->SetContext(&context_); }
   return ptr;
 }
 

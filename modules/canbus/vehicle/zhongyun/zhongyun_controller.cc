@@ -34,21 +34,20 @@ using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }  // namespace
 
-ErrorCode ZhongyunController::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+ZhongyunController::Init(const VehicleParameter&                                params,
+                         CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+                         MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "ZhongyunController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
   }
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -75,8 +74,8 @@ ErrorCode ZhongyunController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
-  gear_control_a1_ = dynamic_cast<Gearcontrola1*>(
-      message_manager_->GetMutableProtocolDataById(Gearcontrola1::ID));
+  gear_control_a1_ =
+      dynamic_cast<Gearcontrola1*>(message_manager_->GetMutableProtocolDataById(Gearcontrola1::ID));
   if (gear_control_a1_ == nullptr) {
     AERROR << "Gearcontrola1 does not exist in the ZhongyunMessageManager!";
     return ErrorCode::CANBUS_ERROR;
@@ -149,9 +148,7 @@ Chassis ZhongyunController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -168,16 +165,13 @@ Chassis ZhongyunController::chassis() {
   // 4 engine_rpm
   if (zhy.has_vehicle_state_feedback_2_c4() &&
       zhy.vehicle_state_feedback_2_c4().has_motor_speed()) {
-    chassis_.set_engine_rpm(
-        static_cast<float>(zhy.vehicle_state_feedback_2_c4().motor_speed()));
+    chassis_.set_engine_rpm(static_cast<float>(zhy.vehicle_state_feedback_2_c4().motor_speed()));
   } else {
     chassis_.set_engine_rpm(0);
   }
   // 5 speed_mps
-  if (zhy.has_vehicle_state_feedback_c1() &&
-      zhy.vehicle_state_feedback_c1().has_speed()) {
-    chassis_.set_speed_mps(
-        static_cast<float>(zhy.vehicle_state_feedback_c1().speed()));
+  if (zhy.has_vehicle_state_feedback_c1() && zhy.vehicle_state_feedback_c1().has_speed()) {
+    chassis_.set_speed_mps(static_cast<float>(zhy.vehicle_state_feedback_c1().speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -187,16 +181,16 @@ Chassis ZhongyunController::chassis() {
   // 7 acc_pedal
   if (zhy.has_vehicle_state_feedback_2_c4() &&
       zhy.vehicle_state_feedback_2_c4().has_driven_torque_feedback()) {
-    chassis_.set_throttle_percentage(static_cast<float>(
-        zhy.vehicle_state_feedback_2_c4().driven_torque_feedback()));
+    chassis_.set_throttle_percentage(
+        static_cast<float>(zhy.vehicle_state_feedback_2_c4().driven_torque_feedback()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 8 brake_pedal
   if (zhy.has_vehicle_state_feedback_c1() &&
       zhy.vehicle_state_feedback_c1().has_brake_torque_feedback()) {
-    chassis_.set_brake_percentage(static_cast<float>(
-        zhy.vehicle_state_feedback_c1().brake_torque_feedback()));
+    chassis_.set_brake_percentage(
+        static_cast<float>(zhy.vehicle_state_feedback_c1().brake_torque_feedback()));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -216,9 +210,7 @@ Chassis ZhongyunController::chassis() {
       case Vehicle_state_feedback_c1::GEAR_STATE_ACTUAL_P: {
         chassis_.set_gear_location(Chassis::GEAR_PARKING);
       } break;
-      default:
-        chassis_.set_gear_location(Chassis::GEAR_INVALID);
-        break;
+      default: chassis_.set_gear_location(Chassis::GEAR_INVALID); break;
     }
   } else {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
@@ -226,32 +218,26 @@ Chassis ZhongyunController::chassis() {
   // 11 steering_percentage
   if (zhy.has_vehicle_state_feedback_c1() &&
       zhy.vehicle_state_feedback_c1().has_steering_actual()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        zhy.vehicle_state_feedback_c1().steering_actual() * 100.0 /
-        vehicle_params_.max_steer_angle() * M_PI / 180));
+    chassis_.set_steering_percentage(
+        static_cast<float>(zhy.vehicle_state_feedback_c1().steering_actual() * 100.0 /
+                           vehicle_params_.max_steer_angle() * M_PI / 180));
   } else {
     chassis_.set_steering_percentage(0);
   }
   // 12 epb
-  if (zhy.has_vehicle_state_feedback_c1() &&
-      zhy.vehicle_state_feedback_c1().has_parking_actual()) {
-    chassis_.set_parking_brake(
-        zhy.vehicle_state_feedback_c1().parking_actual() ==
-        Vehicle_state_feedback_c1::PARKING_ACTUAL_PARKING_TRIGGER);
+  if (zhy.has_vehicle_state_feedback_c1() && zhy.vehicle_state_feedback_c1().has_parking_actual()) {
+    chassis_.set_parking_brake(zhy.vehicle_state_feedback_c1().parking_actual() ==
+                               Vehicle_state_feedback_c1::PARKING_ACTUAL_PARKING_TRIGGER);
   } else {
     chassis_.set_parking_brake(false);
   }
   // 13 error mask
-  if (chassis_error_mask_) {
-    chassis_.set_chassis_error_mask(chassis_error_mask_);
-  }
+  if (chassis_error_mask_) { chassis_.set_chassis_error_mask(chassis_error_mask_); }
   // Give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && !chassis_.parking_brake()) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "CANBUS not ready, epb is not released or firmware error!");
   }
@@ -270,18 +256,15 @@ ErrorCode ZhongyunController::EnableAutoMode() {
   }
   steering_control_a2_->set_steering_enable_control(
       Steering_control_a2::STEERING_ENABLE_CONTROL_STEERING_AUTOCONTROL);
-  gear_control_a1_->set_gear_enable_control(
-      Gear_control_a1::GEAR_ENABLE_CONTROL_GEAR_AUTOCONTROL);
+  gear_control_a1_->set_gear_enable_control(Gear_control_a1::GEAR_ENABLE_CONTROL_GEAR_AUTOCONTROL);
   torque_control_a3_->set_driven_enable_control(
       Torque_control_a3::DRIVEN_ENABLE_CONTROL_DRIVE_AUTO);
-  brake_control_a4_->set_brake_enable_control(
-      Brake_control_a4::BRAKE_ENABLE_CONTROL_BRAKE_AUTO);
+  brake_control_a4_->set_brake_enable_control(Brake_control_a4::BRAKE_ENABLE_CONTROL_BRAKE_AUTO);
   parking_control_a5_->set_parking_enable_control(
       Parking_control_a5::PARKING_ENABLE_CONTROL_PARKING_AUTOCONTROL);
 
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -315,14 +298,12 @@ ErrorCode ZhongyunController::EnableSteeringOnlyMode() {
       Gear_control_a1::GEAR_ENABLE_CONTROL_GEAR_MANUALCONTROL);
   torque_control_a3_->set_driven_enable_control(
       Torque_control_a3::DRIVEN_ENABLE_CONTROL_DRIVE_MANUAL);
-  brake_control_a4_->set_brake_enable_control(
-      Brake_control_a4::BRAKE_ENABLE_CONTROL_BRAKE_MANUAL);
+  brake_control_a4_->set_brake_enable_control(Brake_control_a4::BRAKE_ENABLE_CONTROL_BRAKE_MANUAL);
   parking_control_a5_->set_parking_enable_control(
       Parking_control_a5::PARKING_ENABLE_CONTROL_PARKING_MANUALCONTROL);
 
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -343,12 +324,10 @@ ErrorCode ZhongyunController::EnableSpeedOnlyMode() {
   }
   steering_control_a2_->set_steering_enable_control(
       Steering_control_a2::STEERING_ENABLE_CONTROL_STEERING_MANUALCONTROL);
-  gear_control_a1_->set_gear_enable_control(
-      Gear_control_a1::GEAR_ENABLE_CONTROL_GEAR_AUTOCONTROL);
+  gear_control_a1_->set_gear_enable_control(Gear_control_a1::GEAR_ENABLE_CONTROL_GEAR_AUTOCONTROL);
   torque_control_a3_->set_driven_enable_control(
       Torque_control_a3::DRIVEN_ENABLE_CONTROL_DRIVE_AUTO);
-  brake_control_a4_->set_brake_enable_control(
-      Brake_control_a4::BRAKE_ENABLE_CONTROL_BRAKE_AUTO);
+  brake_control_a4_->set_brake_enable_control(Brake_control_a4::BRAKE_ENABLE_CONTROL_BRAKE_AUTO);
   parking_control_a5_->set_parking_enable_control(
       Parking_control_a5::PARKING_ENABLE_CONTROL_PARKING_AUTOCONTROL);
 
@@ -374,35 +353,29 @@ void ZhongyunController::Gear(Chassis::GearPosition gear_position) {
 
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
-      gear_control_a1_->set_gear_state_target(
-          Gear_control_a1::GEAR_STATE_TARGET_N);
+      gear_control_a1_->set_gear_state_target(Gear_control_a1::GEAR_STATE_TARGET_N);
       break;
     }
     case Chassis::GEAR_REVERSE: {
-      gear_control_a1_->set_gear_state_target(
-          Gear_control_a1::GEAR_STATE_TARGET_R);
+      gear_control_a1_->set_gear_state_target(Gear_control_a1::GEAR_STATE_TARGET_R);
       break;
     }
     case Chassis::GEAR_DRIVE: {
-      gear_control_a1_->set_gear_state_target(
-          Gear_control_a1::GEAR_STATE_TARGET_D);
+      gear_control_a1_->set_gear_state_target(Gear_control_a1::GEAR_STATE_TARGET_D);
       break;
     }
     case Chassis::GEAR_PARKING: {
-      gear_control_a1_->set_gear_state_target(
-          Gear_control_a1::GEAR_STATE_TARGET_P);
+      gear_control_a1_->set_gear_state_target(Gear_control_a1::GEAR_STATE_TARGET_P);
       break;
     }
 
     case Chassis::GEAR_INVALID: {
       AERROR << "Gear command is invalid!";
-      gear_control_a1_->set_gear_state_target(
-          Gear_control_a1::GEAR_STATE_TARGET_INVALID);
+      gear_control_a1_->set_gear_state_target(Gear_control_a1::GEAR_STATE_TARGET_INVALID);
       break;
     }
     default: {
-      gear_control_a1_->set_gear_state_target(
-          Gear_control_a1::GEAR_STATE_TARGET_P);
+      gear_control_a1_->set_gear_state_target(Gear_control_a1::GEAR_STATE_TARGET_P);
       break;
     }
   }
@@ -452,8 +425,7 @@ void ZhongyunController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle = vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   steering_control_a2_->set_steering_target(real_angle);
 }
 
@@ -466,18 +438,15 @@ void ZhongyunController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle = vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   steering_control_a2_->set_steering_target(real_angle);
 }
 
 void ZhongyunController::SetEpbBreak(const ControlCommand& command) {
   if (command.parking_brake()) {
-    parking_control_a5_->set_parking_target(
-        Parking_control_a5::PARKING_TARGET_PARKING_TRIGGER);
+    parking_control_a5_->set_parking_target(Parking_control_a5::PARKING_TARGET_PARKING_TRIGGER);
   } else {
-    parking_control_a5_->set_parking_target(
-        Parking_control_a5::PARKING_TARGET_RELEASE);
+    parking_control_a5_->set_parking_target(Parking_control_a5::PARKING_TARGET_RELEASE);
   }
 }
 
@@ -504,9 +473,7 @@ void ZhongyunController::SetTurningSignal(const ControlCommand& command) {
   // None
 }
 
-void ZhongyunController::ResetProtocol() {
-  message_manager_->ResetSendMessages();
-}
+void ZhongyunController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool ZhongyunController::CheckChassisError() {
   ChassisDetail chassis_detail;
@@ -518,40 +485,32 @@ bool ZhongyunController::CheckChassisError() {
   }
   Zhongyun zhy = chassis_detail.zhongyun();
   // check steer error
-  if (zhy.has_error_state_e1() &&
-      zhy.error_state_e1().has_steering_error_code()) {
-    if (zhy.error_state_e1().steering_error_code() ==
-        Error_state_e1::STEERING_ERROR_CODE_ERROR) {
+  if (zhy.has_error_state_e1() && zhy.error_state_e1().has_steering_error_code()) {
+    if (zhy.error_state_e1().steering_error_code() == Error_state_e1::STEERING_ERROR_CODE_ERROR) {
       return true;
     }
   }
   // check ems error
-  if (zhy.has_error_state_e1() &&
-      zhy.error_state_e1().has_driven_error_code()) {
-    if (zhy.error_state_e1().driven_error_code() ==
-        Error_state_e1::DRIVEN_ERROR_CODE_ERROR) {
+  if (zhy.has_error_state_e1() && zhy.error_state_e1().has_driven_error_code()) {
+    if (zhy.error_state_e1().driven_error_code() == Error_state_e1::DRIVEN_ERROR_CODE_ERROR) {
       return true;
     }
   }
   // check eps error
   if (zhy.has_error_state_e1() && zhy.error_state_e1().has_brake_error_code()) {
-    if (zhy.error_state_e1().brake_error_code() ==
-        Error_state_e1::BRAKE_ERROR_CODE_ERROR) {
+    if (zhy.error_state_e1().brake_error_code() == Error_state_e1::BRAKE_ERROR_CODE_ERROR) {
       return true;
     }
   }
   // check gear error
   if (zhy.has_error_state_e1() && zhy.error_state_e1().has_gear_error_msg()) {
-    if (zhy.error_state_e1().gear_error_msg() ==
-        Error_state_e1::GEAR_ERROR_MSG_ERROR) {
+    if (zhy.error_state_e1().gear_error_msg() == Error_state_e1::GEAR_ERROR_MSG_ERROR) {
       return true;
     }
   }
   // check parking error
-  if (zhy.has_error_state_e1() &&
-      zhy.error_state_e1().has_parking_error_code()) {
-    if (zhy.error_state_e1().parking_error_code() ==
-        Error_state_e1::PARKING_ERROR_CODE_ERROR) {
+  if (zhy.has_error_state_e1() && zhy.error_state_e1().has_parking_error_code()) {
+    if (zhy.error_state_e1().parking_error_code() == Error_state_e1::PARKING_ERROR_CODE_ERROR) {
       return true;
     }
   }
@@ -559,7 +518,7 @@ bool ZhongyunController::CheckChassisError() {
 }
 
 void ZhongyunController::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -572,16 +531,15 @@ void ZhongyunController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -593,8 +551,7 @@ void ZhongyunController::SecurityDogThreadFunc() {
     }
 
     // 2. vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -618,9 +575,8 @@ void ZhongyunController::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR
-          << "Too much time consumption in ZhongyunController looping process:"
-          << elapsed.count();
+      AERROR << "Too much time consumption in ZhongyunController looping process:"
+             << elapsed.count();
     }
   }
 }
@@ -628,11 +584,11 @@ void ZhongyunController::SecurityDogThreadFunc() {
 bool ZhongyunController::CheckResponse(const int32_t flags, bool need_wait) {
   // for Zhongyun, CheckResponse commonly takes 300ms. We leave a 100ms buffer
   // for it.
-  int32_t retry_num = 20;
+  int32_t       retry_num = 20;
   ChassisDetail chassis_detail;
-  bool is_eps_online = false;
-  bool is_vcu_online = false;
-  bool is_esp_online = false;
+  bool          is_eps_online = false;
+  bool          is_vcu_online = false;
+  bool          is_esp_online = false;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -658,8 +614,7 @@ bool ZhongyunController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     if (need_wait) {
       --retry_num;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(20));
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
     }
     if (check_ok) {
       return true;
@@ -669,8 +624,7 @@ bool ZhongyunController::CheckResponse(const int32_t flags, bool need_wait) {
   } while (need_wait && retry_num);
 
   AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+        << ", is_vcu_online:" << is_vcu_online << ", is_esp_online:" << is_esp_online;
   return false;
 }
 
@@ -689,8 +643,7 @@ Chassis::ErrorCode ZhongyunController::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void ZhongyunController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void ZhongyunController::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

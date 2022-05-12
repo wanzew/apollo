@@ -30,8 +30,8 @@ namespace fusion {
 using cyber::common::GetAbsolutePath;
 
 // TODO(all) fix the static string lint issue
-std::string PbfTracker::s_type_fusion_method_ = "DstTypeFusion";  // NOLINT
-std::string PbfTracker::s_existence_fusion_method_ =              // NOLINT
+std::string PbfTracker::s_type_fusion_method_      = "DstTypeFusion";  // NOLINT
+std::string PbfTracker::s_existence_fusion_method_ =                   // NOLINT
     "DstExistenceFusion";
 std::string PbfTracker::s_motion_fusion_method_ =  // NOLINT
     "KalmanMotionFusion";
@@ -43,12 +43,10 @@ PbfTracker::~PbfTracker() {}
 
 bool PbfTracker::InitParams() {
   BaseInitOptions options;
-  if (!GetFusionInitOptions("PbfTracker", &options)) {
-    return false;
-  }
+  if (!GetFusionInitOptions("PbfTracker", &options)) { return false; }
 
-  std::string woork_root_config = GetAbsolutePath(
-      lib::ConfigManager::Instance()->work_root(), options.root_dir);
+  std::string woork_root_config =
+      GetAbsolutePath(lib::ConfigManager::Instance()->work_root(), options.root_dir);
 
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   AINFO << "Config file : " << config;
@@ -59,12 +57,12 @@ bool PbfTracker::InitParams() {
   }
 
   AINFO << "Load PbfTrackerConfig: " << params.type_fusion_method() << ","
-        << params.motion_fusion_method() << "," << params.shape_fusion_method()
-        << "," << params.existence_fusion_method();
-  s_type_fusion_method_ = params.type_fusion_method();
-  s_motion_fusion_method_ = params.motion_fusion_method();
+        << params.motion_fusion_method() << "," << params.shape_fusion_method() << ","
+        << params.existence_fusion_method();
+  s_type_fusion_method_      = params.type_fusion_method();
+  s_motion_fusion_method_    = params.motion_fusion_method();
   s_existence_fusion_method_ = params.existence_fusion_method();
-  s_shape_fusion_method_ = params.shape_fusion_method();
+  s_shape_fusion_method_     = params.shape_fusion_method();
 
   return true;
 }
@@ -103,22 +101,19 @@ bool PbfTracker::InitMethods() {
 
 bool PbfTracker::Init(TrackPtr track, SensorObjectPtr measurement) {
   track_ = track;
-  if (!InitMethods()) {
-    return false;
-  }
+  if (!InitMethods()) { return false; }
   motion_fusion_->Init();
   return true;
 }
 
 void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,
                                        const SensorObjectPtr measurement,
-                                       double target_timestamp) {
+                                       double                target_timestamp) {
   std::string sensor_id = measurement->GetSensorId();
-  ADEBUG << "fusion_updating..." << track_->GetTrackId() << " with "
-         << sensor_id << "..." << measurement->GetBaseObject()->track_id << "@"
+  ADEBUG << "fusion_updating..." << track_->GetTrackId() << " with " << sensor_id << "..."
+         << measurement->GetBaseObject()->track_id << "@"
          << FORMAT_TIMESTAMP(measurement->GetTimestamp());
-  existence_fusion_->UpdateWithMeasurement(measurement, target_timestamp,
-                                           options.match_distance);
+  existence_fusion_->UpdateWithMeasurement(measurement, target_timestamp, options.match_distance);
   motion_fusion_->UpdateWithMeasurement(measurement, target_timestamp);
   shape_fusion_->UpdateWithMeasurement(measurement, target_timestamp);
   type_fusion_->UpdateWithMeasurement(measurement, target_timestamp);
@@ -126,18 +121,14 @@ void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,
 }
 
 void PbfTracker::UpdateWithoutMeasurement(const TrackerOptions& options,
-                                          const std::string& sensor_id,
-                                          double measurement_timestamp,
-                                          double target_timestamp) {
-  existence_fusion_->UpdateWithoutMeasurement(sensor_id, measurement_timestamp,
-                                              target_timestamp,
+                                          const std::string&    sensor_id,
+                                          double                measurement_timestamp,
+                                          double                target_timestamp) {
+  existence_fusion_->UpdateWithoutMeasurement(sensor_id, measurement_timestamp, target_timestamp,
                                               options.match_distance);
-  motion_fusion_->UpdateWithoutMeasurement(sensor_id, measurement_timestamp,
-                                           target_timestamp);
-  shape_fusion_->UpdateWithoutMeasurement(sensor_id, measurement_timestamp,
-                                          target_timestamp);
-  type_fusion_->UpdateWithoutMeasurement(sensor_id, measurement_timestamp,
-                                         target_timestamp,
+  motion_fusion_->UpdateWithoutMeasurement(sensor_id, measurement_timestamp, target_timestamp);
+  shape_fusion_->UpdateWithoutMeasurement(sensor_id, measurement_timestamp, target_timestamp);
+  type_fusion_->UpdateWithoutMeasurement(sensor_id, measurement_timestamp, target_timestamp,
                                          options.match_distance);
   track_->UpdateWithoutSensorObject(sensor_id, measurement_timestamp);
 }

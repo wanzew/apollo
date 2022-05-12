@@ -55,13 +55,13 @@ class Transport {
 
   template <typename M>
   auto CreateTransmitter(const RoleAttributes& attr,
-                         const OptionalMode& mode = OptionalMode::HYBRID) ->
+                         const OptionalMode&   mode = OptionalMode::HYBRID) ->
       typename std::shared_ptr<Transmitter<M>>;
 
   template <typename M>
-  auto CreateReceiver(const RoleAttributes& attr,
+  auto CreateReceiver(const RoleAttributes&                        attr,
                       const typename Receiver<M>::MessageListener& msg_listener,
-                      const OptionalMode& mode = OptionalMode::HYBRID) ->
+                      const OptionalMode&                          mode = OptionalMode::HYBRID) ->
       typename std::shared_ptr<Receiver<M>>;
 
   ParticipantPtr participant() const { return participant_; }
@@ -69,30 +69,28 @@ class Transport {
  private:
   void CreateParticipant();
 
-  std::atomic<bool> is_shutdown_ = {false};
-  ParticipantPtr participant_ = nullptr;
-  NotifierPtr notifier_ = nullptr;
+  std::atomic<bool>  is_shutdown_      = {false};
+  ParticipantPtr     participant_      = nullptr;
+  NotifierPtr        notifier_         = nullptr;
   IntraDispatcherPtr intra_dispatcher_ = nullptr;
-  ShmDispatcherPtr shm_dispatcher_ = nullptr;
-  RtpsDispatcherPtr rtps_dispatcher_ = nullptr;
+  ShmDispatcherPtr   shm_dispatcher_   = nullptr;
+  RtpsDispatcherPtr  rtps_dispatcher_  = nullptr;
 
   DECLARE_SINGLETON(Transport)
 };
 
 template <typename M>
-auto Transport::CreateTransmitter(const RoleAttributes& attr,
-                                  const OptionalMode& mode) ->
+auto Transport::CreateTransmitter(const RoleAttributes& attr, const OptionalMode& mode) ->
     typename std::shared_ptr<Transmitter<M>> {
   if (is_shutdown_.load()) {
     AINFO << "transport has been shut down.";
     return nullptr;
   }
 
-  std::shared_ptr<Transmitter<M>> transmitter = nullptr;
-  RoleAttributes modified_attr = attr;
+  std::shared_ptr<Transmitter<M>> transmitter   = nullptr;
+  RoleAttributes                  modified_attr = attr;
   if (!modified_attr.has_qos_profile()) {
-    modified_attr.mutable_qos_profile()->CopyFrom(
-        QosProfileConf::QOS_PROFILE_DEFAULT);
+    modified_attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
   }
 
   switch (mode) {
@@ -100,49 +98,40 @@ auto Transport::CreateTransmitter(const RoleAttributes& attr,
       transmitter = std::make_shared<IntraTransmitter<M>>(modified_attr);
       break;
 
-    case OptionalMode::SHM:
-      transmitter = std::make_shared<ShmTransmitter<M>>(modified_attr);
-      break;
+    case OptionalMode::SHM: transmitter = std::make_shared<ShmTransmitter<M>>(modified_attr); break;
 
     case OptionalMode::RTPS:
-      transmitter =
-          std::make_shared<RtpsTransmitter<M>>(modified_attr, participant());
+      transmitter = std::make_shared<RtpsTransmitter<M>>(modified_attr, participant());
       break;
 
     default:
-      transmitter =
-          std::make_shared<HybridTransmitter<M>>(modified_attr, participant());
+      transmitter = std::make_shared<HybridTransmitter<M>>(modified_attr, participant());
       break;
   }
 
   RETURN_VAL_IF_NULL(transmitter, nullptr);
-  if (mode != OptionalMode::HYBRID) {
-    transmitter->Enable();
-  }
+  if (mode != OptionalMode::HYBRID) { transmitter->Enable(); }
   return transmitter;
 }
 
 template <typename M>
-auto Transport::CreateReceiver(
-    const RoleAttributes& attr,
-    const typename Receiver<M>::MessageListener& msg_listener,
-    const OptionalMode& mode) -> typename std::shared_ptr<Receiver<M>> {
+auto Transport::CreateReceiver(const RoleAttributes&                        attr,
+                               const typename Receiver<M>::MessageListener& msg_listener,
+                               const OptionalMode& mode) -> typename std::shared_ptr<Receiver<M>> {
   if (is_shutdown_.load()) {
     AINFO << "transport has been shut down.";
     return nullptr;
   }
 
-  std::shared_ptr<Receiver<M>> receiver = nullptr;
-  RoleAttributes modified_attr = attr;
+  std::shared_ptr<Receiver<M>> receiver      = nullptr;
+  RoleAttributes               modified_attr = attr;
   if (!modified_attr.has_qos_profile()) {
-    modified_attr.mutable_qos_profile()->CopyFrom(
-        QosProfileConf::QOS_PROFILE_DEFAULT);
+    modified_attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
   }
 
   switch (mode) {
     case OptionalMode::INTRA:
-      receiver =
-          std::make_shared<IntraReceiver<M>>(modified_attr, msg_listener);
+      receiver = std::make_shared<IntraReceiver<M>>(modified_attr, msg_listener);
       break;
 
     case OptionalMode::SHM:
@@ -154,15 +143,12 @@ auto Transport::CreateReceiver(
       break;
 
     default:
-      receiver = std::make_shared<HybridReceiver<M>>(
-          modified_attr, msg_listener, participant());
+      receiver = std::make_shared<HybridReceiver<M>>(modified_attr, msg_listener, participant());
       break;
   }
 
   RETURN_VAL_IF_NULL(receiver, nullptr);
-  if (mode != OptionalMode::HYBRID) {
-    receiver->Enable();
-  }
+  if (mode != OptionalMode::HYBRID) { receiver->Enable(); }
   return receiver;
 }
 

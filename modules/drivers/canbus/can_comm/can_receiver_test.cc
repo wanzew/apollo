@@ -20,6 +20,7 @@
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/proto/error_code.pb.h"
+
 #include "modules/drivers/canbus/can_client/fake/fake_can_client.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
@@ -29,9 +30,9 @@ namespace canbus {
 
 TEST(CanReceiverTest, ReceiveOne) {
   cyber::Init("can_receiver_test");
-  can::FakeCanClient can_client;
+  can::FakeCanClient                              can_client;
   MessageManager<::apollo::canbus::ChassisDetail> pm;
-  CanReceiver<::apollo::canbus::ChassisDetail> receiver;
+  CanReceiver<::apollo::canbus::ChassisDetail>    receiver;
 
   receiver.Init(&can_client, &pm, false);
   EXPECT_EQ(receiver.Start(), common::ErrorCode::OK);

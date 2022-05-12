@@ -27,11 +27,11 @@ namespace cyber {
 namespace base {
 
 TEST(ReentrantRWLockTest, read_lock) {
-  int count = 0;
-  int thread_init = 0;
-  bool flag = true;
+  int             count       = 0;
+  int             thread_init = 0;
+  bool            flag        = true;
   ReentrantRWLock lock;
-  auto f = [&]() {
+  auto            f = [&]() {
     ReadLockGuard<ReentrantRWLock> lg(lock);
     count++;
     thread_init++;
@@ -61,11 +61,11 @@ TEST(ReentrantRWLockTest, read_lock) {
 }
 
 TEST(ReentrantRWLockTest, write_lock) {
-  int count = 0;
-  int thread_run = 0;
-  bool flag = true;
+  int             count      = 0;
+  int             thread_run = 0;
+  bool            flag       = true;
   ReentrantRWLock lock(false);
-  auto f = [&]() {
+  auto            f = [&]() {
     thread_run++;
     WriteLockGuard<ReentrantRWLock> lg(lock);
     count++;

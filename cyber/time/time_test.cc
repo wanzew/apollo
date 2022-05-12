@@ -42,9 +42,9 @@ TEST(TimeTest, constructor) {
 }
 
 TEST(TimeTest, operators) {
-  Time t1(100);
+  Time     t1(100);
   Duration d(200);
-  Time t2(300);
+  Time     t2(300);
   EXPECT_NE(t1, t2);
   EXPECT_LT(t1, t2);
   EXPECT_LE(t1, t2);

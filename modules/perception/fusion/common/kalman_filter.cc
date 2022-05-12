@@ -14,16 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/fusion/common/kalman_filter.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
 
-KalmanFilter::KalmanFilter() : BaseFilter("KalmanFilter") {}
+KalmanFilter::KalmanFilter()
+    : BaseFilter("KalmanFilter") {}
 
-bool KalmanFilter::Init(const Eigen::VectorXd &initial_belief_states,
-                        const Eigen::MatrixXd &initial_uncertainty) {
+bool KalmanFilter::Init(const Eigen::VectorXd& initial_belief_states,
+                        const Eigen::MatrixXd& initial_uncertainty) {
   if (initial_uncertainty.rows() != initial_uncertainty.cols()) {
     AERROR << "the cols and rows of uncertainty martix should be equal";
     return false;
@@ -40,8 +42,8 @@ bool KalmanFilter::Init(const Eigen::VectorXd &initial_belief_states,
     return false;
   }
 
-  global_states_ = initial_belief_states;
-  global_uncertainty_ = initial_uncertainty;
+  global_states_       = initial_belief_states;
+  global_uncertainty_  = initial_uncertainty;
   prior_global_states_ = global_states_;
 
   transform_matrix_.setIdentity(states_num_, states_num_);
@@ -59,8 +61,8 @@ bool KalmanFilter::Init(const Eigen::VectorXd &initial_belief_states,
   return true;
 }
 
-bool KalmanFilter::Predict(const Eigen::MatrixXd &transform_matrix,
-                           const Eigen::MatrixXd &env_uncertainty_matrix) {
+bool KalmanFilter::Predict(const Eigen::MatrixXd& transform_matrix,
+                           const Eigen::MatrixXd& env_uncertainty_matrix) {
   if (!init_) {
     AERROR << "Predict: Kalman Filter initialize not successfully";
     return false;
@@ -82,16 +84,15 @@ bool KalmanFilter::Predict(const Eigen::MatrixXd &transform_matrix,
     return false;
   }
   transform_matrix_ = transform_matrix;
-  env_uncertainty_ = env_uncertainty_matrix;
-  global_states_ = transform_matrix_ * global_states_;
+  env_uncertainty_  = env_uncertainty_matrix;
+  global_states_    = transform_matrix_ * global_states_;
   global_uncertainty_ =
-      transform_matrix_ * global_uncertainty_ * transform_matrix_.transpose() +
-      env_uncertainty_;
+      transform_matrix_ * global_uncertainty_ * transform_matrix_.transpose() + env_uncertainty_;
   return true;
 }
 
-bool KalmanFilter::Correct(const Eigen::VectorXd &cur_observation,
-                           const Eigen::MatrixXd &cur_observation_uncertainty) {
+bool KalmanFilter::Correct(const Eigen::VectorXd& cur_observation,
+                           const Eigen::MatrixXd& cur_observation_uncertainty) {
   if (!init_) {
     AERROR << "Correct: Kalman Filter initialize not successfully";
     return false;
@@ -111,30 +112,27 @@ bool KalmanFilter::Correct(const Eigen::VectorXd &cur_observation,
     return false;
   }
 
-  cur_observation_ = cur_observation;
+  cur_observation_             = cur_observation;
   cur_observation_uncertainty_ = cur_observation_uncertainty;
-  kalman_gain_ = global_uncertainty_ * c_matrix_.transpose() *
-                 (c_matrix_ * global_uncertainty_ * c_matrix_.transpose() +
-                  cur_observation_uncertainty_)
-                     .inverse();
-  global_states_ = global_states_ + kalman_gain_ * (cur_observation_ -
-                                                    c_matrix_ * global_states_);
+  kalman_gain_ =
+      global_uncertainty_ * c_matrix_.transpose() *
+      (c_matrix_ * global_uncertainty_ * c_matrix_.transpose() + cur_observation_uncertainty_)
+          .inverse();
+  global_states_ = global_states_ + kalman_gain_ * (cur_observation_ - c_matrix_ * global_states_);
   Eigen::MatrixXd tmp_identity;
   tmp_identity.setIdentity(states_num_, states_num_);
-  global_uncertainty_ =
-      (tmp_identity - kalman_gain_ * c_matrix_) * global_uncertainty_ *
-          (tmp_identity - kalman_gain_ * c_matrix_).transpose() +
-      kalman_gain_ * cur_observation_uncertainty_ * kalman_gain_.transpose();
+  global_uncertainty_ = (tmp_identity - kalman_gain_ * c_matrix_) * global_uncertainty_ *
+                            (tmp_identity - kalman_gain_ * c_matrix_).transpose() +
+                        kalman_gain_ * cur_observation_uncertainty_ * kalman_gain_.transpose();
   return true;
 }
 
-bool KalmanFilter::SetControlMatrix(const Eigen::MatrixXd &control_matrix) {
+bool KalmanFilter::SetControlMatrix(const Eigen::MatrixXd& control_matrix) {
   if (!init_) {
     AERROR << "SetControlMatrix: Kalman Filter initialize not successfully";
     return false;
   }
-  if (control_matrix.rows() != states_num_ ||
-      control_matrix.cols() != states_num_) {
+  if (control_matrix.rows() != states_num_ || control_matrix.cols() != states_num_) {
     AERROR << "the rows/cols of control matrix should be equal to state_num";
     return false;
   }
@@ -144,39 +142,29 @@ bool KalmanFilter::SetControlMatrix(const Eigen::MatrixXd &control_matrix) {
 
 Eigen::VectorXd KalmanFilter::GetStates() const { return global_states_; }
 
-Eigen::MatrixXd KalmanFilter::GetUncertainty() const {
-  return global_uncertainty_;
-}
+Eigen::MatrixXd KalmanFilter::GetUncertainty() const { return global_uncertainty_; }
 
-bool KalmanFilter::SetGainBreakdownThresh(const std::vector<bool> &break_down,
-                                          const float threshold) {
-  if (static_cast<int>(break_down.size()) != states_num_) {
-    return false;
-  }
+bool KalmanFilter::SetGainBreakdownThresh(const std::vector<bool>& break_down,
+                                          const float              threshold) {
+  if (static_cast<int>(break_down.size()) != states_num_) { return false; }
   for (int i = 0; i < states_num_; i++) {
-    if (break_down[i]) {
-      gain_break_down_(i) = 1;
-    }
+    if (break_down[i]) { gain_break_down_(i) = 1; }
   }
   gain_break_down_threshold_ = threshold;
   return true;
 }
 
-bool KalmanFilter::SetValueBreakdownThresh(const std::vector<bool> &break_down,
-                                           const float threshold) {
-  if (static_cast<int>(break_down.size()) != states_num_) {
-    return false;
-  }
+bool KalmanFilter::SetValueBreakdownThresh(const std::vector<bool>& break_down,
+                                           const float              threshold) {
+  if (static_cast<int>(break_down.size()) != states_num_) { return false; }
   for (int i = 0; i < states_num_; i++) {
-    if (break_down[i]) {
-      value_break_down_(i) = 1;
-    }
+    if (break_down[i]) { value_break_down_(i) = 1; }
   }
   value_break_down_threshold_ = threshold;
   return true;
 }
 void KalmanFilter::CorrectionBreakdown() {
-  Eigen::VectorXd states_gain = global_states_ - prior_global_states_;
+  Eigen::VectorXd states_gain    = global_states_ - prior_global_states_;
   Eigen::VectorXd breakdown_diff = states_gain.cwiseProduct(gain_break_down_);
   global_states_ -= breakdown_diff;
   if (breakdown_diff.norm() > gain_break_down_threshold_) {
@@ -187,8 +175,7 @@ void KalmanFilter::CorrectionBreakdown() {
 
   Eigen::VectorXd temp;
   temp.setOnes(states_num_, 1);
-  if ((global_states_.cwiseProduct(value_break_down_)).norm() <
-      value_break_down_threshold_) {
+  if ((global_states_.cwiseProduct(value_break_down_)).norm() < value_break_down_threshold_) {
     global_states_ = global_states_.cwiseProduct(temp - value_break_down_);
   }
   prior_global_states_ = global_states_;

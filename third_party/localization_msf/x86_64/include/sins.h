@@ -27,6 +27,7 @@ class Sins {
  public:
   Sins();
   ~Sins();
+
  public:
   void Init(bool imu_can_self_align);
   void SetSinsAlignFromVel(bool flag);
@@ -36,20 +37,20 @@ class Sins {
   void SetResetSinsMeasSpanTime(double time);
 
   void SetImuAntennaLeverArm(double x, double y, double z);
-  
+
   void SetVelThresholdGetYaw(double threshold);
 
   void AddMeasurement(const MeasureData& measure_data);
 
   void AddImu(const ImuData& imu_data);
 
-  void GetPose(InsPva *ins_pva, double pva_covariance[9][9]);
+  void GetPose(InsPva* ins_pva, double pva_covariance[9][9]);
 
   bool IsSinsAligned();
 
-  void GetEarthParameter(InertialParameter *earth_param);
+  void GetEarthParameter(InertialParameter* earth_param);
 
-  void GetRemoveBiasImu(ImuData *imu_data);
+  void GetRemoveBiasImu(ImuData* imu_data);
 
  protected:
   SinsImpl* sins_impl_;

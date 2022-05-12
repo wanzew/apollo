@@ -18,9 +18,7 @@
 
 #include "gtest/gtest.h"
 
-TEST(loadTest, test) {
-  ACHECK(!apollo::perception::inference::load_binary_data("unknown.txt"));
-}
+TEST(loadTest, test) { ACHECK(!apollo::perception::inference::load_binary_data("unknown.txt")); }
 
 TEST(UtilTest, test) {
   // std::vector<std::string> file_list =

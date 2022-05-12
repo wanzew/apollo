@@ -22,15 +22,15 @@
 
 #include <memory>
 
-#include "cyber/common/macros.h"
-#include "cyber/component/timer_component.h"
-#include "cyber/cyber.h"
-
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
 #include "modules/guardian/proto/guardian_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
+
+#include "cyber/common/macros.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/cyber.h"
 
 /**
  * @namespace apollo::guardian
@@ -48,22 +48,18 @@ class GuardianComponent : public apollo::cyber::TimerComponent {
   void PassThroughControlCommand();
   void TriggerSafetyMode();
 
-  apollo::guardian::GuardianConf guardian_conf_;
-  apollo::canbus::Chassis chassis_;
-  apollo::monitor::SystemStatus system_status_;
-  apollo::control::ControlCommand control_cmd_;
+  apollo::guardian::GuardianConf    guardian_conf_;
+  apollo::canbus::Chassis           chassis_;
+  apollo::monitor::SystemStatus     system_status_;
+  apollo::control::ControlCommand   control_cmd_;
   apollo::guardian::GuardianCommand guardian_cmd_;
 
   double last_status_received_s_{};
 
-  std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>
-      chassis_reader_;
-  std::shared_ptr<apollo::cyber::Reader<apollo::control::ControlCommand>>
-      control_cmd_reader_;
-  std::shared_ptr<apollo::cyber::Reader<apollo::monitor::SystemStatus>>
-      system_status_reader_;
-  std::shared_ptr<apollo::cyber::Writer<apollo::guardian::GuardianCommand>>
-      guardian_writer_;
+  std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>           chassis_reader_;
+  std::shared_ptr<apollo::cyber::Reader<apollo::control::ControlCommand>>   control_cmd_reader_;
+  std::shared_ptr<apollo::cyber::Reader<apollo::monitor::SystemStatus>>     system_status_reader_;
+  std::shared_ptr<apollo::cyber::Writer<apollo::guardian::GuardianCommand>> guardian_writer_;
 
   std::mutex mutex_;
 };

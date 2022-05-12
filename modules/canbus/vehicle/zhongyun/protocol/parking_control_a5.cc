@@ -42,13 +42,12 @@ void Parkingcontrola5::UpdateData(uint8_t* data) {
 
 void Parkingcontrola5::Reset() {
   // TODO(ChaoM) :  you should check this manually
-  parking_target_ = Parking_control_a5::PARKING_TARGET_RELEASE;
-  parking_enable_control_ =
-      Parking_control_a5::PARKING_ENABLE_CONTROL_PARKING_MANUALCONTROL;
+  parking_target_         = Parking_control_a5::PARKING_TARGET_RELEASE;
+  parking_enable_control_ = Parking_control_a5::PARKING_ENABLE_CONTROL_PARKING_MANUALCONTROL;
 }
 
-Parkingcontrola5* Parkingcontrola5::set_parking_target(
-    Parking_control_a5::Parking_targetType parking_target) {
+Parkingcontrola5*
+Parkingcontrola5::set_parking_target(Parking_control_a5::Parking_targetType parking_target) {
   parking_target_ = parking_target;
   return this;
 }
@@ -58,8 +57,8 @@ Parkingcontrola5* Parkingcontrola5::set_parking_target(
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 8, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
-void Parkingcontrola5::set_p_parking_target(
-    uint8_t* data, Parking_control_a5::Parking_targetType parking_target) {
+void Parkingcontrola5::set_p_parking_target(uint8_t*                               data,
+                                            Parking_control_a5::Parking_targetType parking_target) {
   int x = parking_target;
 
   Byte to_set(data + 1);
@@ -78,8 +77,7 @@ Parkingcontrola5* Parkingcontrola5::set_parking_enable_control(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 void Parkingcontrola5::set_p_parking_enable_control(
-    uint8_t* data,
-    Parking_control_a5::Parking_enable_controlType parking_enable_control) {
+    uint8_t* data, Parking_control_a5::Parking_enable_controlType parking_enable_control) {
   int x = parking_enable_control;
 
   Byte to_set(data + 0);

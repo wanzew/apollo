@@ -52,8 +52,7 @@ void NdtMapConfig::CreateXml(boost::property_tree::ptree* config) const {
   BaseMapConfig::CreateXml(config);
   config->put("map.map_config.compression", map_is_compression_);
   for (size_t i = 0; i < map_resolutions_.size(); ++i) {
-    config->add("map.map_config.resolutions_z.resolution",
-                map_resolutions_z_[i]);
+    config->add("map.map_config.resolutions_z.resolution", map_resolutions_z_[i]);
   }
 }
 
@@ -64,8 +63,7 @@ void NdtMapConfig::LoadXml(boost::property_tree::ptree* config) {
   const auto& resolutions_z = config->get_child("map.map_config.resolutions_z");
   std::for_each(resolutions_z.begin(), resolutions_z.end(),
                 [this](const boost::property_tree::ptree::value_type& v) {
-                  map_resolutions_z_.push_back(
-                      static_cast<float>(atof(v.second.data().c_str())));
+                  map_resolutions_z_.push_back(static_cast<float>(atof(v.second.data().c_str())));
                 });
 }
 

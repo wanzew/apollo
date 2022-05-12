@@ -52,8 +52,8 @@ namespace lidar {
 
 class NmsCuda {
  private:
-  const int num_threads_;
-  const int num_box_corners_;
+  const int   num_threads_;
+  const int   num_box_corners_;
   const float nms_overlap_threshold_;
 
  public:
@@ -65,8 +65,7 @@ class NmsCuda {
    * @details Captital variables never change after the compile, Non-captital
    * variables could be chaned through rosparam
    */
-  NmsCuda(const int num_threads, const int num_box_corners,
-          const float nms_overlap_threshold);
+  NmsCuda(const int num_threads, const int num_box_corners, const float nms_overlap_threshold);
 
   /**
    * @brief GPU Non-Maximum Suppresion for network output
@@ -76,8 +75,10 @@ class NmsCuda {
    * @param[out] out_num_to_keep Number of kept bounding boxes
    * @details NMS in GPU and postprocessing for selecting box in CPU
    */
-  void DoNmsCuda(const int host_filter_count, float* dev_sorted_box_for_nms,
-                 int* out_keep_inds, int* out_num_to_keep);
+  void DoNmsCuda(const int host_filter_count,
+                 float*    dev_sorted_box_for_nms,
+                 int*      out_keep_inds,
+                 int*      out_num_to_keep);
 };
 
 }  // namespace lidar

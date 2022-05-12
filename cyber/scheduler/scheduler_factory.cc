@@ -43,7 +43,7 @@ using apollo::cyber::common::WorkRoot;
 
 namespace {
 std::atomic<Scheduler*> instance = {nullptr};
-std::mutex mutex;
+std::mutex              mutex;
 }  // namespace
 
 Scheduler* Instance() {
@@ -55,13 +55,12 @@ Scheduler* Instance() {
       std::string policy("classic");
       std::string conf("conf/");
       conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
-      auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
+      auto                              cfg_file = GetAbsolutePath(WorkRoot(), conf);
       apollo::cyber::proto::CyberConfig cfg;
       if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
         policy = cfg.scheduler_conf().policy();
       } else {
-        AWARN << "Scheduler conf named " << cfg_file
-              << " not found, use default.";
+        AWARN << "Scheduler conf named " << cfg_file << " not found, use default.";
       }
       if (!policy.compare("classic")) {
         obj = new SchedulerClassic();
@@ -79,9 +78,7 @@ Scheduler* Instance() {
 
 void CleanUp() {
   Scheduler* obj = instance.load(std::memory_order_acquire);
-  if (obj != nullptr) {
-    obj->Shutdown();
-  }
+  if (obj != nullptr) { obj->Shutdown(); }
 }
 
 }  // namespace scheduler

@@ -19,8 +19,9 @@
 #include <memory>
 #include <vector>
 
-#include "cyber/cyber.h"
 #include "modules/transform/proto/transform.pb.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace transform {
@@ -47,7 +48,7 @@ class TransformBroadcaster {
   void SendTransform(const std::vector<TransformStamped>& transforms);
 
  private:
-  std::shared_ptr<cyber::Node> node_;
+  std::shared_ptr<cyber::Node>                      node_;
   std::shared_ptr<cyber::Writer<TransformStampeds>> writer_;
 };
 }  // namespace transform

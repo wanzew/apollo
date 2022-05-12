@@ -39,13 +39,13 @@ class BatchStream {
   // @brief skip `skipCount` batches
   void skip(int skipCount);
 
-  float *getBatch() { return &mBatch[0]; }
-  int getBatchesRead() const { return mBatchCount; }
-  int getBatchSize() const { return mBatchSize; }
+  float*             getBatch() { return &mBatch[0]; }
+  int                getBatchesRead() const { return mBatchCount; }
+  int                getBatchSize() const { return mBatchSize; }
   nvinfer1::DimsNCHW getDims() const { return mDims; }
 
  private:
-  float *getFileBatch() { return &mFileBatch[0]; }
+  float* getFileBatch() { return &mFileBatch[0]; }
 
   bool update();
 
@@ -60,7 +60,7 @@ class BatchStream {
   nvinfer1::DimsNCHW mDims;
   std::vector<float> mBatch;
   std::vector<float> mFileBatch;
-  std::string mPath;
+  std::string        mPath;
 };
 
 }  // namespace inference

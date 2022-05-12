@@ -38,38 +38,38 @@ class PointPillarsDetection : public BaseLidarDetector {
   PointPillarsDetection();
   virtual ~PointPillarsDetection() = default;
 
-  bool Init(const LidarDetectorInitOptions& options =
-                LidarDetectorInitOptions()) override;
+  bool Init(const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) override;
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "PointPillarsDetection"; }
 
  private:
-  void CloudToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,
-                    float normalizing_factor);
+  void CloudToArray(const base::PointFCloudPtr& pc_ptr,
+                    float*                      out_points_array,
+                    float                       normalizing_factor);
 
-  void FuseCloud(const base::PointFCloudPtr& out_cloud_ptr,
+  void FuseCloud(const base::PointFCloudPtr&             out_cloud_ptr,
                  const std::deque<base::PointDCloudPtr>& fuse_clouds);
 
   std::vector<int> GenerateIndices(int start_index, int size, bool shuffle);
 
   void GetObjects(std::vector<std::shared_ptr<base::Object>>* objects,
-                  const Eigen::Affine3d& pose, std::vector<float>* detections,
-                  std::vector<int>* labels);
+                  const Eigen::Affine3d&                      pose,
+                  std::vector<float>*                         detections,
+                  std::vector<int>*                           labels);
 
   base::ObjectSubType GetObjectSubType(int label);
 
   // reference pointer of lidar frame
-  LidarFrame* lidar_frame_ref_ = nullptr;
+  LidarFrame*                                              lidar_frame_ref_ = nullptr;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;
-  std::shared_ptr<base::AttributePointCloud<base::PointD>>
-      original_world_cloud_;
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> original_world_cloud_;
 
   // PointPillars
-  std::unique_ptr<PointPillars> point_pillars_ptr_;
+  std::unique_ptr<PointPillars>    point_pillars_ptr_;
   std::deque<base::PointDCloudPtr> prev_world_clouds_;
-  base::PointFCloudPtr cur_cloud_ptr_;
+  base::PointFCloudPtr             cur_cloud_ptr_;
 
   // point cloud range
   float x_min_;
@@ -80,12 +80,12 @@ class PointPillarsDetection : public BaseLidarDetector {
   float z_max_;
 
   // time statistics
-  double downsample_time_ = 0.0;
-  double fuse_time_ = 0.0;
-  double shuffle_time_ = 0.0;
+  double downsample_time_     = 0.0;
+  double fuse_time_           = 0.0;
+  double shuffle_time_        = 0.0;
   double cloud_to_array_time_ = 0.0;
-  double inference_time_ = 0.0;
-  double collect_time_ = 0.0;
+  double inference_time_      = 0.0;
+  double collect_time_        = 0.0;
 };  // class PointPillarsDetection
 
 }  // namespace lidar

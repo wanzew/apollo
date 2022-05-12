@@ -30,72 +30,54 @@ using ::apollo::drivers::canbus::Byte;
 Llcauxiliaryfeedback120::Llcauxiliaryfeedback120() {}
 const int32_t Llcauxiliaryfeedback120::ID = 0x120;
 
-void Llcauxiliaryfeedback120::Parse(const std::uint8_t* bytes, int32_t length,
-                                    ChassisDetail* chassis) const {
+void Llcauxiliaryfeedback120::Parse(const std::uint8_t* bytes,
+                                    int32_t             length,
+                                    ChassisDetail*      chassis) const {
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_inverter(
+      llc_fbk_inverter(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch8(
+      llc_fbk_pdu_ch8(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch7(
+      llc_fbk_pdu_ch7(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch6(
+      llc_fbk_pdu_ch6(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch5(
+      llc_fbk_pdu_ch5(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch4(
+      llc_fbk_pdu_ch4(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch3(
+      llc_fbk_pdu_ch3(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch2(
+      llc_fbk_pdu_ch2(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch1(
+      llc_fbk_pdu_ch1(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_hazardlights(
+      llc_fbk_hazardlights(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_ledgreenon(
+      llc_fbk_ledgreenon(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_horn(
+      llc_fbk_horn(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_buzzeron(
+      llc_fbk_buzzeron(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_turnsignal(
+      llc_fbk_turnsignal(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_lowbeam(
+      llc_fbk_lowbeam(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_highbeam(
+      llc_fbk_highbeam(bytes, length));
+  chassis->mutable_transit()->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_ledredon(
+      llc_fbk_ledredon(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_inverter(llc_fbk_inverter(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_pdu_ch8(llc_fbk_pdu_ch8(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_pdu_ch7(llc_fbk_pdu_ch7(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_pdu_ch6(llc_fbk_pdu_ch6(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_pdu_ch5(llc_fbk_pdu_ch5(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_pdu_ch4(llc_fbk_pdu_ch4(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_pdu_ch3(llc_fbk_pdu_ch3(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_pdu_ch2(llc_fbk_pdu_ch2(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_pdu_ch1(llc_fbk_pdu_ch1(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_hazardlights(llc_fbk_hazardlights(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_ledgreenon(llc_fbk_ledgreenon(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_horn(llc_fbk_horn(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_buzzeron(llc_fbk_buzzeron(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_turnsignal(llc_fbk_turnsignal(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_lowbeam(llc_fbk_lowbeam(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_highbeam(llc_fbk_highbeam(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_ledredon(llc_fbk_ledredon(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_auxiliaryfeedback_120()
-      ->set_llc_fbk_autonomybuttonpressed(
-          llc_fbk_autonomybuttonpressed(bytes, length));
+      ->set_llc_fbk_autonomybuttonpressed(llc_fbk_autonomybuttonpressed(bytes, length));
 }
 
 // config detail: {'description': 'Inverter enabled', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_inverter', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 2, 'type': 'bool', 'order': 'intel',
 // 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_inverter(const std::uint8_t* bytes,
-                                               int32_t length) const {
-  Byte t0(bytes + 0);
+bool Llcauxiliaryfeedback120::llc_fbk_inverter(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -106,9 +88,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_inverter(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_pdu_ch8', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 15, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch8(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch8(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(7, 1);
 
   bool ret = x;
@@ -119,9 +100,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch8(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_pdu_ch7', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 14, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch7(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch7(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(6, 1);
 
   bool ret = x;
@@ -132,9 +112,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch7(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_pdu_ch6', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 13, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch6(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch6(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(5, 1);
 
   bool ret = x;
@@ -145,9 +124,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch6(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_pdu_ch5', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 12, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch5(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch5(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(4, 1);
 
   bool ret = x;
@@ -158,9 +136,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch5(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_pdu_ch4', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 11, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch4(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch4(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -171,9 +148,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch4(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_pdu_ch3', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 10, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch3(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch3(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -184,9 +160,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch3(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_pdu_ch2', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 9, 'type': 'bool', 'order': 'intel',
 // 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch2(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch2(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(1, 1);
 
   bool ret = x;
@@ -197,9 +172,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch2(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_pdu_ch1', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 8, 'type': 'bool', 'order': 'intel',
 // 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch1(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch1(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;
@@ -211,8 +185,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_pdu_ch1(const std::uint8_t* bytes,
 // False, 'physical_range': '[0|1]', 'bit': 28, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
 bool Llcauxiliaryfeedback120::llc_fbk_hazardlights(const std::uint8_t* bytes,
-                                                   int32_t length) const {
-  Byte t0(bytes + 3);
+                                                   int32_t             length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(4, 1);
 
   bool ret = x;
@@ -223,9 +197,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_hazardlights(const std::uint8_t* bytes,
 // 0.0, 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_ledgreenon',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 17, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_ledgreenon(const std::uint8_t* bytes,
-                                                 int32_t length) const {
-  Byte t0(bytes + 2);
+bool Llcauxiliaryfeedback120::llc_fbk_ledgreenon(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(1, 1);
 
   bool ret = x;
@@ -236,9 +209,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_ledgreenon(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_horn', 'is_signed_var': False,
 // 'physical_range': '[0|1]', 'bit': 3, 'type': 'bool', 'order': 'intel',
 // 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_horn(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 0);
+bool Llcauxiliaryfeedback120::llc_fbk_horn(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -249,9 +221,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_horn(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_buzzeron', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 19, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_buzzeron(const std::uint8_t* bytes,
-                                               int32_t length) const {
-  Byte t0(bytes + 2);
+bool Llcauxiliaryfeedback120::llc_fbk_buzzeron(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -265,9 +236,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_buzzeron(const std::uint8_t* bytes,
 // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 24, 'type': 'enum',
 // 'order': 'intel', 'physical_unit': ''}
 Llc_auxiliaryfeedback_120::Llc_fbk_turnsignalType
-Llcauxiliaryfeedback120::llc_fbk_turnsignal(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 3);
+Llcauxiliaryfeedback120::llc_fbk_turnsignal(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 2);
 
   Llc_auxiliaryfeedback_120::Llc_fbk_turnsignalType ret =
@@ -279,9 +249,8 @@ Llcauxiliaryfeedback120::llc_fbk_turnsignal(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_lowbeam', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 26, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_lowbeam(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 3);
+bool Llcauxiliaryfeedback120::llc_fbk_lowbeam(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -292,9 +261,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_lowbeam(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_highbeam', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 27, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_highbeam(const std::uint8_t* bytes,
-                                               int32_t length) const {
-  Byte t0(bytes + 3);
+bool Llcauxiliaryfeedback120::llc_fbk_highbeam(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -305,9 +273,8 @@ bool Llcauxiliaryfeedback120::llc_fbk_highbeam(const std::uint8_t* bytes,
 // 0.0, 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_ledredon', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 18, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_ledredon(const std::uint8_t* bytes,
-                                               int32_t length) const {
-  Byte t0(bytes + 2);
+bool Llcauxiliaryfeedback120::llc_fbk_ledredon(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -318,9 +285,9 @@ bool Llcauxiliaryfeedback120::llc_fbk_ledredon(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_autonomybuttonpressed',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 16, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-bool Llcauxiliaryfeedback120::llc_fbk_autonomybuttonpressed(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+bool Llcauxiliaryfeedback120::llc_fbk_autonomybuttonpressed(const std::uint8_t* bytes,
+                                                            int32_t             length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;

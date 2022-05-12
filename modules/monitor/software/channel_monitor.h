@@ -20,8 +20,9 @@
 #include <unordered_map>
 
 #include "modules/dreamview/proto/hmi_mode.pb.h"
-#include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/system_status.pb.h"
+
+#include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/software/latency_monitor.h"
 
 namespace apollo {
@@ -29,14 +30,14 @@ namespace monitor {
 
 class ChannelMonitor : public RecurrentRunner {
  public:
-  explicit ChannelMonitor(
-      const std::shared_ptr<LatencyMonitor>& latency_monitor);
+  explicit ChannelMonitor(const std::shared_ptr<LatencyMonitor>& latency_monitor);
   void RunOnce(const double current_time) override;
 
  private:
-  static void UpdateStatus(
-      const apollo::dreamview::ChannelMonitorConfig& config,
-      ComponentStatus* status, const bool update_freq, const double freq);
+  static void UpdateStatus(const apollo::dreamview::ChannelMonitorConfig& config,
+                           ComponentStatus*                               status,
+                           const bool                                     update_freq,
+                           const double                                   freq);
   std::shared_ptr<LatencyMonitor> latency_monitor_;
 };
 

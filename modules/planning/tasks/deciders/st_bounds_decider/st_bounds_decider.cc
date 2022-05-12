@@ -39,25 +39,22 @@ using STBound = std::vector<STBoundPoint>;
 using ObsDecSet = std::vector<std::pair<std::string, ObjectDecisionType>>;
 }  // namespace
 
-STBoundsDecider::STBoundsDecider(
-    const TaskConfig& config,
-    const std::shared_ptr<DependencyInjector>& injector)
+STBoundsDecider::STBoundsDecider(const TaskConfig&                          config,
+                                 const std::shared_ptr<DependencyInjector>& injector)
     : Decider(config, injector) {
   ACHECK(config.has_st_bounds_decider_config());
   st_bounds_config_ = config.st_bounds_decider_config();
 }
 
-Status STBoundsDecider::Process(Frame* const frame,
-                                ReferenceLineInfo* const reference_line_info) {
+Status STBoundsDecider::Process(Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   // Initialize the related helper classes.
   InitSTBoundsDecider(*frame, reference_line_info);
 
   // Sweep the t-axis, and determine the s-boundaries step by step.
-  STBound regular_st_bound;
-  STBound regular_vt_bound;
+  STBound                                regular_st_bound;
+  STBound                                regular_vt_bound;
   std::vector<std::pair<double, double>> st_guide_line;
-  Status ret = GenerateRegularSTBound(&regular_st_bound, &regular_vt_bound,
-                                      &st_guide_line);
+  Status ret = GenerateRegularSTBound(&regular_st_bound, &regular_vt_bound, &st_guide_line);
   if (!ret.ok()) {
     ADEBUG << "Cannot generate a regular ST-boundary.";
     return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
@@ -71,36 +68,33 @@ Status STBoundsDecider::Process(Frame* const frame,
   st_graph_data->SetSTDrivableBoundary(regular_st_bound, regular_vt_bound);
 
   // Record the ST-Graph for good visualization and easy debugging.
-  auto all_st_boundaries = st_obstacles_processor_.GetAllSTBoundaries();
+  auto                    all_st_boundaries = st_obstacles_processor_.GetAllSTBoundaries();
   std::vector<STBoundary> st_boundaries;
   for (const auto& st_boundary : all_st_boundaries) {
     st_boundaries.push_back(st_boundary.second);
   }
   ADEBUG << "Total ST boundaries = " << st_boundaries.size();
-  STGraphDebug* st_graph_debug = reference_line_info->mutable_debug()
-                                     ->mutable_planning_data()
-                                     ->add_st_graph();
-  RecordSTGraphDebug(st_boundaries, regular_st_bound, st_guide_line,
-                     st_graph_debug);
+  STGraphDebug* st_graph_debug =
+      reference_line_info->mutable_debug()->mutable_planning_data()->add_st_graph();
+  RecordSTGraphDebug(st_boundaries, regular_st_bound, st_guide_line, st_graph_debug);
 
   return Status::OK();
 }
 
-void STBoundsDecider::InitSTBoundsDecider(
-    const Frame& frame, ReferenceLineInfo* const reference_line_info) {
-  const PathData& path_data = reference_line_info->path_data();
-  PathDecision* path_decision = reference_line_info->path_decision();
+void STBoundsDecider::InitSTBoundsDecider(const Frame&             frame,
+                                          ReferenceLineInfo* const reference_line_info) {
+  const PathData& path_data     = reference_line_info->path_data();
+  PathDecision*   path_decision = reference_line_info->path_decision();
 
   // Map all related obstacles onto ST-Graph.
   auto time1 = std::chrono::system_clock::now();
   st_obstacles_processor_.Init(path_data.discretized_path().Length(),
-                               st_bounds_config_.total_time(), path_data,
-                               path_decision, injector_->history());
+                               st_bounds_config_.total_time(), path_data, path_decision,
+                               injector_->history());
   st_obstacles_processor_.MapObstaclesToSTBoundaries(path_decision);
-  auto time2 = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = time2 - time1;
-  ADEBUG << "Time for ST Obstacles Processing = " << diff.count() * 1000
-         << " msec.";
+  auto                          time2 = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff  = time2 - time1;
+  ADEBUG << "Time for ST Obstacles Processing = " << diff.count() * 1000 << " msec.";
 
   // Initialize Guide-Line and Driving-Limits.
   static constexpr double desired_speed = 15.0;
@@ -108,21 +102,19 @@ void STBoundsDecider::InitSTBoundsDecider(
   // reference trajectory, use its reference speed profile to select the st
   // bounds in LaneFollow Hybrid Mode
   if (path_data.is_optimized_towards_trajectory_reference()) {
-    st_guide_line_.Init(desired_speed,
-                        injector_->learning_based_data()
-                            ->learning_data_adc_future_trajectory_points());
+    st_guide_line_.Init(
+        desired_speed,
+        injector_->learning_based_data()->learning_data_adc_future_trajectory_points());
   } else {
     st_guide_line_.Init(desired_speed);
   }
   static constexpr double max_acc = 2.5;
   static constexpr double max_dec = 5.0;
-  static constexpr double max_v = desired_speed * 1.5;
-  st_driving_limits_.Init(max_acc, max_dec, max_v,
-                          frame.PlanningStartPoint().v());
+  static constexpr double max_v   = desired_speed * 1.5;
+  st_driving_limits_.Init(max_acc, max_dec, max_v, frame.PlanningStartPoint().v());
 }
 
-Status STBoundsDecider::GenerateFallbackSTBound(STBound* const st_bound,
-                                                STBound* const vt_bound) {
+Status STBoundsDecider::GenerateFallbackSTBound(STBound* const st_bound, STBound* const vt_bound) {
   // Initialize st-boundary.
   for (double curr_t = 0.0; curr_t <= st_bounds_config_.total_time();
        curr_t += kSTBoundsDeciderResolution) {
@@ -135,35 +127,32 @@ Status STBoundsDecider::GenerateFallbackSTBound(STBound* const st_bound,
   // Sweep-line to get detailed ST-boundary.
   for (size_t i = 0; i < st_bound->size(); ++i) {
     double t, s_lower, s_upper, lower_obs_v, upper_obs_v;
-    std::tie(t, s_lower, s_upper) = st_bound->at(i);
+    std::tie(t, s_lower, s_upper)         = st_bound->at(i);
     std::tie(t, lower_obs_v, upper_obs_v) = vt_bound->at(i);
     ADEBUG << "Processing st-boundary at t = " << t;
 
     // Get Boundary due to driving limits
     auto driving_limits_bound = st_driving_limits_.GetVehicleDynamicsLimits(t);
-    s_lower = std::fmax(s_lower, driving_limits_bound.first);
-    s_upper = std::fmin(s_upper, driving_limits_bound.second);
+    s_lower                   = std::fmax(s_lower, driving_limits_bound.first);
+    s_upper                   = std::fmin(s_upper, driving_limits_bound.second);
     ADEBUG << "Bounds for s due to driving limits are "
            << "s_upper = " << s_upper << ", s_lower = " << s_lower;
 
     // Get Boundary due to obstacles
     std::vector<std::pair<double, double>> available_s_bounds;
-    std::vector<ObsDecSet> available_obs_decisions;
-    if (!st_obstacles_processor_.GetSBoundsFromDecisions(
-            t, &available_s_bounds, &available_obs_decisions)) {
-      const std::string msg =
-          "Failed to find a proper boundary due to obstacles.";
+    std::vector<ObsDecSet>                 available_obs_decisions;
+    if (!st_obstacles_processor_.GetSBoundsFromDecisions(t, &available_s_bounds,
+                                                         &available_obs_decisions)) {
+      const std::string msg = "Failed to find a proper boundary due to obstacles.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     std::vector<std::pair<STBoundPoint, ObsDecSet>> available_choices;
     ADEBUG << "Available choices are:";
     for (int j = 0; j < static_cast<int>(available_s_bounds.size()); ++j) {
-      ADEBUG << "  (" << available_s_bounds[j].first << ", "
-             << available_s_bounds[j].second << ")";
+      ADEBUG << "  (" << available_s_bounds[j].first << ", " << available_s_bounds[j].second << ")";
       available_choices.emplace_back(
-          std::make_tuple(0.0, available_s_bounds[j].first,
-                          available_s_bounds[j].second),
+          std::make_tuple(0.0, available_s_bounds[j].first, available_s_bounds[j].second),
           available_obs_decisions[j]);
     }
     RemoveInvalidDecisions(driving_limits_bound, &available_choices);
@@ -171,12 +160,11 @@ Status STBoundsDecider::GenerateFallbackSTBound(STBound* const st_bound,
     // Always go for the most conservative option.
     if (!available_choices.empty()) {
       // Select the most conservative decision.
-      auto top_choice_s_range = available_choices.front().first;
+      auto top_choice_s_range  = available_choices.front().first;
       auto top_choice_decision = available_choices.front().second;
       for (size_t j = 1; j < available_choices.size(); ++j) {
-        if (std::get<1>(available_choices[j].first) <
-            std::get<1>(top_choice_s_range)) {
-          top_choice_s_range = available_choices[j].first;
+        if (std::get<1>(available_choices[j].first) < std::get<1>(top_choice_s_range)) {
+          top_choice_s_range  = available_choices[j].first;
           top_choice_decision = available_choices[j].second;
         }
       }
@@ -185,30 +173,24 @@ Status STBoundsDecider::GenerateFallbackSTBound(STBound* const st_bound,
       bool is_limited_by_upper_obs = false;
       bool is_limited_by_lower_obs = false;
       if (s_lower < std::get<1>(top_choice_s_range)) {
-        s_lower = std::get<1>(top_choice_s_range);
+        s_lower                 = std::get<1>(top_choice_s_range);
         is_limited_by_lower_obs = true;
       }
       if (s_upper > std::get<2>(top_choice_s_range)) {
-        s_upper = std::get<2>(top_choice_s_range);
+        s_upper                 = std::get<2>(top_choice_s_range);
         is_limited_by_upper_obs = true;
       }
       st_obstacles_processor_.SetObstacleDecision(top_choice_decision);
 
       // Update st-guide-line, st-driving-limit info, and v-limits.
       std::pair<double, double> limiting_speed_info;
-      if (st_obstacles_processor_.GetLimitingSpeedInfo(t,
-                                                       &limiting_speed_info)) {
-        st_driving_limits_.UpdateBlockingInfo(
-            t, s_lower, limiting_speed_info.first, s_upper,
-            limiting_speed_info.second);
+      if (st_obstacles_processor_.GetLimitingSpeedInfo(t, &limiting_speed_info)) {
+        st_driving_limits_.UpdateBlockingInfo(t, s_lower, limiting_speed_info.first, s_upper,
+                                              limiting_speed_info.second);
         st_guide_line_.UpdateBlockingInfo(t, s_lower, true);
         st_guide_line_.UpdateBlockingInfo(t, s_upper, false);
-        if (is_limited_by_lower_obs) {
-          lower_obs_v = limiting_speed_info.first;
-        }
-        if (is_limited_by_upper_obs) {
-          upper_obs_v = limiting_speed_info.second;
-        }
+        if (is_limited_by_lower_obs) { lower_obs_v = limiting_speed_info.first; }
+        if (is_limited_by_upper_obs) { upper_obs_v = limiting_speed_info.second; }
       }
     } else {
       const std::string msg = "No valid st-boundary exists.";
@@ -225,7 +207,8 @@ Status STBoundsDecider::GenerateFallbackSTBound(STBound* const st_bound,
 }
 
 Status STBoundsDecider::GenerateRegularSTBound(
-    STBound* const st_bound, STBound* const vt_bound,
+    STBound* const                                st_bound,
+    STBound* const                                vt_bound,
     std::vector<std::pair<double, double>>* const st_guide_line) {
   // Initialize st-boundary.
   for (double curr_t = 0.0; curr_t <= st_bounds_config_.total_time();
@@ -239,55 +222,51 @@ Status STBoundsDecider::GenerateRegularSTBound(
   // Sweep-line to get detailed ST-boundary.
   for (size_t i = 0; i < st_bound->size(); ++i) {
     double t, s_lower, s_upper, lower_obs_v, upper_obs_v;
-    std::tie(t, s_lower, s_upper) = st_bound->at(i);
+    std::tie(t, s_lower, s_upper)         = st_bound->at(i);
     std::tie(t, lower_obs_v, upper_obs_v) = vt_bound->at(i);
     ADEBUG << "Processing st-boundary at t = " << t;
 
     // Get Boundary due to driving limits
     auto driving_limits_bound = st_driving_limits_.GetVehicleDynamicsLimits(t);
-    s_lower = std::fmax(s_lower, driving_limits_bound.first);
-    s_upper = std::fmin(s_upper, driving_limits_bound.second);
+    s_lower                   = std::fmax(s_lower, driving_limits_bound.first);
+    s_upper                   = std::fmin(s_upper, driving_limits_bound.second);
     ADEBUG << "Bounds for s due to driving limits are "
            << "s_upper = " << s_upper << ", s_lower = " << s_lower;
 
     // Get Boundary due to obstacles
     std::vector<std::pair<double, double>> available_s_bounds;
-    std::vector<ObsDecSet> available_obs_decisions;
-    if (!st_obstacles_processor_.GetSBoundsFromDecisions(
-            t, &available_s_bounds, &available_obs_decisions)) {
-      const std::string msg =
-          "Failed to find a proper boundary due to obstacles.";
+    std::vector<ObsDecSet>                 available_obs_decisions;
+    if (!st_obstacles_processor_.GetSBoundsFromDecisions(t, &available_s_bounds,
+                                                         &available_obs_decisions)) {
+      const std::string msg = "Failed to find a proper boundary due to obstacles.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     std::vector<std::pair<STBoundPoint, ObsDecSet>> available_choices;
     ADEBUG << "Available choices are:";
     for (int j = 0; j < static_cast<int>(available_s_bounds.size()); ++j) {
-      ADEBUG << "  (" << available_s_bounds[j].first << ", "
-             << available_s_bounds[j].second << ")";
+      ADEBUG << "  (" << available_s_bounds[j].first << ", " << available_s_bounds[j].second << ")";
       available_choices.emplace_back(
-          std::make_tuple(0.0, available_s_bounds[j].first,
-                          available_s_bounds[j].second),
+          std::make_tuple(0.0, available_s_bounds[j].first, available_s_bounds[j].second),
           available_obs_decisions[j]);
     }
     RemoveInvalidDecisions(driving_limits_bound, &available_choices);
 
     if (!available_choices.empty()) {
-      ADEBUG << "One decision needs to be made among "
-             << available_choices.size() << " choices.";
+      ADEBUG << "One decision needs to be made among " << available_choices.size() << " choices.";
       double guide_line_s = st_guide_line_.GetGuideSFromT(t);
       st_guide_line->emplace_back(t, guide_line_s);
       RankDecisions(guide_line_s, driving_limits_bound, &available_choices);
       // Select the top decision.
-      auto top_choice_s_range = available_choices.front().first;
+      auto top_choice_s_range      = available_choices.front().first;
       bool is_limited_by_upper_obs = false;
       bool is_limited_by_lower_obs = false;
       if (s_lower < std::get<1>(top_choice_s_range)) {
-        s_lower = std::get<1>(top_choice_s_range);
+        s_lower                 = std::get<1>(top_choice_s_range);
         is_limited_by_lower_obs = true;
       }
       if (s_upper > std::get<2>(top_choice_s_range)) {
-        s_upper = std::get<2>(top_choice_s_range);
+        s_upper                 = std::get<2>(top_choice_s_range);
         is_limited_by_upper_obs = true;
       }
 
@@ -297,19 +276,13 @@ Status STBoundsDecider::GenerateRegularSTBound(
 
       // Update st-guide-line, st-driving-limit info, and v-limits.
       std::pair<double, double> limiting_speed_info;
-      if (st_obstacles_processor_.GetLimitingSpeedInfo(t,
-                                                       &limiting_speed_info)) {
-        st_driving_limits_.UpdateBlockingInfo(
-            t, s_lower, limiting_speed_info.first, s_upper,
-            limiting_speed_info.second);
+      if (st_obstacles_processor_.GetLimitingSpeedInfo(t, &limiting_speed_info)) {
+        st_driving_limits_.UpdateBlockingInfo(t, s_lower, limiting_speed_info.first, s_upper,
+                                              limiting_speed_info.second);
         st_guide_line_.UpdateBlockingInfo(t, s_lower, true);
         st_guide_line_.UpdateBlockingInfo(t, s_upper, false);
-        if (is_limited_by_lower_obs) {
-          lower_obs_v = limiting_speed_info.first;
-        }
-        if (is_limited_by_upper_obs) {
-          upper_obs_v = limiting_speed_info.second;
-        }
+        if (is_limited_by_lower_obs) { lower_obs_v = limiting_speed_info.first; }
+        if (is_limited_by_upper_obs) { upper_obs_v = limiting_speed_info.second; }
       }
     } else {
       const std::string msg = "No valid st-boundary exists.";
@@ -326,19 +299,18 @@ Status STBoundsDecider::GenerateRegularSTBound(
 }
 
 void STBoundsDecider::RemoveInvalidDecisions(
-    std::pair<double, double> driving_limit,
+    std::pair<double, double>                        driving_limit,
     std::vector<std::pair<STBoundPoint, ObsDecSet>>* available_choices) {
   // Remove those choices that don't even fall within driving-limits.
   size_t i = 0;
   while (i < available_choices->size()) {
-    double s_lower = 0.0;
-    double s_upper = 0.0;
+    double s_lower                          = 0.0;
+    double s_upper                          = 0.0;
     std::tie(std::ignore, s_lower, s_upper) = available_choices->at(i).first;
     if (s_lower > driving_limit.second || s_upper < driving_limit.first) {
       // Invalid bound, should be removed.
       if (i != available_choices->size() - 1) {
-        swap(available_choices->at(i),
-             available_choices->at(available_choices->size() - 1));
+        swap(available_choices->at(i), available_choices->at(available_choices->size() - 1));
       }
       available_choices->pop_back();
     } else {
@@ -349,33 +321,30 @@ void STBoundsDecider::RemoveInvalidDecisions(
 }
 
 void STBoundsDecider::RankDecisions(
-    double s_guide_line, std::pair<double, double> driving_limit,
+    double                                           s_guide_line,
+    std::pair<double, double>                        driving_limit,
     std::vector<std::pair<STBoundPoint, ObsDecSet>>* available_choices) {
   // Perform sorting of the existing decisions.
   bool has_swaps = true;
   while (has_swaps) {
     has_swaps = false;
     for (int i = 0; i < static_cast<int>(available_choices->size()) - 1; ++i) {
-      double A_s_lower = 0.0;
-      double A_s_upper = 0.0;
-      std::tie(std::ignore, A_s_lower, A_s_upper) =
-          available_choices->at(i).first;
-      double B_s_lower = 0.0;
-      double B_s_upper = 0.0;
-      std::tie(std::ignore, B_s_lower, B_s_upper) =
-          available_choices->at(i + 1).first;
+      double A_s_lower                            = 0.0;
+      double A_s_upper                            = 0.0;
+      std::tie(std::ignore, A_s_lower, A_s_upper) = available_choices->at(i).first;
+      double B_s_lower                            = 0.0;
+      double B_s_upper                            = 0.0;
+      std::tie(std::ignore, B_s_lower, B_s_upper) = available_choices->at(i + 1).first;
 
-      ADEBUG << "    Range ranking: A has s_upper = " << A_s_upper
-             << ", s_lower = " << A_s_lower;
-      ADEBUG << "    Range ranking: B has s_upper = " << B_s_upper
-             << ", s_lower = " << B_s_lower;
+      ADEBUG << "    Range ranking: A has s_upper = " << A_s_upper << ", s_lower = " << A_s_lower;
+      ADEBUG << "    Range ranking: B has s_upper = " << B_s_upper << ", s_lower = " << B_s_lower;
 
       // If not both are larger than passable-threshold, should select
       // the one with larger room.
-      double A_room = std::fmin(driving_limit.second, A_s_upper) -
-                      std::fmax(driving_limit.first, A_s_lower);
-      double B_room = std::fmin(driving_limit.second, B_s_upper) -
-                      std::fmax(driving_limit.first, B_s_lower);
+      double A_room =
+          std::fmin(driving_limit.second, A_s_upper) - std::fmax(driving_limit.first, A_s_lower);
+      double B_room =
+          std::fmin(driving_limit.second, B_s_upper) - std::fmax(driving_limit.first, B_s_lower);
       if (A_room < kSTPassableThreshold || B_room < kSTPassableThreshold) {
         if (A_room < B_room) {
           swap(available_choices->at(i + 1), available_choices->at(i));
@@ -386,10 +355,8 @@ void STBoundsDecider::RankDecisions(
       }
 
       // Should select the one with overlap to guide-line
-      bool A_contains_guideline =
-          A_s_upper >= s_guide_line && A_s_lower <= s_guide_line;
-      bool B_contains_guideline =
-          B_s_upper >= s_guide_line && B_s_lower <= s_guide_line;
+      bool A_contains_guideline = A_s_upper >= s_guide_line && A_s_lower <= s_guide_line;
+      bool B_contains_guideline = B_s_upper >= s_guide_line && B_s_lower <= s_guide_line;
       if (A_contains_guideline != B_contains_guideline) {
         if (!A_contains_guideline) {
           swap(available_choices->at(i + 1), available_choices->at(i));
@@ -403,9 +370,10 @@ void STBoundsDecider::RankDecisions(
 }
 
 void STBoundsDecider::RecordSTGraphDebug(
-    const std::vector<STBoundary>& st_graph_data, const STBound& st_bound,
+    const std::vector<STBoundary>&                st_graph_data,
+    const STBound&                                st_bound,
     const std::vector<std::pair<double, double>>& st_guide_line,
-    planning_internal::STGraphDebug* const st_graph_debug) {
+    planning_internal::STGraphDebug* const        st_graph_debug) {
   if (!FLAGS_enable_record_debug || !st_graph_debug) {
     ADEBUG << "Skip record debug info";
     return;
@@ -436,21 +404,20 @@ void STBoundsDecider::RecordSTGraphDebug(
   // Plot the chosen ST boundary.
   auto boundary_debug = st_graph_debug->add_boundary();
   boundary_debug->set_name("Generated ST-Boundary");
-  boundary_debug->set_type(
-      StGraphBoundaryDebug::ST_BOUNDARY_TYPE_DRIVABLE_REGION);
+  boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_DRIVABLE_REGION);
   for (const auto& st_bound_pt : st_bound) {
-    auto point_debug = boundary_debug->add_point();
-    double t = 0.0;
-    double s_lower = 0.0;
+    auto   point_debug                = boundary_debug->add_point();
+    double t                          = 0.0;
+    double s_lower                    = 0.0;
     std::tie(t, s_lower, std::ignore) = st_bound_pt;
     point_debug->set_t(t);
     point_debug->set_s(s_lower);
     ADEBUG << "(" << t << ", " << s_lower << ")";
   }
   for (int i = static_cast<int>(st_bound.size()) - 1; i >= 0; --i) {
-    auto point_debug = boundary_debug->add_point();
-    double t = 0.0;
-    double s_upper = 0.0;
+    auto   point_debug                = boundary_debug->add_point();
+    double t                          = 0.0;
+    double s_upper                    = 0.0;
     std::tie(t, std::ignore, s_upper) = st_bound[i];
     point_debug->set_t(t);
     point_debug->set_s(s_upper);

@@ -19,9 +19,10 @@
 #include <memory>
 #include <unordered_map>
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -45,13 +46,13 @@ class ScenarioManager final {
  private:
   void Observe(const Frame& frame);
 
-  std::unique_ptr<Scenario> CreateScenario(
-      ScenarioConfig::ScenarioType scenario_type);
+  std::unique_ptr<Scenario> CreateScenario(ScenarioConfig::ScenarioType scenario_type);
 
   void RegisterScenarios();
 
-  ScenarioConfig::ScenarioType SelectBareIntersectionScenario(
-      const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap);
+  ScenarioConfig::ScenarioType
+  SelectBareIntersectionScenario(const Frame&              frame,
+                                 const hdmap::PathOverlap& pnc_junction_overlap);
 
   ScenarioConfig::ScenarioType SelectPullOverScenario(const Frame& frame);
 
@@ -59,71 +60,66 @@ class ScenarioManager final {
 
   ScenarioConfig::ScenarioType SelectInterceptionScenario(const Frame& frame);
 
-  ScenarioConfig::ScenarioType SelectStopSignScenario(
-      const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap);
+  ScenarioConfig::ScenarioType SelectStopSignScenario(const Frame&              frame,
+                                                      const hdmap::PathOverlap& stop_sign_overlap);
 
-  ScenarioConfig::ScenarioType SelectTrafficLightScenario(
-      const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap);
+  ScenarioConfig::ScenarioType
+  SelectTrafficLightScenario(const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap);
 
   ScenarioConfig::ScenarioType SelectValetParkingScenario(const Frame& frame);
 
   ScenarioConfig::ScenarioType SelectDeadEndScenario(const Frame& frame);
 
-  ScenarioConfig::ScenarioType SelectYieldSignScenario(
-      const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap);
+  ScenarioConfig::ScenarioType
+  SelectYieldSignScenario(const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap);
 
   ScenarioConfig::ScenarioType SelectParkAndGoScenario(const Frame& frame);
 
-  void ScenarioDispatch(const Frame& frame);
+  void                         ScenarioDispatch(const Frame& frame);
   ScenarioConfig::ScenarioType ScenarioDispatchLearning();
   ScenarioConfig::ScenarioType ScenarioDispatchNonLearning(const Frame& frame);
 
-  bool IsBareIntersectionScenario(
-      const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsBareIntersectionScenario(const ScenarioConfig::ScenarioType& scenario_type);
   bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
-  bool IsTrafficLightScenario(
-      const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsTrafficLightScenario(const ScenarioConfig::ScenarioType& scenario_type);
   bool IsYieldSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContext(const Frame& frame,
-                             const ScenarioConfig::ScenarioType& scenario_type);
+  void UpdatePlanningContext(const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContextBareIntersectionScenario(
-      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+  void
+  UpdatePlanningContextBareIntersectionScenario(const Frame&                        frame,
+                                                const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContextEmergencyStopcenario(
-      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+  void UpdatePlanningContextEmergencyStopcenario(const Frame&                        frame,
+                                                 const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContextPullOverScenario(
-      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+  void UpdatePlanningContextPullOverScenario(const Frame&                        frame,
+                                             const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContextStopSignScenario(
-      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+  void UpdatePlanningContextStopSignScenario(const Frame&                        frame,
+                                             const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContextTrafficLightScenario(
-      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+  void UpdatePlanningContextTrafficLightScenario(const Frame&                        frame,
+                                                 const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContextYieldSignScenario(
-      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+  void UpdatePlanningContextYieldSignScenario(const Frame&                        frame,
+                                              const ScenarioConfig::ScenarioType& scenario_type);
 
   bool JudgeReachTargetPoint(const common::VehicleState& car_position,
-                             const common::PointENU& target_point);
+                             const common::PointENU&     target_point);
 
  private:
-  std::shared_ptr<DependencyInjector> injector_;
-  PlanningConfig planning_config_;
-  std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
-                     std::hash<int>>
-      config_map_;
-  std::unique_ptr<Scenario> current_scenario_;
+  std::shared_ptr<DependencyInjector>                                              injector_;
+  PlanningConfig                                                                   planning_config_;
+  std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig, std::hash<int>> config_map_;
+  std::unique_ptr<Scenario>    current_scenario_;
   ScenarioConfig::ScenarioType default_scenario_type_;
-  ScenarioContext scenario_context_;
-  std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap,
-                     std::hash<int>>
-      first_encountered_overlap_map_;
-  bool routing_in_flag_ = true;
+  ScenarioContext              scenario_context_;
+  std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap, std::hash<int>>
+                   first_encountered_overlap_map_;
+  bool             routing_in_flag_ = true;
   common::PointENU dead_end_point_;
-  bool reach_target_pose_ = false;
+  bool             reach_target_pose_ = false;
 };
 
 }  // namespace scenario

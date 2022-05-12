@@ -55,10 +55,10 @@
 
 #include "Eigen/Core"
 
+#include "modules/drivers/proto/conti_radar.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-
-#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
@@ -74,7 +74,7 @@ struct PreprocessorOptions {
 
 class BasePreprocessor {
  public:
-  BasePreprocessor() = default;
+  BasePreprocessor()          = default;
   virtual ~BasePreprocessor() = default;
 
   virtual bool Init() = 0;
@@ -85,7 +85,7 @@ class BasePreprocessor {
   // @param [out]: corrected radar obstacles
   virtual bool Preprocess(const drivers::ContiRadar& raw_obstacles,
                           const PreprocessorOptions& options,
-                          drivers::ContiRadar* corrected_obstacles) = 0;
+                          drivers::ContiRadar*       corrected_obstacles) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -94,8 +94,7 @@ class BasePreprocessor {
 };
 
 PERCEPTION_REGISTER_REGISTERER(BasePreprocessor);
-#define PERCEPTION_REGISTER_PREPROCESSOR(name) \
-  PERCEPTION_REGISTER_CLASS(BasePreprocessor, name)
+#define PERCEPTION_REGISTER_PREPROCESSOR(name) PERCEPTION_REGISTER_CLASS(BasePreprocessor, name)
 
 }  // namespace radar
 }  // namespace perception

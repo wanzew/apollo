@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "modules/planning/scenarios/dead_end/deadend_turnaround/deadend_turnaround_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
@@ -32,25 +33,22 @@ namespace deadend_turnaround {
 
 class StageApproachingTurningPoint : public Stage {
  public:
-  StageApproachingTurningPoint(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  StageApproachingTurningPoint(const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+                             Frame*                         frame) override;
 
-  DeadEndTurnAroundContext* GetContext() {
-    return GetContextAs<DeadEndTurnAroundContext>();
-  }
+  DeadEndTurnAroundContext* GetContext() { return GetContextAs<DeadEndTurnAroundContext>(); }
 
   bool CheckADCStop(const Frame& frame);
 
  private:
   ScenarioDeadEndTurnAroundConfig scenario_config_;
-  routing::RoutingRequest routing_request_in_;
-  bool routing_in_flag_ = true;
+  routing::RoutingRequest         routing_request_in_;
+  bool                            routing_in_flag_ = true;
 };
 
 }  // namespace deadend_turnaround

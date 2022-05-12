@@ -61,12 +61,12 @@ TEST(AsyncTest, create_task) {
   task_1.get();
 
   Message msg;
-  auto task_2 = Async(&Task2, msg);
+  auto    task_2 = Async(&Task2, msg);
   task_2.get();
 
   auto shared_msg = std::make_shared<Message>();
-  shared_msg->id = 1;
-  auto task_3 = Async(&Task3, shared_msg);
+  shared_msg->id  = 1;
+  auto task_3     = Async(&Task3, shared_msg);
   EXPECT_EQ(task_3.get(), 1);
 }
 
@@ -80,11 +80,11 @@ TEST(AsyncTest, batch_run) {
     result.get();
   }
 
-  int loop = 10;
+  int                                loop = 10;
   std::vector<std::future<uint64_t>> int_results;
   for (int i = 0; i < loop; i++) {
     auto shared_msg = std::make_shared<Message>();
-    shared_msg->id = i;
+    shared_msg->id  = i;
     int_results.push_back(Async(&Task3, shared_msg));
   }
 

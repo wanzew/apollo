@@ -56,7 +56,6 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-
 #include "modules/perception/base/frame.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
@@ -67,16 +66,17 @@ namespace radar {
 struct TrackerOptions {};
 class BaseTracker {
  public:
-  BaseTracker() : name_("BaseTracker") {}
+  BaseTracker()
+      : name_("BaseTracker") {}
   virtual ~BaseTracker() = default;
-  virtual bool Init() = 0;
+  virtual bool Init()    = 0;
   // @brief: tracking objects.
   // @param [in]: current object frame.
   // @param [in]: options.
   // @param [out]: current tracked objects frame.
-  virtual bool Track(const base::Frame &detected_frame,
-                     const TrackerOptions &options,
-                     base::FramePtr tracked_frame) = 0;
+  virtual bool        Track(const base::Frame&    detected_frame,
+                            const TrackerOptions& options,
+                            base::FramePtr        tracked_frame) = 0;
   virtual std::string Name() { return name_; }
 
  protected:
@@ -86,8 +86,7 @@ class BaseTracker {
   DISALLOW_COPY_AND_ASSIGN(BaseTracker);
 };
 PERCEPTION_REGISTER_REGISTERER(BaseTracker);
-#define PERCEPTION_REGISTER_TRACKER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseTracker, name)
+#define PERCEPTION_REGISTER_TRACKER(name) PERCEPTION_REGISTER_CLASS(BaseTracker, name)
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo

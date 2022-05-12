@@ -32,24 +32,19 @@ namespace planning {
 class Decider : public Task {
  public:
   explicit Decider(const TaskConfig& config);
-  Decider(const TaskConfig& config,
-          const std::shared_ptr<DependencyInjector>& injector);
+  Decider(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector);
   virtual ~Decider() = default;
 
-  apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
   apollo::common::Status Execute(Frame* frame) override;
 
  protected:
-  virtual apollo::common::Status Process(
-      Frame* frame, ReferenceLineInfo* reference_line_info) {
+  virtual apollo::common::Status Process(Frame* frame, ReferenceLineInfo* reference_line_info) {
     return apollo::common::Status::OK();
   }
 
-  virtual apollo::common::Status Process(Frame* frame) {
-    return apollo::common::Status::OK();
-  }
+  virtual apollo::common::Status Process(Frame* frame) { return apollo::common::Status::OK(); }
 };
 
 }  // namespace planning

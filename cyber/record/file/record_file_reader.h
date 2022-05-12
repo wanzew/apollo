@@ -18,12 +18,12 @@
 #define CYBER_RECORD_FILE_RECORD_FILE_READER_H_
 
 #include <fstream>
+#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
-#include <limits>
 #include "google/protobuf/io/coded_stream.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/message.h"
@@ -44,7 +44,7 @@ using google::protobuf::io::ZeroCopyInputStream;
 
 class RecordFileReader : public RecordFileBase {
  public:
-  RecordFileReader() = default;
+  RecordFileReader()          = default;
   virtual ~RecordFileReader() = default;
   bool Open(const std::string& path) override;
   void Close() override;
@@ -63,13 +63,12 @@ class RecordFileReader : public RecordFileBase {
 
 template <typename T>
 bool RecordFileReader::ReadSection(int64_t size, T* message) {
-  if (size < std::numeric_limits<int>::min() ||
-      size > std::numeric_limits<int>::max()) {
+  if (size < std::numeric_limits<int>::min() || size > std::numeric_limits<int>::max()) {
     AERROR << "Size value greater than the range of int value.";
     return false;
   }
-  FileInputStream raw_input(fd_, static_cast<int>(size));
-  CodedInputStream coded_input(&raw_input);
+  FileInputStream         raw_input(fd_, static_cast<int>(size));
+  CodedInputStream        coded_input(&raw_input);
   CodedInputStream::Limit limit = coded_input.PushLimit(static_cast<int>(size));
   if (!message->ParseFromCodedStream(&coded_input)) {
     AERROR << "Parse section message failed.";

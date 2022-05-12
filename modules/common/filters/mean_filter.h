@@ -65,21 +65,21 @@ class MeanFilter {
   double Update(const double measurement);
 
  private:
-  void RemoveEarliest();
-  void Insert(const double value);
-  double GetMin() const;
-  double GetMax() const;
-  bool ShouldPopOldestCandidate(const std::uint_fast8_t old_time) const;
+  void              RemoveEarliest();
+  void              Insert(const double value);
+  double            GetMin() const;
+  double            GetMax() const;
+  bool              ShouldPopOldestCandidate(const std::uint_fast8_t old_time) const;
   std::uint_fast8_t window_size_ = 0;
-  double sum_ = 0.0;
-  std::uint_fast8_t time_ = 0;
+  double            sum_         = 0.0;
+  std::uint_fast8_t time_        = 0;
   // front = earliest
   std::deque<double> values_;
   // front = min
   std::deque<std::pair<std::uint_fast8_t, double>> min_candidates_;
   // front = max
   std::deque<std::pair<std::uint_fast8_t, double>> max_candidates_;
-  bool initialized_ = false;
+  bool                                             initialized_ = false;
 };
 
 }  // namespace common

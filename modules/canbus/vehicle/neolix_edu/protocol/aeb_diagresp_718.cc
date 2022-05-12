@@ -30,8 +30,9 @@ using ::apollo::drivers::canbus::Byte;
 Aebdiagresp718::Aebdiagresp718() {}
 const int32_t Aebdiagresp718::ID = 0x718;
 
-void Aebdiagresp718::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
+void Aebdiagresp718::Parse(const std::uint8_t* bytes,
+                           int32_t             length,
+                           ChassisDetail*      chassis) const {
   chassis->mutable_neolix_edu()->mutable_aeb_diagresp_718()->set_aeb_diagresp(
       aeb_diagresp(bytes, length));
 }
@@ -39,9 +40,8 @@ void Aebdiagresp718::Parse(const std::uint8_t* bytes, int32_t length,
 // config detail: {'name': 'aeb_diagresp', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0.0|1.0]', 'bit': 0,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': 'bit'}
-bool Aebdiagresp718::aeb_diagresp(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 0);
+bool Aebdiagresp718::aeb_diagresp(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;

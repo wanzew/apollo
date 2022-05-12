@@ -19,10 +19,12 @@
 #include <limits>
 #include <string>
 
+#include "opencv2/opencv.hpp"
+
+#include "modules/common/proto/geometry.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/proto/geometry.pb.h"
-#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace dreamview {
@@ -34,35 +36,34 @@ using apollo::localization::Pose;
 using apollo::transform::TransformStamped;
 
 namespace {
-void ConvertMatrixToArray(const Eigen::Matrix4d &matrix,
-                          std::vector<double> *array) {
-  const double *pointer = matrix.data();
+void ConvertMatrixToArray(const Eigen::Matrix4d& matrix, std::vector<double>* array) {
+  const double* pointer = matrix.data();
   for (int i = 0; i < matrix.size(); ++i) {
     array->push_back(pointer[i]);
   }
 }
 
 template <typename Point>
-void ConstructTransformationMatrix(const Quaternion &quaternion,
-                                   const Point &translation,
-                                   Eigen::Matrix4d *matrix) {
+void ConstructTransformationMatrix(const Quaternion& quaternion,
+                                   const Point&      translation,
+                                   Eigen::Matrix4d*  matrix) {
   matrix->setConstant(0);
   Eigen::Quaterniond q;
-  q.x() = quaternion.qx();
-  q.y() = quaternion.qy();
-  q.z() = quaternion.qz();
-  q.w() = quaternion.qw();
+  q.x()                     = quaternion.qx();
+  q.y()                     = quaternion.qy();
+  q.z()                     = quaternion.qz();
+  q.w()                     = quaternion.qw();
   matrix->block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
-  (*matrix)(0, 3) = translation.x();
-  (*matrix)(1, 3) = translation.y();
-  (*matrix)(2, 3) = translation.z();
-  (*matrix)(3, 3) = 1;
+  (*matrix)(0, 3)           = translation.x();
+  (*matrix)(1, 3)           = translation.y();
+  (*matrix)(2, 3)           = translation.z();
+  (*matrix)(3, 3)           = 1;
 }
 }  // namespace
 
-PerceptionCameraUpdater::PerceptionCameraUpdater(WebSocketHandler *websocket)
-    : websocket_(websocket),
-      node_(cyber::CreateNode("perception_camera_updater")) {
+PerceptionCameraUpdater::PerceptionCameraUpdater(WebSocketHandler* websocket)
+    : websocket_(websocket)
+    , node_(cyber::CreateNode("perception_camera_updater")) {
   InitReaders();
 }
 
@@ -78,8 +79,7 @@ void PerceptionCameraUpdater::Stop() {
   enabled_ = false;
 }
 
-void PerceptionCameraUpdater::GetImageLocalization(
-    std::vector<double> *localization) {
+void PerceptionCameraUpdater::GetImageLocalization(std::vector<double>* localization) {
   if (localization_queue_.empty()) {
     AERROR << "Localization queue is empty, cannot get localization for image,"
            << "image_timestamp: " << current_image_timestamp_;
@@ -87,13 +87,13 @@ void PerceptionCameraUpdater::GetImageLocalization(
   }
 
   double timestamp_diff = std::numeric_limits<double>::max();
-  Pose image_pos;
+  Pose   image_pos;
   while (!localization_queue_.empty()) {
-    const double tmp_diff = localization_queue_.front()->measurement_time() -
-                            current_image_timestamp_;
+    const double tmp_diff =
+        localization_queue_.front()->measurement_time() - current_image_timestamp_;
     if (tmp_diff < 0) {
       timestamp_diff = tmp_diff;
-      image_pos = localization_queue_.front()->pose();
+      image_pos      = localization_queue_.front()->pose();
       if (localization_queue_.size() > 1) {
         localization_queue_.pop_front();
       } else {
@@ -102,9 +102,7 @@ void PerceptionCameraUpdater::GetImageLocalization(
         break;
       }
     } else {
-      if (tmp_diff < std::fabs(timestamp_diff)) {
-        image_pos = localization_queue_.front()->pose();
-      }
+      if (tmp_diff < std::fabs(timestamp_diff)) { image_pos = localization_queue_.front()->pose(); }
       break;
     }
   }
@@ -115,9 +113,9 @@ void PerceptionCameraUpdater::GetImageLocalization(
   ConvertMatrixToArray(localization_matrix, localization);
 }
 
-bool PerceptionCameraUpdater::QueryStaticTF(const std::string &frame_id,
-                                            const std::string &child_frame_id,
-                                            Eigen::Matrix4d *matrix) {
+bool PerceptionCameraUpdater::QueryStaticTF(const std::string& frame_id,
+                                            const std::string& child_frame_id,
+                                            Eigen::Matrix4d*   matrix) {
   TransformStamped transform;
   if (tf_buffer_->GetLatestStaticTF(frame_id, child_frame_id, &transform)) {
     ConstructTransformationMatrix(transform.transform().rotation(),
@@ -128,7 +126,7 @@ bool PerceptionCameraUpdater::QueryStaticTF(const std::string &frame_id,
 }
 
 void PerceptionCameraUpdater::GetLocalization2CameraTF(
-    std::vector<double> *localization2camera_tf) {
+    std::vector<double>* localization2camera_tf) {
   Eigen::Matrix4d localization2camera_mat = Eigen::Matrix4d::Identity();
 
   // Since "/tf" topic has dynamic updates of world->novatel and
@@ -153,18 +151,14 @@ void PerceptionCameraUpdater::GetLocalization2CameraTF(
   ConvertMatrixToArray(localization2camera_mat, localization2camera_tf);
 }
 
-void PerceptionCameraUpdater::OnImage(
-    const std::shared_ptr<CompressedImage> &compressed_image) {
-  if (!enabled_ ||
-      compressed_image->format() == "h265" /* skip video format */) {
-    return;
-  }
+void PerceptionCameraUpdater::OnImage(const std::shared_ptr<CompressedImage>& compressed_image) {
+  if (!enabled_ || compressed_image->format() == "h265" /* skip video format */) { return; }
 
   std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
                                            compressed_image->data().end());
-  cv::Mat mat_image = cv::imdecode(compressed_raw_data, cv::IMREAD_COLOR);
-  const int width = mat_image.cols;
-  const int height = mat_image.rows;
+  cv::Mat              mat_image = cv::imdecode(compressed_raw_data, cv::IMREAD_COLOR);
+  const int            width     = mat_image.cols;
+  const int            height    = mat_image.rows;
 
   // Scale down image size properly to reduce data transfer latency through
   // websocket and ensure image quality is acceptable meanwhile
@@ -194,10 +188,8 @@ void PerceptionCameraUpdater::OnImage(
 }
 
 void PerceptionCameraUpdater::OnLocalization(
-    const std::shared_ptr<LocalizationEstimate> &localization) {
-  if (!enabled_) {
-    return;
-  }
+    const std::shared_ptr<LocalizationEstimate>& localization) {
+  if (!enabled_) { return; }
 
   std::lock_guard<std::mutex> lock(localization_mutex_);
   localization_queue_.push_back(localization);
@@ -206,18 +198,15 @@ void PerceptionCameraUpdater::OnLocalization(
 void PerceptionCameraUpdater::InitReaders() {
   node_->CreateReader<CompressedImage>(
       FLAGS_image_short_topic,
-      [this](const std::shared_ptr<CompressedImage> &image) {
-        OnImage(image);
-      });
+      [this](const std::shared_ptr<CompressedImage>& image) { OnImage(image); });
 
   node_->CreateReader<LocalizationEstimate>(
-      FLAGS_localization_topic,
-      [this](const std::shared_ptr<LocalizationEstimate> &localization) {
+      FLAGS_localization_topic, [this](const std::shared_ptr<LocalizationEstimate>& localization) {
         OnLocalization(localization);
       });
 }
 
-void PerceptionCameraUpdater::GetUpdate(std::string *camera_update) {
+void PerceptionCameraUpdater::GetUpdate(std::string* camera_update) {
   {
     std::lock(image_mutex_, localization_mutex_);
     std::lock_guard<std::mutex> lock1(image_mutex_, std::adopt_lock);
@@ -225,12 +214,11 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update) {
 
     std::vector<double> localization;
     GetImageLocalization(&localization);
-    *camera_update_.mutable_localization() = {localization.begin(),
-                                              localization.end()};
+    *camera_update_.mutable_localization() = {localization.begin(), localization.end()};
     std::vector<double> localization2camera_tf;
     GetLocalization2CameraTF(&localization2camera_tf);
-    *camera_update_.mutable_localization2camera_tf() = {
-        localization2camera_tf.begin(), localization2camera_tf.end()};
+    *camera_update_.mutable_localization2camera_tf() = {localization2camera_tf.begin(),
+                                                        localization2camera_tf.end()};
     // Concurrently modify protobuf msg can cause ByteSizeConsistencyError
     // when serializing, so we need lock.
     camera_update_.SerializeToString(camera_update);

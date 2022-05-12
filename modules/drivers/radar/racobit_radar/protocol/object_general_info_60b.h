@@ -16,8 +16,9 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
+
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace drivers {
@@ -25,13 +26,11 @@ namespace racobit_radar {
 
 using apollo::drivers::RacobitRadar;
 
-class ObjectGeneralInfo60B
-    : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
+class ObjectGeneralInfo60B : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
  public:
   static const uint32_t ID;
   ObjectGeneralInfo60B();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             RacobitRadar* racobit_radar) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, RacobitRadar* racobit_radar) const override;
 
  private:
   int object_id(const std::uint8_t* bytes, int32_t length) const;

@@ -44,12 +44,12 @@ class BaseTracker {
   // @param [in/out]: track
   virtual void UpdateWithMeasurement(const TrackerOptions& options,
                                      const SensorObjectPtr measurement,
-                                     double target_timestamp) = 0;
+                                     double                target_timestamp) = 0;
 
   virtual void UpdateWithoutMeasurement(const TrackerOptions& options,
-                                        const std::string& sensor_id,
-                                        double measurement_timestamp,
-                                        double target_timestamp) = 0;
+                                        const std::string&    sensor_id,
+                                        double                measurement_timestamp,
+                                        double                target_timestamp) = 0;
 
   virtual std::string Name() const = 0;
 

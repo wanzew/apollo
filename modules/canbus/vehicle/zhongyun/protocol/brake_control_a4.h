@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class Brakecontrola4 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Brakecontrola4
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -46,8 +47,8 @@ class Brakecontrola4 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  Brakecontrola4* set_brake_enable_control(
-      Brake_control_a4::Brake_enable_controlType brake_enable_control);
+  Brakecontrola4*
+  set_brake_enable_control(Brake_control_a4::Brake_enable_controlType brake_enable_control);
 
  private:
   // config detail: {'name': 'brake_torque', 'offset': 0.0, 'precision': 0.05,
@@ -60,12 +61,11 @@ class Brakecontrola4 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  void set_p_brake_enable_control(
-      uint8_t* data,
-      Brake_control_a4::Brake_enable_controlType brake_enable_control);
+  void set_p_brake_enable_control(uint8_t*                                   data,
+                                  Brake_control_a4::Brake_enable_controlType brake_enable_control);
 
  private:
-  double brake_torque_;
+  double                                     brake_torque_;
   Brake_control_a4::Brake_enable_controlType brake_enable_control_;
 };
 

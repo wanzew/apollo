@@ -16,9 +16,10 @@
 
 #include "modules/planning/common/speed/st_boundary.h"
 
-#include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -64,10 +65,10 @@ TEST(StBoundaryTest, boundary_range) {
   STBoundary boundary(point_pairs);
 
   boundary.SetBoundaryType(STBoundary::BoundaryType::YIELD);
-  double t = -10.0;
+  double       t  = -10.0;
   const double dt = 0.01;
   while (t < 10.0) {
-    double low = 0.0;
+    double low  = 0.0;
     double high = 0.0;
     if (t < 0.0) {
       EXPECT_TRUE(boundary.GetUnblockSRange(t, &high, &low));
@@ -104,21 +105,18 @@ TEST(StBoundaryTest, get_index_range) {
 
   STBoundary boundary(point_pairs);
 
-  size_t left = 0;
+  size_t left  = 0;
   size_t right = 0;
 
-  EXPECT_TRUE(
-      boundary.GetIndexRange(lower_points, -517957.08587679861, &left, &right));
+  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517957.08587679861, &left, &right));
   EXPECT_EQ(left, 0);
   EXPECT_EQ(right, 0);
 
-  EXPECT_TRUE(
-      boundary.GetIndexRange(lower_points, -517955.58587660792, &left, &right));
+  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517955.58587660792, &left, &right));
   EXPECT_EQ(left, 0);
   EXPECT_EQ(right, 1);
 
-  EXPECT_TRUE(
-      boundary.GetIndexRange(lower_points, -517955.58587660792, &left, &right));
+  EXPECT_TRUE(boundary.GetIndexRange(lower_points, -517955.58587660792, &left, &right));
   EXPECT_EQ(left, 0);
   EXPECT_EQ(right, 1);
 

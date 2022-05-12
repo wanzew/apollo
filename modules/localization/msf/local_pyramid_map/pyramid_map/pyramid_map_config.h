@@ -16,6 +16,7 @@
 #pragma once
 
 #include <string>
+
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
 namespace apollo {
@@ -28,15 +29,15 @@ class PyramidMapConfig : public BaseMapConfig {
   explicit PyramidMapConfig(const std::string& map_version);
   ~PyramidMapConfig();
 
-  bool has_intensity_ = true;
-  bool has_intensity_var_ = true;
-  bool has_altitude_ = true;
-  bool has_altitude_var_ = true;
-  bool has_ground_altitude_ = true;
-  bool has_count_ = true;
-  bool has_ground_count_ = true;
-  unsigned int resolution_num_ = 1;
-  unsigned int resolution_ratio_ = 2;
+  bool         has_intensity_       = true;
+  bool         has_intensity_var_   = true;
+  bool         has_altitude_        = true;
+  bool         has_altitude_var_    = true;
+  bool         has_ground_altitude_ = true;
+  bool         has_count_           = true;
+  bool         has_ground_count_    = true;
+  unsigned int resolution_num_      = 1;
+  unsigned int resolution_ratio_    = 2;
   /**@brief coordinate type. */
   std::string coordinate_type_ = "";
   /**@brief During the visualization (for example, Call the function get_image()

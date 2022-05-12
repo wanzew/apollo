@@ -21,7 +21,8 @@ namespace localization {
 namespace msf {
 namespace pyramid_map {
 
-NdtMap::NdtMap(NdtMapConfig* config) : BaseMap(config) {}
+NdtMap::NdtMap(NdtMapConfig* config)
+    : BaseMap(config) {}
 
 NdtMap::~NdtMap() {}
 

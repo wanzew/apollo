@@ -35,32 +35,30 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-static const char NormalNMS[] = "NormalNMS";
-static const char LinearSoftNMS[] = "LinearSoftNMS";
+static const char NormalNMS[]       = "NormalNMS";
+static const char LinearSoftNMS[]   = "LinearSoftNMS";
 static const char GuassianSoftNMS[] = "GuassianSoftNMS";
-static const char BoxVote[] = "BoxVote";
-static const int kBoxBlockSize = 32;
-static const int kMaxObjSize = 1000;
+static const char BoxVote[]         = "BoxVote";
+static const int  kBoxBlockSize     = 32;
+static const int  kMaxObjSize       = 1000;
 
 struct NormalizedBBox {
-  float xmin = -1;
-  float ymin = -1;
-  float xmax = -1;
-  float ymax = -1;
-  int label = -1;
+  float xmin  = -1;
+  float ymin  = -1;
+  float xmax  = -1;
+  float ymax  = -1;
+  int   label = -1;
   float score = -1;
-  float size = -1;
-  bool mask = false;
+  float size  = -1;
+  bool  mask  = false;
 
-  bool operator()(NormalizedBBox i, NormalizedBBox j) {
-    return i.score < j.score;
-  }
+  bool operator()(NormalizedBBox i, NormalizedBBox j) { return i.score < j.score; }
 };
 
 struct BBox3D {
-  float h = -1;
-  float w = -1;
-  float l = -1;
+  float h     = -1;
+  float w     = -1;
+  float l     = -1;
   float alpha = -1;
 };
 
@@ -69,10 +67,10 @@ struct AnchorBox {
   float h;
 };
 struct NMSParam {
-  float threshold;
-  float inter_cls_nms_thresh;
-  float inter_cls_conf_thresh;
-  float sigma;
+  float       threshold;
+  float       inter_cls_nms_thresh;
+  float       inter_cls_conf_thresh;
+  float       sigma;
   std::string type = BoxVote;
 };
 struct YoloBlobs {
@@ -115,106 +113,120 @@ struct MinDims {
   float min_2d_height = 0.0f;
   float min_3d_height = 0.0f;
   float min_3d_length = 0.0f;
-  float min_3d_width = 0.0f;
+  float min_3d_width  = 0.0f;
 };
 
-constexpr float minExpPower = -10.0f;
-constexpr float maxExpPower = 5.0f;
-constexpr int anchorSizeFactor = 2;
-constexpr int numScales = 3;
+constexpr float minExpPower      = -10.0f;
+constexpr float maxExpPower      = 5.0f;
+constexpr int   anchorSizeFactor = 2;
+constexpr int   numScales        = 3;
 
 __host__ __device__ float sigmoid_gpu(float x);
-__host__ __device__ float bbox_size_gpu(const float *bbox,
-                                        const bool normalized);
-__host__ __device__ float jaccard_overlap_gpu(const float *bbox1,
-                                              const float *bbox2);
+__host__ __device__ float bbox_size_gpu(const float* bbox, const bool normalized);
+__host__ __device__ float jaccard_overlap_gpu(const float* bbox1, const float* bbox2);
 
 template <typename T>
-bool sort_score_pair_descend(const std::pair<float, T> &pair1,
-                             const std::pair<float, T> &pair2) {
+bool sort_score_pair_descend(const std::pair<float, T>& pair1, const std::pair<float, T>& pair2) {
   return pair1.first > pair2.first;
 }
 
-void get_max_score_index(const std::vector<float> &scores,
-                         const float threshold, const int top_k,
-                         std::vector<std::pair<float, int>> *score_index_vec);
+void get_max_score_index(const std::vector<float>&           scores,
+                         const float                         threshold,
+                         const int                           top_k,
+                         std::vector<std::pair<float, int>>* score_index_vec);
 
-float get_bbox_size(const NormalizedBBox &bbox);
+float get_bbox_size(const NormalizedBBox& bbox);
 
-void get_intersect_bbox(const NormalizedBBox &bbox1,
-                        const NormalizedBBox &bbox2,
-                        NormalizedBBox *intersect_bbox);
+void get_intersect_bbox(const NormalizedBBox& bbox1,
+                        const NormalizedBBox& bbox2,
+                        NormalizedBBox*       intersect_bbox);
 
-float get_jaccard_overlap(const NormalizedBBox &bbox1,
-                          const NormalizedBBox &bbox2);
+float get_jaccard_overlap(const NormalizedBBox& bbox1, const NormalizedBBox& bbox2);
 
-void apply_nms(const bool *overlapped, const int num,
-               std::vector<int> *indices);
+void apply_nms(const bool* overlapped, const int num, std::vector<int>* indices);
 
-void apply_nms_gpu(const float *bbox_data, const float *conf_data,
-                   const std::vector<int> &origin_indices, const int bbox_step,
-                   const float confidence_threshold, const int top_k,
-                   const float nms_threshold, std::vector<int> *indices,
-                   base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
-                   const cudaStream_t &_stream);
+void apply_nms_gpu(const float*            bbox_data,
+                   const float*            conf_data,
+                   const std::vector<int>& origin_indices,
+                   const int               bbox_step,
+                   const float             confidence_threshold,
+                   const int               top_k,
+                   const float             nms_threshold,
+                   std::vector<int>*       indices,
+                   base::Blob<bool>*       overlapped,
+                   base::Blob<int>*        idx_sm,
+                   const cudaStream_t&     _stream);
 
-void compute_overlapped_by_idx_gpu(const int nthreads, const float *bbox_data,
-                                   const float overlap_threshold,
-                                   const int *idx, const int num_idx,
-                                   bool *overlapped_data,
-                                   const cudaStream_t &_stream);
+void compute_overlapped_by_idx_gpu(const int           nthreads,
+                                   const float*        bbox_data,
+                                   const float         overlap_threshold,
+                                   const int*          idx,
+                                   const int           num_idx,
+                                   bool*               overlapped_data,
+                                   const cudaStream_t& _stream);
 
-int get_objects_gpu(
-    const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
-    const std::vector<base::ObjectSubType> &types, const NMSParam &nms,
-    const yolo::ModelParam &model_param, float light_vis_conf_threshold,
-    float light_swt_conf_threshold, base::Blob<bool> *overlapped,
-    base::Blob<int> *idx_sm,
-    const std::map<base::ObjectSubType, std::vector<int>> &indices,
-    const std::map<base::ObjectSubType, std::vector<float>> &conf_scores);
+int get_objects_gpu(const YoloBlobs&                                       yolo_blobs,
+                    const cudaStream_t&                                    stream,
+                    const std::vector<base::ObjectSubType>&                types,
+                    const NMSParam&                                        nms,
+                    const yolo::ModelParam&                                model_param,
+                    float                                                  light_vis_conf_threshold,
+                    float                                                  light_swt_conf_threshold,
+                    base::Blob<bool>*                                      overlapped,
+                    base::Blob<int>*                                       idx_sm,
+                    const std::map<base::ObjectSubType, std::vector<int>>& indices,
+                    const std::map<base::ObjectSubType, std::vector<float>>& conf_scores);
 
-void get_objects_cpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
-                     const std::vector<base::ObjectSubType> &types,
-                     const NMSParam &nms, const yolo::ModelParam &model_param,
-                     float light_vis_conf_threshold,
-                     float light_swt_conf_threshold,
-                     base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
-                     std::vector<base::ObjectPtr> *objects);
+void get_objects_cpu(const YoloBlobs&                        yolo_blobs,
+                     const cudaStream_t&                     stream,
+                     const std::vector<base::ObjectSubType>& types,
+                     const NMSParam&                         nms,
+                     const yolo::ModelParam&                 model_param,
+                     float                                   light_vis_conf_threshold,
+                     float                                   light_swt_conf_threshold,
+                     base::Blob<bool>*                       overlapped,
+                     base::Blob<int>*                        idx_sm,
+                     std::vector<base::ObjectPtr>*           objects);
 
-void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
-                        std::vector<float> *scores, const float score_threshold,
-                        const float nms_threshold, const int top_k,
-                        std::vector<int> *indices, bool is_linear,
-                        const float sigma);
+void apply_softnms_fast(const std::vector<NormalizedBBox>& bboxes,
+                        std::vector<float>*                scores,
+                        const float                        score_threshold,
+                        const float                        nms_threshold,
+                        const int                          top_k,
+                        std::vector<int>*                  indices,
+                        bool                               is_linear,
+                        const float                        sigma);
 
-void apply_boxvoting_fast(std::vector<NormalizedBBox> *bboxes,
-                          std::vector<float> *scores,
-                          const float conf_threshold, const float nms_threshold,
-                          const float sigma, std::vector<int> *indices);
+void apply_boxvoting_fast(std::vector<NormalizedBBox>* bboxes,
+                          std::vector<float>*          scores,
+                          const float                  conf_threshold,
+                          const float                  nms_threshold,
+                          const float                  sigma,
+                          std::vector<int>*            indices);
 
-void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
-                    const std::vector<float> &scores,
-                    const float score_threshold, const float nms_threshold,
-                    const float eta, const int top_k,
-                    std::vector<int> *indices);
+void apply_nms_fast(const std::vector<NormalizedBBox>& bboxes,
+                    const std::vector<float>&          scores,
+                    const float                        score_threshold,
+                    const float                        nms_threshold,
+                    const float                        eta,
+                    const int                          top_k,
+                    std::vector<int>*                  indices);
 
-void recover_bbox(int roi_w, int roi_h, int offset_y,
-                  std::vector<base::ObjectPtr> *objects);
+void recover_bbox(int roi_w, int roi_h, int offset_y, std::vector<base::ObjectPtr>* objects);
 
-void filter_bbox(const MinDims &min_dims,
-                 std::vector<base::ObjectPtr> *objects);
+void filter_bbox(const MinDims& min_dims, std::vector<base::ObjectPtr>* objects);
 
-void fill_bbox3d(bool with_bbox3d, base::ObjectPtr obj, const float *bbox);
+void fill_bbox3d(bool with_bbox3d, base::ObjectPtr obj, const float* bbox);
 
-void fill_frbox(bool with_frbox, base::ObjectPtr obj, const float *bbox);
+void fill_frbox(bool with_frbox, base::ObjectPtr obj, const float* bbox);
 
-void fill_lights(bool with_lights, base::ObjectPtr obj, const float *bbox);
-void fill_ratios(bool with_ratios, base::ObjectPtr obj, const float *bbox);
-void fill_area_id(bool with_flag, base::ObjectPtr obj, const float *data);
+void fill_lights(bool with_lights, base::ObjectPtr obj, const float* bbox);
+void fill_ratios(bool with_ratios, base::ObjectPtr obj, const float* bbox);
+void fill_area_id(bool with_flag, base::ObjectPtr obj, const float* data);
 
-void fill_base(base::ObjectPtr obj, const float *bbox);
+void fill_base(base::ObjectPtr obj, const float* bbox);
 
-const float *get_gpu_data(bool flag, const base::Blob<float> &blob);
+const float* get_gpu_data(bool flag, const base::Blob<float>& blob);
 
 int get_area_id(float visible_ratios[4]);
 

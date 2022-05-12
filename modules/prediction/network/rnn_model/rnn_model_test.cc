@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/network/rnn_model/rnn_model.h"
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
-#include "modules/prediction/network/rnn_model/rnn_model.h"
 
 namespace apollo {
 namespace prediction {
@@ -29,9 +30,8 @@ class NetModelTest : public ::testing::Test {
 };
 
 TEST(NetModelTest, verification_test) {
-  const std::string rnn_filename =
-      "modules/prediction/data/rnn_vehicle_model.bin";
-  NetParameter net_parameter = NetParameter();
+  const std::string rnn_filename  = "modules/prediction/data/rnn_vehicle_model.bin";
+  NetParameter      net_parameter = NetParameter();
   EXPECT_TRUE(cyber::common::GetProtoFromFile(rnn_filename, &net_parameter));
   EXPECT_TRUE(RnnModel::Instance()->LoadModel(net_parameter));
 

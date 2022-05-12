@@ -29,7 +29,8 @@ struct SppClusterInitializer {
 
 static const size_t kSppClusterPoolSize = 1000;
 
-typedef base::LightObjectPool<SppCluster, kSppClusterPoolSize,
+typedef base::LightObjectPool<SppCluster,
+                              kSppClusterPoolSize,
                               SppClusterInitializer,
                               base::SensorType::VELODYNE_64>
     SppClusterPool;

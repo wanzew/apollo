@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #include <algorithm>
 #include <cmath>
 #include <vector>
+
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/convolve.h"
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/image.h"
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/imconv.h"
@@ -43,10 +44,10 @@ namespace perception {
 namespace lidar {
 const double WIDTH = 4.0;
 /* normalize mask so it integrates to one */
-void normalize(std::vector<float> *mask_input) {
-  std::vector<float> &mask = *mask_input;
-  int len = mask.size();
-  float sum = 0;
+void normalize(std::vector<float>* mask_input) {
+  std::vector<float>& mask = *mask_input;
+  int                 len  = mask.size();
+  float               sum  = 0;
   for (int i = 1; i < len; i++) {
     sum += fabs(mask[i]);
   }
@@ -56,46 +57,44 @@ void normalize(std::vector<float> *mask_input) {
   }
 }
 /* make filters */
-#define MAKE_FILTER(name, fun)                           \
-  std::vector<float> make_##name(float sigma) {          \
-    sigma = std::max(sigma, 0.01F);                      \
-    int len = static_cast<int>(ceil(sigma * WIDTH)) + 1; \
-    std::vector<float> mask(len);                        \
-    for (int i = 0; i < len; i++) {                      \
-      mask[i] = fun;                                     \
-    }                                                    \
-    return mask;                                         \
+#define MAKE_FILTER(name, fun)                                                                     \
+  std::vector<float> make_##name(float sigma) {                                                    \
+    sigma                  = std::max(sigma, 0.01F);                                               \
+    int                len = static_cast<int>(ceil(sigma * WIDTH)) + 1;                            \
+    std::vector<float> mask(len);                                                                  \
+    for (int i = 0; i < len; i++) {                                                                \
+      mask[i] = fun;                                                                               \
+    }                                                                                              \
+    return mask;                                                                                   \
   }
 MAKE_FILTER(fgauss, exp(-0.5 * square(i / sigma)));
 /* convolve image with gaussian filter */
-Image<float> *smooth(Image<float> *src, float sigma) {
+Image<float>* smooth(Image<float>* src, float sigma) {
   std::vector<float> mask = make_fgauss(sigma);
   normalize(mask);
-  Image<float> *tmp = new Image<float>(src->height(), src->width(), false);
-  Image<float> *dst = new Image<float>(src->width(), src->height(), false);
+  Image<float>* tmp = new Image<float>(src->height(), src->width(), false);
+  Image<float>* dst = new Image<float>(src->width(), src->height(), false);
   convolve_even(src, tmp, mask);
   convolve_even(tmp, dst, mask);
   delete tmp;
   return dst;
 }
 /* convolve image with gaussian filter */
-Image<float> *smooth(Image<uchar> *src, float sigma) {
-  Image<float> *tmp = image_uchar2float(src);
-  Image<float> *dst = smooth(tmp, sigma);
+Image<float>* smooth(Image<uchar>* src, float sigma) {
+  Image<float>* tmp = image_uchar2float(src);
+  Image<float>* dst = smooth(tmp, sigma);
   delete tmp;
   return dst;
 }
 /* compute laplacian */
-Image<float> *laplacian(Image<float> *src) {
-  int width = src->width();
-  int height = src->height();
-  Image<float> *dst = new Image<float>(width, height);
+Image<float>* laplacian(Image<float>* src) {
+  int           width  = src->width();
+  int           height = src->height();
+  Image<float>* dst    = new Image<float>(width, height);
   for (int y = 1; y < height - 1; y++) {
     for (int x = 1; x < width - 1; x++) {
-      float d2x =
-          imRef(src, x - 1, y) + imRef(src, x + 1, y) - 2 * imRef(src, x, y);
-      float d2y =
-          imRef(src, x, y - 1) + imRef(src, x, y + 1) - 2 * imRef(src, x, y);
+      float d2x        = imRef(src, x - 1, y) + imRef(src, x + 1, y) - 2 * imRef(src, x, y);
+      float d2y        = imRef(src, x, y - 1) + imRef(src, x, y + 1) - 2 * imRef(src, x, y);
       imRef(dst, x, y) = d2x + d2y;
     }
   }

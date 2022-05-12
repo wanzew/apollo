@@ -24,9 +24,8 @@ using apollo::cyber::ParameterServer;
 
 int main(int argc, char** argv) {
   apollo::cyber::Init(*argv);
-  std::shared_ptr<apollo::cyber::Node> node =
-      apollo::cyber::CreateNode("parameter");
-  auto param_server = std::make_shared<ParameterServer>(node);
+  std::shared_ptr<apollo::cyber::Node> node         = apollo::cyber::CreateNode("parameter");
+  auto                                 param_server = std::make_shared<ParameterServer>(node);
   auto param_client = std::make_shared<ParameterClient>(node, "parameter");
   param_server->SetParameter(Parameter("int", 1));
   Parameter parameter;

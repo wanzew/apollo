@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include "gtest/gtest.h"
+
 #include "modules/common/math/sin_table.h"
 
 namespace apollo {

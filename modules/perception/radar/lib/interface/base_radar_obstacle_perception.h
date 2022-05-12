@@ -63,24 +63,24 @@ namespace apollo {
 namespace perception {
 namespace radar {
 struct RadarPerceptionOptions {
-  DetectorOptions detector_options;
+  DetectorOptions  detector_options;
   RoiFilterOptions roi_filter_options;
-  TrackerOptions track_options;
-  std::string sensor_name;
+  TrackerOptions   track_options;
+  std::string      sensor_name;
 };
 class BaseRadarObstaclePerception {
  public:
-  BaseRadarObstaclePerception() = default;
-  virtual ~BaseRadarObstaclePerception() = default;
-  virtual bool Init(const std::string& pipeline_name) = 0;
-  virtual bool Perceive(const drivers::ContiRadar& corrected_obstacles,
-                        const RadarPerceptionOptions& options,
-                        std::vector<base::ObjectPtr>* objects) = 0;
-  virtual std::string Name() const = 0;
+  BaseRadarObstaclePerception()                                       = default;
+  virtual ~BaseRadarObstaclePerception()                              = default;
+  virtual bool        Init(const std::string& pipeline_name)          = 0;
+  virtual bool        Perceive(const drivers::ContiRadar&    corrected_obstacles,
+                               const RadarPerceptionOptions& options,
+                               std::vector<base::ObjectPtr>* objects) = 0;
+  virtual std::string Name() const                                    = 0;
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseRadarObstaclePerception);
-#define PERCEPTION_REGISTER_RADAR_OBSTACLE_PERCEPTION(name) \
+#define PERCEPTION_REGISTER_RADAR_OBSTACLE_PERCEPTION(name)                                        \
   PERCEPTION_REGISTER_CLASS(BaseRadarObstaclePerception, name)
 
 }  // namespace radar

@@ -26,14 +26,11 @@ bool HesaiDriver::Init() {
     return false;
   }
   Parser* hesai_parser = ParserFactory::CreateParser(node_, conf_);
-  if (hesai_parser == nullptr) {
-    AERROR << "create parser error";
-  }
+  if (hesai_parser == nullptr) { AERROR << "create parser error"; }
   parser_.reset(hesai_parser);
   scan_writer_ = node_->CreateWriter<HesaiScan>(conf_.scan_channel());
   if (scan_writer_ == nullptr) {
-    AERROR << "writer:" << conf_.scan_channel()
-           << " create error, check cyber is inited.";
+    AERROR << "writer:" << conf_.scan_channel() << " create error, check cyber is inited.";
     return false;
   }
 
@@ -67,7 +64,7 @@ bool HesaiDriver::Init() {
   }
   tz_second_ = conf_.time_zone() * 3600;
   input_.reset(new Input(conf_.lidar_recv_port(), conf_.gps_recv_port()));
-  poll_thread_ = std::thread(&HesaiDriver::PollThread, this);
+  poll_thread_    = std::thread(&HesaiDriver::PollThread, this);
   process_thread_ = std::thread(&HesaiDriver::ProcessThread, this);
   return true;
 }
@@ -75,18 +72,12 @@ bool HesaiDriver::Init() {
 void HesaiDriver::PollThread() {
   AINFO << "Poll thread start";
   while (running_) {
-    auto start = std::chrono::steady_clock::now();
-    std::shared_ptr<HesaiPacket>& pkt = pkt_buffer_[pkt_index_];
-    if (input_->GetPacket(pkt.get()) == -1) {
-      continue;
-    }
-    auto end = std::chrono::steady_clock::now();
-    auto duration =
-        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-            .count();
-    if (duration > 50) {
-      AWARN << "recv packet cost:" << duration;
-    }
+    auto                          start = std::chrono::steady_clock::now();
+    std::shared_ptr<HesaiPacket>& pkt   = pkt_buffer_[pkt_index_];
+    if (input_->GetPacket(pkt.get()) == -1) { continue; }
+    auto end      = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    if (duration > 50) { AWARN << "recv packet cost:" << duration; }
     {
       std::lock_guard<std::mutex> lck(packet_mutex_);
       pkt_queue_.push_back(pkt);
@@ -97,40 +88,31 @@ void HesaiDriver::PollThread() {
 }
 
 void HesaiDriver::ProcessGps(const HesaiPacket& pkt) {
-  if (pkt.size != GPS_PACKET_SIZE) {
-    return;
-  }
+  if (pkt.size != GPS_PACKET_SIZE) { return; }
 
   const uint8_t* recvbuf = pkt.data;
-  int index = 0;
-  GPS gps;
+  int            index   = 0;
+  GPS            gps;
   gps.flag = (recvbuf[index] & 0xff) | ((recvbuf[index + 1] & 0xff) << 8);
   index += GPS_PACKET_FLAG_SIZE;
-  gps.year = ((recvbuf[index] & 0xff) - 0x30) +
-             ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
+  gps.year = ((recvbuf[index] & 0xff) - 0x30) + ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
   index += GPS_PACKET_YEAR_SIZE;
-  gps.month = ((recvbuf[index] & 0xff) - 0x30) +
-              ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
+  gps.month = ((recvbuf[index] & 0xff) - 0x30) + ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
   index += GPS_PACKET_MONTH_SIZE;
-  gps.day = ((recvbuf[index] & 0xff) - 0x30) +
-            ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
+  gps.day = ((recvbuf[index] & 0xff) - 0x30) + ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
   index += GPS_PACKET_DAY_SIZE;
-  gps.second = ((recvbuf[index] & 0xff) - 0x30) +
-               ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
+  gps.second = ((recvbuf[index] & 0xff) - 0x30) + ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
   index += GPS_PACKET_SECOND_SIZE;
-  gps.minute = ((recvbuf[index] & 0xff) - 0x30) +
-               ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
+  gps.minute = ((recvbuf[index] & 0xff) - 0x30) + ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
   index += GPS_PACKET_MINUTE_SIZE;
-  gps.hour = ((recvbuf[index] & 0xff) - 0x30) +
-             ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
+  gps.hour = ((recvbuf[index] & 0xff) - 0x30) + ((recvbuf[index + 1] & 0xff) - 0x30) * 10;
   index += GPS_PACKET_HOUR_SIZE;
   gps.fineTime = (recvbuf[index] & 0xff) | (recvbuf[index + 1] & 0xff) << 8 |
-                 ((recvbuf[index + 2] & 0xff) << 16) |
-                 ((recvbuf[index + 3] & 0xff) << 24);
+                 ((recvbuf[index + 2] & 0xff) << 16) | ((recvbuf[index + 3] & 0xff) << 24);
 
   struct tm t;
-  t.tm_sec = gps.second;
-  t.tm_min = gps.minute;
+  t.tm_sec  = gps.second;
+  t.tm_min  = gps.minute;
   t.tm_hour = gps.hour;
   t.tm_mday = gps.day;
 
@@ -138,27 +120,25 @@ void HesaiDriver::ProcessGps(const HesaiPacket& pkt) {
   t.tm_mon = gps.month - 1;
   // UTC's year only include 0 - 99 year , which indicate 2000 to 2099.
   // and mktime's year start from 1900 which is 0. so we need add 100 year.
-  t.tm_year = gps.year + 100;
+  t.tm_year  = gps.year + 100;
   t.tm_isdst = 0;
 
   // static_cast<double>(mktime(&t) + tz_second_));
   uint64_t gps_timestamp = static_cast<uint64_t>(timegm(&t));
-  auto now = apollo::cyber::Time().Now().ToNanosecond();
+  auto     now           = apollo::cyber::Time().Now().ToNanosecond();
   AINFO << "hesai gps time:" << gps_timestamp << ", sys time:" << now
         << ", diff:" << now - gps_timestamp;
 }
 
 void HesaiDriver::ProcessThread() {
-  std::shared_ptr<HesaiPacket> pkt = nullptr;
-  bool is_end = false;
-  int seq = 0;
+  std::shared_ptr<HesaiPacket> pkt    = nullptr;
+  bool                         is_end = false;
+  int                          seq    = 0;
   AINFO << "packet process thread start";
   while (running_) {
     {
       std::unique_lock<std::mutex> lck(packet_mutex_);
-      if (pkt_queue_.empty()) {
-        packet_condition_.wait(lck);
-      }
+      if (pkt_queue_.empty()) { packet_condition_.wait(lck); }
       if (pkt_queue_.empty()) {
         // exit notify empty
         continue;
@@ -175,7 +155,7 @@ void HesaiDriver::ProcessThread() {
     parser_->Parse(pkt->data, pkt->size, &is_end);
 
     if (is_end && scan_buffer_[index_]->firing_pkts_size() > 0) {
-      is_end = false;
+      is_end   = false;
       auto now = apollo::cyber::Time().Now();
       scan_buffer_[index_]->mutable_header()->set_timestamp_sec(now.ToSecond());
       scan_buffer_[index_]->mutable_header()->set_frame_id(conf_.frame_id());

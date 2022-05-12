@@ -24,27 +24,36 @@ namespace perception {
 namespace common {
 
 template <typename T>
-inline void IGetPointcloudsDimWBound(const T *threeds, int n, int start_offset,
-                                     int element_size, T *dim_min_x,
-                                     T *dim_max_x, T *dim_min_y, T *dim_max_y,
-                                     T *dim_min_z, T *dim_max_z, T bound_min_x,
-                                     T bound_max_x, T bound_min_y,
-                                     T bound_max_y, T bound_min_z,
-                                     T bound_max_z) {
+inline void IGetPointcloudsDimWBound(const T* threeds,
+                                     int      n,
+                                     int      start_offset,
+                                     int      element_size,
+                                     T*       dim_min_x,
+                                     T*       dim_max_x,
+                                     T*       dim_min_y,
+                                     T*       dim_max_y,
+                                     T*       dim_min_z,
+                                     T*       dim_max_z,
+                                     T        bound_min_x,
+                                     T        bound_max_x,
+                                     T        bound_min_y,
+                                     T        bound_max_y,
+                                     T        bound_min_z,
+                                     T        bound_max_z) {
   int i;
-  T x, y, z;
+  T   x, y, z;
 
   *dim_min_x = *dim_min_y = *dim_min_z = std::numeric_limits<T>::max() / 2;
   *dim_max_x = *dim_max_y = *dim_max_z = -(std::numeric_limits<T>::max() / 2);
-  const T *cptr = threeds + start_offset;
+  const T* cptr                        = threeds + start_offset;
   for (i = 0; i < n; i++) {
     x = cptr[0];
     y = cptr[1];
     z = cptr[2];
     cptr += element_size;
 
-    if (x < bound_min_x || x > bound_max_x || y < bound_min_y ||
-        y > bound_max_y || z < bound_min_z || z > bound_max_z) {
+    if (x < bound_min_x || x > bound_max_x || y < bound_min_y || y > bound_max_y ||
+        z < bound_min_z || z > bound_max_z) {
       continue;
     } else {
       *dim_min_x = IMin(dim_min_x, x);

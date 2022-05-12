@@ -19,10 +19,12 @@
 #include <string>
 #include <utility>
 
+#include "gmock/gmock.h"
+
+#include "modules/control/proto/control_conf.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gmock/gmock.h"
-#include "modules/control/proto/control_conf.pb.h"
 
 using ::testing::ElementsAre;
 
@@ -32,8 +34,7 @@ namespace control {
 class Interpolation1DTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string control_conf_file =
-        "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
+    std::string control_conf_file = "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
   }
 
@@ -73,8 +74,7 @@ TEST_F(Interpolation1DTest, unordered) {
 }
 
 TEST_F(Interpolation1DTest, gain_scheduler) {
-  const auto& gain_scheduler =
-      control_conf_.lat_controller_conf().lat_err_gain_scheduler();
+  const auto& gain_scheduler = control_conf_.lat_controller_conf().lat_err_gain_scheduler();
   AINFO << "Lateral Error Gain Scheduler:" << gain_scheduler.DebugString();
 
   Interpolation1D::DataType xy;

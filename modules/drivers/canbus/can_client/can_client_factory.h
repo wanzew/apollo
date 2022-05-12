@@ -25,7 +25,6 @@
 #include <unordered_map>
 
 #include "cyber/common/macros.h"
-
 #include "modules/common/util/factory.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 
@@ -42,8 +41,7 @@ namespace canbus {
  * @brief CanClientFactory inherites apollo::common::util::Factory.
  */
 class CanClientFactory
-    : public apollo::common::util::Factory<CANCardParameter::CANCardBrand,
-                                           CanClient> {
+    : public apollo::common::util::Factory<CANCardParameter::CANCardBrand, CanClient> {
  public:
   /**
    * @brief Register the CAN clients of all brands. This function call the
@@ -58,7 +56,7 @@ class CanClientFactory
    * @param parameter The parameter to create the CAN client.
    * @return A pointer to the created CAN client.
    */
-  std::unique_ptr<CanClient> CreateCANClient(const CANCardParameter &parameter);
+  std::unique_ptr<CanClient> CreateCANClient(const CANCardParameter& parameter);
 
  private:
   DECLARE_SINGLETON(CanClientFactory)

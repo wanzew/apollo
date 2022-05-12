@@ -43,15 +43,18 @@ using google::protobuf::FileDescriptor;
 using google::protobuf::FileDescriptorProto;
 
 class ErrorCollector : public google::protobuf::DescriptorPool::ErrorCollector {
-  using ErrorLocation =
-      google::protobuf::DescriptorPool::ErrorCollector::ErrorLocation;
-  void AddError(const std::string& filename, const std::string& element_name,
+  using ErrorLocation = google::protobuf::DescriptorPool::ErrorCollector::ErrorLocation;
+  void AddError(const std::string&               filename,
+                const std::string&               element_name,
                 const google::protobuf::Message* descriptor,
-                ErrorLocation location, const std::string& message) override;
+                ErrorLocation                    location,
+                const std::string&               message) override;
 
-  void AddWarning(const std::string& filename, const std::string& element_name,
+  void AddWarning(const std::string&               filename,
+                  const std::string&               element_name,
                   const google::protobuf::Message* descriptor,
-                  ErrorLocation location, const std::string& message) override;
+                  ErrorLocation                    location,
+                  const std::string&               message) override;
 };
 
 class ProtobufFactory {
@@ -72,39 +75,33 @@ class ProtobufFactory {
   bool RegisterMessage(const FileDescriptorProto& file_desc_proto);
 
   // Serialize all descriptors of the given message to string.
-  static void GetDescriptorString(const google::protobuf::Message& message,
-                                  std::string* desc_str);
+  static void GetDescriptorString(const google::protobuf::Message& message, std::string* desc_str);
 
   // Serialize all descriptors of the descriptor to string.
-  static void GetDescriptorString(const Descriptor* desc,
-                                  std::string* desc_str);
+  static void GetDescriptorString(const Descriptor* desc, std::string* desc_str);
 
   // Get Serialized descriptors of messages with the given type.
   void GetDescriptorString(const std::string& type, std::string* desc_str);
 
   // Given a type name, constructs the default (prototype) Message of that type.
   // Returns nullptr if no such message exists.
-  google::protobuf::Message* GenerateMessageByType(
-      const std::string& type) const;
+  google::protobuf::Message* GenerateMessageByType(const std::string& type) const;
 
   // Find a top-level message type by name. Returns nullptr if not found.
   const Descriptor* FindMessageTypeByName(const std::string& type) const;
 
   // Find a service definition by name. Returns nullptr if not found.
-  const google::protobuf::ServiceDescriptor* FindServiceByName(
-      const std::string& name) const;
+  const google::protobuf::ServiceDescriptor* FindServiceByName(const std::string& name) const;
 
   void GetPythonDesc(const std::string& type, std::string* desc_str);
 
  private:
-  bool RegisterMessage(const ProtoDesc& proto_desc);
-  google::protobuf::Message* GetMessageByGeneratedType(
-      const std::string& type) const;
-  static bool GetProtoDesc(const FileDescriptor* file_desc,
-                           ProtoDesc* proto_desc);
+  bool                       RegisterMessage(const ProtoDesc& proto_desc);
+  google::protobuf::Message* GetMessageByGeneratedType(const std::string& type) const;
+  static bool                GetProtoDesc(const FileDescriptor* file_desc, ProtoDesc* proto_desc);
 
-  std::mutex register_mutex_;
-  std::unique_ptr<DescriptorPool> pool_ = nullptr;
+  std::mutex                             register_mutex_;
+  std::unique_ptr<DescriptorPool>        pool_    = nullptr;
   std::unique_ptr<DynamicMessageFactory> factory_ = nullptr;
 
   DECLARE_SINGLETON(ProtobufFactory);

@@ -26,51 +26,40 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-LocationExporter::LocationExporter(const std::string &loc_file_folder) {
-  gnss_loc_file_ = loc_file_folder + "/gnss_loc.txt";
-  lidar_loc_file_ = loc_file_folder + "/lidar_loc.txt";
-  fusion_loc_file_ = loc_file_folder + "/fusion_loc.txt";
+LocationExporter::LocationExporter(const std::string& loc_file_folder) {
+  gnss_loc_file_     = loc_file_folder + "/gnss_loc.txt";
+  lidar_loc_file_    = loc_file_folder + "/lidar_loc.txt";
+  fusion_loc_file_   = loc_file_folder + "/fusion_loc.txt";
   odometry_loc_file_ = loc_file_folder + "/odometry_loc.txt";
 
   if ((gnss_loc_file_handle_ = fopen(gnss_loc_file_.c_str(), "a")) == nullptr) {
     AERROR << "Cannot open gnss localization file!";
   }
 
-  if ((lidar_loc_file_handle_ = fopen(lidar_loc_file_.c_str(), "a")) ==
-      nullptr) {
+  if ((lidar_loc_file_handle_ = fopen(lidar_loc_file_.c_str(), "a")) == nullptr) {
     AERROR << "Cannot open lidar localization file!";
   }
 
-  if ((fusion_loc_file_handle_ = fopen(fusion_loc_file_.c_str(), "a")) ==
-      nullptr) {
+  if ((fusion_loc_file_handle_ = fopen(fusion_loc_file_.c_str(), "a")) == nullptr) {
     AERROR << "Cannot open fusion localization file!";
   }
 
-  if ((odometry_loc_file_handle_ = fopen(odometry_loc_file_.c_str(), "a")) ==
-      nullptr) {
+  if ((odometry_loc_file_handle_ = fopen(odometry_loc_file_.c_str(), "a")) == nullptr) {
     AERROR << "Cannot open odometry localization file!";
   }
 }
 
 LocationExporter::~LocationExporter() {
-  if (gnss_loc_file_handle_ != nullptr) {
-    fclose(gnss_loc_file_handle_);
-  }
+  if (gnss_loc_file_handle_ != nullptr) { fclose(gnss_loc_file_handle_); }
 
-  if (lidar_loc_file_handle_ != nullptr) {
-    fclose(lidar_loc_file_handle_);
-  }
+  if (lidar_loc_file_handle_ != nullptr) { fclose(lidar_loc_file_handle_); }
 
-  if (fusion_loc_file_handle_ != nullptr) {
-    fclose(fusion_loc_file_handle_);
-  }
+  if (fusion_loc_file_handle_ != nullptr) { fclose(fusion_loc_file_handle_); }
 
-  if (odometry_loc_file_handle_ != nullptr) {
-    fclose(odometry_loc_file_handle_);
-  }
+  if (odometry_loc_file_handle_ != nullptr) { fclose(odometry_loc_file_handle_); }
 }
 
-void LocationExporter::GnssLocCallback(const std::string &msg_string) {
+void LocationExporter::GnssLocCallback(const std::string& msg_string) {
   AINFO << "GNSS location callback.";
   LocalizationEstimate msg;
   msg.ParseFromString(msg_string);
@@ -78,9 +67,9 @@ void LocationExporter::GnssLocCallback(const std::string &msg_string) {
   static unsigned int index = 1;
 
   double timestamp = msg.measurement_time();
-  double x = msg.pose().position().x();
-  double y = msg.pose().position().y();
-  double z = msg.pose().position().z();
+  double x         = msg.pose().position().x();
+  double y         = msg.pose().position().y();
+  double z         = msg.pose().position().z();
 
   double qx = msg.pose().orientation().qx();
   double qy = msg.pose().orientation().qy();
@@ -91,23 +80,22 @@ void LocationExporter::GnssLocCallback(const std::string &msg_string) {
   double std_y = msg.uncertainty().position_std_dev().y();
   double std_z = msg.uncertainty().position_std_dev().z();
 
-  fprintf(gnss_loc_file_handle_,
-          "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
-          x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
+  fprintf(gnss_loc_file_handle_, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
+          timestamp, x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
 }
 
-void LocationExporter::LidarLocCallback(const std::string &msg_string) {
+void LocationExporter::LidarLocCallback(const std::string& msg_string) {
   AINFO << "Lidar location callback.";
   LocalizationEstimate msg;
   msg.ParseFromString(msg_string);
   static unsigned int index = 1;
 
   double timestamp = msg.measurement_time();
-  double x = msg.pose().position().x();
-  double y = msg.pose().position().y();
-  double z = msg.pose().position().z();
+  double x         = msg.pose().position().x();
+  double y         = msg.pose().position().y();
+  double z         = msg.pose().position().z();
 
   double qx = msg.pose().orientation().qx();
   double qy = msg.pose().orientation().qy();
@@ -124,23 +112,22 @@ void LocationExporter::LidarLocCallback(const std::string &msg_string) {
   double std_y = msg.uncertainty().position_std_dev().y();
   double std_z = msg.uncertainty().position_std_dev().z();
 
-  fprintf(lidar_loc_file_handle_,
-          "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
-          x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
+  fprintf(lidar_loc_file_handle_, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
+          timestamp, x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
 }
 
-void LocationExporter::FusionLocCallback(const std::string &msg_string) {
+void LocationExporter::FusionLocCallback(const std::string& msg_string) {
   AINFO << "Fusion location callback.";
   LocalizationEstimate msg;
   msg.ParseFromString(msg_string);
   static unsigned int index = 1;
 
   double timestamp = msg.measurement_time();
-  double x = msg.pose().position().x();
-  double y = msg.pose().position().y();
-  double z = msg.pose().position().z();
+  double x         = msg.pose().position().x();
+  double y         = msg.pose().position().y();
+  double z         = msg.pose().position().z();
 
   double qx = msg.pose().orientation().qx();
   double qy = msg.pose().orientation().qy();
@@ -157,23 +144,22 @@ void LocationExporter::FusionLocCallback(const std::string &msg_string) {
   double std_y = msg.uncertainty().position_std_dev().y();
   double std_z = msg.uncertainty().position_std_dev().z();
 
-  fprintf(fusion_loc_file_handle_,
-          "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
-          x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
+  fprintf(fusion_loc_file_handle_, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
+          timestamp, x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
 }
 
-void LocationExporter::OdometryLocCallback(const std::string &msg_string) {
+void LocationExporter::OdometryLocCallback(const std::string& msg_string) {
   AINFO << "Odometry location callback.";
   Gps msg;
   msg.ParseFromString(msg_string);
   static unsigned int index = 1;
 
   double timestamp = msg.header().timestamp_sec();
-  double x = msg.localization().position().x();
-  double y = msg.localization().position().y();
-  double z = msg.localization().position().z();
+  double x         = msg.localization().position().x();
+  double y         = msg.localization().position().y();
+  double z         = msg.localization().position().z();
 
   double qx = msg.localization().orientation().qx();
   double qy = msg.localization().orientation().qy();
@@ -190,9 +176,8 @@ void LocationExporter::OdometryLocCallback(const std::string &msg_string) {
   double std_y = 0;
   double std_z = 0;
 
-  fprintf(odometry_loc_file_handle_,
-          "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index, timestamp,
-          x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
+  fprintf(odometry_loc_file_handle_, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", index,
+          timestamp, x, y, z, qx, qy, qz, qw, std_x, std_y, std_z);
 
   ++index;
 }

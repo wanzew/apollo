@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_bcs_2_307.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,10 +28,10 @@ class Scubcs2307Test : public ::testing::Test {
 };
 
 TEST_F(Scubcs2307Test, reset) {
-  Scubcs2307 scubcs2307;
-  int32_t length = 8;
+  Scubcs2307    scubcs2307;
+  int32_t       length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
+  uint8_t       bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
   scubcs2307.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_2_307().bcs_vehspdvd(), 0);  //

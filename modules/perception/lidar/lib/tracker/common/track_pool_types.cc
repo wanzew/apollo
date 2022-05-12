@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {

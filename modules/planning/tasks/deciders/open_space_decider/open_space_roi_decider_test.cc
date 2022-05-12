@@ -20,6 +20,7 @@
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_roi_decider.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -33,14 +34,13 @@ class OpenSpaceRoiDeciderTest : public ::testing::Test {
   }
 
  protected:
-  TaskConfig config_;
+  TaskConfig                          config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(OpenSpaceRoiDeciderTest, Init) {
   OpenSpaceRoiDecider open_space_roi_decider(config_, injector_);
-  EXPECT_EQ(open_space_roi_decider.Name(),
-            TaskConfig::TaskType_Name(config_.task_type()));
+  EXPECT_EQ(open_space_roi_decider.Name(), TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 }  // namespace planning

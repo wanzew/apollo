@@ -35,8 +35,8 @@ using SegmentPtr = std::shared_ptr<Segment>;
 
 struct WritableBlock {
   uint32_t index = 0;
-  Block* block = nullptr;
-  uint8_t* buf = nullptr;
+  Block*   block = nullptr;
+  uint8_t* buf   = nullptr;
 };
 using ReadableBlock = WritableBlock;
 
@@ -53,24 +53,24 @@ class Segment {
 
  protected:
   virtual bool Destroy();
-  virtual void Reset() = 0;
-  virtual bool Remove() = 0;
-  virtual bool OpenOnly() = 0;
+  virtual void Reset()        = 0;
+  virtual bool Remove()       = 0;
+  virtual bool OpenOnly()     = 0;
   virtual bool OpenOrCreate() = 0;
 
-  bool init_;
-  ShmConf conf_;
+  bool     init_;
+  ShmConf  conf_;
   uint64_t channel_id_;
 
-  State* state_;
-  Block* blocks_;
-  void* managed_shm_;
-  std::mutex block_buf_lock_;
+  State*                                 state_;
+  Block*                                 blocks_;
+  void*                                  managed_shm_;
+  std::mutex                             block_buf_lock_;
   std::unordered_map<uint32_t, uint8_t*> block_buf_addrs_;
 
  private:
-  bool Remap();
-  bool Recreate(const uint64_t& msg_size);
+  bool     Remap();
+  bool     Recreate(const uint64_t& msg_size);
   uint32_t GetNextWritableBlockIndex();
 };
 

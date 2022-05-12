@@ -28,24 +28,22 @@ namespace lidar {
 class FeatureDescriptor {
  public:
   explicit FeatureDescriptor(base::PointFCloud* cloud) { cloud_ = cloud; }
-  FeatureDescriptor() : cloud_(nullptr) {}
+  FeatureDescriptor()
+      : cloud_(nullptr) {}
   ~FeatureDescriptor() = default;
 
   void SetCloud(base::PointFCloud* cloud) { cloud_ = cloud; }
 
   void ComputeHistogram(int bin_size, float* feature) {
     GetMinMaxCenter();
-    int xstep = bin_size;
-    int ystep = bin_size;
-    int zstep = bin_size;
-    int stat_len = xstep + ystep + zstep;
+    int              xstep    = bin_size;
+    int              ystep    = bin_size;
+    int              zstep    = bin_size;
+    int              stat_len = xstep + ystep + zstep;
     std::vector<int> stat_feat(stat_len, 0);
-    float xsize =
-        (max_pt_.x - min_pt_.x) / static_cast<float>(xstep) + 0.000001f;
-    float ysize =
-        (max_pt_.y - min_pt_.y) / static_cast<float>(ystep) + 0.000001f;
-    float zsize =
-        (max_pt_.z - min_pt_.z) / static_cast<float>(zstep) + 0.000001f;
+    float            xsize = (max_pt_.x - min_pt_.x) / static_cast<float>(xstep) + 0.000001f;
+    float            ysize = (max_pt_.y - min_pt_.y) / static_cast<float>(ystep) + 0.000001f;
+    float            zsize = (max_pt_.z - min_pt_.z) / static_cast<float>(zstep) + 0.000001f;
 
     int pt_num = static_cast<int>(cloud_->size());
     for (int i = 0; i < pt_num; ++i) {
@@ -63,8 +61,7 @@ class FeatureDescriptor {
     feature[5] = zsize;
     feature[6] = static_cast<float>(pt_num);
     for (size_t i = 0; i < stat_feat.size(); ++i) {
-      feature[i + 7] =
-          static_cast<float>(stat_feat[i]) / static_cast<float>(pt_num);
+      feature[i + 7] = static_cast<float>(stat_feat[i]) / static_cast<float>(pt_num);
     }
   }
 
@@ -97,9 +94,9 @@ class FeatureDescriptor {
   }
 
   base::PointFCloud* cloud_;
-  base::PointF min_pt_;
-  base::PointF max_pt_;
-  base::PointF center_pt_;
+  base::PointF       min_pt_;
+  base::PointF       max_pt_;
+  base::PointF       center_pt_;
 };  // class FeatureDescriptor
 
 }  // namespace lidar

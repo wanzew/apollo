@@ -27,16 +27,16 @@ namespace inference {
 
 class SLICEPlugin : public nvinfer1::IPlugin {
  public:
-  SLICEPlugin(const SliceParameter &param, const nvinfer1::Dims &in_dims) {
+  SLICEPlugin(const SliceParameter& param, const nvinfer1::Dims& in_dims) {
     CHECK_GT(param.slice_point_size(), 0);
     for (int i = 0; i < param.slice_point_size(); i++) {
       slice_point_.push_back(param.slice_point(i));
     }
-    axis_ = std::max(param.axis() - 1, 0);
+    axis_              = std::max(param.axis() - 1, 0);
     input_dims_.nbDims = in_dims.nbDims;
     CHECK_GT(input_dims_.nbDims, 0);
     for (int i = 0; i < in_dims.nbDims; i++) {
-      input_dims_.d[i] = in_dims.d[i];
+      input_dims_.d[i]    = in_dims.d[i];
       input_dims_.type[i] = in_dims.type[i];
     }
 
@@ -47,38 +47,40 @@ class SLICEPlugin : public nvinfer1::IPlugin {
         out_slice_dims_.push_back(slice_point_[i] - slice_point_[i - 1]);
       }
     }
-    out_slice_dims_.push_back(input_dims_.d[axis_] -
-                              slice_point_[slice_point_.size() - 1]);
+    out_slice_dims_.push_back(input_dims_.d[axis_] - slice_point_[slice_point_.size() - 1]);
   }
   SLICEPlugin() {}
   ~SLICEPlugin() {}
-  virtual int initialize() { return 0; }
+  virtual int  initialize() { return 0; }
   virtual void terminate() {}
-  int getNbOutputs() const override {
-    return static_cast<int>(slice_point_.size()) + 1;
-  }
-  nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
-                                     int nbInputDims) override {
+  int          getNbOutputs() const override { return static_cast<int>(slice_point_.size()) + 1; }
+  nvinfer1::Dims
+  getOutputDimensions(int index, const nvinfer1::Dims* inputs, int nbInputDims) override {
     nvinfer1::Dims out_dims = inputs[0];
-    out_dims.d[axis_] = out_slice_dims_[index];
+    out_dims.d[axis_]       = out_slice_dims_[index];
     return out_dims;
   }
 
-  void configure(const nvinfer1::Dims *inputDims, int nbInputs,
-                 const nvinfer1::Dims *outputDims, int nbOutputs,
-                 int maxBatchSize) override {
+  void configure(const nvinfer1::Dims* inputDims,
+                 int                   nbInputs,
+                 const nvinfer1::Dims* outputDims,
+                 int                   nbOutputs,
+                 int                   maxBatchSize) override {
     input_dims_ = inputDims[0];
   }
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
 
-  virtual int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream);
+  virtual int enqueue(int                batchSize,
+                      const void* const* inputs,
+                      void**             outputs,
+                      void*              workspace,
+                      cudaStream_t       stream);
 
   size_t getSerializationSize() override { return 0; }
 
-  void serialize(void *buffer) override {
-    char *d = reinterpret_cast<char *>(buffer), *a = d;
+  void serialize(void* buffer) override {
+    char * d = reinterpret_cast<char*>(buffer), *a = d;
     size_t size = getSerializationSize();
     CHECK_EQ(d, a + size);
   }
@@ -86,8 +88,8 @@ class SLICEPlugin : public nvinfer1::IPlugin {
  private:
   std::vector<int> slice_point_;
   std::vector<int> out_slice_dims_;
-  int axis_;
-  nvinfer1::Dims input_dims_;
+  int              axis_;
+  nvinfer1::Dims   input_dims_;
 };
 
 }  // namespace inference

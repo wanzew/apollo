@@ -45,8 +45,8 @@ class EmptyPredictor : public Predictor {
    * @return If predicted successfully
    */
   bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
-               Obstacle* obstacle,
-               ObstaclesContainer* obstacles_container) override;
+               Obstacle*                     obstacle,
+               ObstaclesContainer*           obstacles_container) override;
 };
 
 }  // namespace prediction

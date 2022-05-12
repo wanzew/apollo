@@ -32,24 +32,21 @@ namespace planning {
 
 class Crosswalk : public TrafficRule {
  public:
-  Crosswalk(const TrafficRuleConfig& config,
-            const std::shared_ptr<DependencyInjector>& injector);
+  Crosswalk(const TrafficRuleConfig& config, const std::shared_ptr<DependencyInjector>& injector);
   virtual ~Crosswalk() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
+  void MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
   bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
-  bool CheckStopForObstacle(ReferenceLineInfo* const reference_line_info,
+  bool CheckStopForObstacle(ReferenceLineInfo* const           reference_line_info,
                             const hdmap::CrosswalkInfoConstPtr crosswalk_ptr,
-                            const Obstacle& obstacle,
-                            const double stop_deceleration);
+                            const Obstacle&                    obstacle,
+                            const double                       stop_deceleration);
 
  private:
-  static constexpr char const* CROSSWALK_VO_ID_PREFIX = "CW_";
+  static constexpr char const*           CROSSWALK_VO_ID_PREFIX = "CW_";
   std::vector<const hdmap::PathOverlap*> crosswalk_overlaps_;
 };
 

@@ -46,18 +46,18 @@ struct alignas(16) Frame {
   // @brief sensor information
   SensorInfo sensor_info;
 
-  double timestamp = 0.0;
+  double                               timestamp = 0.0;
   std::vector<std::shared_ptr<Object>> objects;
-  Eigen::Affine3d sensor2world_pose;
+  Eigen::Affine3d                      sensor2world_pose;
 
   // sensor-specific frame supplements
-  LidarFrameSupplement lidar_frame_supplement;
-  RadarFrameSupplement radar_frame_supplement;
-  CameraFrameSupplement camera_frame_supplement;
+  LidarFrameSupplement      lidar_frame_supplement;
+  RadarFrameSupplement      radar_frame_supplement;
+  CameraFrameSupplement     camera_frame_supplement;
   UltrasonicFrameSupplement ultrasonic_frame_supplement;
 };
 
-typedef std::shared_ptr<Frame> FramePtr;
+typedef std::shared_ptr<Frame>       FramePtr;
 typedef std::shared_ptr<const Frame> FrameConstPtr;
 
 }  // namespace base

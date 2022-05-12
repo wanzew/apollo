@@ -18,12 +18,14 @@
 #include <string>
 #include <thread>
 #include <vector>
+
 #include "gtest/gtest.h"
+
+#include "cyber/proto/unit_test.pb.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/common/util.h"
 #include "cyber/init.h"
-#include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/receiver/shm_receiver.h"
 #include "cyber/transport/transmitter/shm_transmitter.h"
 #include "cyber/transport/transport.h"
@@ -35,9 +37,10 @@ namespace transport {
 class ShmTransceiverTest : public ::testing::Test {
  protected:
   using TransmitterPtr = std::shared_ptr<Transmitter<proto::UnitTest>>;
-  using ReceiverPtr = std::shared_ptr<Receiver<proto::UnitTest>>;
+  using ReceiverPtr    = std::shared_ptr<Receiver<proto::UnitTest>>;
 
-  ShmTransceiverTest() : channel_name_("shm_channel") {}
+  ShmTransceiverTest()
+      : channel_name_("shm_channel") {}
 
   virtual ~ShmTransceiverTest() {}
 
@@ -59,22 +62,20 @@ class ShmTransceiverTest : public ::testing::Test {
     transmitter_b_ = nullptr;
   }
 
-  std::string channel_name_;
+  std::string    channel_name_;
   TransmitterPtr transmitter_a_ = nullptr;
   TransmitterPtr transmitter_b_ = nullptr;
 };
 
 TEST_F(ShmTransceiverTest, constructor) {
   RoleAttributes attr;
-  TransmitterPtr transmitter =
-      std::make_shared<ShmTransmitter<proto::UnitTest>>(attr);
-  ReceiverPtr receiver =
-      std::make_shared<ShmReceiver<proto::UnitTest>>(attr, nullptr);
+  TransmitterPtr transmitter = std::make_shared<ShmTransmitter<proto::UnitTest>>(attr);
+  ReceiverPtr    receiver    = std::make_shared<ShmReceiver<proto::UnitTest>>(attr, nullptr);
 
   EXPECT_EQ(transmitter->seq_num(), 0);
 
   auto& transmitter_id = transmitter->id();
-  auto& receiver_id = receiver->id();
+  auto& receiver_id    = receiver->id();
 
   EXPECT_NE(transmitter_id.ToString(), receiver_id.ToString());
 }
@@ -84,12 +85,12 @@ TEST_F(ShmTransceiverTest, enable_and_disable) {
   transmitter_a_->Enable();
 
   std::vector<proto::UnitTest> msgs;
-  RoleAttributes attr;
+  RoleAttributes               attr;
   attr.set_channel_name(channel_name_);
   attr.set_channel_id(common::Hash(channel_name_));
   ReceiverPtr receiver = std::make_shared<ShmReceiver<proto::UnitTest>>(
-      attr, [&msgs](const std::shared_ptr<proto::UnitTest>& msg,
-                    const MessageInfo& msg_info, const RoleAttributes& attr) {
+      attr, [&msgs](const std::shared_ptr<proto::UnitTest>& msg, const MessageInfo& msg_info,
+                    const RoleAttributes& attr) {
         (void)msg_info;
         (void)attr;
         msgs.emplace_back(*msg);
@@ -99,8 +100,7 @@ TEST_F(ShmTransceiverTest, enable_and_disable) {
   // repeated call
   receiver->Enable();
 
-  ReceiverPtr receiver_null_cb =
-      std::make_shared<ShmReceiver<proto::UnitTest>>(attr, nullptr);
+  ReceiverPtr receiver_null_cb = std::make_shared<ShmReceiver<proto::UnitTest>>(attr, nullptr);
   receiver_null_cb->Enable();
 
   auto msg = std::make_shared<proto::UnitTest>();

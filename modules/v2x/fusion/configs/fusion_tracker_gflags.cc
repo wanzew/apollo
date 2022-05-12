@@ -26,10 +26,12 @@ namespace v2x {
 namespace ft {
 
 // config manager
-DEFINE_string(config_path, "/apollo/modules/v2x/data",
+DEFINE_string(config_path,
+              "/apollo/modules/v2x/data",
               "ADU shared data path, including maps, routings...");
 DEFINE_string(v2x_module_name, "v2x_fusion", "name");
-DEFINE_string(v2x_fusion_obstacles_topic, "/apollo/msf/obstacles",
+DEFINE_string(v2x_fusion_obstacles_topic,
+              "/apollo/msf/obstacles",
               "perception obstacle topic name");
 DEFINE_bool(use_v2x, false, "use v2x");
 // fusion

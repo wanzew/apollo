@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/half_circle_angle.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/kalman_filter.h"
@@ -28,8 +29,8 @@ namespace camera {
 
 TEST(KalmanTest, copy_test) {
   KalmanFilterConstVelocity kf;
-  Eigen::Vector3d center;
-  Eigen::Vector2d measure;
+  Eigen::Vector3d           center;
+  Eigen::Vector2d           measure;
   center << 0, 0, 0;
   kf.Init(center);
   for (int i = 0; i < 10; ++i) {
@@ -43,9 +44,9 @@ TEST(KalmanTest, copy_test) {
 
 TEST(KalmanTest, zero_test) {
   KalmanFilterConstVelocity kf;
-  Eigen::Vector3d center;
-  Eigen::Vector4d state;
-  Eigen::Vector2d measure;
+  Eigen::Vector3d           center;
+  Eigen::Vector4d           state;
+  Eigen::Vector2d           measure;
   center << 0, 0, 0;
   state << 0, 0, 0, 0;
   measure << 0, 0;
@@ -132,7 +133,7 @@ TEST(EKFTest, ekf_test) {
 
 TEST(MeanFilterTest, mean_filter_test) {
   MeanFilter mean_filter;
-  int window_size = 5;
+  int        window_size = 5;
   mean_filter.SetWindow(window_size);
 
   Eigen::Vector2d x;
@@ -147,7 +148,7 @@ TEST(MeanFilterTest, mean_filter_test) {
   x << 10.0f, 200.0f;
   mean_filter.AddMeasure(x);
   state = mean_filter.get_state();
-  var = mean_filter.get_variance();
+  var   = mean_filter.get_variance();
   ASSERT_TRUE(std::fabs(state[0] - 5.5f) < 1e-6);
   ASSERT_TRUE(std::fabs(state[1] - 101.0f) < 1e-6);
 
@@ -182,7 +183,7 @@ TEST(SimilarTest, cpu_test) {
   frame2.detected_objects.push_back(object3);
   base::Blob<float> sim;
   similar.Calc(&frame1, &frame2, &sim);
-  const float *sim_data = sim.cpu_data();
+  const float* sim_data = sim.cpu_data();
   ASSERT_TRUE(fabs(sim_data[0] - 1) < 1e-3f);    // NOLINT
   ASSERT_TRUE(fabs(sim_data[1] - 0.0) < 1e-3f);  // NOLINT
 
@@ -197,11 +198,11 @@ TEST(SimilarTest, GPU_test) {
   using base::Object;
   using base::ObjectPtr;
 
-  std::vector<int> shape(2);
-  const float *sim_data;
-  ObjectPtr object(new Object);
-  CameraFrame frame1;
-  CameraFrame frame2;
+  std::vector<int>                   shape(2);
+  const float*                       sim_data;
+  ObjectPtr                          object(new Object);
+  CameraFrame                        frame1;
+  CameraFrame                        frame2;
   std::shared_ptr<base::Blob<float>> sim1(new base::Blob<float>);
   ASSERT_FALSE(similar.Calc(&frame1, &frame1, sim1.get()));
   frame1.detected_objects.push_back(object);
@@ -214,9 +215,9 @@ TEST(SimilarTest, GPU_test) {
   frame1.track_feature_blob->Reshape(shape);
   ASSERT_TRUE(frame1.track_feature_blob->shape(0) == 1);  // NOLINT
   ASSERT_TRUE(frame1.track_feature_blob->shape(1) == 2);  // NOLINT
-  float *feature1 = frame1.track_feature_blob->mutable_cpu_data();
-  feature1[0] = 0.707f;
-  feature1[1] = 0.707f;
+  float* feature1 = frame1.track_feature_blob->mutable_cpu_data();
+  feature1[0]     = 0.707f;
+  feature1[1]     = 0.707f;
 
   similar.Calc(&frame1, &frame1, sim1.get());
   sim_data = sim1->cpu_data();
@@ -232,13 +233,13 @@ TEST(SimilarTest, GPU_test) {
   frame2.track_feature_blob->Reshape(shape);
   ASSERT_TRUE(frame2.track_feature_blob->shape(0) == 3);  // NOLINT
   ASSERT_TRUE(frame2.track_feature_blob->shape(1) == 2);  // NOLINT
-  float *feature2 = frame2.track_feature_blob->mutable_cpu_data();
-  feature2[0] = 0.707f;
-  feature2[1] = 0.707f;
-  feature2[2] = 1.0f;
-  feature2[3] = 0.0f;
-  feature2[4] = -0.707f;
-  feature2[5] = 0.707f;
+  float* feature2 = frame2.track_feature_blob->mutable_cpu_data();
+  feature2[0]     = 0.707f;
+  feature2[1]     = 0.707f;
+  feature2[2]     = 1.0f;
+  feature2[3]     = 0.0f;
+  feature2[4]     = -0.707f;
+  feature2[5]     = 0.707f;
   std::shared_ptr<base::Blob<float>> sim2(new base::Blob<float>);
   similar.Calc(&frame1, &frame2, sim2.get());
   ASSERT_TRUE(sim2->shape(0) == 1);  // NOLINT
@@ -270,7 +271,7 @@ TEST(AngleTest, angle_test) {
 
 TEST(KalmanConstTest, const_filter_test) {
   {
-    KalmanFilterConstState<1> filter;
+    KalmanFilterConstState<1>           filter;
     KalmanFilterConstState<1>::VectorNd param;
     param << 0.0;
     EXPECT_TRUE(filter.Init(param));
@@ -278,10 +279,9 @@ TEST(KalmanConstTest, const_filter_test) {
     filter.process_noise_ << 0.1;
     std::srand(static_cast<unsigned int>(std::time(NULL)));
     std::vector<double> measurements = {
-        1.27201411, -0.27051547, -2.50816196, 0.05856895,  -3.14114835,
-        1.3873894,  0.90496925,  -0.00598577, 0.48878823,  0.75704055,
-        0.19266443, 2.05814734,  0.44203236,  -0.36923239, -2.74245158,
-        1.71922351, 0.50960368,  -1.24154697, -1.7048239,  0.80218156};
+        1.27201411,  -0.27051547, -2.50816196, 0.05856895,  -3.14114835, 1.3873894,  0.90496925,
+        -0.00598577, 0.48878823,  0.75704055,  0.19266443,  2.05814734,  0.44203236, -0.36923239,
+        -2.74245158, 1.71922351,  0.50960368,  -1.24154697, -1.7048239,  0.80218156};
 
     for (size_t i = 0; i < measurements.size(); ++i) {
       param << measurements[i];
@@ -294,7 +294,7 @@ TEST(KalmanConstTest, const_filter_test) {
   }
 
   {
-    KalmanFilterConstState<1> filter;
+    KalmanFilterConstState<1>           filter;
     KalmanFilterConstState<1>::VectorNd param;
     param << 0.0;
     EXPECT_FALSE(filter.Predict(1.0));

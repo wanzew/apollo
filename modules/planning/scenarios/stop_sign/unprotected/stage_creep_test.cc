@@ -16,9 +16,10 @@
 
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_creep.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -34,16 +35,14 @@ class StopSignUnprotectedStageCreepTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StopSignUnprotectedStageCreepTest, Init) {
-  StopSignUnprotectedStageCreep stop_sign_unprotected_stage_creep(config_,
-                                                                  injector_);
+  StopSignUnprotectedStageCreep stop_sign_unprotected_stage_creep(config_, injector_);
   EXPECT_EQ(stop_sign_unprotected_stage_creep.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP));
+            ScenarioConfig::StageType_Name(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP));
 }
 
 }  // namespace stop_sign

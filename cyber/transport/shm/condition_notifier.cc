@@ -18,6 +18,7 @@
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
+
 #include <thread>
 
 #include "cyber/common/log.h"
@@ -46,9 +47,7 @@ ConditionNotifier::ConditionNotifier() {
 ConditionNotifier::~ConditionNotifier() { Shutdown(); }
 
 void ConditionNotifier::Shutdown() {
-  if (is_shutdown_.exchange(true)) {
-    return;
-  }
+  if (is_shutdown_.exchange(true)) { return; }
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   Reset();
@@ -60,10 +59,10 @@ bool ConditionNotifier::Notify(const ReadableInfo& info) {
     return false;
   }
 
-  uint64_t seq = indicator_->next_seq.fetch_add(1);
-  uint64_t idx = seq % kBufLength;
+  uint64_t seq           = indicator_->next_seq.fetch_add(1);
+  uint64_t idx           = seq % kBufLength;
   indicator_->infos[idx] = info;
-  indicator_->seqs[idx] = seq;
+  indicator_->seqs[idx]  = seq;
 
   return true;
 }
@@ -83,11 +82,11 @@ bool ConditionNotifier::Listen(int timeout_ms, ReadableInfo* info) {
   while (!is_shutdown_.load()) {
     uint64_t seq = indicator_->next_seq.load();
     if (seq != next_seq_) {
-      auto idx = next_seq_ % kBufLength;
+      auto idx        = next_seq_ % kBufLength;
       auto actual_seq = indicator_->seqs[idx];
       if (actual_seq >= next_seq_) {
         next_seq_ = actual_seq;
-        *info = indicator_->infos[idx];
+        *info     = indicator_->infos[idx];
         ++next_seq_;
         return true;
       } else {
@@ -113,9 +112,7 @@ bool ConditionNotifier::OpenOrCreate() {
   int shmid = 0;
   while (retry < 2) {
     shmid = shmget(key_, shm_size_, 0644 | IPC_CREAT | IPC_EXCL);
-    if (shmid != -1) {
-      break;
-    }
+    if (shmid != -1) { break; }
 
     if (EINVAL == errno) {
       AINFO << "need larger space, recreate.";

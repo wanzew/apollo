@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/camera/lib/obstacle/tracker/omt/obstacle_reference.h"
+#include "gtest/gtest.h"
+
+#include "modules/perception/camera/lib/obstacle/tracker/omt/proto/omt.pb.h"
 
 #include "cyber/common/file.h"
-#include "gtest/gtest.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/proto/omt.pb.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/obstacle_reference.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 
 namespace apollo {
@@ -37,44 +38,44 @@ TEST(RefTest, update_test) {
   ACHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   ObstacleReference ref;
-  omt::OmtParam omt_param;
-  std::string omt_config = apollo::cyber::common::GetAbsolutePath(
+  omt::OmtParam     omt_param;
+  std::string       omt_config = apollo::cyber::common::GetAbsolutePath(
       "/apollo/modules/perception/testdata/"
       "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
       "config.pt");
   ACHECK(apollo::cyber::common::GetProtoFromFile(omt_config, &omt_param));
   ref.Init(omt_param.reference(), 1920.0f, 1080.0f);
-  std::string sensor_name = "onsemi_obstacle";
-  DataProvider provider;
+  std::string               sensor_name = "onsemi_obstacle";
+  DataProvider              provider;
   DataProvider::InitOptions options;
-  options.image_width = 1920;
-  options.image_height = 1080;
+  options.image_width     = 1920;
+  options.image_height    = 1080;
   options.do_undistortion = false;
-  options.device_id = 0;
-  options.sensor_name = sensor_name;
+  options.device_id       = 0;
+  options.sensor_name     = sensor_name;
   provider.Init(options);
   CameraFrame frame;
   frame.data_provider = &provider;
-  frame.timestamp = 0;
+  frame.timestamp     = 0;
 
   // first frame with one car object
   base::ObjectPtr object(new base::Object);
-  base::BBox2DF bbox(500, 500, 1000, 1000);
+  base::BBox2DF   bbox(500, 500, 1000, 1000);
   object->camera_supplement.box = bbox;
-  object->type = base::ObjectType::VEHICLE;
-  object->sub_type = base::ObjectSubType::CAR;
+  object->type                  = base::ObjectType::VEHICLE;
+  object->sub_type              = base::ObjectSubType::CAR;
   object->size << 1.6, 1.7, 3.8;
 
   frame.detected_objects.push_back(object);
   // new target
-  Target target(omt_param.target_param());
+  Target              target(omt_param.target_param());
   std::vector<Target> targets;
   targets.push_back(target);
   targets[0].id = 0;
   PatchIndicator indicator(0, 0, sensor_name);
   TrackObjectPtr track_obj(new TrackObject);
   track_obj->indicator = indicator;
-  track_obj->object = object;
+  track_obj->object    = object;
   track_obj->timestamp = 0;
   targets[0].Add(track_obj);
 
@@ -89,7 +90,7 @@ TEST(RefTest, update_test) {
   object->sub_type = base::ObjectSubType::UNKNOWN;
   ref.UpdateReference(&frame, targets);
   CHECK_EQ(ref.reference_[sensor_name].size(), 1);
-  object->sub_type = base::ObjectSubType::CAR;
+  object->sub_type                   = base::ObjectSubType::CAR;
   object->camera_supplement.box.xmin = 0;
   object->camera_supplement.box.xmax = 100;
   ref.UpdateReference(&frame, targets);
@@ -98,19 +99,19 @@ TEST(RefTest, update_test) {
   object->camera_supplement.box.ymax = 500;
   ref.UpdateReference(&frame, targets);
   CHECK_EQ(ref.reference_[sensor_name].size(), 1);
-  track_obj->indicator.sensor_name = "asdfasdf";
+  track_obj->indicator.sensor_name   = "asdfasdf";
   object->camera_supplement.box.ymax = 900;
   ref.UpdateReference(&frame, targets);
   CHECK_EQ(ref.reference_[sensor_name].size(), 1);
-  track_obj->indicator.sensor_name = sensor_name;
+  track_obj->indicator.sensor_name   = sensor_name;
   object->camera_supplement.box.ymax = 599;
-  frame.camera_k_matrix(1, 2) = 600;
+  frame.camera_k_matrix(1, 2)        = 600;
   ref.UpdateReference(&frame, targets);
   CHECK_EQ(ref.reference_[sensor_name].size(), 1);
   object->camera_supplement.box.xmin = 1700;
   object->camera_supplement.box.xmax = 1800;
   object->camera_supplement.box.ymax = 650;
-  frame.camera_k_matrix(1, 2) = 600;
+  frame.camera_k_matrix(1, 2)        = 600;
   ref.UpdateReference(&frame, targets);
   CHECK_EQ(ref.reference_[sensor_name].size(), 1);
   object->size << 0.6, 0.7, 1.5;

@@ -22,6 +22,7 @@
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -35,15 +36,13 @@ class OpenSpaceTrajectoryPartitionTest : public ::testing::Test {
   }
 
  protected:
-  TaskConfig config_;
+  TaskConfig                          config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(OpenSpaceTrajectoryPartitionTest, Init) {
-  OpenSpaceTrajectoryPartition open_space_trajectory_partition(config_,
-                                                               injector_);
-  EXPECT_EQ(open_space_trajectory_partition.Name(),
-            TaskConfig::TaskType_Name(config_.task_type()));
+  OpenSpaceTrajectoryPartition open_space_trajectory_partition(config_, injector_);
+  EXPECT_EQ(open_space_trajectory_partition.Name(), TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 }  // namespace planning

@@ -32,7 +32,7 @@
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 #if WITH_TELEOP == 1
-#include "modules/dreamview/backend/teleop/teleop.h"
+#  include "modules/dreamview/backend/teleop/teleop.h"
 #endif
 
 /**
@@ -48,27 +48,27 @@ class Dreamview {
 
   apollo::common::Status Init();
   apollo::common::Status Start();
-  void Stop();
+  void                   Stop();
 
  private:
   void TerminateProfilingMode();
 
   std::unique_ptr<cyber::Timer> exit_timer_;
 
-  std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
-  std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
-  std::unique_ptr<SimControl> sim_control_;
-  std::unique_ptr<CivetServer> server_;
-  std::unique_ptr<WebSocketHandler> websocket_;
-  std::unique_ptr<WebSocketHandler> map_ws_;
-  std::unique_ptr<WebSocketHandler> point_cloud_ws_;
-  std::unique_ptr<WebSocketHandler> camera_ws_;
-  std::unique_ptr<ImageHandler> image_;
-  std::unique_ptr<MapService> map_service_;
-  std::unique_ptr<HMI> hmi_;
+  std::unique_ptr<SimulationWorldUpdater>  sim_world_updater_;
+  std::unique_ptr<PointCloudUpdater>       point_cloud_updater_;
+  std::unique_ptr<SimControl>              sim_control_;
+  std::unique_ptr<CivetServer>             server_;
+  std::unique_ptr<WebSocketHandler>        websocket_;
+  std::unique_ptr<WebSocketHandler>        map_ws_;
+  std::unique_ptr<WebSocketHandler>        point_cloud_ws_;
+  std::unique_ptr<WebSocketHandler>        camera_ws_;
+  std::unique_ptr<ImageHandler>            image_;
+  std::unique_ptr<MapService>              map_service_;
+  std::unique_ptr<HMI>                     hmi_;
   std::unique_ptr<PerceptionCameraUpdater> perception_camera_updater_;
 #if WITH_TELEOP == 1
-  std::unique_ptr<TeleopService> teleop_;
+  std::unique_ptr<TeleopService>    teleop_;
   std::unique_ptr<WebSocketHandler> teleop_ws_;
 #endif
 };

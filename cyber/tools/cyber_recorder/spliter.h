@@ -23,8 +23,9 @@
 #include <string>
 #include <vector>
 
-#include "cyber/common/log.h"
 #include "cyber/proto/record.pb.h"
+
+#include "cyber/common/log.h"
 #include "cyber/record/file/record_file_reader.h"
 #include "cyber/record/file/record_file_writer.h"
 #include "cyber/record/header_builder.h"
@@ -40,24 +41,25 @@ namespace record {
 
 class Spliter {
  public:
-  Spliter(const std::string& input_file, const std::string& output_file,
+  Spliter(const std::string&              input_file,
+          const std::string&              output_file,
           const std::vector<std::string>& white_channels,
           const std::vector<std::string>& black_channels,
-          uint64_t begin_time = 0,
-          uint64_t end_time = std::numeric_limits<uint64_t>::max());
+          uint64_t                        begin_time = 0,
+          uint64_t                        end_time   = std::numeric_limits<uint64_t>::max());
   virtual ~Spliter();
   bool Proc();
 
  private:
-  RecordFileReader reader_;
-  RecordFileWriter writer_;
-  std::string input_file_;
-  std::string output_file_;
+  RecordFileReader         reader_;
+  RecordFileWriter         writer_;
+  std::string              input_file_;
+  std::string              output_file_;
   std::vector<std::string> white_channels_;
   std::vector<std::string> black_channels_;
-  bool all_channels_;
-  uint64_t begin_time_;
-  uint64_t end_time_;
+  bool                     all_channels_;
+  uint64_t                 begin_time_;
+  uint64_t                 end_time_;
 };
 
 }  // namespace record

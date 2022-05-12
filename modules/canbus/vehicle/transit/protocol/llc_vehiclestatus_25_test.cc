@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/transit/protocol/llc_vehiclestatus_25.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/drivers/canbus/common/byte.h"
@@ -35,9 +36,8 @@ class llc_vehiclestatus_25Test : public ::testing ::Test {
 
 TEST_F(llc_vehiclestatus_25Test, 12voltage) {
   const std::uint8_t kBytes = 0xFF;
-  std::int32_t length = 8;
-  EXPECT_DOUBLE_EQ(Llcauxiliary_status25_.llc_fbk_12voltage(&kBytes, length),
-                   25.5);
+  std::int32_t       length = 8;
+  EXPECT_DOUBLE_EQ(Llcauxiliary_status25_.llc_fbk_12voltage(&kBytes, length), 25.5);
 }
 
 }  // namespace transit

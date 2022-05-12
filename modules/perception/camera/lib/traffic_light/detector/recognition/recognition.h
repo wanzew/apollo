@@ -19,9 +19,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/camera/lib/traffic_light/detector/recognition/proto/recognition.pb.h"
+
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/classify.h"
-#include "modules/perception/camera/lib/traffic_light/detector/recognition/proto/recognition.pb.h"
 #include "modules/perception/inference/inference.h"
 
 namespace apollo {
@@ -40,8 +41,7 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
   // @param [in]: options
   // @param [in/out]: frame
   // traffic_light type and 2D bbox should be filled, required,
-  bool Detect(const TrafficLightDetectorOptions& options,
-              CameraFrame* frame) override;
+  bool Detect(const TrafficLightDetectorOptions& options, CameraFrame* frame) override;
 
   std::string Name() const override;
 
@@ -49,9 +49,9 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
   TrafficLightRecognition& operator=(const BaseTrafficLightDetector&) = delete;
 
  private:
-  std::shared_ptr<ClassifyBySimple> classify_vertical_;
-  std::shared_ptr<ClassifyBySimple> classify_quadrate_;
-  std::shared_ptr<ClassifyBySimple> classify_horizontal_;
+  std::shared_ptr<ClassifyBySimple>             classify_vertical_;
+  std::shared_ptr<ClassifyBySimple>             classify_quadrate_;
+  std::shared_ptr<ClassifyBySimple>             classify_horizontal_;
   traffic_light::recognition::RecognizeBoxParam recognize_param_;
 };
 

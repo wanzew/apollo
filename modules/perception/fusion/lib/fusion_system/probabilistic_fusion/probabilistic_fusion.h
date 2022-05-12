@@ -30,12 +30,12 @@ namespace perception {
 namespace fusion {
 
 struct FusionParams {
-  bool use_lidar = true;
-  bool use_radar = true;
-  bool use_camera = true;
-  std::string tracker_method;
-  std::string data_association_method;
-  std::string gate_keeper_method;
+  bool                     use_lidar  = true;
+  bool                     use_radar  = true;
+  bool                     use_camera = true;
+  std::string              tracker_method;
+  std::string              data_association_method;
+  std::string              gate_keeper_method;
   std::vector<std::string> prohibition_sensors;
 };
 
@@ -49,8 +49,8 @@ class ProbabilisticFusion : public BaseFusionSystem {
 
   bool Init(const FusionInitOptions& init_options) override;
 
-  bool Fuse(const FusionOptions& options,
-            const base::FrameConstPtr& sensor_frame,
+  bool Fuse(const FusionOptions&          options,
+            const base::FrameConstPtr&    sensor_frame,
             std::vector<base::ObjectPtr>* fused_objects) override;
 
   std::string Name() const override;
@@ -60,30 +60,27 @@ class ProbabilisticFusion : public BaseFusionSystem {
 
   void FuseFrame(const SensorFramePtr& frame);
 
-  void CollectFusedObjects(double timestamp,
-                           std::vector<base::ObjectPtr>* fused_objects);
+  void CollectFusedObjects(double timestamp, std::vector<base::ObjectPtr>* fused_objects);
 
   void FuseForegroundTrack(const SensorFramePtr& frame);
   void FusebackgroundTrack(const SensorFramePtr& frame);
 
   void RemoveLostTrack();
 
-  void UpdateAssignedTracks(
-      const SensorFramePtr& frame,
-      const std::vector<TrackMeasurmentPair>& assignments);
+  void UpdateAssignedTracks(const SensorFramePtr&                   frame,
+                            const std::vector<TrackMeasurmentPair>& assignments);
 
-  void UpdateUnassignedTracks(const SensorFramePtr& frame,
+  void UpdateUnassignedTracks(const SensorFramePtr&      frame,
                               const std::vector<size_t>& unassigned_track_inds);
 
-  void CreateNewTracks(const SensorFramePtr& frame,
-                       const std::vector<size_t>& unassigned_obj_inds);
+  void CreateNewTracks(const SensorFramePtr& frame, const std::vector<size_t>& unassigned_obj_inds);
 
-  void CollectObjectsByTrack(double timestamp, const TrackPtr& track,
+  void CollectObjectsByTrack(double                        timestamp,
+                             const TrackPtr&               track,
                              std::vector<base::ObjectPtr>* fused_objects);
 
-  void CollectSensorMeasurementFromObject(
-      const SensorObjectConstPtr& object,
-      base::SensorObjectMeasurement* measurement);
+  void CollectSensorMeasurementFromObject(const SensorObjectConstPtr&    object,
+                                          base::SensorObjectMeasurement* measurement);
 
  private:
   std::mutex data_mutex_;
@@ -91,11 +88,11 @@ class ProbabilisticFusion : public BaseFusionSystem {
 
   bool started_ = false;
 
-  ScenePtr scenes_ = nullptr;
+  ScenePtr                                  scenes_ = nullptr;
   std::vector<std::shared_ptr<BaseTracker>> trackers_;  // for foreground
 
   std::unique_ptr<BaseDataAssociation> matcher_;
-  std::unique_ptr<BaseGatekeeper> gate_keeper_;
+  std::unique_ptr<BaseGatekeeper>      gate_keeper_;
 
   FusionParams params_;
 };

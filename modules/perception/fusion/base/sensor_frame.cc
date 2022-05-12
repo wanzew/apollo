@@ -21,17 +21,14 @@ namespace fusion {
 
 SensorFrame::SensorFrame() { header_.reset(new SensorFrameHeader()); }
 
-SensorFrame::SensorFrame(const base::FrameConstPtr& base_frame_ptr) {
-  Initialize(base_frame_ptr);
-}
+SensorFrame::SensorFrame(const base::FrameConstPtr& base_frame_ptr) { Initialize(base_frame_ptr); }
 
 void SensorFrame::Initialize(const base::FrameConstPtr& base_frame_ptr) {
-  header_.reset(new SensorFrameHeader(base_frame_ptr->sensor_info,
-                                      base_frame_ptr->timestamp,
+  header_.reset(new SensorFrameHeader(base_frame_ptr->sensor_info, base_frame_ptr->timestamp,
                                       base_frame_ptr->sensor2world_pose));
 
-  lidar_frame_supplement_ = base_frame_ptr->lidar_frame_supplement;
-  radar_frame_supplement_ = base_frame_ptr->radar_frame_supplement;
+  lidar_frame_supplement_  = base_frame_ptr->lidar_frame_supplement;
+  radar_frame_supplement_  = base_frame_ptr->radar_frame_supplement;
   camera_frame_supplement_ = base_frame_ptr->camera_frame_supplement;
 
   const auto& base_objects = base_frame_ptr->objects;
@@ -47,23 +44,18 @@ void SensorFrame::Initialize(const base::FrameConstPtr& base_frame_ptr) {
   }
 }
 
-void SensorFrame::Initialize(const base::FrameConstPtr& base_frame_ptr,
-                             const SensorPtr& sensor) {
+void SensorFrame::Initialize(const base::FrameConstPtr& base_frame_ptr, const SensorPtr& sensor) {
   Initialize(base_frame_ptr);
 }
 
 std::string SensorFrame::GetSensorId() const {
-  if (header_ == nullptr) {
-    return std::string("");
-  }
+  if (header_ == nullptr) { return std::string(""); }
 
   return header_->sensor_info.name;
 }
 
 base::SensorType SensorFrame::GetSensorType() const {
-  if (header_ == nullptr) {
-    return base::SensorType::UNKNOWN_SENSOR_TYPE;
-  }
+  if (header_ == nullptr) { return base::SensorType::UNKNOWN_SENSOR_TYPE; }
 
   return header_->sensor_info.type;
 }

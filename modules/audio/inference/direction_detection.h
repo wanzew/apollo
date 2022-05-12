@@ -28,14 +28,15 @@
 // Eigen 3.3.7: #define ALIVE (0)
 // fastrtps: enum ChangeKind_t { ALIVE, ... };
 #if defined(ALIVE)
-#undef ALIVE
+#  undef ALIVE
 #endif
 
 #include "ATen/ATen.h"
 #include "torch/torch.h"
 
-#include "cyber/cyber.h"
 #include "modules/common/proto/geometry.pb.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace audio {
@@ -47,30 +48,30 @@ class DirectionDetection {
   DirectionDetection();
   ~DirectionDetection();
   // Estimates the position of the source of the sound
-  std::pair<Point3D, double> EstimateSoundSource(
-      std::vector<std::vector<double>>&& channels_vec,
-      const std::string& respeaker_extrinsic_file,
-      const int sample_rate, const double mic_distance);
+  std::pair<Point3D, double> EstimateSoundSource(std::vector<std::vector<double>>&& channels_vec,
+                                                 const std::string& respeaker_extrinsic_file,
+                                                 const int          sample_rate,
+                                                 const double       mic_distance);
 
  private:
-  const double kSoundSpeed = 343.2;
-  const int kDistance = 50;
+  const double                     kSoundSpeed = 343.2;
+  const int                        kDistance   = 50;
   std::unique_ptr<Eigen::Matrix4d> respeaker2imu_ptr_;
 
   // Estimates the direction of the source of the sound
   double EstimateDirection(std::vector<std::vector<double>>&& channels_vec,
-                           const int sample_rate, const double mic_distance);
+                           const int                          sample_rate,
+                           const double                       mic_distance);
 
-  bool LoadExtrinsics(const std::string& yaml_file,
-                      Eigen::Matrix4d* respeaker_extrinsic);
+  bool LoadExtrinsics(const std::string& yaml_file, Eigen::Matrix4d* respeaker_extrinsic);
 
   // Computes the offset between the signal sig and the reference signal refsig
   // using the Generalized Cross Correlation - Phase Transform (GCC-PHAT)method.
-  double GccPhat(const torch::Tensor& sig, const torch::Tensor& refsig, int fs,
-                 double max_tau, int interp);
+  double GccPhat(
+      const torch::Tensor& sig, const torch::Tensor& refsig, int fs, double max_tau, int interp);
 
   // Libtorch does not support Complex type currently.
-  void ConjugateTensor(torch::Tensor* tensor);
+  void          ConjugateTensor(torch::Tensor* tensor);
   torch::Tensor ComplexMultiply(const torch::Tensor& a, const torch::Tensor& b);
   torch::Tensor ComplexAbsolute(const torch::Tensor& tensor);
 };

@@ -33,23 +33,23 @@ namespace dreamview {
 
 class HMI {
  public:
-  HMI(WebSocketHandler *websocket, MapService *map_service);
+  HMI(WebSocketHandler* websocket, MapService* map_service);
   void Start();
   void Stop();
 
  private:
   // Send VehicleParam to the given conn, or broadcast if conn is null.
-  void SendVehicleParam(WebSocketHandler::Connection *conn = nullptr);
-  void SendStatus(WebSocketHandler::Connection *conn = nullptr);
+  void SendVehicleParam(WebSocketHandler::Connection* conn = nullptr);
+  void SendStatus(WebSocketHandler::Connection* conn = nullptr);
 
   void RegisterMessageHandlers();
 
-  std::unique_ptr<HMIWorker> hmi_worker_;
+  std::unique_ptr<HMIWorker>                hmi_worker_;
   apollo::common::monitor::MonitorLogBuffer monitor_log_buffer_;
 
   // No ownership.
-  WebSocketHandler *websocket_;
-  MapService *map_service_;
+  WebSocketHandler* websocket_;
+  MapService*       map_service_;
 };
 
 }  // namespace dreamview

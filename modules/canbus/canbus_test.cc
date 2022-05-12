@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/canbus_component.h"
-
 #include "gtest/gtest.h"
+
+#include "modules/canbus/canbus_component.h"
 
 namespace apollo {
 namespace canbus {

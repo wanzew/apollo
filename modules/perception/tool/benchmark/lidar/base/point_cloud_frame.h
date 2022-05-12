@@ -16,6 +16,7 @@
 #pragma once
 #include <string>
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/util/types.h"
 
 namespace apollo {
@@ -30,9 +31,7 @@ class PointCloudFrame {
 
   bool load(const std::vector<std::string>& filenames);
 
-  inline const PointCloudConstPtr get_point_cloud() const {
-    return _point_cloud;
-  }
+  inline const PointCloudConstPtr get_point_cloud() const { return _point_cloud; }
 
   inline std::string get_name() const { return _name; }
 
@@ -42,7 +41,7 @@ class PointCloudFrame {
 
  private:
   PointCloudPtr _point_cloud;
-  std::string _name;
+  std::string   _name;
 
  private:
   static std::string _s_cloud_type;

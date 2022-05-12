@@ -18,8 +18,9 @@
 #include <chrono>
 #include <string>
 
-#include "modules/planning/common/trajectory_evaluator.h"
 #include "modules/planning/proto/learning_data.pb.h"
+
+#include "modules/planning/common/trajectory_evaluator.h"
 
 namespace apollo {
 namespace planning {
@@ -32,13 +33,12 @@ class Evaluator {
   void Evaluate(const std::string& source_file);
 
  private:
-  void WriteOutData(const std::string& source_filename,
-                    const LearningData& learning_data);
+  void WriteOutData(const std::string& source_filename, const LearningData& learning_data);
 
  private:
   std::chrono::time_point<std::chrono::system_clock> start_time_;
-  LearningData learning_data_;
-  TrajectoryEvaluator trajectory_evaluator_;
+  LearningData                                       learning_data_;
+  TrajectoryEvaluator                                trajectory_evaluator_;
 };
 
 }  // namespace planning

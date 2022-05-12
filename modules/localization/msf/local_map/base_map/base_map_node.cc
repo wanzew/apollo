@@ -28,28 +28,24 @@ using cyber::common::DirectoryExists;
 using cyber::common::EnsureDirectory;
 
 BaseMapNode::BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy)
-    : map_matrix_(matrix), compression_strategy_(strategy) {}
+    : map_matrix_(matrix)
+    , compression_strategy_(strategy) {}
 
 BaseMapNode::~BaseMapNode() {
-  if (map_matrix_ != nullptr) {
-    delete map_matrix_;
-  }
-  if (compression_strategy_ != nullptr) {
-    delete compression_strategy_;
-  }
+  if (map_matrix_ != nullptr) { delete map_matrix_; }
+  if (compression_strategy_ != nullptr) { delete compression_strategy_; }
 }
 
 void BaseMapNode::Init(const BaseMapConfig* map_config,
-                       const MapNodeIndex& index, bool create_map_cells) {
-  map_config_ = map_config;
-  index_ = index;
+                       const MapNodeIndex&  index,
+                       bool                 create_map_cells) {
+  map_config_      = map_config;
+  index_           = index;
   left_top_corner_ = GetLeftTopCorner(*map_config_, index_);
-  is_reserved_ = false;
-  data_is_ready_ = false;
-  is_changed_ = false;
-  if (create_map_cells) {
-    InitMapMatrix(map_config_);
-  }
+  is_reserved_     = false;
+  data_is_ready_   = false;
+  is_changed_      = false;
+  if (create_map_cells) { InitMapMatrix(map_config_); }
 }
 
 void BaseMapNode::InitMapMatrix(const BaseMapConfig* map_config) {
@@ -65,9 +61,9 @@ void BaseMapNode::Finalize() {
 }
 
 void BaseMapNode::ResetMapNode() {
-  is_changed_ = false;
+  is_changed_    = false;
   data_is_ready_ = false;
-  is_reserved_ = false;
+  is_reserved_   = false;
   map_matrix_->Reset(map_config_);
 }
 
@@ -79,38 +75,26 @@ void BaseMapNode::ResetMapNode() {
 
 bool BaseMapNode::Save() {
   SaveIntensityImage();
-  char buf[1024];
+  char        buf[1024];
   std::string path = map_config_->map_folder_path_;
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   path = path + "/map";
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%03u", index_.resolution_id_);
   path = path + buf;
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   if (index_.zone_id_ > 0) {
     path = path + "/north";
   } else {
     path = path + "/south";
   }
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%02d", abs(index_.zone_id_));
   path = path + buf;
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%08u", index_.m_);
   path = path + buf;
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%08u", index_.n_);
   path = path + buf;
 
@@ -129,38 +113,26 @@ bool BaseMapNode::Save() {
 }
 
 bool BaseMapNode::Load() {
-  char buf[1024];
+  char        buf[1024];
   std::string path = map_config_->map_folder_path_;
-  if (!DirectoryExists(path)) {
-    return false;
-  }
+  if (!DirectoryExists(path)) { return false; }
   path = path + "/map";
-  if (!DirectoryExists(path)) {
-    return false;
-  }
+  if (!DirectoryExists(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%03u", index_.resolution_id_);
   path = path + buf;
-  if (!DirectoryExists(path)) {
-    return false;
-  }
+  if (!DirectoryExists(path)) { return false; }
   if (index_.zone_id_ > 0) {
     path = path + "/north";
   } else {
     path = path + "/south";
   }
-  if (!DirectoryExists(path)) {
-    return false;
-  }
+  if (!DirectoryExists(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%02d", abs(index_.zone_id_));
   path = path + buf;
-  if (!DirectoryExists(path)) {
-    return false;
-  }
+  if (!DirectoryExists(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%08u", index_.m_);
   path = path + buf;
-  if (!DirectoryExists(path)) {
-    return false;
-  }
+  if (!DirectoryExists(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%08u", index_.n_);
   path = path + buf;
 
@@ -175,7 +147,7 @@ bool BaseMapNode::Load(const char* filename) {
   if (file) {
     LoadBinary(file);
     fclose(file);
-    is_changed_ = false;
+    is_changed_    = false;
     data_is_ready_ = true;
     return true;
   } else {
@@ -186,9 +158,9 @@ bool BaseMapNode::Load(const char* filename) {
 
 unsigned int BaseMapNode::LoadBinary(FILE* file) {
   // Load the header
-  unsigned int header_size = GetHeaderBinarySize();
+  unsigned int               header_size = GetHeaderBinarySize();
   std::vector<unsigned char> buf(header_size);
-  size_t read_size = fread(&buf[0], 1, header_size, file);
+  size_t                     read_size = fread(&buf[0], 1, header_size, file);
   CHECK_EQ(read_size, header_size);
   unsigned int processed_size = LoadHeaderBinary(&buf[0]);
   CHECK_EQ(processed_size, header_size);
@@ -202,17 +174,17 @@ unsigned int BaseMapNode::LoadBinary(FILE* file) {
 }
 
 unsigned int BaseMapNode::CreateBinary(FILE* file) const {
-  unsigned int buf_size = GetBinarySize();
+  unsigned int               buf_size = GetBinarySize();
   std::vector<unsigned char> buffer;
   buffer.resize(buf_size);
 
-  unsigned int binary_size = 0;
+  unsigned int               binary_size = 0;
   std::vector<unsigned char> body_buffer;
   CreateBodyBinary(&body_buffer);
   // CHECK_EQ(processed_size, buf_size);
 
   // Create header
-  unsigned int header_size = GetHeaderBinarySize();
+  unsigned int header_size    = GetHeaderBinarySize();
   unsigned int processed_size = CreateHeaderBinary(&buffer[0], buf_size);
   CHECK_EQ(processed_size, header_size);
 
@@ -233,35 +205,34 @@ unsigned int BaseMapNode::GetBinarySize() const {
 }
 
 unsigned int BaseMapNode::LoadHeaderBinary(unsigned char* buf) {
-  unsigned int target_size = GetHeaderBinarySize();
-  unsigned int* p = reinterpret_cast<unsigned int*>(buf);
-  index_.resolution_id_ = *p;
+  unsigned int  target_size = GetHeaderBinarySize();
+  unsigned int* p           = reinterpret_cast<unsigned int*>(buf);
+  index_.resolution_id_     = *p;
   ++p;
-  int* pp = reinterpret_cast<int*>(p);
+  int* pp         = reinterpret_cast<int*>(p);
   index_.zone_id_ = *pp;
   ++pp;
-  p = reinterpret_cast<unsigned int*>(pp);
+  p         = reinterpret_cast<unsigned int*>(pp);
   index_.m_ = *p;
   ++p;
   index_.n_ = *p;
   ++p;
   // left_top_corner_ = GetLeftTopCorner(*map_config_, index_);
-  left_top_corner_ = GetLeftTopCorner(*map_config_, index_);
+  left_top_corner_       = GetLeftTopCorner(*map_config_, index_);
   file_body_binary_size_ = *p;
   return target_size;
 }
 
-unsigned int BaseMapNode::CreateHeaderBinary(unsigned char* buf,
-                                             unsigned int buf_size) const {
+unsigned int BaseMapNode::CreateHeaderBinary(unsigned char* buf, unsigned int buf_size) const {
   unsigned int target_size = GetHeaderBinarySize();
   if (buf_size >= target_size) {
     unsigned int* p = reinterpret_cast<unsigned int*>(buf);
-    *p = index_.resolution_id_;
+    *p              = index_.resolution_id_;
     ++p;
     int* pp = reinterpret_cast<int*>(p);
-    *pp = index_.zone_id_;
+    *pp     = index_.zone_id_;
     ++pp;
-    p = reinterpret_cast<unsigned int*>(pp);
+    p  = reinterpret_cast<unsigned int*>(pp);
     *p = index_.m_;
     ++p;
     *p = index_.n_;
@@ -292,23 +263,19 @@ unsigned int BaseMapNode::GetHeaderBinarySize() const {
 // }
 
 unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
-  if (compression_strategy_ == nullptr) {
-    return map_matrix_->LoadBinary(&((*buf)[0]));
-  }
+  if (compression_strategy_ == nullptr) { return map_matrix_->LoadBinary(&((*buf)[0])); }
   std::vector<unsigned char> buf_uncompressed;
-  int ret = compression_strategy_->Decode(buf, &buf_uncompressed);
+  int                        ret = compression_strategy_->Decode(buf, &buf_uncompressed);
   if (ret < 0) {
     AERROR << "compression Decode error: " << ret;
     return 0;
   }
   AERROR << "map node compress ratio: "
-         << static_cast<float>(buf->size()) /
-                static_cast<float>(buf_uncompressed.size());
+         << static_cast<float>(buf->size()) / static_cast<float>(buf_uncompressed.size());
   return map_matrix_->LoadBinary(&buf_uncompressed[0]);
 }
 
-unsigned int BaseMapNode::CreateBodyBinary(
-    std::vector<unsigned char>* buf) const {
+unsigned int BaseMapNode::CreateBodyBinary(std::vector<unsigned char>* buf) const {
   if (compression_strategy_ == nullptr) {
     unsigned int body_size = GetBodyBinarySize();
     buf->resize(body_size);
@@ -326,9 +293,7 @@ unsigned int BaseMapNode::CreateBodyBinary(
   return static_cast<unsigned int>(buf->size());
 }
 
-unsigned int BaseMapNode::GetBodyBinarySize() const {
-  return map_matrix_->GetBinarySize();
-}
+unsigned int BaseMapNode::GetBodyBinarySize() const { return map_matrix_->GetBinarySize(); }
 
 // bool BaseMapNode::GetCoordinate(const idl::car::core::numerical::Vector2D&
 // coordinate,
@@ -350,15 +315,12 @@ unsigned int BaseMapNode::GetBodyBinarySize() const {
 // }
 
 bool BaseMapNode::GetCoordinate(const Eigen::Vector2d& coordinate,
-                                unsigned int* x, unsigned int* y) const {
+                                unsigned int*          x,
+                                unsigned int*          y) const {
   const Eigen::Vector2d& left_top_corner = GetLeftTopCorner();
-  int off_x = static_cast<int>((coordinate[0] - left_top_corner[0]) /
-                               GetMapResolution());
-  int off_y = static_cast<int>((coordinate[1] - left_top_corner[1]) /
-                               GetMapResolution());
-  if (off_x >= 0 &&
-      off_x < static_cast<int>(this->map_config_->map_node_size_x_) &&
-      off_y >= 0 &&
+  int off_x = static_cast<int>((coordinate[0] - left_top_corner[0]) / GetMapResolution());
+  int off_y = static_cast<int>((coordinate[1] - left_top_corner[1]) / GetMapResolution());
+  if (off_x >= 0 && off_x < static_cast<int>(this->map_config_->map_node_size_x_) && off_y >= 0 &&
       off_y < static_cast<int>(this->map_config_->map_node_size_y_)) {
     *x = static_cast<unsigned int>(off_x);
     *y = static_cast<unsigned int>(off_y);
@@ -377,7 +339,8 @@ bool BaseMapNode::GetCoordinate(const Eigen::Vector2d& coordinate,
 // }
 
 bool BaseMapNode::GetCoordinate(const Eigen::Vector3d& coordinate,
-                                unsigned int* x, unsigned int* y) const {
+                                unsigned int*          x,
+                                unsigned int*          y) const {
   Eigen::Vector2d coord2d(coordinate[0], coordinate[1]);
   return GetCoordinate(coord2d, x, y);
 }
@@ -391,12 +354,10 @@ bool BaseMapNode::GetCoordinate(const Eigen::Vector3d& coordinate,
 //     return coord;
 // }
 
-Eigen::Vector2d BaseMapNode::GetCoordinate(unsigned int x,
-                                           unsigned int y) const {
+Eigen::Vector2d BaseMapNode::GetCoordinate(unsigned int x, unsigned int y) const {
   const Eigen::Vector2d& left_top_corner = GetLeftTopCorner();
-  Eigen::Vector2d coord(
-      left_top_corner[0] + static_cast<float>(x) * GetMapResolution(),
-      left_top_corner[1] + static_cast<float>(y) * GetMapResolution());
+  Eigen::Vector2d        coord(left_top_corner[0] + static_cast<float>(x) * GetMapResolution(),
+                        left_top_corner[1] + static_cast<float>(y) * GetMapResolution());
   return coord;
 }
 
@@ -413,56 +374,42 @@ Eigen::Vector2d BaseMapNode::GetCoordinate(unsigned int x,
 // }
 
 Eigen::Vector2d BaseMapNode::GetLeftTopCorner(const BaseMapConfig& config,
-                                              const MapNodeIndex& index) {
+                                              const MapNodeIndex&  index) {
   Eigen::Vector2d coord;
-  coord[0] = config.map_range_.GetMinX() +
-             static_cast<float>(config.map_node_size_x_) *
-                 config.map_resolutions_[index.resolution_id_] *
-                 static_cast<float>(index.n_);
-  coord[1] = config.map_range_.GetMinY() +
-             static_cast<float>(config.map_node_size_y_) *
-                 config.map_resolutions_[index.resolution_id_] *
-                 static_cast<float>(index.m_);
+  coord[0] = config.map_range_.GetMinX() + static_cast<float>(config.map_node_size_x_) *
+                                               config.map_resolutions_[index.resolution_id_] *
+                                               static_cast<float>(index.n_);
+  coord[1] = config.map_range_.GetMinY() + static_cast<float>(config.map_node_size_y_) *
+                                               config.map_resolutions_[index.resolution_id_] *
+                                               static_cast<float>(index.m_);
   DCHECK_LT(coord[0], config.map_range_.GetMaxX());
   DCHECK_LT(coord[1], config.map_range_.GetMaxY());
   return coord;
 }
 
 bool BaseMapNode::SaveIntensityImage() const {
-  char buf[1024];
+  char        buf[1024];
   std::string path = map_config_->map_folder_path_;
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   path = path + "/image";
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%03u", index_.resolution_id_);
   path = path + buf;
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   if (index_.zone_id_ > 0) {
     path = path + "/north";
   } else {
     path = path + "/south";
   }
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%02d", abs(index_.zone_id_));
   path = path + buf;
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%08u", index_.m_);
   path = path + buf;
-  if (!EnsureDirectory(path)) {
-    return false;
-  }
+  if (!EnsureDirectory(path)) { return false; }
   snprintf(buf, sizeof(buf), "/%08u.png", index_.n_);
-  path = path + buf;
+  path          = path + buf;
   bool success0 = SaveIntensityImage(path);
   return success0;
 }

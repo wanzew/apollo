@@ -36,8 +36,8 @@ struct FusionOptions {};
 
 class BaseFusionSystem {
  public:
-  BaseFusionSystem() = default;
-  virtual ~BaseFusionSystem() = default;
+  BaseFusionSystem()                        = default;
+  virtual ~BaseFusionSystem()               = default;
   BaseFusionSystem(const BaseFusionSystem&) = delete;
   BaseFusionSystem& operator=(const BaseFusionSystem&) = delete;
 
@@ -47,8 +47,8 @@ class BaseFusionSystem {
   // @param [in]: options
   // @param [in]: sensor_frame
   // @param [out]: fused objects
-  virtual bool Fuse(const FusionOptions& options,
-                    const base::FrameConstPtr& sensor_frame,
+  virtual bool Fuse(const FusionOptions&          options,
+                    const base::FrameConstPtr&    sensor_frame,
                     std::vector<base::ObjectPtr>* fused_objects) = 0;
 
   virtual std::string Name() const = 0;
@@ -58,8 +58,7 @@ class BaseFusionSystem {
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseFusionSystem);
-#define FUSION_REGISTER_FUSIONSYSTEM(name) \
-  PERCEPTION_REGISTER_CLASS(BaseFusionSystem, name)
+#define FUSION_REGISTER_FUSIONSYSTEM(name) PERCEPTION_REGISTER_CLASS(BaseFusionSystem, name)
 
 }  // namespace fusion
 }  // namespace perception

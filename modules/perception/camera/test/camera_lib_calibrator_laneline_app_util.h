@@ -33,12 +33,10 @@ namespace obstacle {
 // void change_suffix(std::string file_path, std::string suffix,
 //                    std::string *file_path_changed);
 
-bool load_filename(std::string path, std::string suffix,
-                   std::vector<std::string> *name_list);
+bool load_filename(std::string path, std::string suffix, std::vector<std::string>* name_list);
 
 // bool load_ref_camera_p_mat(const std::string &filename, float p_mat[12]);
-bool load_ref_camera_k_mat(const std::string &filename, float k_mat[9], int *w,
-                           int *h);
+bool load_ref_camera_k_mat(const std::string& filename, float k_mat[9], int* w, int* h);
 
 // void draw_2d_bbox(cv::Mat *image, float left, float top, float right,
 //                   float bottom, const cv::Scalar &color);
@@ -46,9 +44,12 @@ bool load_ref_camera_k_mat(const std::string &filename, float k_mat[9], int *w,
 // void draw_2d_face(cv::Mat *image, const float corners_2d[16],
 //                   const int idx_points[4], const cv::Scalar &color);
 
-void write_text_on_image(cv::Mat *image, float left, float top,
-                         const char *text, const CvFont &font,
-                         const cv::Scalar &color);
+void write_text_on_image(cv::Mat*          image,
+                         float             left,
+                         float             top,
+                         const char*       text,
+                         const CvFont&     font,
+                         const cv::Scalar& color);
 
 // void add_noise_to_vector_radius(float *x, int n, float radius,
 //                                 bool set_seed = false);

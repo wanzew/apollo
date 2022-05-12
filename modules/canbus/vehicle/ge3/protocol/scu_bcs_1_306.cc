@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_bcs_1_306.h"
+
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -28,16 +30,13 @@ using ::apollo::drivers::canbus::Byte;
 Scubcs1306::Scubcs1306() {}
 const int32_t Scubcs1306::ID = 0x306;
 
-void Scubcs1306::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
+void Scubcs1306::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_aebavailable(
       bcs_aebavailable(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_cddavailable(
       bcs_cddavailable(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_brkpedact(
-      bcs_brkpedact(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_intidx(
-      bcs_intidx(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_brkpedact(bcs_brkpedact(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_intidx(bcs_intidx(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_vdcfaultst(
       bcs_vdcfaultst(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_vdcactivest(
@@ -46,13 +45,10 @@ void Scubcs1306::Parse(const std::uint8_t* bytes, int32_t length,
       bcs_absfaultst(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_absactivest(
       bcs_absactivest(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_faultst(
-      bcs_faultst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_drvmode(
-      bcs_drvmode(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_faultst(bcs_faultst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcs_1_306()->set_bcs_drvmode(bcs_drvmode(bytes, length));
   // newcode
-  chassis->mutable_check_response()->set_is_esp_online(
-      bcs_drvmode(bytes, length) == 3);
+  chassis->mutable_check_response()->set_is_esp_online(bcs_drvmode(bytes, length) == 3);
 }
 
 // config detail: {'description': 'VDC active status', 'enum': {0:
@@ -60,13 +56,12 @@ void Scubcs1306::Parse(const std::uint8_t* bytes, int32_t length,
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_aebavailable', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 17, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Scu_bcs_1_306::Bcs_aebavailableType Scubcs1306::bcs_aebavailable(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+Scu_bcs_1_306::Bcs_aebavailableType Scubcs1306::bcs_aebavailable(const std::uint8_t* bytes,
+                                                                 int32_t             length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_bcs_1_306::Bcs_aebavailableType ret =
-      static_cast<Scu_bcs_1_306::Bcs_aebavailableType>(x);
+  Scu_bcs_1_306::Bcs_aebavailableType ret = static_cast<Scu_bcs_1_306::Bcs_aebavailableType>(x);
   return ret;
 }
 
@@ -75,13 +70,12 @@ Scu_bcs_1_306::Bcs_aebavailableType Scubcs1306::bcs_aebavailable(
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_cddavailable', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 16, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Scu_bcs_1_306::Bcs_cddavailableType Scubcs1306::bcs_cddavailable(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+Scu_bcs_1_306::Bcs_cddavailableType Scubcs1306::bcs_cddavailable(const std::uint8_t* bytes,
+                                                                 int32_t             length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 1);
 
-  Scu_bcs_1_306::Bcs_cddavailableType ret =
-      static_cast<Scu_bcs_1_306::Bcs_cddavailableType>(x);
+  Scu_bcs_1_306::Bcs_cddavailableType ret = static_cast<Scu_bcs_1_306::Bcs_cddavailableType>(x);
   return ret;
 }
 
@@ -89,12 +83,11 @@ Scu_bcs_1_306::Bcs_cddavailableType Scubcs1306::bcs_cddavailable(
 // 'precision': 0.1, 'len': 10, 'name': 'bcs_brkpedact', 'is_signed_var': False,
 // 'physical_range': '[0|100]', 'bit': 15, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': '%'}
-double Scubcs1306::bcs_brkpedact(const std::uint8_t* bytes,
-                                 int32_t length) const {
-  Byte t0(bytes + 1);
+double Scubcs1306::bcs_brkpedact(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(6, 2);
   x <<= 2;
   x |= t;
@@ -110,12 +103,11 @@ double Scubcs1306::bcs_brkpedact(const std::uint8_t* bytes,
 // 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 21, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
 Scu_bcs_1_306::Bcs_intidxType Scubcs1306::bcs_intidx(const std::uint8_t* bytes,
-                                                     int32_t length) const {
-  Byte t0(bytes + 2);
+                                                     int32_t             length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(3, 3);
 
-  Scu_bcs_1_306::Bcs_intidxType ret =
-      static_cast<Scu_bcs_1_306::Bcs_intidxType>(x);
+  Scu_bcs_1_306::Bcs_intidxType ret = static_cast<Scu_bcs_1_306::Bcs_intidxType>(x);
   return ret;
 }
 
@@ -124,13 +116,12 @@ Scu_bcs_1_306::Bcs_intidxType Scubcs1306::bcs_intidx(const std::uint8_t* bytes,
 // 1, 'name': 'bcs_vdcfaultst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_bcs_1_306::Bcs_vdcfaultstType Scubcs1306::bcs_vdcfaultst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcs_1_306::Bcs_vdcfaultstType Scubcs1306::bcs_vdcfaultst(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_bcs_1_306::Bcs_vdcfaultstType ret =
-      static_cast<Scu_bcs_1_306::Bcs_vdcfaultstType>(x);
+  Scu_bcs_1_306::Bcs_vdcfaultstType ret = static_cast<Scu_bcs_1_306::Bcs_vdcfaultstType>(x);
   return ret;
 }
 
@@ -139,13 +130,12 @@ Scu_bcs_1_306::Bcs_vdcfaultstType Scubcs1306::bcs_vdcfaultst(
 // 'len': 1, 'name': 'bcs_vdcactivest', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 2, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_bcs_1_306::Bcs_vdcactivestType Scubcs1306::bcs_vdcactivest(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcs_1_306::Bcs_vdcactivestType Scubcs1306::bcs_vdcactivest(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(2, 1);
 
-  Scu_bcs_1_306::Bcs_vdcactivestType ret =
-      static_cast<Scu_bcs_1_306::Bcs_vdcactivestType>(x);
+  Scu_bcs_1_306::Bcs_vdcactivestType ret = static_cast<Scu_bcs_1_306::Bcs_vdcactivestType>(x);
   return ret;
 }
 
@@ -154,13 +144,12 @@ Scu_bcs_1_306::Bcs_vdcactivestType Scubcs1306::bcs_vdcactivest(
 // 1, 'name': 'bcs_absfaultst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 3, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_bcs_1_306::Bcs_absfaultstType Scubcs1306::bcs_absfaultst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcs_1_306::Bcs_absfaultstType Scubcs1306::bcs_absfaultst(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(3, 1);
 
-  Scu_bcs_1_306::Bcs_absfaultstType ret =
-      static_cast<Scu_bcs_1_306::Bcs_absfaultstType>(x);
+  Scu_bcs_1_306::Bcs_absfaultstType ret = static_cast<Scu_bcs_1_306::Bcs_absfaultstType>(x);
   return ret;
 }
 
@@ -169,13 +158,12 @@ Scu_bcs_1_306::Bcs_absfaultstType Scubcs1306::bcs_absfaultst(
 // 'len': 1, 'name': 'bcs_absactivest', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 4, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_bcs_1_306::Bcs_absactivestType Scubcs1306::bcs_absactivest(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcs_1_306::Bcs_absactivestType Scubcs1306::bcs_absactivest(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(4, 1);
 
-  Scu_bcs_1_306::Bcs_absactivestType ret =
-      static_cast<Scu_bcs_1_306::Bcs_absactivestType>(x);
+  Scu_bcs_1_306::Bcs_absactivestType ret = static_cast<Scu_bcs_1_306::Bcs_absactivestType>(x);
   return ret;
 }
 
@@ -184,13 +172,12 @@ Scu_bcs_1_306::Bcs_absactivestType Scubcs1306::bcs_absactivest(
 // 'name': 'bcs_faultst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 5, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_bcs_1_306::Bcs_faultstType Scubcs1306::bcs_faultst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcs_1_306::Bcs_faultstType Scubcs1306::bcs_faultst(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(5, 1);
 
-  Scu_bcs_1_306::Bcs_faultstType ret =
-      static_cast<Scu_bcs_1_306::Bcs_faultstType>(x);
+  Scu_bcs_1_306::Bcs_faultstType ret = static_cast<Scu_bcs_1_306::Bcs_faultstType>(x);
   return ret;
 }
 
@@ -199,13 +186,12 @@ Scu_bcs_1_306::Bcs_faultstType Scubcs1306::bcs_faultst(
 // 3: 'BCS_DRVMODE_AUTO'}, 'precision': 1.0, 'len': 2, 'name': 'bcs_drvmode',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 7,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Scu_bcs_1_306::Bcs_drvmodeType Scubcs1306::bcs_drvmode(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcs_1_306::Bcs_drvmodeType Scubcs1306::bcs_drvmode(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(6, 2);
 
-  Scu_bcs_1_306::Bcs_drvmodeType ret =
-      static_cast<Scu_bcs_1_306::Bcs_drvmodeType>(x);
+  Scu_bcs_1_306::Bcs_drvmodeType ret = static_cast<Scu_bcs_1_306::Bcs_drvmodeType>(x);
   return ret;
 }
 }  // namespace ge3

@@ -48,10 +48,10 @@ void Brakecmd104::UpdateData(uint8_t* data) {
 void Brakecmd104::Reset() {
   // TODO(QiL) you should check this manually
   ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
-  clear_faults_ = false;
-  brake_cmd_ = 0.0;
+  enable_           = false;
+  clear_override_   = false;
+  clear_faults_     = false;
+  brake_cmd_        = 0.0;
 }
 
 Brakecmd104* Brakecmd104::set_ignore_overrides(bool ignore_overrides) {
@@ -125,10 +125,10 @@ Brakecmd104* Brakecmd104::set_brake_cmd(double brake_cmd) {
 void Brakecmd104::set_p_brake_cmd(uint8_t* data, double brake_cmd) {
   const double scaling_bias = 0.0;   // estimated from the garage test data
   const double scaling_gain = 0.80;  // estimated from the garage test data
-  brake_cmd = std::max(0.0, (brake_cmd - scaling_bias) / (scaling_gain * 100));
-  brake_cmd = ProtocolData::BoundedValue(0.0, 1.0, brake_cmd);
+  brake_cmd                 = std::max(0.0, (brake_cmd - scaling_bias) / (scaling_gain * 100));
+  brake_cmd                 = ProtocolData::BoundedValue(0.0, 1.0, brake_cmd);
   // TODO(AS): fix this scaling.
-  int x = static_cast<int>(brake_cmd / 0.001000);
+  int     x = static_cast<int>(brake_cmd / 0.001000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);

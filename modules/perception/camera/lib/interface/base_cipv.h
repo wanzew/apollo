@@ -25,8 +25,8 @@
 
 #include "cyber/common/macros.h"
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -34,16 +34,16 @@ namespace camera {
 
 struct CipvInitOptions : public BaseInitOptions {
   float min_laneline_length_for_cipv = 2.0f;
-  float average_lane_width_in_meter = 3.7f;
-  float max_vehicle_width_in_meter = 1.87f;
-  float average_frame_rate = 0.05f;
-  bool image_based_cipv = false;
-  int debug_level = 0;
+  float average_lane_width_in_meter  = 3.7f;
+  float max_vehicle_width_in_meter   = 1.87f;
+  float average_frame_rate           = 0.05f;
+  bool  image_based_cipv             = false;
+  int   debug_level                  = 0;
 };
 
 struct CipvOptions {
-  float velocity = 5.0f;
-  float yaw_rate = 0.0f;
+  float velocity  = 5.0f;
+  float yaw_rate  = 0.0f;
   float yaw_angle = 0.0f;
 };
 
@@ -53,16 +53,16 @@ class BaseCipv {
 
   // Member functions
  public:
-  BaseCipv() = default;
+  BaseCipv()          = default;
   virtual ~BaseCipv() = default;
 
-  virtual bool Init(const Eigen::Matrix3d &homography_im2car,
-      const CipvInitOptions &options = CipvInitOptions()) = 0;
+  virtual bool Init(const Eigen::Matrix3d& homography_im2car,
+                    const CipvInitOptions& options = CipvInitOptions()) = 0;
 
-  virtual bool Process(CameraFrame *frame,
-                    const CipvOptions &options,
-                    const Eigen::Affine3d &world2camera,
-                    const base::MotionBufferPtr &motion_buffer) = 0;
+  virtual bool Process(CameraFrame*                 frame,
+                       const CipvOptions&           options,
+                       const Eigen::Affine3d&       world2camera,
+                       const base::MotionBufferPtr& motion_buffer) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -71,8 +71,7 @@ class BaseCipv {
 };  // class BaseCipv
 
 PERCEPTION_REGISTER_REGISTERER(BaseCipv);
-#define PERCEPTION_REGISTER_CIPV(name) \
-  PERCEPTION_REGISTER_CLASS(BaseCipv, name)
+#define PERCEPTION_REGISTER_CIPV(name) PERCEPTION_REGISTER_CLASS(BaseCipv, name)
 
 }  // namespace camera
 }  // namespace perception

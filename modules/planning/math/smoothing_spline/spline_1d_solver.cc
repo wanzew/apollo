@@ -25,10 +25,9 @@ namespace planning {
 using Eigen::MatrixXd;
 
 // converte qp problem to proto
-void Spline1dSolver::GenerateProblemProto(
-    QuadraticProgrammingProblem* const qp_proto) const {
+void Spline1dSolver::GenerateProblemProto(QuadraticProgrammingProblem* const qp_proto) const {
   const MatrixXd& kernel_matrix = kernel_.kernel_matrix();
-  const MatrixXd& offset = kernel_.offset();
+  const MatrixXd& offset        = kernel_.offset();
   const MatrixXd& inequality_constraint_matrix =
       constraint_.inequality_constraint().constraint_matrix();
   const MatrixXd& inequality_constraint_boundary =
@@ -45,15 +44,13 @@ void Spline1dSolver::GenerateProblemProto(
     qp_proto->add_bias(offset(i, 0));
   }
 
-  ConvertMatrixXdToProto(inequality_constraint_matrix,
-                         qp_proto->mutable_inequality_matrix());
+  ConvertMatrixXdToProto(inequality_constraint_matrix, qp_proto->mutable_inequality_matrix());
 
   for (int i = 0; i < inequality_constraint_boundary.rows(); ++i) {
     qp_proto->add_inequality_value(inequality_constraint_boundary(i, 0));
   }
 
-  ConvertMatrixXdToProto(equality_constraint_matrix,
-                         qp_proto->mutable_equality_matrix());
+  ConvertMatrixXdToProto(equality_constraint_matrix, qp_proto->mutable_equality_matrix());
 
   for (int i = 0; i < equality_constraint_boundary.rows(); ++i) {
     qp_proto->add_equality_value(equality_constraint_boundary(i, 0));
@@ -70,7 +67,7 @@ void Spline1dSolver::GenerateProblemProto(
 }
 
 void Spline1dSolver::ConvertMatrixXdToProto(const Eigen::MatrixXd& matrix,
-                                            QPMatrix* const proto) const {
+                                            QPMatrix* const        proto) const {
   int row_size = static_cast<int>(matrix.rows());
   int col_size = static_cast<int>(matrix.cols());
 

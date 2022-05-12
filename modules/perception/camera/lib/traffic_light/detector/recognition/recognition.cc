@@ -21,10 +21,8 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool TrafficLightRecognition::Init(
-    const TrafficLightDetectorInitOptions& options) {
-  std::string proto_path =
-      cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
+bool TrafficLightRecognition::Init(const TrafficLightDetectorInitOptions& options) {
+  std::string proto_path = cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
 
   AINFO << "proto_path " << proto_path;
   if (!cyber::common::GetProtoFromFile(proto_path, &recognize_param_)) {
@@ -36,40 +34,34 @@ bool TrafficLightRecognition::Init(
   classify_vertical_.reset(new ClassifyBySimple);
   classify_horizontal_.reset(new ClassifyBySimple);
 
-  classify_quadrate_->Init(recognize_param_.quadrate_model(), options.gpu_id,
-                           options.root_dir);
-  classify_vertical_->Init(recognize_param_.vertical_model(), options.gpu_id,
-                           options.root_dir);
-  classify_horizontal_->Init(recognize_param_.horizontal_model(),
-                             options.gpu_id, options.root_dir);
+  classify_quadrate_->Init(recognize_param_.quadrate_model(), options.gpu_id, options.root_dir);
+  classify_vertical_->Init(recognize_param_.vertical_model(), options.gpu_id, options.root_dir);
+  classify_horizontal_->Init(recognize_param_.horizontal_model(), options.gpu_id, options.root_dir);
 
   return true;
 }
 
 bool TrafficLightRecognition::Detect(const TrafficLightDetectorOptions& options,
-                                     CameraFrame* frame) {
+                                     CameraFrame*                       frame) {
   std::vector<base::TrafficLightPtr> candidate(1);
 
   for (base::TrafficLightPtr light : frame->traffic_lights) {
     if (light->region.is_detected) {
       candidate[0] = light;
-      if (light->region.detect_class_id ==
-          base::TLDetectionClass::TL_QUADRATE_CLASS) {
+      if (light->region.detect_class_id == base::TLDetectionClass::TL_QUADRATE_CLASS) {
         AINFO << "Recognize Use Quadrate Model!";
         classify_quadrate_->Perform(frame, &candidate);
-      } else if (light->region.detect_class_id ==
-                 base::TLDetectionClass::TL_VERTICAL_CLASS) {
+      } else if (light->region.detect_class_id == base::TLDetectionClass::TL_VERTICAL_CLASS) {
         AINFO << "Recognize Use Vertical Model!";
         classify_vertical_->Perform(frame, &candidate);
-      } else if (light->region.detect_class_id ==
-                 base::TLDetectionClass::TL_HORIZONTAL_CLASS) {
+      } else if (light->region.detect_class_id == base::TLDetectionClass::TL_HORIZONTAL_CLASS) {
         AINFO << "Recognize Use Horizonal Model!";
         classify_horizontal_->Perform(frame, &candidate);
       } else {
         return false;
       }
     } else {
-      light->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+      light->status.color      = base::TLColor::TL_UNKNOWN_COLOR;
       light->status.confidence = 0;
     }
   }
@@ -77,9 +69,7 @@ bool TrafficLightRecognition::Detect(const TrafficLightDetectorOptions& options,
   return true;
 }
 
-std::string TrafficLightRecognition::Name() const {
-  return "TrafficLightRecognition";
-}
+std::string TrafficLightRecognition::Name() const { return "TrafficLightRecognition"; }
 
 REGISTER_TRAFFIC_LIGHT_DETECTOR(TrafficLightRecognition);
 

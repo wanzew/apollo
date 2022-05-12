@@ -35,8 +35,8 @@ SubscriberListener::~SubscriberListener() {
 void SubscriberListener::onNewDataMessage(eprosima::fastrtps::Subscriber* sub) {
   RETURN_IF_NULL(callback_);
 
-  std::lock_guard<std::mutex> lock(mutex_);
-  eprosima::fastrtps::SampleInfo_t m_info;
+  std::lock_guard<std::mutex>       lock(mutex_);
+  eprosima::fastrtps::SampleInfo_t  m_info;
   cyber::transport::UnderlayMessage m;
   RETURN_IF(!sub->takeNextData(reinterpret_cast<void*>(&m), &m_info));
   RETURN_IF(m_info.sampleKind != eprosima::fastrtps::ALIVE);
@@ -44,9 +44,8 @@ void SubscriberListener::onNewDataMessage(eprosima::fastrtps::Subscriber* sub) {
   callback_(m.data());
 }
 
-void SubscriberListener::onSubscriptionMatched(
-    eprosima::fastrtps::Subscriber* sub,
-    eprosima::fastrtps::MatchingInfo& info) {
+void SubscriberListener::onSubscriptionMatched(eprosima::fastrtps::Subscriber*   sub,
+                                               eprosima::fastrtps::MatchingInfo& info) {
   (void)sub;
   (void)info;
 }

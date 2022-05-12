@@ -19,10 +19,12 @@
 #include <iostream>
 #include <string>
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
+
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/leadlag_conf.pb.h"
+
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace control {
@@ -30,21 +32,19 @@ namespace control {
 class LeadlagControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string control_conf_file =
-        "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
+    std::string control_conf_file = "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
     lon_controller_conf_ = control_conf_.lon_controller_conf();
   }
 
  protected:
-  ControlConf control_conf_;
+  ControlConf       control_conf_;
   LonControllerConf lon_controller_conf_;
 };
 
 TEST_F(LeadlagControllerTest, StationLeadlagController) {
-  double dt = 0.01;
-  LeadlagConf leadlag_conf =
-      lon_controller_conf_.reverse_station_leadlag_conf();
+  double            dt           = 0.01;
+  LeadlagConf       leadlag_conf = lon_controller_conf_.reverse_station_leadlag_conf();
   LeadlagController leadlag_controller;
   leadlag_controller.Init(leadlag_conf, dt);
   leadlag_controller.Reset();
@@ -59,8 +59,8 @@ TEST_F(LeadlagControllerTest, StationLeadlagController) {
 }
 
 TEST_F(LeadlagControllerTest, SpeedLeadlagController) {
-  double dt = 0.01;
-  LeadlagConf leadlag_conf = lon_controller_conf_.reverse_speed_leadlag_conf();
+  double            dt           = 0.01;
+  LeadlagConf       leadlag_conf = lon_controller_conf_.reverse_speed_leadlag_conf();
   LeadlagController leadlag_controller;
   leadlag_controller.Init(leadlag_conf, dt);
   leadlag_controller.Reset();

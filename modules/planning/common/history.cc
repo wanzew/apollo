@@ -39,9 +39,8 @@ void HistoryObjectDecision::Init(const ObjectDecision& object_decisions) {
   }
 }
 
-void HistoryObjectDecision::Init(
-    const std::string& id,
-    const std::vector<ObjectDecisionType>& object_decision) {
+void HistoryObjectDecision::Init(const std::string&                     id,
+                                 const std::vector<ObjectDecisionType>& object_decision) {
   id_ = id;
   object_decision_.clear();
   for (const auto decision_type : object_decision) {
@@ -49,8 +48,7 @@ void HistoryObjectDecision::Init(
   }
 }
 
-std::vector<const ObjectDecisionType*>
-HistoryObjectDecision::GetObjectDecision() const {
+std::vector<const ObjectDecisionType*> HistoryObjectDecision::GetObjectDecision() const {
   std::vector<const ObjectDecisionType*> result;
   for (size_t i = 0; i < object_decision_.size(); i++) {
     result.push_back(&(object_decision_[i]));
@@ -65,10 +63,10 @@ HistoryObjectDecision::GetObjectDecision() const {
 void HistoryFrame::Init(const ADCTrajectory& adc_trajactory) {
   adc_trajactory_.CopyFrom(adc_trajactory);
 
-  seq_num_ = adc_trajactory.header().sequence_num();
+  seq_num_                     = adc_trajactory.header().sequence_num();
   const auto& object_decisions = adc_trajactory.decision().object_decision();
   for (int i = 0; i < object_decisions.decision_size(); i++) {
-    const std::string id = object_decisions.decision(i).id();
+    const std::string     id = object_decisions.decision(i).id();
     HistoryObjectDecision object_decision;
     object_decision.Init(object_decisions.decision(i));
     object_decisions_map_[id] = object_decision;
@@ -77,8 +75,7 @@ void HistoryFrame::Init(const ADCTrajectory& adc_trajactory) {
   }
 }
 
-std::vector<const HistoryObjectDecision*> HistoryFrame::GetObjectDecisions()
-    const {
+std::vector<const HistoryObjectDecision*> HistoryFrame::GetObjectDecisions() const {
   std::vector<const HistoryObjectDecision*> result;
   for (size_t i = 0; i < object_decisions_.size(); i++) {
     result.push_back(&(object_decisions_[i]));
@@ -87,8 +84,7 @@ std::vector<const HistoryObjectDecision*> HistoryFrame::GetObjectDecisions()
   return result;
 }
 
-std::vector<const HistoryObjectDecision*> HistoryFrame::GetStopObjectDecisions()
-    const {
+std::vector<const HistoryObjectDecision*> HistoryFrame::GetStopObjectDecisions() const {
   std::vector<const HistoryObjectDecision*> result;
   for (size_t i = 0; i < object_decisions_.size(); i++) {
     auto obj_decision = object_decisions_[i].GetObjectDecision();
@@ -105,45 +101,36 @@ std::vector<const HistoryObjectDecision*> HistoryFrame::GetStopObjectDecisions()
   }
 
   // sort
-  std::sort(
-      result.begin(), result.end(),
-      [](const HistoryObjectDecision* lhs, const HistoryObjectDecision* rhs) {
-        return lhs->id() < rhs->id();
-      });
+  std::sort(result.begin(), result.end(),
+            [](const HistoryObjectDecision* lhs, const HistoryObjectDecision* rhs) {
+              return lhs->id() < rhs->id();
+            });
 
   return result;
 }
 
-const HistoryObjectDecision* HistoryFrame::GetObjectDecisionsById(
-    const std::string& id) const {
-  if (object_decisions_map_.find(id) == object_decisions_map_.end()) {
-    return nullptr;
-  }
+const HistoryObjectDecision* HistoryFrame::GetObjectDecisionsById(const std::string& id) const {
+  if (object_decisions_map_.find(id) == object_decisions_map_.end()) { return nullptr; }
   return &(object_decisions_map_.at(id));
 }
 
 ////////////////////////////////////////////////
 // HistoryObjectStatus
 
-void HistoryObjectStatus::Init(const std::string& id,
-                               const ObjectStatus& object_status) {
-  id_ = id;
+void HistoryObjectStatus::Init(const std::string& id, const ObjectStatus& object_status) {
+  id_            = id;
   object_status_ = object_status;
 }
 
 ////////////////////////////////////////////////
 // HistoryStatus
 
-void HistoryStatus::SetObjectStatus(const std::string& id,
-                                    const ObjectStatus& object_status) {
+void HistoryStatus::SetObjectStatus(const std::string& id, const ObjectStatus& object_status) {
   object_id_to_status_[id] = object_status;
 }
 
-bool HistoryStatus::GetObjectStatus(const std::string& id,
-                                    ObjectStatus* const object_status) {
-  if (object_id_to_status_.count(id) == 0) {
-    return false;
-  }
+bool HistoryStatus::GetObjectStatus(const std::string& id, ObjectStatus* const object_status) {
+  if (object_id_to_status_.count(id) == 0) { return false; }
 
   *object_status = object_id_to_status_[id];
   return true;
@@ -162,8 +149,7 @@ const HistoryFrame* History::GetLastFrame() const {
 void History::Clear() { history_frames_.clear(); }
 
 int History::Add(const ADCTrajectory& adc_trajectory_pb) {
-  if (history_frames_.size() >=
-      static_cast<size_t>(FLAGS_history_max_record_num)) {
+  if (history_frames_.size() >= static_cast<size_t>(FLAGS_history_max_record_num)) {
     history_frames_.pop_front();
   }
 

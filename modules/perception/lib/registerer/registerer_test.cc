@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
-
 #include "modules/perception/lib/registerer/registerer.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -24,17 +24,16 @@ namespace lib {
 
 class BaseClass {
  public:
-  BaseClass() = default;
+  BaseClass()  = default;
   ~BaseClass() = default;
   virtual std::string Name() const { return "BaseClass1"; }
 };
 PERCEPTION_REGISTER_REGISTERER(BaseClass);
-#define PERCEPTION_REGISTER_TEST(name) \
-  PERCEPTION_REGISTER_CLASS(BaseClass, name)
+#define PERCEPTION_REGISTER_TEST(name) PERCEPTION_REGISTER_CLASS(BaseClass, name)
 
 class DerivedClass1 : BaseClass {
  public:
-  DerivedClass1() = default;
+  DerivedClass1()  = default;
   ~DerivedClass1() = default;
   virtual std::string Name() const { return "DerivedClass1"; }
 };
@@ -42,7 +41,7 @@ PERCEPTION_REGISTER_TEST(DerivedClass1);
 
 TEST(RegistererTest, Test) {
   BaseClass* ptr = nullptr;
-  ptr = BaseClassRegisterer::GetInstanceByName("DerivedClass1");
+  ptr            = BaseClassRegisterer::GetInstanceByName("DerivedClass1");
   ASSERT_TRUE(ptr != nullptr);
   EXPECT_EQ(ptr->Name(), "DerivedClass1");
   ptr = BaseClassRegisterer::GetInstanceByName("NotExists");

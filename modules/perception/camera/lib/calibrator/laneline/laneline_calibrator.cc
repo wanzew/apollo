@@ -21,10 +21,10 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool LaneLineCalibrator::Init(const CalibratorInitOptions &options) {
+bool LaneLineCalibrator::Init(const CalibratorInitOptions& options) {
   LocalCalibratorInitOptions local_options;
-  local_options.cx = options.cx;
-  local_options.cy = options.cy;
+  local_options.cx      = options.cx;
+  local_options.cy      = options.cy;
   local_options.focal_x = options.focal_x;
   local_options.focal_y = options.focal_y;
   image_width_ = local_options.image_width = options.image_width;
@@ -33,8 +33,7 @@ bool LaneLineCalibrator::Init(const CalibratorInitOptions &options) {
   return true;
 }
 
-bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
-                                   float *pitch_angle) {
+bool LaneLineCalibrator::Calibrate(const CalibratorOptions& options, float* pitch_angle) {
   if (pitch_angle == nullptr) {
     AERROR << "pitch_angle is not available";
     return false;
@@ -46,7 +45,7 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
   }
 
   double cam_ori[4] = {0};
-  cam_ori[3] = 1.0;
+  cam_ori[3]        = 1.0;
 
   // Camera to world pose
   Eigen::Affine3d c2w = *options.camera2world_pose;
@@ -63,15 +62,15 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
 
   common::IMultAx3x4(p2w, cam_ori, cam_coord_cur_);
   time_diff_ = kTimeDiffDefault;
-  yaw_rate_ = kYawRateDefault;
-  velocity_ = kVelocityDefault;
+  yaw_rate_  = kYawRateDefault;
+  velocity_  = kVelocityDefault;
 
   timestamp_cur_ = *options.timestamp;
   if (!is_first_frame_) {
     time_diff_ = fabsf(static_cast<float>(timestamp_cur_ - timestamp_pre_));
     ADEBUG << timestamp_cur_ << " " << timestamp_pre_ << std::endl;
-    camera::GetYawVelocityInfo(time_diff_, cam_coord_cur_, cam_coord_pre_,
-                               cam_coord_pre_pre_, &yaw_rate_, &velocity_);
+    camera::GetYawVelocityInfo(time_diff_, cam_coord_cur_, cam_coord_pre_, cam_coord_pre_pre_,
+                               &yaw_rate_, &velocity_);
     std::string timediff_yawrate_velocity_text =
         absl::StrCat("time_diff_: ", std::to_string(time_diff_).substr(0, 4),
                      " | yaw_rate_: ", std::to_string(yaw_rate_).substr(0, 4),
@@ -79,74 +78,67 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
     ADEBUG << timediff_yawrate_velocity_text << std::endl;
   }
 
-  bool updated =
-      calibrator_.Process(ego_lane, velocity_, yaw_rate_, time_diff_);
+  bool updated = calibrator_.Process(ego_lane, velocity_, yaw_rate_, time_diff_);
   if (updated) {
-    *pitch_angle = calibrator_.get_pitch_estimation();
+    *pitch_angle        = calibrator_.get_pitch_estimation();
     float vanishing_row = calibrator_.get_vanishing_row();
     AINFO << "#updated pitch angle: " << *pitch_angle;
     AINFO << "#vanishing row: " << vanishing_row;
   }
 
-  if (!is_first_frame_) {
-    memcpy(cam_coord_pre_pre_, cam_coord_pre_, sizeof(double) * 3);
-  }
+  if (!is_first_frame_) { memcpy(cam_coord_pre_pre_, cam_coord_pre_, sizeof(double) * 3); }
   is_first_frame_ = false;
   memcpy(cam_coord_pre_, cam_coord_cur_, sizeof(double) * 3);
   timestamp_pre_ = timestamp_cur_;
   return updated;
 }
 
-bool LaneLineCalibrator::LoadEgoLaneline(
-    const std::vector<base::LaneLine> &lane_objects, EgoLane *ego_lane) {
+bool LaneLineCalibrator::LoadEgoLaneline(const std::vector<base::LaneLine>& lane_objects,
+                                         EgoLane*                           ego_lane) {
   if (ego_lane == nullptr) {
     AERROR << "ego_lane is not available";
     return false;
   }
 
-  bool found_ego_left = false;
+  bool found_ego_left  = false;
   bool found_ego_right = false;
   // Using points from model fitting
   for (size_t i = 0; i < lane_objects.size(); ++i) {
     if (lane_objects[i].pos_type == base::LaneLinePositionType::EGO_LEFT) {
-      int num_points =
-          static_cast<int>(lane_objects[i].curve_image_point_set.size());
+      int num_points = static_cast<int>(lane_objects[i].curve_image_point_set.size());
       ego_lane->left_line.lane_point.resize(num_points);
-      const auto &curve = lane_objects[i].curve_image_coord;
-      float y_curve = 0.0f;
-      float x_curve = 0.0f;
-      float x_raw = 0.0f;
+      const auto& curve   = lane_objects[i].curve_image_coord;
+      float       y_curve = 0.0f;
+      float       x_curve = 0.0f;
+      float       x_raw   = 0.0f;
       for (int j = 0; j < num_points; ++j) {
         y_curve = lane_objects[i].curve_image_point_set[j].y;
-        x_curve = curve.a * common::ICub(y_curve) +
-                  curve.b * common::ISqr(y_curve) + curve.c * y_curve + curve.d;
-        x_raw = lane_objects[i].curve_image_point_set[j].x;
+        x_curve = curve.a * common::ICub(y_curve) + curve.b * common::ISqr(y_curve) +
+                  curve.c * y_curve + curve.d;
+        x_raw                                = lane_objects[i].curve_image_point_set[j].x;
         ego_lane->left_line.lane_point[j](1) = y_curve;
         ego_lane->left_line.lane_point[j](0) = (x_curve + x_raw) / 2;
       }
       found_ego_left = true;
     }
     if (lane_objects[i].pos_type == base::LaneLinePositionType::EGO_RIGHT) {
-      int num_points =
-          static_cast<int>(lane_objects[i].curve_image_point_set.size());
+      int num_points = static_cast<int>(lane_objects[i].curve_image_point_set.size());
       ego_lane->right_line.lane_point.resize(num_points);
-      const auto &curve = lane_objects[i].curve_image_coord;
-      float y_curve = 0.0f;
-      float x_curve = 0.0f;
-      float x_raw = 0.0f;
+      const auto& curve   = lane_objects[i].curve_image_coord;
+      float       y_curve = 0.0f;
+      float       x_curve = 0.0f;
+      float       x_raw   = 0.0f;
       for (int j = 0; j < num_points; ++j) {
         y_curve = lane_objects[i].curve_image_point_set[j].y;
-        x_curve = curve.a * common::ICub(y_curve) +
-                  curve.b * common::ISqr(y_curve) + curve.c * y_curve + curve.d;
-        x_raw = lane_objects[i].curve_image_point_set[j].x;
+        x_curve = curve.a * common::ICub(y_curve) + curve.b * common::ISqr(y_curve) +
+                  curve.c * y_curve + curve.d;
+        x_raw                                 = lane_objects[i].curve_image_point_set[j].x;
         ego_lane->right_line.lane_point[j](1) = y_curve;
         ego_lane->right_line.lane_point[j](0) = (x_curve + x_raw) / 2;
       }
       found_ego_right = true;
     }
-    if (found_ego_left && found_ego_right) {
-      return true;
-    }
+    if (found_ego_left && found_ego_right) { return true; }
   }
   return false;
 }

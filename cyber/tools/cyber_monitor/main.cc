@@ -27,7 +27,7 @@ namespace {
 void SigResizeHandle(int) { Screen::Instance()->Resize(); }
 void SigCtrlCHandle(int) { Screen::Instance()->Stop(); }
 
-void printHelp(const char *cmd_name) {
+void printHelp(const char* cmd_name) {
   std::cout << "Usage:\n"
             << cmd_name << "  [option]\nOption:\n"
             << "   -h print help info\n"
@@ -43,19 +43,13 @@ enum COMMAND {
   CHANNEL     // 3 -> 4
 };
 
-COMMAND ParseOption(int argc, char *const argv[], std::string *command_val) {
-  if (argc > 4) {
-    return TOO_MANY_PARAMETER;
-  }
+COMMAND ParseOption(int argc, char* const argv[], std::string* command_val) {
+  if (argc > 4) { return TOO_MANY_PARAMETER; }
   int index = 1;
   while (true) {
-    const char *opt = argv[index];
-    if (opt == nullptr) {
-      break;
-    }
-    if (strcmp(opt, "-h") == 0) {
-      return HELP;
-    }
+    const char* opt = argv[index];
+    if (opt == nullptr) { break; }
+    if (strcmp(opt, "-h") == 0) { return HELP; }
     if (strcmp(opt, "-c") == 0) {
       if (argv[index + 1]) {
         *command_val = argv[index + 1];
@@ -71,51 +65,46 @@ COMMAND ParseOption(int argc, char *const argv[], std::string *command_val) {
 
 }  // namespace
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   std::string val;
 
   COMMAND com = ParseOption(argc, argv, &val);
 
   switch (com) {
-    case TOO_MANY_PARAMETER:
-      std::cout << "Too many paramtes\n";
-    case HELP:
-      printHelp(argv[0]);
-      return 0;
+    case TOO_MANY_PARAMETER: std::cout << "Too many paramtes\n";
+    case HELP: printHelp(argv[0]); return 0;
     default: {
     }
   }
 
   apollo::cyber::Init(argv[0]);
-  FLAGS_minloglevel = 3;
-  FLAGS_alsologtostderr = 0;
+  FLAGS_minloglevel      = 3;
+  FLAGS_alsologtostderr  = 0;
   FLAGS_colorlogtostderr = 0;
 
   CyberTopologyMessage topology_msg(val);
 
-  auto topology_callback =
-      [&topology_msg](const apollo::cyber::proto::ChangeMsg &change_msg) {
-        topology_msg.TopologyChanged(change_msg);
-      };
+  auto topology_callback = [&topology_msg](const apollo::cyber::proto::ChangeMsg& change_msg) {
+    topology_msg.TopologyChanged(change_msg);
+  };
 
   auto channel_manager =
-      apollo::cyber::service_discovery::TopologyManager::Instance()
-          ->channel_manager();
+      apollo::cyber::service_discovery::TopologyManager::Instance()->channel_manager();
   channel_manager->AddChangeListener(topology_callback);
 
   std::vector<apollo::cyber::proto::RoleAttributes> role_vec;
   channel_manager->GetWriters(&role_vec);
-  for (auto &role : role_vec) {
+  for (auto& role : role_vec) {
     topology_msg.AddReaderWriter(role, true);
   }
 
   role_vec.clear();
   channel_manager->GetReaders(&role_vec);
-  for (auto &role : role_vec) {
+  for (auto& role : role_vec) {
     topology_msg.AddReaderWriter(role, false);
   }
 
-  Screen *s = Screen::Instance();
+  Screen* s = Screen::Instance();
 
   signal(SIGWINCH, SigResizeHandle);
   signal(SIGINT, SigCtrlCHandle);

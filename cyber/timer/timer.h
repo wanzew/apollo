@@ -38,13 +38,18 @@ struct TimerOption {
    * @param oneshot Oneshot or period
    */
   TimerOption(uint32_t period, std::function<void()> callback, bool oneshot)
-      : period(period), callback(callback), oneshot(oneshot) {}
+      : period(period)
+      , callback(callback)
+      , oneshot(oneshot) {}
 
   /**
    * @brief Default constructor for initializer list
    *
    */
-  TimerOption() : period(), callback(), oneshot() {}
+  TimerOption()
+      : period()
+      , callback()
+      , oneshot() {}
 
   /**
    * @brief The period of the timer, unit is ms
@@ -110,12 +115,12 @@ class Timer {
   void Stop();
 
  private:
-  bool InitTimerTask();
-  uint64_t timer_id_;
-  TimerOption timer_opt_;
-  TimingWheel* timing_wheel_ = nullptr;
+  bool                       InitTimerTask();
+  uint64_t                   timer_id_;
+  TimerOption                timer_opt_;
+  TimingWheel*               timing_wheel_ = nullptr;
   std::shared_ptr<TimerTask> task_;
-  std::atomic<bool> started_ = {false};
+  std::atomic<bool>          started_ = {false};
 };
 
 }  // namespace cyber

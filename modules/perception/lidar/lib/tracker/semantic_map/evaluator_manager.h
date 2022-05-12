@@ -59,19 +59,18 @@ class EvaluatorManager {
    */
   void Run(ObstaclesContainer* obstacles_container);
 
-  void EvaluateObstacle(Obstacle* obstacle,
-                        ObstaclesContainer* obstacles_container,
+  void EvaluateObstacle(Obstacle*              obstacle,
+                        ObstaclesContainer*    obstacles_container,
                         std::vector<Obstacle*> dynamic_env);
 
-  void EvaluateObstacle(Obstacle* obstacle,
-                        ObstaclesContainer* obstacles_container);
+  void EvaluateObstacle(Obstacle* obstacle, ObstaclesContainer* obstacles_container);
 
  private:
   void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container);
 
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
-  std::unique_ptr<SemanticMap> semantic_map_;
-  std::unique_ptr<SemanticLSTMEvaluator> evaluator_;
+  std::unique_ptr<SemanticMap>             semantic_map_;
+  std::unique_ptr<SemanticLSTMEvaluator>   evaluator_;
 };
 
 }  // namespace perception

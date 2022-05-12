@@ -22,7 +22,7 @@
 namespace apollo {
 namespace perception {
 namespace camera {
-void init_box(NormalizedBBox *box) {
+void init_box(NormalizedBBox* box) {
   box->xmin = 1;
   box->xmax = 10;
   box->ymin = 1;
@@ -132,11 +132,11 @@ TEST(YoloCameraDetectorTest, box_test) {
   float size = 0.0f;
   init_box(&box1);
   box1.xmax = 0;
-  size = get_bbox_size(box1);
+  size      = get_bbox_size(box1);
   ASSERT_TRUE(fabs(size) < 1e-3);
   init_box(&box1);
   box1.ymax = 0;
-  size = get_bbox_size(box1);
+  size      = get_bbox_size(box1);
   ASSERT_TRUE(fabs(size) < 1e-3);
 
   init_box(&box1);
@@ -144,7 +144,7 @@ TEST(YoloCameraDetectorTest, box_test) {
   ASSERT_TRUE(fabs(size - 81) < 1e-3);
 
   box1.size = 10;
-  size = get_bbox_size(box1);
+  size      = get_bbox_size(box1);
   ASSERT_TRUE(fabs(size - 10) < 1e-3);
 
   init_box(&box1);
@@ -153,10 +153,10 @@ TEST(YoloCameraDetectorTest, box_test) {
   AINFO << size;
   ASSERT_TRUE(fabs(size - 1) < 1e-3);
   box2.ymax = 0;
-  size = get_jaccard_overlap(box1, box2);
+  size      = get_jaccard_overlap(box1, box2);
   ASSERT_TRUE(fabs(size) < 1e-3);
   box2.xmax = 0;
-  size = get_jaccard_overlap(box1, box2);
+  size      = get_jaccard_overlap(box1, box2);
   ASSERT_TRUE(fabs(size) < 1e-3);
 }
 TEST(YoloCameraDetectorTest, filter_box) {
@@ -164,12 +164,12 @@ TEST(YoloCameraDetectorTest, filter_box) {
   obj.reset(new base::Object);
   obj->camera_supplement.box.ymax = 50;
   obj->camera_supplement.box.ymin = 10;
-  obj->size[0] = 10;  // length
-  obj->size[1] = 20;  // width
-  obj->size[2] = 30;  // height
+  obj->size[0]                    = 10;  // length
+  obj->size[1]                    = 20;  // width
+  obj->size[2]                    = 30;  // height
 
   std::vector<base::ObjectPtr> v_objs;
-  MinDims min_dims;
+  MinDims                      min_dims;
 
   v_objs.push_back(obj);
   filter_bbox(min_dims, &v_objs);
@@ -180,7 +180,7 @@ TEST(YoloCameraDetectorTest, filter_box) {
   min_dims.min_2d_height = 20;
   min_dims.min_3d_height = -1;
   min_dims.min_3d_length = -1;
-  min_dims.min_3d_width = -1;
+  min_dims.min_3d_width  = -1;
   filter_bbox(min_dims, &v_objs);
   ASSERT_EQ(v_objs.size(), 1);
 
@@ -189,7 +189,7 @@ TEST(YoloCameraDetectorTest, filter_box) {
   min_dims.min_2d_height = 20;
   min_dims.min_3d_height = 15;
   min_dims.min_3d_length = 25;
-  min_dims.min_3d_width = 35;
+  min_dims.min_3d_width  = 35;
   filter_bbox(min_dims, &v_objs);
   ASSERT_EQ(v_objs.size(), 0);
 
@@ -198,7 +198,7 @@ TEST(YoloCameraDetectorTest, filter_box) {
   min_dims.min_2d_height = 50;
   min_dims.min_3d_height = -1;
   min_dims.min_3d_length = -1;
-  min_dims.min_3d_width = -1;
+  min_dims.min_3d_width  = -1;
   filter_bbox(min_dims, &v_objs);
   ASSERT_EQ(v_objs.size(), 0);
 
@@ -207,7 +207,7 @@ TEST(YoloCameraDetectorTest, filter_box) {
   min_dims.min_2d_height = 50;
   min_dims.min_3d_height = 15;
   min_dims.min_3d_length = 25;
-  min_dims.min_3d_width = 35;
+  min_dims.min_3d_width  = 35;
   filter_bbox(min_dims, &v_objs);
   ASSERT_EQ(v_objs.size(), 0);
 }
@@ -281,26 +281,26 @@ TEST(YoloCameraDetectorTest, fill_results) {
 TEST(YoloCameraDetectorTest, nms_test) {
   {
     std::vector<NormalizedBBox> test_objects;
-    NormalizedBBox obj_ped1;
-    obj_ped1.xmin = .1f;
-    obj_ped1.xmax = .3f;
-    obj_ped1.ymin = .20f;
-    obj_ped1.ymax = .60f;
+    NormalizedBBox              obj_ped1;
+    obj_ped1.xmin  = .1f;
+    obj_ped1.xmax  = .3f;
+    obj_ped1.ymin  = .20f;
+    obj_ped1.ymax  = .60f;
     obj_ped1.score = 0.9f;
     obj_ped1.label = static_cast<int>(base::ObjectType::PEDESTRIAN);
 
     NormalizedBBox obj_ped2;
-    obj_ped2.xmin = .10f;
-    obj_ped2.xmax = .25f;
-    obj_ped2.ymin = .30f;
-    obj_ped2.ymax = .60f;
+    obj_ped2.xmin  = .10f;
+    obj_ped2.xmax  = .25f;
+    obj_ped2.ymin  = .30f;
+    obj_ped2.ymax  = .60f;
     obj_ped2.score = 0.8f;
     obj_ped2.label = static_cast<int>(base::ObjectType::PEDESTRIAN);
     NormalizedBBox obj_ped3;
-    obj_ped3.xmin = .7f;
-    obj_ped3.xmax = .8f;
-    obj_ped3.ymin = .7f;
-    obj_ped3.ymax = .8f;
+    obj_ped3.xmin  = .7f;
+    obj_ped3.xmax  = .8f;
+    obj_ped3.ymin  = .7f;
+    obj_ped3.ymax  = .8f;
     obj_ped3.score = 0.01f;
     obj_ped3.label = static_cast<int>(base::ObjectType::PEDESTRIAN);
 
@@ -314,13 +314,11 @@ TEST(YoloCameraDetectorTest, nms_test) {
     scores.push_back(obj_ped3.score);
 
     std::vector<int> indices;
-    apply_softnms_fast(test_objects, &scores, 0.1f, 0.5f, 20, &indices, true,
-                       0.4f);
+    apply_softnms_fast(test_objects, &scores, 0.1f, 0.5f, 20, &indices, true, 0.4f);
     CHECK_LT(scores[1], 0.8f);
     scores[1] = 0.8f;
     scores[2] = 0.01f;
-    apply_softnms_fast(test_objects, &scores, 0.1f, 0.5f, 20, &indices, false,
-                       0.4f);
+    apply_softnms_fast(test_objects, &scores, 0.1f, 0.5f, 20, &indices, false, 0.4f);
     CHECK_LT(scores[1], 0.8f);
 
     scores[1] = 0.8f;
@@ -346,33 +344,32 @@ TEST(YoloCameraDetectorTest, nms_test) {
     apply_boxvoting_fast(&test_objects, &scores, 0, 0.5f, 0, &indices);
 
     std::vector<NormalizedBBox> test_empty_objects;
-    std::vector<float> test_empty_scores;
+    std::vector<float>          test_empty_scores;
 
-    apply_boxvoting_fast(&test_empty_objects, &test_empty_scores, 0.1f, 0.5f,
-                         0.4f, &indices);
+    apply_boxvoting_fast(&test_empty_objects, &test_empty_scores, 0.1f, 0.5f, 0.4f, &indices);
   }
   {
     std::vector<NormalizedBBox> test_objects;
-    NormalizedBBox obj_ped1;
-    obj_ped1.xmin = .1f;
-    obj_ped1.xmax = .3f;
-    obj_ped1.ymin = .20f;
-    obj_ped1.ymax = .60f;
+    NormalizedBBox              obj_ped1;
+    obj_ped1.xmin  = .1f;
+    obj_ped1.xmax  = .3f;
+    obj_ped1.ymin  = .20f;
+    obj_ped1.ymax  = .60f;
     obj_ped1.score = 0.9f;
     obj_ped1.label = static_cast<int>(base::ObjectType::PEDESTRIAN);
 
     NormalizedBBox obj_ped2;
-    obj_ped2.xmin = .10f;
-    obj_ped2.xmax = .25f;
-    obj_ped2.ymin = .30f;
-    obj_ped2.ymax = .60f;
+    obj_ped2.xmin  = .10f;
+    obj_ped2.xmax  = .25f;
+    obj_ped2.ymin  = .30f;
+    obj_ped2.ymax  = .60f;
     obj_ped2.score = 0.8f;
     obj_ped2.label = static_cast<int>(base::ObjectType::PEDESTRIAN);
     NormalizedBBox obj_ped3;
-    obj_ped3.xmin = .7f;
-    obj_ped3.xmax = .8f;
-    obj_ped3.ymin = .7f;
-    obj_ped3.ymax = .8f;
+    obj_ped3.xmin  = .7f;
+    obj_ped3.xmax  = .8f;
+    obj_ped3.ymin  = .7f;
+    obj_ped3.ymax  = .8f;
     obj_ped3.score = 0.01f;
     obj_ped3.label = static_cast<int>(base::ObjectType::PEDESTRIAN);
 
@@ -390,28 +387,28 @@ TEST(YoloCameraDetectorTest, nms_test) {
     CHECK_EQ(indices.size(), 1);
     apply_nms_fast(test_objects, scores, 0.1f, 0.5f, 0.7f, 20, &indices);
     CHECK_EQ(indices.size(), 1);
-    obj_ped3.xmin = .10f;
-    obj_ped3.xmax = .25f;
-    obj_ped3.ymin = .32f;
-    obj_ped3.ymax = .60f;
+    obj_ped3.xmin  = .10f;
+    obj_ped3.xmax  = .25f;
+    obj_ped3.ymin  = .32f;
+    obj_ped3.ymax  = .60f;
     obj_ped3.score = 0.6f;
     apply_nms_fast(test_objects, scores, 0.1f, 0.6f, 1.2f, 20, &indices);
   }
   {
     std::vector<NormalizedBBox> test_objects;
-    NormalizedBBox obj_cyc;
-    obj_cyc.xmin = .1f;
-    obj_cyc.xmax = .3f;
-    obj_cyc.ymin = .20f;
-    obj_cyc.ymax = .60f;
+    NormalizedBBox              obj_cyc;
+    obj_cyc.xmin  = .1f;
+    obj_cyc.xmax  = .3f;
+    obj_cyc.ymin  = .20f;
+    obj_cyc.ymax  = .60f;
     obj_cyc.score = 0.9f;
     obj_cyc.label = static_cast<int>(base::ObjectType::BICYCLE);
 
     NormalizedBBox obj_ped;
-    obj_ped.xmin = .10f;
-    obj_ped.xmax = .25f;
-    obj_ped.ymin = .30f;
-    obj_ped.ymax = .60f;
+    obj_ped.xmin  = .10f;
+    obj_ped.xmax  = .25f;
+    obj_ped.ymin  = .30f;
+    obj_ped.ymax  = .60f;
     obj_ped.score = 0.95f;
     obj_ped.label = static_cast<int>(base::ObjectType::PEDESTRIAN);
     /*
@@ -431,18 +428,18 @@ TEST(YoloCameraDetectorTest, nms_test) {
   for (int i = 0; i < 1; i++) {
     base::ObjectPtr obj;
     obj.reset(new base::Object);
-    obj->camera_supplement.alpha = 0;
+    obj->camera_supplement.alpha    = 0;
     obj->camera_supplement.box.xmin = 0.1f;
     obj->camera_supplement.box.ymin = 0.2f;
     obj->camera_supplement.box.xmax = 0.3f;
     obj->camera_supplement.box.ymax = 0.4f;
-    obj->size[2] = 1.6f;
-    obj->size[1] = 1.4f;
-    obj->size[0] = 4.0f;
-    obj->center[0] = 0;
-    obj->center[1] = 0;
-    obj->center[2] = 0;
-    obj->theta = 1.1f;
+    obj->size[2]                    = 1.6f;
+    obj->size[1]                    = 1.4f;
+    obj->size[0]                    = 4.0f;
+    obj->center[0]                  = 0;
+    obj->center[1]                  = 0;
+    obj->center[2]                  = 0;
+    obj->theta                      = 1.1f;
     visual_objects.push_back(obj);
   }
   recover_bbox(10, 10, 5, &visual_objects);
@@ -453,14 +450,13 @@ TEST(YoloCameraDetectorTest, nms_test) {
 
   {
     std::vector<NormalizedBBox> test_empty_objects;
-    std::vector<float> empty_scores;
-    std::vector<int> empty_indices;
+    std::vector<float>          empty_scores;
+    std::vector<int>            empty_indices;
 
-    apply_softnms_fast(test_empty_objects, &empty_scores, 0.1f, 0.5f, 20,
-                       &empty_indices, true, 0.8f);
+    apply_softnms_fast(test_empty_objects, &empty_scores, 0.1f, 0.5f, 20, &empty_indices, true,
+                       0.8f);
     CHECK_EQ(empty_indices.size(), 0);
-    apply_boxvoting_fast(&test_empty_objects, &empty_scores, 0.1f, 0.5f, 20,
-                         &empty_indices);
+    apply_boxvoting_fast(&test_empty_objects, &empty_scores, 0.1f, 0.5f, 20, &empty_indices);
     CHECK_EQ(empty_indices.size(), 0);
   }
 }

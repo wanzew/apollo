@@ -20,10 +20,11 @@
 
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 #include "modules/planning/scenarios/traffic_light/protected/stage_intersection_cruise.h"
 
@@ -35,9 +36,7 @@ namespace traffic_light {
 using apollo::hdmap::HDMapUtil;
 
 void TrafficLightProtectedScenario::Init() {
-  if (init_) {
-    return;
-  }
+  if (init_) { return; }
 
   Scenario::Init();
 
@@ -55,60 +54,46 @@ void TrafficLightProtectedScenario::Init() {
   }
 
   context_.current_traffic_light_overlap_ids.clear();
-  for (int i = 0;
-       i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
+  for (int i = 0; i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
     const std::string traffic_light_overlap_id =
         traffic_light_status.current_traffic_light_overlap_id(i);
     hdmap::SignalInfoConstPtr traffic_light =
-        HDMapUtil::BaseMap().GetSignalById(
-            hdmap::MakeMapId(traffic_light_overlap_id));
-    if (!traffic_light) {
-      AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
-    }
+        HDMapUtil::BaseMap().GetSignalById(hdmap::MakeMapId(traffic_light_overlap_id));
+    if (!traffic_light) { AERROR << "Could not find traffic light: " << traffic_light_overlap_id; }
 
-    context_.current_traffic_light_overlap_ids.push_back(
-        traffic_light_overlap_id);
+    context_.current_traffic_light_overlap_ids.push_back(traffic_light_overlap_id);
   }
 
   init_ = true;
 }
 
-apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
-               const std::shared_ptr<DependencyInjector>& injector)>
+apollo::common::util::Factory<ScenarioConfig::StageType,
+                              Stage,
+                              Stage* (*)(const ScenarioConfig::StageConfig&         stage_config,
+                                         const std::shared_ptr<DependencyInjector>& injector)>
     TrafficLightProtectedScenario::s_stage_factory_;
 
 void TrafficLightProtectedScenario::RegisterStages() {
-  if (!s_stage_factory_.Empty()) {
-    s_stage_factory_.Clear();
-  }
-  s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new TrafficLightProtectedStageApproach(config, injector);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new TrafficLightProtectedStageIntersectionCruise(config,
-                                                                injector);
-      });
+  if (!s_stage_factory_.Empty()) { s_stage_factory_.Clear(); }
+  s_stage_factory_.Register(ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new TrafficLightProtectedStageApproach(config, injector);
+                            });
+  s_stage_factory_.Register(ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new TrafficLightProtectedStageIntersectionCruise(config,
+                                                                                      injector);
+                            });
 }
 
-std::unique_ptr<Stage> TrafficLightProtectedScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
-  if (s_stage_factory_.Empty()) {
-    RegisterStages();
-  }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config, injector);
-  if (ptr) {
-    ptr->SetContext(&context_);
-  }
+std::unique_ptr<Stage>
+TrafficLightProtectedScenario::CreateStage(const ScenarioConfig::StageConfig&         stage_config,
+                                           const std::shared_ptr<DependencyInjector>& injector) {
+  if (s_stage_factory_.Empty()) { RegisterStages(); }
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(), stage_config, injector);
+  if (ptr) { ptr->SetContext(&context_); }
   return ptr;
 }
 

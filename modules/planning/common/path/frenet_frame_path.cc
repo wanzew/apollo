@@ -34,22 +34,16 @@ FrenetFramePath::FrenetFramePath(std::vector<FrenetFramePoint> points)
     : std::vector<FrenetFramePoint>(std::move(points)) {}
 
 double FrenetFramePath::Length() const {
-  if (empty()) {
-    return 0.0;
-  }
+  if (empty()) { return 0.0; }
   return back().s() - front().s();
 }
 
 FrenetFramePoint FrenetFramePath::GetNearestPoint(const SLBoundary& sl) const {
-  auto it_lower =
-      std::lower_bound(begin(), end(), sl.start_s(), LowerBoundComparator);
-  if (it_lower == end()) {
-    return back();
-  }
-  auto it_upper =
-      std::upper_bound(it_lower, end(), sl.end_s(), UpperBoundComparator);
+  auto it_lower = std::lower_bound(begin(), end(), sl.start_s(), LowerBoundComparator);
+  if (it_lower == end()) { return back(); }
+  auto   it_upper = std::upper_bound(it_lower, end(), sl.end_s(), UpperBoundComparator);
   double min_dist = std::numeric_limits<double>::max();
-  auto min_it = it_upper;
+  auto   min_it   = it_upper;
   for (auto it = it_lower; it != it_upper; ++it) {
     if (it->l() >= sl.start_l() && it->l() <= sl.end_l()) {
       return *it;
@@ -57,13 +51,13 @@ FrenetFramePoint FrenetFramePath::GetNearestPoint(const SLBoundary& sl) const {
       double diff = it->l() - sl.end_l();
       if (diff < min_dist) {
         min_dist = diff;
-        min_it = it;
+        min_it   = it;
       }
     } else {
       double diff = sl.start_l() - it->l();
       if (diff < min_dist) {
         min_dist = diff;
-        min_it = it;
+        min_it   = it;
       }
     }
   }
@@ -79,9 +73,9 @@ FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
     return back();
   }
   const auto& p0 = *(it_lower - 1);
-  const auto s0 = p0.s();
+  const auto  s0 = p0.s();
   const auto& p1 = *it_lower;
-  const auto s1 = p1.s();
+  const auto  s1 = p1.s();
 
   FrenetFramePoint p;
   p.set_s(s);

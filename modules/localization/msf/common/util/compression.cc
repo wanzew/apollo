@@ -16,9 +16,9 @@
 
 #include "modules/localization/msf/common/util/compression.h"
 
-#include <cstring>
-
 #include <zlib.h>
+
+#include <cstring>
 
 #include "cyber/common/log.h"
 
@@ -38,31 +38,29 @@ int ZlibStrategy::Decode(BufferStr* buf, BufferStr* buf_uncompressed) {
 
 int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
   dst->resize(zlib_chunk * 2);
-  int ret, flush;
-  unsigned have;
-  z_stream stream_data;
-  unsigned char* in = &((*src)[0]);
-  unsigned char* out = &((*dst)[0]);
-  unsigned int src_idx = 0;
-  unsigned int dst_idx = 0;
+  int            ret, flush;
+  unsigned       have;
+  z_stream       stream_data;
+  unsigned char* in      = &((*src)[0]);
+  unsigned char* out     = &((*dst)[0]);
+  unsigned int   src_idx = 0;
+  unsigned int   dst_idx = 0;
 
   /* allocate deflate state */
   stream_data.zalloc = Z_NULL;
-  stream_data.zfree = Z_NULL;
+  stream_data.zfree  = Z_NULL;
   stream_data.opaque = Z_NULL;
-  ret = deflateInit(&stream_data, Z_BEST_SPEED);
-  if (ret != Z_OK) {
-    return ret;
-  }
+  ret                = deflateInit(&stream_data, Z_BEST_SPEED);
+  if (ret != Z_OK) { return ret; }
   /* compress until end of file */
   do {
     in = &((*src)[src_idx]);
     if (src->size() - src_idx > zlib_chunk) {
       stream_data.avail_in = zlib_chunk;
-      flush = Z_NO_FLUSH;
+      flush                = Z_NO_FLUSH;
     } else {
       stream_data.avail_in = static_cast<unsigned int>(src->size()) - src_idx;
-      flush = Z_FINISH;
+      flush                = Z_FINISH;
     }
     stream_data.next_in = in;
     src_idx += stream_data.avail_in;
@@ -71,14 +69,12 @@ int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
        compression if all of source has been read in */
     do {
       stream_data.avail_out = zlib_chunk;
-      stream_data.next_out = out;
-      ret = deflate(&stream_data, flush); /* no bad return value */
-      DCHECK_NE(ret, Z_STREAM_ERROR);     /* state not clobbered */
+      stream_data.next_out  = out;
+      ret                   = deflate(&stream_data, flush); /* no bad return value */
+      DCHECK_NE(ret, Z_STREAM_ERROR);                       /* state not clobbered */
       have = zlib_chunk - stream_data.avail_out;
       dst_idx += have;
-      if (dst_idx + zlib_chunk > dst->size()) {
-        dst->resize(dst_idx + zlib_chunk * 2);
-      }
+      if (dst_idx + zlib_chunk > dst->size()) { dst->resize(dst_idx + zlib_chunk * 2); }
       out = &((*dst)[dst_idx]);
     } while (stream_data.avail_out == 0);
     DCHECK_EQ(stream_data.avail_in, 0U); /* all input will be used */
@@ -95,21 +91,19 @@ int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
 
 int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
   dst->resize(zlib_chunk * 2);
-  int ret;
-  unsigned have;
-  z_stream stream_data;
-  unsigned char* in = &((*src)[0]);
-  unsigned char* out = &((*dst)[0]);
-  unsigned int src_idx = 0;
-  unsigned int dst_idx = 0;
+  int            ret;
+  unsigned       have;
+  z_stream       stream_data;
+  unsigned char* in      = &((*src)[0]);
+  unsigned char* out     = &((*dst)[0]);
+  unsigned int   src_idx = 0;
+  unsigned int   dst_idx = 0;
 
   /* allocate inflate state */
   std::memset(&stream_data, 0, sizeof(z_stream));
 
   ret = inflateInit(&stream_data);
-  if (ret != Z_OK) {
-    return ret;
-  }
+  if (ret != Z_OK) { return ret; }
   /* decompress until deflate stream ends or end of file */
   do {
     in = &((*src)[src_idx]);
@@ -120,28 +114,21 @@ int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
     }
     stream_data.next_in = in;
     src_idx += stream_data.avail_in;
-    if (stream_data.avail_in == 0) {
-      break;
-    }
+    if (stream_data.avail_in == 0) { break; }
     /* run inflate() on input until output buffer not full */
     do {
       stream_data.avail_out = zlib_chunk;
-      stream_data.next_out = out;
-      ret = inflate(&stream_data, Z_NO_FLUSH);
+      stream_data.next_out  = out;
+      ret                   = inflate(&stream_data, Z_NO_FLUSH);
       DCHECK_NE(ret, Z_STREAM_ERROR); /* state not clobbered */
       switch (ret) {
-        case Z_NEED_DICT:
-          ret = Z_DATA_ERROR; /* and fall through */
+        case Z_NEED_DICT: ret = Z_DATA_ERROR; /* and fall through */
         case Z_DATA_ERROR:
-        case Z_MEM_ERROR:
-          (void)inflateEnd(&stream_data);
-          return ret;
+        case Z_MEM_ERROR: (void)inflateEnd(&stream_data); return ret;
       }
       have = zlib_chunk - stream_data.avail_out;
       dst_idx += have;
-      if (dst_idx + zlib_chunk > dst->size()) {
-        dst->resize(dst_idx + zlib_chunk * 2);
-      }
+      if (dst_idx + zlib_chunk > dst->size()) { dst->resize(dst_idx + zlib_chunk * 2); }
       out = &((*dst)[dst_idx]);
     } while (stream_data.avail_out == 0);
 

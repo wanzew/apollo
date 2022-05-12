@@ -30,8 +30,7 @@ class DummyROIFilter : public BaseROIFilter {
 
   virtual ~DummyROIFilter() = default;
 
-  bool Init(
-      const ROIFilterInitOptions& options = ROIFilterInitOptions()) override;
+  bool Init(const ROIFilterInitOptions& options = ROIFilterInitOptions()) override;
 
   // @brief: filter roi points from point cloud
   // @param [in]: options

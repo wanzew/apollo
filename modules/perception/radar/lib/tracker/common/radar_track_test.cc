@@ -36,7 +36,7 @@ TEST(RadarTrackTest, radar_track_test) {
   object->track_id = 100;
   object->center << 10.0, 20.0, 0.0;
   object->velocity << 3.0, 4.0, 0.0;
-  double timestamp = 123456789.0;
+  double        timestamp = 123456789.0;
   RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
   EXPECT_EQ(radar_track->GetObsId(), 0);
   EXPECT_FALSE(radar_track->ConfirmTrack());
@@ -74,7 +74,7 @@ TEST(RadarTrackTest, radar_track_function_test) {
   object->track_id = 100;
   object->center << 10.0, 20.0, 0.0;
   object->velocity << 3.0, 4.0, 0.0;
-  double timestamp = 123456789.0;
+  double        timestamp = 123456789.0;
   RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
   EXPECT_LT(std::fabs(radar_track->GetTrackingTime() - 0.0), 1e-5);
   EXPECT_LT(std::fabs(radar_track->GetTimestamp() - timestamp), 1e-5);

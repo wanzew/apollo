@@ -30,7 +30,7 @@ namespace cyber {
 namespace scheduler {
 
 Scheduler* Instance();
-void CleanUp();
+void       CleanUp();
 
 }  // namespace scheduler
 }  // namespace cyber

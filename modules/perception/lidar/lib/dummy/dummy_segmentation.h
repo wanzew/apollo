@@ -30,8 +30,7 @@ class DummySegmentation : public BaseLidarDetector {
 
   virtual ~DummySegmentation() = default;
 
-  bool Init(const LidarDetectorInitOptions& options =
-                LidarDetectorInitOptions()) override;
+  bool Init(const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) override;
 
   // @brief: segment point cloud and get objects.
   // @param [in]: options

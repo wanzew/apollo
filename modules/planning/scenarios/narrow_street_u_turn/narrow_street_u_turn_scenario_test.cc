@@ -20,9 +20,10 @@
 
 #include "modules/planning/scenarios/narrow_street_u_turn/narrow_street_u_turn_scenario.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -39,15 +40,14 @@ class NarrowStreetUTurnTest : public ::testing::Test {
 };
 
 TEST_F(NarrowStreetUTurnTest, Init) {
-  FLAGS_scenario_narrow_street_u_turn_config_file =
-      "/apollo/modules/planning/conf/scenario/"
-      "narrow_street_u_turn_config.pb.txt";
+  FLAGS_scenario_narrow_street_u_turn_config_file = "/apollo/modules/planning/conf/scenario/"
+                                                    "narrow_street_u_turn_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_narrow_street_u_turn_config_file, &config));
   ScenarioContext context;
-  auto injector = std::make_shared<DependencyInjector>();
+  auto            injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new NarrowStreetUTurnScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::NARROW_STREET_U_TURN);
 }

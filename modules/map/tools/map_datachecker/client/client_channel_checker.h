@@ -18,8 +18,9 @@
 #include <memory>
 #include <string>
 
-#include "modules/map/tools/map_datachecker/client/client_gflags.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
+
+#include "modules/map/tools/map_datachecker/client/client_gflags.h"
 
 namespace apollo {
 namespace hdmap {
@@ -40,8 +41,8 @@ class ChannelChecker {
 
  private:
   std::unique_ptr<CollectionCheckerService::Stub> service_stub_;
-  int check_period_;
-  const std::string& stop_flag_file_;
+  int                                             check_period_;
+  const std::string&                              stop_flag_file_;
 };
 
 }  // namespace hdmap

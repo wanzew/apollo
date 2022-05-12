@@ -24,6 +24,7 @@
 
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/task_config.pb.h"
+
 #include "modules/planning/tasks/optimizers/speed_optimizer.h"
 
 namespace apollo {
@@ -39,15 +40,15 @@ class PathTimeHeuristicOptimizer : public SpeedOptimizer {
   explicit PathTimeHeuristicOptimizer(const TaskConfig& config);
 
  private:
-  common::Status Process(const PathData& path_data,
+  common::Status Process(const PathData&                path_data,
                          const common::TrajectoryPoint& init_point,
-                         SpeedData* const speed_data) override;
+                         SpeedData* const               speed_data) override;
 
   bool SearchPathTimeGraph(SpeedData* speed_data) const;
 
  private:
-  common::TrajectoryPoint init_point_;
-  SLBoundary adc_sl_boundary_;
+  common::TrajectoryPoint       init_point_;
+  SLBoundary                    adc_sl_boundary_;
   SpeedHeuristicOptimizerConfig speed_heuristic_optimizer_config_;
 };
 

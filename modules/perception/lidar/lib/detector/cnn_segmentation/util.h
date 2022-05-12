@@ -20,10 +20,10 @@ namespace perception {
 namespace lidar {
 
 enum class MetaType {
-  META_UNKNOWN = 0,
-  META_SMALLMOT = 1,
-  META_BIGMOT = 2,
-  META_NONMOT = 3,
+  META_UNKNOWN    = 0,
+  META_SMALLMOT   = 1,
+  META_BIGMOT     = 2,
+  META_NONMOT     = 3,
   META_PEDESTRIAN = 4,
   MAX_META_TYPE
 };
@@ -35,12 +35,11 @@ inline int F2I(float val, float ori, float scale) {
 }
 
 // for axis rotated case
-inline void GroupPc2Pixel(float pc_x, float pc_y, float scale, float range,
-                          int* x, int* y) {
+inline void GroupPc2Pixel(float pc_x, float pc_y, float scale, float range, int* x, int* y) {
   float fx = (range - (0.707107f * (pc_x + pc_y))) * scale;
   float fy = (range - (0.707107f * (pc_x - pc_y))) * scale;
-  *x = fx < 0 ? -1 : static_cast<int>(fx);
-  *y = fy < 0 ? -1 : static_cast<int>(fy);
+  *x       = fx < 0 ? -1 : static_cast<int>(fx);
+  *y       = fy < 0 ? -1 : static_cast<int>(fy);
 }
 
 // for axis aligned case

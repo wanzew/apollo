@@ -38,10 +38,8 @@ TEST(FileTest, proto_set_get_test) {
   EXPECT_TRUE(SetProtoToASCIIFile(message, "message.ascii"));
   EXPECT_TRUE(SetProtoToBinaryFile(message, "message.binary"));
 
-  EXPECT_FALSE(
-      GetProtoFromASCIIFile("not_exists_dir/message.proto", &read_message));
-  EXPECT_FALSE(
-      GetProtoFromBinaryFile("not_exists_dir/message.proto", &read_message));
+  EXPECT_FALSE(GetProtoFromASCIIFile("not_exists_dir/message.proto", &read_message));
+  EXPECT_FALSE(GetProtoFromBinaryFile("not_exists_dir/message.proto", &read_message));
   EXPECT_TRUE(GetProtoFromASCIIFile("message.ascii", &read_message));
   EXPECT_TRUE(GetProtoFromBinaryFile("message.binary", &read_message));
 
@@ -101,13 +99,10 @@ TEST(FileTest, ListSubPaths) {
   const auto root_subdirs = ListSubPaths("/");
 
   // Some common root subdirs should exist.
-  EXPECT_NE(root_subdirs.end(),
-            std::find(root_subdirs.begin(), root_subdirs.end(), "home"));
-  EXPECT_NE(root_subdirs.end(),
-            std::find(root_subdirs.begin(), root_subdirs.end(), "root"));
+  EXPECT_NE(root_subdirs.end(), std::find(root_subdirs.begin(), root_subdirs.end(), "home"));
+  EXPECT_NE(root_subdirs.end(), std::find(root_subdirs.begin(), root_subdirs.end(), "root"));
   // Something shouldn't exist.
-  EXPECT_EQ(root_subdirs.end(),
-            std::find(root_subdirs.begin(), root_subdirs.end(), "impossible"));
+  EXPECT_EQ(root_subdirs.end(), std::find(root_subdirs.begin(), root_subdirs.end(), "impossible"));
 }
 
 TEST(FileTest, Glob) {
@@ -117,12 +112,10 @@ TEST(FileTest, Glob) {
   EXPECT_THAT(Glob("/apollo"), testing::ElementsAre(std::string("/apollo")));
   EXPECT_THAT(Glob("/apol?o"), testing::ElementsAre(std::string("/apollo")));
   // Match multiple.
-  EXPECT_THAT(
-      Glob("/apol?o/modules/p*"),
-      testing::AllOf(
-          testing::Contains(std::string("/apollo/modules/perception")),
-          testing::Contains(std::string("/apollo/modules/planning")),
-          testing::Contains(std::string("/apollo/modules/prediction"))));
+  EXPECT_THAT(Glob("/apol?o/modules/p*"),
+              testing::AllOf(testing::Contains(std::string("/apollo/modules/perception")),
+                             testing::Contains(std::string("/apollo/modules/planning")),
+                             testing::Contains(std::string("/apollo/modules/prediction"))));
 }
 
 TEST(FileTest, GetAbsolutePath) {

@@ -44,9 +44,9 @@ class TimerComponent : public ComponentBase {
    *
    * @return returns true if successful, otherwise returns false
    */
-  bool Initialize(const TimerComponentConfig& config) override;
-  void Clear() override;
-  bool Process();
+  bool     Initialize(const TimerComponentConfig& config) override;
+  void     Clear() override;
+  bool     Process();
   uint64_t GetInterval() const;
 
  private:
@@ -57,7 +57,7 @@ class TimerComponent : public ComponentBase {
    */
   virtual bool Proc() = 0;
 
-  uint64_t interval_ = 0;
+  uint64_t               interval_ = 0;
   std::unique_ptr<Timer> timer_;
 };
 

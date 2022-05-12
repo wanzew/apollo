@@ -32,12 +32,8 @@ namespace velodyne {
 uint64_t VelodyneDriver::sync_counter = 0;
 
 VelodyneDriver::~VelodyneDriver() {
-  if (poll_thread_.joinable()) {
-    poll_thread_.join();
-  }
-  if (positioning_thread_.joinable()) {
-    positioning_thread_.join();
-  }
+  if (poll_thread_.joinable()) { poll_thread_.join(); }
+  if (positioning_thread_.joinable()) { positioning_thread_.join(); }
 }
 
 bool VelodyneDriver::Init() {
@@ -57,30 +53,26 @@ bool VelodyneDriver::Init() {
   positioning_input_->init(config_.positioning_data_port());
 
   // raw data output topic
-  positioning_thread_ =
-      std::thread(&VelodyneDriver::PollPositioningPacket, this);
-  poll_thread_ = std::thread(&VelodyneDriver::DevicePoll, this);
+  positioning_thread_ = std::thread(&VelodyneDriver::PollPositioningPacket, this);
+  poll_thread_        = std::thread(&VelodyneDriver::DevicePoll, this);
   return true;
 }
 
-void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time,
-                                             uint64_t* basetime) {
+void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time, uint64_t* basetime) {
   struct tm time;
   std::memset(&time, 0, sizeof(tm));
   time.tm_year = nmea_time->year + (2000 - 1900);
-  time.tm_mon = nmea_time->mon - 1;
+  time.tm_mon  = nmea_time->mon - 1;
   time.tm_mday = nmea_time->day;
   time.tm_hour = nmea_time->hour;
 
   // set last gps time using gps socket packet
-  last_gps_time_ =
-      static_cast<uint32_t>((nmea_time->min * 60 + nmea_time->sec) * 1e6);
+  last_gps_time_ = static_cast<uint32_t>((nmea_time->min * 60 + nmea_time->sec) * 1e6);
 
-  AINFO << "Set base unix time : " << time.tm_year << "-" << time.tm_mon << "-"
-        << time.tm_mday << " " << time.tm_hour << ":" << time.tm_min << ":"
-        << time.tm_sec;
+  AINFO << "Set base unix time : " << time.tm_year << "-" << time.tm_mon << "-" << time.tm_mday
+        << " " << time.tm_hour << ":" << time.tm_min << ":" << time.tm_sec;
   uint64_t unix_base = static_cast<uint64_t>(timegm(&time));
-  *basetime = unix_base * static_cast<uint64_t>(1e6);
+  *basetime          = unix_base * static_cast<uint64_t>(1e6);
 }
 
 bool VelodyneDriver::SetBaseTime() {
@@ -132,8 +124,8 @@ bool VelodyneDriver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   scan->set_mode(config_.mode());
   // we use first packet gps time update gps base hour
   // in cloud nodelet, will update base time packet by packet
-  uint32_t current_secs = *(reinterpret_cast<uint32_t*>(
-      const_cast<char*>(scan->firing_pkts(0).data().data() + 1200)));
+  uint32_t current_secs =
+      *(reinterpret_cast<uint32_t*>(const_cast<char*>(scan->firing_pkts(0).data().data() + 1200)));
 
   UpdateGpsTopHour(current_secs);
   scan->set_basetime(basetime_);
@@ -145,15 +137,13 @@ int VelodyneDriver::PollStandard(std::shared_ptr<VelodyneScan> scan) {
   // Since the velodyne delivers data at a very high rate, keep reading and
   // publishing scans as fast as possible.
   while ((config_.use_poll_sync() &&
-          ((config_.is_main_frame() &&
-            scan->firing_pkts_size() < config_.npackets()) ||
+          ((config_.is_main_frame() && scan->firing_pkts_size() < config_.npackets()) ||
            (!config_.is_main_frame() && sync_counter == last_count_))) ||
-         (!config_.use_poll_sync() &&
-          scan->firing_pkts_size() < config_.npackets())) {
+         (!config_.use_poll_sync() && scan->firing_pkts_size() < config_.npackets())) {
     while (true) {
       // keep reading until full packet received
       VelodynePacket* packet = scan->add_firing_pkts();
-      int rc = input_->get_firing_data_packet(packet);
+      int             rc     = input_->get_firing_data_packet(packet);
 
       if (rc == 0) {
         break;  // got a full packet?
@@ -175,21 +165,20 @@ int VelodyneDriver::PollStandard(std::shared_ptr<VelodyneScan> scan) {
 void VelodyneDriver::PollPositioningPacket(void) {
   while (!cyber::IsShutdown()) {
     NMEATimePtr nmea_time(new NMEATime);
-    bool ret = true;
+    bool        ret = true;
     if (config_.has_use_gps_time() && !config_.use_gps_time()) {
-      time_t t = time(NULL);
+      time_t    t = time(NULL);
       struct tm current_time;
       localtime_r(&t, &current_time);
       nmea_time->year = static_cast<uint16_t>(current_time.tm_year - 100);
-      nmea_time->mon = static_cast<uint16_t>(current_time.tm_mon + 1);
-      nmea_time->day = static_cast<uint16_t>(current_time.tm_mday);
+      nmea_time->mon  = static_cast<uint16_t>(current_time.tm_mon + 1);
+      nmea_time->day  = static_cast<uint16_t>(current_time.tm_mday);
       nmea_time->hour = static_cast<uint16_t>(current_time.tm_hour);
-      nmea_time->min = static_cast<uint16_t>(current_time.tm_min);
-      nmea_time->sec = static_cast<uint16_t>(current_time.tm_sec);
+      nmea_time->min  = static_cast<uint16_t>(current_time.tm_min);
+      nmea_time->sec  = static_cast<uint16_t>(current_time.tm_sec);
       AINFO << "Get NMEA Time from local time :"
-            << "year:" << nmea_time->year << "mon:" << nmea_time->mon
-            << "day:" << nmea_time->day << "hour:" << nmea_time->hour
-            << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
+            << "year:" << nmea_time->year << "mon:" << nmea_time->mon << "day:" << nmea_time->day
+            << "hour:" << nmea_time->hour << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
     } else {
       while (!cyber::IsShutdown()) {
         int rc = positioning_input_->get_positioning_data_packet(nmea_time);
@@ -229,8 +218,9 @@ void VelodyneDriver::UpdateGpsTopHour(uint32_t current_time) {
   last_gps_time_ = current_time;
 }
 
-VelodyneDriver* VelodyneDriverFactory::CreateDriver(
-    const std::shared_ptr<::apollo::cyber::Node>& node, const Config& config) {
+VelodyneDriver*
+VelodyneDriverFactory::CreateDriver(const std::shared_ptr<::apollo::cyber::Node>& node,
+                                    const Config&                                 config) {
   auto new_config = config;
   if (new_config.prefix_angle() > 35900 || new_config.prefix_angle() < 100) {
     AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";
@@ -289,7 +279,7 @@ void VelodyneDriver::DevicePoll() {
   while (!apollo::cyber::IsShutdown()) {
     // poll device until end of file
     std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();
-    bool ret = Poll(scan);
+    bool                          ret  = Poll(scan);
     if (ret) {
       apollo::common::util::FillHeader("velodyne", scan.get());
       writer_->Write(scan);

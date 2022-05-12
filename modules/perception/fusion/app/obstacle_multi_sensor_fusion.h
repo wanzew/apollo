@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
+#include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
 
 namespace apollo {
 namespace perception {
@@ -28,13 +28,12 @@ namespace fusion {
 
 class ObstacleMultiSensorFusion : public BaseMultiSensorFusion {
  public:
-  ObstacleMultiSensorFusion() = default;
+  ObstacleMultiSensorFusion()          = default;
   virtual ~ObstacleMultiSensorFusion() = default;
 
   bool Init(const ObstacleMultiSensorFusionParam& param) override;
 
-  bool Process(const base::FrameConstPtr& frame,
-               std::vector<base::ObjectPtr>* objects) override;
+  bool Process(const base::FrameConstPtr& frame, std::vector<base::ObjectPtr>* objects) override;
 
   std::string Name() const override { return "ObstacleMultiSensorFusion"; }
 

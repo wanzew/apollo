@@ -16,14 +16,16 @@
 
 #include "modules/monitor/hardware/socket_can_monitor.h"
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include <string>
+
+#include <linux/can.h>
+#include <linux/can/raw.h>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -31,11 +33,10 @@
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
-DEFINE_string(socket_can_monitor_name, "SocketCanMonitor",
-              "Name of the CAN monitor.");
-DEFINE_double(socket_can_monitor_interval, 3,
-              "Socket CAN status checking interval seconds.");
-DEFINE_string(socket_can_component_name, "SocketCAN",
+DEFINE_string(socket_can_monitor_name, "SocketCanMonitor", "Name of the CAN monitor.");
+DEFINE_double(socket_can_monitor_interval, 3, "Socket CAN status checking interval seconds.");
+DEFINE_string(socket_can_component_name,
+              "SocketCAN",
               "Name of the Socket CAN component in SystemStatus.");
 
 namespace apollo {
@@ -47,11 +48,10 @@ bool SocketCanHandlerTest(const int dev_handler, std::string* message) {
   // init config and state
   // 1. set receive message_id filter, ie white list
   struct can_filter filter[1];
-  filter[0].can_id = 0x000;
+  filter[0].can_id   = 0x000;
   filter[0].can_mask = CAN_SFF_MASK;
 
-  int ret = setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
-                       sizeof(filter));
+  int ret = setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FILTER, &filter, sizeof(filter));
   if (ret < 0) {
     *message = "set message filter failed";
     return false;
@@ -59,8 +59,7 @@ bool SocketCanHandlerTest(const int dev_handler, std::string* message) {
 
   // 2. enable reception of can frames.
   const int enable = 1;
-  ret = setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable,
-                   sizeof(enable));
+  ret = setsockopt(dev_handler, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable, sizeof(enable));
   if (ret < 0) {
     *message = "Enable reception of can frames failed";
     return false;
@@ -75,10 +74,9 @@ bool SocketCanHandlerTest(const int dev_handler, std::string* message) {
 
   // bind socket to network interface
   struct sockaddr_can addr;
-  addr.can_family = AF_CAN;
+  addr.can_family  = AF_CAN;
   addr.can_ifindex = ifr.ifr_ifindex;
-  ret = bind(dev_handler, reinterpret_cast<struct sockaddr*>(&addr),
-             sizeof(addr));
+  ret              = bind(dev_handler, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr));
 
   if (ret < 0) {
     *message = "bind socket can failed";
@@ -103,14 +101,12 @@ bool SocketCanTest(std::string* message) {
 }  // namespace
 
 SocketCanMonitor::SocketCanMonitor()
-    : RecurrentRunner(FLAGS_socket_can_monitor_name,
-                      FLAGS_socket_can_monitor_interval) {}
+    : RecurrentRunner(FLAGS_socket_can_monitor_name, FLAGS_socket_can_monitor_interval) {}
 
 void SocketCanMonitor::RunOnce(const double current_time) {
-  auto manager = MonitorManager::Instance();
+  auto       manager   = MonitorManager::Instance();
   Component* component = apollo::common::util::FindOrNull(
-      *manager->GetStatus()->mutable_components(),
-      FLAGS_socket_can_component_name);
+      *manager->GetStatus()->mutable_components(), FLAGS_socket_can_component_name);
   if (component == nullptr) {
     // Canbus is not monitored in current mode, skip.
     return;
@@ -119,9 +115,9 @@ void SocketCanMonitor::RunOnce(const double current_time) {
   status->clear_status();
 
   std::string message;
-  const bool ret = SocketCanTest(&message);
-  SummaryMonitor::EscalateStatus(
-      ret ? ComponentStatus::OK : ComponentStatus::ERROR, message, status);
+  const bool  ret = SocketCanTest(&message);
+  SummaryMonitor::EscalateStatus(ret ? ComponentStatus::OK : ComponentStatus::ERROR, message,
+                                 status);
 }
 
 }  // namespace monitor

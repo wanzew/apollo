@@ -16,9 +16,10 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_approach.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -34,7 +35,7 @@ class StageApproachTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 

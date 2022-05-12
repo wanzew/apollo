@@ -26,9 +26,7 @@ LidarSupplement::~LidarSupplement() {}
 
 LidarSupplement::LidarSupplement(const LidarSupplement& rhs) {}
 
-LidarSupplement& LidarSupplement::operator=(const LidarSupplement& rhs) {
-  return (*this);
-}
+LidarSupplement& LidarSupplement::operator=(const LidarSupplement& rhs) { return (*this); }
 
 void LidarSupplement::clone(const LidarSupplement& rhs) {}
 
@@ -38,24 +36,24 @@ RadarSupplement::RadarSupplement() {}
 RadarSupplement::~RadarSupplement() {}
 
 RadarSupplement::RadarSupplement(const RadarSupplement& rhs) {
-  range = rhs.range;
-  angle = rhs.angle;
-  relative_radial_velocity = rhs.relative_radial_velocity;
+  range                        = rhs.range;
+  angle                        = rhs.angle;
+  relative_radial_velocity     = rhs.relative_radial_velocity;
   relative_tangential_velocity = rhs.relative_tangential_velocity;
 }
 
 RadarSupplement& RadarSupplement::operator=(const RadarSupplement& rhs) {
-  range = rhs.range;
-  angle = rhs.angle;
-  relative_radial_velocity = rhs.relative_radial_velocity;
+  range                        = rhs.range;
+  angle                        = rhs.angle;
+  relative_radial_velocity     = rhs.relative_radial_velocity;
   relative_tangential_velocity = rhs.relative_tangential_velocity;
   return (*this);
 }
 
 void RadarSupplement::clone(const RadarSupplement& rhs) {
-  range = rhs.range;
-  angle = rhs.angle;
-  relative_radial_velocity = rhs.relative_radial_velocity;
+  range                        = rhs.range;
+  angle                        = rhs.angle;
+  relative_radial_velocity     = rhs.relative_radial_velocity;
   relative_tangential_velocity = rhs.relative_tangential_velocity;
 }
 
@@ -65,18 +63,18 @@ CameraSupplement::CameraSupplement() {}
 CameraSupplement::~CameraSupplement() {}
 
 CameraSupplement::CameraSupplement(const CameraSupplement& rhs) {
-  upper_left = rhs.upper_left;
+  upper_left  = rhs.upper_left;
   lower_right = rhs.lower_right;
 }
 
 CameraSupplement& CameraSupplement::operator=(const CameraSupplement& rhs) {
-  upper_left = rhs.upper_left;
+  upper_left  = rhs.upper_left;
   lower_right = rhs.lower_right;
   return (*this);
 }
 
 void CameraSupplement::clone(const CameraSupplement& rhs) {
-  upper_left = rhs.upper_left;
+  upper_left  = rhs.upper_left;
   lower_right = rhs.lower_right;
 }
 

@@ -33,18 +33,16 @@ namespace planning {
  */
 class Rerouting : public TrafficRule {
  public:
-  Rerouting(const TrafficRuleConfig& config,
-            const std::shared_ptr<DependencyInjector>& injector);
+  Rerouting(const TrafficRuleConfig& config, const std::shared_ptr<DependencyInjector>& injector);
   virtual ~Rerouting() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   bool ChangeLaneFailRerouting();
 
   ReferenceLineInfo* reference_line_info_ = nullptr;
-  Frame* frame_ = nullptr;
+  Frame*             frame_               = nullptr;
 };
 
 }  // namespace planning

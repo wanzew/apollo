@@ -41,8 +41,7 @@
 namespace apollo {
 namespace bridge {
 
-#define BRIDGE_COMPONENT_REGISTER(pb_msg) \
-  CYBER_REGISTER_COMPONENT(UDPBridgeSenderComponent<pb_msg>)
+#define BRIDGE_COMPONENT_REGISTER(pb_msg) CYBER_REGISTER_COMPONENT(UDPBridgeSenderComponent<pb_msg>)
 
 template <typename T>
 class UDPBridgeSenderComponent final : public cyber::Component<T> {
@@ -51,16 +50,16 @@ class UDPBridgeSenderComponent final : public cyber::Component<T> {
       : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
   bool Init() override;
-  bool Proc(const std::shared_ptr<T> &pb_msg) override;
+  bool Proc(const std::shared_ptr<T>& pb_msg) override;
 
   std::string Name() const { return FLAGS_bridge_module_name; }
 
  private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-  unsigned int remote_port_ = 0;
-  std::string remote_ip_ = "";
-  std::string proto_name_ = "";
-  std::mutex mutex_;
+  unsigned int                      remote_port_ = 0;
+  std::string                       remote_ip_   = "";
+  std::string                       proto_name_  = "";
+  std::mutex                        mutex_;
 };
 
 BRIDGE_COMPONENT_REGISTER(planning::ADCTrajectory)

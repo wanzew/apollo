@@ -53,10 +53,8 @@ TEST_F(DevkitMessageManagerTest, GetSendProtocols) {
   EXPECT_NE(manager_.GetMutableProtocolDataById(Brakecommand101::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Gearcommand103::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Parkcommand104::ID), nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringcommand102::ID),
-            nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Throttlecommand100::ID),
-            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringcommand102::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Throttlecommand100::ID), nullptr);
 }
 
 TEST_F(DevkitMessageManagerTest, GetRecvProtocols) {
@@ -64,18 +62,15 @@ TEST_F(DevkitMessageManagerTest, GetRecvProtocols) {
   EXPECT_NE(manager_.GetMutableProtocolDataById(Brakereport501::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Gearreport503::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Parkreport504::ID), nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringreport502::ID),
-            nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Throttlereport500::ID),
-            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringreport502::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Throttlereport500::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Ultrsensor1507::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Ultrsensor2508::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Ultrsensor3509::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Ultrsensor4510::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Ultrsensor5511::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Vcureport505::ID), nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Wheelspeedreport506::ID),
-            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Wheelspeedreport506::ID), nullptr);
 }
 
 }  // namespace devkit

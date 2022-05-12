@@ -24,10 +24,10 @@ namespace msf {
 
 TEST(Rect2DTestSuite, Rect2DTest) {
   Rect2D<double> rect_a(0.5, 0.5, 1.0, 1.0);
-  double min_x = rect_a.GetMinX();
-  double min_y = rect_a.GetMinY();
-  double max_x = rect_a.GetMaxX();
-  double max_y = rect_a.GetMaxY();
+  double         min_x = rect_a.GetMinX();
+  double         min_y = rect_a.GetMinY();
+  double         max_x = rect_a.GetMaxX();
+  double         max_y = rect_a.GetMaxY();
   EXPECT_LT(std::abs(min_x - 0.5), 1e-5);
   EXPECT_LT(std::abs(min_y - 0.5), 1e-5);
   EXPECT_LT(std::abs(max_x - 1.0), 1e-5);

@@ -23,9 +23,11 @@ namespace apollo {
 namespace routing {
 namespace edge_creator {
 
-void GetPbEdge(const Node& node_from, const Node& node_to,
+void GetPbEdge(const Node&                node_from,
+               const Node&                node_to,
                const Edge::DirectionType& type,
-               const RoutingConfig& routingconfig, Edge* pb_edge);
+               const RoutingConfig&       routingconfig,
+               Edge*                      pb_edge);
 
 }  // namespace edge_creator
 }  // namespace routing

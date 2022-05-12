@@ -32,14 +32,14 @@ struct TypeFusionOption {};
 
 class BaseOneShotTypeFusion {
  public:
-  virtual bool Init(const TypeFusionInitOption& option) = 0;
-  virtual bool TypeFusion(const TypeFusionOption& option,
-                          std::shared_ptr<perception::base::Object> object) = 0;
-  virtual std::string Name() const = 0;
+  virtual bool        Init(const TypeFusionInitOption& option)                     = 0;
+  virtual bool        TypeFusion(const TypeFusionOption&                   option,
+                                 std::shared_ptr<perception::base::Object> object) = 0;
+  virtual std::string Name() const                                                 = 0;
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseOneShotTypeFusion);
-#define PERCEPTION_REGISTER_ONESHOTTYPEFUSION(name) \
+#define PERCEPTION_REGISTER_ONESHOTTYPEFUSION(name)                                                \
   PERCEPTION_REGISTER_CLASS(BaseOneShotTypeFusion, name)
 
 class BaseSequenceTypeFusion {
@@ -47,14 +47,13 @@ class BaseSequenceTypeFusion {
   typedef ObjectSequence::TrackedObjects TrackedObjects;
 
  public:
-  virtual bool Init(const TypeFusionInitOption& option) = 0;
-  virtual bool TypeFusion(const TypeFusionOption& option,
-                          TrackedObjects* tracked_objects) = 0;
-  virtual std::string Name() const = 0;
+  virtual bool Init(const TypeFusionInitOption& option)                                    = 0;
+  virtual bool TypeFusion(const TypeFusionOption& option, TrackedObjects* tracked_objects) = 0;
+  virtual std::string Name() const                                                         = 0;
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseSequenceTypeFusion);
-#define PERCEPTION_REGISTER_SEQUENCETYPEFUSION(name) \
+#define PERCEPTION_REGISTER_SEQUENCETYPEFUSION(name)                                               \
   PERCEPTION_REGISTER_CLASS(BaseSequenceTypeFusion, name)
 
 }  // namespace lidar

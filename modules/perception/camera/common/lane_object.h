@@ -24,9 +24,9 @@
 namespace apollo {
 namespace perception {
 
-constexpr float kMaxFloat = std::numeric_limits<float>::max();
-constexpr float kLowestFloat = -std::numeric_limits<float>::max();
-constexpr float kMinAngle = kLowestFloat / 180.0f;
+constexpr float kMaxFloat     = std::numeric_limits<float>::max();
+constexpr float kLowestFloat  = -std::numeric_limits<float>::max();
+constexpr float kMinAngle     = kLowestFloat / 180.0f;
 constexpr float kFloatEpsilon = 0.000001f;  // should be changed
 
 constexpr float k45DegreeInRadian = static_cast<float>(45.0f * M_PI) / 180.0f;
@@ -38,8 +38,7 @@ constexpr float kAverageLaneWidthInMeter = 3.7f;
 // Maximum vehicle width
 constexpr float kMaxVehicleWidthInMeter = 1.87f;
 // Margin from a virtual car lane to actual lane
-constexpr float kMarginVehicleToLane =
-    (kAverageLaneWidthInMeter - kMaxVehicleWidthInMeter) / 2.0f;
+constexpr float kMarginVehicleToLane = (kAverageLaneWidthInMeter - kMaxVehicleWidthInMeter) / 2.0f;
 // The width of virtual egolane when there is only one lane line
 constexpr float kSingleVirtualEgolaneWidthInMeter =
     kMaxVehicleWidthInMeter + kMarginVehicleToLane;  // 3.1f
@@ -68,7 +67,7 @@ struct LineSegment2Df {
 
 struct VanishingPoint {
   Point2Df vanishing_point;
-  float distance_traveled;
+  float    distance_traveled;
 };
 
 // two lane lines used for camera calibration

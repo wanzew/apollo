@@ -18,11 +18,10 @@
 #include <memory>
 #include <string>
 
-#include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/base/camera.h"
+#include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -40,15 +39,14 @@ class BaseTrafficLightDetector {
 
   virtual ~BaseTrafficLightDetector() = default;
 
-  virtual bool Init(const TrafficLightDetectorInitOptions& options =
-                        TrafficLightDetectorInitOptions()) = 0;
+  virtual bool
+  Init(const TrafficLightDetectorInitOptions& options = TrafficLightDetectorInitOptions()) = 0;
 
   // @brief: detect traffic_light from image.
   // @param [in]: options
   // @param [in/out]: frame
   // traffic_light type and 2D bbox should be filled, required,
-  virtual bool Detect(const TrafficLightDetectorOptions& options,
-                      CameraFrame* frame) = 0;
+  virtual bool Detect(const TrafficLightDetectorOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -57,7 +55,7 @@ class BaseTrafficLightDetector {
 };  // class BaseTrafficLightDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseTrafficLightDetector);
-#define REGISTER_TRAFFIC_LIGHT_DETECTOR(name) \
+#define REGISTER_TRAFFIC_LIGHT_DETECTOR(name)                                                      \
   PERCEPTION_REGISTER_CLASS(BaseTrafficLightDetector, name)
 
 }  // namespace camera

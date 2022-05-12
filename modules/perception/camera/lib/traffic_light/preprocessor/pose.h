@@ -33,7 +33,7 @@ class CarPose {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  CarPose() = default;
+  CarPose()  = default;
   ~CarPose() = default;
 
   bool Init(double ts, const Eigen::Matrix4d& pose);
@@ -42,18 +42,16 @@ class CarPose {
   const Eigen::Vector3d getCarPosition() const;
 
   void ClearCameraPose(const std::string& camera_name);
-  void SetCameraPose(const std::string& camera_name,
-                     const Eigen::Matrix4d& c2w_pose);
-  bool GetCameraPose(const std::string& camera_name,
-                     Eigen::Matrix4d* c2w_pose) const;
+  void SetCameraPose(const std::string& camera_name, const Eigen::Matrix4d& c2w_pose);
+  bool GetCameraPose(const std::string& camera_name, Eigen::Matrix4d* c2w_pose) const;
 
-  void setTimestamp(double ts) { timestamp_ = ts; }
+  void   setTimestamp(double ts) { timestamp_ = ts; }
   double getTimestamp() const { return timestamp_; }
 
   Eigen::Matrix4d pose_;  // car(novatel) to world pose
   // camera to world poses
   apollo::common::EigenMap<std::string, Eigen::Matrix4d> c2w_poses_;
-  double timestamp_;
+  double                                                 timestamp_;
 
  private:
   friend std::ostream& operator<<(std::ostream& os, const CarPose&);

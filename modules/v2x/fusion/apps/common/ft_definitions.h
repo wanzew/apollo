@@ -36,8 +36,8 @@ using apollo::v2x::V2XObstacles;
 using apollo::v2x::ft::base::Object;
 
 using PerceptionObstaclesPtr = std::shared_ptr<PerceptionObstacles>;
-using V2XObstaclesPtr = std::shared_ptr<V2XObstacles>;
-using StatusPtr = std::shared_ptr<LocalizationEstimate>;
+using V2XObstaclesPtr        = std::shared_ptr<V2XObstacles>;
+using StatusPtr              = std::shared_ptr<LocalizationEstimate>;
 
 }  // namespace ft
 }  // namespace v2x

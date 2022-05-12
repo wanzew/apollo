@@ -17,14 +17,14 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ge3 {
 
-class Pcepb203 : public ::apollo::drivers::canbus::ProtocolData<
-                     ::apollo::canbus::ChassisDetail> {
+class Pcepb203 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -63,11 +63,10 @@ class Pcepb203 : public ::apollo::drivers::canbus::ProtocolData<
   // 1, 'name': 'PC_EpbEnable', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_pc_epbenable(uint8_t* data,
-                          Pc_epb_203::Pc_epbenableType pc_epbenable);
+  void set_p_pc_epbenable(uint8_t* data, Pc_epb_203::Pc_epbenableType pc_epbenable);
 
  private:
-  Pc_epb_203::Pc_epbreqType pc_epbreq_;
+  Pc_epb_203::Pc_epbreqType    pc_epbreq_;
   Pc_epb_203::Pc_epbenableType pc_epbenable_;
 };
 

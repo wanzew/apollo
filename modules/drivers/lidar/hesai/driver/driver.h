@@ -43,33 +43,35 @@ namespace hesai {
 class HesaiDriver : public apollo::drivers::lidar::LidarDriver {
  public:
   HesaiDriver(const std::shared_ptr<::apollo::cyber::Node>& node,
-              const ::apollo::drivers::lidar::config& conf)
-      : node_(node), conf_(conf.hesai()) {}
+              const ::apollo::drivers::lidar::config&       conf)
+      : node_(node)
+      , conf_(conf.hesai()) {}
   HesaiDriver(const std::shared_ptr<::apollo::cyber::Node>& node,
-              const ::apollo::drivers::hesai::Config& conf)
-      : node_(node), conf_(conf) {}
+              const ::apollo::drivers::hesai::Config&       conf)
+      : node_(node)
+      , conf_(conf) {}
   ~HesaiDriver() { Stop(); }
   bool Init() override;
 
  private:
-  std::shared_ptr<::apollo::cyber::Node> node_ = nullptr;
-  Config conf_;
-  std::shared_ptr<Parser> parser_ = nullptr;
-  std::shared_ptr<Input> input_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Node>              node_ = nullptr;
+  Config                                              conf_;
+  std::shared_ptr<Parser>                             parser_      = nullptr;
+  std::shared_ptr<Input>                              input_       = nullptr;
   std::shared_ptr<::apollo::cyber::Writer<HesaiScan>> scan_writer_ = nullptr;
-  std::mutex packet_mutex_;
-  std::condition_variable packet_condition_;
-  std::thread poll_thread_;
-  std::thread process_thread_;
-  std::atomic<bool> running_ = {true};
-  std::deque<std::shared_ptr<HesaiScan>> scan_buffer_;
-  int scan_buffer_size_ = 10;
-  int index_ = 0;
-  int tz_second_ = 0;
-  std::vector<std::shared_ptr<HesaiPacket>> pkt_buffer_;
-  int pkt_index_ = 0;
-  int pkt_buffer_capacity_ = 0;
-  std::list<std::shared_ptr<HesaiPacket>> pkt_queue_;
+  std::mutex                                          packet_mutex_;
+  std::condition_variable                             packet_condition_;
+  std::thread                                         poll_thread_;
+  std::thread                                         process_thread_;
+  std::atomic<bool>                                   running_ = {true};
+  std::deque<std::shared_ptr<HesaiScan>>              scan_buffer_;
+  int                                                 scan_buffer_size_ = 10;
+  int                                                 index_            = 0;
+  int                                                 tz_second_        = 0;
+  std::vector<std::shared_ptr<HesaiPacket>>           pkt_buffer_;
+  int                                                 pkt_index_           = 0;
+  int                                                 pkt_buffer_capacity_ = 0;
+  std::list<std::shared_ptr<HesaiPacket>>             pkt_queue_;
 
  private:
   void PollThread();
@@ -80,12 +82,8 @@ class HesaiDriver : public apollo::drivers::lidar::LidarDriver {
     AINFO << "driver stoping...";
     running_.store(false);
     packet_condition_.notify_all();
-    if (poll_thread_.joinable()) {
-      poll_thread_.join();
-    }
-    if (process_thread_.joinable()) {
-      process_thread_.join();
-    }
+    if (poll_thread_.joinable()) { poll_thread_.join(); }
+    if (process_thread_.joinable()) { process_thread_.join(); }
   }
 };
 

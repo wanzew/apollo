@@ -61,7 +61,7 @@ class HermesCanClient : public CanClient {
    * @return The status of the start action which is defined by
    *         apollo::common::ErrorCode.
    */
-  bool Init(const CANCardParameter &parameter) override;
+  bool Init(const CANCardParameter& parameter) override;
 
   /**
    * @brief Start the ESD CAN client.
@@ -83,8 +83,8 @@ class HermesCanClient : public CanClient {
    * @return The status of the sending action which is defined by
    *         apollo::common::ErrorCode.
    */
-  virtual apollo::common::ErrorCode Send(const std::vector<CanFrame> &frames,
-                                         int32_t *const frame_num);
+  virtual apollo::common::ErrorCode Send(const std::vector<CanFrame>& frames,
+                                         int32_t* const               frame_num);
 
   /**
    * @brief Receive messages
@@ -93,8 +93,8 @@ class HermesCanClient : public CanClient {
    * @return The status of the receiving action which is defined by
    *         apollo::common::ErrorCode.
    */
-  virtual apollo::common::ErrorCode Receive(std::vector<CanFrame> *const frames,
-                                            int32_t *const frame_num);
+  virtual apollo::common::ErrorCode Receive(std::vector<CanFrame>* const frames,
+                                            int32_t* const               frame_num);
   /**
    * @brief Get the error string.
    * @param status The status to get the error string.
@@ -107,11 +107,11 @@ class HermesCanClient : public CanClient {
   void SetInited(bool init);
 
  private:
-  bool is_init_ = false;
-  bcan_hdl_t dev_handler_;
+  bool                           is_init_ = false;
+  bcan_hdl_t                     dev_handler_;
   CANCardParameter::CANChannelId port_;
-  bcan_msg_t _send_frames[MAX_CAN_SEND_FRAME_LEN];
-  bcan_msg_t _recv_frames[MAX_CAN_RECV_FRAME_LEN];
+  bcan_msg_t                     _send_frames[MAX_CAN_SEND_FRAME_LEN];
+  bcan_msg_t                     _recv_frames[MAX_CAN_RECV_FRAME_LEN];
 };
 
 }  // namespace can

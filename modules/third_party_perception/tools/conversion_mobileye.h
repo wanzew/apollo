@@ -32,10 +32,10 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion_mobileye {
 
-apollo::perception::PerceptionObstacles MobileyeToPerceptionObstacles(
-    const apollo::drivers::Mobileye& mobileye,
-    const apollo::localization::LocalizationEstimate& localization,
-    const apollo::canbus::Chassis& chassis);
+apollo::perception::PerceptionObstacles
+MobileyeToPerceptionObstacles(const apollo::drivers::Mobileye&                  mobileye,
+                              const apollo::localization::LocalizationEstimate& localization,
+                              const apollo::canbus::Chassis&                    chassis);
 
 }  // namespace conversion_mobileye
 }  // namespace third_party_perception

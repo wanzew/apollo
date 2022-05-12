@@ -23,7 +23,7 @@ using apollo::routing::GraphCreator;
 
 TEST(GraphCreatorTest, IsValidUTurn) {
   const double min_turn_radius = 6.0;
-  Lane lane;
+  Lane         lane;
   lane.mutable_id()->set_id("lane1");
   lane.set_turn(Lane::LEFT_TURN);
   // left_turn is not a u-turn, return false
@@ -31,7 +31,7 @@ TEST(GraphCreatorTest, IsValidUTurn) {
 
   lane.set_turn(Lane::U_TURN);
 
-  auto* segment = lane.mutable_central_curve()->add_segment();
+  auto* segment      = lane.mutable_central_curve()->add_segment();
   auto* line_segment = segment->mutable_line_segment();
   {
     // a straight line case

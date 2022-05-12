@@ -20,12 +20,13 @@
 #include <string>
 #include <unordered_map>
 
-#include "cyber/common/macros.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_mode.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
+
+#include "cyber/common/macros.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 
 /**
  * @namespace apollo::monitor
@@ -45,8 +46,8 @@ class MonitorManager {
 
   // Getters.
   const apollo::dreamview::HMIMode& GetHMIMode() const { return mode_config_; }
-  bool IsInAutonomousMode() const { return in_autonomous_driving_; }
-  SystemStatus* GetStatus() { return &status_; }
+  bool                              IsInAutonomousMode() const { return in_autonomous_driving_; }
+  SystemStatus*                     GetStatus() { return &status_; }
   apollo::common::monitor::MonitorLogBuffer& LogBuffer() { return log_buffer_; }
 
   // Cyber reader / writer creator.
@@ -67,14 +68,14 @@ class MonitorManager {
   SystemStatus status_;
 
   // Input statuses.
-  std::string current_mode_;
+  std::string                        current_mode_;
   const apollo::dreamview::HMIConfig hmi_config_;
-  apollo::dreamview::HMIMode mode_config_;
-  bool in_autonomous_driving_ = false;
-  bool CheckAutonomousDriving(const double current_time);
+  apollo::dreamview::HMIMode         mode_config_;
+  bool                               in_autonomous_driving_ = false;
+  bool                               CheckAutonomousDriving(const double current_time);
 
-  apollo::common::monitor::MonitorLogBuffer log_buffer_;
-  std::shared_ptr<apollo::cyber::Node> node_;
+  apollo::common::monitor::MonitorLogBuffer                           log_buffer_;
+  std::shared_ptr<apollo::cyber::Node>                                node_;
   std::unordered_map<std::string, std::shared_ptr<cyber::ReaderBase>> readers_;
 
   DECLARE_SINGLETON(MonitorManager)

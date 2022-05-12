@@ -16,9 +16,10 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QtGui/QImage>
 #include <QtGui/QOpenGLBuffer>
-#include <memory>
 
 #include "modules/drivers/proto/sensor_image.pb.h"
 
@@ -40,11 +41,11 @@ class Texture {
 
   GLsizei width(void) const { return image_width_; }
   GLsizei height(void) const { return image_height_; }
-  GLenum texture_format(void) const { return texture_format_; }
+  GLenum  texture_format(void) const { return texture_format_; }
   GLsizei data_size(void) const { return data_size_; }
 
-  bool UpdateData(const QImage& img);
-  bool UpdateData(const std::shared_ptr<const apollo::drivers::Image>&);
+  bool           UpdateData(const QImage& img);
+  bool           UpdateData(const std::shared_ptr<const apollo::drivers::Image>&);
   const GLubyte* data(void) const { return data_; }
 
  private:
@@ -53,9 +54,9 @@ class Texture {
     bool is_size_changed_ : 1;
     bool is_dirty_ : 1;
   };
-  GLenum texture_format_;
-  GLsizei image_width_;
-  GLsizei image_height_;
-  GLsizei data_size_;
+  GLenum   texture_format_;
+  GLsizei  image_width_;
+  GLsizei  image_height_;
+  GLsizei  data_size_;
   GLubyte* data_;
 };

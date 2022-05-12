@@ -33,20 +33,14 @@ using apollo::cyber::base::WriteLockGuard;
 using apollo::cyber::croutine::RoutineState;
 
 std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
-  if (cyber_unlikely(stop_.load())) {
-    return nullptr;
-  }
+  if (cyber_unlikely(stop_.load())) { return nullptr; }
 
   ReadLockGuard<AtomicRWLock> lock(rq_lk_);
   for (auto it : cr_queue_) {
     auto cr = it.second;
-    if (!cr->Acquire()) {
-      continue;
-    }
+    if (!cr->Acquire()) { continue; }
 
-    if (cr->UpdateState() == RoutineState::READY) {
-      return cr;
-    }
+    if (cr->UpdateState() == RoutineState::READY) { return cr; }
     cr->Release();
   }
   return nullptr;
@@ -67,11 +61,8 @@ void ChoreographyContext::Notify() {
 
 void ChoreographyContext::Wait() {
   std::unique_lock<std::mutex> lk(mtx_wq_);
-  cv_wq_.wait_for(lk, std::chrono::milliseconds(1000),
-                  [&]() { return notify > 0; });
-  if (notify > 0) {
-    notify--;
-  }
+  cv_wq_.wait_for(lk, std::chrono::milliseconds(1000), [&]() { return notify > 0; });
+  if (notify > 0) { notify--; }
 }
 
 void ChoreographyContext::Shutdown() {

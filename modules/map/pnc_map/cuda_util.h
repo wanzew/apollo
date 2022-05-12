@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
-
 #include <cublas_v2.h>
+
+#include <vector>
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
@@ -35,19 +35,18 @@ class CudaNearestSegment {
  public:
   CudaNearestSegment();
 
-  bool UpdateLineSegment(
-      const std::vector<apollo::common::math::LineSegment2d>& segments);
+  bool UpdateLineSegment(const std::vector<apollo::common::math::LineSegment2d>& segments);
 
   int FindNearestSegment(double x, double y);
 
   ~CudaNearestSegment();
 
  private:
-  std::size_t size_ = 0;
+  std::size_t        size_ = 0;
   CudaLineSegment2d* host_seg_;
-  double* dev_dist_;
+  double*            dev_dist_;
   CudaLineSegment2d* dev_seg_;
-  cublasHandle_t handle_;
+  cublasHandle_t     handle_;
 };
 
 }  // namespace pnc_map

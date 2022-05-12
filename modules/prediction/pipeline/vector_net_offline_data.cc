@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <fstream>
+
 #include "modules/prediction/pipeline/vector_net.h"
 
 using apollo::prediction::VectorNet;
@@ -25,18 +26,16 @@ int main(int argc, char* argv[]) {
 
   // get world-coord from protobuf
   apollo::prediction::WorldCoord world_coords;
-  std::fstream input(
-      FLAGS_world_coordinate_file, std::ios::in | std::ios::binary);
+  std::fstream input(FLAGS_world_coordinate_file, std::ios::in | std::ios::binary);
   if (!world_coords.ParseFromIstream(&input)) {
     AERROR << "Failed to parse file: " << FLAGS_world_coordinate_file;
     return -1;
   }
   for (auto pose : world_coords.pose()) {
-    double x = pose.x();
-    double y = pose.y();
-    double phi = pose.phi();
-    std::string _file_name = \
-        FLAGS_prediction_target_dir + "/" + pose.id() + ".pb.txt";
+    double      x          = pose.x();
+    double      y          = pose.y();
+    double      phi        = pose.phi();
+    std::string _file_name = FLAGS_prediction_target_dir + "/" + pose.id() + ".pb.txt";
     vector_net.offline_query(x, y, phi, _file_name);
   }
 

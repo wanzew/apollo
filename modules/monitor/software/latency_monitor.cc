@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -30,17 +31,13 @@
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
-DEFINE_string(latency_monitor_name, "LatencyMonitor",
-              "Name of the latency monitor.");
+DEFINE_string(latency_monitor_name, "LatencyMonitor", "Name of the latency monitor.");
 
-DEFINE_double(latency_monitor_interval, 1.5,
-              "Latency report interval in seconds.");
+DEFINE_double(latency_monitor_interval, 1.5, "Latency report interval in seconds.");
 
-DEFINE_double(latency_report_interval, 15.0,
-              "Latency report interval in seconds.");
+DEFINE_double(latency_report_interval, 15.0, "Latency report interval in seconds.");
 
-DEFINE_int32(latency_reader_capacity, 30,
-             "The max message numbers in latency reader queue.");
+DEFINE_int32(latency_reader_capacity, 30, "The max message numbers in latency reader queue.");
 
 namespace apollo {
 namespace monitor {
@@ -54,7 +51,7 @@ using apollo::common::LatencyTrack;
 
 LatencyStat GenerateStat(const std::vector<uint64_t>& numbers) {
   LatencyStat stat;
-  uint64_t min_number = (1UL << 63), max_number = 0, sum = 0;
+  uint64_t    min_number = (1UL << 63), max_number = 0, sum = 0;
   for (const auto number : numbers) {
     min_number = std::min(min_number, number);
     max_number = std::max(max_number, number);
@@ -63,8 +60,7 @@ LatencyStat GenerateStat(const std::vector<uint64_t>& numbers) {
   const uint32_t sample_size = static_cast<uint32_t>(numbers.size());
   stat.set_min_duration(min_number);
   stat.set_max_duration(max_number);
-  stat.set_aver_duration(
-      sample_size == 0 ? 0 : static_cast<uint64_t>(sum / sample_size));
+  stat.set_aver_duration(sample_size == 0 ? 0 : static_cast<uint64_t>(sum / sample_size));
   stat.set_sample_size(sample_size);
   return stat;
 }
@@ -76,9 +72,9 @@ void SetStat(const LatencyStat& src, LatencyStat* dst) {
   dst->set_sample_size(src.sample_size());
 }
 
-void SetLatency(const std::string& latency_name,
+void SetLatency(const std::string&           latency_name,
                 const std::vector<uint64_t>& latency_values,
-                LatencyTrack* track) {
+                LatencyTrack*                track) {
   auto* latency_track = track->add_latency_track();
   latency_track->set_latency_name(latency_name);
   SetStat(GenerateStat(latency_values), latency_track->mutable_latency_stat());
@@ -87,61 +83,50 @@ void SetLatency(const std::string& latency_name,
 }  // namespace
 
 LatencyMonitor::LatencyMonitor()
-    : RecurrentRunner(FLAGS_latency_monitor_name,
-                      FLAGS_latency_monitor_interval) {}
+    : RecurrentRunner(FLAGS_latency_monitor_name, FLAGS_latency_monitor_interval) {}
 
 void LatencyMonitor::RunOnce(const double current_time) {
   static auto reader =
-      MonitorManager::Instance()->CreateReader<LatencyRecordMap>(
-          FLAGS_latency_recording_topic);
+      MonitorManager::Instance()->CreateReader<LatencyRecordMap>(FLAGS_latency_recording_topic);
   reader->SetHistoryDepth(FLAGS_latency_reader_capacity);
   reader->Observe();
 
   static std::string last_processed_key;
-  std::string first_key_of_current_round;
+  std::string        first_key_of_current_round;
   for (auto it = reader->Begin(); it != reader->End(); ++it) {
     const std::string current_key =
         absl::StrCat((*it)->module_name(), (*it)->header().sequence_num());
-    if (it == reader->Begin()) {
-      first_key_of_current_round = current_key;
-    }
-    if (current_key == last_processed_key) {
-      break;
-    }
+    if (it == reader->Begin()) { first_key_of_current_round = current_key; }
+    if (current_key == last_processed_key) { break; }
     UpdateStat(*it);
   }
   last_processed_key = first_key_of_current_round;
 
   if (current_time - flush_time_ > FLAGS_latency_report_interval) {
     flush_time_ = current_time;
-    if (!track_map_.empty()) {
-      PublishLatencyReport();
-    }
+    if (!track_map_.empty()) { PublishLatencyReport(); }
   }
 }
 
-void LatencyMonitor::UpdateStat(
-    const std::shared_ptr<LatencyRecordMap>& records) {
+void LatencyMonitor::UpdateStat(const std::shared_ptr<LatencyRecordMap>& records) {
   const auto module_name = records->module_name();
   for (const auto& record : records->latency_records()) {
-    track_map_[record.message_id()].emplace(record.begin_time(),
-                                            record.end_time(), module_name);
+    track_map_[record.message_id()].emplace(record.begin_time(), record.end_time(), module_name);
   }
 
   if (!records->latency_records().empty()) {
     const auto begin_time = records->latency_records().begin()->begin_time();
-    const auto end_time = records->latency_records().rbegin()->end_time();
+    const auto end_time   = records->latency_records().rbegin()->end_time();
     if (end_time > begin_time) {
       freq_map_[module_name] =
-          records->latency_records().size() /
-          apollo::cyber::Time(end_time - begin_time).ToSecond();
+          records->latency_records().size() / apollo::cyber::Time(end_time - begin_time).ToSecond();
     }
   }
 }
 
 void LatencyMonitor::PublishLatencyReport() {
-  static auto writer = MonitorManager::Instance()->CreateWriter<LatencyReport>(
-      FLAGS_latency_reporting_topic);
+  static auto writer =
+      MonitorManager::Instance()->CreateWriter<LatencyReport>(FLAGS_latency_reporting_topic);
   apollo::common::util::FillHeader("LatencyReport", &latency_report_);
   AggregateLatency();
   writer->Write(latency_report_);
@@ -152,14 +137,14 @@ void LatencyMonitor::PublishLatencyReport() {
 }
 
 void LatencyMonitor::AggregateLatency() {
-  static const std::string kE2EStartPoint = FLAGS_pointcloud_topic;
+  static const std::string                               kE2EStartPoint = FLAGS_pointcloud_topic;
   std::unordered_map<std::string, std::vector<uint64_t>> modules_track;
   std::unordered_map<std::string, std::vector<uint64_t>> e2es_track;
-  std::unordered_set<std::string> all_modules;
+  std::unordered_set<std::string>                        all_modules;
 
   // Aggregate modules latencies
   std::string module_name;
-  uint64_t begin_time = 0, end_time = 0;
+  uint64_t    begin_time = 0, end_time = 0;
   for (const auto& message : track_map_) {
     auto iter = message.second.begin();
     while (iter != message.second.end()) {
@@ -173,7 +158,7 @@ void LatencyMonitor::AggregateLatency() {
   std::unordered_map<std::string, uint64_t> e2e_latencies;
   for (const auto& message : track_map_) {
     uint64_t e2e_begin_time = 0;
-    auto iter = message.second.begin();
+    auto     iter           = message.second.begin();
     e2e_latencies.clear();
     while (iter != message.second.end()) {
       std::tie(begin_time, std::ignore, module_name) = *iter;
@@ -181,7 +166,7 @@ void LatencyMonitor::AggregateLatency() {
         e2e_begin_time = begin_time;
       } else if (module_name != kE2EStartPoint && e2e_begin_time != 0 &&
                  e2e_latencies.find(module_name) == e2e_latencies.end()) {
-        const auto duration = begin_time - e2e_begin_time;
+        const auto duration        = begin_time - e2e_begin_time;
         e2e_latencies[module_name] = duration;
         e2es_track[module_name].push_back(duration);
       }
@@ -208,16 +193,12 @@ void LatencyMonitor::AggregateLatency() {
   }
   auto* e2es_latency = latency_report_.mutable_e2es_latency();
   for (const auto& e2e : e2es_track) {
-    SetLatency(absl::StrCat(kE2EStartPoint, " -> ", e2e.first), e2e.second,
-               e2es_latency);
+    SetLatency(absl::StrCat(kE2EStartPoint, " -> ", e2e.first), e2e.second, e2es_latency);
   }
 }
 
-bool LatencyMonitor::GetFrequency(const std::string& channel_name,
-                                  double* freq) {
-  if (freq_map_.find(channel_name) == freq_map_.end()) {
-    return false;
-  }
+bool LatencyMonitor::GetFrequency(const std::string& channel_name, double* freq) {
+  if (freq_map_.find(channel_name) == freq_map_.end()) { return false; }
   *freq = freq_map_[channel_name];
   return true;
 }

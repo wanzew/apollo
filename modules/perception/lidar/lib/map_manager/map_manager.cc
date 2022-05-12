@@ -15,11 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 
+#include "modules/perception/proto/map_manager_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/map_manager_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -28,20 +28,20 @@ namespace lidar {
 using cyber::common::GetAbsolutePath;
 
 bool MapManager::Init(const MapManagerInitOptions& options) {
-  auto config_manager = lib::ConfigManager::Instance();
-  const lib::ModelConfig* model_config = nullptr;
+  auto                    config_manager = lib::ConfigManager::Instance();
+  const lib::ModelConfig* model_config   = nullptr;
   ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
-  std::string config_file;
-  std::string root_path;
+  std::string       config_file;
+  std::string       root_path;
   ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "map_manager.conf");
   MapManagerConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
-  update_pose_ = config.update_pose();
+  update_pose_         = config.update_pose();
   roi_search_distance_ = config.roi_search_distance();
-  hdmap_input_ = map::HDMapInput::Instance();
+  hdmap_input_         = map::HDMapInput::Instance();
   if (!hdmap_input_->Init()) {
     AINFO << "Failed to init hdmap input.";
     return false;
@@ -54,24 +54,19 @@ bool MapManager::Update(const MapManagerOptions& options, LidarFrame* frame) {
     AINFO << "Frame is nullptr.";
     return false;
   }
-  if (!(frame->hdmap_struct)) {
-    frame->hdmap_struct.reset(new base::HdmapStruct);
-  }
+  if (!(frame->hdmap_struct)) { frame->hdmap_struct.reset(new base::HdmapStruct); }
   if (!hdmap_input_) {
     AINFO << "Hdmap input is nullptr";
     return false;
   }
   if (update_pose_) {
-    if (!QueryPose(&(frame->lidar2world_pose))) {
-      AINFO << "Failed to query updated pose.";
-    }
+    if (!QueryPose(&(frame->lidar2world_pose))) { AINFO << "Failed to query updated pose."; }
   }
   base::PointD point;
   point.x = frame->lidar2world_pose.translation()(0);
   point.y = frame->lidar2world_pose.translation()(1);
   point.z = frame->lidar2world_pose.translation()(2);
-  if (!hdmap_input_->GetRoiHDMapStruct(point, roi_search_distance_,
-                                       frame->hdmap_struct)) {
+  if (!hdmap_input_->GetRoiHDMapStruct(point, roi_search_distance_, frame->hdmap_struct)) {
     frame->hdmap_struct->road_polygons.clear();
     frame->hdmap_struct->road_boundary.clear();
     frame->hdmap_struct->hole_polygons.clear();

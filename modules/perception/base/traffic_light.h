@@ -26,18 +26,18 @@ namespace perception {
 namespace base {
 
 enum class TLColor {
-  TL_UNKNOWN_COLOR = 0,
-  TL_RED = 1,
-  TL_YELLOW = 2,
-  TL_GREEN = 3,
-  TL_BLACK = 4,
+  TL_UNKNOWN_COLOR   = 0,
+  TL_RED             = 1,
+  TL_YELLOW          = 2,
+  TL_GREEN           = 3,
+  TL_BLACK           = 4,
   TL_TOTAL_COLOR_NUM = 5
 };
 
 enum class TLDetectionClass {
-  TL_UNKNOWN_CLASS = -1,
-  TL_VERTICAL_CLASS = 0,
-  TL_QUADRATE_CLASS = 1,
+  TL_UNKNOWN_CLASS    = -1,
+  TL_VERTICAL_CLASS   = 0,
+  TL_QUADRATE_CLASS   = 1,
   TL_HORIZONTAL_CLASS = 2
 };
 
@@ -46,14 +46,14 @@ struct LightRegion {
   // roi is marked by map & projection, it may be too large or not accuracy.
   Rect<int> projection_roi;
   Rect<int> crop_roi;
-  bool outside_image = false;
+  bool      outside_image = false;
 
   std::vector<Rect<int>> debug_roi;
-  std::vector<float> debug_roi_detect_scores;
+  std::vector<float>     debug_roi_detect_scores;
 
-  Rect<int> detection_roi;
-  bool is_detected = false;
-  bool is_selected = false;
+  Rect<int>        detection_roi;
+  bool             is_detected     = false;
+  bool             is_selected     = false;
   TLDetectionClass detect_class_id = TLDetectionClass::TL_UNKNOWN_CLASS;
 
   // 3d polygon
@@ -80,13 +80,13 @@ struct TrafficLight {
   TrafficLight() = default;
 
   std::string id;
-  int semantic = 0;
+  int         semantic = 0;
   LightRegion region;  // Light region.
   LightStatus status;  // Light Status.
 };
 
 typedef std::shared_ptr<TrafficLight> TrafficLightPtr;
-typedef std::vector<TrafficLightPtr> TrafficLightPtrs;
+typedef std::vector<TrafficLightPtr>  TrafficLightPtrs;
 
 }  // namespace base
 }  // namespace perception

@@ -23,10 +23,8 @@ namespace base {
 Eigen::Vector2f PinholeCameraModel::Project(const Eigen::Vector3f& point3d) {
   Eigen::Vector2f pt2d;
 
-  pt2d(0) = point3d(0) / point3d(2) * intrinsic_params_(0, 0) +
-            intrinsic_params_(0, 2);
-  pt2d(1) = point3d(1) / point3d(2) * intrinsic_params_(1, 1) +
-            intrinsic_params_(1, 2);
+  pt2d(0) = point3d(0) / point3d(2) * intrinsic_params_(0, 0) + intrinsic_params_(0, 2);
+  pt2d(1) = point3d(1) / point3d(2) * intrinsic_params_(1, 1) + intrinsic_params_(1, 2);
 
   return pt2d;
 }

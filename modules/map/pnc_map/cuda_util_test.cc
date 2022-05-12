@@ -26,10 +26,10 @@ using apollo::common::math::Vec2d;
 
 TEST(CudaUtil, CudaNearestSegment) {
   CudaNearestSegment segment_tool;
-  Vec2d p1(0, 0);
-  Vec2d p2(1, 0);
-  Vec2d p3(2, 0);
-  Vec2d p4(3, 0);
+  Vec2d              p1(0, 0);
+  Vec2d              p2(1, 0);
+  Vec2d              p3(2, 0);
+  Vec2d              p4(3, 0);
 
   std::vector<LineSegment2d> segments;
   segments.emplace_back(p1, p2);

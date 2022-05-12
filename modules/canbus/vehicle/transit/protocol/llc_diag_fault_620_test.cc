@@ -36,38 +36,34 @@ class Diag_fault_620_test : public ::testing::Test {
 };
 
 TEST_F(Diag_fault_620_test, General) {
-  const uint8_t bytes[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const int32_t length_disengagecounter_brake = 8;
-  const int32_t length_disengagecounter_steer = 8;
+  const uint8_t bytes[8]                         = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
+  const int32_t length_disengagecounter_brake    = 8;
+  const int32_t length_disengagecounter_steer    = 8;
   const int32_t length_disengagecounter_throttle = 8;
-  const int32_t length_fbk_faultcounter = 8;
-  const int32_t length_disengagecounter_button = 8;
-  const int32_t length_fbk_version_year = 7;
-  const int32_t length_fbk_version_month = 4;
-  const int32_t length_fbk_version_day = 5;
-  const int32_t length_fbk_version_hour = 5;
-  const int equivalent_disengagecounter_brake = 0xcb;
-  const int equivalent_disengagecounter_steer = 0xad;
-  const int equivalent_disengagecounter_throttle = 0xbc;
-  const int equivalent_fbk_faultcounter = 0x8f;
-  const int equivalent_disengagecounter_button = 0x9e;
-  const int equivalent_fbk_version_year = 0x83b;
-  const int equivalent_fbk_version_month = 0x03;
-  const int equivalent_fbk_version_day = 0x1d;
-  const int equivalent_fbk_version_hour = 0x18;
-  EXPECT_EQ(diagfault_.llc_disengagecounter_brake(
-                bytes, length_disengagecounter_brake),
+  const int32_t length_fbk_faultcounter          = 8;
+  const int32_t length_disengagecounter_button   = 8;
+  const int32_t length_fbk_version_year          = 7;
+  const int32_t length_fbk_version_month         = 4;
+  const int32_t length_fbk_version_day           = 5;
+  const int32_t length_fbk_version_hour          = 5;
+  const int     equivalent_disengagecounter_brake    = 0xcb;
+  const int     equivalent_disengagecounter_steer    = 0xad;
+  const int     equivalent_disengagecounter_throttle = 0xbc;
+  const int     equivalent_fbk_faultcounter          = 0x8f;
+  const int     equivalent_disengagecounter_button   = 0x9e;
+  const int     equivalent_fbk_version_year          = 0x83b;
+  const int     equivalent_fbk_version_month         = 0x03;
+  const int     equivalent_fbk_version_day           = 0x1d;
+  const int     equivalent_fbk_version_hour          = 0x18;
+  EXPECT_EQ(diagfault_.llc_disengagecounter_brake(bytes, length_disengagecounter_brake),
             equivalent_disengagecounter_brake);
-  EXPECT_EQ(diagfault_.llc_disengagecounter_steer(
-                bytes, length_disengagecounter_steer),
+  EXPECT_EQ(diagfault_.llc_disengagecounter_steer(bytes, length_disengagecounter_steer),
             equivalent_disengagecounter_steer);
-  EXPECT_EQ(diagfault_.llc_disengagecounter_throttle(
-                bytes, length_disengagecounter_throttle),
+  EXPECT_EQ(diagfault_.llc_disengagecounter_throttle(bytes, length_disengagecounter_throttle),
             equivalent_disengagecounter_throttle);
   EXPECT_EQ(diagfault_.llc_fbk_faultcounter(bytes, length_fbk_faultcounter),
             equivalent_fbk_faultcounter);
-  EXPECT_EQ(diagfault_.llc_disengagecounter_button(
-                bytes, length_disengagecounter_button),
+  EXPECT_EQ(diagfault_.llc_disengagecounter_button(bytes, length_disengagecounter_button),
             equivalent_disengagecounter_button);
   EXPECT_EQ(diagfault_.llc_fbk_version_year(bytes, length_fbk_version_year),
             equivalent_fbk_version_year);

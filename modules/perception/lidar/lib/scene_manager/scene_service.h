@@ -27,7 +27,7 @@ namespace lidar {
 
 class SceneServiceContent {
  public:
-  SceneServiceContent() = default;
+  SceneServiceContent()          = default;
   virtual ~SceneServiceContent() = default;
   // @brief: get service content name
   // @return: name
@@ -50,22 +50,21 @@ class SceneServiceContent {
 };
 
 PERCEPTION_REGISTER_REGISTERER(SceneServiceContent);
-#define PERCEPTION_REGISTER_SCENESERVICECONTENT(name) \
+#define PERCEPTION_REGISTER_SCENESERVICECONTENT(name)                                              \
   PERCEPTION_REGISTER_CLASS(SceneServiceContent, name)
 
-typedef std::shared_ptr<SceneServiceContent> SceneServiceContentPtr;
+typedef std::shared_ptr<SceneServiceContent>       SceneServiceContentPtr;
 typedef std::shared_ptr<const SceneServiceContent> SceneServiceContentConstPtr;
 
 struct SceneServiceInitOptions {};
 
 class SceneService {
  public:
-  SceneService() = default;
+  SceneService()          = default;
   virtual ~SceneService() = default;
   // @brief: initialize scene service
   // @param [in]: init options
-  virtual bool Init(
-      const SceneServiceInitOptions& options = SceneServiceInitOptions()) = 0;
+  virtual bool Init(const SceneServiceInitOptions& options = SceneServiceInitOptions()) = 0;
   // @brief: get service name
   // @return: name
   virtual std::string Name() const = 0;
@@ -84,17 +83,16 @@ class SceneService {
 
  protected:
   SceneServiceContentPtr self_content_;
-  std::mutex mutex_;
+  std::mutex             mutex_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(SceneService);
 };
 
 PERCEPTION_REGISTER_REGISTERER(SceneService);
-#define PERCEPTION_REGISTER_SCENESERVICE(name) \
-  PERCEPTION_REGISTER_CLASS(SceneService, name)
+#define PERCEPTION_REGISTER_SCENESERVICE(name) PERCEPTION_REGISTER_CLASS(SceneService, name)
 
-typedef std::shared_ptr<SceneService> SceneServicePtr;
+typedef std::shared_ptr<SceneService>       SceneServicePtr;
 typedef std::shared_ptr<const SceneService> SceneServiceConstPtr;
 
 }  // namespace lidar

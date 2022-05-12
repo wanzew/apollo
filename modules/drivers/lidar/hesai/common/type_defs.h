@@ -18,6 +18,7 @@
 #define LIDAR_HESAI_SRC_TYPE_DEFS_H_
 
 #include <ctime>
+
 #include "modules/drivers/lidar/hesai/common/const_var.h"
 
 namespace apollo {
@@ -25,66 +26,66 @@ namespace drivers {
 namespace hesai {
 
 typedef struct HesaiPacket {
-  double stamp;
-  uint8_t data[ETHERNET_MTU];
+  double   stamp;
+  uint8_t  data[ETHERNET_MTU];
   uint32_t size;
 } HesaiPacket;
 
 /**************Hesai40P****************************/
 typedef struct Hesai40PUnit {
   uint8_t intensity;
-  double distance;
+  double  distance;
 } Hesai40PUnit;
 
 typedef struct Hesai40PBlock {
-  uint16_t azimuth;
-  uint16_t sob;
+  uint16_t     azimuth;
+  uint16_t     sob;
   Hesai40PUnit units[LASER_COUNT];
 } Hesai40PBlock;
 
 typedef struct Hesai40Packet {
   Hesai40PBlock blocks[BLOCKS_PER_PACKET];
-  struct tm t;
-  uint32_t usec;
-  int echo;
+  struct tm     t;
+  uint32_t      usec;
+  int           echo;
 } Hesai40Packet;
 
 /************Hesai64*******************************/
 typedef struct Hesai64Header {
-  uint16_t sob;           // 0xFFEE 2bytes
-  uint8_t chLaserNumber;  // laser number 1byte
-  uint8_t chBlockNumber;  // block number 1byte
-  uint8_t chReturnType;   // return mode 1 byte
-                          // when dual return 0
-                          // Single Return
-                          // 1-The first block is the 1 st return.
-                          // 2-The first block is the 2 nd return
-  uint8_t chDisUnit;      // Distance unit, 6mm/5mm/4mm
+  uint16_t sob;            // 0xFFEE 2bytes
+  uint8_t  chLaserNumber;  // laser number 1byte
+  uint8_t  chBlockNumber;  // block number 1byte
+  uint8_t  chReturnType;   // return mode 1 byte
+                           // when dual return 0
+                           // Single Return
+                           // 1-The first block is the 1 st return.
+                           // 2-The first block is the 2 nd return
+  uint8_t chDisUnit;       // Distance unit, 6mm/5mm/4mm
  public:
   Hesai64Header() {
-    sob = 0;
+    sob           = 0;
     chLaserNumber = 0;
     chBlockNumber = 0;
-    chReturnType = 0;
-    chDisUnit = 0;
+    chReturnType  = 0;
+    chDisUnit     = 0;
   }
 } Hesai64Header;
 
 typedef struct Hesai64Unit {
-  double distance;
+  double  distance;
   uint8_t reflectivity;  // reflectivity
 } Hesai64Unit;
 
 typedef struct Hesai64Block {
-  uint16_t azimuth;  // packet angle  ,Azimuth = RealAzimuth * 100
+  uint16_t    azimuth;  // packet angle  ,Azimuth = RealAzimuth * 100
   Hesai64Unit units[LASER_COUNT_L64];
 } Hesai64Block;
 
 typedef struct Hesai64Packet {
   Hesai64Header header;
-  Hesai64Block blocks[BLOCKS_PER_PACKET_L64];
-  uint8_t echo;
-  unsigned int timestamp;  // ms
+  Hesai64Block  blocks[BLOCKS_PER_PACKET_L64];
+  uint8_t       echo;
+  unsigned int  timestamp;  // ms
   unsigned char utc_time[UTC_TIME];
 } Hesai64Packet;
 

@@ -24,26 +24,27 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/map/pnc_map/path.h"
 #include "modules/map/proto/map.pb.h"
 #include "modules/map/proto/map_geometry.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
-#include "modules/planning/reference_line/reference_point.h"
 #include "modules/routing/proto/routing.pb.h"
+
+#include "modules/common/math/vec2d.h"
+#include "modules/map/pnc_map/path.h"
+#include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
 namespace planning {
 
 class ReferenceLine {
  public:
-  ReferenceLine() = default;
+  ReferenceLine()                                             = default;
   explicit ReferenceLine(const ReferenceLine& reference_line) = default;
   template <typename Iterator>
   ReferenceLine(const Iterator begin, const Iterator end)
-      : reference_points_(begin, end),
-        map_path_(std::move(std::vector<hdmap::MapPathPoint>(begin, end))) {}
+      : reference_points_(begin, end)
+      , map_path_(std::move(std::vector<hdmap::MapPathPoint>(begin, end))) {}
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   explicit ReferenceLine(const hdmap::Path& hdmap_path);
 
@@ -71,66 +72,59 @@ class ReferenceLine {
    */
   bool Stitch(const ReferenceLine& other);
 
-  bool Segment(const common::math::Vec2d& point, const double distance_backward,
-               const double distance_forward);
+  bool Segment(const common::math::Vec2d& point,
+               const double               distance_backward,
+               const double               distance_forward);
 
-  bool Segment(const double s, const double distance_backward,
-               const double distance_forward);
+  bool Segment(const double s, const double distance_backward, const double distance_forward);
 
-  const hdmap::Path& map_path() const;
+  const hdmap::Path&                 map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;
 
   ReferencePoint GetReferencePoint(const double s) const;
 
-  common::FrenetFramePoint GetFrenetPoint(
-      const common::PathPoint& path_point) const;
+  common::FrenetFramePoint GetFrenetPoint(const common::PathPoint& path_point) const;
 
-  std::pair<std::array<double, 3>, std::array<double, 3>> ToFrenetFrame(
-      const common::TrajectoryPoint& traj_point) const;
+  std::pair<std::array<double, 3>, std::array<double, 3>>
+  ToFrenetFrame(const common::TrajectoryPoint& traj_point) const;
 
-  std::vector<ReferencePoint> GetReferencePoints(double start_s,
-                                                 double end_s) const;
+  std::vector<ReferencePoint> GetReferencePoints(double start_s, double end_s) const;
 
   size_t GetNearestReferenceIndex(const double s) const;
 
   ReferencePoint GetNearestReferencePoint(const common::math::Vec2d& xy) const;
 
-  std::vector<hdmap::LaneSegment> GetLaneSegments(const double start_s,
-                                                  const double end_s) const;
+  std::vector<hdmap::LaneSegment> GetLaneSegments(const double start_s, const double end_s) const;
 
   ReferencePoint GetNearestReferencePoint(const double s) const;
 
   ReferencePoint GetReferencePoint(const double x, const double y) const;
 
   bool GetApproximateSLBoundary(const common::math::Box2d& box,
-                                const double start_s, const double end_s,
-                                SLBoundary* const sl_boundary) const;
-  bool GetSLBoundary(const common::math::Box2d& box,
-                     SLBoundary* const sl_boundary) const;
-  bool GetSLBoundary(const hdmap::Polygon& polygon,
-                     SLBoundary* const sl_boundary) const;
+                                const double               start_s,
+                                const double               end_s,
+                                SLBoundary* const          sl_boundary) const;
+  bool GetSLBoundary(const common::math::Box2d& box, SLBoundary* const sl_boundary) const;
+  bool GetSLBoundary(const hdmap::Polygon& polygon, SLBoundary* const sl_boundary) const;
 
-  bool SLToXY(const common::SLPoint& sl_point,
-              common::math::Vec2d* const xy_point) const;
-  bool XYToSL(const common::math::Vec2d& xy_point,
-              common::SLPoint* const sl_point) const;
+  bool SLToXY(const common::SLPoint& sl_point, common::math::Vec2d* const xy_point) const;
+  bool XYToSL(const common::math::Vec2d& xy_point, common::SLPoint* const sl_point) const;
   template <class XYPoint>
   bool XYToSL(const XYPoint& xy, common::SLPoint* const sl_point) const {
     return XYToSL(common::math::Vec2d(xy.x(), xy.y()), sl_point);
   }
 
-  bool GetLaneWidth(const double s, double* const lane_left_width,
-                    double* const lane_right_width) const;
+  bool
+  GetLaneWidth(const double s, double* const lane_left_width, double* const lane_right_width) const;
 
   bool GetOffsetToMap(const double s, double* l_offset) const;
 
-  bool GetRoadWidth(const double s, double* const road_left_width,
-                    double* const road_right_width) const;
+  bool
+  GetRoadWidth(const double s, double* const road_left_width, double* const road_right_width) const;
 
   hdmap::Road::Type GetRoadType(const double s) const;
 
-  void GetLaneFromS(const double s,
-                    std::vector<hdmap::LaneInfoConstPtr>* lanes) const;
+  void GetLaneFromS(const double s, std::vector<hdmap::LaneInfoConstPtr>* lanes) const;
 
   double GetDrivingWidth(const SLBoundary& sl_boundary) const;
 
@@ -201,33 +195,42 @@ class ReferenceLine {
    * s >= s0 && s <= s1
    * @return The interpolated ReferencePoint.
    */
-  static ReferencePoint Interpolate(const ReferencePoint& p0, const double s0,
-                                    const ReferencePoint& p1, const double s1,
-                                    const double s);
-  ReferencePoint InterpolateWithMatchedIndex(
-      const ReferencePoint& p0, const double s0, const ReferencePoint& p1,
-      const double s1, const hdmap::InterpolatedIndex& index) const;
+  static ReferencePoint Interpolate(const ReferencePoint& p0,
+                                    const double          s0,
+                                    const ReferencePoint& p1,
+                                    const double          s1,
+                                    const double          s);
+  ReferencePoint        InterpolateWithMatchedIndex(const ReferencePoint&           p0,
+                                                    const double                    s0,
+                                                    const ReferencePoint&           p1,
+                                                    const double                    s1,
+                                                    const hdmap::InterpolatedIndex& index) const;
 
-  static double FindMinDistancePoint(const ReferencePoint& p0, const double s0,
-                                     const ReferencePoint& p1, const double s1,
-                                     const double x, const double y);
+  static double FindMinDistancePoint(const ReferencePoint& p0,
+                                     const double          s0,
+                                     const ReferencePoint& p1,
+                                     const double          s1,
+                                     const double          x,
+                                     const double          y);
 
  private:
   struct SpeedLimit {
-    double start_s = 0.0;
-    double end_s = 0.0;
+    double start_s     = 0.0;
+    double end_s       = 0.0;
     double speed_limit = 0.0;  // unit m/s
-    SpeedLimit() = default;
+    SpeedLimit()       = default;
     SpeedLimit(double _start_s, double _end_s, double _speed_limit)
-        : start_s(_start_s), end_s(_end_s), speed_limit(_speed_limit) {}
+        : start_s(_start_s)
+        , end_s(_end_s)
+        , speed_limit(_speed_limit) {}
   };
   /**
    * This speed limit overrides the lane speed limit
    **/
-  std::vector<SpeedLimit> speed_limit_;
+  std::vector<SpeedLimit>     speed_limit_;
   std::vector<ReferencePoint> reference_points_;
-  hdmap::Path map_path_;
-  uint32_t priority_ = 0;
+  hdmap::Path                 map_path_;
+  uint32_t                    priority_ = 0;
 };
 
 }  // namespace planning

@@ -27,20 +27,20 @@
 #include <boost/filesystem.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
-#include "cyber/common/log.h"
 #include "fastrtps/TopicDataType.h"
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 const size_t kBufferSize = 20480000;
 
-void FileUtility::ComputeFileMd5(const std::string &file_path,
-                                 unsigned char res[kUcharMd5Length]) {
+void FileUtility::ComputeFileMd5(const std::string& file_path, unsigned char res[kUcharMd5Length]) {
   std::vector<unsigned char> buf(kBufferSize);
-  unsigned char *buf_pt = &buf[0];
+  unsigned char*             buf_pt = &buf[0];
 
-  FILE *file = fopen(file_path.c_str(), "rb");
+  FILE*  file       = fopen(file_path.c_str(), "rb");
   size_t total_size = 0;
   if (file) {
     int count = 1;
@@ -64,12 +64,11 @@ void FileUtility::ComputeFileMd5(const std::string &file_path,
   fclose(file);
 }
 
-void FileUtility::ComputeFileMd5(const std::string &file_path,
-                                 char res[kCharMd5Lenth]) {
+void FileUtility::ComputeFileMd5(const std::string& file_path, char res[kCharMd5Lenth]) {
   std::vector<unsigned char> buf(kBufferSize);
-  unsigned char *buf_pt = &buf[0];
+  unsigned char*             buf_pt = &buf[0];
 
-  FILE *file = fopen(file_path.c_str(), "rb");
+  FILE*  file       = fopen(file_path.c_str(), "rb");
   size_t total_size = 0;
   if (file) {
     int count = 1;
@@ -93,8 +92,9 @@ void FileUtility::ComputeFileMd5(const std::string &file_path,
   fclose(file);
 }
 
-void FileUtility::ComputeBinaryMd5(const unsigned char *binary, size_t size,
-                                   unsigned char res[kUcharMd5Length]) {
+void FileUtility::ComputeBinaryMd5(const unsigned char* binary,
+                                   size_t               size,
+                                   unsigned char        res[kUcharMd5Length]) {
   MD5 md5;
   md5.init();
   md5.update(binary, static_cast<unsigned int>(size));
@@ -104,11 +104,12 @@ void FileUtility::ComputeBinaryMd5(const unsigned char *binary, size_t size,
   }
 }
 
-void FileUtility::ComputeBinaryMd5(const unsigned char *binary, size_t size,
-                                   char res[kCharMd5Lenth]) {
+void FileUtility::ComputeBinaryMd5(const unsigned char* binary,
+                                   size_t               size,
+                                   char                 res[kCharMd5Lenth]) {
   unsigned char md[kUcharMd5Length] = {"\0"};
-  char buf[kCharMd5Lenth] = {'\0'};
-  char tmp[3] = {'\0'};
+  char          buf[kCharMd5Lenth]  = {'\0'};
+  char          tmp[3]              = {'\0'};
 
   ComputeBinaryMd5(binary, size, md);
 

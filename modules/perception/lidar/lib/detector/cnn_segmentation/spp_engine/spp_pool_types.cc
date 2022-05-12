@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/spp_engine/spp_pool_types.h"
+
 #include "modules/perception/lidar/common/lidar_log.h"
 
 namespace apollo {

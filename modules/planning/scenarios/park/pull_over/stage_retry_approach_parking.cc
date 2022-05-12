@@ -33,8 +33,7 @@ namespace pull_over {
 using apollo::common::TrajectoryPoint;
 
 PullOverStageRetryApproachParking::PullOverStageRetryApproachParking(
-    const ScenarioConfig::StageConfig& config,
-    const std::shared_ptr<DependencyInjector>& injector)
+    const ScenarioConfig::StageConfig& config, const std::shared_ptr<DependencyInjector>& injector)
     : Stage(config, injector) {}
 
 Stage::StageStatus PullOverStageRetryApproachParking::FinishStage() {
@@ -42,29 +41,26 @@ Stage::StageStatus PullOverStageRetryApproachParking::FinishStage() {
   return Stage::FINISHED;
 }
 
-Stage::StageStatus PullOverStageRetryApproachParking::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus
+PullOverStageRetryApproachParking::Process(const TrajectoryPoint& planning_init_point,
+                                           Frame*                 frame) {
   ADEBUG << "stage: RetryApproachParking";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "PullOverStageRetryApproachParking planning error";
-  }
+  if (!plan_ok) { AERROR << "PullOverStageRetryApproachParking planning error"; }
 
-  if (CheckADCStop(*frame)) {
-    return FinishStage();
-  }
+  if (CheckADCStop(*frame)) { return FinishStage(); }
 
   return StageStatus::RUNNING;
 }
 
 bool PullOverStageRetryApproachParking::CheckADCStop(const Frame& frame) {
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_speed = injector_->vehicle_state()->linear_velocity();
-  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+  const auto&  reference_line_info = frame.reference_line_info().front();
+  const double adc_speed           = injector_->vehicle_state()->linear_velocity();
+  const double max_adc_stop_speed  = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
                                         .max_abs_speed_when_stopped();
@@ -74,14 +70,11 @@ bool PullOverStageRetryApproachParking::CheckADCStop(const Frame& frame) {
   }
 
   // check stop close enough to stop line of the stop_sign
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double stop_fence_start_s =
-      frame.open_space_info().open_space_pre_stop_fence_s();
-  const double distance_stop_line_to_adc_front_edge =
-      stop_fence_start_s - adc_front_edge_s;
+  const double adc_front_edge_s   = reference_line_info.AdcSlBoundary().end_s();
+  const double stop_fence_start_s = frame.open_space_info().open_space_pre_stop_fence_s();
+  const double distance_stop_line_to_adc_front_edge = stop_fence_start_s - adc_front_edge_s;
 
-  if (distance_stop_line_to_adc_front_edge >
-      scenario_config_.max_valid_stop_distance()) {
+  if (distance_stop_line_to_adc_front_edge > scenario_config_.max_valid_stop_distance()) {
     ADEBUG << "not a valid stop. too far from stop line.";
     return false;
   }

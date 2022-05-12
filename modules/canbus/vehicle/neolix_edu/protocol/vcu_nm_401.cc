@@ -30,8 +30,7 @@ using ::apollo::drivers::canbus::Byte;
 Vcunm401::Vcunm401() {}
 const int32_t Vcunm401::ID = 0x401;
 
-void Vcunm401::Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const {
+void Vcunm401::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_neolix_edu()->mutable_vcu_nm_401()->set_vcu_sleepcommand(
       vcu_sleepcommand(bytes, length));
 }
@@ -40,9 +39,8 @@ void Vcunm401::Parse(const std::uint8_t* bytes, int32_t length,
 // 'precision': 1.0, 'len': 1, 'name': 'vcu_sleepcommand', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 0, 'type': 'bool', 'order':
 // 'motorola', 'physical_unit': 'bit'}
-bool Vcunm401::vcu_sleepcommand(const std::uint8_t* bytes,
-                                int32_t length) const {
-  Byte t0(bytes + 0);
+bool Vcunm401::vcu_sleepcommand(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;

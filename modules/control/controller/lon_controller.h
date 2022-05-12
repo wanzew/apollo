@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/control/common/interpolation_2d.h"
@@ -64,7 +65,7 @@ class LonController : public Controller {
    * @return Status initialization status
    */
   common::Status Init(std::shared_ptr<DependencyInjector> injector,
-                      const ControlConf *control_conf) override;
+                      const ControlConf*                  control_conf) override;
 
   /**
    * @brief compute brake / throttle values based on current vehicle status
@@ -75,10 +76,10 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      control::ControlCommand *cmd) override;
+  common::Status ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                                       const canbus::Chassis*                    chassis,
+                                       const planning::ADCTrajectory*            trajectory,
+                                       control::ControlCommand*                  cmd) override;
 
   /**
    * @brief reset longitudinal controller
@@ -98,34 +99,33 @@ class LonController : public Controller {
   std::string Name() const override;
 
  protected:
-  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
-                                 const double preview_time, const double ts,
-                                 SimpleLongitudinalDebug *debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer* trajectory,
+                                 const double              preview_time,
+                                 const double              ts,
+                                 SimpleLongitudinalDebug*  debug);
 
-  void GetPathRemain(SimpleLongitudinalDebug *debug);
+  void GetPathRemain(SimpleLongitudinalDebug* debug);
 
  private:
-  void SetDigitalFilterPitchAngle(const LonControllerConf &lon_controller_conf);
+  void SetDigitalFilterPitchAngle(const LonControllerConf& lon_controller_conf);
 
-  void LoadControlCalibrationTable(
-      const LonControllerConf &lon_controller_conf);
+  void LoadControlCalibrationTable(const LonControllerConf& lon_controller_conf);
 
-  void SetDigitalFilter(double ts, double cutoff_freq,
-                        common::DigitalFilter *digital_filter);
+  void SetDigitalFilter(double ts, double cutoff_freq, common::DigitalFilter* digital_filter);
 
   void CloseLogFile();
 
-  const localization::LocalizationEstimate *localization_ = nullptr;
-  const canbus::Chassis *chassis_ = nullptr;
+  const localization::LocalizationEstimate* localization_ = nullptr;
+  const canbus::Chassis*                    chassis_      = nullptr;
 
-  std::unique_ptr<Interpolation2D> control_interpolation_;
-  const planning::ADCTrajectory *trajectory_message_ = nullptr;
+  std::unique_ptr<Interpolation2D>    control_interpolation_;
+  const planning::ADCTrajectory*      trajectory_message_ = nullptr;
   std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
 
   std::string name_;
-  bool controller_initialized_ = false;
+  bool        controller_initialized_ = false;
 
-  double previous_acceleration_ = 0.0;
+  double previous_acceleration_           = 0.0;
   double previous_acceleration_reference_ = 0.0;
 
   PIDController speed_pid_controller_;
@@ -134,11 +134,11 @@ class LonController : public Controller {
   LeadlagController speed_leadlag_controller_;
   LeadlagController station_leadlag_controller_;
 
-  FILE *speed_log_file_ = nullptr;
+  FILE* speed_log_file_ = nullptr;
 
   common::DigitalFilter digital_filter_pitch_angle_;
 
-  const ControlConf *control_conf_ = nullptr;
+  const ControlConf* control_conf_ = nullptr;
 
   // vehicle parameter
   common::VehicleParam vehicle_param_;

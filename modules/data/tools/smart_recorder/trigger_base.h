@@ -20,8 +20,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "cyber/record/record_message.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
+
+#include "cyber/record/record_message.h"
 
 namespace apollo {
 namespace data {
@@ -51,12 +52,12 @@ class TriggerBase {
   virtual ~TriggerBase() = default;
 
  protected:
-  void TriggerIt(const uint64_t msg_time) const;
+  void     TriggerIt(const uint64_t msg_time) const;
   uint64_t GetValidValueInRange(const double desired_value,
                                 const double min_limit,
                                 const double max_limit) const;
 
-  std::string trigger_name_;
+  std::string              trigger_name_;
   std::unique_ptr<Trigger> trigger_obj_ = nullptr;
 
  private:

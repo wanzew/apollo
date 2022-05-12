@@ -23,13 +23,12 @@
 namespace apollo {
 namespace prediction {
 
-std::shared_ptr<ScenarioFeatures> ScenarioAnalyzer::Analyze(
-    const EnvironmentFeatures& environment_features) {
+std::shared_ptr<ScenarioFeatures>
+ScenarioAnalyzer::Analyze(const EnvironmentFeatures& environment_features) {
   Scenario::Type scenario_type = Scenario::UNKNOWN;
 
   if (environment_features.has_front_junction() &&
-      environment_features.GetFrontJunction().second <
-          FLAGS_junction_distance_threshold) {
+      environment_features.GetFrontJunction().second < FLAGS_junction_distance_threshold) {
     scenario_type = Scenario::JUNCTION;
   } else if (environment_features.has_ego_lane()) {
     scenario_type = Scenario::CRUISE;
@@ -42,11 +41,9 @@ std::shared_ptr<ScenarioFeatures> ScenarioAnalyzer::Analyze(
   }
 
   if (scenario_type == Scenario::JUNCTION) {
-    auto junction_scenario_features =
-        std::make_shared<JunctionScenarioFeatures>();
+    auto junction_scenario_features = std::make_shared<JunctionScenarioFeatures>();
     // TODO(all) refactor this part
-    junction_scenario_features->BuildJunctionScenarioFeatures(
-        environment_features);
+    junction_scenario_features->BuildJunctionScenarioFeatures(environment_features);
     return junction_scenario_features;
   }
 

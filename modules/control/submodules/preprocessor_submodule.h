@@ -19,20 +19,21 @@
 #include <memory>
 #include <string>
 
-#include "cyber/class_loader/class_loader.h"
-#include "cyber/component/component.h"
-#include "cyber/component/timer_component.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/status/status.h"
-#include "modules/common/util/util.h"
-#include "modules/control/common/dependency_injector.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_common_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/control/proto/preprocessor.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/component.h"
+#include "cyber/component/timer_component.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/status/status.h"
+#include "modules/common/util/util.h"
+#include "modules/control/common/dependency_injector.h"
 
 namespace apollo {
 namespace control {
@@ -60,7 +61,7 @@ class PreprocessorSubmodule final : public cyber::Component<LocalView> {
    */
   bool Init() override;
 
-  bool Proc(const std::shared_ptr<LocalView> &local_view) override;
+  bool Proc(const std::shared_ptr<LocalView>& local_view) override;
 
  private:
   /**
@@ -69,7 +70,7 @@ class PreprocessorSubmodule final : public cyber::Component<LocalView> {
    * @param local_view
    * @return common::Status
    */
-  common::Status CheckInput(LocalView *local_view);
+  common::Status CheckInput(LocalView* local_view);
 
   /**
    * @brief check time stamp
@@ -77,9 +78,9 @@ class PreprocessorSubmodule final : public cyber::Component<LocalView> {
    * @param local_view
    * @return common::Status
    */
-  common::Status CheckTimestamp(const LocalView &local_view);
+  common::Status CheckTimestamp(const LocalView& local_view);
 
-  common::Status ProducePreprocessorStatus(Preprocessor *preprocessor_status);
+  common::Status ProducePreprocessorStatus(Preprocessor* preprocessor_status);
 
  private:
   double init_time_ = 0.0;

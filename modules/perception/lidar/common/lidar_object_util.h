@@ -28,13 +28,14 @@ namespace lidar {
 // @param [in]: expand valud, in meter
 // @param [out]: bounding box vertices(4 in xy plane)
 void GetBoundingBox2d(const std::shared_ptr<base::Object>& object,
-                      base::PointCloud<base::PointD>* box, double expand = 0.0);
+                      base::PointCloud<base::PointD>*      box,
+                      double                               expand = 0.0);
 
 // @brief: compute object shape(center, size) from given direction and polygon
 // @param [in/out]: input object, center and size will be updated
 // @param [in]: whether use world cloud or local cloud
 void ComputeObjectShapeFromPolygon(std::shared_ptr<base::Object> object,
-                                   bool use_world_cloud = false);
+                                   bool                          use_world_cloud = false);
 
 }  // namespace lidar
 }  // namespace perception

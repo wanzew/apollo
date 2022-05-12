@@ -35,16 +35,14 @@ class BaseGroundDetector {
 
   virtual ~BaseGroundDetector() = default;
 
-  virtual bool Init(const GroundDetectorInitOptions& options =
-                        GroundDetectorInitOptions()) = 0;
+  virtual bool Init(const GroundDetectorInitOptions& options = GroundDetectorInitOptions()) = 0;
 
   // @brief: detect ground points from point cloud.
   // @param [in]: options
   // @param [in/out]: frame
   // non_ground_indices should be filled, required,
   // label field of point cloud can be filled, optional,
-  virtual bool Detect(const GroundDetectorOptions& options,
-                      LidarFrame* frame) = 0;
+  virtual bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -53,8 +51,7 @@ class BaseGroundDetector {
 };  // class BaseGroundDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseGroundDetector);
-#define PERCEPTION_REGISTER_GROUNDDETECTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseGroundDetector, name)
+#define PERCEPTION_REGISTER_GROUNDDETECTOR(name) PERCEPTION_REGISTER_CLASS(BaseGroundDetector, name)
 
 }  // namespace lidar
 }  // namespace perception

@@ -19,21 +19,22 @@
 #include <memory>
 #include <string>
 
-#include "cyber/class_loader/class_loader.h"
-#include "cyber/component/component.h"
-#include "cyber/component/timer_component.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/util/util.h"
-#include "modules/control/controller/controller.h"
-#include "modules/control/controller/lat_controller.h"
-#include "modules/control/controller/lon_controller.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/control/proto/preprocessor.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/component.h"
+#include "cyber/component/timer_component.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/util/util.h"
+#include "modules/control/controller/controller.h"
+#include "modules/control/controller/lat_controller.h"
+#include "modules/control/controller/lon_controller.h"
 
 namespace apollo {
 namespace control {
@@ -70,8 +71,8 @@ class LatLonControllerSubmodule final : public cyber::Component<Preprocessor> {
   bool Proc(const std::shared_ptr<Preprocessor>& preprocessor_status) override;
 
  private:
-  common::Status ProduceControlCoreCommand(
-      const LocalView& local_view, ControlCommand* control_core_command);
+  common::Status ProduceControlCoreCommand(const LocalView& local_view,
+                                           ControlCommand*  control_core_command);
 
  private:
   bool estop_ = false;
@@ -83,10 +84,10 @@ class LatLonControllerSubmodule final : public cyber::Component<Preprocessor> {
 
   std::mutex mutex_;
   // TODO(SHU): separate conf
-  ControlConf lateral_controller_conf_;
-  ControlConf longitudinal_controller_conf_;
+  ControlConf                                    lateral_controller_conf_;
+  ControlConf                                    longitudinal_controller_conf_;
   std::shared_ptr<cyber::Writer<ControlCommand>> control_core_writer_;
-  std::shared_ptr<DependencyInjector> injector_;
+  std::shared_ptr<DependencyInjector>            injector_;
 };
 
 CYBER_REGISTER_COMPONENT(LatLonControllerSubmodule)

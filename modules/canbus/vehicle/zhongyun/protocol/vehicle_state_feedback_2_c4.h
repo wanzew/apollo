@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class Vehiclestatefeedback2c4 : public ::apollo::drivers::canbus::ProtocolData<
-                                    ::apollo::canbus::ChassisDetail> {
+class Vehiclestatefeedback2c4
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vehiclestatefeedback2c4();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'motor_speed', 'offset': 0.0, 'precision': 1.0,
@@ -41,8 +41,7 @@ class Vehiclestatefeedback2c4 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 0.05, 'len': 16, 'is_signed_var': False, 'physical_range':
   // '[0|100]', 'bit': 16, 'type': 'double', 'order': 'intel', 'physical_unit':
   // '%'}
-  double driven_torque_feedback(const std::uint8_t* bytes,
-                                const int32_t length) const;
+  double driven_torque_feedback(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace zhongyun

@@ -31,27 +31,22 @@ Llcmotioncommandfeedback122::Llcmotioncommandfeedback122() {}
 const int32_t Llcmotioncommandfeedback122::ID = 0x22;
 
 void Llcmotioncommandfeedback122::Parse(const std::uint8_t* bytes,
-                                        int32_t length,
-                                        ChassisDetail* chassis) const {
+                                        int32_t             length,
+                                        ChassisDetail*      chassis) const {
   chassis->mutable_transit()
       ->mutable_llc_motioncommandfeedback1_22()
-      ->set_llc_fbk_steeringanglesetpoint(
-          llc_fbk_steeringanglesetpoint(bytes, length));
+      ->set_llc_fbk_steeringanglesetpoint(llc_fbk_steeringanglesetpoint(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motioncommandfeedback1_22()->set_llc_fbk_throttlesetpoint(
+      llc_fbk_throttlesetpoint(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_motioncommandfeedback1_22()
-      ->set_llc_fbk_throttlesetpoint(llc_fbk_throttlesetpoint(bytes, length));
+      ->set_llc_fbk_brakepercentsetpoint(llc_fbk_brakepercentsetpoint(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_motioncommandfeedback1_22()
-      ->set_llc_fbk_brakepercentsetpoint(
-          llc_fbk_brakepercentsetpoint(bytes, length));
+      ->set_llc_motioncommandfeedback1_count(llc_motioncommandfeedback1_count(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_motioncommandfeedback1_22()
-      ->set_llc_motioncommandfeedback1_count(
-          llc_motioncommandfeedback1_count(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motioncommandfeedback1_22()
-      ->set_llc_motioncommandfeedback1_check(
-          llc_motioncommandfeedback1_check(bytes, length));
+      ->set_llc_motioncommandfeedback1_check(llc_motioncommandfeedback1_check(bytes, length));
 }
 
 // config detail: {'description': 'Steering angle setpoint (after limits)',
@@ -59,12 +54,12 @@ void Llcmotioncommandfeedback122::Parse(const std::uint8_t* bytes,
 // 'llc_fbk_steeringanglesetpoint', 'is_signed_var': True, 'physical_range':
 // '[-1638.4|1638.35]', 'bit': 21, 'type': 'double', 'order': 'intel',
 // 'physical_unit': 'deg'}
-double Llcmotioncommandfeedback122::llc_fbk_steeringanglesetpoint(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+double Llcmotioncommandfeedback122::llc_fbk_steeringanglesetpoint(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 5);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -86,12 +81,12 @@ double Llcmotioncommandfeedback122::llc_fbk_steeringanglesetpoint(
 // 'llc_fbk_throttlesetpoint', 'is_signed_var': False, 'physical_range':
 // '[0|102.3]', 'bit': 11, 'type': 'double', 'order': 'intel', 'physical_unit':
 // '%'}
-double Llcmotioncommandfeedback122::llc_fbk_throttlesetpoint(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+double Llcmotioncommandfeedback122::llc_fbk_throttlesetpoint(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 5);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
@@ -105,12 +100,12 @@ double Llcmotioncommandfeedback122::llc_fbk_throttlesetpoint(
 // 'llc_fbk_brakepercentsetpoint', 'is_signed_var': False, 'physical_range':
 // '[0|113.8132]', 'bit': 0, 'type': 'double', 'order': 'intel',
 // 'physical_unit': '%'}
-double Llcmotioncommandfeedback122::llc_fbk_brakepercentsetpoint(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+double Llcmotioncommandfeedback122::llc_fbk_brakepercentsetpoint(const std::uint8_t* bytes,
+                                                                 int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 3);
 
-  Byte t1(bytes + 0);
+  Byte    t1(bytes + 0);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -123,9 +118,9 @@ double Llcmotioncommandfeedback122::llc_fbk_brakepercentsetpoint(
 // 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':
 // 'llc_motioncommandfeedback1_count', 'is_signed_var': False, 'physical_range':
 // '[0|3]', 'bit': 54, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
-int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_count(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 6);
+int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_count(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(6, 2);
 
   int ret = x;
@@ -136,9 +131,9 @@ int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_count(
 // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
 // 'llc_motioncommandfeedback1_check', 'is_signed_var': False, 'physical_range':
 // '[0|255]', 'bit': 56, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
-int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_check(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_check(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;

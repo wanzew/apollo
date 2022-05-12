@@ -35,7 +35,7 @@ namespace service_discovery {
 ChannelManager::ChannelManager() {
   allowed_role_ |= 1 << RoleType::ROLE_WRITER;
   allowed_role_ |= 1 << RoleType::ROLE_READER;
-  change_type_ = ChangeType::CHANGE_CHANNEL;
+  change_type_  = ChangeType::CHANGE_CHANNEL;
   channel_name_ = "channel_change_broadcast";
   exempted_msg_types_.emplace(message::MessageType<message::RawMessage>());
   exempted_msg_types_.emplace(message::MessageType<message::PyMessageWrap>());
@@ -47,44 +47,34 @@ void ChannelManager::GetChannelNames(std::vector<std::string>* channels) {
   RETURN_IF_NULL(channels);
 
   std::unordered_set<std::string> local_channels;
-  std::vector<RolePtr> roles;
+  std::vector<RolePtr>            roles;
   channel_writers_.GetAllRoles(&roles);
   channel_readers_.GetAllRoles(&roles);
   for (auto& role : roles) {
     local_channels.emplace(role->attributes().channel_name());
   }
-  std::move(local_channels.begin(), local_channels.end(),
-            std::back_inserter(*channels));
+  std::move(local_channels.begin(), local_channels.end(), std::back_inserter(*channels));
 }
 
-void ChannelManager::GetProtoDesc(const std::string& channel_name,
-                                  std::string* proto_desc) {
+void ChannelManager::GetProtoDesc(const std::string& channel_name, std::string* proto_desc) {
   RETURN_IF_NULL(proto_desc);
-  uint64_t key = common::GlobalData::RegisterChannel(channel_name);
-  RolePtr writer = nullptr;
-  if (!channel_writers_.Search(key, &writer)) {
-    return;
-  }
+  uint64_t key    = common::GlobalData::RegisterChannel(channel_name);
+  RolePtr  writer = nullptr;
+  if (!channel_writers_.Search(key, &writer)) { return; }
 
-  if (writer->attributes().has_proto_desc()) {
-    *proto_desc = writer->attributes().proto_desc();
-  }
+  if (writer->attributes().has_proto_desc()) { *proto_desc = writer->attributes().proto_desc(); }
 }
 
-void ChannelManager::GetMsgType(const std::string& channel_name,
-                                std::string* msg_type) {
+void ChannelManager::GetMsgType(const std::string& channel_name, std::string* msg_type) {
   RETURN_IF_NULL(msg_type);
-  uint64_t key = common::GlobalData::RegisterChannel(channel_name);
-  RolePtr writer = nullptr;
+  uint64_t key    = common::GlobalData::RegisterChannel(channel_name);
+  RolePtr  writer = nullptr;
   if (!channel_writers_.Search(key, &writer)) {
-    AERROR << "cannot find writer of channel: " << channel_name
-           << " key: " << key;
+    AERROR << "cannot find writer of channel: " << channel_name << " key: " << key;
     return;
   }
 
-  if (writer->attributes().has_message_type()) {
-    *msg_type = writer->attributes().message_type();
-  }
+  if (writer->attributes().has_message_type()) { *msg_type = writer->attributes().message_type(); }
 }
 
 bool ChannelManager::HasWriter(const std::string& channel_name) {
@@ -97,15 +87,13 @@ void ChannelManager::GetWriters(RoleAttrVec* writers) {
   channel_writers_.GetAllRoles(writers);
 }
 
-void ChannelManager::GetWritersOfNode(const std::string& node_name,
-                                      RoleAttrVec* writers) {
+void ChannelManager::GetWritersOfNode(const std::string& node_name, RoleAttrVec* writers) {
   RETURN_IF_NULL(writers);
   uint64_t key = common::GlobalData::RegisterNode(node_name);
   node_writers_.Search(key, writers);
 }
 
-void ChannelManager::GetWritersOfChannel(const std::string& channel_name,
-                                         RoleAttrVec* writers) {
+void ChannelManager::GetWritersOfChannel(const std::string& channel_name, RoleAttrVec* writers) {
   RETURN_IF_NULL(writers);
   uint64_t key = common::GlobalData::RegisterChannel(channel_name);
   channel_writers_.Search(key, writers);
@@ -121,29 +109,24 @@ void ChannelManager::GetReaders(RoleAttrVec* readers) {
   channel_readers_.GetAllRoles(readers);
 }
 
-void ChannelManager::GetReadersOfNode(const std::string& node_name,
-                                      RoleAttrVec* readers) {
+void ChannelManager::GetReadersOfNode(const std::string& node_name, RoleAttrVec* readers) {
   RETURN_IF_NULL(readers);
   uint64_t key = common::GlobalData::RegisterNode(node_name);
   node_readers_.Search(key, readers);
 }
 
-void ChannelManager::GetReadersOfChannel(const std::string& channel_name,
-                                         RoleAttrVec* readers) {
+void ChannelManager::GetReadersOfChannel(const std::string& channel_name, RoleAttrVec* readers) {
   RETURN_IF_NULL(readers);
   uint64_t key = common::GlobalData::RegisterChannel(channel_name);
   channel_readers_.Search(key, readers);
 }
 
-void ChannelManager::GetUpstreamOfNode(const std::string& node_name,
-                                       RoleAttrVec* upstream_nodes) {
+void ChannelManager::GetUpstreamOfNode(const std::string& node_name, RoleAttrVec* upstream_nodes) {
   RETURN_IF_NULL(upstream_nodes);
 
   RoleAttrVec readers;
   GetReadersOfNode(node_name, &readers);
-  if (readers.empty()) {
-    return;
-  }
+  if (readers.empty()) { return; }
   std::unordered_set<std::string> channels;
   for (auto& reader : readers) {
     channels.emplace(reader.channel_name());
@@ -169,14 +152,12 @@ void ChannelManager::GetUpstreamOfNode(const std::string& node_name,
 }
 
 void ChannelManager::GetDownstreamOfNode(const std::string& node_name,
-                                         RoleAttrVec* downstream_nodes) {
+                                         RoleAttrVec*       downstream_nodes) {
   RETURN_IF_NULL(downstream_nodes);
 
   RoleAttrVec writers;
   GetWritersOfNode(node_name, &writers);
-  if (writers.empty()) {
-    return;
-  }
+  if (writers.empty()) { return; }
   std::unordered_set<std::string> channels;
   for (auto& writer : writers) {
     channels.emplace(writer.channel_name());
@@ -201,24 +182,17 @@ void ChannelManager::GetDownstreamOfNode(const std::string& node_name,
   }
 }
 
-FlowDirection ChannelManager::GetFlowDirection(
-    const std::string& lhs_node_name, const std::string& rhs_node_name) {
+FlowDirection ChannelManager::GetFlowDirection(const std::string& lhs_node_name,
+                                               const std::string& rhs_node_name) {
   Vertice lhs(lhs_node_name);
   Vertice rhs(rhs_node_name);
   return node_graph_.GetDirectionOf(lhs, rhs);
 }
 
-bool ChannelManager::IsMessageTypeMatching(const std::string& lhs,
-                                           const std::string& rhs) {
-  if (lhs == rhs) {
-    return true;
-  }
-  if (exempted_msg_types_.count(lhs) > 0) {
-    return true;
-  }
-  if (exempted_msg_types_.count(rhs) > 0) {
-    return true;
-  }
+bool ChannelManager::IsMessageTypeMatching(const std::string& lhs, const std::string& rhs) {
+  if (lhs == rhs) { return true; }
+  if (exempted_msg_types_.count(lhs) > 0) { return true; }
+  if (exempted_msg_types_.count(rhs) > 0) { return true; }
   return false;
 }
 
@@ -238,8 +212,7 @@ void ChannelManager::Dispose(const ChangeMsg& msg) {
   Notify(msg);
 }
 
-void ChannelManager::OnTopoModuleLeave(const std::string& host_name,
-                                       int process_id) {
+void ChannelManager::OnTopoModuleLeave(const std::string& host_name, int process_id) {
   RETURN_IF(!is_discovery_started_.load());
 
   RoleAttributes attr;
@@ -254,15 +227,13 @@ void ChannelManager::OnTopoModuleLeave(const std::string& host_name,
 
   ChangeMsg msg;
   for (auto& writer : writers_to_remove) {
-    Convert(writer->attributes(), RoleType::ROLE_WRITER, OperateType::OPT_LEAVE,
-            &msg);
+    Convert(writer->attributes(), RoleType::ROLE_WRITER, OperateType::OPT_LEAVE, &msg);
     DisposeLeave(msg);
     Notify(msg);
   }
 
   for (auto& reader : readers_to_remove) {
-    Convert(reader->attributes(), RoleType::ROLE_READER, OperateType::OPT_LEAVE,
-            &msg);
+    Convert(reader->attributes(), RoleType::ROLE_READER, OperateType::OPT_LEAVE, &msg);
     DisposeLeave(msg);
     Notify(msg);
   }
@@ -272,13 +243,11 @@ void ChannelManager::DisposeJoin(const ChangeMsg& msg) {
   ScanMessageType(msg);
 
   Vertice v(msg.role_attr().node_name());
-  Edge e;
+  Edge    e;
   e.set_value(msg.role_attr().channel_name());
   if (msg.role_type() == RoleType::ROLE_WRITER) {
-    if (msg.role_attr().has_proto_desc() &&
-        msg.role_attr().proto_desc() != "") {
-      message::ProtobufFactory::Instance()->RegisterMessage(
-          msg.role_attr().proto_desc());
+    if (msg.role_attr().has_proto_desc() && msg.role_attr().proto_desc() != "") {
+      message::ProtobufFactory::Instance()->RegisterMessage(msg.role_attr().proto_desc());
     }
     auto role = std::make_shared<RoleWriter>(msg.role_attr(), msg.timestamp());
     node_writers_.Add(role->attributes().node_id(), role);
@@ -295,7 +264,7 @@ void ChannelManager::DisposeJoin(const ChangeMsg& msg) {
 
 void ChannelManager::DisposeLeave(const ChangeMsg& msg) {
   Vertice v(msg.role_attr().node_name());
-  Edge e;
+  Edge    e;
   e.set_value(msg.role_attr().channel_name());
   if (msg.role_type() == RoleType::ROLE_WRITER) {
     auto role = std::make_shared<RoleWriter>(msg.role_attr());
@@ -312,37 +281,31 @@ void ChannelManager::DisposeLeave(const ChangeMsg& msg) {
 }
 
 void ChannelManager::ScanMessageType(const ChangeMsg& msg) {
-  uint64_t key = msg.role_attr().channel_id();
+  uint64_t    key = msg.role_attr().channel_id();
   std::string role_type("reader");
-  if (msg.role_type() == RoleType::ROLE_WRITER) {
-    role_type = "writer";
-  }
+  if (msg.role_type() == RoleType::ROLE_WRITER) { role_type = "writer"; }
 
   RoleAttrVec existed_writers;
   channel_writers_.Search(key, &existed_writers);
   for (auto& w_attr : existed_writers) {
-    if (!IsMessageTypeMatching(msg.role_attr().message_type(),
-                               w_attr.message_type())) {
-      AERROR << "newly added " << role_type << "(belongs to node["
-             << msg.role_attr().node_name() << "])"
+    if (!IsMessageTypeMatching(msg.role_attr().message_type(), w_attr.message_type())) {
+      AERROR << "newly added " << role_type << "(belongs to node[" << msg.role_attr().node_name()
+             << "])"
              << "'s message type[" << msg.role_attr().message_type()
-             << "] does not match the exsited writer(belongs to node["
-             << w_attr.node_name() << "])'s message type["
-             << w_attr.message_type() << "].";
+             << "] does not match the exsited writer(belongs to node[" << w_attr.node_name()
+             << "])'s message type[" << w_attr.message_type() << "].";
     }
   }
 
   RoleAttrVec existed_readers;
   channel_readers_.Search(key, &existed_readers);
   for (auto& r_attr : existed_readers) {
-    if (!IsMessageTypeMatching(msg.role_attr().message_type(),
-                               r_attr.message_type())) {
-      AERROR << "newly added " << role_type << "(belongs to node["
-             << msg.role_attr().node_name() << "])"
+    if (!IsMessageTypeMatching(msg.role_attr().message_type(), r_attr.message_type())) {
+      AERROR << "newly added " << role_type << "(belongs to node[" << msg.role_attr().node_name()
+             << "])"
              << "'s message type[" << msg.role_attr().message_type()
-             << "] does not match the exsited reader(belongs to node["
-             << r_attr.node_name() << "])'s message type["
-             << r_attr.message_type() << "].";
+             << "] does not match the exsited reader(belongs to node[" << r_attr.node_name()
+             << "])'s message type[" << r_attr.message_type() << "].";
     }
   }
 }

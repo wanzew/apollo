@@ -42,11 +42,11 @@ namespace apollo {
 namespace drivers {
 namespace lidar {
 
-class LidarDriverFactory
-    : public apollo::common::util::Factory<
-          LidarParameter::LidarBrand, LidarDriver,
-          LidarDriver* (*)(const std::shared_ptr<::apollo::cyber::Node>& node,
-                           const apollo::drivers::lidar::config& config)> {
+class LidarDriverFactory : public apollo::common::util::Factory<
+                               LidarParameter::LidarBrand,
+                               LidarDriver,
+                               LidarDriver* (*)(const std::shared_ptr<::apollo::cyber::Node>& node,
+                                                const apollo::drivers::lidar::config& config)> {
  public:
   LidarDriverFactory(const apollo::drivers::lidar::config& config);
   /**
@@ -62,9 +62,8 @@ class LidarDriverFactory
    * @param parameter The parameter to create the CAN client.
    * @return A pointer to the created CAN client.
    */
-  std::unique_ptr<LidarDriver> CreateLidarDriver(
-      const std::shared_ptr<::apollo::cyber::Node>& node,
-      const apollo::drivers::lidar::config& parameter);
+  std::unique_ptr<LidarDriver> CreateLidarDriver(const std::shared_ptr<::apollo::cyber::Node>& node,
+                                                 const apollo::drivers::lidar::config& parameter);
 
  protected:
  private:

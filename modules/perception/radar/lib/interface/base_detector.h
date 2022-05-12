@@ -55,10 +55,10 @@
 
 #include "Eigen/Core"
 
+#include "modules/drivers/proto/conti_radar.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-
-#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/common/geometry/roi_filter.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -70,16 +70,16 @@ namespace perception {
 namespace radar {
 
 struct DetectorOptions {
-  Eigen::Matrix4d* radar2world_pose = nullptr;
-  Eigen::Matrix4d* radar2novatel_trans = nullptr;
-  Eigen::Vector3f car_linear_speed = Eigen::Vector3f::Zero();
-  Eigen::Vector3f car_angular_speed = Eigen::Vector3f::Zero();
-  base::HdmapStructPtr roi = nullptr;
+  Eigen::Matrix4d*     radar2world_pose    = nullptr;
+  Eigen::Matrix4d*     radar2novatel_trans = nullptr;
+  Eigen::Vector3f      car_linear_speed    = Eigen::Vector3f::Zero();
+  Eigen::Vector3f      car_angular_speed   = Eigen::Vector3f::Zero();
+  base::HdmapStructPtr roi                 = nullptr;
 };
 
 class BaseDetector {
  public:
-  BaseDetector() = default;
+  BaseDetector()          = default;
   virtual ~BaseDetector() = default;
 
   virtual bool Init() = 0;
@@ -89,8 +89,8 @@ class BaseDetector {
   // @param [in]: options.
   // @param [out]: detected objects.
   virtual bool Detect(const drivers::ContiRadar& corrected_obstacles,
-                      const DetectorOptions& options,
-                      base::FramePtr detected_frame) = 0;
+                      const DetectorOptions&     options,
+                      base::FramePtr             detected_frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -99,8 +99,7 @@ class BaseDetector {
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseDetector);
-#define PERCEPTION_REGISTER_DETECTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseDetector, name)
+#define PERCEPTION_REGISTER_DETECTOR(name) PERCEPTION_REGISTER_CLASS(BaseDetector, name)
 
 }  // namespace radar
 }  // namespace perception

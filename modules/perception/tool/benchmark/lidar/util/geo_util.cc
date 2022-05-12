@@ -15,21 +15,23 @@
  *****************************************************************************/
 
 #include "modules/perception/tool/benchmark/lidar/util/geo_util.h"
+
 #include <utility>
 
 namespace apollo {
 namespace perception {
 namespace benchmark {
 
-bool is_point_xy_in_polygon2d_xy(const Point& point, const PointCloud& polygon,
-                                 float distance_to_boundary) {
+bool is_point_xy_in_polygon2d_xy(const Point&      point,
+                                 const PointCloud& polygon,
+                                 float             distance_to_boundary) {
   typedef float Type;
-  bool in_poly = false;
-  Type x1 = 0.0;
-  Type x2 = 0.0;
-  Type y1 = 0.0;
-  Type y2 = 0.0;
-  size_t nr_poly_points = polygon.size();
+  bool          in_poly        = false;
+  Type          x1             = 0.0;
+  Type          x2             = 0.0;
+  Type          y1             = 0.0;
+  Type          y2             = 0.0;
+  size_t        nr_poly_points = polygon.size();
   // start with the last point to make the check last point<->first point the
   // first one
   Type xold = polygon.at(nr_poly_points - 1).x;
@@ -50,17 +52,11 @@ bool is_point_xy_in_polygon2d_xy(const Point& point, const PointCloud& polygon,
     }
     // if the point is on the boundary, then it is defined as in the polygon
     Type value = (point.y - y1) * (x2 - x1) - (y2 - y1) * (point.x - x1);
-    Type temp = std::sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-    if (temp < std::numeric_limits<Type>::epsilon()) {
-      continue;
-    }
+    Type temp  = std::sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    if (temp < std::numeric_limits<Type>::epsilon()) { continue; }
     Type distance = std::abs(value) / temp;
-    if (x1 <= point.x && point.x <= x2 && distance < distance_to_boundary) {
-      return true;
-    }
-    if ((x1 < point.x) == (point.x <= x2) && value < 0.f) {
-      in_poly = !in_poly;
-    }
+    if (x1 <= point.x && point.x <= x2 && distance < distance_to_boundary) { return true; }
+    if ((x1 < point.x) == (point.x <= x2) && value < 0.f) { in_poly = !in_poly; }
     xold = xnew;
     yold = ynew;
   }
@@ -70,16 +66,12 @@ bool is_point_xy_in_polygon2d_xy(const Point& point, const PointCloud& polygon,
 bool VisPoint::operator<(const VisPoint& other) const {
   bool is_a_left = strictly_less(x(), 0.0);
   bool is_b_left = strictly_less(other.x(), 0.0);
-  if (is_a_left != is_b_left) {
-    return is_b_left;
-  }
+  if (is_a_left != is_b_left) { return is_b_left; }
 
   if (approx_equal(x(), 0.0) && approx_equal(other.x(), 0.0)) {
     bool is_a_down = strictly_less(y(), 0.0);
     bool is_b_down = strictly_less(other.y(), 0.0);
-    if (is_a_down != is_b_down) {
-      return is_b_down;
-    }
+    if (is_a_down != is_b_down) { return is_b_down; }
     if (is_a_down) {
       return strictly_less(other.y(), y());
     } else {
@@ -88,9 +80,7 @@ bool VisPoint::operator<(const VisPoint& other) const {
   }
 
   float det = cross(other);
-  if (approx_equal(det, 0.0)) {
-    return length_squared() < other.length_squared();
-  }
+  if (approx_equal(det, 0.0)) { return length_squared() < other.length_squared(); }
   return det < 0;
 }
 
@@ -98,21 +88,15 @@ bool VisPoint::operator==(const VisPoint& other) const {
   return approx_equal(x(), other.x()) && approx_equal(y(), other.y());
 }
 
-bool VisPoint::operator!=(const VisPoint& other) const {
-  return !(*this == other);
-}
+bool VisPoint::operator!=(const VisPoint& other) const { return !(*this == other); }
 
 bool Segment::operator<(const Segment& other) const {
   VisPoint a = start, b = end;
   VisPoint c = other.start, d = other.end;
   VisPoint o = VisPoint(0, 0);
 
-  if (approx_equal(b.x(), 0.0)) {
-    b.x() = -std::numeric_limits<float>::epsilon();
-  }
-  if (approx_equal(d.x(), 0.0)) {
-    d.x() = -std::numeric_limits<float>::epsilon();
-  }
+  if (approx_equal(b.x(), 0.0)) { b.x() = -std::numeric_limits<float>::epsilon(); }
+  if (approx_equal(d.x(), 0.0)) { d.x() = -std::numeric_limits<float>::epsilon(); }
 
   // will not have overlap part
   if (b < c) {
@@ -123,12 +107,8 @@ bool Segment::operator<(const Segment& other) const {
 
   // sort the endpoints so that if there are common endpoints,
   // it will be a and c
-  if (b == c || b == d) {
-    std::swap(a, b);
-  }
-  if (a == d) {
-    std::swap(c, d);
-  }
+  if (b == c || b == d) { std::swap(a, b); }
+  if (a == d) { std::swap(c, d); }
 
   // cases with common endpoints
   if (a == c) {
@@ -174,32 +154,26 @@ bool Segment::operator==(const Segment& other) const {
   return start == other.start && end == other.end;
 }
 
-bool Segment::operator!=(const Segment& other) const {
-  return !(*this == other);
-}
+bool Segment::operator!=(const Segment& other) const { return !(*this == other); }
 
-Orientation compute_orientation(const VisPoint& o, const VisPoint& a,
-                                const VisPoint& b) {
+Orientation compute_orientation(const VisPoint& o, const VisPoint& a, const VisPoint& b) {
   float det = (a - o).cross(b - o);
   return static_cast<Orientation>(static_cast<int>(strictly_less(0.0, det)) -
                                   static_cast<int>(strictly_less(det, 0.0)));
 }
 
-bool intersects(const VisPoint& ray, const Segment& segment,
-                VisPoint* intersection) {
+bool intersects(const VisPoint& ray, const Segment& segment, VisPoint* intersection) {
   // let a = a2 - a1 (ray), b = b2 - b1 (segment),
   // accordingly segment: s1 = a1 + t*a, s2 = b1 + u*b
   // intersection: a1 + t*a = b1 + u*b, when 0<=t (ray) && 0<=u<=1 (segment)
   VisPoint a = ray;
   VisPoint b = segment.end - segment.start;
 
-  float t = segment.start.cross(b) / a.cross(b);
-  float u = a.cross(-segment.start) / a.cross(b);
+  float t       = segment.start.cross(b) / a.cross(b);
+  float u       = a.cross(-segment.start) / a.cross(b);
   *intersection = a * t;
 
-  if (std::isfinite(t) && t >= 0 && std::isfinite(u) && u >= 0 && u <= 1) {
-    return true;
-  }
+  if (std::isfinite(t) && t >= 0 && std::isfinite(u) && u >= 0 && u <= 1) { return true; }
   return false;
 }
 

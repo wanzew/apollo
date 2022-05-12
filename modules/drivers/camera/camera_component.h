@@ -21,10 +21,10 @@
 #include <memory>
 #include <vector>
 
-#include "cyber/cyber.h"
 #include "modules/drivers/camera/proto/config.pb.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/drivers/camera/usb_cam.h"
 
 namespace apollo {
@@ -45,18 +45,18 @@ class CameraComponent : public Component<> {
  private:
   void run();
 
-  std::shared_ptr<Writer<Image>> writer_ = nullptr;
-  std::unique_ptr<UsbCam> camera_device_;
-  std::shared_ptr<Config> camera_config_;
-  CameraImagePtr raw_image_ = nullptr;
+  std::shared_ptr<Writer<Image>>      writer_ = nullptr;
+  std::unique_ptr<UsbCam>             camera_device_;
+  std::shared_ptr<Config>             camera_config_;
+  CameraImagePtr                      raw_image_ = nullptr;
   std::vector<std::shared_ptr<Image>> pb_image_buffer_;
-  uint32_t spin_rate_ = 200;
-  uint32_t device_wait_ = 2000;
-  int index_ = 0;
-  int buffer_size_ = 16;
-  const int32_t MAX_IMAGE_SIZE = 20 * 1024 * 1024;
-  std::future<void> async_result_;
-  std::atomic<bool> running_ = {false};
+  uint32_t                            spin_rate_     = 200;
+  uint32_t                            device_wait_   = 2000;
+  int                                 index_         = 0;
+  int                                 buffer_size_   = 16;
+  const int32_t                       MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+  std::future<void>                   async_result_;
+  std::atomic<bool>                   running_ = {false};
 };
 
 CYBER_REGISTER_COMPONENT(CameraComponent)

@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Shiftrpt228 : public ::apollo::drivers::canbus::ProtocolData<
-                        ::apollo::canbus::ChassisDetail> {
+class Shiftrpt228
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Shiftrpt228();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'VEHICLE_FAULT', 'offset': 0.0, 'precision': 1.0,
@@ -51,15 +51,13 @@ class Shiftrpt228 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool output_reported_fault(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool output_reported_fault(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'INPUT_OUTPUT_FAULT', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 3, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool input_output_fault(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  bool input_output_fault(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'ENABLED', 'offset': 0.0, 'precision': 1.0, 'len':
   // 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0, 'type':
@@ -70,8 +68,7 @@ class Shiftrpt228 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 2, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool command_output_fault(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool command_output_fault(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'MANUAL_INPUT', 'enum': {0: 'MANUAL_INPUT_PARK', 1:
   // 'MANUAL_INPUT_REVERSE', 2: 'MANUAL_INPUT_NEUTRAL', 3:
@@ -81,7 +78,7 @@ class Shiftrpt228 : public ::apollo::drivers::canbus::ProtocolData<
   // 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 15, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Shift_rpt_228::Manual_inputType manual_input(const std::uint8_t* bytes,
-                                               const int32_t length) const;
+                                               const int32_t       length) const;
 
   // config detail: {'name': 'COMMANDED_VALUE', 'enum': {0:
   // 'COMMANDED_VALUE_PARK', 1: 'COMMANDED_VALUE_REVERSE', 2:
@@ -89,8 +86,8 @@ class Shiftrpt228 : public ::apollo::drivers::canbus::ProtocolData<
   // 'COMMANDED_VALUE_LOW', 7: 'COMMANDED_VALUE_NONE'}, 'precision': 1.0, 'len':
   // 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|4]', 'bit':
   // 23, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Shift_rpt_228::Commanded_valueType commanded_value(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Shift_rpt_228::Commanded_valueType commanded_value(const std::uint8_t* bytes,
+                                                     const int32_t       length) const;
 
   // config detail: {'name': 'OUTPUT_VALUE', 'enum': {0: 'OUTPUT_VALUE_PARK', 1:
   // 'OUTPUT_VALUE_REVERSE', 2: 'OUTPUT_VALUE_NEUTRAL', 3:
@@ -100,7 +97,7 @@ class Shiftrpt228 : public ::apollo::drivers::canbus::ProtocolData<
   // 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 31, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Shift_rpt_228::Output_valueType output_value(const std::uint8_t* bytes,
-                                               const int32_t length) const;
+                                               const int32_t       length) const;
 };
 
 }  // namespace lexus

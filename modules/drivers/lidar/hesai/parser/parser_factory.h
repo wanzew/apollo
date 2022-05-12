@@ -27,8 +27,8 @@ namespace hesai {
 
 class ParserFactory {
  public:
-  static Parser* CreateParser(
-      const std::shared_ptr<::apollo::cyber::Node>& node, const Config& conf);
+  static Parser* CreateParser(const std::shared_ptr<::apollo::cyber::Node>& node,
+                              const Config&                                 conf);
 };
 
 }  // namespace hesai

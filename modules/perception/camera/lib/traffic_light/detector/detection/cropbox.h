@@ -23,9 +23,10 @@ namespace camera {
 
 class IGetBox {
  public:
-  virtual void getCropBox(const int width, const int height,
-                          const base::TrafficLightPtr &light,
-                          base::RectI *crop_box) = 0;
+  virtual void getCropBox(const int                    width,
+                          const int                    height,
+                          const base::TrafficLightPtr& light,
+                          base::RectI*                 crop_box) = 0;
 };
 
 class CropBox : public IGetBox {
@@ -34,20 +35,22 @@ class CropBox : public IGetBox {
 
   void Init(float crop_scale, int min_crop_size);
 
-  virtual void getCropBox(const int width, const int height,
-                          const base::TrafficLightPtr &light,
-                          base::RectI *crop_box);
+  virtual void getCropBox(const int                    width,
+                          const int                    height,
+                          const base::TrafficLightPtr& light,
+                          base::RectI*                 crop_box);
 
  private:
-  float crop_scale_ = 2.5f;
-  int min_crop_size_ = 270;
+  float crop_scale_    = 2.5f;
+  int   min_crop_size_ = 270;
 };
 
 class CropBoxWholeImage : public IGetBox {
  public:
-  virtual void getCropBox(const int width, const int height,
-                          const base::TrafficLightPtr &light,
-                          base::RectI *crop_box);
+  virtual void getCropBox(const int                    width,
+                          const int                    height,
+                          const base::TrafficLightPtr& light,
+                          base::RectI*                 crop_box);
 };
 
 }  // namespace camera

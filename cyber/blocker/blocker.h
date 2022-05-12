@@ -34,29 +34,34 @@ class BlockerBase {
  public:
   virtual ~BlockerBase() = default;
 
-  virtual void Reset() = 0;
-  virtual void ClearObserved() = 0;
-  virtual void ClearPublished() = 0;
-  virtual void Observe() = 0;
-  virtual bool IsObservedEmpty() const = 0;
-  virtual bool IsPublishedEmpty() const = 0;
+  virtual void Reset()                                     = 0;
+  virtual void ClearObserved()                             = 0;
+  virtual void ClearPublished()                            = 0;
+  virtual void Observe()                                   = 0;
+  virtual bool IsObservedEmpty() const                     = 0;
+  virtual bool IsPublishedEmpty() const                    = 0;
   virtual bool Unsubscribe(const std::string& callback_id) = 0;
 
-  virtual size_t capacity() const = 0;
-  virtual void set_capacity(size_t capacity) = 0;
-  virtual const std::string& channel_name() const = 0;
+  virtual size_t             capacity() const              = 0;
+  virtual void               set_capacity(size_t capacity) = 0;
+  virtual const std::string& channel_name() const          = 0;
 };
 
 struct BlockerAttr {
-  BlockerAttr() : capacity(10), channel_name("") {}
+  BlockerAttr()
+      : capacity(10)
+      , channel_name("") {}
   explicit BlockerAttr(const std::string& channel)
-      : capacity(10), channel_name(channel) {}
+      : capacity(10)
+      , channel_name(channel) {}
   BlockerAttr(size_t cap, const std::string& channel)
-      : capacity(cap), channel_name(channel) {}
+      : capacity(cap)
+      , channel_name(channel) {}
   BlockerAttr(const BlockerAttr& attr)
-      : capacity(attr.capacity), channel_name(attr.channel_name) {}
+      : capacity(attr.capacity)
+      , channel_name(attr.channel_name) {}
 
-  size_t capacity;
+  size_t      capacity;
   std::string channel_name;
 };
 
@@ -65,12 +70,12 @@ class Blocker : public BlockerBase {
   friend class BlockerManager;
 
  public:
-  using MessageType = T;
-  using MessagePtr = std::shared_ptr<T>;
+  using MessageType  = T;
+  using MessagePtr   = std::shared_ptr<T>;
   using MessageQueue = std::list<MessagePtr>;
-  using Callback = std::function<void(const MessagePtr&)>;
-  using CallbackMap = std::unordered_map<std::string, Callback>;
-  using Iterator = typename std::list<std::shared_ptr<T>>::const_iterator;
+  using Callback     = std::function<void(const MessagePtr&)>;
+  using CallbackMap  = std::unordered_map<std::string, Callback>;
+  using Iterator     = typename std::list<std::shared_ptr<T>>::const_iterator;
 
   explicit Blocker(const BlockerAttr& attr);
   virtual ~Blocker();
@@ -88,15 +93,15 @@ class Blocker : public BlockerBase {
   bool Unsubscribe(const std::string& callback_id) override;
 
   const MessageType& GetLatestObserved() const;
-  const MessagePtr GetLatestObservedPtr() const;
-  const MessagePtr GetOldestObservedPtr() const;
-  const MessagePtr GetLatestPublishedPtr() const;
+  const MessagePtr   GetLatestObservedPtr() const;
+  const MessagePtr   GetOldestObservedPtr() const;
+  const MessagePtr   GetLatestPublishedPtr() const;
 
   Iterator ObservedBegin() const;
   Iterator ObservedEnd() const;
 
-  size_t capacity() const override;
-  void set_capacity(size_t capacity) override;
+  size_t             capacity() const override;
+  void               set_capacity(size_t capacity) override;
   const std::string& channel_name() const override;
 
  private:
@@ -104,19 +109,21 @@ class Blocker : public BlockerBase {
   void Enqueue(const MessagePtr& msg);
   void Notify(const MessagePtr& msg);
 
-  BlockerAttr attr_;
-  MessageQueue observed_msg_queue_;
-  MessageQueue published_msg_queue_;
+  BlockerAttr        attr_;
+  MessageQueue       observed_msg_queue_;
+  MessageQueue       published_msg_queue_;
   mutable std::mutex msg_mutex_;
 
-  CallbackMap published_callbacks_;
+  CallbackMap        published_callbacks_;
   mutable std::mutex cb_mutex_;
 
   MessageType dummy_msg_;
 };
 
 template <typename T>
-Blocker<T>::Blocker(const BlockerAttr& attr) : attr_(attr), dummy_msg_() {}
+Blocker<T>::Blocker(const BlockerAttr& attr)
+    : attr_(attr)
+    , dummy_msg_() {}
 
 template <typename T>
 Blocker<T>::~Blocker() {
@@ -180,12 +187,9 @@ bool Blocker<T>::IsPublishedEmpty() const {
 }
 
 template <typename T>
-bool Blocker<T>::Subscribe(const std::string& callback_id,
-                           const Callback& callback) {
+bool Blocker<T>::Subscribe(const std::string& callback_id, const Callback& callback) {
   std::lock_guard<std::mutex> lock(cb_mutex_);
-  if (published_callbacks_.find(callback_id) != published_callbacks_.end()) {
-    return false;
-  }
+  if (published_callbacks_.find(callback_id) != published_callbacks_.end()) { return false; }
   published_callbacks_[callback_id] = callback;
   return true;
 }
@@ -199,36 +203,28 @@ bool Blocker<T>::Unsubscribe(const std::string& callback_id) {
 template <typename T>
 auto Blocker<T>::GetLatestObserved() const -> const MessageType& {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  if (observed_msg_queue_.empty()) {
-    return dummy_msg_;
-  }
+  if (observed_msg_queue_.empty()) { return dummy_msg_; }
   return *observed_msg_queue_.front();
 }
 
 template <typename T>
 auto Blocker<T>::GetLatestObservedPtr() const -> const MessagePtr {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  if (observed_msg_queue_.empty()) {
-    return nullptr;
-  }
+  if (observed_msg_queue_.empty()) { return nullptr; }
   return observed_msg_queue_.front();
 }
 
 template <typename T>
 auto Blocker<T>::GetOldestObservedPtr() const -> const MessagePtr {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  if (observed_msg_queue_.empty()) {
-    return nullptr;
-  }
+  if (observed_msg_queue_.empty()) { return nullptr; }
   return observed_msg_queue_.back();
 }
 
 template <typename T>
 auto Blocker<T>::GetLatestPublishedPtr() const -> const MessagePtr {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  if (published_msg_queue_.empty()) {
-    return nullptr;
-  }
+  if (published_msg_queue_.empty()) { return nullptr; }
   return published_msg_queue_.front();
 }
 
@@ -263,9 +259,7 @@ const std::string& Blocker<T>::channel_name() const {
 
 template <typename T>
 void Blocker<T>::Enqueue(const MessagePtr& msg) {
-  if (attr_.capacity == 0) {
-    return;
-  }
+  if (attr_.capacity == 0) { return; }
   std::lock_guard<std::mutex> lock(msg_mutex_);
   published_msg_queue_.push_front(msg);
   while (published_msg_queue_.size() > attr_.capacity) {

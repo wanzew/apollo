@@ -18,6 +18,7 @@
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
+
 #include "modules/data/tools/smart_recorder/trigger_base.h"
 
 namespace apollo {
@@ -32,15 +33,12 @@ class EmergencyModeTrigger : public TriggerBase {
   EmergencyModeTrigger();
 
   void Pull(const cyber::record::RecordMessage& msg) override;
-  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override {
-    return false;
-  };
+  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override { return false; };
 
   virtual ~EmergencyModeTrigger() = default;
 
  private:
-  apollo::canbus::Chassis::DrivingMode cur_driving_mode_ =
-      apollo::canbus::Chassis::COMPLETE_MANUAL;
+  apollo::canbus::Chassis::DrivingMode cur_driving_mode_ = apollo::canbus::Chassis::COMPLETE_MANUAL;
 };
 
 }  // namespace data

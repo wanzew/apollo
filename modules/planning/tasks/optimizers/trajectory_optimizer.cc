@@ -30,9 +30,8 @@ using apollo::common::Status;
 TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig& config)
     : Task(config) {}
 
-TrajectoryOptimizer::TrajectoryOptimizer(
-    const TaskConfig& config,
-    const std::shared_ptr<DependencyInjector>& injector)
+TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig&                          config,
+                                         const std::shared_ptr<DependencyInjector>& injector)
     : Task(config, injector) {}
 
 Status TrajectoryOptimizer::Execute(Frame* frame) {

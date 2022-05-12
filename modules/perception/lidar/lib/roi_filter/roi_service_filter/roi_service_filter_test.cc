@@ -43,9 +43,8 @@ class LidarLibROIServiceFilterTest : public testing::Test {
     putenv(cyber_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root =
-        "/apollo/modules/perception/testdata/"
-        "lidar/lib/roi_filter/roi_service_filter";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+                      "lidar/lib/roi_filter/roi_service_filter";
     FLAGS_config_manager_path = "./conf";
     lib::ConfigManager::Instance()->Reset();
 
@@ -57,22 +56,19 @@ class LidarLibROIServiceFilterTest : public testing::Test {
 };
 
 void MockData(LidarFrame* frame) {
-  std::string pcd =
-      "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
-      "roi_service_filter/data/pcd/1532063882.176900.pcd";
-  std::string pose =
-      "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
-      "roi_service_filter/data/pose/1532063882.176900.pose";
+  std::string pcd = "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
+                    "roi_service_filter/data/pcd/1532063882.176900.pcd";
+  std::string pose = "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
+                     "roi_service_filter/data/pose/1532063882.176900.pose";
 
   // a. load pcd
   frame->cloud = base::PointFCloudPool::Instance().Get();
   EXPECT_TRUE(LoadPCLPCD(pcd, frame->cloud.get()));
 
   // b. load pose
-  int idt = 0;
+  int    idt       = 0;
   double timestamp = 0.0;
-  EXPECT_TRUE(
-      common::ReadPoseFile(pose, &frame->lidar2world_pose, &idt, &timestamp));
+  EXPECT_TRUE(common::ReadPoseFile(pose, &frame->lidar2world_pose, &idt, &timestamp));
 
   // c.update hdmap struct;
   base::PointD point;
@@ -80,14 +76,13 @@ void MockData(LidarFrame* frame) {
   point.y = frame->lidar2world_pose.translation()(1);
   point.z = frame->lidar2world_pose.translation()(2);
   frame->hdmap_struct.reset(new base::HdmapStruct);
-  ACHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(point, 120.0,
-                                                        frame->hdmap_struct));
+  ACHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(point, 120.0, frame->hdmap_struct));
 
   // d. trans points
   frame->world_cloud = base::PointDCloudPool::Instance().Get();
   // auto translation = frame->lidar2world_pose.translation();
   for (size_t i = 0; i < frame->cloud->size(); ++i) {
-    auto& local_pt = frame->cloud->at(i);
+    auto&           local_pt = frame->cloud->at(i);
     Eigen::Vector3d trans_pt(local_pt.x, local_pt.y, local_pt.z);
     trans_pt = frame->lidar2world_pose * trans_pt;
     base::PointD world_pt;

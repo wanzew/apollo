@@ -19,12 +19,15 @@
 #include <string>
 
 #include "absl/strings/str_cat.h"
+
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_string(functional_safety_monitor_name, "FunctionalSafetyMonitor",
+DEFINE_string(functional_safety_monitor_name,
+              "FunctionalSafetyMonitor",
               "Name of the functional safety monitor.");
 
-DEFINE_double(safety_mode_seconds_before_estop, 10.0,
+DEFINE_double(safety_mode_seconds_before_estop,
+              10.0,
               "Interval before sending estop after we found critical errors.");
 
 namespace apollo {
@@ -32,8 +35,7 @@ namespace monitor {
 namespace {
 
 bool IsSafe(const std::string& name, const ComponentStatus& status) {
-  if (status.status() == ComponentStatus::ERROR ||
-      status.status() == ComponentStatus::FATAL) {
+  if (status.status() == ComponentStatus::ERROR || status.status() == ComponentStatus::FATAL) {
     MonitorManager::Instance()->LogBuffer().ERROR(
         absl::StrCat(name, " triggers safe mode: ", status.message()));
     return false;
@@ -68,8 +70,7 @@ void FunctionalSafetyMonitor::RunOnce(const double current_time) {
   }
 
   // Trigger EStop if no action was taken in time.
-  if (system_status->safety_mode_trigger_time() +
-          FLAGS_safety_mode_seconds_before_estop <
+  if (system_status->safety_mode_trigger_time() + FLAGS_safety_mode_seconds_before_estop <
       current_time) {
     system_status->set_require_emergency_stop(true);
   }
@@ -78,18 +79,15 @@ void FunctionalSafetyMonitor::RunOnce(const double current_time) {
 bool FunctionalSafetyMonitor::CheckSafety() {
   // We only check safety in self driving mode.
   auto manager = MonitorManager::Instance();
-  if (!manager->IsInAutonomousMode()) {
-    return true;
-  }
+  if (!manager->IsInAutonomousMode()) { return true; }
 
   // Check HMI modules status.
-  const auto& mode = manager->GetHMIMode();
+  const auto& mode        = manager->GetHMIMode();
   const auto& hmi_modules = manager->GetStatus()->hmi_modules();
   for (const auto& iter : mode.modules()) {
     const std::string& module_name = iter.first;
-    const auto& module = iter.second;
-    if (module.required_for_safety() &&
-        !IsSafe(module_name, hmi_modules.at(module_name))) {
+    const auto&        module      = iter.second;
+    if (module.required_for_safety() && !IsSafe(module_name, hmi_modules.at(module_name))) {
       return false;
     }
   }
@@ -98,7 +96,7 @@ bool FunctionalSafetyMonitor::CheckSafety() {
   const auto& components = manager->GetStatus()->components();
   for (const auto& iter : mode.monitored_components()) {
     const std::string& component_name = iter.first;
-    const auto& component = iter.second;
+    const auto&        component      = iter.second;
     if (component.required_for_safety() &&
         !IsSafe(component_name, components.at(component_name).summary())) {
       return false;

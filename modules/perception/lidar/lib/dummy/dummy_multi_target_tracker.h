@@ -30,15 +30,14 @@ class DummyMultiTargetTracker : public BaseMultiTargetTracker {
 
   virtual ~DummyMultiTargetTracker() = default;
 
-  bool Init(const MultiTargetTrackerInitOptions& options =
-                MultiTargetTrackerInitOptions()) override;
+  bool
+  Init(const MultiTargetTrackerInitOptions& options = MultiTargetTrackerInitOptions()) override;
 
   // @brief: track segmented objects, and estimate motion
   // @param [in]: options
   // @param [in/out]: tracked object
   // tracked objects should be filled, required,
-  bool Track(const MultiTargetTrackerOptions& options,
-             LidarFrame* frame) override;
+  bool Track(const MultiTargetTrackerOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "DummyMultiTargetTracker"; }
 

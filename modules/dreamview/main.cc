@@ -18,14 +18,14 @@
 #include "cyber/init.h"
 #include "modules/dreamview/backend/dreamview.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   // Added by caros to improve dv performance
   apollo::cyber::GlobalData::Instance()->SetProcessGroup("dreamview_sched");
   apollo::cyber::Init(argv[0]);
 
   apollo::dreamview::Dreamview dreamview;
-  const bool init_success = dreamview.Init().ok() && dreamview.Start().ok();
+  const bool                   init_success = dreamview.Init().ok() && dreamview.Start().ok();
   if (!init_success) {
     AERROR << "Failed to initialize dreamview server";
     return -1;

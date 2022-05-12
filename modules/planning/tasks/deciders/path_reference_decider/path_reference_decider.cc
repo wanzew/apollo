@@ -46,28 +46,23 @@ using common::math::LineSegment2d;
 using common::math::Vec2d;
 
 int PathReferenceDecider::valid_path_reference_counter_ = 0;
-int PathReferenceDecider::total_path_counter_ = 0;
+int PathReferenceDecider::total_path_counter_           = 0;
 
-PathReferenceDecider::PathReferenceDecider(
-    const TaskConfig &config,
-    const std::shared_ptr<DependencyInjector> &injector)
+PathReferenceDecider::PathReferenceDecider(const TaskConfig&                          config,
+                                           const std::shared_ptr<DependencyInjector>& injector)
     : Task(config, injector) {}
 
-Status PathReferenceDecider::Execute(Frame *frame,
-                                     ReferenceLineInfo *reference_line_info) {
+Status PathReferenceDecider::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
   return Process(frame, reference_line_info);
 }
 
-Status PathReferenceDecider::Process(Frame *frame,
-                                     ReferenceLineInfo *reference_line_info) {
+Status PathReferenceDecider::Process(Frame* frame, ReferenceLineInfo* reference_line_info) {
   constexpr double kMathEpsilon = 1e-10;
   // skip using path reference during lane changing
   // There are two reference line during change lane
-  if (FLAGS_skip_path_reference_in_change_lane &&
-      frame->reference_line_info().size() > 1) {
-    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
-        false);
+  if (FLAGS_skip_path_reference_in_change_lane && frame->reference_line_info().size() > 1) {
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(false);
     ADEBUG << "Skip path reference when changing lane.";
     ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
            << "] total_path_counter[" << total_path_counter_ << "]";
@@ -79,17 +74,14 @@ Status PathReferenceDecider::Process(Frame *frame,
     reference_line_info->mutable_debug()
         ->mutable_planning_data()
         ->mutable_hybrid_model()
-        ->set_learning_model_output_usage_ratio(
-            static_cast<double>(valid_path_reference_counter_) /
-            (total_path_counter_ + kMathEpsilon));
+        ->set_learning_model_output_usage_ratio(static_cast<double>(valid_path_reference_counter_) /
+                                                (total_path_counter_ + kMathEpsilon));
     return Status::OK();
   }
 
   // skip using path reference during side pass
-  if (FLAGS_skip_path_reference_in_side_pass &&
-      reference_line_info->is_path_lane_borrow()) {
-    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
-        false);
+  if (FLAGS_skip_path_reference_in_side_pass && reference_line_info->is_path_lane_borrow()) {
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(false);
     ADEBUG << "Skip path reference when sidepass.";
     ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
            << "] total_path_counter[" << total_path_counter_ << "]";
@@ -101,28 +93,25 @@ Status PathReferenceDecider::Process(Frame *frame,
     reference_line_info->mutable_debug()
         ->mutable_planning_data()
         ->mutable_hybrid_model()
-        ->set_learning_model_output_usage_ratio(
-            static_cast<double>(valid_path_reference_counter_) /
-            (total_path_counter_ + kMathEpsilon));
+        ->set_learning_model_output_usage_ratio(static_cast<double>(valid_path_reference_counter_) /
+                                                (total_path_counter_ + kMathEpsilon));
     return Status::OK();
   }
 
   // get path bounds info from reference line info
-  const std::vector<PathBoundary> &path_boundaries =
+  const std::vector<PathBoundary>& path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
   ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
 
   // get learning model output (trajectory) from frame
-  const std::vector<common::TrajectoryPoint> &learning_model_trajectory =
-      injector_->learning_based_data()
-          ->learning_data_adc_future_trajectory_points();
+  const std::vector<common::TrajectoryPoint>& learning_model_trajectory =
+      injector_->learning_based_data()->learning_data_adc_future_trajectory_points();
   ADEBUG << "There are " << learning_model_trajectory.size() << " path points.";
 
   // get regular path bound
   size_t regular_path_bound_idx = GetRegularPathBound(path_boundaries);
   if (regular_path_bound_idx == path_boundaries.size()) {
-    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
-        false);
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(false);
     const std::string msg = "No regular path boundary";
     AERROR << msg;
     ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
@@ -135,9 +124,8 @@ Status PathReferenceDecider::Process(Frame *frame,
     reference_line_info->mutable_debug()
         ->mutable_planning_data()
         ->mutable_hybrid_model()
-        ->set_learning_model_output_usage_ratio(
-            static_cast<double>(valid_path_reference_counter_) /
-            (total_path_counter_ + kMathEpsilon));
+        ->set_learning_model_output_usage_ratio(static_cast<double>(valid_path_reference_counter_) /
+                                                (total_path_counter_ + kMathEpsilon));
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
@@ -145,8 +133,7 @@ Status PathReferenceDecider::Process(Frame *frame,
 
   // when learning model has no output, use rule-based model instead.
   if (learning_model_trajectory.size() == 0) {
-    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
-        false);
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(false);
     ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
            << "] total_path_counter[" << total_path_counter_ << "]";
     std::string err_msg = "No learning model output";
@@ -157,21 +144,18 @@ Status PathReferenceDecider::Process(Frame *frame,
     reference_line_info->mutable_debug()
         ->mutable_planning_data()
         ->mutable_hybrid_model()
-        ->set_learning_model_output_usage_ratio(
-            static_cast<double>(valid_path_reference_counter_) /
-            (total_path_counter_ + kMathEpsilon));
+        ->set_learning_model_output_usage_ratio(static_cast<double>(valid_path_reference_counter_) /
+                                                (total_path_counter_ + kMathEpsilon));
     return Status::OK();
   }
   std::vector<PathPoint> path_reference;
   // adjusting trajectory init point
   DiscretizedTrajectory stitched_learning_model_trajectory;
   reference_line_info->AdjustTrajectoryWhichStartsFromCurrentPos(
-      frame->PlanningStartPoint(), learning_model_trajectory,
-      &stitched_learning_model_trajectory);
+      frame->PlanningStartPoint(), learning_model_trajectory, &stitched_learning_model_trajectory);
   // when path_reference is too short not valid path reference
   if (stitched_learning_model_trajectory.size() <= 1) {
-    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
-        false);
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(false);
     ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
            << "] total_path_counter[" << total_path_counter_ << "]";
     std::string err_msg = "Stitched path reference is too short";
@@ -182,9 +166,8 @@ Status PathReferenceDecider::Process(Frame *frame,
     reference_line_info->mutable_debug()
         ->mutable_planning_data()
         ->mutable_hybrid_model()
-        ->set_learning_model_output_usage_ratio(
-            static_cast<double>(valid_path_reference_counter_) /
-            (total_path_counter_ + kMathEpsilon));
+        ->set_learning_model_output_usage_ratio(static_cast<double>(valid_path_reference_counter_) /
+                                                (total_path_counter_ + kMathEpsilon));
     return Status::OK();
   }
   ConvertTrajectoryToPath(stitched_learning_model_trajectory, &path_reference);
@@ -193,11 +176,9 @@ Status PathReferenceDecider::Process(Frame *frame,
 
   // check if path reference is valid
   // current, only check if path reference point is within path bounds
-  if (!IsValidPathReference(*reference_line_info,
-                            path_boundaries[regular_path_bound_idx],
+  if (!IsValidPathReference(*reference_line_info, path_boundaries[regular_path_bound_idx],
                             path_reference)) {
-    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
-        false);
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(false);
     ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
            << "] total_path_counter[" << total_path_counter_ << "]";
     std::string err_msg = "Learning model output violates path bounds";
@@ -209,9 +190,8 @@ Status PathReferenceDecider::Process(Frame *frame,
     reference_line_info->mutable_debug()
         ->mutable_planning_data()
         ->mutable_hybrid_model()
-        ->set_learning_model_output_usage_ratio(
-            static_cast<double>(valid_path_reference_counter_) /
-            (total_path_counter_ + kMathEpsilon));
+        ->set_learning_model_output_usage_ratio(static_cast<double>(valid_path_reference_counter_) /
+                                                (total_path_counter_ + kMathEpsilon));
     return Status::OK();
   }
 
@@ -234,11 +214,9 @@ Status PathReferenceDecider::Process(Frame *frame,
       ->mutable_hybrid_model()
       ->mutable_evaluated_path_reference()
       ->mutable_path_point()
-      ->CopyFrom(
-          {evaluated_path_reference.begin(), evaluated_path_reference.end()});
+      ->CopyFrom({evaluated_path_reference.begin(), evaluated_path_reference.end()});
   // set evaluated path data
-  reference_line_info->mutable_path_data()->set_path_reference(
-      std::move(evaluated_path_reference));
+  reference_line_info->mutable_path_data()->set_path_reference(std::move(evaluated_path_reference));
   // uncomment this for debug
   //   const std::string evaluation_path_name = "evaluated_path_reference";
   //   RecordDebugInfo(evaluated_path_reference, evaluation_path_name,
@@ -252,9 +230,8 @@ Status PathReferenceDecider::Process(Frame *frame,
   reference_line_info->mutable_debug()
       ->mutable_planning_data()
       ->mutable_hybrid_model()
-      ->set_learning_model_output_usage_ratio(
-          static_cast<double>(valid_path_reference_counter_) /
-          (total_path_counter_ + kMathEpsilon));
+      ->set_learning_model_output_usage_ratio(static_cast<double>(valid_path_reference_counter_) /
+                                              (total_path_counter_ + kMathEpsilon));
 
   ADEBUG << "path reference size:" << path_reference.size();
 
@@ -262,16 +239,15 @@ Status PathReferenceDecider::Process(Frame *frame,
 }
 
 void PathReferenceDecider::ConvertTrajectoryToPath(
-    const std::vector<TrajectoryPoint> &trajectory_points,
-    std::vector<PathPoint> *path_points) {
+    const std::vector<TrajectoryPoint>& trajectory_points, std::vector<PathPoint>* path_points) {
   for (auto trajectory_point : trajectory_points) {
     if (trajectory_point.has_path_point()) {
       path_points->push_back(trajectory_point.path_point());
     }
   }
 }
-size_t PathReferenceDecider::GetRegularPathBound(
-    const std::vector<PathBoundary> &path_bounds) const {
+size_t
+PathReferenceDecider::GetRegularPathBound(const std::vector<PathBoundary>& path_bounds) const {
   for (auto iter = begin(path_bounds); iter != end(path_bounds); ++iter) {
     if (iter->label().find("regular") != std::string::npos) {
       return distance(begin(path_bounds), iter);
@@ -280,17 +256,15 @@ size_t PathReferenceDecider::GetRegularPathBound(
   return path_bounds.size();
 }
 
-bool PathReferenceDecider::IsValidPathReference(
-    const ReferenceLineInfo &reference_line_info,
-    const PathBoundary &regular_path_bound,
-    const std::vector<PathPoint> &path_reference) {
+bool PathReferenceDecider::IsValidPathReference(const ReferenceLineInfo&      reference_line_info,
+                                                const PathBoundary&           regular_path_bound,
+                                                const std::vector<PathPoint>& path_reference) {
   for (auto path_referece_point : path_reference) {
     const double cur_x = path_referece_point.x();
     const double cur_y = path_referece_point.y();
-    if (-1 == IsPointWithinPathBounds(reference_line_info, regular_path_bound,
-                                      cur_x, cur_y)) {
-      ADEBUG << ", x: " << std::setprecision(9) << cur_x
-             << ", y: " << std::setprecision(9) << cur_y;
+    if (-1 == IsPointWithinPathBounds(reference_line_info, regular_path_bound, cur_x, cur_y)) {
+      ADEBUG << ", x: " << std::setprecision(9) << cur_x << ", y: " << std::setprecision(9)
+             << cur_y;
       return false;
     }
   }
@@ -298,8 +272,7 @@ bool PathReferenceDecider::IsValidPathReference(
 }
 
 bool PathReferenceDecider::IsADCBoxAlongPathReferenceWithinPathBounds(
-    const std::vector<TrajectoryPoint> &path_reference,
-    const PathBoundary &regular_path_bound) {
+    const std::vector<TrajectoryPoint>& path_reference, const PathBoundary& regular_path_bound) {
   /* check adc box has overlap with each path line segment*/
   // loop over output trajectory points
   // check if path reference point is valid or not
@@ -310,9 +283,8 @@ bool PathReferenceDecider::IsADCBoxAlongPathReferenceWithinPathBounds(
   std::vector<Box2d> vehicle_boxes;
   for (const auto path_reference_point : path_reference) {
     // add ADC box to current path_reference_point
-    const auto &path_point = path_reference_point.path_point();
-    Box2d vehicle_box =
-        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
+    const auto& path_point  = path_reference_point.path_point();
+    Box2d       vehicle_box = common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
     vehicle_boxes.emplace_back(vehicle_box);
   }
   // check intersection of linesegments and adc boxes
@@ -325,13 +297,11 @@ bool PathReferenceDecider::IsADCBoxAlongPathReferenceWithinPathBounds(
       // TODO(Shu): early stop when vehicle box is far away.
       for (auto vehicle_box : vehicle_boxes) {
         if (vehicle_box.HasOverlap(line_segment)) {
-          ADEBUG << std::setprecision(9) << "Vehicle box:["
-                 << vehicle_box.center_x() << "," << vehicle_box.center_y()
-                 << "]"
+          ADEBUG << std::setprecision(9) << "Vehicle box:[" << vehicle_box.center_x() << ","
+                 << vehicle_box.center_y() << "]"
                  << "Violate path bound at [" << line_segment.start().x() << ","
                  << line_segment.start().y() << "];"
-                 << "[" << line_segment.end().x() << ","
-                 << line_segment.end().y() << "]";
+                 << "[" << line_segment.end().x() << "," << line_segment.end().y() << "]";
           return false;
         }
       }
@@ -342,15 +312,13 @@ bool PathReferenceDecider::IsADCBoxAlongPathReferenceWithinPathBounds(
 }
 
 void PathReferenceDecider::PathBoundToLineSegments(
-    const PathBoundary &path_bound,
-    std::vector<std::vector<LineSegment2d>> *path_bound_segments) {
-  const double start_s = path_bound.start_s();
-  const double delta_s = path_bound.delta_s();
-  const size_t path_bound_size = path_bound.boundary().size();
-  std::vector<LineSegment2d> cur_left_bound_segments;
-  std::vector<LineSegment2d> cur_right_bound_segments;
-  const std::vector<std::pair<double, double>> &path_bound_points =
-      path_bound.boundary();
+    const PathBoundary& path_bound, std::vector<std::vector<LineSegment2d>>* path_bound_segments) {
+  const double                                  start_s         = path_bound.start_s();
+  const double                                  delta_s         = path_bound.delta_s();
+  const size_t                                  path_bound_size = path_bound.boundary().size();
+  std::vector<LineSegment2d>                    cur_left_bound_segments;
+  std::vector<LineSegment2d>                    cur_right_bound_segments;
+  const std::vector<std::pair<double, double>>& path_bound_points = path_bound.boundary();
   // setup the init path bound point
   SLPoint prev_left_sl_point;
   SLPoint prev_right_sl_point;
@@ -361,34 +329,28 @@ void PathReferenceDecider::PathBoundToLineSegments(
   // slpoint to cartesion point
   Vec2d prev_left_cartesian_point;
   Vec2d prev_right_cartesian_point;
-  reference_line_info_->reference_line().SLToXY(prev_left_sl_point,
-                                                &prev_left_cartesian_point);
-  reference_line_info_->reference_line().SLToXY(prev_right_sl_point,
-                                                &prev_right_cartesian_point);
+  reference_line_info_->reference_line().SLToXY(prev_left_sl_point, &prev_left_cartesian_point);
+  reference_line_info_->reference_line().SLToXY(prev_right_sl_point, &prev_right_cartesian_point);
   for (size_t i = 1; i < path_bound_size; ++i) {
     // s = start_s + i * delta_s
-    double current_s = start_s + i * delta_s;
+    double  current_s = start_s + i * delta_s;
     SLPoint left_sl_point;
-    Vec2d left_cartesian_point;
+    Vec2d   left_cartesian_point;
     SLPoint right_sl_point;
-    Vec2d right_cartesian_point;
+    Vec2d   right_cartesian_point;
 
     left_sl_point.set_l(std::get<0>(path_bound_points[i]));
     left_sl_point.set_s(current_s);
     right_sl_point.set_l(std::get<1>(path_bound_points[i]));
     right_sl_point.set_s(current_s);
 
-    reference_line_info_->reference_line().SLToXY(left_sl_point,
-                                                  &left_cartesian_point);
-    reference_line_info_->reference_line().SLToXY(right_sl_point,
-                                                  &right_cartesian_point);
+    reference_line_info_->reference_line().SLToXY(left_sl_point, &left_cartesian_point);
+    reference_line_info_->reference_line().SLToXY(right_sl_point, &right_cartesian_point);
 
     // together with previous point form line segment
-    LineSegment2d cur_left_segment(prev_left_cartesian_point,
-                                   left_cartesian_point);
-    LineSegment2d cur_right_segment(prev_right_cartesian_point,
-                                    right_cartesian_point);
-    prev_left_cartesian_point = left_cartesian_point;
+    LineSegment2d cur_left_segment(prev_left_cartesian_point, left_cartesian_point);
+    LineSegment2d cur_right_segment(prev_right_cartesian_point, right_cartesian_point);
+    prev_left_cartesian_point  = left_cartesian_point;
     prev_right_cartesian_point = right_cartesian_point;
     cur_left_bound_segments.emplace_back(cur_left_segment);
     cur_right_bound_segments.emplace_back(cur_right_segment);
@@ -397,25 +359,24 @@ void PathReferenceDecider::PathBoundToLineSegments(
   path_bound_segments->emplace_back(cur_right_bound_segments);
 }
 
-int PathReferenceDecider::IsPointWithinPathBounds(
-    const ReferenceLineInfo &reference_line_info,
-    const PathBoundary &path_bound, const double x, const double y) {
-  const double kPathBoundsDeciderResolution = 0.5;
+int PathReferenceDecider::IsPointWithinPathBounds(const ReferenceLineInfo& reference_line_info,
+                                                  const PathBoundary&      path_bound,
+                                                  const double             x,
+                                                  const double             y) {
+  const double    kPathBoundsDeciderResolution = 0.5;
   common::SLPoint point_sl;
   reference_line_info.reference_line().XYToSL({x, y}, &point_sl);
-  const double start_s = path_bound.start_s();
-  const double delta_s = path_bound.delta_s();
-  const int path_bound_size = path_bound.boundary().size();
-  const double end_s = start_s + delta_s * (path_bound_size - 1);
+  const double start_s         = path_bound.start_s();
+  const double delta_s         = path_bound.delta_s();
+  const int    path_bound_size = path_bound.boundary().size();
+  const double end_s           = start_s + delta_s * (path_bound_size - 1);
 
-  if (point_sl.s() > end_s ||
-      point_sl.s() < start_s - kPathBoundsDeciderResolution * 2) {
+  if (point_sl.s() > end_s || point_sl.s() < start_s - kPathBoundsDeciderResolution * 2) {
     AERROR << "Longitudinally outside the boundary.";
     return -1;
   }
   int idx_after = 0;
-  while (idx_after < path_bound_size &&
-         start_s + idx_after * delta_s < point_sl.s()) {
+  while (idx_after < path_bound_size && start_s + idx_after * delta_s < point_sl.s()) {
     ++idx_after;
   }
   if (idx_after == 0) {
@@ -436,12 +397,11 @@ int PathReferenceDecider::IsPointWithinPathBounds(
   return -1;
 }
 
-void PathReferenceDecider::EvaluatePathReference(
-    const PathBoundary &path_bound,
-    const std::vector<PathPoint> &path_reference,
-    std::vector<PathPoint> *evaluated_path_reference) {
-  const double delta_s = path_bound.delta_s();
-  const double path_reference_end_s = path_reference.back().s();
+void PathReferenceDecider::EvaluatePathReference(const PathBoundary&           path_bound,
+                                                 const std::vector<PathPoint>& path_reference,
+                                                 std::vector<PathPoint>* evaluated_path_reference) {
+  const double    delta_s              = path_bound.delta_s();
+  const double    path_reference_end_s = path_reference.back().s();
   DiscretizedPath discrete_path_reference;
   for (auto path_point : path_reference) {
     discrete_path_reference.emplace_back(path_point);
@@ -450,26 +410,22 @@ void PathReferenceDecider::EvaluatePathReference(
   for (idx = 0; idx < path_bound.boundary().size(); ++idx) {
     // relative s
     double cur_s = static_cast<double>(idx) * delta_s;
-    if (cur_s > path_reference_end_s) {
-      break;
-    }
-    evaluated_path_reference->emplace_back(
-        discrete_path_reference.Evaluate(cur_s));
+    if (cur_s > path_reference_end_s) { break; }
+    evaluated_path_reference->emplace_back(discrete_path_reference.Evaluate(cur_s));
   }
 }
 
-void PathReferenceDecider::RecordDebugInfo(
-    const std::vector<PathPoint> &path_points, const std::string &path_name,
-    ReferenceLineInfo *const reference_line_info) {
+void PathReferenceDecider::RecordDebugInfo(const std::vector<PathPoint>& path_points,
+                                           const std::string&            path_name,
+                                           ReferenceLineInfo* const      reference_line_info) {
   // Sanity checks.
   ACHECK(!path_points.empty());
   CHECK_NOTNULL(reference_line_info);
   // Insert the transformed PathData into the simulator display.
-  auto *ptr_display_path =
+  auto* ptr_display_path =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
   ptr_display_path->set_name(path_name);
-  ptr_display_path->mutable_path_point()->CopyFrom(
-      {path_points.begin(), path_points.end()});
+  ptr_display_path->mutable_path_point()->CopyFrom({path_points.begin(), path_points.end()});
 }
 
 }  // namespace planning

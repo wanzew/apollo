@@ -22,11 +22,12 @@
 #include "grpc++/grpc++.h"
 #include "yaml-cpp/yaml.h"
 
+#include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_common.h"
 #include "modules/map/tools/map_datachecker/client/client_gflags.h"
 #include "modules/map/tools/map_datachecker/client/exception_handler.h"
-#include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
 
 namespace apollo {
 namespace hdmap {
@@ -35,10 +36,9 @@ template <typename REQUEST_TYPE, typename RESPONSE_TYPE>
 class Alignment {
  public:
   Alignment() {
-    YAML::Node node = YAML::LoadFile(FLAGS_client_conf_yaml);
-    std::string server_addr =
-        node["grpc_host_port"]["grpc_host"].as<std::string>() + ":" +
-        node["grpc_host_port"]["grpc_port"].as<std::string>();
+    YAML::Node  node        = YAML::LoadFile(FLAGS_client_conf_yaml);
+    std::string server_addr = node["grpc_host_port"]["grpc_host"].as<std::string>() + ":" +
+                              node["grpc_host_port"]["grpc_port"].as<std::string>();
     check_period_ = node["alignment"]["check_period"].as<int>();
     service_stub_ = CollectionCheckerService::NewStub(
         grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials()));
@@ -62,7 +62,7 @@ class Alignment {
     int ret = 0;
     while (true) {
       double progress = 0.0;
-      ret = Check(&progress);
+      ret             = Check(&progress);
       if (ret != 0) {
         AERROR << "alignment check failed";
         break;
@@ -75,9 +75,7 @@ class Alignment {
       }
       std::this_thread::sleep_for(std::chrono::seconds(check_period_));
     }
-    if (ret != 0) {
-      return -1;
-    }
+    if (ret != 0) { return -1; }
     ret = Stop();
     if (ret != 0) {
       AERROR << "alignment stop failed";
@@ -116,8 +114,8 @@ class Alignment {
     AINFO << "alignment request: "
           << "cmd: [" << request.cmd() << "]";
     RESPONSE_TYPE response;
-    int ret = GrpcStub(&request, &response);
-    *progress = response.progress();
+    int           ret = GrpcStub(&request, &response);
+    *progress         = response.progress();
     return ret;
   }
 
@@ -135,21 +133,18 @@ class Alignment {
 
  protected:
   std::unique_ptr<CollectionCheckerService::Stub> service_stub_;
-  virtual grpc::Status GrpcAlignmentStub(REQUEST_TYPE* request,
-                                         RESPONSE_TYPE* response) = 0;
+  virtual grpc::Status GrpcAlignmentStub(REQUEST_TYPE* request, RESPONSE_TYPE* response) = 0;
 };
 
 class StaticAlign : public Alignment<StaticAlignRequest, StaticAlignResponse> {
-  grpc::Status GrpcAlignmentStub(StaticAlignRequest* request,
-                                 StaticAlignResponse* response) {
+  grpc::Status GrpcAlignmentStub(StaticAlignRequest* request, StaticAlignResponse* response) {
     grpc::ClientContext context;
     return service_stub_->ServiceStaticAlign(&context, *request, response);
   }
 };
 
 class EightRoute : public Alignment<EightRouteRequest, EightRouteResponse> {
-  grpc::Status GrpcAlignmentStub(EightRouteRequest* request,
-                                 EightRouteResponse* response) {
+  grpc::Status GrpcAlignmentStub(EightRouteRequest* request, EightRouteResponse* response) {
     grpc::ClientContext context;
     return service_stub_->ServiceEightRoute(&context, *request, response);
   }

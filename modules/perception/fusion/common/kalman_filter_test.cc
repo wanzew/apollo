@@ -29,7 +29,7 @@ TEST(FusionCommonTest, return_name_test) {
 }
 
 TEST(FusionCommonTest, test_init) {
-  KalmanFilter kal;
+  KalmanFilter    kal;
   Eigen::VectorXd states;
   Eigen::MatrixXd uncertainty;
   EXPECT_FALSE(kal.Init(states, uncertainty));
@@ -43,7 +43,7 @@ TEST(FusionCommonTest, test_init) {
 }
 
 TEST(FusionCommonTest, test_predict) {
-  KalmanFilter kal;
+  KalmanFilter    kal;
   Eigen::VectorXd states;
   Eigen::MatrixXd uncertainty;
   Eigen::MatrixXd transform_matrix;
@@ -66,7 +66,7 @@ TEST(FusionCommonTest, test_predict) {
 }
 
 TEST(FusionCommonTest, test_correct) {
-  KalmanFilter kal;
+  KalmanFilter    kal;
   Eigen::VectorXd obs_states;
   Eigen::MatrixXd obs_uncertainty;
   EXPECT_FALSE(kal.Correct(obs_states, obs_uncertainty));
@@ -87,7 +87,7 @@ TEST(FusionCommonTest, test_correct) {
 }
 
 TEST(FusionCommonTest, test_breakdown_setting) {
-  KalmanFilter kal;
+  KalmanFilter    kal;
   Eigen::VectorXd states;
   Eigen::MatrixXd uncertainty;
   states.setIdentity(4, 1);
@@ -102,7 +102,7 @@ TEST(FusionCommonTest, test_breakdown_setting) {
 }
 
 TEST(FusionCommonTest, test_decorrelation) {
-  KalmanFilter kal;
+  KalmanFilter    kal;
   Eigen::VectorXd states;
   Eigen::MatrixXd uncertainty;
   states.setIdentity(4, 1);
@@ -113,18 +113,18 @@ TEST(FusionCommonTest, test_decorrelation) {
 }
 
 TEST(FusionCommonTest, test_value) {
-  KalmanFilter kal;
-  double time_diff = 0.05;
+  KalmanFilter    kal;
+  double          time_diff = 0.05;
   Eigen::VectorXd states;
   Eigen::MatrixXd uncertainty;
   states.setIdentity(6, 1);
   uncertainty.setIdentity(6, 6);
-  states(0) = 10.0;
-  states(1) = 20.0;
-  states(2) = 2.5;
-  states(3) = 2.5;
-  states(4) = 0.5;
-  states(5) = 0.5;
+  states(0)         = 10.0;
+  states(1)         = 20.0;
+  states(2)         = 2.5;
+  states(3)         = 2.5;
+  states(4)         = 0.5;
+  states(5)         = 0.5;
   uncertainty(0, 2) = 0.5;
   uncertainty(1, 3) = 0.25;
   uncertainty(2, 0) = 0.5;
@@ -171,18 +171,18 @@ TEST(FusionCommonTest, test_value) {
 }
 
 TEST(FusionCommonTest, test_correction) {
-  KalmanFilter kal;
-  double time_diff = 0.05;
+  KalmanFilter    kal;
+  double          time_diff = 0.05;
   Eigen::VectorXd states;
   Eigen::MatrixXd uncertainty;
   states.setIdentity(6, 1);
   uncertainty.setIdentity(6, 6);
-  states(0) = 10.0;
-  states(1) = 20.0;
-  states(2) = 2.5;
-  states(3) = 2.5;
-  states(4) = 0.5;
-  states(5) = 0.5;
+  states(0)         = 10.0;
+  states(1)         = 20.0;
+  states(2)         = 2.5;
+  states(3)         = 2.5;
+  states(4)         = 0.5;
+  states(5)         = 0.5;
   uncertainty(0, 2) = 0.5;
   uncertainty(1, 3) = 0.25;
   uncertainty(2, 0) = 0.5;
@@ -202,7 +202,7 @@ TEST(FusionCommonTest, test_correction) {
   env_uncertainty.setIdentity(6, 6);
   env_uncertainty = env_uncertainty * 0.1 * time_diff;
   EXPECT_TRUE(kal.Predict(transform_matrix, env_uncertainty));
-  std::vector<bool> break_down = {0, 0, 0, 0, 1, 1};
+  std::vector<bool> break_down  = {0, 0, 0, 0, 1, 1};
   std::vector<bool> break_down2 = {0, 0, 1, 1, 0, 0};
   EXPECT_TRUE(kal.SetGainBreakdownThresh(break_down, 1.0));
   EXPECT_TRUE(kal.SetValueBreakdownThresh(break_down2, 100));
@@ -215,7 +215,7 @@ TEST(FusionCommonTest, test_correction) {
 }
 
 TEST(FusionCommonTest, test_set_cmat) {
-  KalmanFilter kal;
+  KalmanFilter    kal;
   Eigen::MatrixXd c_mat;
   c_mat.setIdentity(6, 1);
   bool state = kal.SetControlMatrix(c_mat);

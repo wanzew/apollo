@@ -26,8 +26,7 @@ namespace prediction {
 class PedestrianInteractionEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    std::string file =
-        "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
+    std::string file = "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
     cyber::common::GetProtoFromFile(file, &perception_obstacles_);
   }
 
@@ -36,8 +35,7 @@ class PedestrianInteractionEvaluatorTest : public KMLMapBasedTest {
 };
 
 TEST_F(PedestrianInteractionEvaluatorTest, Evaluate) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 101);

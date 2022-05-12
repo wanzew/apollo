@@ -37,11 +37,11 @@ using apollo::cyber::message::RawMessage;
 
 constexpr char kChannelName1[] = "/test/channel1";
 constexpr char kMessageType1[] = "apollo.cyber.proto.Test";
-constexpr char kProtoDesc1[] = "1234567890";
-constexpr char kTestFile[] = "viewer_test.record";
+constexpr char kProtoDesc1[]   = "1234567890";
+constexpr char kTestFile[]     = "viewer_test.record";
 
-static void ConstructRecord(uint64_t msg_num, uint64_t begin_time,
-                            uint64_t time_step, bool reverse = false) {
+static void
+ConstructRecord(uint64_t msg_num, uint64_t begin_time, uint64_t time_step, bool reverse = false) {
   RecordWriter writer;
   writer.SetSizeOfFileSegmentation(0);
   writer.SetIntervalOfFileSegmentation(0);
@@ -49,9 +49,7 @@ static void ConstructRecord(uint64_t msg_num, uint64_t begin_time,
   writer.WriteChannel(kChannelName1, kMessageType1, kProtoDesc1);
   for (uint64_t i = 0; i < msg_num; i++) {
     auto ai = i;
-    if (reverse) {
-      ai = msg_num - 1 - i;
-    }
+    if (reverse) { ai = msg_num - 1 - i; }
     auto msg = std::make_shared<RawMessage>(std::to_string(ai));
     writer.WriteMessage(kChannelName1, msg, begin_time + time_step * ai);
   }
@@ -62,21 +60,19 @@ static void ConstructRecord(uint64_t msg_num, uint64_t begin_time,
 uint64_t CheckCount(RecordViewer viewer) {
   int i = 0;
   for (auto& msg : viewer) {
-    if (msg.time >= 0) {
-      i++;
-    }
+    if (msg.time >= 0) { i++; }
   }
   return i;
 }
 
 TEST(RecordTest, iterator_test) {
-  uint64_t msg_num = 200;
+  uint64_t msg_num    = 200;
   uint64_t begin_time = 100000000;
-  uint64_t step_time = 100000000;  // 100ms
-  uint64_t end_time = begin_time + step_time * (msg_num - 1);
+  uint64_t step_time  = 100000000;  // 100ms
+  uint64_t end_time   = begin_time + step_time * (msg_num - 1);
   ConstructRecord(msg_num, begin_time, step_time);
 
-  auto reader = std::make_shared<RecordReader>(kTestFile);
+  auto         reader = std::make_shared<RecordReader>(kTestFile);
   RecordViewer viewer(reader);
   EXPECT_TRUE(viewer.IsValid());
   EXPECT_EQ(begin_time, viewer.begin_time());
@@ -112,16 +108,16 @@ TEST(RecordTest, iterator_test) {
 }
 
 TEST(RecordTest, iterator_test_reverse) {
-  uint64_t msg_num = 200;
+  uint64_t msg_num    = 200;
   uint64_t begin_time = 1000;
-  uint64_t step_time = 10;
+  uint64_t step_time  = 10;
   // TODO(storypku): investigtate why the following fails
   // uint64_t begin_time = 100000000;
   // uint64_t step_time = 100000000;  // 100ms
   uint64_t end_time = begin_time + step_time * (msg_num - 1);
   ConstructRecord(msg_num, begin_time, step_time, true);
 
-  auto reader = std::make_shared<RecordReader>(kTestFile);
+  auto         reader = std::make_shared<RecordReader>(kTestFile);
   RecordViewer viewer(reader);
   EXPECT_TRUE(viewer.IsValid());
   EXPECT_EQ(begin_time, viewer.begin_time());
@@ -148,13 +144,13 @@ TEST(RecordTest, iterator_test_reverse) {
 }
 
 TEST(RecordTest, filter_test) {
-  uint64_t msg_num = 200;
+  uint64_t msg_num    = 200;
   uint64_t begin_time = 100000000;
-  uint64_t step_time = 100000000;  // 100ms
-  uint64_t end_time = begin_time + step_time * (msg_num - 1);
+  uint64_t step_time  = 100000000;  // 100ms
+  uint64_t end_time   = begin_time + step_time * (msg_num - 1);
   ConstructRecord(msg_num, begin_time, step_time);
 
-  auto reader = std::make_shared<RecordReader>(kTestFile);
+  auto         reader = std::make_shared<RecordReader>(kTestFile);
   RecordViewer viewer_0(reader);
   EXPECT_EQ(CheckCount(viewer_0), msg_num);
   EXPECT_EQ(begin_time, viewer_0.begin_time());
@@ -184,8 +180,7 @@ TEST(RecordTest, filter_test) {
   EXPECT_NE(it_1, it_2);
 
   // pick 2 frame
-  RecordViewer viewer_5(reader, begin_time + 12 * step_time,
-                        begin_time + 13 * step_time);
+  RecordViewer viewer_5(reader, begin_time + 12 * step_time, begin_time + 13 * step_time);
   EXPECT_EQ(CheckCount(viewer_5), 2);
 
   // filter with not exist channel
@@ -199,13 +194,13 @@ TEST(RecordTest, filter_test) {
 }
 
 TEST(RecordTest, mult_iterator_test) {
-  uint64_t msg_num = 200;
+  uint64_t msg_num    = 200;
   uint64_t begin_time = 100000000;
-  uint64_t step_time = 100000000;  // 100ms
-  uint64_t end_time = begin_time + step_time * (msg_num - 1);
+  uint64_t step_time  = 100000000;  // 100ms
+  uint64_t end_time   = begin_time + step_time * (msg_num - 1);
   ConstructRecord(msg_num, begin_time, step_time);
 
-  auto reader = std::make_shared<RecordReader>(kTestFile);
+  auto         reader = std::make_shared<RecordReader>(kTestFile);
   RecordViewer viewer(reader);
   EXPECT_TRUE(viewer.IsValid());
   EXPECT_EQ(begin_time, viewer.begin_time());

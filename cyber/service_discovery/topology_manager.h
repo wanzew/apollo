@@ -63,12 +63,11 @@ using ServiceManagerPtr = std::shared_ptr<ServiceManager>;
  */
 class TopologyManager {
  public:
-  using ChangeSignal = base::Signal<const ChangeMsg&>;
-  using ChangeFunc = std::function<void(const ChangeMsg&)>;
-  using ChangeConnection = base::Connection<const ChangeMsg&>;
-  using PartNameContainer =
-      std::map<eprosima::fastrtps::rtps::GUID_t, std::string>;
-  using PartInfo = eprosima::fastrtps::ParticipantDiscoveryInfo;
+  using ChangeSignal      = base::Signal<const ChangeMsg&>;
+  using ChangeFunc        = std::function<void(const ChangeMsg&)>;
+  using ChangeConnection  = base::Connection<const ChangeMsg&>;
+  using PartNameContainer = std::map<eprosima::fastrtps::rtps::GUID_t, std::string>;
+  using PartInfo          = eprosima::fastrtps::ParticipantDiscoveryInfo;
 
   virtual ~TopologyManager();
 
@@ -117,18 +116,19 @@ class TopologyManager {
   void OnParticipantChange(const PartInfo& info);
   bool Convert(const PartInfo& info, ChangeMsg* change_msg);
   bool ParseParticipantName(const std::string& participant_name,
-                            std::string* host_name, int* process_id);
+                            std::string*       host_name,
+                            int*               process_id);
 
   std::atomic<bool> init_;             /// Is TopologyManager inited
-  NodeManagerPtr node_manager_;        /// shared ptr of NodeManager
+  NodeManagerPtr    node_manager_;     /// shared ptr of NodeManager
   ChannelManagerPtr channel_manager_;  /// shared ptr of ChannelManager
   ServiceManagerPtr service_manager_;  /// shared ptr of ServiceManager
   /// rtps participant to publish and subscribe
   transport::ParticipantPtr participant_;
-  ParticipantListener* participant_listener_;
-  ChangeSignal change_signal_;           /// topology changing signal,
-                                         ///< connect to `ChangeFunc`s
-  PartNameContainer participant_names_;  /// other participant in the topology
+  ParticipantListener*      participant_listener_;
+  ChangeSignal              change_signal_;  /// topology changing signal,
+                                             ///< connect to `ChangeFunc`s
+  PartNameContainer participant_names_;      /// other participant in the topology
 
   DECLARE_SINGLETON(TopologyManager)
 };

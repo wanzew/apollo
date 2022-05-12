@@ -24,7 +24,7 @@ namespace perception {
 namespace lidar {
 
 TEST(SppClusterTest, spp_cluster_test) {
-  SppLabelImage image;
+  SppLabelImage  image;
   SppLabelImage& const_image = image;
   image.Init(5, 5);
   EXPECT_EQ(image.width_, 5);
@@ -61,42 +61,38 @@ TEST(SppClusterTest, spp_cluster_test) {
   EXPECT_NE(image.GetSppLabelImage(), nullptr);
   EXPECT_NE(const_image.GetSppLabelImage(), nullptr);
 
-  float confidence_map[] = {0.1f, 0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 0.6f,
-                            0.1f, 0.3f, 0.3f, 0.1f, 0.6f, 0.1f, 0.1f,
-                            0.1f, 0.1f, 0.6f, 0.1f, 0.2f, 0.1f, 0.1f,
-                            0.1f, 0.1f, 0.2f, 0.1f};
+  float confidence_map[] = {0.1f, 0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 0.6f, 0.1f, 0.3f,
+                            0.3f, 0.1f, 0.6f, 0.1f, 0.1f, 0.1f, 0.1f, 0.6f, 0.1f,
+                            0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f};
 
   image.FilterClusters(confidence_map, 0.5f);
   EXPECT_EQ(image.GetClusterNum(), 1);
 
   float class_map[] = {
-      0.1f, 0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 0.2f, 0.1f, 0.3f, 0.3f,
-      0.1f, 0.3f, 0.1f, 0.1f, 0.1f, 0.1f, 0.4f, 0.1f, 0.2f, 0.1f,
-      0.1f, 0.1f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.3f,
-      0.1f, 0.8f, 0.1f, 0.3f, 0.3f, 0.1f, 0.7f, 0.1f, 0.1f, 0.1f,
-      0.1f, 0.6f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f,
+      0.1f, 0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 0.2f, 0.1f, 0.3f, 0.3f, 0.1f, 0.3f, 0.1f,
+      0.1f, 0.1f, 0.1f, 0.4f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f, 0.1f,
+      0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 0.8f, 0.1f, 0.3f, 0.3f, 0.1f, 0.7f, 0.1f, 0.1f,
+      0.1f, 0.1f, 0.6f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f,
   };
   image.CalculateClusterClass(class_map, 2);
   EXPECT_EQ(static_cast<size_t>(image.GetCluster(0)->type), 1);
 
   float heading_map[] = {
-      0.1f, 0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 1.0f, 0.1f, 0.3f, 0.3f,
-      0.1f, 1.0f, 0.1f, 0.1f, 0.1f, 0.1f, 1.0f, 0.1f, 0.2f, 0.1f,
-      0.1f, 0.1f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.3f,
-      0.1f, 0.0f, 0.1f, 0.3f, 0.3f, 0.1f, 0.0f, 0.1f, 0.1f, 0.1f,
-      0.1f, 0.0f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f,
+      0.1f, 0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 1.0f, 0.1f, 0.3f, 0.3f, 0.1f, 1.0f, 0.1f,
+      0.1f, 0.1f, 0.1f, 1.0f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f, 0.1f,
+      0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 0.0f, 0.1f, 0.3f, 0.3f, 0.1f, 0.0f, 0.1f, 0.1f,
+      0.1f, 0.1f, 0.0f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f,
   };
   image.CalculateClusterHeading(heading_map);
   EXPECT_NEAR(image.GetCluster(0)->yaw, 0.f, 1e-9);
 
-  float top_z_map[] = {0.1f, 0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 0.5f, 0.1f, 0.3f,
-                       0.3f, 0.1f, 0.6f, 0.1f, 0.1f, 0.1f, 0.1f, 0.7f, 0.1f,
-                       0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f};
+  float top_z_map[] = {0.1f, 0.1f, 0.1f, 0.1f, 0.3f, 0.1f, 0.5f, 0.1f, 0.3f, 0.3f, 0.1f, 0.6f, 0.1f,
+                       0.1f, 0.1f, 0.1f, 0.7f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f};
 
   image.CalculateClusterTopZ(top_z_map);
   EXPECT_NEAR(image.GetCluster(0)->top_z, 0.6f, 1e-4);
 
-  SppClusterList list;
+  SppClusterList        list;
   const SppClusterList& const_list = list;
   list.Init(10);
   EXPECT_EQ(list.size(), 10);

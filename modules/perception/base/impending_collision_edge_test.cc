@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
-
 #include "modules/perception/base/impending_collision_edge.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -25,7 +25,7 @@ class ImpendingCollisionEdgeTest : public ::testing::Test {};
 
 TEST_F(ImpendingCollisionEdgeTest, ImpendingCollisionEdge) {
   ImpendingCollisionEdge edge;
-  edge.id = 2;
+  edge.id            = 2;
   edge.tracking_time = 1.0;
   edge.points.push_back(Eigen::Vector3d(1, 1, 1));
 
@@ -39,8 +39,7 @@ TEST_F(ImpendingCollisionEdgeTest, ImpendingCollisionEdges) {
   ImpendingCollisionEdges edges;
 
   edges.timestamp = 1.0;
-  std::shared_ptr<ImpendingCollisionEdge> collision_edge_ptr(
-      new ImpendingCollisionEdge());
+  std::shared_ptr<ImpendingCollisionEdge> collision_edge_ptr(new ImpendingCollisionEdge());
   edges.impending_collision_edges.push_back(collision_edge_ptr);
 
   EXPECT_DOUBLE_EQ(edges.timestamp, 1.0);

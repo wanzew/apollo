@@ -21,10 +21,11 @@
 #include <utility>
 #include <vector>
 
+#include "modules/perception/camera/lib/obstacle/transformer/singlestage/proto/singlestage.pb.h"
+
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/twod_threed_util.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
-#include "modules/perception/camera/lib/obstacle/transformer/singlestage/proto/singlestage.pb.h"
 #include "modules/perception/common/i_lib/core/i_blas.h"
 
 namespace apollo {
@@ -37,7 +38,7 @@ struct TransformerParams {
 
   void set_default();
 
-  int max_nr_iter;
+  int   max_nr_iter;
   float learning_rate;
   float k_min_cost;
   float eps_cost;
@@ -45,41 +46,54 @@ struct TransformerParams {
 
 class SingleStageObstacleTransformer : public BaseObstacleTransformer {
  public:
-  SingleStageObstacleTransformer() : BaseObstacleTransformer() {}
+  SingleStageObstacleTransformer()
+      : BaseObstacleTransformer() {}
 
   virtual ~SingleStageObstacleTransformer() {}
-  bool Init(const ObstacleTransformerInitOptions &options =
-                ObstacleTransformerInitOptions()) override;
+  bool
+  Init(const ObstacleTransformerInitOptions& options = ObstacleTransformerInitOptions()) override;
 
   // @brief: transform 2D detections to 3D bounding box
   // @param [in]: frame
   // @param [out]: frame
-  bool Transform(const ObstacleTransformerOptions &options,
-                 CameraFrame *frame) override;
+  bool Transform(const ObstacleTransformerOptions& options, CameraFrame* frame) override;
 
   std::string Name() const override;
 
  private:
-  int MatchTemplates(base::ObjectSubType sub_type, float *dimension_hwl);
-  void FillResults(float object_center[3], float dimension_hwl[3],
-                   float rotation_y, Eigen::Affine3d camera2world_pose,
-                   float theta_ray, base::ObjectPtr obj);
-  float CenterPointFromBbox(const float *bbox, const float *hwl,
-                            float ry, float *center, float *center2d,
-                            const float* k_mat, int height, int width);
-  void ConstraintCenterPoint(const float *bbox, const float &z_ref,
-                             const float &ry, const float *hwl,
-                             const float* k_mat, float *center,
-                             float *x, int height, int width);
+  int   MatchTemplates(base::ObjectSubType sub_type, float* dimension_hwl);
+  void  FillResults(float           object_center[3],
+                    float           dimension_hwl[3],
+                    float           rotation_y,
+                    Eigen::Affine3d camera2world_pose,
+                    float           theta_ray,
+                    base::ObjectPtr obj);
+  float CenterPointFromBbox(const float* bbox,
+                            const float* hwl,
+                            float        ry,
+                            float*       center,
+                            float*       center2d,
+                            const float* k_mat,
+                            int          height,
+                            int          width);
+  void  ConstraintCenterPoint(const float* bbox,
+                              const float& z_ref,
+                              const float& ry,
+                              const float* hwl,
+                              const float* k_mat,
+                              float*       center,
+                              float*       x,
+                              int          height,
+                              int          width);
 
  private:
   singlestage::SinglestageParam singlestage_param_;
-  int image_width_ = 0;
-  int image_height_ = 0;
-  TransformerParams params_;
+  int                           image_width_  = 0;
+  int                           image_height_ = 0;
+  TransformerParams             params_;
 
  protected:
-  ObjectTemplateManager *object_template_manager_ = nullptr;
+  ObjectTemplateManager* object_template_manager_ = nullptr;
 };
 
 }  // namespace camera

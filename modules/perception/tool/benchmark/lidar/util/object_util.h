@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 
 namespace apollo {
@@ -22,12 +23,10 @@ namespace perception {
 namespace benchmark {
 
 // get 8 vertices of the 3D bounding box
-bool get_bbox_vertices(const ObjectConstPtr object,
-                       std::vector<Eigen::Vector3d>* vertices);
+bool get_bbox_vertices(const ObjectConstPtr object, std::vector<Eigen::Vector3d>* vertices);
 
 // fill cloud and indices, using center, width/length/height
-bool fill_objects_with_point_cloud(std::vector<ObjectPtr>* objects,
-                                   const PointCloudConstPtr cloud);
+bool fill_objects_with_point_cloud(std::vector<ObjectPtr>* objects, const PointCloudConstPtr cloud);
 
 bool fill_axis_align_box(ObjectPtr object);
 

@@ -17,34 +17,32 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Aebdiagnosis1626 : public ::apollo::drivers::canbus::ProtocolData<
-                             ::apollo::canbus::ChassisDetail> {
+class Aebdiagnosis1626
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Aebdiagnosis1626();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'AEB_SoftwareVersion', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0.0|255.0]', 'bit': 55, 'type': 'double', 'order': 'motorola',
   // 'physical_unit': 'bit'}
-  double aeb_softwareversion(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  double aeb_softwareversion(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'AEB_HardwareVersion', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0.0|255.0]', 'bit': 63, 'type': 'double', 'order': 'motorola',
   // 'physical_unit': 'bit'}
-  double aeb_hardwareversion(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  double aeb_hardwareversion(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace neolix_edu

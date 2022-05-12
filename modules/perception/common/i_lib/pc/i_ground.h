@@ -29,13 +29,13 @@ namespace common {
 struct GroundPlaneLiDAR {
   GroundPlaneLiDAR() {
     IZero4(params);
-    nr_support = 0;
+    nr_support  = 0;
     is_detected = false;
   }
 
-  GroundPlaneLiDAR &operator=(const GroundPlaneLiDAR &pi) {
+  GroundPlaneLiDAR& operator=(const GroundPlaneLiDAR& pi) {
     ICopy4(pi.params, this->params);
-    this->nr_support = pi.GetNrSupport();
+    this->nr_support  = pi.GetNrSupport();
     this->is_detected = pi.GetStatus();
     return (*this);
   }
@@ -43,9 +43,7 @@ struct GroundPlaneLiDAR {
   float GetDegreeNormalToX() const {
     float normal[3];
     ICopy3(params, normal);
-    if (normal[0] < 0) {
-      INeg3(normal);
-    }
+    if (normal[0] < 0) { INeg3(normal); }
     // normalize:
     IScale3(normal, IRec(ISqrt(ISquaresum3(normal))));
     return IRadiansToDegree(IAcos(normal[0]));
@@ -54,9 +52,7 @@ struct GroundPlaneLiDAR {
   float get_degree_normal_to_y() const {
     float normal[3];
     ICopy3(params, normal);
-    if (normal[1] < 0) {
-      INeg3(normal);
-    }
+    if (normal[1] < 0) { INeg3(normal); }
     // normalize:
     IScale3(normal, IRec(ISqrt(ISquaresum3(normal))));
     return IRadiansToDegree(IAcos(normal[1]));
@@ -65,30 +61,22 @@ struct GroundPlaneLiDAR {
   float GetDegreeNormalToZ() const {
     float normal[3];
     ICopy3(params, normal);
-    if (normal[2] < 0) {
-      INeg3(normal);
-    }
+    if (normal[2] < 0) { INeg3(normal); }
     // normalize:
     IScale3(normal, IRec(ISqrt(ISquaresum3(normal))));
     return IRadiansToDegree(IAcos(normal[2]));
   }
 
   void ForcePositiveNormalX() {
-    if (params[0] < 0) {
-      INeg4(params);
-    }
+    if (params[0] < 0) { INeg4(params); }
   }
 
   void ForcePositiveNormalY() {
-    if (params[1] < 0) {
-      INeg4(params);
-    }
+    if (params[1] < 0) { INeg4(params); }
   }
 
   void ForcePositiveNormalZ() {
-    if (params[2] < 0) {
-      INeg4(params);
-    }
+    if (params[2] < 0) { INeg4(params); }
   }
 
   void ForceInvalid() {
@@ -102,9 +90,7 @@ struct GroundPlaneLiDAR {
   }
 
   bool IsValid() const {
-    if (nr_support && (params[0] != 0 || params[1] != 0 || params[2] != 0)) {
-      return true;
-    }
+    if (nr_support && (params[0] != 0 || params[1] != 0 || params[2] != 0)) { return true; }
     return false;
   }
 
@@ -120,21 +106,21 @@ struct GroundPlaneLiDAR {
 
  private:
   bool is_detected;
-  int nr_support;
+  int  nr_support;
 };
 
 struct GroundPlaneSpherical {
   GroundPlaneSpherical() {
     theta = phi = d = 0;
-    nr_support = 0;
-    is_detected = false;
+    nr_support      = 0;
+    is_detected     = false;
   }
 
-  GroundPlaneSpherical &operator=(const GroundPlaneSpherical &pi) {
-    this->theta = pi.theta;
-    this->phi = pi.phi;
-    this->d = pi.d;
-    this->nr_support = pi.GetNrSupport();
+  GroundPlaneSpherical& operator=(const GroundPlaneSpherical& pi) {
+    this->theta       = pi.theta;
+    this->phi         = pi.phi;
+    this->d           = pi.d;
+    this->nr_support  = pi.GetNrSupport();
     this->is_detected = pi.GetStatus();
     return (*this);
   }
@@ -143,7 +129,7 @@ struct GroundPlaneSpherical {
 
   void ForceInvalid() {
     theta = phi = d = 0;
-    nr_support = 0;
+    nr_support      = 0;
   }
 
   int GetNrSupport() const { return nr_support; }
@@ -160,13 +146,13 @@ struct GroundPlaneSpherical {
 
  private:
   bool is_detected;
-  int nr_support;
+  int  nr_support;
 };
 
 struct PlaneFitGroundDetectorParam {
   PlaneFitGroundDetectorParam() { SetDefault(); }
-  bool Validate() const;
-  void SetDefault();
+  bool         Validate() const;
+  void         SetDefault();
   unsigned int nr_points_max;
   unsigned int nr_grids_fine;
   unsigned int nr_grids_coarse;
@@ -175,151 +161,169 @@ struct PlaneFitGroundDetectorParam {
   unsigned int nr_samples_min_threshold;
   unsigned int nr_inliers_min_threshold;
   unsigned int nr_samples_max_threshold;
-  float sample_region_z_lower;
-  float sample_region_z_upper;
-  float roi_region_rad_x;
-  float roi_region_rad_y;
-  float roi_region_rad_z;
-  float roi_near_rad;
-  float planefit_dist_threshold_near;
-  float planefit_dist_threshold_far;
-  float planefit_filter_threshold;
-  float planefit_orien_threshold;
-  float termi_inlier_percen_threshold;
-  float candidate_filter_threshold;
-  int nr_ransac_iter_threshold;
-  int nr_smooth_iter;
+  float        sample_region_z_lower;
+  float        sample_region_z_upper;
+  float        roi_region_rad_x;
+  float        roi_region_rad_y;
+  float        roi_region_rad_z;
+  float        roi_near_rad;
+  float        planefit_dist_threshold_near;
+  float        planefit_dist_threshold_far;
+  float        planefit_filter_threshold;
+  float        planefit_orien_threshold;
+  float        termi_inlier_percen_threshold;
+  float        candidate_filter_threshold;
+  int          nr_ransac_iter_threshold;
+  int          nr_smooth_iter;
 };
 
 struct PlaneFitPointCandIndices {
   PlaneFitPointCandIndices() { random_seed = I_DEFAULT_SEED; }
-  void Reserve(unsigned int size) { indices.reserve(size); }
-  void Clear() { indices.clear(); }
-  inline void PushIndex(int i) { indices.push_back(i); }
-  int Prune(unsigned int min_nr_samples, unsigned int max_nr_samples);
-  unsigned int Size() const {
-    return static_cast<unsigned int>(indices.size());
-  }
-  int &operator[](unsigned int i) {
+  void         Reserve(unsigned int size) { indices.reserve(size); }
+  void         Clear() { indices.clear(); }
+  inline void  PushIndex(int i) { indices.push_back(i); }
+  int          Prune(unsigned int min_nr_samples, unsigned int max_nr_samples);
+  unsigned int Size() const { return static_cast<unsigned int>(indices.size()); }
+  int&         operator[](unsigned int i) {
     assert(i >= 0 && i < indices.size());
     return indices.at(i);
   }
-  int &operator[](int i) {
+  int& operator[](int i) {
     assert(i >= 0 && i < static_cast<int>(indices.size()));
     return indices.at(i);
   }
-  const int &operator[](unsigned int i) const {
+  const int& operator[](unsigned int i) const {
     assert(i >= 0 && i < indices.size());
     return indices.at(i);
   }
-  const int &operator[](int i) const {
+  const int& operator[](int i) const {
     assert(i >= 0 && i < static_cast<int>(indices.size()));
     return indices.at(i);
   }
   std::vector<int> indices;
-  int random_seed;
+  int              random_seed;
 };
 
-void IPlaneEucliToSpher(const GroundPlaneLiDAR &src, GroundPlaneSpherical *dst);
+void IPlaneEucliToSpher(const GroundPlaneLiDAR& src, GroundPlaneSpherical* dst);
 
-void IPlaneSpherToEucli(const GroundPlaneSpherical &src, GroundPlaneLiDAR *dst);
+void IPlaneSpherToEucli(const GroundPlaneSpherical& src, GroundPlaneLiDAR* dst);
 
 class BaseGroundDetector {
  public:
-  explicit BaseGroundDetector(const PlaneFitGroundDetectorParam &param)
+  explicit BaseGroundDetector(const PlaneFitGroundDetectorParam& param)
       : param_(param) {}
   virtual ~BaseGroundDetector() {}
-  virtual bool Detect(const float *point_cloud, float *height_above_ground,
+  virtual bool Detect(const float* point_cloud,
+                      float*       height_above_ground,
                       unsigned int nr_points,
                       unsigned int nr_point_elements) = 0;
 
  protected:
-  const PlaneFitGroundDetectorParam &param_;
+  const PlaneFitGroundDetectorParam& param_;
 };
 
 class PlaneFitGroundDetector : public BaseGroundDetector {
   static const int dim_point_ = 3;
 
  public:
-  explicit PlaneFitGroundDetector(const PlaneFitGroundDetectorParam &param);
+  explicit PlaneFitGroundDetector(const PlaneFitGroundDetectorParam& param);
   ~PlaneFitGroundDetector();
-  bool Init();
-  bool Detect(const float *point_cloud, float *height_above_ground,
-              unsigned int nr_points, unsigned int nr_point_elements);
-  const char *GetLabel() const;
-  const VoxelGridXY<float> *GetGrid() const;
-  const GroundPlaneLiDAR *GetGroundPlane(int r, int c) const;
-  unsigned int GetGridDimX() const;
-  unsigned int GetGridDimY() const;
-  float GetUnknownHeight();
-  PlaneFitPointCandIndices **GetCandis() const;
+  bool                       Init();
+  bool                       Detect(const float* point_cloud,
+                                    float*       height_above_ground,
+                                    unsigned int nr_points,
+                                    unsigned int nr_point_elements);
+  const char*                GetLabel() const;
+  const VoxelGridXY<float>*  GetGrid() const;
+  const GroundPlaneLiDAR*    GetGroundPlane(int r, int c) const;
+  unsigned int               GetGridDimX() const;
+  unsigned int               GetGridDimY() const;
+  float                      GetUnknownHeight();
+  PlaneFitPointCandIndices** GetCandis() const;
 
  protected:
-  void CleanUp();
-  void InitOrderTable(const VoxelGridXY<float> *vg, std::pair<int, int> *order);
-  int Fit();
-  int FitLine(unsigned int r);
-  int FitGrid(const float *point_cloud, PlaneFitPointCandIndices *candi,
-              GroundPlaneLiDAR *groundplane, unsigned int nr_points,
-              unsigned int nr_point_element, float dist_thre);
-  int FitInOrder();
-  int FilterCandidates(int r, int c, const float *point_cloud,
-                       PlaneFitPointCandIndices *candi,
-                       std::vector<std::pair<int, int>> *neighbors,
-                       unsigned int nr_point_element);
-  int FitGridWithNeighbors(int r, int c, const float *point_cloud,
-                           GroundPlaneLiDAR *groundplane,
-                           unsigned int nr_points,
-                           unsigned int nr_point_element, float dist_thre);
-  void GetNeighbors(int r, int c, int rows, int cols,
-                    std::vector<std::pair<int, int>> *neighbors);
-  float CalculateAngleDist(const GroundPlaneLiDAR &plane,
-                           const std::vector<std::pair<int, int>> &neighbors);
-  int Filter();
-  int FilterLine(unsigned int r);
-  int FilterGrid(const Voxel<float> &vg, const float *point_cloud,
-                 PlaneFitPointCandIndices *candi, unsigned int nr_points,
-                 unsigned int nr_point_element);
-  int Smooth();
-  int SmoothLine(unsigned int up, unsigned int r, unsigned int dn);
-  int CompleteGrid(const GroundPlaneSpherical &lt,
-                   const GroundPlaneSpherical &rt,
-                   const GroundPlaneSpherical &up,
-                   const GroundPlaneSpherical &dn, GroundPlaneSpherical *gp);
-  int SmoothGrid(const GroundPlaneSpherical &g, const GroundPlaneSpherical &lt,
-                 const GroundPlaneSpherical &rt, const GroundPlaneSpherical &up,
-                 const GroundPlaneSpherical &dn, GroundPlaneSpherical *gp);
-  int CompareZ(const float *point_cloud, const std::vector<int> &point_indices,
-               const float *z_values, PlaneFitPointCandIndices *candi,
-               unsigned int nr_points, unsigned int nr_point_element,
-               unsigned int nr_compares);
-  void ComputeAdaptiveThreshold();
-  void ComputeSignedGroundHeight(const float *point_cloud,
-                                 float *height_above_ground,
-                                 unsigned int nr_points,
-                                 unsigned int nr_point_elements);
-  void ComputeSignedGroundHeightLine(const float *point_cloud,
-                                     const GroundPlaneLiDAR *up,
-                                     const GroundPlaneLiDAR *cn,
-                                     const GroundPlaneLiDAR *dn,
-                                     float *height_above_ground, unsigned int r,
-                                     unsigned int nr_points,
-                                     unsigned int nr_point_elements);
+  void  CleanUp();
+  void  InitOrderTable(const VoxelGridXY<float>* vg, std::pair<int, int>* order);
+  int   Fit();
+  int   FitLine(unsigned int r);
+  int   FitGrid(const float*              point_cloud,
+                PlaneFitPointCandIndices* candi,
+                GroundPlaneLiDAR*         groundplane,
+                unsigned int              nr_points,
+                unsigned int              nr_point_element,
+                float                     dist_thre);
+  int   FitInOrder();
+  int   FilterCandidates(int                               r,
+                         int                               c,
+                         const float*                      point_cloud,
+                         PlaneFitPointCandIndices*         candi,
+                         std::vector<std::pair<int, int>>* neighbors,
+                         unsigned int                      nr_point_element);
+  int   FitGridWithNeighbors(int               r,
+                             int               c,
+                             const float*      point_cloud,
+                             GroundPlaneLiDAR* groundplane,
+                             unsigned int      nr_points,
+                             unsigned int      nr_point_element,
+                             float             dist_thre);
+  void  GetNeighbors(int r, int c, int rows, int cols, std::vector<std::pair<int, int>>* neighbors);
+  float CalculateAngleDist(const GroundPlaneLiDAR&                 plane,
+                           const std::vector<std::pair<int, int>>& neighbors);
+  int   Filter();
+  int   FilterLine(unsigned int r);
+  int   FilterGrid(const Voxel<float>&       vg,
+                   const float*              point_cloud,
+                   PlaneFitPointCandIndices* candi,
+                   unsigned int              nr_points,
+                   unsigned int              nr_point_element);
+  int   Smooth();
+  int   SmoothLine(unsigned int up, unsigned int r, unsigned int dn);
+  int   CompleteGrid(const GroundPlaneSpherical& lt,
+                     const GroundPlaneSpherical& rt,
+                     const GroundPlaneSpherical& up,
+                     const GroundPlaneSpherical& dn,
+                     GroundPlaneSpherical*       gp);
+  int   SmoothGrid(const GroundPlaneSpherical& g,
+                   const GroundPlaneSpherical& lt,
+                   const GroundPlaneSpherical& rt,
+                   const GroundPlaneSpherical& up,
+                   const GroundPlaneSpherical& dn,
+                   GroundPlaneSpherical*       gp);
+  int   CompareZ(const float*              point_cloud,
+                 const std::vector<int>&   point_indices,
+                 const float*              z_values,
+                 PlaneFitPointCandIndices* candi,
+                 unsigned int              nr_points,
+                 unsigned int              nr_point_element,
+                 unsigned int              nr_compares);
+  void  ComputeAdaptiveThreshold();
+  void  ComputeSignedGroundHeight(const float* point_cloud,
+                                  float*       height_above_ground,
+                                  unsigned int nr_points,
+                                  unsigned int nr_point_elements);
+  void  ComputeSignedGroundHeightLine(const float*            point_cloud,
+                                      const GroundPlaneLiDAR* up,
+                                      const GroundPlaneLiDAR* cn,
+                                      const GroundPlaneLiDAR* dn,
+                                      float*                  height_above_ground,
+                                      unsigned int            r,
+                                      unsigned int            nr_points,
+                                      unsigned int            nr_point_elements);
 
  protected:
-  VoxelGridXY<float> *vg_fine_;
-  VoxelGridXY<float> *vg_coarse_;
-  GroundPlaneLiDAR **ground_planes_;
-  GroundPlaneSpherical **ground_planes_sphe_;
-  PlaneFitPointCandIndices **local_candis_;
-  std::pair<float, bool> **ground_z_;
-  float **pf_thresholds_;
-  unsigned int *map_fine_to_coarse_;
-  char *labels_;
-  float *sampled_z_values_;
-  float *pf_threeds_;
-  int *sampled_indices_;
-  std::pair<int, int> *order_table_;
+  VoxelGridXY<float>*        vg_fine_;
+  VoxelGridXY<float>*        vg_coarse_;
+  GroundPlaneLiDAR**         ground_planes_;
+  GroundPlaneSpherical**     ground_planes_sphe_;
+  PlaneFitPointCandIndices** local_candis_;
+  std::pair<float, bool>**   ground_z_;
+  float**                    pf_thresholds_;
+  unsigned int*              map_fine_to_coarse_;
+  char*                      labels_;
+  float*                     sampled_z_values_;
+  float*                     pf_threeds_;
+  int*                       sampled_indices_;
+  std::pair<int, int>*       order_table_;
 };
 
 }  // namespace common

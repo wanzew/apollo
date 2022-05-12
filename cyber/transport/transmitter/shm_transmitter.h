@@ -51,18 +51,18 @@ class ShmTransmitter : public Transmitter<M> {
  private:
   bool Transmit(const M& msg, const MessageInfo& msg_info);
 
-  SegmentPtr segment_;
-  uint64_t channel_id_;
-  uint64_t host_id_;
+  SegmentPtr  segment_;
+  uint64_t    channel_id_;
+  uint64_t    host_id_;
   NotifierPtr notifier_;
 };
 
 template <typename M>
 ShmTransmitter<M>::ShmTransmitter(const RoleAttributes& attr)
-    : Transmitter<M>(attr),
-      segment_(nullptr),
-      channel_id_(attr.channel_id()),
-      notifier_(nullptr) {
+    : Transmitter<M>(attr)
+    , segment_(nullptr)
+    , channel_id_(attr.channel_id())
+    , notifier_(nullptr) {
   host_id_ = common::Hash(attr.host_ip());
 }
 
@@ -73,27 +73,24 @@ ShmTransmitter<M>::~ShmTransmitter() {
 
 template <typename M>
 void ShmTransmitter<M>::Enable() {
-  if (this->enabled_) {
-    return;
-  }
+  if (this->enabled_) { return; }
 
-  segment_ = SegmentFactory::CreateSegment(channel_id_);
-  notifier_ = NotifierFactory::CreateNotifier();
+  segment_       = SegmentFactory::CreateSegment(channel_id_);
+  notifier_      = NotifierFactory::CreateNotifier();
   this->enabled_ = true;
 }
 
 template <typename M>
 void ShmTransmitter<M>::Disable() {
   if (this->enabled_) {
-    segment_ = nullptr;
-    notifier_ = nullptr;
+    segment_       = nullptr;
+    notifier_      = nullptr;
     this->enabled_ = false;
   }
 }
 
 template <typename M>
-bool ShmTransmitter<M>::Transmit(const MessagePtr& msg,
-                                 const MessageInfo& msg_info) {
+bool ShmTransmitter<M>::Transmit(const MessagePtr& msg, const MessageInfo& msg_info) {
   return Transmit(*msg, msg_info);
 }
 
@@ -105,7 +102,7 @@ bool ShmTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
   }
 
   WritableBlock wb;
-  std::size_t msg_size = message::ByteSize(msg);
+  std::size_t   msg_size = message::ByteSize(msg);
   if (!segment_->AcquireBlockToWrite(msg_size, &wb)) {
     AERROR << "acquire block failed.";
     return false;
@@ -130,8 +127,7 @@ bool ShmTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
 
   ReadableInfo readable_info(host_id_, wb.index, channel_id_);
 
-  ADEBUG << "Writing sharedmem message: "
-         << common::GlobalData::GetChannelById(channel_id_)
+  ADEBUG << "Writing sharedmem message: " << common::GlobalData::GetChannelById(channel_id_)
          << " to block: " << wb.index;
   return notifier_->Notify(readable_info);
 }

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_3_303.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,10 +28,10 @@ class Scu3303Test : public ::testing::Test {
 };
 
 TEST_F(Scu3303Test, reset) {
-  Scu3303 scu3303;
-  int32_t length = 8;
+  Scu3303       scu3303;
+  int32_t       length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0x41, 0x42, 0x43, 0x61, 0x62, 0x30, 0x31, 0x32};
+  uint8_t       bytes[8] = {0x41, 0x42, 0x43, 0x61, 0x62, 0x30, 0x31, 0x32};
 
   scu3303.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_3_303().vin08(), 'A');  // 65

@@ -30,7 +30,7 @@ class ThreadWorker {
   ~ThreadWorker() { Release(); }
 
   // bind a bool returned function, should be called before start
-  void Bind(const std::function<bool()> &func);
+  void Bind(const std::function<bool()>& func);
 
   // start the thread loopy running
   void Start();
@@ -50,8 +50,8 @@ class ThreadWorker {
 
  private:
   std::unique_ptr<std::thread> thread_ptr_;
-  std::mutex mutex_;
-  std::condition_variable condition_;
+  std::mutex                   mutex_;
+  std::condition_variable      condition_;
 
   bool work_flag_ = false;
   bool exit_flag_ = true;

@@ -31,7 +31,7 @@ namespace third_party_perception {
 namespace filter {
 
 RadarObstacles FilterRadarObstacles(const RadarObstacles& radar_obstacles);
-bool IsPreserved(const RadarObstacle& radar_obstacle);
+bool           IsPreserved(const RadarObstacle& radar_obstacle);
 
 }  // namespace filter
 }  // namespace third_party_perception

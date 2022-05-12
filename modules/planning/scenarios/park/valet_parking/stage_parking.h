@@ -32,17 +32,15 @@ namespace valet_parking {
 
 class StageParking : public Stage {
  public:
-  StageParking(const ScenarioConfig::StageConfig& config,
+  StageParking(const ScenarioConfig::StageConfig&         config,
                const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+                             Frame*                         frame) override;
 
-  ValetParkingContext* GetContext() {
-    return GetContextAs<ValetParkingContext>();
-  }
+  ValetParkingContext* GetContext() { return GetContextAs<ValetParkingContext>(); }
 
  private:
   Stage::StageStatus FinishStage();

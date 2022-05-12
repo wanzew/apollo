@@ -28,7 +28,7 @@ namespace common {
 class Universe {
   struct Element {
     int rank = 0;
-    int p = 0;
+    int p    = 0;
     int size = 1;
   };
 
@@ -55,7 +55,7 @@ class Universe {
 
  private:
   std::vector<Element> elts_;
-  int sets_num_ = 0;
+  int                  sets_num_ = 0;
 };
 
 }  // namespace common

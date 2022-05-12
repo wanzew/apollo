@@ -34,8 +34,7 @@ ProtobufFactory::~ProtobufFactory() {
   pool_.reset();
 }
 
-bool ProtobufFactory::RegisterMessage(
-    const google::protobuf::Message& message) {
+bool ProtobufFactory::RegisterMessage(const google::protobuf::Message& message) {
   const Descriptor* descriptor = message.GetDescriptor();
   return RegisterMessage(*descriptor);
 }
@@ -49,9 +48,7 @@ bool ProtobufFactory::RegisterMessage(const Descriptor& desc) {
 bool ProtobufFactory::RegisterMessage(const ProtoDesc& proto_desc) {
   for (int i = 0; i < proto_desc.dependencies_size(); ++i) {
     auto dep = proto_desc.dependencies(i);
-    if (!RegisterMessage(dep)) {
-      return false;
-    }
+    if (!RegisterMessage(dep)) { return false; }
   }
 
   FileDescriptorProto file_desc_proto;
@@ -72,11 +69,10 @@ bool ProtobufFactory::RegisterMessage(const std::string& proto_desc_str) {
 }
 
 // Internal method
-bool ProtobufFactory::RegisterMessage(
-    const FileDescriptorProto& file_desc_proto) {
-  ErrorCollector ec;
+bool ProtobufFactory::RegisterMessage(const FileDescriptorProto& file_desc_proto) {
+  ErrorCollector              ec;
   std::lock_guard<std::mutex> lg(register_mutex_);
-  auto file_desc = pool_->BuildFileCollectingErrors(file_desc_proto, &ec);
+  auto                        file_desc = pool_->BuildFileCollectingErrors(file_desc_proto, &ec);
   if (!file_desc) {
     /*
     AERROR << "Failed to register protobuf messages ["
@@ -88,29 +84,23 @@ bool ProtobufFactory::RegisterMessage(
 }
 
 // Internal method
-bool ProtobufFactory::GetProtoDesc(const FileDescriptor* file_desc,
-                                   ProtoDesc* proto_desc) {
+bool ProtobufFactory::GetProtoDesc(const FileDescriptor* file_desc, ProtoDesc* proto_desc) {
   FileDescriptorProto file_desc_proto;
   file_desc->CopyTo(&file_desc_proto);
   std::string str("");
-  if (!file_desc_proto.SerializeToString(&str)) {
-    return false;
-  }
+  if (!file_desc_proto.SerializeToString(&str)) { return false; }
 
   proto_desc->set_desc(str);
 
   for (int i = 0; i < file_desc->dependency_count(); ++i) {
     auto desc = proto_desc->add_dependencies();
-    if (!GetProtoDesc(file_desc->dependency(i), desc)) {
-      return false;
-    }
+    if (!GetProtoDesc(file_desc->dependency(i), desc)) { return false; }
   }
 
   return true;
 }
 
-void ProtobufFactory::GetDescriptorString(const Descriptor* desc,
-                                          std::string* desc_str) {
+void ProtobufFactory::GetDescriptorString(const Descriptor* desc, std::string* desc_str) {
   ProtoDesc proto_desc;
   if (!GetProtoDesc(desc->file(), &proto_desc)) {
     AERROR << "Failed to get descriptor from message";
@@ -122,54 +112,41 @@ void ProtobufFactory::GetDescriptorString(const Descriptor* desc,
   }
 }
 
-void ProtobufFactory::GetDescriptorString(
-    const google::protobuf::Message& message, std::string* desc_str) {
+void ProtobufFactory::GetDescriptorString(const google::protobuf::Message& message,
+                                          std::string*                     desc_str) {
   const Descriptor* desc = message.GetDescriptor();
   return GetDescriptorString(desc, desc_str);
 }
 
-void ProtobufFactory::GetPythonDesc(const std::string& type,
-                                    std::string* desc_str) {
+void ProtobufFactory::GetPythonDesc(const std::string& type, std::string* desc_str) {
   auto desc = pool_->FindMessageTypeByName(type);
-  if (desc == nullptr) {
-    return;
-  }
+  if (desc == nullptr) { return; }
   google::protobuf::DescriptorProto dp;
   desc->CopyTo(&dp);
   dp.SerializeToString(desc_str);
 }
 
-void ProtobufFactory::GetDescriptorString(const std::string& type,
-                                          std::string* desc_str) {
+void ProtobufFactory::GetDescriptorString(const std::string& type, std::string* desc_str) {
   auto desc = DescriptorPool::generated_pool()->FindMessageTypeByName(type);
-  if (desc != nullptr) {
-    return GetDescriptorString(desc, desc_str);
-  }
+  if (desc != nullptr) { return GetDescriptorString(desc, desc_str); }
 
   desc = pool_->FindMessageTypeByName(type);
-  if (desc == nullptr) {
-    return;
-  }
+  if (desc == nullptr) { return; }
   return GetDescriptorString(desc, desc_str);
 }
 
 // Internal method
-google::protobuf::Message* ProtobufFactory::GenerateMessageByType(
-    const std::string& type) const {
+google::protobuf::Message* ProtobufFactory::GenerateMessageByType(const std::string& type) const {
   google::protobuf::Message* message = GetMessageByGeneratedType(type);
-  if (message != nullptr) {
-    return message;
-  }
+  if (message != nullptr) { return message; }
 
-  const google::protobuf::Descriptor* descriptor =
-      pool_->FindMessageTypeByName(type);
+  const google::protobuf::Descriptor* descriptor = pool_->FindMessageTypeByName(type);
   if (descriptor == nullptr) {
     AERROR << "cannot find [" << type << "] descriptor";
     return nullptr;
   }
 
-  const google::protobuf::Message* prototype =
-      factory_->GetPrototype(descriptor);
+  const google::protobuf::Message* prototype = factory_->GetPrototype(descriptor);
   if (prototype == nullptr) {
     AERROR << "cannot find [" << type << "] prototype";
     return nullptr;
@@ -178,17 +155,15 @@ google::protobuf::Message* ProtobufFactory::GenerateMessageByType(
   return prototype->New();
 }
 
-google::protobuf::Message* ProtobufFactory::GetMessageByGeneratedType(
-    const std::string& type) const {
-  auto descriptor =
-      DescriptorPool::generated_pool()->FindMessageTypeByName(type);
+google::protobuf::Message*
+ProtobufFactory::GetMessageByGeneratedType(const std::string& type) const {
+  auto descriptor = DescriptorPool::generated_pool()->FindMessageTypeByName(type);
   if (descriptor == nullptr) {
     // AERROR << "cannot find [" << type << "] descriptor";
     return nullptr;
   }
 
-  auto prototype =
-      MessageFactory::generated_factory()->GetPrototype(descriptor);
+  auto prototype = MessageFactory::generated_factory()->GetPrototype(descriptor);
   if (prototype == nullptr) {
     // AERROR << "cannot find [" << type << "] prototype";
     return nullptr;
@@ -197,32 +172,31 @@ google::protobuf::Message* ProtobufFactory::GetMessageByGeneratedType(
   return prototype->New();
 }
 
-const Descriptor* ProtobufFactory::FindMessageTypeByName(
-    const std::string& name) const {
+const Descriptor* ProtobufFactory::FindMessageTypeByName(const std::string& name) const {
   return pool_->FindMessageTypeByName(name);
 }
 
-const google::protobuf::ServiceDescriptor* ProtobufFactory::FindServiceByName(
-    const std::string& name) const {
+const google::protobuf::ServiceDescriptor*
+ProtobufFactory::FindServiceByName(const std::string& name) const {
   return pool_->FindServiceByName(name);
 }
 
-void ErrorCollector::AddError(const std::string& filename,
-                              const std::string& element_name,
+void ErrorCollector::AddError(const std::string&               filename,
+                              const std::string&               element_name,
                               const google::protobuf::Message* descriptor,
-                              ErrorLocation location,
-                              const std::string& message) {
+                              ErrorLocation                    location,
+                              const std::string&               message) {
   UNUSED(element_name);
   UNUSED(descriptor);
   UNUSED(location);
   AWARN << "[" << filename << "] " << message;
 }
 
-void ErrorCollector::AddWarning(const std::string& filename,
-                                const std::string& element_name,
+void ErrorCollector::AddWarning(const std::string&               filename,
+                                const std::string&               element_name,
                                 const google::protobuf::Message* descriptor,
-                                ErrorLocation location,
-                                const std::string& message) {
+                                ErrorLocation                    location,
+                                const std::string&               message) {
   UNUSED(element_name);
   UNUSED(descriptor);
   UNUSED(location);

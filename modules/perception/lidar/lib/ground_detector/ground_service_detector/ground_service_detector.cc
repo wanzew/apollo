@@ -16,10 +16,11 @@
 
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/ground_service_detector.h"
 
+#include "modules/perception/lidar/lib/ground_detector/ground_service_detector/proto/ground_service_detector_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
-#include "modules/perception/lidar/lib/ground_detector/ground_service_detector/proto/ground_service_detector_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -34,8 +35,8 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   ACHECK(config_manager->GetModelConfig(Name(), &model_config));
 
   const std::string work_root = config_manager->work_root();
-  std::string config_file;
-  std::string root_path;
+  std::string       config_file;
+  std::string       root_path;
   ACHECK(model_config->get_value("root_path", &root_path));
 
   config_file = GetAbsolutePath(work_root, root_path);
@@ -45,8 +46,8 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   ground_threshold_ = config.ground_threshold();
 
-  ground_service_ = std::dynamic_pointer_cast<GroundService>(
-      SceneManager::Instance().Service("GroundService"));
+  ground_service_ =
+      std::dynamic_pointer_cast<GroundService>(SceneManager::Instance().Service("GroundService"));
   if (ground_service_ == nullptr) {
     AERROR << "Ground service is nullptr, Init scene manager first !";
     return false;
@@ -54,8 +55,7 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   return true;
 }
 
-bool GroundServiceDetector::Detect(const GroundDetectorOptions& options,
-                                   LidarFrame* frame) {
+bool GroundServiceDetector::Detect(const GroundDetectorOptions& options, LidarFrame* frame) {
   if (frame == nullptr || frame->world_cloud == nullptr) {
     AERROR << "Frame is nullptr.";
     return false;
@@ -65,22 +65,20 @@ bool GroundServiceDetector::Detect(const GroundDetectorOptions& options,
     AERROR << "service is not ready.";
     return false;
   }
-  auto& cloud = frame->world_cloud;
+  auto& cloud              = frame->world_cloud;
   auto& non_ground_indices = frame->non_ground_indices;
   non_ground_indices.indices.clear();
   non_ground_indices.indices.reserve(cloud->size());
   for (size_t i = 0; i < cloud->size(); ++i) {
-    auto& pt = cloud->at(i);
+    auto&           pt = cloud->at(i);
     Eigen::Vector3d world_point(pt.x, pt.y, pt.z);
-    float dist = ground_service_->QueryPointToGroundDistance(
-        world_point, ground_service_content_);
-    frame->cloud->mutable_points_height()->at(i) = dist;
+    float dist = ground_service_->QueryPointToGroundDistance(world_point, ground_service_content_);
+    frame->cloud->mutable_points_height()->at(i)       = dist;
     frame->world_cloud->mutable_points_height()->at(i) = dist;
     if (dist > ground_threshold_) {
       non_ground_indices.indices.push_back(static_cast<int>(i));
     } else {
-      frame->cloud->mutable_points_label()->at(i) =
-          static_cast<uint8_t>(LidarPointLabel::GROUND);
+      frame->cloud->mutable_points_label()->at(i) = static_cast<uint8_t>(LidarPointLabel::GROUND);
     }
   }
   return true;

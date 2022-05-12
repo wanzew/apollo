@@ -17,8 +17,10 @@
 
 #include <algorithm>
 #include <limits>
-#include "cyber/common/log.h"
+
 #include "opencv2/opencv.hpp"
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -26,17 +28,15 @@ namespace base {
 
 bool DownSamplePointCloudBeams(base::PointFCloudPtr cloud_ptr,
                                base::PointFCloudPtr out_cloud_ptr,
-                               int downsample_factor) {
-  if (downsample_factor <= 0) {
-    return false;
-  }
+                               int                  downsample_factor) {
+  if (downsample_factor <= 0) { return false; }
   for (size_t i = 0; i < cloud_ptr->size(); ++i) {
     int32_t beam_id = cloud_ptr->points_beam_id(i);
     if (beam_id % downsample_factor == 0) {
-      base::PointF point = cloud_ptr->at(i);
-      double timestamp = cloud_ptr->points_timestamp(i);
-      float height = cloud_ptr->points_height(i);
-      uint8_t label = cloud_ptr->points_label(i);
+      base::PointF point     = cloud_ptr->at(i);
+      double       timestamp = cloud_ptr->points_timestamp(i);
+      float        height    = cloud_ptr->points_height(i);
+      uint8_t      label     = cloud_ptr->points_label(i);
       out_cloud_ptr->push_back(point, timestamp, height, beam_id, label);
     }
   }
@@ -78,24 +78,22 @@ double OrientCloud(const PointFCloud& pc, PointFCloud* pc_out, bool demean) {
   // Use Minimum Area Bounding Box
   BoundingCube bbox;
   GetPointCloudMinareaBbox(pc, &bbox);
-  float theta = static_cast<float>(bbox.yaw);
+  float           theta     = static_cast<float>(bbox.yaw);
   Eigen::Affine3f transform = Eigen::Affine3f::Identity();
   transform.rotate(Eigen::AngleAxisf(-theta, Eigen::Vector3f(0, 0, 1)));
   pc.TransformPointCloud(transform, pc_out, true);
-  if (demean) {
-    CloudDemean(pc_out);
-  }
+  if (demean) { CloudDemean(pc_out); }
   return theta;
 }
 
-bool GetPointCloudMinareaBbox(const PointFCloud& pc, BoundingCube* box,
-                              const int& min_num_points, const bool& verbose) {
-  if (pc.size() <= static_cast<size_t>(min_num_points)) {
-    return false;
-  }
+bool GetPointCloudMinareaBbox(const PointFCloud& pc,
+                              BoundingCube*      box,
+                              const int&         min_num_points,
+                              const bool&        verbose) {
+  if (pc.size() <= static_cast<size_t>(min_num_points)) { return false; }
   std::vector<cv::Point2f> pts;
-  float min_z = std::numeric_limits<float>::max();
-  float max_z = -std::numeric_limits<float>::max();
+  float                    min_z = std::numeric_limits<float>::max();
+  float                    max_z = -std::numeric_limits<float>::max();
   for (size_t i = 0; i < pc.size(); ++i) {
     pts.push_back(cv::Point2f(pc[i].x, pc[i].y));
     min_z = std::min(min_z, pc[i].z);
@@ -106,8 +104,8 @@ bool GetPointCloudMinareaBbox(const PointFCloud& pc, BoundingCube* box,
   // adjust angle
   if (mar.size.width < mar.size.height) {
     mar.angle -= 90;
-    float tmp = mar.size.width;
-    mar.size.width = mar.size.height;
+    float tmp       = mar.size.width;
+    mar.size.width  = mar.size.height;
     mar.size.height = tmp;
   }
   if (verbose) {
@@ -116,13 +114,13 @@ bool GetPointCloudMinareaBbox(const PointFCloud& pc, BoundingCube* box,
     AINFO << "yaw = " << mar.angle << std::endl;
     AINFO << "height = " << max_z - min_z << std::endl;
   }
-  box->x = mar.center.x;
-  box->y = mar.center.y;
-  box->z = static_cast<float>((min_z + max_z) / 2.0);
+  box->x      = mar.center.x;
+  box->y      = mar.center.y;
+  box->z      = static_cast<float>((min_z + max_z) / 2.0);
   box->length = mar.size.width;
-  box->width = mar.size.height;
+  box->width  = mar.size.height;
   box->height = max_z - min_z;
-  box->yaw = static_cast<float>((M_PI * (mar.angle + 180)) / 180);
+  box->yaw    = static_cast<float>((M_PI * (mar.angle + 180)) / 180);
   return true;
 }
 

@@ -41,12 +41,11 @@ int main(int argc, char** argv) {
     return -1;
   }
   std::cout << "is_optimized:" << model.is_optimized() << std::endl;
-  std::cout << "after loading parameter size:" << model.parameters().size()
-            << std::endl;
+  std::cout << "after loading parameter size:" << model.parameters().size() << std::endl;
 
   std::vector<torch::jit::IValue> torch_inputs;
 
-  int input_dim = 2 * 3 * 224 * 224 + 2 * 14;
+  int                 input_dim = 2 * 3 * 224 * 224 + 2 * 14;
   std::vector<double> feature_values(input_dim, 0.5);
 
   std::vector<torch::jit::IValue> inputs;
@@ -63,18 +62,13 @@ int main(int argc, char** argv) {
   auto torch_output_tensor = torch_output.toTensor();
   std::cout << "tensor dim:" << torch_output_tensor.dim() << std::endl;
   std::cout << "tensor sizes:" << torch_output_tensor.sizes() << std::endl;
-  std::cout << "tensor toString:" << torch_output_tensor.toString()
-            << std::endl;
-  std::cout << "tensor [0,0,0] element:" << torch_output_tensor[0][0][0]
-            << std::endl;
-  std::cout << "tensor [0,0,1] element:" << torch_output_tensor[0][0][1]
-            << std::endl;
+  std::cout << "tensor toString:" << torch_output_tensor.toString() << std::endl;
+  std::cout << "tensor [0,0,0] element:" << torch_output_tensor[0][0][0] << std::endl;
+  std::cout << "tensor [0,0,1] element:" << torch_output_tensor[0][0][1] << std::endl;
   std::cout << "tensor [0,0,0] element:"
-            << double(torch_output_tensor.accessor<float, 3>()[0][0][0])
-            << std::endl;
+            << double(torch_output_tensor.accessor<float, 3>()[0][0][0]) << std::endl;
   std::cout << "tensor [0,0,1] element:"
-            << double(torch_output_tensor.accessor<float, 3>()[0][0][1])
-            << std::endl;
+            << double(torch_output_tensor.accessor<float, 3>()[0][0][1]) << std::endl;
 
   return 0;
 }

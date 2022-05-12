@@ -27,31 +27,22 @@ namespace v2x {
 namespace ft {
 
 TEST(Fusion, get_km_result) {
-  Fusion fusion;
-  std::vector<base::Object> fused_objects;
+  Fusion                                 fusion;
+  std::vector<base::Object>              fused_objects;
   std::vector<std::vector<base::Object>> fusion_result;
-  std::vector<base::Object> objects1;
-  std::vector<base::Object> objects2;
-  std::vector<base::Object> objects3;
-  std::vector<base::Object> objects4;
-  EXPECT_FALSE(
-      fusion.CombineNewResource(objects1, &fused_objects, &fusion_result));
-  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object1", &objects1,
-           "camera1");
-  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object2", &objects2,
-           "camera2");
-  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object3", &objects3,
-           "camera3");
-  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object4", &objects4,
-           "camera4");
-  EXPECT_TRUE(
-      fusion.CombineNewResource(objects1, &fused_objects, &fusion_result));
-  EXPECT_TRUE(
-      fusion.CombineNewResource(objects2, &fused_objects, &fusion_result));
-  EXPECT_TRUE(
-      fusion.CombineNewResource(objects3, &fused_objects, &fusion_result));
-  EXPECT_TRUE(
-      fusion.CombineNewResource(objects4, &fused_objects, &fusion_result));
+  std::vector<base::Object>              objects1;
+  std::vector<base::Object>              objects2;
+  std::vector<base::Object>              objects3;
+  std::vector<base::Object>              objects4;
+  EXPECT_FALSE(fusion.CombineNewResource(objects1, &fused_objects, &fusion_result));
+  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object1", &objects1, "camera1");
+  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object2", &objects2, "camera2");
+  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object3", &objects3, "camera3");
+  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object4", &objects4, "camera4");
+  EXPECT_TRUE(fusion.CombineNewResource(objects1, &fused_objects, &fusion_result));
+  EXPECT_TRUE(fusion.CombineNewResource(objects2, &fused_objects, &fusion_result));
+  EXPECT_TRUE(fusion.CombineNewResource(objects3, &fused_objects, &fusion_result));
+  EXPECT_TRUE(fusion.CombineNewResource(objects4, &fused_objects, &fusion_result));
   EXPECT_GE(fused_objects.size(), 9);
   EXPECT_LE(fused_objects.size(), 12);
 }

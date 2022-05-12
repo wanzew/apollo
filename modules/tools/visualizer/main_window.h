@@ -16,16 +16,18 @@
 
 #pragma once
 
-#include <QtCore/QMutex>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenu>
 #include <map>
 #include <memory>
 #include <string>
 
+#include <QtCore/QMutex>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
+
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/proto/radar.pb.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
+
 #include "modules/tools/visualizer/channel_reader.h"
 #include "modules/tools/visualizer/msg_dialog.h"
 
@@ -95,40 +97,36 @@ class MainWindow : public QMainWindow {
   struct VideoImgProxy;
   struct RadarData;
 
-  void PointCloudReaderCallback(
-      const std::shared_ptr<const apollo::drivers::PointCloud>& pdata);
-  void ImageReaderCallback(
-      const std::shared_ptr<const apollo::drivers::Image>& imgData,
-      VideoImgProxy* proxy);
-  void ImageReaderCallback(
-      const std::shared_ptr<const apollo::drivers::CompressedImage>& imgData,
-      VideoImgProxy* proxy);
+  void PointCloudReaderCallback(const std::shared_ptr<const apollo::drivers::PointCloud>& pdata);
+  void ImageReaderCallback(const std::shared_ptr<const apollo::drivers::Image>& imgData,
+                           VideoImgProxy*                                       proxy);
+  void ImageReaderCallback(const std::shared_ptr<const apollo::drivers::CompressedImage>& imgData,
+                           VideoImgProxy*                                                 proxy);
 
-  void InsertAllChannelNames(void);
+  void           InsertAllChannelNames(void);
   VideoImgProxy* AddVideoImgViewer(void);
-  void DoDeleteVideoImg(VideoImgProxy*);
-  void DoPlayVideoImage(bool, VideoImgProxy*);
-  void calculateWH(void);
+  void           DoDeleteVideoImg(VideoImgProxy*);
+  void           DoPlayVideoImage(bool, VideoImgProxy*);
+  void           calculateWH(void);
 
   RadarData* createRadarData(void);
-  void DoOpenRadarChannel(bool b, RadarData* radarProxy);
-  void RadarRenderCallback(
-      const std::shared_ptr<const apollo::drivers::RadarObstacles>& rawData,
-      RadarData* radar);
+  void       DoOpenRadarChannel(bool b, RadarData* radarProxy);
+  void RadarRenderCallback(const std::shared_ptr<const apollo::drivers::RadarObstacles>& rawData,
+                           RadarData*                                                    radar);
 
-  Ui::MainWindow* ui_;
-  MessageDialog* msg_dialog_;
+  Ui::MainWindow*    ui_;
+  MessageDialog*     msg_dialog_;
   VideoImagesDialog* open_images_dialog_;
 
   QTreeWidgetItem* all_channel_root_;
 
-  Grid* grid_;
-  QCheckBox* enable_grid_checkBox_;
+  Grid*            grid_;
+  QCheckBox*       enable_grid_checkBox_;
   QTreeWidgetItem* grid_root_item_;
 
-  QTreeWidgetItem* pointcloud_top_item_;
-  QComboBox* pointcloud_comboBox_;
-  QPushButton* pointcloud_button_;
+  QTreeWidgetItem*                               pointcloud_top_item_;
+  QComboBox*                                     pointcloud_comboBox_;
+  QPushButton*                                   pointcloud_button_;
   CyberChannReader<apollo::drivers::PointCloud>* pointcloud_channel_Reader_;
 
   QMutex pointcloud_reader_mutex_;

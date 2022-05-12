@@ -16,8 +16,9 @@
 
 #include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
 
-#include "Eigen/Core"
 #include "gtest/gtest.h"
+
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {
@@ -43,38 +44,38 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize_badcase1) {
   SecureMat<float>* global_costs = optimizer_->mutable_global_costs();
   global_costs->Reserve(1000, 1000);
 
-  float bound_value = 10.0f;
-  float cost_thresh = 2.5f;
+  float                                      bound_value = 10.0f;
+  float                                      cost_thresh = 2.5f;
   GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
   std::vector<std::pair<size_t, size_t>> assignments;
-  std::vector<size_t> unassigned_rows;
-  std::vector<size_t> unassigned_cols;
+  std::vector<size_t>                    unassigned_rows;
+  std::vector<size_t>                    unassigned_cols;
   global_costs->Resize(16, 16);
   for (size_t i = 0; i < 16; ++i) {
     for (size_t j = 0; j < 16; ++j) {
       (*global_costs)(i, j) = 10;
     }
   }
-  (*global_costs)(1, 0) = 0.265f;
-  (*global_costs)(2, 1) = 1.824f;
-  (*global_costs)(3, 2) = 1.785f;
-  (*global_costs)(3, 11) = 0.309f;
-  (*global_costs)(4, 3) = 1.784f;
-  (*global_costs)(5, 4) = 1.809f;
-  (*global_costs)(6, 5) = 1.775f;
-  (*global_costs)(7, 6) = 1.798f;
-  (*global_costs)(8, 7) = 1.814f;
-  (*global_costs)(9, 8) = 1.721f;
-  (*global_costs)(10, 9) = 1.904f;
+  (*global_costs)(1, 0)   = 0.265f;
+  (*global_costs)(2, 1)   = 1.824f;
+  (*global_costs)(3, 2)   = 1.785f;
+  (*global_costs)(3, 11)  = 0.309f;
+  (*global_costs)(4, 3)   = 1.784f;
+  (*global_costs)(5, 4)   = 1.809f;
+  (*global_costs)(6, 5)   = 1.775f;
+  (*global_costs)(7, 6)   = 1.798f;
+  (*global_costs)(8, 7)   = 1.814f;
+  (*global_costs)(9, 8)   = 1.721f;
+  (*global_costs)(10, 9)  = 1.904f;
   (*global_costs)(11, 10) = 1.816f;
   (*global_costs)(12, 11) = 1.785f;
   (*global_costs)(13, 12) = 1.954f;
   (*global_costs)(14, 13) = 0.247f;
   (*global_costs)(15, 15) = 1.814f;
 
-  optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments,
-                    &unassigned_rows, &unassigned_cols);
+  optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments, &unassigned_rows,
+                    &unassigned_cols);
   EXPECT_EQ(15, assignments.size());
   EXPECT_EQ(1, assignments[0].first);
   EXPECT_EQ(0, assignments[0].second);
@@ -112,13 +113,13 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize_badcase_2) {
   SecureMat<float>* global_costs = optimizer_->mutable_global_costs();
   global_costs->Reserve(1000, 1000);
 
-  float bound_value = 10.0f;
-  float cost_thresh = 2.5f;
+  float                                      bound_value = 10.0f;
+  float                                      cost_thresh = 2.5f;
   GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
   std::vector<std::pair<size_t, size_t>> assignments;
-  std::vector<size_t> unassigned_rows;
-  std::vector<size_t> unassigned_cols;
+  std::vector<size_t>                    unassigned_rows;
+  std::vector<size_t>                    unassigned_cols;
   global_costs->Resize(9, 9);
   for (size_t i = 0; i < 9; ++i) {
     for (size_t j = 0; j < 9; ++j) {
@@ -136,8 +137,8 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize_badcase_2) {
   (*global_costs)(7, 7) = 1.844f;
   (*global_costs)(8, 8) = 1.844f;
 
-  optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments,
-                    &unassigned_rows, &unassigned_cols);
+  optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments, &unassigned_rows,
+                    &unassigned_cols);
   EXPECT_EQ(9, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(0, assignments[0].second);
@@ -163,13 +164,13 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   SecureMat<float>* global_costs = optimizer_->mutable_global_costs();
   global_costs->Reserve(1000, 1000);
 
-  float cost_thresh = 1.0f;
-  float bound_value = 2.0f;
+  float                                      cost_thresh = 1.0f;
+  float                                      bound_value = 2.0f;
   GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
   std::vector<std::pair<size_t, size_t>> assignments;
-  std::vector<size_t> unassigned_rows;
-  std::vector<size_t> unassigned_cols;
+  std::vector<size_t>                    unassigned_rows;
+  std::vector<size_t>                    unassigned_cols;
 
   /* case 1: most basic one
    * costs:
@@ -184,8 +185,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   (*global_costs)(0, 1) = 2.0f;
   (*global_costs)(1, 1) = 0.1f;
 
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(2, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(0, assignments[0].second);
@@ -207,8 +207,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   (*global_costs)(1, 0) = 0.0f;
   (*global_costs)(1, 1) = 0.0f;
 
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(2, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(0, assignments[0].second);
@@ -230,8 +229,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   (*global_costs)(1, 0) = 3.0f;
   (*global_costs)(1, 1) = 3.0f;
 
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(0, assignments.size());
   EXPECT_EQ(2, unassigned_rows.size());
   EXPECT_EQ(0, unassigned_rows[0]);
@@ -263,8 +261,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   (*global_costs)(2, 2) = 4.7f;
   (*global_costs)(2, 3) = 4.9f;
 
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(0, assignments.size());
   EXPECT_EQ(3, unassigned_rows.size());
   EXPECT_EQ(0, unassigned_rows[0]);
@@ -277,8 +274,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   EXPECT_EQ(3, unassigned_cols[3]);
 
   cost_thresh = 2.0;
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(2, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(2, assignments[0].second);
@@ -291,8 +287,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   EXPECT_EQ(3, unassigned_cols[1]);
 
   cost_thresh = 4.0;
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(3, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(2, assignments[0].second);
@@ -361,8 +356,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   (*global_costs)(6, 4) = 4.9f;
   (*global_costs)(6, 5) = 4.9f;
 
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(5, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(2, assignments[0].second);
@@ -382,8 +376,8 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
 
   cost_thresh = 4.0;
   bound_value = 10;
-  optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments,
-                    &unassigned_rows, &unassigned_cols);
+  optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments, &unassigned_rows,
+                    &unassigned_cols);
   EXPECT_EQ(5, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(2, assignments[0].second);
@@ -403,8 +397,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
 
   /* case 6: empty one */
   global_costs->Resize(0, 0);
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(0, assignments.size());
   EXPECT_EQ(0, unassigned_rows.size());
   EXPECT_EQ(0, unassigned_rows.size());
@@ -414,13 +407,13 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Maximize) {
   SecureMat<float>* global_costs = optimizer_->mutable_global_costs();
   global_costs->Reserve(1000, 1000);
 
-  float cost_thresh = 1.0f;
-  float bound_value = 2.0f;
+  float                                      cost_thresh = 1.0f;
+  float                                      bound_value = 2.0f;
   GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       GatedHungarianMatcher<float>::OptimizeFlag::OPTMAX;
   std::vector<std::pair<size_t, size_t>> assignments;
-  std::vector<size_t> unassigned_rows;
-  std::vector<size_t> unassigned_cols;
+  std::vector<size_t>                    unassigned_rows;
+  std::vector<size_t>                    unassigned_cols;
 
   /* case 1: most basic one
    * costs:
@@ -435,8 +428,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Maximize) {
   (*global_costs)(0, 1) = 2.0f;
   (*global_costs)(1, 1) = 0.1f;
 
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(2, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(1, assignments[0].second);
@@ -502,8 +494,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Maximize) {
   (*global_costs)(6, 4) = 4.9f;
   (*global_costs)(6, 5) = 1.9f;
 
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(5, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(0, assignments[0].second);
@@ -523,8 +514,8 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Maximize) {
 
   cost_thresh = 4.0;
   bound_value = 0;
-  optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments,
-                    &unassigned_rows, &unassigned_cols);
+  optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments, &unassigned_rows,
+                    &unassigned_cols);
   EXPECT_EQ(5, assignments.size());
   EXPECT_EQ(0, assignments[0].first);
   EXPECT_EQ(0, assignments[0].second);
@@ -544,8 +535,7 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Maximize) {
 
   /* case 3: empty one */
   global_costs->Resize(0, 0);
-  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
-                    &unassigned_cols);
+  optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows, &unassigned_cols);
   EXPECT_EQ(0, assignments.size());
   EXPECT_EQ(0, unassigned_rows.size());
   EXPECT_EQ(0, unassigned_rows.size());

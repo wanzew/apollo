@@ -27,11 +27,11 @@ namespace inference {
 
 class ReLUPlugin : public nvinfer1::IPlugin {
  public:
-  ReLUPlugin(const ReLUParameter &param, const nvinfer1::Dims &in_dims) {
+  ReLUPlugin(const ReLUParameter& param, const nvinfer1::Dims& in_dims) {
     input_dims_.nbDims = in_dims.nbDims;
     CHECK_GT(input_dims_.nbDims, 0);
     for (int i = 0; i < in_dims.nbDims; i++) {
-      input_dims_.d[i] = in_dims.d[i];
+      input_dims_.d[i]    = in_dims.d[i];
       input_dims_.type[i] = in_dims.type[i];
     }
     negative_slope_ = param.negative_slope();
@@ -39,37 +39,42 @@ class ReLUPlugin : public nvinfer1::IPlugin {
 
   ReLUPlugin() {}
   ~ReLUPlugin() {}
-  virtual int initialize() { return 0; }
+  virtual int  initialize() { return 0; }
   virtual void terminate() {}
-  int getNbOutputs() const override { return 1; }
+  int          getNbOutputs() const override { return 1; }
 
-  nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
-                                     int nbInputDims) override {
+  nvinfer1::Dims
+  getOutputDimensions(int index, const nvinfer1::Dims* inputs, int nbInputDims) override {
     nvinfer1::Dims out_dims = inputs[0];
     return out_dims;
   }
 
-  void configure(const nvinfer1::Dims *inputDims, int nbInputs,
-                 const nvinfer1::Dims *outputDims, int nbOutputs,
-                 int maxBatchSize) override {
+  void configure(const nvinfer1::Dims* inputDims,
+                 int                   nbInputs,
+                 const nvinfer1::Dims* outputDims,
+                 int                   nbOutputs,
+                 int                   maxBatchSize) override {
     input_dims_ = inputDims[0];
   }
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
 
-  virtual int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream);
+  virtual int enqueue(int                batchSize,
+                      const void* const* inputs,
+                      void**             outputs,
+                      void*              workspace,
+                      cudaStream_t       stream);
 
   size_t getSerializationSize() override { return 0; }
 
-  void serialize(void *buffer) override {
-    char *d = reinterpret_cast<char *>(buffer), *a = d;
+  void serialize(void* buffer) override {
+    char * d = reinterpret_cast<char*>(buffer), *a = d;
     size_t size = getSerializationSize();
     CHECK_EQ(d, a + size);
   }
 
  private:
-  float negative_slope_;
+  float          negative_slope_;
   nvinfer1::Dims input_dims_;
 };
 

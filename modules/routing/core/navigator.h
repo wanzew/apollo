@@ -33,32 +33,32 @@ class Navigator {
 
   bool IsReady() const;
 
-  bool SearchRoute(const RoutingRequest& request,
-                   RoutingResponse* const response);
+  bool SearchRoute(const RoutingRequest& request, RoutingResponse* const response);
 
  private:
-  bool Init(const RoutingRequest& request, const TopoGraph* graph,
+  bool Init(const RoutingRequest&               request,
+            const TopoGraph*                    graph,
             std::vector<const TopoNode*>* const way_nodes,
-            std::vector<double>* const way_s);
+            std::vector<double>* const          way_s);
 
   void Clear();
 
-  bool SearchRouteByStrategy(
-      const TopoGraph* graph, const std::vector<const TopoNode*>& way_nodes,
-      const std::vector<double>& way_s,
-      std::vector<NodeWithRange>* const result_nodes) const;
+  bool SearchRouteByStrategy(const TopoGraph*                    graph,
+                             const std::vector<const TopoNode*>& way_nodes,
+                             const std::vector<double>&          way_s,
+                             std::vector<NodeWithRange>* const   result_nodes) const;
 
   bool MergeRoute(const std::vector<NodeWithRange>& node_vec,
                   std::vector<NodeWithRange>* const result_node_vec) const;
 
  private:
-  bool is_ready_ = false;
+  bool                       is_ready_ = false;
   std::unique_ptr<TopoGraph> graph_;
 
   TopoRangeManager topo_range_manager_;
 
   std::unique_ptr<BlackListRangeGenerator> black_list_generator_;
-  std::unique_ptr<ResultGenerator> result_generator_;
+  std::unique_ptr<ResultGenerator>         result_generator_;
 };
 
 }  // namespace routing

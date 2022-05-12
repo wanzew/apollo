@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 
@@ -38,22 +39,18 @@ struct StopSignUnprotectedContext;
 
 class StopSignUnprotectedStagePreStop : public Stage {
  public:
-  StopSignUnprotectedStagePreStop(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  StopSignUnprotectedStagePreStop(const ScenarioConfig::StageConfig&         config,
+                                  const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+                             Frame*                         frame) override;
 
-  StopSignUnprotectedContext* GetContext() {
-    return GetContextAs<StopSignUnprotectedContext>();
-  }
+  StopSignUnprotectedContext* GetContext() { return GetContextAs<StopSignUnprotectedContext>(); }
 
-  int AddWatchVehicle(const Obstacle& obstacle,
-                      std::unordered_map<std::string, std::vector<std::string>>*
-                          watch_vehicles);
+  int AddWatchVehicle(const Obstacle&                                            obstacle,
+                      std::unordered_map<std::string, std::vector<std::string>>* watch_vehicles);
 
   bool CheckADCStop(const double adc_front_edge_s, const double stop_line_s);
 

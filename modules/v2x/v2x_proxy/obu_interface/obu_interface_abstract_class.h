@@ -46,16 +46,13 @@ class ObuInterFaceBase {
 
   virtual bool InitialClient() = 0;
 
-  virtual void GetV2xTrafficLightFromObu(
-      std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> *msg) {}
+  virtual void
+  GetV2xTrafficLightFromObu(std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight>* msg) {}
 
-  virtual void SendCarStatusToObu(
-      const std::shared_ptr<::apollo::v2x::CarStatus> &msg) {}
+  virtual void SendCarStatusToObu(const std::shared_ptr<::apollo::v2x::CarStatus>& msg) {}
 
-  virtual void GetV2xRsiFromObu(
-      std::shared_ptr<::apollo::v2x::obu::ObuRsi> *msg) {}
-  virtual void GetV2xObstaclesFromObu(
-      std::shared_ptr<::apollo::v2x::V2XObstacles> *msg) {}
+  virtual void GetV2xRsiFromObu(std::shared_ptr<::apollo::v2x::obu::ObuRsi>* msg) {}
+  virtual void GetV2xObstaclesFromObu(std::shared_ptr<::apollo::v2x::V2XObstacles>* msg) {}
 };
 
 }  // namespace v2x

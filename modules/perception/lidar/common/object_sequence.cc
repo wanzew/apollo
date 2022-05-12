@@ -25,15 +25,15 @@ namespace lidar {
 
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 
-bool ObjectSequence::AddTrackedFrameObjects(
-    const std::vector<ObjectPtr>& objects, TimeStampKey timestamp) {
+bool ObjectSequence::AddTrackedFrameObjects(const std::vector<ObjectPtr>& objects,
+                                            TimeStampKey                  timestamp) {
   std::lock_guard<std::mutex> lock(mutex_);
   for (const auto& obj : objects) {
     TrackIdKey& track_id = obj->track_id;
-    auto iter = sequence_.find(track_id);
+    auto        iter     = sequence_.find(track_id);
     if (iter == sequence_.end()) {
       auto res = sequence_.insert(std::make_pair(track_id, TrackedObjects()));
-      iter = res.first;
+      iter     = res.first;
     }
     auto res = iter->second.insert(std::make_pair(timestamp, obj));
     if (!res.second) {
@@ -46,23 +46,17 @@ bool ObjectSequence::AddTrackedFrameObjects(
   return true;
 }
 
-bool ObjectSequence::GetTrackInTemporalWindow(TrackIdKey track_id,
+bool ObjectSequence::GetTrackInTemporalWindow(TrackIdKey      track_id,
                                               TrackedObjects* track,
-                                              TimeStampKey window_time) {
-  if (track == nullptr) {
-    return false;
-  }
+                                              TimeStampKey    window_time) {
+  if (track == nullptr) { return false; }
   track->clear();
   std::lock_guard<std::mutex> lock(mutex_);
-  double start_time = current_ - window_time;
-  auto iter = sequence_.find(track_id);
-  if (iter == sequence_.end()) {
-    return false;
-  }
+  double                      start_time = current_ - window_time;
+  auto                        iter       = sequence_.find(track_id);
+  if (iter == sequence_.end()) { return false; }
   for (auto& tobj : iter->second) {
-    if (tobj.first >= start_time) {
-      track->insert(tobj);
-    }
+    if (tobj.first >= start_time) { track->insert(tobj); }
   }
   return true;
 }

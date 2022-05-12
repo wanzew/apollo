@@ -27,7 +27,8 @@ namespace lidar {
 
 class ROIServiceFilter : public BaseROIFilter {
  public:
-  ROIServiceFilter() : BaseROIFilter() {}
+  ROIServiceFilter()
+      : BaseROIFilter() {}
   ~ROIServiceFilter() = default;
 
   bool Init(const ROIFilterInitOptions& options) override;
@@ -37,7 +38,7 @@ class ROIServiceFilter : public BaseROIFilter {
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
 
  private:
-  ROIServicePtr roi_service_ = nullptr;
+  ROIServicePtr     roi_service_ = nullptr;
   ROIServiceContent roi_service_content_;
 };
 

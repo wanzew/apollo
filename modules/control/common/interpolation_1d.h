@@ -44,10 +44,10 @@ class Interpolation1D {
 
   Eigen::RowVectorXd ScaledValues(Eigen::VectorXd const& x_vec) const;
 
-  double x_min_ = 0.0;
-  double x_max_ = 0.0;
+  double x_min_   = 0.0;
+  double x_max_   = 0.0;
   double y_start_ = 0.0;
-  double y_end_ = 0.0;
+  double y_end_   = 0.0;
 
   // Spline of one-dimensional "points."
   std::unique_ptr<Eigen::Spline<double, 1>> spline_;

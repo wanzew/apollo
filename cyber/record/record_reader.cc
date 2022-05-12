@@ -37,21 +37,18 @@ RecordReader::RecordReader(const std::string& file) {
   }
   chunk_.reset(new ChunkBody());
   is_valid_ = true;
-  header_ = file_reader_->GetHeader();
+  header_   = file_reader_->GetHeader();
   if (file_reader_->ReadIndex()) {
     index_ = file_reader_->GetIndex();
     for (int i = 0; i < index_.indexes_size(); ++i) {
       auto single_idx = index_.mutable_indexes(i);
-      if (single_idx->type() != SectionType::SECTION_CHANNEL) {
-        continue;
-      }
+      if (single_idx->type() != SectionType::SECTION_CHANNEL) { continue; }
       if (!single_idx->has_channel_cache()) {
         AERROR << "Single channel index does not have channel_cache.";
         continue;
       }
       auto channel_cache = single_idx->mutable_channel_cache();
-      channel_info_.insert(
-          std::make_pair(channel_cache->name(), *channel_cache));
+      channel_info_.insert(std::make_pair(channel_cache->name(), *channel_cache));
     }
   }
   file_reader_->Reset();
@@ -59,7 +56,7 @@ RecordReader::RecordReader(const std::string& file) {
 
 void RecordReader::Reset() {
   file_reader_->Reset();
-  reach_end_ = false;
+  reach_end_     = false;
   message_index_ = 0;
   chunk_.reset(new ChunkBody());
 }
@@ -72,30 +69,21 @@ std::set<std::string> RecordReader::GetChannelList() const {
   return channel_list;
 }
 
-bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
-                               uint64_t end_time) {
-  if (!is_valid_) {
-    return false;
-  }
+bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time, uint64_t end_time) {
+  if (!is_valid_) { return false; }
 
-  if (begin_time > header_.end_time() || end_time < header_.begin_time()) {
-    return false;
-  }
+  if (begin_time > header_.end_time() || end_time < header_.begin_time()) { return false; }
 
   while (message_index_ < chunk_->messages_size()) {
     const auto& next_message = chunk_->messages(message_index_);
-    uint64_t time = next_message.time();
-    if (time > end_time) {
-      return false;
-    }
+    uint64_t    time         = next_message.time();
+    if (time > end_time) { return false; }
     ++message_index_;
-    if (time < begin_time) {
-      continue;
-    }
+    if (time < begin_time) { continue; }
 
     message->channel_name = next_message.channel_name();
-    message->content = next_message.content();
-    message->time = time;
+    message->content      = next_message.content();
+    message->time         = time;
     return true;
   }
 
@@ -139,12 +127,8 @@ bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
           AERROR << "Failed to read chunk header section.";
           return false;
         }
-        if (header.end_time() < begin_time) {
-          skip_next_chunk_body = true;
-        }
-        if (header.begin_time() > end_time) {
-          return false;
-        }
+        if (header.end_time() < begin_time) { skip_next_chunk_body = true; }
+        if (header.begin_time() > end_time) { return false; }
         break;
       }
       case SectionType::SECTION_CHUNK_BODY: {
@@ -162,8 +146,7 @@ bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
         return true;
       }
       default: {
-        AERROR << "Invalid section, type: " << section.type
-               << ", size: " << section.size;
+        AERROR << "Invalid section, type: " << section.type << ", size: " << section.size;
         return false;
       }
     }
@@ -173,27 +156,19 @@ bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
 
 uint64_t RecordReader::GetMessageNumber(const std::string& channel_name) const {
   auto search = channel_info_.find(channel_name);
-  if (search == channel_info_.end()) {
-    return 0;
-  }
+  if (search == channel_info_.end()) { return 0; }
   return search->second.message_number();
 }
 
-const std::string& RecordReader::GetMessageType(
-    const std::string& channel_name) const {
+const std::string& RecordReader::GetMessageType(const std::string& channel_name) const {
   auto search = channel_info_.find(channel_name);
-  if (search == channel_info_.end()) {
-    return kEmptyString;
-  }
+  if (search == channel_info_.end()) { return kEmptyString; }
   return search->second.message_type();
 }
 
-const std::string& RecordReader::GetProtoDesc(
-    const std::string& channel_name) const {
+const std::string& RecordReader::GetProtoDesc(const std::string& channel_name) const {
   auto search = channel_info_.find(channel_name);
-  if (search == channel_info_.end()) {
-    return kEmptyString;
-  }
+  if (search == channel_info_.end()) { return kEmptyString; }
   return search->second.proto_desc();
 }
 

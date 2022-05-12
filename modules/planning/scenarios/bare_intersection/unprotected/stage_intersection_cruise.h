@@ -36,13 +36,13 @@ struct BareIntersectionUnprotectedContext;
 class BareIntersectionUnprotectedStageIntersectionCruise : public Stage {
  public:
   BareIntersectionUnprotectedStageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config,
+      const ScenarioConfig::StageConfig&         config,
       const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+                             Frame*                         frame) override;
 
   BareIntersectionUnprotectedContext* GetContext() {
     return GetContextAs<BareIntersectionUnprotectedContext>();
@@ -52,7 +52,7 @@ class BareIntersectionUnprotectedStageIntersectionCruise : public Stage {
 
  private:
   ScenarioBareIntersectionUnprotectedConfig scenario_config_;
-  StageIntersectionCruiseImpl stage_impl_;
+  StageIntersectionCruiseImpl               stage_impl_;
 };
 
 }  // namespace bare_intersection

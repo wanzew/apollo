@@ -39,32 +39,35 @@ class HMMatcher : public BaseMatcher {
   // @params[OUT] unassigned_tracks: unmatched tracks
   // @params[OUT] unassigned_objects: unmatched objects
   // @return nothing
-  bool Match(const std::vector<RadarTrackPtr> &radar_tracks,
-             const base::Frame &radar_frame,
-             const TrackObjectMatcherOptions &options,
-             std::vector<TrackObjectPair> *assignments,
-             std::vector<size_t> *unassigned_tracks,
-             std::vector<size_t> *unassigned_objects) override;
+  bool Match(const std::vector<RadarTrackPtr>& radar_tracks,
+             const base::Frame&                radar_frame,
+             const TrackObjectMatcherOptions&  options,
+             std::vector<TrackObjectPair>*     assignments,
+             std::vector<size_t>*              unassigned_tracks,
+             std::vector<size_t>*              unassigned_objects) override;
 
  protected:
-  bool RefinedTrack(const base::ObjectPtr &track_object, double track_timestamp,
-                    const base::ObjectPtr &radar_object,
-                    double radar_timestamp) override;
+  bool RefinedTrack(const base::ObjectPtr& track_object,
+                    double                 track_timestamp,
+                    const base::ObjectPtr& radar_object,
+                    double                 radar_timestamp) override;
 
  private:
   common::GatedHungarianMatcher<double> hungarian_matcher_;
-  void TrackObjectPropertyMatch(const std::vector<RadarTrackPtr> &radar_tracks,
-                                const base::Frame &radar_frame,
-                                std::vector<TrackObjectPair> *assignments,
-                                std::vector<size_t> *unassigned_tracks,
-                                std::vector<size_t> *unassigned_objects);
-  void ComputeAssociationMat(const std::vector<RadarTrackPtr> &radar_tracks,
-                             const base::Frame &radar_frame,
-                             const std::vector<size_t> &unassigned_tracks,
-                             const std::vector<size_t> &unassigned_objects,
-                             std::vector<std::vector<double>> *association_mat);
-  double DistanceBetweenObs(const base::ObjectPtr &obs1, double timestamp1,
-                            const base::ObjectPtr &obs2, double timestamp2);
+  void   TrackObjectPropertyMatch(const std::vector<RadarTrackPtr>& radar_tracks,
+                                  const base::Frame&                radar_frame,
+                                  std::vector<TrackObjectPair>*     assignments,
+                                  std::vector<size_t>*              unassigned_tracks,
+                                  std::vector<size_t>*              unassigned_objects);
+  void   ComputeAssociationMat(const std::vector<RadarTrackPtr>& radar_tracks,
+                               const base::Frame&                radar_frame,
+                               const std::vector<size_t>&        unassigned_tracks,
+                               const std::vector<size_t>&        unassigned_objects,
+                               std::vector<std::vector<double>>* association_mat);
+  double DistanceBetweenObs(const base::ObjectPtr& obs1,
+                            double                 timestamp1,
+                            const base::ObjectPtr& obs2,
+                            double                 timestamp2);
 };
 
 }  // namespace radar

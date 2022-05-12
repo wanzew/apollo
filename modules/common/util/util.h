@@ -29,12 +29,13 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/proto/geometry.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/geometry.pb.h"
-#include "modules/common/proto/pnc_point.pb.h"
 
 /**
  * @namespace apollo::common::util
@@ -45,8 +46,7 @@ namespace common {
 namespace util {
 template <typename ProtoA, typename ProtoB>
 bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
-  return a.GetTypeName() == b.GetTypeName() &&
-         a.SerializeAsString() == b.SerializeAsString();
+  return a.GetTypeName() == b.GetTypeName() && a.SerializeAsString() == b.SerializeAsString();
   // Test shows that the above method is 5 times faster than the
   // API: google::protobuf::util::MessageDifferencer::Equals(a, b);
 }
@@ -71,11 +71,8 @@ PointENU operator+(const PointENU enu, const math::Vec2d& xy);
  * segment. `start` and `end` will be the first and last element in `sliced`.
  */
 template <typename T>
-void uniform_slice(const T start, const T end, uint32_t num,
-                   std::vector<T>* sliced) {
-  if (!sliced || num == 0) {
-    return;
-  }
+void uniform_slice(const T start, const T end, uint32_t num, std::vector<T>* sliced) {
+  if (!sliced || num == 0) { return; }
   const T delta = (end - start) / num;
   sliced->resize(num + 1);
   T s = start;
@@ -114,7 +111,8 @@ bool SamePointXY(const U& u, const V& v) {
 
 PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
                                             const PathPoint& p2,
-                                            const double w1, const double w2);
+                                            const double     w1,
+                                            const double     w2);
 
 // Test whether two float or double numbers are equal.
 // ulp: units in the last place.
@@ -123,8 +121,7 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
 IsFloatEqual(T x, T y, int ulp = 2) {
   // the machine epsilon has to be scaled to the magnitude of the values used
   // and multiplied by the desired precision in ULPs (units in the last place)
-  return std::fabs(x - y) <
-             std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
+  return std::fabs(x - y) < std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
          // unless the result is subnormal
          || std::fabs(x - y) < std::numeric_limits<T>::min();
 }
@@ -136,7 +133,7 @@ template <typename T>
 class FunctionInfo {
  public:
   typedef int (T::*Function)();
-  Function function_;
+  Function    function_;
   std::string fun_name_;
 };
 
@@ -151,7 +148,7 @@ bool ExcuteAllFunctions(T* obj, FunctionInfo<T> fun_list[]) {
   return true;
 }
 
-#define EXEC_ALL_FUNS(type, obj, list) \
+#define EXEC_ALL_FUNS(type, obj, list)                                                             \
   ExcuteAllFunctions<type, sizeof(list) / sizeof(FunctionInfo<type>)>(obj, list)
 
 template <typename A, typename B>
@@ -159,8 +156,6 @@ std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {
   return os << "first: " << p.first << ", second: " << p.second;
 }
 
-#define UNIQUE_LOCK_MULTITHREAD(mutex_type)                         \
-  std::unique_ptr<std::unique_lock<std::mutex>> lock_ptr = nullptr; \
-  if (FLAGS_multithread_run) {                                      \
-    lock_ptr.reset(new std::unique_lock<std::mutex>(mutex_type));   \
-  }
+#define UNIQUE_LOCK_MULTITHREAD(mutex_type)                                                        \
+  std::unique_ptr<std::unique_lock<std::mutex>> lock_ptr = nullptr;                                \
+  if (FLAGS_multithread_run) { lock_ptr.reset(new std::unique_lock<std::mutex>(mutex_type)); }

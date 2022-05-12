@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "gtest/gtest.h"
+
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 
@@ -58,12 +59,12 @@ TEST(SimilarMapTest, SimilarMap_test) {
   ASSERT_TRUE(similar_map.Init(10));
   auto sim = similar_map.get(0, 0).get();
   sim->Reshape({2, 2});
-  float *sim_data = sim->mutable_cpu_data();
-  *sim_data = 1.2f;
+  float* sim_data = sim->mutable_cpu_data();
+  *sim_data       = 1.2f;
   *(sim_data + 1) = 1.4f;
   *(sim_data + 2) = 1.6f;
   *(sim_data + 3) = 1.8f;
-  auto sim1 = similar_map.get(0, 0)->cpu_data();
+  auto sim1       = similar_map.get(0, 0)->cpu_data();
   EXPECT_FLOAT_EQ(*sim1, 1.2);
   EXPECT_FLOAT_EQ(*(sim1 + 1), 1.4);
   EXPECT_FLOAT_EQ(*(sim1 + 2), 1.6);
@@ -74,11 +75,11 @@ TEST(SimilarMapTest, SimilarMap_test) {
   EXPECT_FLOAT_EQ(similar_map.sim(p1, p2), 1.4);
 
   std::shared_ptr<base::Blob<float>> set_blob(new base::Blob<float>({4, 1}));
-  float *sim_data1 = set_blob->mutable_cpu_data();
-  *sim_data1 = 0.2f;
-  *(sim_data1 + 1) = 0.4f;
-  *(sim_data1 + 2) = 0.6f;
-  *(sim_data1 + 3) = 0.8f;
+  float*                             sim_data1 = set_blob->mutable_cpu_data();
+  *sim_data1                                   = 0.2f;
+  *(sim_data1 + 1)                             = 0.4f;
+  *(sim_data1 + 2)                             = 0.6f;
+  *(sim_data1 + 3)                             = 0.8f;
   similar_map.set(0, 1, set_blob);
   auto sim2 = similar_map.get(0, 1)->cpu_data();
   EXPECT_FLOAT_EQ(*sim2, 0.2);
@@ -112,7 +113,7 @@ TEST(FrameListTest, FrameList_test) {
   ASSERT_EQ(frame_list[5], frame_list[-1]);
   base::ObjectPtr object;
   frames[1].detected_objects.push_back(object);
-  PatchIndicator indicator(1, 0);
+  PatchIndicator  indicator(1, 0);
   base::ObjectPtr object1 = frame_list.get_object(indicator);
   ASSERT_EQ(object1, object);
 }

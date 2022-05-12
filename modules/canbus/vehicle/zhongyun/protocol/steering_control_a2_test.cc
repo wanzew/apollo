@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/zhongyun/protocol/steering_control_a2.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ class Steeringcontrola2Test : public ::testing::Test {
 };
 
 TEST_F(Steeringcontrola2Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t           data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Steeringcontrola2 steer;
   EXPECT_EQ(steer.GetPeriod(), 20 * 1000);
   steer.UpdateData(data);

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/protocol/gear_status_514.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -26,8 +27,8 @@ class Gearstatus514Test : public ::testing::Test {
 };
 
 TEST_F(Gearstatus514Test, General) {
-  uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
-  int32_t length = 8;
+  uint8_t       data[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
+  int32_t       length  = 8;
   ChassisDetail cd;
   Gearstatus514 gearstatus;
   gearstatus.Parse(data, length, &cd);

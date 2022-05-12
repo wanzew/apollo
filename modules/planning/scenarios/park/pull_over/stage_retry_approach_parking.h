@@ -34,16 +34,12 @@ struct PullOverContext;
 
 class PullOverStageRetryApproachParking : public Stage {
  public:
-  PullOverStageRetryApproachParking(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector);
+  PullOverStageRetryApproachParking(const ScenarioConfig::StageConfig&         config,
+                                    const std::shared_ptr<DependencyInjector>& injector);
 
-  StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame) override;
+  StageStatus Process(const common::TrajectoryPoint& planning_init_point, Frame* frame) override;
 
-  PullOverContext* GetContext() {
-    return Stage::GetContextAs<PullOverContext>();
-  }
+  PullOverContext* GetContext() { return Stage::GetContextAs<PullOverContext>(); }
 
   Stage::StageStatus FinishStage();
 

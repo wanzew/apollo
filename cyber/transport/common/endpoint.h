@@ -38,12 +38,12 @@ class Endpoint {
   explicit Endpoint(const RoleAttributes& attr);
   virtual ~Endpoint();
 
-  const Identity& id() const { return id_; }
+  const Identity&       id() const { return id_; }
   const RoleAttributes& attributes() const { return attr_; }
 
  protected:
-  bool enabled_;
-  Identity id_;
+  bool           enabled_;
+  Identity       id_;
   RoleAttributes attr_;
 };
 

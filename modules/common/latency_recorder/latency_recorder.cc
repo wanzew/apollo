@@ -31,8 +31,8 @@ LatencyRecorder::LatencyRecorder(const std::string& module_name)
 }
 
 void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
-                                          const Time& begin_time,
-                                          const Time& end_time) {
+                                          const Time&    begin_time,
+                                          const Time&    end_time) {
   // TODO(michael): ALERT for now for trouble shooting,
   // CHECK_LT(begin_time, end_time) in the future to enforce the validation
   if (begin_time >= end_time) {
@@ -42,20 +42,17 @@ void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
 
     // FIXME(storypku): IsRealityMode|MockTime
     if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
-      AERROR_EVERY(kErrorReduceBase) << "latency begin_time: " << begin_time
-                                     << " >= end_time: " << end_time << ", "
-                                     << kErrorReduceBase << " times";
+      AERROR_EVERY(kErrorReduceBase)
+          << "latency begin_time: " << begin_time << " >= end_time: " << end_time << ", "
+          << kErrorReduceBase << " times";
       return;
     }
-    AERROR << "latency begin_time: " << begin_time
-           << " >= end_time: " << end_time;
+    AERROR << "latency begin_time: " << begin_time << " >= end_time: " << end_time;
     return;
   }
 
   static auto writer = CreateWriter();
-  if (writer == nullptr || message_id == 0) {
-    return;
-  }
+  if (writer == nullptr || message_id == 0) { return; }
 
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -64,7 +61,7 @@ void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
   latency_record->set_end_time(end_time.ToNanosecond());
   latency_record->set_message_id(message_id);
 
-  const auto now = Clock::Now();
+  const auto                    now = Clock::Now();
   const apollo::cyber::Duration kPublishInterval(3.0);
   if (now - current_time_ > kPublishInterval) {
     PublishLatencyRecords(writer);
@@ -72,8 +69,7 @@ void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
   }
 }
 
-std::shared_ptr<apollo::cyber::Writer<LatencyRecordMap>>
-LatencyRecorder::CreateWriter() {
+std::shared_ptr<apollo::cyber::Writer<LatencyRecordMap>> LatencyRecorder::CreateWriter() {
   const std::string node_name_prefix = "latency_recorder";
   if (module_name_.empty()) {
     AERROR << "missing module name for sending latency records";
@@ -82,8 +78,8 @@ LatencyRecorder::CreateWriter() {
   if (node_ == nullptr) {
     current_time_ = Clock::Now();
 
-    node_ = apollo::cyber::CreateNode(absl::StrCat(
-        node_name_prefix, module_name_, current_time_.ToNanosecond()));
+    node_ = apollo::cyber::CreateNode(
+        absl::StrCat(node_name_prefix, module_name_, current_time_.ToNanosecond()));
     if (node_ == nullptr) {
       AERROR << "unable to create node for latency recording";
       return nullptr;

@@ -53,23 +53,22 @@ void Ads338e::UpdateData(uint8_t* data) {
 
 void Ads338e::Reset() {
   // TODO(ChaoMa) you should check this manually
-  ads_bcm_worksts_ = Ads3_38e::ADS_BCM_WORKSTS_DISABLE;
+  ads_bcm_worksts_     = Ads3_38e::ADS_BCM_WORKSTS_DISABLE;
   ads_bcmworkstsvalid_ = Ads3_38e::ADS_BCMWORKSTSVALID_INVALID;
-  ads_reqcontrolbcm_ = Ads3_38e::ADS_REQCONTROLBCM_NO_REQUEST;
-  highbeamton_ = Ads3_38e::HIGHBEAMTON_TURN_OFF;
-  dippedbeamon_ = Ads3_38e::DIPPEDBEAMON_TURN_OFF;
-  turnllighton_ = Ads3_38e::TURNLLIGHTON_TURN_OFF;
-  emergencylighton_ = Ads3_38e::EMERGENCYLIGHTON_TURN_OFF;
-  ffoglampon_ = Ads3_38e::FFOGLAMPON_TURN_OFF;
-  rfoglampon_ = Ads3_38e::RFOGLAMPON_TURN_OFF;
-  brakelight_ = Ads3_38e::BRAKELIGHT_TURN_OFF;
-  hornon_ = Ads3_38e::HORNON_TURN_OFF;
-  fwindshieldwiper_ = Ads3_38e::FWINDSHIELDWIPER_TURN_OFF;
-  rwindshieldwiper_ = Ads3_38e::RWINDSHIELDWIPER_TURN_OFF;
+  ads_reqcontrolbcm_   = Ads3_38e::ADS_REQCONTROLBCM_NO_REQUEST;
+  highbeamton_         = Ads3_38e::HIGHBEAMTON_TURN_OFF;
+  dippedbeamon_        = Ads3_38e::DIPPEDBEAMON_TURN_OFF;
+  turnllighton_        = Ads3_38e::TURNLLIGHTON_TURN_OFF;
+  emergencylighton_    = Ads3_38e::EMERGENCYLIGHTON_TURN_OFF;
+  ffoglampon_          = Ads3_38e::FFOGLAMPON_TURN_OFF;
+  rfoglampon_          = Ads3_38e::RFOGLAMPON_TURN_OFF;
+  brakelight_          = Ads3_38e::BRAKELIGHT_TURN_OFF;
+  hornon_              = Ads3_38e::HORNON_TURN_OFF;
+  fwindshieldwiper_    = Ads3_38e::FWINDSHIELDWIPER_TURN_OFF;
+  rwindshieldwiper_    = Ads3_38e::RWINDSHIELDWIPER_TURN_OFF;
 }
 
-Ads338e* Ads338e::set_ads_bcm_worksts(
-    Ads3_38e::Ads_bcm_workstsType ads_bcm_worksts) {
+Ads338e* Ads338e::set_ads_bcm_worksts(Ads3_38e::Ads_bcm_workstsType ads_bcm_worksts) {
   ads_bcm_worksts_ = ads_bcm_worksts;
   return this;
 }
@@ -81,16 +80,14 @@ Ads338e* Ads338e::set_ads_bcm_worksts(
 // 'len': 2, 'name': 'ADS_BCM_WorkSts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|3]', 'bit': 6, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_ads_bcm_worksts(
-    uint8_t* data, Ads3_38e::Ads_bcm_workstsType ads_bcm_worksts) {
+void Ads338e::set_p_ads_bcm_worksts(uint8_t* data, Ads3_38e::Ads_bcm_workstsType ads_bcm_worksts) {
   int x = ads_bcm_worksts;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 5, 2);
 }
 
-Ads338e* Ads338e::set_ads_bcmworkstsvalid(
-    Ads3_38e::Ads_bcmworkstsvalidType ads_bcmworkstsvalid) {
+Ads338e* Ads338e::set_ads_bcmworkstsvalid(Ads3_38e::Ads_bcmworkstsvalidType ads_bcmworkstsvalid) {
   ads_bcmworkstsvalid_ = ads_bcmworkstsvalid;
   return this;
 }
@@ -100,16 +97,15 @@ Ads338e* Ads338e::set_ads_bcmworkstsvalid(
 // 1: 'ADS_BCMWORKSTSVALID_VALID'}, 'precision': 1.0, 'len': 1, 'name':
 // 'ADS_BCMWorkStsValid','is_signed_var': False, 'offset': 0.0,'physical_range':
 // '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Ads338e::set_p_ads_bcmworkstsvalid(
-    uint8_t* data, Ads3_38e::Ads_bcmworkstsvalidType ads_bcmworkstsvalid) {
+void Ads338e::set_p_ads_bcmworkstsvalid(uint8_t*                          data,
+                                        Ads3_38e::Ads_bcmworkstsvalidType ads_bcmworkstsvalid) {
   int x = ads_bcmworkstsvalid;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 7, 1);
 }
 
-Ads338e* Ads338e::set_ads_reqcontrolbcm(
-    Ads3_38e::Ads_reqcontrolbcmType ads_reqcontrolbcm) {
+Ads338e* Ads338e::set_ads_reqcontrolbcm(Ads3_38e::Ads_reqcontrolbcmType ads_reqcontrolbcm) {
   ads_reqcontrolbcm_ = ads_reqcontrolbcm;
   return this;
 }
@@ -119,8 +115,8 @@ Ads338e* Ads338e::set_ads_reqcontrolbcm(
 // 'ADS_REQCONTROLBCM_REQUEST'}, 'precision': 1.0, 'len': 1, 'name':
 // 'ADS_ReqControlBCM', 'is_signed_var':False, 'offset': 0.0, 'physical_range':
 // '[0|1]', 'bit': 8, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Ads338e::set_p_ads_reqcontrolbcm(
-    uint8_t* data, Ads3_38e::Ads_reqcontrolbcmType ads_reqcontrolbcm) {
+void Ads338e::set_p_ads_reqcontrolbcm(uint8_t*                        data,
+                                      Ads3_38e::Ads_reqcontrolbcmType ads_reqcontrolbcm) {
   int x = ads_reqcontrolbcm;
 
   Byte to_set(data + 1);
@@ -137,8 +133,7 @@ Ads338e* Ads338e::set_highbeamton(Ads3_38e::HighbeamtonType highbeamton) {
 // 'len': 1, 'name': 'HighBeamtON', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 11, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_highbeamton(uint8_t* data,
-                                Ads3_38e::HighbeamtonType highbeamton) {
+void Ads338e::set_p_highbeamton(uint8_t* data, Ads3_38e::HighbeamtonType highbeamton) {
   int x = highbeamton;
 
   Byte to_set(data + 1);
@@ -155,8 +150,7 @@ Ads338e* Ads338e::set_dippedbeamon(Ads3_38e::DippedbeamonType dippedbeamon) {
 // 'len': 1, 'name': 'DippedBeamON', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 12, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_dippedbeamon(uint8_t* data,
-                                 Ads3_38e::DippedbeamonType dippedbeamon) {
+void Ads338e::set_p_dippedbeamon(uint8_t* data, Ads3_38e::DippedbeamonType dippedbeamon) {
   int x = dippedbeamon;
 
   Byte to_set(data + 1);
@@ -174,16 +168,14 @@ Ads338e* Ads338e::set_turnllighton(Ads3_38e::TurnllightonType turnllighton) {
 // 'len': 2, 'name': 'TurnlLightON', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|3]', 'bit': 17, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_turnllighton(uint8_t* data,
-                                 Ads3_38e::TurnllightonType turnllighton) {
+void Ads338e::set_p_turnllighton(uint8_t* data, Ads3_38e::TurnllightonType turnllighton) {
   int x = turnllighton;
 
   Byte to_set(data + 2);
   to_set.set_value(static_cast<uint8_t>(x), 0, 2);
 }
 
-Ads338e* Ads338e::set_emergencylighton(
-    Ads3_38e::EmergencylightonType emergencylighton) {
+Ads338e* Ads338e::set_emergencylighton(Ads3_38e::EmergencylightonType emergencylighton) {
   emergencylighton_ = emergencylighton;
   return this;
 }
@@ -193,8 +185,8 @@ Ads338e* Ads338e::set_emergencylighton(
 // 'len': 1, 'name': 'EmergencyLightON', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 45, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_emergencylighton(
-    uint8_t* data, Ads3_38e::EmergencylightonType emergencylighton) {
+void Ads338e::set_p_emergencylighton(uint8_t*                       data,
+                                     Ads3_38e::EmergencylightonType emergencylighton) {
   int x = emergencylighton;
 
   Byte to_set(data + 5);
@@ -211,8 +203,7 @@ Ads338e* Ads338e::set_ffoglampon(Ads3_38e::FfoglamponType ffoglampon) {
 // 'name': 'FFogLampON', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 46, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_ffoglampon(uint8_t* data,
-                               Ads3_38e::FfoglamponType ffoglampon) {
+void Ads338e::set_p_ffoglampon(uint8_t* data, Ads3_38e::FfoglamponType ffoglampon) {
   int x = ffoglampon;
 
   Byte to_set(data + 5);
@@ -229,8 +220,7 @@ Ads338e* Ads338e::set_rfoglampon(Ads3_38e::RfoglamponType rfoglampon) {
 // 'name': 'RFogLampON', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 47, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_rfoglampon(uint8_t* data,
-                               Ads3_38e::RfoglamponType rfoglampon) {
+void Ads338e::set_p_rfoglampon(uint8_t* data, Ads3_38e::RfoglamponType rfoglampon) {
   int x = rfoglampon;
 
   Byte to_set(data + 5);
@@ -247,8 +237,7 @@ Ads338e* Ads338e::set_brakelight(Ads3_38e::BrakelightType brakelight) {
 // 'name': 'BrakeLight', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 48, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_brakelight(uint8_t* data,
-                               Ads3_38e::BrakelightType brakelight) {
+void Ads338e::set_p_brakelight(uint8_t* data, Ads3_38e::BrakelightType brakelight) {
   int x = brakelight;
 
   Byte to_set(data + 6);
@@ -271,8 +260,7 @@ void Ads338e::set_p_hornon(uint8_t* data, Ads3_38e::HornonType hornon) {
   to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
-Ads338e* Ads338e::set_fwindshieldwiper(
-    Ads3_38e::FwindshieldwiperType fwindshieldwiper) {
+Ads338e* Ads338e::set_fwindshieldwiper(Ads3_38e::FwindshieldwiperType fwindshieldwiper) {
   fwindshieldwiper_ = fwindshieldwiper;
   return this;
 }
@@ -282,16 +270,15 @@ Ads338e* Ads338e::set_fwindshieldwiper(
 // 'len': 1, 'name': 'Fwindshieldwiper', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 50, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_fwindshieldwiper(
-    uint8_t* data, Ads3_38e::FwindshieldwiperType fwindshieldwiper) {
+void Ads338e::set_p_fwindshieldwiper(uint8_t*                       data,
+                                     Ads3_38e::FwindshieldwiperType fwindshieldwiper) {
   int x = fwindshieldwiper;
 
   Byte to_set(data + 6);
   to_set.set_value(static_cast<uint8_t>(x), 2, 1);
 }
 
-Ads338e* Ads338e::set_rwindshieldwiper(
-    Ads3_38e::RwindshieldwiperType rwindshieldwiper) {
+Ads338e* Ads338e::set_rwindshieldwiper(Ads3_38e::RwindshieldwiperType rwindshieldwiper) {
   rwindshieldwiper_ = rwindshieldwiper;
   return this;
 }
@@ -301,8 +288,8 @@ Ads338e* Ads338e::set_rwindshieldwiper(
 // 'len': 1, 'name': 'Rwindshieldwiper', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 60, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads338e::set_p_rwindshieldwiper(
-    uint8_t* data, Ads3_38e::RwindshieldwiperType rwindshieldwiper) {
+void Ads338e::set_p_rwindshieldwiper(uint8_t*                       data,
+                                     Ads3_38e::RwindshieldwiperType rwindshieldwiper) {
   int x = rwindshieldwiper;
 
   Byte to_set(data + 7);

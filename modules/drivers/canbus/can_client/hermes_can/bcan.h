@@ -18,6 +18,7 @@
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
+
 #include <cstdint>
 #include <cstdlib>
 
@@ -56,19 +57,18 @@ enum bcan_baudrate_val {
 };
 
 /* Returns bcan library version. */
-const char *bcan_get_libversion(void);
+const char* bcan_get_libversion(void);
 
 /* Returns detailed bcan library build info. */
-const char *bcan_bld_info(void);
+const char* bcan_bld_info(void);
 
 /* Returns brief bcan library build info. */
-const char *bcan_bld_info_short(void);
+const char* bcan_bld_info_short(void);
 
 /* Returns error message corresponding to the given error code. */
-const char *bcan_get_err_msg(int err_code);
+const char* bcan_get_err_msg(int err_code);
 
-int bcan_open(uint32_t dev_index, uint32_t flags, uint64_t tx_to,
-              uint64_t rx_to, bcan_hdl_t *hdl);
+int bcan_open(uint32_t dev_index, uint32_t flags, uint64_t tx_to, uint64_t rx_to, bcan_hdl_t* hdl);
 int bcan_close(bcan_hdl_t hdl);
 int bcan_start(bcan_hdl_t hdl);
 int bcan_stop(bcan_hdl_t hdl);
@@ -76,12 +76,12 @@ int bcan_stop(bcan_hdl_t hdl);
 int bcan_set_loopback(bcan_hdl_t hdl);
 int bcan_unset_loopback(bcan_hdl_t hdl);
 int bcan_set_baudrate(bcan_hdl_t hdl, uint32_t rate);
-int bcan_get_baudrate(bcan_hdl_t hdl, uint32_t *rate);
-int bcan_recv(bcan_hdl_t hdl, bcan_msg_t *buf, uint32_t num_msg);
-int bcan_send(bcan_hdl_t hdl, bcan_msg_t *buf, uint32_t num_msg);
-int bcan_send_hi_pri(bcan_hdl_t hdl, bcan_msg_t *buf);
+int bcan_get_baudrate(bcan_hdl_t hdl, uint32_t* rate);
+int bcan_recv(bcan_hdl_t hdl, bcan_msg_t* buf, uint32_t num_msg);
+int bcan_send(bcan_hdl_t hdl, bcan_msg_t* buf, uint32_t num_msg);
+int bcan_send_hi_pri(bcan_hdl_t hdl, bcan_msg_t* buf);
 int bcan_get_status(bcan_hdl_t hdl);
-int bcan_get_err_counter(bcan_hdl_t hdl, uint8_t *rx_err, uint8_t *tx_err);
+int bcan_get_err_counter(bcan_hdl_t hdl, uint8_t* rx_err, uint8_t* tx_err);
 
 /* The following APIs are not implemented yet. { */
 int bcan_id_add(bcan_hdl_t hdl, uint32_t id_start, uint32_t id_end);

@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -24,8 +25,7 @@ namespace wey {
 
 using ::apollo::drivers::canbus::MessageManager;
 
-class WeyMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+class WeyMessageManager : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   WeyMessageManager();
   virtual ~WeyMessageManager();

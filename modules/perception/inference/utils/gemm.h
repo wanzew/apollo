@@ -26,7 +26,7 @@ namespace perception {
 namespace inference {
 class GPUL2Norm {
  public:
-  void L2Norm(base::Blob<float> *input_data);
+  void L2Norm(base::Blob<float>* input_data);
 
  private:
   base::Blob<float> scale_;
@@ -34,11 +34,18 @@ class GPUL2Norm {
   base::Blob<float> square_;
 };
 
-void GPUGemmFloat(const CBLAS_TRANSPOSE TransA, const CBLAS_TRANSPOSE TransB,
-                  const int M, const int N, const int K, const float alpha,
-                  const float *A, const float *B, const float beta, float *C);
-void GPUMultiFloat(const int n, const float *a, const float *b, float *result);
-void GPUMSetFloat(const int n, const float alpha, float *result);
+void GPUGemmFloat(const CBLAS_TRANSPOSE TransA,
+                  const CBLAS_TRANSPOSE TransB,
+                  const int             M,
+                  const int             N,
+                  const int             K,
+                  const float           alpha,
+                  const float*          A,
+                  const float*          B,
+                  const float           beta,
+                  float*                C);
+void GPUMultiFloat(const int n, const float* a, const float* b, float* result);
+void GPUMSetFloat(const int n, const float alpha, float* result);
 
 }  // namespace inference
 }  // namespace perception

@@ -26,11 +26,13 @@
 #include <vector>
 
 #include "gtest/gtest_prod.h"
+
+#include "modules/planning/proto/planning.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/speed/st_point.h"
-#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -42,10 +44,9 @@ class STBoundary : public common::math::Polygon2d {
    *   Each pair refers to a time t, with (lower_s, upper_s).
    */
   STBoundary() = default;
-  explicit STBoundary(
-      const std::vector<std::pair<STPoint, STPoint>>& point_pairs,
-      bool is_accurate_boundary = false);
-  explicit STBoundary(const common::math::Box2d& box) = delete;
+  explicit STBoundary(const std::vector<std::pair<STPoint, STPoint>>& point_pairs,
+                      bool                                            is_accurate_boundary = false);
+  explicit STBoundary(const common::math::Box2d& box)          = delete;
   explicit STBoundary(std::vector<common::math::Vec2d> points) = delete;
 
   /** @brief Wrapper of the constructor (old).
@@ -56,9 +57,8 @@ class STBoundary : public common::math::Polygon2d {
   /** @brief Wrapper of the constructor. It doesn't use RemoveRedundantPoints
    * and generates an accurate ST-boundary.
    */
-  static STBoundary CreateInstanceAccurate(
-      const std::vector<STPoint>& lower_points,
-      const std::vector<STPoint>& upper_points);
+  static STBoundary CreateInstanceAccurate(const std::vector<STPoint>& lower_points,
+                                           const std::vector<STPoint>& upper_points);
 
   /** @brief Default destructor.
    */
@@ -66,14 +66,11 @@ class STBoundary : public common::math::Polygon2d {
 
   bool IsEmpty() const { return lower_points_.empty(); }
 
-  bool GetUnblockSRange(const double curr_time, double* s_upper,
-                        double* s_lower) const;
+  bool GetUnblockSRange(const double curr_time, double* s_upper, double* s_lower) const;
 
-  bool GetBoundarySRange(const double curr_time, double* s_upper,
-                         double* s_lower) const;
+  bool GetBoundarySRange(const double curr_time, double* s_upper, double* s_lower) const;
 
-  bool GetBoundarySlopes(const double curr_time, double* ds_upper,
-                         double* ds_lower) const;
+  bool GetBoundarySlopes(const double curr_time, double* ds_upper, double* ds_lower) const;
 
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
@@ -88,9 +85,9 @@ class STBoundary : public common::math::Polygon2d {
 
   static std::string TypeName(BoundaryType type);
 
-  BoundaryType boundary_type() const;
+  BoundaryType       boundary_type() const;
   const std::string& id() const;
-  double characteristic_length() const;
+  double             characteristic_length() const;
 
   void set_id(const std::string& id);
   void SetBoundaryType(const BoundaryType& boundary_type);
@@ -105,7 +102,7 @@ class STBoundary : public common::math::Polygon2d {
   std::vector<STPoint> lower_points() const { return lower_points_; }
 
   // Used by st-optimizer.
-  bool IsPointInBoundary(const STPoint& st_point) const;
+  bool       IsPointInBoundary(const STPoint& st_point) const;
   STBoundary ExpandByS(const double s) const;
   STBoundary ExpandByT(const double t) const;
 
@@ -126,20 +123,18 @@ class STBoundary : public common::math::Polygon2d {
   void set_obstacle_road_right_ending_t(double road_right_ending_t) {
     obstacle_road_right_ending_t_ = road_right_ending_t;
   }
-  double obstacle_road_right_ending_t() const {
-    return obstacle_road_right_ending_t_;
-  }
+  double obstacle_road_right_ending_t() const { return obstacle_road_right_ending_t_; }
 
  private:
   /** @brief The sanity check function for a vector of ST-point pairs.
    */
-  bool IsValid(
-      const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;
+  bool IsValid(const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;
 
   /** @brief Returns true if point is within max_dist distance to seg.
    */
   bool IsPointNear(const common::math::LineSegment2d& seg,
-                   const common::math::Vec2d& point, const double max_dist);
+                   const common::math::Vec2d&         point,
+                   const double                       max_dist);
 
   /** @brief Sometimes a sequence of upper and lower points lie almost on
    * two straightlines. In this case, the intermediate points are removed,
@@ -148,16 +143,17 @@ class STBoundary : public common::math::Polygon2d {
   // TODO(all): When slope is high, this may introduce significant errors.
   // Also, when accumulated for multiple t, the error can get significant.
   // This function should be reconsidered, because it may be dangerous.
-  void RemoveRedundantPoints(
-      std::vector<std::pair<STPoint, STPoint>>* point_pairs);
+  void RemoveRedundantPoints(std::vector<std::pair<STPoint, STPoint>>* point_pairs);
   FRIEND_TEST(StBoundaryTest, remove_redundant_points);
 
   /** @brief Given time t, find a segment denoted by left and right idx, that
    * contains the time t.
    * - If t is less than all or larger than all, return false.
    */
-  bool GetIndexRange(const std::vector<STPoint>& points, const double t,
-                     size_t* left, size_t* right) const;
+  bool GetIndexRange(const std::vector<STPoint>& points,
+                     const double                t,
+                     size_t*                     left,
+                     size_t*                     right) const;
   FRIEND_TEST(StBoundaryTest, get_index_range);
 
  private:
@@ -167,11 +163,11 @@ class STBoundary : public common::math::Polygon2d {
   std::vector<STPoint> lower_points_;
 
   std::string id_;
-  double characteristic_length_ = 1.0;
-  double min_s_ = std::numeric_limits<double>::max();
-  double max_s_ = std::numeric_limits<double>::lowest();
-  double min_t_ = std::numeric_limits<double>::max();
-  double max_t_ = std::numeric_limits<double>::lowest();
+  double      characteristic_length_ = 1.0;
+  double      min_s_                 = std::numeric_limits<double>::max();
+  double      max_s_                 = std::numeric_limits<double>::lowest();
+  double      min_t_                 = std::numeric_limits<double>::max();
+  double      max_t_                 = std::numeric_limits<double>::lowest();
 
   STPoint bottom_left_point_;
   STPoint bottom_right_point_;

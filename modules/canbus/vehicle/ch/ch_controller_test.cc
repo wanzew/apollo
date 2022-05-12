@@ -15,14 +15,17 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/ch_controller.h"
-#include "cyber/common/file.h"
+
 #include "gtest/gtest.h"
+
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
-#include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
@@ -35,8 +38,7 @@ using apollo::control::ControlCommand;
 class ChControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string canbus_conf_file =
-        "modules/canbus/testdata/conf/ch_canbus_conf_test.pb.txt";
+    std::string canbus_conf_file = "modules/canbus/testdata/conf/ch_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
     control_cmd_.set_throttle(20.0);
@@ -46,13 +48,13 @@ class ChControllerTest : public ::testing::Test {
   }
 
  protected:
-  ChController controller_;
-  ControlCommand control_cmd_;
-  VehicleSignal vehicle_signal_;
+  ChController                               controller_;
+  ControlCommand                             control_cmd_;
+  VehicleSignal                              vehicle_signal_;
   CanSender<::apollo::canbus::ChassisDetail> sender_;
-  ChMessageManager msg_manager_;
-  CanbusConf canbus_conf_;
-  VehicleParameter params_;
+  ChMessageManager                           msg_manager_;
+  CanbusConf                                 canbus_conf_;
+  VehicleParameter                           params_;
 };
 
 TEST_F(ChControllerTest, Init) {
@@ -83,10 +85,8 @@ TEST_F(ChControllerTest, Status) {
 TEST_F(ChControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
-            ErrorCode::OK);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_AUTO_DRIVE),
-            ErrorCode::CANBUS_ERROR);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL), ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_AUTO_DRIVE), ErrorCode::CANBUS_ERROR);
 }
 
 }  // namespace ch

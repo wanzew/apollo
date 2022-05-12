@@ -84,13 +84,13 @@ class DataCollectionMonitor : public FuelMonitor {
   void LoadConfiguration();
   void ConstructCategories();
   void ConstructCategoriesHelper(const std::string& scenario_name,
-                                 const Scenario& scenario, int feature_idx,
-                                 std::string current_category_name,
-                                 const Category& current_category);
+                                 const Scenario&    scenario,
+                                 int                feature_idx,
+                                 std::string        current_category_name,
+                                 const Category&    current_category);
   void OnChassis(const std::shared_ptr<apollo::canbus::Chassis>& chassis);
-  bool IsCompliedWithCriteria(
-      const std::shared_ptr<apollo::canbus::Chassis>& chassis,
-      const Category& category);
+  bool IsCompliedWithCriteria(const std::shared_ptr<apollo::canbus::Chassis>& chassis,
+                              const Category&                                 category);
 
   std::unique_ptr<cyber::Node> node_;
 
@@ -103,8 +103,7 @@ class DataCollectionMonitor : public FuelMonitor {
       scenario_to_categories_;
 
   // Number of frames that has been collected for each (scenario, category)
-  std::unordered_map<std::string, std::unordered_map<std::string, size_t>>
-      category_frame_count_;
+  std::unordered_map<std::string, std::unordered_map<std::string, size_t>> category_frame_count_;
 
   // Number of consecutive frames that has been collected for each (scenario,
   // category).

@@ -19,6 +19,7 @@
 #include <limits>
 
 #include "Eigen/Core"
+
 #include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
@@ -30,9 +31,9 @@ namespace common {
 // the type of points could be double or float
 // old name: cross_prod
 template <typename Type>
-inline Type CrossProduct(const Eigen::Matrix<Type, 2, 1> &point1,
-                         const Eigen::Matrix<Type, 2, 1> &point2,
-                         const Eigen::Matrix<Type, 2, 1> &point3) {
+inline Type CrossProduct(const Eigen::Matrix<Type, 2, 1>& point1,
+                         const Eigen::Matrix<Type, 2, 1>& point2,
+                         const Eigen::Matrix<Type, 2, 1>& point3) {
   return (point2.x() - point1.x()) * (point3.y() - point1.y()) -
          (point3.x() - point1.x()) * (point2.y() - point1.y());
 }
@@ -42,9 +43,8 @@ inline Type CrossProduct(const Eigen::Matrix<Type, 2, 1> &point1,
 // the type of points could be double or float
 // old name: cross_prod
 template <typename PointT>
-inline typename PointT::Type CrossProduct(const PointT &point1,
-                                          const PointT &point2,
-                                          const PointT &point3) {
+inline typename PointT::Type
+CrossProduct(const PointT& point1, const PointT& point2, const PointT& point3) {
   return (point2.x - point1.x) * (point3.y - point1.y) -
          (point3.x - point1.x) * (point2.y - point1.y);
 }
@@ -52,8 +52,7 @@ inline typename PointT::Type CrossProduct(const PointT &point1,
 // @brief calculate the Eucliden distance between two points
 // old name: euclidean_dist
 template <typename PointT>
-inline typename PointT::Type CalculateEuclidenDist(const PointT &pt1,
-                                                   const PointT &pt2) {
+inline typename PointT::Type CalculateEuclidenDist(const PointT& pt1, const PointT& pt2) {
   typename PointT::Type dist = (pt1.x - pt2.x) * (pt1.x - pt2.x);
   dist += (pt1.y - pt2.y) * (pt1.y - pt2.y);
   dist += (pt1.z - pt2.z) * (pt1.z - pt2.z);
@@ -63,8 +62,7 @@ inline typename PointT::Type CalculateEuclidenDist(const PointT &pt1,
 // @brief calculate the Euclidean distance between two points in X-Y plane
 // old name: euclidean_dist_2d_xy
 template <typename PointT>
-inline typename PointT::Type CalculateEuclidenDist2DXY(const PointT &pt1,
-                                                       const PointT &pt2) {
+inline typename PointT::Type CalculateEuclidenDist2DXY(const PointT& pt1, const PointT& pt2) {
   typename PointT::Type dist = (pt1.x - pt2.x) * (pt1.x - pt2.x);
   dist += (pt1.y - pt2.y) * (pt1.y - pt2.y);
   return static_cast<typename PointT::Type>(sqrt(dist));
@@ -74,12 +72,10 @@ inline typename PointT::Type CalculateEuclidenDist2DXY(const PointT &pt1,
 // between two vectors in X-Y plane
 // old name: vector_cos_theta_2d_xy
 template <typename T>
-T CalculateCosTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
-                        const Eigen::Matrix<T, 3, 1> &v2) {
+T CalculateCosTheta2DXY(const Eigen::Matrix<T, 3, 1>& v1, const Eigen::Matrix<T, 3, 1>& v2) {
   T v1_len = static_cast<T>(sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum()));
   T v2_len = static_cast<T>(sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum()));
-  if (v1_len < std::numeric_limits<T>::epsilon() ||
-      v2_len < std::numeric_limits<T>::epsilon()) {
+  if (v1_len < std::numeric_limits<T>::epsilon() || v2_len < std::numeric_limits<T>::epsilon()) {
     return 0.0;
   }
   T cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
@@ -89,21 +85,16 @@ T CalculateCosTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
 // @brief calculate the rotation angle between two vectors in X-Y plane
 // old name: vector_theta_2d_xy
 template <typename T>
-T CalculateTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
-                     const Eigen::Matrix<T, 3, 1> &v2) {
+T CalculateTheta2DXY(const Eigen::Matrix<T, 3, 1>& v1, const Eigen::Matrix<T, 3, 1>& v2) {
   T v1_len = static_cast<T>(sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum()));
   T v2_len = static_cast<T>(sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum()));
-  if (v1_len < std::numeric_limits<T>::epsilon() ||
-      v2_len < std::numeric_limits<T>::epsilon()) {
+  if (v1_len < std::numeric_limits<T>::epsilon() || v2_len < std::numeric_limits<T>::epsilon()) {
     return 0.0;
   }
-  const T cos_theta =
-      (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
+  const T cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
   const T sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);
-  T theta = std::acos(cos_theta);
-  if (sin_theta < 0.0) {
-    theta = -theta;
-  }
+  T       theta     = std::acos(cos_theta);
+  if (sin_theta < 0.0) { theta = -theta; }
   return theta;
 }
 
@@ -111,17 +102,15 @@ T CalculateTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
 // transform from v1 axis coordinate to v2 axis coordinate
 // old name: vector_rot_mat_2d_xy
 template <typename T>
-Eigen::Matrix<T, 3, 3> CalculateRotationMat2DXY(
-    const Eigen::Matrix<T, 3, 1> &v1, const Eigen::Matrix<T, 3, 1> &v2) {
+Eigen::Matrix<T, 3, 3> CalculateRotationMat2DXY(const Eigen::Matrix<T, 3, 1>& v1,
+                                                const Eigen::Matrix<T, 3, 1>& v2) {
   T v1_len = static_cast<T>(sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum()));
   T v2_len = static_cast<T>(sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum()));
-  if (v1_len < std::numeric_limits<T>::epsilon() ||
-      v2_len < std::numeric_limits<T>::epsilon()) {
+  if (v1_len < std::numeric_limits<T>::epsilon() || v2_len < std::numeric_limits<T>::epsilon()) {
     return Eigen::Matrix<T, 3, 3>::Zero(3, 3);
   }
 
-  const T cos_theta =
-      (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
+  const T cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
   const T sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);
 
   Eigen::Matrix<T, 3, 3> rot_mat;
@@ -132,20 +121,18 @@ Eigen::Matrix<T, 3, 3> CalculateRotationMat2DXY(
 // @brief calculate the project vector from one vector to another
 // old name: compute_2d_xy_project_vector
 template <typename T>
-Eigen::Matrix<T, 3, 1> Calculate2DXYProjectVector(
-    const Eigen::Matrix<T, 3, 1> &projected_vector,
-    const Eigen::Matrix<T, 3, 1> &project_vector) {
+Eigen::Matrix<T, 3, 1> Calculate2DXYProjectVector(const Eigen::Matrix<T, 3, 1>& projected_vector,
+                                                  const Eigen::Matrix<T, 3, 1>& project_vector) {
   if (projected_vector.head(2).norm() < std::numeric_limits<T>::epsilon() ||
       project_vector.head(2).norm() < std::numeric_limits<T>::epsilon()) {
     return Eigen::Matrix<T, 3, 1>::Zero(3, 1);
   }
   Eigen::Matrix<T, 3, 1> project_dir = project_vector;
-  project_dir(2) = 0.0;
+  project_dir(2)                     = 0.0;
   project_dir.normalize();
 
   const T projected_vector_project_dir_inner_product =
-      projected_vector(0) * project_dir(0) +
-      projected_vector(1) * project_dir(1);
+      projected_vector(0) * project_dir(0) + projected_vector(1) * project_dir(1);
   const T projected_vector_project_dir_angle_cos =
       projected_vector_project_dir_inner_product /
       (projected_vector.head(2).norm() * project_dir.head(2).norm());
@@ -157,28 +144,24 @@ Eigen::Matrix<T, 3, 1> Calculate2DXYProjectVector(
 // @brief convert point xyz in Cartesian coordinate to polar coordinate
 // old name: xyz_to_polar_coordinate
 template <typename PointT>
-void ConvertCartesiantoPolarCoordinate(const PointT &xyz,
-                                       typename PointT::Type *h_angle_in_degree,
-                                       typename PointT::Type *v_angle_in_degree,
-                                       typename PointT::Type *dist) {
-  using T = typename PointT::Type;
+void ConvertCartesiantoPolarCoordinate(const PointT&          xyz,
+                                       typename PointT::Type* h_angle_in_degree,
+                                       typename PointT::Type* v_angle_in_degree,
+                                       typename PointT::Type* dist) {
+  using T                  = typename PointT::Type;
   const T radian_to_degree = 180.0 / M_PI;
-  const T x = xyz.x;
-  const T y = xyz.y;
-  const T z = xyz.z;
+  const T x                = xyz.x;
+  const T y                = xyz.y;
+  const T z                = xyz.z;
 
-  (*dist) = static_cast<T>(sqrt(x * x + y * y + z * z));
+  (*dist)   = static_cast<T>(sqrt(x * x + y * y + z * z));
   T dist_xy = static_cast<T>(sqrt(x * x + y * y));
 
   (*h_angle_in_degree) = std::acos(x / dist_xy) * radian_to_degree;
-  if (y < 0.0) {
-    (*h_angle_in_degree) = static_cast<T>(360.0) - (*h_angle_in_degree);
-  }
+  if (y < 0.0) { (*h_angle_in_degree) = static_cast<T>(360.0) - (*h_angle_in_degree); }
 
   (*v_angle_in_degree) = std::acos(dist_xy / (*dist)) * radian_to_degree;
-  if (z < 0.0) {
-    (*v_angle_in_degree) = -(*v_angle_in_degree);
-  }
+  if (z < 0.0) { (*v_angle_in_degree) = -(*v_angle_in_degree); }
 }
 
 }  // namespace common

@@ -22,8 +22,7 @@ namespace apollo {
 namespace common {
 namespace monitor {
 
-MonitorLogBuffer::MonitorLogBuffer(
-    const MonitorMessageItem::MessageSource &source)
+MonitorLogBuffer::MonitorLogBuffer(const MonitorMessageItem::MessageSource& source)
     : source_(source) {}
 
 void MonitorLogBuffer::Publish() {
@@ -36,8 +35,8 @@ void MonitorLogBuffer::Publish() {
 
 MonitorLogBuffer::~MonitorLogBuffer() { Publish(); }
 
-void MonitorLogBuffer::AddMonitorMsgItem(
-    const MonitorMessageItem::LogLevel log_level, const std::string &msg) {
+void MonitorLogBuffer::AddMonitorMsgItem(const MonitorMessageItem::LogLevel log_level,
+                                         const std::string&                 msg) {
   level_ = log_level;
   monitor_msg_items_.push_back(std::make_pair(log_level, msg));
 }

@@ -32,7 +32,7 @@ using apollo::cyber::proto::UnitTest;
 void cb(const std::shared_ptr<UnitTest>& msg_ptr) { UNUSED(msg_ptr); }
 
 TEST(BlockerTest, blocker_manager_test) {
-  auto block_mgr = BlockerManager::Instance();
+  auto                           block_mgr = BlockerManager::Instance();
   Blocker<UnitTest>::MessageType msgtype;
 
   block_mgr->Publish<UnitTest>("ch1", msgtype);
@@ -47,8 +47,8 @@ TEST(BlockerTest, blocker_manager_test) {
 
 TEST(BlockerTest, blocker_intra_writer) {
   proto::RoleAttributes role_attr;
-  auto msg_ptr = std::make_shared<UnitTest>();
-  UnitTest msg;
+  auto                  msg_ptr = std::make_shared<UnitTest>();
+  UnitTest              msg;
   IntraWriter<UnitTest> writer(role_attr);
   EXPECT_FALSE(writer.Write(msg_ptr));
 
@@ -62,12 +62,12 @@ TEST(BlockerTest, blocker_intra_writer) {
 }
 
 TEST(BlockerTest, blocker_intra_reader) {
-  auto block_mgr = BlockerManager::Instance();
+  auto                           block_mgr = BlockerManager::Instance();
   Blocker<UnitTest>::MessageType msgtype;
   block_mgr->Publish<UnitTest>("ch1", msgtype);
 
   proto::RoleAttributes role_attr;
-  auto msg = std::make_shared<UnitTest>();
+  auto                  msg = std::make_shared<UnitTest>();
 
   IntraWriter<UnitTest> writer(role_attr);
   writer.Init();

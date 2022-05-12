@@ -33,17 +33,14 @@ struct LearningModelSampleContext;
 
 class LearningModelSampleStageRun : public Stage {
  public:
-  LearningModelSampleStageRun(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  LearningModelSampleStageRun(const ScenarioConfig::StageConfig&         config,
+                              const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-  LearningModelSampleContext* GetContext() {
-    return GetContextAs<LearningModelSampleContext>();
-  }
+  Stage::StageStatus          Process(const common::TrajectoryPoint& planning_init_point,
+                                      Frame*                         frame) override;
+  LearningModelSampleContext* GetContext() { return GetContextAs<LearningModelSampleContext>(); }
 
   Stage::StageStatus FinishStage();
 

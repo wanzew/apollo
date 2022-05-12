@@ -48,9 +48,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
   virtual bool Initialize(const ComponentConfig& config) { return false; }
   virtual bool Initialize(const TimerComponentConfig& config) { return false; }
   virtual void Shutdown() {
-    if (is_shutdown_.exchange(true)) {
-      return;
-    }
+    if (is_shutdown_.exchange(true)) { return; }
 
     Clear();
     for (auto& reader : readers_) {
@@ -65,15 +63,14 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
   }
 
  protected:
-  virtual bool Init() = 0;
-  virtual void Clear() { return; }
+  virtual bool       Init() = 0;
+  virtual void       Clear() { return; }
   const std::string& ConfigFilePath() const { return config_file_path_; }
 
   void LoadConfigFiles(const ComponentConfig& config) {
     if (!config.config_file_path().empty()) {
       if (config.config_file_path()[0] != '/') {
-        config_file_path_ = common::GetAbsolutePath(common::WorkRoot(),
-                                                    config.config_file_path());
+        config_file_path_ = common::GetAbsolutePath(common::WorkRoot(), config.config_file_path());
       } else {
         config_file_path_ = config.config_file_path();
       }
@@ -82,8 +79,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
     if (!config.flag_file_path().empty()) {
       std::string flag_file_path = config.flag_file_path();
       if (flag_file_path[0] != '/') {
-        flag_file_path =
-            common::GetAbsolutePath(common::WorkRoot(), flag_file_path);
+        flag_file_path = common::GetAbsolutePath(common::WorkRoot(), flag_file_path);
       }
       google::SetCommandLineOption("flagfile", flag_file_path.c_str());
     }
@@ -92,8 +88,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
   void LoadConfigFiles(const TimerComponentConfig& config) {
     if (!config.config_file_path().empty()) {
       if (config.config_file_path()[0] != '/') {
-        config_file_path_ = common::GetAbsolutePath(common::WorkRoot(),
-                                                    config.config_file_path());
+        config_file_path_ = common::GetAbsolutePath(common::WorkRoot(), config.config_file_path());
       } else {
         config_file_path_ = config.config_file_path();
       }
@@ -102,16 +97,15 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
     if (!config.flag_file_path().empty()) {
       std::string flag_file_path = config.flag_file_path();
       if (flag_file_path[0] != '/') {
-        flag_file_path =
-            common::GetAbsolutePath(common::WorkRoot(), flag_file_path);
+        flag_file_path = common::GetAbsolutePath(common::WorkRoot(), flag_file_path);
       }
       google::SetCommandLineOption("flagfile", flag_file_path.c_str());
     }
   }
 
-  std::atomic<bool> is_shutdown_ = {false};
-  std::shared_ptr<Node> node_ = nullptr;
-  std::string config_file_path_ = "";
+  std::atomic<bool>                        is_shutdown_      = {false};
+  std::shared_ptr<Node>                    node_             = nullptr;
+  std::string                              config_file_path_ = "";
   std::vector<std::shared_ptr<ReaderBase>> readers_;
 };
 

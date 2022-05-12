@@ -25,16 +25,14 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-BaseMapNodePool::BaseMapNodePool(unsigned int pool_size,
-                                 unsigned int thread_size)
+BaseMapNodePool::BaseMapNodePool(unsigned int pool_size, unsigned int thread_size)
     : pool_size_(pool_size) {}
 
 BaseMapNodePool::~BaseMapNodePool() { Release(); }
 
-void BaseMapNodePool::Initial(const BaseMapConfig* map_config,
-                              bool is_fixed_size) {
+void BaseMapNodePool::Initial(const BaseMapConfig* map_config, bool is_fixed_size) {
   is_fixed_size_ = is_fixed_size;
-  map_config_ = map_config;
+  map_config_    = map_config;
   for (unsigned int i = 0; i < pool_size_; ++i) {
     BaseMapNode* node = AllocNewMapNode();
     InitNewMapNode(node);
@@ -43,9 +41,7 @@ void BaseMapNodePool::Initial(const BaseMapConfig* map_config,
 }
 
 void BaseMapNodePool::Release() {
-  if (node_reset_workers_.valid()) {
-    node_reset_workers_.get();
-  }
+  if (node_reset_workers_.valid()) { node_reset_workers_.get(); }
   for (BaseMapNode* node : free_list_) {
     FinalizeMapNode(node);
     DellocMapNode(node);
@@ -61,15 +57,11 @@ void BaseMapNodePool::Release() {
 
 BaseMapNode* BaseMapNodePool::AllocMapNode() {
   if (free_list_.empty()) {
-    if (node_reset_workers_.valid()) {
-      node_reset_workers_.wait();
-    }
+    if (node_reset_workers_.valid()) { node_reset_workers_.wait(); }
   }
   boost::unique_lock<boost::mutex> lock(mutex_);
   if (free_list_.empty()) {
-    if (is_fixed_size_) {
-      return nullptr;
-    }
+    if (is_fixed_size_) { return nullptr; }
     BaseMapNode* node = AllocNewMapNode();
     InitNewMapNode(node);
     pool_size_++;
@@ -84,15 +76,14 @@ BaseMapNode* BaseMapNodePool::AllocMapNode() {
 }
 
 void BaseMapNodePool::FreeMapNode(BaseMapNode* map_node) {
-  node_reset_workers_ =
-      cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
+  node_reset_workers_ = cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
 }
 
 void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
   FinalizeMapNode(map_node);
   ResetMapNode(map_node);
   {
-    boost::unique_lock<boost::mutex> lock(mutex_);
+    boost::unique_lock<boost::mutex>          lock(mutex_);
     typename std::set<BaseMapNode*>::iterator f = busy_nodes_.find(map_node);
     DCHECK(f != busy_nodes_.end());
     free_list_.push_back(*f);
@@ -100,9 +91,7 @@ void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
   }
 }
 
-void BaseMapNodePool::InitNewMapNode(BaseMapNode* node) {
-  node->InitMapMatrix(map_config_);
-}
+void BaseMapNodePool::InitNewMapNode(BaseMapNode* node) { node->InitMapMatrix(map_config_); }
 
 void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) { node->Finalize(); }
 

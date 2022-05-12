@@ -27,10 +27,10 @@ class Bmsreport512Test : public ::testing::Test {
 };
 
 TEST_F(Bmsreport512Test, General) {
-  uint8_t data[8] = {0x01, 0x00, 0x01, 0x03, 0x52, 0x01, 0x00, 0x01};
-  int32_t length = 8;
+  uint8_t       data[8] = {0x01, 0x00, 0x01, 0x03, 0x52, 0x01, 0x00, 0x01};
+  int32_t       length  = 8;
   ChassisDetail cd;
-  Bmsreport512 bmsreport;
+  Bmsreport512  bmsreport;
   bmsreport.Parse(data, length, &cd);
 
   EXPECT_EQ(data[0], 0b00000001);

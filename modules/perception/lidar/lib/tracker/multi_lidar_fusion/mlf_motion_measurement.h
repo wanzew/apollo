@@ -25,31 +25,30 @@ namespace lidar {
 
 class MlfMotionMeasurement {
  public:
-  MlfMotionMeasurement() = default;
+  MlfMotionMeasurement()  = default;
   ~MlfMotionMeasurement() = default;
   // @brief: wrapper of motion measurement functions
   // @params [in]: track_data: track data
   // @params [in]: new_object: object for current updating
-  void ComputeMotionMeasurment(const MlfTrackDataConstPtr& track_data,
-                               TrackedObjectPtr new_object);
+  void ComputeMotionMeasurment(const MlfTrackDataConstPtr& track_data, TrackedObjectPtr new_object);
 
  protected:
   // @brief: select measurement based on track history
   // @params [in]: track data
   // @params [in]: latest object in track
   // @params [out]: new object for storing selection
-  void MeasurementSelection(const MlfTrackDataConstPtr& track_data,
+  void MeasurementSelection(const MlfTrackDataConstPtr&  track_data,
                             const TrackedObjectConstPtr& latest_object,
-                            TrackedObjectPtr new_object);
+                            TrackedObjectPtr             new_object);
   // @brief: estimate measurement quality
   // @params [in]: latest object in track
   // @params [out]: new object for storing quality
   void MeasurementQualityEstimation(const TrackedObjectConstPtr& latest_object,
-                                    TrackedObjectPtr new_object);
+                                    TrackedObjectPtr             new_object);
 
  private:
   const double EPSILON_TIME = 1e-3;  // or numeric_limits<double>::epsilon()
-  const double DEFAULT_FPS = 0.1;
+  const double DEFAULT_FPS  = 0.1;
   DISALLOW_COPY_AND_ASSIGN(MlfMotionMeasurement);
 };  // class MlfMotionMeasurement
 

@@ -41,8 +41,7 @@
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
-typedef std::shared_ptr<apollo::perception::Motion_Service>
-    MotionServiceMsgType;
+typedef std::shared_ptr<apollo::perception::Motion_Service> MotionServiceMsgType;
 using apollo::common::EigenMap;
 using apollo::common::EigenVector;
 
@@ -55,60 +54,58 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  CameraObstacleDetectionComponent() : seq_num_(0) {}
+  CameraObstacleDetectionComponent()
+      : seq_num_(0) {}
   ~CameraObstacleDetectionComponent();
 
-  CameraObstacleDetectionComponent(const CameraObstacleDetectionComponent&) =
-      delete;
-  CameraObstacleDetectionComponent& operator=(
-      const CameraObstacleDetectionComponent&) = delete;
+  CameraObstacleDetectionComponent(const CameraObstacleDetectionComponent&) = delete;
+  CameraObstacleDetectionComponent& operator=(const CameraObstacleDetectionComponent&) = delete;
 
   bool Init() override;
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
-                      const std::string& camera_name);
+                      const std::string&                             camera_name);
 
  private:
-  int InitConfig();
-  int InitSensorInfo();
-  int InitAlgorithmPlugin();
-  int InitCameraFrames();
-  int InitProjectMatrix();
-  int InitCameraListeners();
-  int InitMotionService();
+  int  InitConfig();
+  int  InitSensorInfo();
+  int  InitAlgorithmPlugin();
+  int  InitCameraFrames();
+  int  InitProjectMatrix();
+  int  InitCameraListeners();
+  int  InitMotionService();
   void SetCameraHeightAndPitch();
   void OnMotionService(const MotionServiceMsgType& message);
 
-  int InternalProc(
-      const std::shared_ptr<apollo::drivers::Image const>& in_message,
-      const std::string& camera_name, apollo::common::ErrorCode* error_code,
-      SensorFrameMessage* prefused_message,
-      apollo::perception::PerceptionObstacles* out_message);
+  int InternalProc(const std::shared_ptr<apollo::drivers::Image const>& in_message,
+                   const std::string&                                   camera_name,
+                   apollo::common::ErrorCode*                           error_code,
+                   SensorFrameMessage*                                  prefused_message,
+                   apollo::perception::PerceptionObstacles*             out_message);
 
-  int MakeProtobufMsg(double msg_timestamp, int seq_num,
-                      const std::vector<base::ObjectPtr>& objects,
-                      const std::vector<base::LaneLine>& lane_objects,
-                      const apollo::common::ErrorCode error_code,
+  int MakeProtobufMsg(double                                   msg_timestamp,
+                      int                                      seq_num,
+                      const std::vector<base::ObjectPtr>&      objects,
+                      const std::vector<base::LaneLine>&       lane_objects,
+                      const apollo::common::ErrorCode          error_code,
                       apollo::perception::PerceptionObstacles* obstacles);
 
-  int ConvertObjectToPb(const base::ObjectPtr& object_ptr,
+  int ConvertObjectToPb(const base::ObjectPtr&                  object_ptr,
                         apollo::perception::PerceptionObstacle* pb_msg);
 
-  int ConvertObjectToCameraObstacle(
-      const base::ObjectPtr& object_ptr,
-      apollo::perception::camera::CameraObstacle* camera_obstacle);
+  int ConvertObjectToCameraObstacle(const base::ObjectPtr&                      object_ptr,
+                                    apollo::perception::camera::CameraObstacle* camera_obstacle);
 
-  int ConvertLaneToCameraLaneline(
-      const base::LaneLine& lane_line,
-      apollo::perception::camera::CameraLaneLine* camera_laneline);
+  int ConvertLaneToCameraLaneline(const base::LaneLine&                       lane_line,
+                                  apollo::perception::camera::CameraLaneLine* camera_laneline);
 
-  int MakeCameraDebugMsg(
-      double msg_timestamp, const std::string& camera_name,
-      const camera::CameraFrame& camera_frame,
-      apollo::perception::camera::CameraDebug* camera_debug_msg);
+  int MakeCameraDebugMsg(double                                   msg_timestamp,
+                         const std::string&                       camera_name,
+                         const camera::CameraFrame&               camera_frame,
+                         apollo::perception::camera::CameraDebug* camera_debug_msg);
 
  private:
   std::mutex mutex_;
-  uint32_t seq_num_;
+  uint32_t   seq_num_;
 
   std::vector<std::shared_ptr<cyber::Node>> camera_listener_nodes_;
 
@@ -126,37 +123,35 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
   std::map<std::string, float> name_camera_pitch_angle_diff_map_;
 
   // TF stuff
-  std::map<std::string, std::string> tf_camera_frame_id_map_;
-  std::map<std::string, std::shared_ptr<TransformWrapper>>
-      camera2world_trans_wrapper_map_;
+  std::map<std::string, std::string>                       tf_camera_frame_id_map_;
+  std::map<std::string, std::shared_ptr<TransformWrapper>> camera2world_trans_wrapper_map_;
 
   // pre-allocaated-mem data_provider;
-  std::map<std::string, std::shared_ptr<camera::DataProvider>>
-      data_providers_map_;
+  std::map<std::string, std::shared_ptr<camera::DataProvider>> data_providers_map_;
 
   // map for store params
   EigenMap<std::string, Eigen::Matrix4d> extrinsic_map_;
   EigenMap<std::string, Eigen::Matrix3f> intrinsic_map_;
-  Eigen::Matrix3d homography_im2car_;
+  Eigen::Matrix3d                        homography_im2car_;
 
   // camera obstacle pipeline
-  camera::CameraPerceptionInitOptions camera_perception_init_options_;
-  camera::CameraPerceptionOptions camera_perception_options_;
+  camera::CameraPerceptionInitOptions              camera_perception_init_options_;
+  camera::CameraPerceptionOptions                  camera_perception_options_;
   std::unique_ptr<camera::ObstacleDetectionCamera> camera_obstacle_pipeline_;
 
   // fixed size camera frames
-  int frame_capacity_ = 20;
-  int frame_id_ = 0;
+  int                              frame_capacity_ = 20;
+  int                              frame_id_       = 0;
   EigenVector<camera::CameraFrame> camera_frames_;
 
   // image info.
-  int image_width_ = 1920;
-  int image_height_ = 1080;
+  int image_width_       = 1920;
+  int image_height_      = 1080;
   int image_channel_num_ = 3;
-  int image_data_size_ = -1;
+  int image_data_size_   = -1;
 
   // default camera pitch angle & height
-  float default_camera_pitch_ = 0.f;
+  float default_camera_pitch_  = 0.f;
   float default_camera_height_ = 1.6f;
 
   // options for DataProvider
@@ -166,50 +161,45 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
 
   std::string prefused_channel_name_;
 
-  bool enable_visualization_ = false;
+  bool        enable_visualization_ = false;
   std::string camera_perception_viz_message_channel_name_;
   std::string visual_debug_folder_;
   std::string visual_camera_;
 
-  bool output_final_obstacles_ = false;
+  bool        output_final_obstacles_ = false;
   std::string output_obstacles_channel_name_;
 
-  bool output_camera_debug_msg_ = false;
+  bool        output_camera_debug_msg_ = false;
   std::string camera_debug_channel_name_;
 
   Eigen::Matrix3d project_matrix_;
-  double pitch_diff_ = 0.0;
+  double          pitch_diff_ = 0.0;
 
   double last_timestamp_ = 0.0;
-  double ts_diff_ = 1.0;
+  double ts_diff_        = 1.0;
 
-  std::shared_ptr<
-      apollo::cyber::Writer<apollo::perception::PerceptionObstacles>>
-      writer_;
+  std::shared_ptr<apollo::cyber::Writer<apollo::perception::PerceptionObstacles>> writer_;
 
-  std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>>
-      sensorframe_writer_;
+  std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>> sensorframe_writer_;
 
-  std::shared_ptr<apollo::cyber::Writer<CameraPerceptionVizMessage>>
-      camera_viz_writer_;
+  std::shared_ptr<apollo::cyber::Writer<CameraPerceptionVizMessage>> camera_viz_writer_;
 
-  std::shared_ptr<
-      apollo::cyber::Writer<apollo::perception::camera::CameraDebug>>
+  std::shared_ptr<apollo::cyber::Writer<apollo::perception::camera::CameraDebug>>
       camera_debug_writer_;
 
   // variable for motion service
   base::MotionBufferPtr motion_buffer_;
-  const int motion_buffer_size_ = 100;
+  const int             motion_buffer_size_ = 100;
 
   // // variables for CIPV
-  bool enable_cipv_ = false;
+  bool                              enable_cipv_ = false;
   std::unique_ptr<camera::BaseCipv> cipv_;
-  camera::CipvInitOptions cipv_init_options_;
-  std::string cipv_name_;
+  camera::CipvInitOptions           cipv_init_options_;
+  std::string                       cipv_name_;
 
   // variables for visualization
   camera::Visualizer visualize_;
-  bool write_visual_img_;
+  bool               write_visual_img_;
 };
 
 CYBER_REGISTER_COMPONENT(CameraObstacleDetectionComponent);

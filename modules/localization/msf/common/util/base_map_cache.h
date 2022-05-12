@@ -17,8 +17,8 @@
 
 #include <functional>
 #include <utility>
-#include "cyber/common/log.h"
 
+#include "cyber/common/log.h"
 #include "modules/common/util/lru_cache.h"
 
 namespace apollo {
@@ -37,14 +37,13 @@ class MapNodeCache {
     value->SetIsReserved(false);
     return true;
   }
-  static bool CacheL2Destroy(Element* value) {
-    return !(value->GetIsReserved());
-  }
+  static bool CacheL2Destroy(Element* value) { return !(value->GetIsReserved()); }
 
  public:
   /**@brief The constructor. */
   MapNodeCache(unsigned int capacity, const DestroyFunc& destroy_func)
-      : destroy_func_(destroy_func), lru_map_nodes_(capacity) {}
+      : destroy_func_(destroy_func)
+      , lru_map_nodes_(capacity) {}
   /**@brief The destructor. */
   ~MapNodeCache() {}
   /**@brief Find element for key if it exists in the cache. If not exist, return
@@ -70,9 +69,7 @@ class MapNodeCache {
 
   /**@brief Change cache's max capacity. New capacity must be larger than size
    * in use. */
-  bool ChangeCapacity(int capacity) {
-    return lru_map_nodes_.ChangeCapacity(capacity);
-  }
+  bool ChangeCapacity(int capacity) { return lru_map_nodes_.ChangeCapacity(capacity); }
   /**@brief return cache's in use. */
   unsigned int Size() { return lru_map_nodes_.size(); }
   /**@brief return cache's max capacity. */
@@ -84,40 +81,33 @@ class MapNodeCache {
    * can't be removed. Then the cache will try to find another element to
    * remove. */
   const DestroyFunc destroy_func_;
-  MapLRUCache lru_map_nodes_;
+  MapLRUCache       lru_map_nodes_;
 };
 
 template <class Key, class Element, class MapLRUCache>
-bool MapNodeCache<Key, Element, MapLRUCache>::Get(const Key& key,
-                                                  Element** value) {
+bool MapNodeCache<Key, Element, MapLRUCache>::Get(const Key& key, Element** value) {
   auto value_ptr = lru_map_nodes_.Get(key);
-  if (!value_ptr) {
-    return false;
-  }
+  if (!value_ptr) { return false; }
   *value = *value_ptr;
   return true;
 }
 
 template <class Key, class Element, class MapLRUCache>
-bool MapNodeCache<Key, Element, MapLRUCache>::GetSilent(const Key& key,
-                                                        Element** value) {
+bool MapNodeCache<Key, Element, MapLRUCache>::GetSilent(const Key& key, Element** value) {
   auto value_ptr = lru_map_nodes_.GetSilently(key);
-  if (!value_ptr) {
-    return false;
-  }
+  if (!value_ptr) { return false; }
   *value = *value_ptr;
   return true;
 }
 
 template <class Key, class Element, class MapLRUCache>
-Element* MapNodeCache<Key, Element, MapLRUCache>::Put(const Key& key,
-                                                      Element* value) {
+Element* MapNodeCache<Key, Element, MapLRUCache>::Put(const Key& key, Element* value) {
   if (value == nullptr) {
     AINFO << "LRUCache Warning: put a NULL";
     return nullptr;
   }
 
-  auto* value_ptr = lru_map_nodes_.Get(key);
+  auto*    value_ptr   = lru_map_nodes_.Get(key);
   Element* node_remove = nullptr;
   if (value_ptr) {
     node_remove = *value_ptr;
@@ -130,7 +120,7 @@ Element* MapNodeCache<Key, Element, MapLRUCache>::Put(const Key& key,
   }
 
   if (lru_map_nodes_.size() >= lru_map_nodes_.capacity()) {
-    auto* node = lru_map_nodes_.Last();
+    auto* node  = lru_map_nodes_.Last();
     node_remove = node->val;
     Key key_tmp;
     lru_map_nodes_.PutAndGetObsolete(key, &value, &key_tmp);
@@ -144,9 +134,7 @@ Element* MapNodeCache<Key, Element, MapLRUCache>::Put(const Key& key,
 template <class Key, class Element, class MapLRUCache>
 Element* MapNodeCache<Key, Element, MapLRUCache>::Remove(const Key& key) {
   auto* node_remove = lru_map_nodes_.GetSilently(key);
-  if (node_remove && lru_map_nodes_.Remove(key)) {
-    return *node_remove;
-  }
+  if (node_remove && lru_map_nodes_.Remove(key)) { return *node_remove; }
 
   return nullptr;
 }
@@ -154,9 +142,7 @@ Element* MapNodeCache<Key, Element, MapLRUCache>::Remove(const Key& key) {
 template <class Key, class Element, class MapLRUCache>
 Element* MapNodeCache<Key, Element, MapLRUCache>::ClearOne() {
   auto* node_remove = lru_map_nodes_.Last();
-  if (!node_remove) {
-    return nullptr;
-  }
+  if (!node_remove) { return nullptr; }
   while (node_remove != lru_map_nodes_.First()) {
     if (destroy_func_(node_remove->val)) {
       lru_map_nodes_.Remove(node_remove->key);
@@ -164,8 +150,7 @@ Element* MapNodeCache<Key, Element, MapLRUCache>::ClearOne() {
     }
     node_remove = node_remove->prev;
   }
-  if (node_remove == lru_map_nodes_.First() &&
-      destroy_func_(node_remove->val)) {
+  if (node_remove == lru_map_nodes_.First() && destroy_func_(node_remove->val)) {
     lru_map_nodes_.Remove(node_remove->key);
     return node_remove->val;
   }

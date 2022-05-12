@@ -33,19 +33,19 @@ namespace base {
 
 // @brief a simplified light object pool from concurrent object pool, can be
 //        specialized for different sensors
-template <class ObjectType, size_t N = kPoolDefaultSize,
-          class Initializer = ObjectPoolDefaultInitializer<ObjectType>,
+template <class ObjectType,
+          size_t N               = kPoolDefaultSize,
+          class Initializer      = ObjectPoolDefaultInitializer<ObjectType>,
           SensorType sensor_type = SensorType::UNKNOWN_SENSOR_TYPE>
 class LightObjectPool : public BaseObjectPool<ObjectType> {
  public:
   using BaseObjectPool<ObjectType>::capacity_;
 
   // @brief Only allow accessing from global instance
-  static LightObjectPool& Instance(
-      const std::string& sensor_name = "velodyne64") {
-    typedef std::shared_ptr<LightObjectPool> LightObjectPoolPtr;
+  static LightObjectPool& Instance(const std::string& sensor_name = "velodyne64") {
+    typedef std::shared_ptr<LightObjectPool>         LightObjectPoolPtr;
     static std::map<std::string, LightObjectPoolPtr> object_pool;
-    auto itr = object_pool.find(sensor_name);
+    auto                                             itr = object_pool.find(sensor_name);
     if (itr == object_pool.end()) {
       auto ret = object_pool.insert(std::pair<std::string, LightObjectPoolPtr>(
           sensor_name, LightObjectPoolPtr(new LightObjectPool(N))));
@@ -57,31 +57,25 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
   // @brief overrided function to get object smart pointer
   std::shared_ptr<ObjectType> Get() override {
     ObjectType* ptr = nullptr;
-    if (queue_.empty()) {
-      Add(1 + kPoolDefaultExtendNum);
-    }
+    if (queue_.empty()) { Add(1 + kPoolDefaultExtendNum); }
     ptr = queue_.front();
     queue_.pop();
     kInitializer(ptr);
-    return std::shared_ptr<ObjectType>(
-        ptr, [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); });
+    return std::shared_ptr<ObjectType>(ptr, [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); });
   }
 
   // @brief overrided function to get batch of smart pointers
   // @params[IN] num: batch number
   // @params[OUT] data: vector container to store the pointers
-  void BatchGet(size_t num,
-                std::vector<std::shared_ptr<ObjectType>>* data) override {
-    if (queue_.size() < num) {
-      Add(num - queue_.size() + kPoolDefaultExtendNum);
-    }
+  void BatchGet(size_t num, std::vector<std::shared_ptr<ObjectType>>* data) override {
+    if (queue_.size() < num) { Add(num - queue_.size() + kPoolDefaultExtendNum); }
     ObjectType* ptr = nullptr;
     for (size_t i = 0; i < num; ++i) {
       ptr = queue_.front();
       queue_.pop();
       kInitializer(ptr);
-      data->emplace_back(std::shared_ptr<ObjectType>(
-          ptr, [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); }));
+      data->emplace_back(
+          std::shared_ptr<ObjectType>(ptr, [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); }));
     }
   }
 
@@ -89,23 +83,19 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
   // @params[IN] num: batch number
   // @params[IN] is_front: indicating insert to front or back of the list
   // @params[OUT] data: list container to store the pointers
-  void BatchGet(size_t num, bool is_front,
-                std::list<std::shared_ptr<ObjectType>>* data) override {
+  void BatchGet(size_t num, bool is_front, std::list<std::shared_ptr<ObjectType>>* data) override {
     std::vector<ObjectType*> buffer(num, nullptr);
-    if (queue_.size() < num) {
-      Add(num - queue_.size() + kPoolDefaultExtendNum);
-    }
+    if (queue_.size() < num) { Add(num - queue_.size() + kPoolDefaultExtendNum); }
     for (size_t i = 0; i < num; ++i) {
       buffer[i] = queue_.front();
       queue_.pop();
     }
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
-      is_front
-          ? data->emplace_front(std::shared_ptr<ObjectType>(
-                buffer[i], [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); }))
-          : data->emplace_back(std::shared_ptr<ObjectType>(
-                buffer[i], [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); }));
+      is_front ? data->emplace_front(std::shared_ptr<ObjectType>(
+                     buffer[i], [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); })) :
+                 data->emplace_back(std::shared_ptr<ObjectType>(
+                     buffer[i], [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); }));
     }
   }
 
@@ -113,31 +103,25 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
   // @params[IN] num: batch number
   // @params[IN] is_front: indicating insert to front or back of the deque
   // @params[OUT] data: deque container to store the pointers
-  void BatchGet(size_t num, bool is_front,
-                std::deque<std::shared_ptr<ObjectType>>* data) override {
+  void BatchGet(size_t num, bool is_front, std::deque<std::shared_ptr<ObjectType>>* data) override {
     std::vector<ObjectType*> buffer(num, nullptr);
-    if (queue_.size() < num) {
-      Add(num - queue_.size() + kPoolDefaultExtendNum);
-    }
+    if (queue_.size() < num) { Add(num - queue_.size() + kPoolDefaultExtendNum); }
     for (size_t i = 0; i < num; ++i) {
       buffer[i] = queue_.front();
       queue_.pop();
     }
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
-      is_front
-          ? data->emplace_front(std::shared_ptr<ObjectType>(
-                buffer[i], [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); }))
-          : data->emplace_back(std::shared_ptr<ObjectType>(
-                buffer[i], [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); }));
+      is_front ? data->emplace_front(std::shared_ptr<ObjectType>(
+                     buffer[i], [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); })) :
+                 data->emplace_back(std::shared_ptr<ObjectType>(
+                     buffer[i], [&](ObjectType* obj_ptr) { queue_.push(obj_ptr); }));
     }
   }
 
   // @brief overrided function to set capacity
   void set_capacity(size_t capacity) override {
-    if (capacity_ < capacity) {
-      Add(capacity - capacity_);
-    }
+    if (capacity_ < capacity) { Add(capacity - capacity_); }
   }
 
   // @brief get remained object number
@@ -177,7 +161,7 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
 
   std::queue<ObjectType*> queue_;
   // @brief point to a continuous memory of default pool size
-  ObjectType* cache_ = nullptr;
+  ObjectType*  cache_ = nullptr;
   const size_t kDefaultCacheSize;
   // @brief list to store extended memory, not as efficient
   std::list<ObjectType*> extended_cache_;

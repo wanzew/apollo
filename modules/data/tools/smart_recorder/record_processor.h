@@ -20,10 +20,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
+
 #include "cyber/record/record_message.h"
 #include "cyber/record/record_writer.h"
-
-#include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
 #include "modules/data/tools/smart_recorder/trigger_base.h"
 
 namespace apollo {
@@ -35,10 +35,9 @@ namespace data {
  */
 class RecordProcessor {
  public:
-  RecordProcessor(const std::string& source_record_dir,
-                  const std::string& restored_output_dir);
-  virtual bool Init(const SmartRecordTrigger& trigger_conf);
-  virtual bool Process() = 0;
+  RecordProcessor(const std::string& source_record_dir, const std::string& restored_output_dir);
+  virtual bool        Init(const SmartRecordTrigger& trigger_conf);
+  virtual bool        Process()                    = 0;
   virtual std::string GetDefaultOutputFile() const = 0;
   virtual ~RecordProcessor() { writer_->Close(); }
 
@@ -46,9 +45,9 @@ class RecordProcessor {
   bool InitTriggers(const SmartRecordTrigger& trigger_conf);
   bool ShouldRestore(const cyber::record::RecordMessage& msg) const;
 
-  const std::string source_record_dir_;
-  const std::string restored_output_dir_;
-  std::vector<std::unique_ptr<TriggerBase>> triggers_;
+  const std::string                            source_record_dir_;
+  const std::string                            restored_output_dir_;
+  std::vector<std::unique_ptr<TriggerBase>>    triggers_;
   std::unique_ptr<cyber::record::RecordWriter> writer_ = nullptr;
 };
 

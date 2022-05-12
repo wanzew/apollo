@@ -40,7 +40,7 @@ class Transmitter : public Endpoint {
   explicit Transmitter(const RoleAttributes& attr);
   virtual ~Transmitter();
 
-  virtual void Enable() = 0;
+  virtual void Enable()  = 0;
   virtual void Disable() = 0;
 
   virtual void Enable(const RoleAttributes& opposite_attr);
@@ -54,13 +54,14 @@ class Transmitter : public Endpoint {
   uint64_t seq_num() const { return seq_num_; }
 
  protected:
-  uint64_t seq_num_;
+  uint64_t    seq_num_;
   MessageInfo msg_info_;
 };
 
 template <typename M>
 Transmitter<M>::Transmitter(const RoleAttributes& attr)
-    : Endpoint(attr), seq_num_(0) {
+    : Endpoint(attr)
+    , seq_num_(0) {
   msg_info_.set_sender_id(this->id_);
   msg_info_.set_seq_num(this->seq_num_);
 }
@@ -71,8 +72,8 @@ Transmitter<M>::~Transmitter() {}
 template <typename M>
 bool Transmitter<M>::Transmit(const MessagePtr& msg) {
   msg_info_.set_seq_num(NextSeqNum());
-  PerfEventCache::Instance()->AddTransportEvent(
-      TransPerf::TRANSMIT_BEGIN, attr_.channel_id(), msg_info_.seq_num());
+  PerfEventCache::Instance()->AddTransportEvent(TransPerf::TRANSMIT_BEGIN, attr_.channel_id(),
+                                                msg_info_.seq_num());
   return Transmit(msg, msg_info_);
 }
 

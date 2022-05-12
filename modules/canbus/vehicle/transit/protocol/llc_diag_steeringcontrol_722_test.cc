@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/transit/protocol/llc_diag_steeringcontrol_722.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/drivers/canbus/common/byte.h"
@@ -32,11 +33,11 @@ class llc_diag_steeringcontrol_722Test : public ::testing ::Test {
 
 TEST_F(llc_diag_steeringcontrol_722Test, General) {
   Llcdiagsteeringcontrol722 steeringctrl_722_;
-  uint8_t data[7] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  uint8_t                   data[7] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
   EXPECT_EQ(steeringctrl_722_.GetPeriod(), 10 * 1000);
 
-  double pos = 3;
-  int torque = 0xF;
+  double pos    = 3;
+  int    torque = 0xF;
 
   steeringctrl_722_.set_llc_dbg_steeringsensorposition(pos);
   steeringctrl_722_.set_llc_dbg_steeringrackinputtorque(torque);

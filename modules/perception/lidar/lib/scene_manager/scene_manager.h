@@ -47,8 +47,7 @@ class SceneManager {
   // @brief: reset scene manager
   // @param [in]: initialization options
   // @return: status
-  bool Reset(
-      const SceneManagerInitOptions& options = SceneManagerInitOptions());
+  bool Reset(const SceneManagerInitOptions& options = SceneManagerInitOptions());
 
   int GetServiceNum() const { return static_cast<int>(services_.size()); }
 
@@ -57,13 +56,12 @@ class SceneManager {
   // @brief: initialize scene manager
   // @param [in]: initialization options
   // @return: status
-  bool InitInternal(
-      const SceneManagerInitOptions& options = SceneManagerInitOptions());
+  bool InitInternal(const SceneManagerInitOptions& options = SceneManagerInitOptions());
 
  protected:
   std::map<std::string, SceneServicePtr> services_;
-  bool initialized_ = false;
-  std::mutex mutex_;
+  bool                                   initialized_ = false;
+  std::mutex                             mutex_;
 };
 
 }  // namespace lidar

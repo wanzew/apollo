@@ -31,7 +31,7 @@ using common::GlobalData;
 
 auto NotifierFactory::CreateNotifier() -> NotifierPtr {
   std::string notifier_type(ConditionNotifier::Type());
-  auto& g_conf = GlobalData::Instance()->Config();
+  auto&       g_conf = GlobalData::Instance()->Config();
   if (g_conf.has_transport_conf() && g_conf.transport_conf().has_shm_conf() &&
       g_conf.transport_conf().shm_conf().has_notifier_type()) {
     notifier_type = g_conf.transport_conf().shm_conf().notifier_type();

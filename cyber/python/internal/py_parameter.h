@@ -18,6 +18,7 @@
 #define CYBER_PYTHON_INTERNAL_PY_PARAMETER_H_
 
 #include <unistd.h>
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -35,7 +36,8 @@ namespace cyber {
 class PyParameter {
  public:
   PyParameter() {}
-  explicit PyParameter(Parameter* param) : parameter_(*param) {}
+  explicit PyParameter(Parameter* param)
+      : parameter_(*param) {}
 
   PyParameter(const std::string& name, const int64_t int_value)
       : parameter_(name, int_value) {}
@@ -43,8 +45,10 @@ class PyParameter {
       : parameter_(name, double_value) {}
   PyParameter(const std::string& name, const std::string& string_value)
       : parameter_(name, string_value) {}
-  PyParameter(const std::string& name, const std::string& msg_str,
-              const std::string& full_name, const std::string& proto_desc)
+  PyParameter(const std::string& name,
+              const std::string& msg_str,
+              const std::string& full_name,
+              const std::string& proto_desc)
       : parameter_(name, msg_str, full_name, proto_desc) {}
 
   uint type() { return parameter_.Type(); }
@@ -55,8 +59,8 @@ class PyParameter {
 
   std::string name() { return parameter_.Name(); }
 
-  int64_t as_int64() { return parameter_.AsInt64(); }
-  double as_double() { return parameter_.AsDouble(); }
+  int64_t     as_int64() { return parameter_.AsInt64(); }
+  double      as_double() { return parameter_.AsDouble(); }
   std::string as_string() { return parameter_.AsString(); }
   std::string debug_string() { return parameter_.DebugString(); }
 
@@ -68,13 +72,10 @@ class PyParameter {
 
 class PyParameterClient {
  public:
-  PyParameterClient(const std::shared_ptr<Node>& node,
-                    const std::string& service_node_name)
+  PyParameterClient(const std::shared_ptr<Node>& node, const std::string& service_node_name)
       : parameter_clt_(node, service_node_name) {}
 
-  bool set_parameter(const Parameter& parameter) {
-    return parameter_clt_.SetParameter(parameter);
-  }
+  bool set_parameter(const Parameter& parameter) { return parameter_clt_.SetParameter(parameter); }
   bool get_parameter(const std::string& param_name, Parameter* parameter) {
     return parameter_clt_.GetParameter(param_name, parameter);
   }
@@ -91,9 +92,7 @@ class PyParameterServer {
   explicit PyParameterServer(const std::shared_ptr<Node>& node)
       : parameter_srv_(node) {}
 
-  void set_parameter(const Parameter& parameter) {
-    parameter_srv_.SetParameter(parameter);
-  }
+  void set_parameter(const Parameter& parameter) { parameter_srv_.SetParameter(parameter); }
   bool get_parameter(const std::string& param_name, Parameter* parameter) {
     return parameter_srv_.GetParameter(param_name, parameter);
   }

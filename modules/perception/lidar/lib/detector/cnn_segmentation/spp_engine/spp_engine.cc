@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/spp_engine/spp_engine.h"
+
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
@@ -23,13 +24,15 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-void SppEngine::Init(size_t width, size_t height, float range,
-                     const SppParams& param, const std::string& sensor_name) {
+void SppEngine::Init(size_t             width,
+                     size_t             height,
+                     float              range,
+                     const SppParams&   param,
+                     const std::string& sensor_name) {
   // initialize connect component detector
   detector_2d_cc_.Init(static_cast<int>(height), static_cast<int>(width));
   detector_2d_cc_.SetData(data_.obs_prob_data_ref, data_.offset_data,
-                          static_cast<float>(height) / (2.f * range),
-                          data_.objectness_threshold);
+                          static_cast<float>(height) / (2.f * range), data_.objectness_threshold);
   // initialize label image
   labels_2d_.Init(width, height, sensor_name);
   labels_2d_.InitRangeMask(range, param.confidence_range);
@@ -37,9 +40,9 @@ void SppEngine::Init(size_t width, size_t height, float range,
   params_ = param;
 
   // initialize feature size
-  width_ = width;
+  width_  = width;
   height_ = height;
-  range_ = range;
+  range_  = range;
   // bind worker
   worker_.Bind([&]() {
     data_.confidence_pt_blob->cpu_data();
@@ -51,8 +54,8 @@ void SppEngine::Init(size_t width, size_t height, float range,
   worker_.Start();
 }
 
-size_t SppEngine::ProcessConnectedComponentCluster(
-    const base::PointFCloudConstPtr point_cloud, const CloudMask& mask) {
+size_t SppEngine::ProcessConnectedComponentCluster(const base::PointFCloudConstPtr point_cloud,
+                                                   const CloudMask&                mask) {
   Timer timer;
   data_.category_pt_blob->cpu_data();
   data_.instance_pt_blob->cpu_data();
@@ -71,39 +74,27 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   // 2018.6.21 filter use category data to reserve long range objects
   // should be reverted after retrain model
   labels_2d_.FilterClusters(data_.confidence_data, data_.obs_prob_data_ref[0],
-                            data_.confidence_threshold,
-                            data_.objectness_threshold);
+                            data_.confidence_threshold, data_.objectness_threshold);
   double filter_time = timer.toc(true);
   if (data_.class_prob_data != nullptr) {
     labels_2d_.CalculateClusterClass(data_.class_prob_data, data_.class_num);
   }
-  if (data_.heading_data != nullptr) {
-    labels_2d_.CalculateClusterHeading(data_.heading_data);
-  }
-  if (data_.z_data != nullptr) {
-    labels_2d_.CalculateClusterTopZ(data_.z_data);
-  }
+  if (data_.heading_data != nullptr) { labels_2d_.CalculateClusterHeading(data_.heading_data); }
+  if (data_.z_data != nullptr) { labels_2d_.CalculateClusterTopZ(data_.z_data); }
   double chz_time = timer.toc(true);
   // 2. process 2d to 3d
   // first sync between cluster list and label image,
   // and they shared the same cluster pointer
   clusters_ = labels_2d_;
   for (size_t i = 0; i < point_cloud->size(); ++i) {
-    if (mask.size() && mask[static_cast<int>(i)] == 0) {
-      continue;
-    }
+    if (mask.size() && mask[static_cast<int>(i)] == 0) { continue; }
     // out of range
     const int id = data_.grid_indices[i];
-    if (id < 0) {
-      continue;
-    }
-    const auto& point = point_cloud->at(i);
+    if (id < 0) { continue; }
+    const auto&     point = point_cloud->at(i);
     const uint16_t& label = labels_2d_[0][id];
-    if (!label) {
-      continue;
-    }
-    if (point.z <=
-        labels_2d_.GetCluster(label - 1)->top_z + data_.top_z_threshold) {
+    if (!label) { continue; }
+    if (point.z <= labels_2d_.GetCluster(label - 1)->top_z + data_.top_z_threshold) {
       clusters_.AddPointSample(label - 1, point, point_cloud->points_height(i),
                                static_cast<uint32_t>(i));
     }
@@ -114,25 +105,23 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   double remove_time = timer.toc(true);
 
   AINFO << "SegForeground: sync1 " << sync_time1 << "\tdetect: " << detect_time
-        << "\tsync2: " << sync_time2 << "\tfilter: " << filter_time
-        << "\tchz: " << chz_time << "\tmapping: " << mapping_time
-        << "\tremove: " << remove_time;
+        << "\tsync2: " << sync_time2 << "\tfilter: " << filter_time << "\tchz: " << chz_time
+        << "\tmapping: " << mapping_time << "\tremove: " << remove_time;
 
   return clusters_.size();
 }
 
-size_t SppEngine::ProcessForegroundSegmentation(
-    const base::PointFCloudConstPtr point_cloud) {
+size_t SppEngine::ProcessForegroundSegmentation(const base::PointFCloudConstPtr point_cloud) {
   mask_.clear();
   ProcessConnectedComponentCluster(point_cloud, mask_);
   AINFO << "Foreground: " << clusters_.size() << " clusters";
   return clusters_.size();
 }
 
-size_t SppEngine::RemoveGroundPointsInForegroundCluster(
-    const base::PointFCloudConstPtr full_point_cloud,
-    const base::PointIndices& roi_indices,
-    const base::PointIndices& roi_non_ground_indices) {
+size_t
+SppEngine::RemoveGroundPointsInForegroundCluster(const base::PointFCloudConstPtr full_point_cloud,
+                                                 const base::PointIndices&       roi_indices,
+                                                 const base::PointIndices& roi_non_ground_indices) {
   mask_.Set(full_point_cloud->size(), 0);
   mask_.AddIndices(roi_indices);
   mask_.RemoveIndicesOfIndices(roi_indices, roi_non_ground_indices);

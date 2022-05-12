@@ -24,6 +24,7 @@
 #include <string>
 
 #include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -31,26 +32,24 @@ namespace planning {
 
 class PathDecider : public Task {
  public:
-  PathDecider(const TaskConfig &config,
-              const std::shared_ptr<DependencyInjector> &injector);
+  PathDecider(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector);
 
-  apollo::common::Status Execute(
-      Frame *frame, ReferenceLineInfo *reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
-  apollo::common::Status Process(const ReferenceLineInfo *reference_line_info,
-                                 const PathData &path_data,
-                                 PathDecision *const path_decision);
+  apollo::common::Status Process(const ReferenceLineInfo* reference_line_info,
+                                 const PathData&          path_data,
+                                 PathDecision* const      path_decision);
 
-  bool MakeObjectDecision(const PathData &path_data,
-                          const std::string &blocking_obstacle_id,
-                          PathDecision *const path_decision);
+  bool MakeObjectDecision(const PathData&     path_data,
+                          const std::string&  blocking_obstacle_id,
+                          PathDecision* const path_decision);
 
-  bool MakeStaticObstacleDecision(const PathData &path_data,
-                                  const std::string &blocking_obstacle_id,
-                                  PathDecision *const path_decision);
+  bool MakeStaticObstacleDecision(const PathData&     path_data,
+                                  const std::string&  blocking_obstacle_id,
+                                  PathDecision* const path_decision);
 
-  ObjectStop GenerateObjectStopDecision(const Obstacle &obstacle) const;
+  ObjectStop GenerateObjectStopDecision(const Obstacle& obstacle) const;
 };
 
 }  // namespace planning

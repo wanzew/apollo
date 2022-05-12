@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
 
@@ -26,36 +26,35 @@ namespace lidar {
 
 class PointCloudPreprocessor : public BasePointCloudPreprocessor {
  public:
-  PointCloudPreprocessor() : BasePointCloudPreprocessor() {}
+  PointCloudPreprocessor()
+      : BasePointCloudPreprocessor() {}
 
   virtual ~PointCloudPreprocessor() = default;
 
   bool Init(const PointCloudPreprocessorInitOptions& options =
                 PointCloudPreprocessorInitOptions()) override;
 
-  bool Preprocess(
-      const PointCloudPreprocessorOptions& options,
-      const std::shared_ptr<apollo::drivers::PointCloud const>& message,
-      LidarFrame* frame) const override;
+  bool Preprocess(const PointCloudPreprocessorOptions&                      options,
+                  const std::shared_ptr<apollo::drivers::PointCloud const>& message,
+                  LidarFrame*                                               frame) const override;
 
-  bool Preprocess(const PointCloudPreprocessorOptions& options,
-                  LidarFrame* frame) const override;
+  bool Preprocess(const PointCloudPreprocessorOptions& options, LidarFrame* frame) const override;
 
   std::string Name() const override { return "PointCloudPreprocessor"; }
 
  private:
   bool TransformCloud(const base::PointFCloudPtr& local_cloud,
-                      const Eigen::Affine3d& pose,
-                      base::PointDCloudPtr world_cloud) const;
+                      const Eigen::Affine3d&      pose,
+                      base::PointDCloudPtr        world_cloud) const;
   // params
-  bool filter_naninf_points_ = true;
-  bool filter_nearby_box_points_ = true;
-  float box_forward_x_ = 0.0f;
-  float box_backward_x_ = 0.0f;
-  float box_forward_y_ = 0.0f;
-  float box_backward_y_ = 0.0f;
-  bool filter_high_z_points_ = true;
-  float z_threshold_ = 5.0f;
+  bool               filter_naninf_points_     = true;
+  bool               filter_nearby_box_points_ = true;
+  float              box_forward_x_            = 0.0f;
+  float              box_backward_x_           = 0.0f;
+  float              box_forward_y_            = 0.0f;
+  float              box_backward_y_           = 0.0f;
+  bool               filter_high_z_points_     = true;
+  float              z_threshold_              = 5.0f;
   static const float kPointInfThreshold;
 };  // class PointCloudPreprocessor
 

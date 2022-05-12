@@ -29,17 +29,15 @@ class AudioInfo {
  public:
   AudioInfo() = default;
 
-  void Insert(
-      const apollo::drivers::microphone::config::AudioData&);
+  void Insert(const apollo::drivers::microphone::config::AudioData&);
 
   std::vector<std::vector<double>> GetSignals(const int signal_length);
 
  private:
-  void InsertChannelData(
-      const std::size_t index,
-      const apollo::drivers::microphone::config::ChannelData& channel_data,
-      const apollo::drivers::microphone::config::MicrophoneConfig&
-          microphone_config);
+  void
+  InsertChannelData(const std::size_t                                            index,
+                    const apollo::drivers::microphone::config::ChannelData&      channel_data,
+                    const apollo::drivers::microphone::config::MicrophoneConfig& microphone_config);
 
   std::vector<std::deque<double>> signals_;
 };

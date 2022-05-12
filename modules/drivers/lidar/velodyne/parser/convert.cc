@@ -36,9 +36,8 @@ void Convert::init(const Config& velodyne_config) {
 }
 
 /** @brief Callback for raw scan messages. */
-void Convert::ConvertPacketsToPointcloud(
-    const std::shared_ptr<VelodyneScan>& scan_msg,
-    std::shared_ptr<PointCloud> point_cloud) {
+void Convert::ConvertPacketsToPointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
+                                         std::shared_ptr<PointCloud>          point_cloud) {
   ADEBUG << "Convert scan msg seq " << scan_msg->header().sequence_num();
 
   parser_->GeneratePointcloud(scan_msg, point_cloud);

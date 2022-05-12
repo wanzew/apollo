@@ -20,7 +20,8 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-Dispatcher::Dispatcher() : is_shutdown_(false) {}
+Dispatcher::Dispatcher()
+    : is_shutdown_(false) {}
 
 Dispatcher::~Dispatcher() { Shutdown(); }
 
@@ -29,9 +30,7 @@ void Dispatcher::Shutdown() {
   ADEBUG << "Shutdown";
 }
 
-bool Dispatcher::HasChannel(uint64_t channel_id) {
-  return msg_listeners_.Has(channel_id);
-}
+bool Dispatcher::HasChannel(uint64_t channel_id) { return msg_listeners_.Has(channel_id); }
 
 }  // namespace transport
 }  // namespace cyber

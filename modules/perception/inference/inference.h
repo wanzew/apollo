@@ -29,29 +29,27 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-typedef std::map<std::string,
-                 std::shared_ptr<apollo::perception::base::Blob<float>>>
-    BlobMap;
+typedef std::map<std::string, std::shared_ptr<apollo::perception::base::Blob<float>>> BlobMap;
 
 class Inference {
  public:
   virtual void Infer() = 0;
-  Inference() = default;
+  Inference()          = default;
 
   virtual ~Inference() = default;
 
-  virtual bool Init(const std::map<std::string, std::vector<int>> &shapes) = 0;
+  virtual bool Init(const std::map<std::string, std::vector<int>>& shapes) = 0;
 
-  void set_max_batch_size(const int &batch_size);
+  void set_max_batch_size(const int& batch_size);
 
-  void set_gpu_id(const int &gpu_id);
+  void set_gpu_id(const int& gpu_id);
 
-  virtual std::shared_ptr<apollo::perception::base::Blob<float>> get_blob(
-      const std::string &name) = 0;
+  virtual std::shared_ptr<apollo::perception::base::Blob<float>>
+  get_blob(const std::string& name) = 0;
 
  protected:
   int max_batch_size_ = 1;
-  int gpu_id_ = 0;
+  int gpu_id_         = 0;
 };
 
 }  // namespace inference

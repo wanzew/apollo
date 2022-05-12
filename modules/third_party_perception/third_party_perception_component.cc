@@ -16,8 +16,9 @@
 
 #include "modules/third_party_perception/third_party_perception_component.h"
 
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/third_party_perception/proto/third_party_perception_component.pb.h"
+
+#include "modules/common/adapters/adapter_gflags.h"
 
 DECLARE_string(flagfile);
 
@@ -25,15 +26,13 @@ namespace apollo {
 namespace third_party_perception {
 
 bool ThirdPartyPerceptionComponent::Init() {
-  apollo::third_party_perception::ThirdPartyPerceptionDevice
-      third_party_perception_param;
+  apollo::third_party_perception::ThirdPartyPerceptionDevice third_party_perception_param;
   if (!GetProtoConfig(&third_party_perception_param)) {
     AINFO << "load third party perception param failed";
     return false;
   }
 
-  ThirdPartyPerceptionDeviceType device_type =
-      third_party_perception_param.device_type();
+  ThirdPartyPerceptionDeviceType device_type = third_party_perception_param.device_type();
 
   if (device_type == ThirdPartyPerceptionDeviceType::SMARTEREYE) {
     perception_ = std::make_shared<ThirdPartyPerceptionSmartereye>(node_.get());
@@ -43,21 +42,17 @@ bool ThirdPartyPerceptionComponent::Init() {
     perception_ = std::make_shared<ThirdPartyPerception>(node_.get());
   }
 
-  if (!perception_->Init().ok()) {
-    return false;
-  }
+  if (!perception_->Init().ok()) { return false; }
 
-  writer_ = node_->CreateWriter<apollo::perception::PerceptionObstacles>(
-      FLAGS_perception_obstacle_topic);
+  writer_ =
+      node_->CreateWriter<apollo::perception::PerceptionObstacles>(FLAGS_perception_obstacle_topic);
 
   return perception_->Start().ok();
 }
 
 bool ThirdPartyPerceptionComponent::Proc() {
   auto response = std::make_shared<apollo::perception::PerceptionObstacles>();
-  if (!perception_->Process(response.get())) {
-    return false;
-  }
+  if (!perception_->Process(response.get())) { return false; }
   writer_->Write(response);
   return true;
 }

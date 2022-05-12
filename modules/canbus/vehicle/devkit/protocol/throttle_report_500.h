@@ -17,27 +17,26 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Throttlereport500 : public ::apollo::drivers::canbus::ProtocolData<
-                              ::apollo::canbus::ChassisDetail> {
+class Throttlereport500
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Throttlereport500();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'Throttle_Pedal_Actual', 'offset': 0.0,
   // 'precision': 0.1, 'len': 16, 'is_signed_var': False, 'physical_range':
   // '[0|100]', 'bit': 31, 'type': 'double', 'order': 'motorola',
   // 'physical_unit': '%'}
-  double throttle_pedal_actual(const std::uint8_t* bytes,
-                               const int32_t length) const;
+  double throttle_pedal_actual(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Drive system communication fault', 'enum':
   // {0: 'THROTTLE_FLT2_NO_FAULT', 1:
@@ -45,16 +44,16 @@ class Throttlereport500 : public ::apollo::drivers::canbus::ProtocolData<
   // 8, 'name': 'Throttle_FLT2', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 23, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Throttle_report_500::Throttle_flt2Type throttle_flt2(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Throttle_report_500::Throttle_flt2Type throttle_flt2(const std::uint8_t* bytes,
+                                                       const int32_t       length) const;
 
   // config detail: {'description': 'Drive system hardware fault', 'enum': {0:
   // 'THROTTLE_FLT1_NO_FAULT', 1: 'THROTTLE_FLT1_DRIVE_SYSTEM_HARDWARE_FAULT'},
   // 'precision': 1.0, 'len': 8, 'name': 'Throttle_FLT1', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 15, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Throttle_report_500::Throttle_flt1Type throttle_flt1(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Throttle_report_500::Throttle_flt1Type throttle_flt1(const std::uint8_t* bytes,
+                                                       const int32_t       length) const;
 
   // config detail: {'name': 'Throttle_EN_state', 'enum': {0:
   // 'THROTTLE_EN_STATE_MANUAL', 1: 'THROTTLE_EN_STATE_AUTO', 2:
@@ -62,8 +61,8 @@ class Throttlereport500 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 2, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|2]', 'bit': 1, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Throttle_report_500::Throttle_en_stateType throttle_en_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Throttle_report_500::Throttle_en_stateType throttle_en_state(const std::uint8_t* bytes,
+                                                               const int32_t       length) const;
 };
 
 }  // namespace devkit

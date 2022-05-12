@@ -18,6 +18,7 @@
 #define CYBER_TRANSPORT_SHM_MULTICAST_NOTIFIER_H_
 
 #include <netinet/in.h>
+
 #include <atomic>
 
 #include "cyber/common/macros.h"
@@ -40,9 +41,9 @@ class MulticastNotifier : public NotifierBase {
  private:
   bool Init();
 
-  int notify_fd_ = -1;
+  int                notify_fd_ = -1;
   struct sockaddr_in notify_addr_;
-  int listen_fd_ = -1;
+  int                listen_fd_ = -1;
   struct sockaddr_in listen_addr_;
 
   std::atomic<bool> is_shutdown_ = {false};

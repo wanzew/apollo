@@ -18,17 +18,18 @@
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
+
 #include <cstdint>
 #include <cstdlib>
 
 #include "linux/zynq_api.h"
 
 #ifdef DEBUG
-#define BLOG_DBG0(s...) syslog(LOG_DEBUG, s);
+#  define BLOG_DBG0(s...) syslog(LOG_DEBUG, s);
 #else
-#define BLOG_DBG0(s...) \
-  do {                  \
-  } while (0);
+#  define BLOG_DBG0(s...)                                                                          \
+    do {                                                                                           \
+    } while (0);
 #endif
 #define BLOG_ERR(s...) syslog(LOG_ERR, s);
 
@@ -38,9 +39,9 @@ typedef uint64_t bcan_hdl_t;
 #define BCAN_MAX_RX_MSG 256
 
 typedef struct bcan_ihdl {
-  int dev_index;
-  int dev_state;
-  int fd;
+  int      dev_index;
+  int      dev_state;
+  int      fd;
   uint32_t baudrate;
   uint32_t tx_to;
   uint32_t rx_to;

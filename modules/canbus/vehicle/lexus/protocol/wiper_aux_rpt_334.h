@@ -17,27 +17,26 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Wiperauxrpt334 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Wiperauxrpt334
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Wiperauxrpt334();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'SPRAY_EMPTY_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 13, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool spray_empty_is_valid(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool spray_empty_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'SPRAY_EMPTY', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 5,
@@ -48,8 +47,7 @@ class Wiperauxrpt334 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 12, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool spray_near_empty_is_valid(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+  bool spray_near_empty_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'SPRAY_NEAR_EMPTY', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
@@ -61,8 +59,7 @@ class Wiperauxrpt334 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 11, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool rear_spraying_is_valid(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  bool rear_spraying_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'REAR_SPRAYING', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 3,
@@ -73,8 +70,7 @@ class Wiperauxrpt334 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 10, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool rear_wiping_is_valid(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool rear_wiping_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'REAR_WIPING', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 2,
@@ -85,8 +81,7 @@ class Wiperauxrpt334 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 9, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool front_spraying_is_valid(const std::uint8_t* bytes,
-                               const int32_t length) const;
+  bool front_spraying_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'FRONT_SPRAYING', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,
@@ -97,8 +92,7 @@ class Wiperauxrpt334 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 8, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool front_wiping_is_valid(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool front_wiping_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'FRONT_WIPING', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0,

@@ -20,36 +20,26 @@ namespace perception {
 namespace lidar {
 
 void SppData::MakeReference(size_t width, size_t height, float range) {
-  obs_prob_data = category_pt_blob->mutable_cpu_data();
-  offset_data = instance_pt_blob->mutable_cpu_data();
+  obs_prob_data   = category_pt_blob->mutable_cpu_data();
+  offset_data     = instance_pt_blob->mutable_cpu_data();
   confidence_data = confidence_pt_blob->mutable_cpu_data();
-  if (height_pt_blob != nullptr) {
-    z_data = height_pt_blob->mutable_cpu_data();
-  }
-  if (classify_pt_blob != nullptr) {
-    class_prob_data = classify_pt_blob->mutable_cpu_data();
-  }
-  if (heading_pt_blob != nullptr) {
-    heading_data = heading_pt_blob->mutable_cpu_data();
-  }
+  if (height_pt_blob != nullptr) { z_data = height_pt_blob->mutable_cpu_data(); }
+  if (classify_pt_blob != nullptr) { class_prob_data = classify_pt_blob->mutable_cpu_data(); }
+  if (heading_pt_blob != nullptr) { heading_data = heading_pt_blob->mutable_cpu_data(); }
 
-  if (obs_prob_data_ref == nullptr) {
-    obs_prob_data_ref = new float*[height];
-  }
+  if (obs_prob_data_ref == nullptr) { obs_prob_data_ref = new float*[height]; }
   for (size_t i = 0; i < height; ++i) {
     obs_prob_data_ref[i] = obs_prob_data + i * width;
   }
 
-  data_width = width;
+  data_width  = width;
   data_height = height;
-  data_range = range;
-  data_size = width * height;
+  data_range  = range;
+  data_size   = width * height;
 }
 
 SppData::~SppData() {
-  if (obs_prob_data_ref) {
-    delete[] obs_prob_data_ref;
-  }
+  if (obs_prob_data_ref) { delete[] obs_prob_data_ref; }
 }
 
 }  // namespace lidar

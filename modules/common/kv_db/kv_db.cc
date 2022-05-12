@@ -17,14 +17,13 @@
 
 #include <sqlite3.h>
 
+#include "absl/strings/str_cat.h"
 #include "gflags/gflags.h"
 
-#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/util.h"
 
-DEFINE_string(kv_db_path, "/apollo/data/kv_db.sqlite",
-              "Path to Key-value DB file.");
+DEFINE_string(kv_db_path, "/apollo/data/kv_db.sqlite", "Path to Key-value DB file.");
 
 namespace apollo {
 namespace common {
@@ -33,10 +32,10 @@ namespace {
 // Self-maintained sqlite instance.
 class SqliteWraper {
  public:
-  static int Callback(void *data, int argc, char **argv, char **col_name) {
+  static int Callback(void* data, int argc, char** argv, char** col_name) {
     if (data != nullptr) {
-      std::string *data_str = static_cast<std::string *>(data);
-      *data_str = argc > 0 ? argv[0] : "";
+      std::string* data_str = static_cast<std::string*>(data);
+      *data_str             = argc > 0 ? argv[0] : "";
     }
     return 0;
   }
@@ -50,24 +49,21 @@ class SqliteWraper {
     }
 
     // Create table if it doesn't exist.
-    static const char *kCreateTableSql =
-        "CREATE TABLE IF NOT EXISTS key_value "
-        "(key VARCHAR(128) PRIMARY KEY NOT NULL, value TEXT);";
-    if (!SQL(kCreateTableSql)) {
-      Release();
-    }
+    static const char* kCreateTableSql = "CREATE TABLE IF NOT EXISTS key_value "
+                                         "(key VARCHAR(128) PRIMARY KEY NOT NULL, value TEXT);";
+    if (!SQL(kCreateTableSql)) { Release(); }
   }
 
   ~SqliteWraper() { Release(); }
 
-  bool SQL(std::string_view sql, std::string *value = nullptr) {
+  bool SQL(std::string_view sql, std::string* value = nullptr) {
     AINFO << "Executing SQL: " << sql;
     if (db_ == nullptr) {
       AERROR << "DB is not open properly.";
       return false;
     }
 
-    char *error = nullptr;
+    char* error = nullptr;
     if (sqlite3_exec(db_, sql.data(), Callback, value, &error) != SQLITE_OK) {
       AERROR << "Failed to execute SQL: " << error;
       sqlite3_free(error);
@@ -84,33 +80,28 @@ class SqliteWraper {
     }
   }
 
-  sqlite3 *db_ = nullptr;
+  sqlite3* db_ = nullptr;
 };
 
 }  // namespace
 
 bool KVDB::Put(std::string_view key, std::string_view value) {
   SqliteWraper sqlite;
-  return sqlite.SQL(
-      absl::StrCat("INSERT OR REPLACE INTO key_value (key, value) VALUES ('",
-                   key, "', '", value, "');"));
+  return sqlite.SQL(absl::StrCat("INSERT OR REPLACE INTO key_value (key, value) VALUES ('", key,
+                                 "', '", value, "');"));
 }
 
 bool KVDB::Delete(std::string_view key) {
   SqliteWraper sqlite;
-  return sqlite.SQL(
-      absl::StrCat("DELETE FROM key_value WHERE key='", key, "';"));
+  return sqlite.SQL(absl::StrCat("DELETE FROM key_value WHERE key='", key, "';"));
 }
 
 std::optional<std::string> KVDB::Get(std::string_view key) {
   SqliteWraper sqlite;
-  std::string value;
-  const bool ret = sqlite.SQL(
-      absl::StrCat("SELECT value FROM key_value WHERE key='", key, "';"),
-      &value);
-  if (ret && !value.empty()) {
-    return value;
-  }
+  std::string  value;
+  const bool   ret =
+      sqlite.SQL(absl::StrCat("SELECT value FROM key_value WHERE key='", key, "';"), &value);
+  if (ret && !value.empty()) { return value; }
   return {};
 }
 

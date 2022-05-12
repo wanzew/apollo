@@ -28,26 +28,27 @@
 namespace nvinfer1 {
 class Int8EntropyCalibrator : public IInt8EntropyCalibrator {
  public:
-  Int8EntropyCalibrator(
-      const apollo::perception::inference::BatchStream &stream, int first_batch,
-      bool read_cache, std::string network);
+  Int8EntropyCalibrator(const apollo::perception::inference::BatchStream& stream,
+                        int                                               first_batch,
+                        bool                                              read_cache,
+                        std::string                                       network);
 
   virtual ~Int8EntropyCalibrator();
   int getBatchSize() const override { return stream_.getBatchSize(); }
 
-  bool getBatch(void *bindings[], const char *names[], int nbBindings) override;
+  bool getBatch(void* bindings[], const char* names[], int nbBindings) override;
 
-  const void *readCalibrationCache(size_t &length) override;
+  const void* readCalibrationCache(size_t& length) override;
 
-  void writeCalibrationCache(const void *cache, size_t length) override;
+  void writeCalibrationCache(const void* cache, size_t length) override;
 
  private:
   apollo::perception::inference::BatchStream stream_;
-  bool read_cache_ = true;
-  std::string network_ = "yolo";
-  size_t input_count_;
-  void *device_input_ = nullptr;
-  std::vector<char> calibration_cache_;
+  bool                                       read_cache_ = true;
+  std::string                                network_    = "yolo";
+  size_t                                     input_count_;
+  void*                                      device_input_ = nullptr;
+  std::vector<char>                          calibration_cache_;
 };
 
 }  //  namespace nvinfer1

@@ -59,29 +59,29 @@ void Adcauxiliarycontrol110::UpdateData(uint8_t* data) {
 
 void Adcauxiliarycontrol110::Reset() {
   // TODO(All) :  you should check this manually
-  adc_auxcontrol_counter_ = 0;
-  adc_auxcontrol_checksum_ = 0;
+  adc_auxcontrol_counter_         = 0;
+  adc_auxcontrol_checksum_        = 0;
   adc_cmd_inverter_controlenable_ = false;
-  adc_cmd_inverter_ = false;
-  adc_cmd_wiper_ = 0;
-  adc_cmd_pdu_controlenable_ = false;
-  adc_cmd_pdu_ch8_ = false;
-  adc_cmd_pdu_ch7_ = false;
-  adc_cmd_pdu_ch6_ = false;
-  adc_cmd_pdu_ch5_ = false;
-  adc_cmd_pdu_ch4_ = false;
-  adc_cmd_pdu_ch3_ = false;
-  adc_cmd_pdu_ch2_ = false;
-  adc_cmd_pdu_ch1_ = false;
-  adc_cmd_hazardlights_ = false;
-  adc_cmd_highbeam_ = false;
-  adc_cmd_lowbeam_ = false;
-  adc_cmd_horn_ = false;
-  adc_cmd_turnsignal_ = Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE;
+  adc_cmd_inverter_               = false;
+  adc_cmd_wiper_                  = 0;
+  adc_cmd_pdu_controlenable_      = false;
+  adc_cmd_pdu_ch8_                = false;
+  adc_cmd_pdu_ch7_                = false;
+  adc_cmd_pdu_ch6_                = false;
+  adc_cmd_pdu_ch5_                = false;
+  adc_cmd_pdu_ch4_                = false;
+  adc_cmd_pdu_ch3_                = false;
+  adc_cmd_pdu_ch2_                = false;
+  adc_cmd_pdu_ch1_                = false;
+  adc_cmd_hazardlights_           = false;
+  adc_cmd_highbeam_               = false;
+  adc_cmd_lowbeam_                = false;
+  adc_cmd_horn_                   = false;
+  adc_cmd_turnsignal_             = Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE;
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_auxcontrol_counter(
-    int adc_auxcontrol_counter) {
+Adcauxiliarycontrol110*
+Adcauxiliarycontrol110::set_adc_auxcontrol_counter(int adc_auxcontrol_counter) {
   adc_auxcontrol_counter_ = adc_auxcontrol_counter;
   return this;
 }
@@ -90,18 +90,17 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_auxcontrol_counter(
 // 0.0, 'precision': 1.0, 'len': 2, 'name': 'ADC_AuxControl_Counter',
 // 'is_signed_var': False, 'physical_range': '[0|3]', 'bit': 54, 'type': 'int',
 // 'order': 'intel', 'physical_unit': ''}
-void Adcauxiliarycontrol110::set_p_adc_auxcontrol_counter(
-    uint8_t* data, int adc_auxcontrol_counter) {
-  adc_auxcontrol_counter =
-      ProtocolData::BoundedValue(0, 3, adc_auxcontrol_counter);
-  uint8_t x = static_cast<uint8_t>(adc_auxcontrol_counter);
+void Adcauxiliarycontrol110::set_p_adc_auxcontrol_counter(uint8_t* data,
+                                                          int      adc_auxcontrol_counter) {
+  adc_auxcontrol_counter = ProtocolData::BoundedValue(0, 3, adc_auxcontrol_counter);
+  uint8_t x              = static_cast<uint8_t>(adc_auxcontrol_counter);
 
   Byte to_set(data + 6);
   to_set.set_value(x, 6, 2);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_auxcontrol_checksum(
-    int adc_auxcontrol_checksum) {
+Adcauxiliarycontrol110*
+Adcauxiliarycontrol110::set_adc_auxcontrol_checksum(int adc_auxcontrol_checksum) {
   adc_auxcontrol_checksum_ = adc_auxcontrol_checksum;
   return this;
 }
@@ -110,19 +109,17 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_auxcontrol_checksum(
 // 'precision': 1.0, 'len': 8, 'name': 'ADC_AuxControl_Checksum',
 // 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type':
 // 'int', 'order': 'intel', 'physical_unit': ''}
-void Adcauxiliarycontrol110::set_p_adc_auxcontrol_checksum(
-    uint8_t* data, int adc_auxcontrol_checksum) {
-  adc_auxcontrol_checksum =
-      ProtocolData::BoundedValue(0, 255, adc_auxcontrol_checksum);
-  uint8_t x = static_cast<uint8_t>(adc_auxcontrol_checksum);
+void Adcauxiliarycontrol110::set_p_adc_auxcontrol_checksum(uint8_t* data,
+                                                           int      adc_auxcontrol_checksum) {
+  adc_auxcontrol_checksum = ProtocolData::BoundedValue(0, 255, adc_auxcontrol_checksum);
+  uint8_t x               = static_cast<uint8_t>(adc_auxcontrol_checksum);
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);
 }
 
 Adcauxiliarycontrol110*
-Adcauxiliarycontrol110::set_adc_cmd_inverter_controlenable(
-    bool adc_cmd_inverter_controlenable) {
+Adcauxiliarycontrol110::set_adc_cmd_inverter_controlenable(bool adc_cmd_inverter_controlenable) {
   adc_cmd_inverter_controlenable_ = adc_cmd_inverter_controlenable;
   return this;
 }
@@ -139,8 +136,7 @@ void Adcauxiliarycontrol110::set_p_adc_cmd_inverter_controlenable(
   to_set.set_value(x, 1, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_inverter(
-    bool adc_cmd_inverter) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_inverter(bool adc_cmd_inverter) {
   adc_cmd_inverter_ = adc_cmd_inverter;
   return this;
 }
@@ -149,16 +145,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_inverter(
 // 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_Inverter', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 2, 'type': 'bool', 'order': 'intel',
 // 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_inverter(uint8_t* data,
-                                                    bool adc_cmd_inverter) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_inverter(uint8_t* data, bool adc_cmd_inverter) {
   uint8_t x = adc_cmd_inverter;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 2, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_wiper(
-    int adc_cmd_wiper) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_wiper(int adc_cmd_wiper) {
   adc_cmd_wiper_ = adc_cmd_wiper;
   return this;
 }
@@ -167,17 +161,16 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_wiper(
 // 'precision': 1.0, 'len': 2, 'name': 'ADC_CMD_Wiper', 'is_signed_var': False,
 // 'physical_range': '[0|3]', 'bit': 4, 'type': 'int', 'order': 'intel',
 // 'physical_unit': ''}
-void Adcauxiliarycontrol110::set_p_adc_cmd_wiper(uint8_t* data,
-                                                 int adc_cmd_wiper) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_wiper(uint8_t* data, int adc_cmd_wiper) {
   adc_cmd_wiper = ProtocolData::BoundedValue(0, 3, adc_cmd_wiper);
-  uint8_t x = static_cast<uint8_t>(adc_cmd_wiper);
+  uint8_t x     = static_cast<uint8_t>(adc_cmd_wiper);
 
   Byte to_set(data + 0);
   to_set.set_value(x, 4, 2);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_controlenable(
-    bool adc_cmd_pdu_controlenable) {
+Adcauxiliarycontrol110*
+Adcauxiliarycontrol110::set_adc_cmd_pdu_controlenable(bool adc_cmd_pdu_controlenable) {
   adc_cmd_pdu_controlenable_ = adc_cmd_pdu_controlenable;
   return this;
 }
@@ -186,16 +179,15 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_controlenable(
 // if not overridden)', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name':
 // 'ADC_CMD_PDU_ControlEnable', 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 0, 'type': 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_controlenable(
-    uint8_t* data, bool adc_cmd_pdu_controlenable) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_controlenable(uint8_t* data,
+                                                             bool     adc_cmd_pdu_controlenable) {
   uint8_t x = adc_cmd_pdu_controlenable;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch8(
-    bool adc_cmd_pdu_ch8) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch8(bool adc_cmd_pdu_ch8) {
   adc_cmd_pdu_ch8_ = adc_cmd_pdu_ch8;
   return this;
 }
@@ -204,16 +196,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch8(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch8',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 15, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch8(uint8_t* data,
-                                                   bool adc_cmd_pdu_ch8) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch8(uint8_t* data, bool adc_cmd_pdu_ch8) {
   uint8_t x = adc_cmd_pdu_ch8;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 7, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch7(
-    bool adc_cmd_pdu_ch7) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch7(bool adc_cmd_pdu_ch7) {
   adc_cmd_pdu_ch7_ = adc_cmd_pdu_ch7;
   return this;
 }
@@ -222,16 +212,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch7(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch7',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 14, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch7(uint8_t* data,
-                                                   bool adc_cmd_pdu_ch7) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch7(uint8_t* data, bool adc_cmd_pdu_ch7) {
   uint8_t x = adc_cmd_pdu_ch7;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 6, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch6(
-    bool adc_cmd_pdu_ch6) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch6(bool adc_cmd_pdu_ch6) {
   adc_cmd_pdu_ch6_ = adc_cmd_pdu_ch6;
   return this;
 }
@@ -240,16 +228,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch6(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch6',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 13, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch6(uint8_t* data,
-                                                   bool adc_cmd_pdu_ch6) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch6(uint8_t* data, bool adc_cmd_pdu_ch6) {
   uint8_t x = adc_cmd_pdu_ch6;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 5, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch5(
-    bool adc_cmd_pdu_ch5) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch5(bool adc_cmd_pdu_ch5) {
   adc_cmd_pdu_ch5_ = adc_cmd_pdu_ch5;
   return this;
 }
@@ -258,16 +244,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch5(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch5',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 12, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch5(uint8_t* data,
-                                                   bool adc_cmd_pdu_ch5) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch5(uint8_t* data, bool adc_cmd_pdu_ch5) {
   uint8_t x = adc_cmd_pdu_ch5;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 4, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch4(
-    bool adc_cmd_pdu_ch4) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch4(bool adc_cmd_pdu_ch4) {
   adc_cmd_pdu_ch4_ = adc_cmd_pdu_ch4;
   return this;
 }
@@ -276,16 +260,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch4(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch4',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 11, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch4(uint8_t* data,
-                                                   bool adc_cmd_pdu_ch4) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch4(uint8_t* data, bool adc_cmd_pdu_ch4) {
   uint8_t x = adc_cmd_pdu_ch4;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 3, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch3(
-    bool adc_cmd_pdu_ch3) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch3(bool adc_cmd_pdu_ch3) {
   adc_cmd_pdu_ch3_ = adc_cmd_pdu_ch3;
   return this;
 }
@@ -294,16 +276,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch3(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch3',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 10, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch3(uint8_t* data,
-                                                   bool adc_cmd_pdu_ch3) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch3(uint8_t* data, bool adc_cmd_pdu_ch3) {
   uint8_t x = adc_cmd_pdu_ch3;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 2, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch2(
-    bool adc_cmd_pdu_ch2) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch2(bool adc_cmd_pdu_ch2) {
   adc_cmd_pdu_ch2_ = adc_cmd_pdu_ch2;
   return this;
 }
@@ -312,16 +292,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch2(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch2',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 9, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch2(uint8_t* data,
-                                                   bool adc_cmd_pdu_ch2) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch2(uint8_t* data, bool adc_cmd_pdu_ch2) {
   uint8_t x = adc_cmd_pdu_ch2;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 1, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch1(
-    bool adc_cmd_pdu_ch1) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch1(bool adc_cmd_pdu_ch1) {
   adc_cmd_pdu_ch1_ = adc_cmd_pdu_ch1;
   return this;
 }
@@ -330,16 +308,15 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_pdu_ch1(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_PDU_Ch1',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 8, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch1(uint8_t* data,
-                                                   bool adc_cmd_pdu_ch1) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_pdu_ch1(uint8_t* data, bool adc_cmd_pdu_ch1) {
   uint8_t x = adc_cmd_pdu_ch1;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 0, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_hazardlights(
-    bool adc_cmd_hazardlights) {
+Adcauxiliarycontrol110*
+Adcauxiliarycontrol110::set_adc_cmd_hazardlights(bool adc_cmd_hazardlights) {
   adc_cmd_hazardlights_ = adc_cmd_hazardlights;
   return this;
 }
@@ -348,16 +325,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_hazardlights(
 // 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_HazardLights', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 28, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_hazardlights(
-    uint8_t* data, bool adc_cmd_hazardlights) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_hazardlights(uint8_t* data, bool adc_cmd_hazardlights) {
   uint8_t x = adc_cmd_hazardlights;
 
   Byte to_set(data + 3);
   to_set.set_value(x, 4, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_highbeam(
-    bool adc_cmd_highbeam) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_highbeam(bool adc_cmd_highbeam) {
   adc_cmd_highbeam_ = adc_cmd_highbeam;
   return this;
 }
@@ -366,16 +341,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_highbeam(
 // 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_HighBeam', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 27, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_highbeam(uint8_t* data,
-                                                    bool adc_cmd_highbeam) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_highbeam(uint8_t* data, bool adc_cmd_highbeam) {
   uint8_t x = adc_cmd_highbeam;
 
   Byte to_set(data + 3);
   to_set.set_value(x, 3, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_lowbeam(
-    bool adc_cmd_lowbeam) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_lowbeam(bool adc_cmd_lowbeam) {
   adc_cmd_lowbeam_ = adc_cmd_lowbeam;
   return this;
 }
@@ -384,16 +357,14 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_lowbeam(
 // 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_LowBeam', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 26, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_lowbeam(uint8_t* data,
-                                                   bool adc_cmd_lowbeam) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_lowbeam(uint8_t* data, bool adc_cmd_lowbeam) {
   uint8_t x = adc_cmd_lowbeam;
 
   Byte to_set(data + 3);
   to_set.set_value(x, 2, 1);
 }
 
-Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_horn(
-    bool adc_cmd_horn) {
+Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_horn(bool adc_cmd_horn) {
   adc_cmd_horn_ = adc_cmd_horn;
   return this;
 }
@@ -402,8 +373,7 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_horn(
 // 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_Horn', 'is_signed_var': False,
 // 'physical_range': '[0|1]', 'bit': 3, 'type': 'bool', 'order': 'intel',
 // 'physical_unit': 'T/F'}
-void Adcauxiliarycontrol110::set_p_adc_cmd_horn(uint8_t* data,
-                                                bool adc_cmd_horn) {
+void Adcauxiliarycontrol110::set_p_adc_cmd_horn(uint8_t* data, bool adc_cmd_horn) {
   uint8_t x = adc_cmd_horn;
 
   Byte to_set(data + 0);
@@ -423,8 +393,7 @@ Adcauxiliarycontrol110* Adcauxiliarycontrol110::set_adc_cmd_turnsignal(
 // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 24, 'type': 'enum',
 // 'order': 'intel', 'physical_unit': ''}
 void Adcauxiliarycontrol110::set_p_adc_cmd_turnsignal(
-    uint8_t* data,
-    Adc_auxiliarycontrol_110::Adc_cmd_turnsignalType adc_cmd_turnsignal) {
+    uint8_t* data, Adc_auxiliarycontrol_110::Adc_cmd_turnsignalType adc_cmd_turnsignal) {
   uint8_t x = adc_cmd_turnsignal;
 
   Byte to_set(data + 3);

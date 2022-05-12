@@ -43,7 +43,7 @@ void Steeringcmd6d::UpdateData(uint8_t* data) {
 void Steeringcmd6d::Reset() {
   // TODO(QiL) :you should check this manually
   position_value_ = 0.0;
-  speed_limit_ = 0.0;
+  speed_limit_    = 0.0;
 }
 
 Steeringcmd6d* Steeringcmd6d::set_position_value(double position_value) {
@@ -56,10 +56,9 @@ Steeringcmd6d* Steeringcmd6d::set_position_value(double position_value) {
 // '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'radians'}
 void Steeringcmd6d::set_p_position_value(uint8_t* data, double position_value) {
-  position_value =
-      ProtocolData::BoundedValue(-2147483.648, 2147483.647, position_value);
-  int x = static_cast<int>(position_value / 0.001000);
-  uint8_t t = 0;
+  position_value = ProtocolData::BoundedValue(-2147483.648, 2147483.647, position_value);
+  int     x      = static_cast<int>(position_value / 0.001000);
+  uint8_t t      = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 3);
@@ -91,8 +90,8 @@ Steeringcmd6d* Steeringcmd6d::set_speed_limit(double speed_limit) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
 void Steeringcmd6d::set_p_speed_limit(uint8_t* data, double speed_limit) {
   speed_limit = ProtocolData::BoundedValue(0.0, 65.535, speed_limit);
-  int x = static_cast<int>(speed_limit / 0.001000);
-  uint8_t t = 0;
+  int     x   = static_cast<int>(speed_limit / 0.001000);
+  uint8_t t   = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 7);

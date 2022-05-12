@@ -27,9 +27,9 @@ class Ultrsensor4510Test : public ::testing::Test {
 };
 
 TEST_F(Ultrsensor4510Test, General) {
-  uint8_t data[8] = {0xE2, 0x95, 0x06, 0x58, 0x08, 0xD6, 0x02, 0x44};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t        data[8] = {0xE2, 0x95, 0x06, 0x58, 0x08, 0xD6, 0x02, 0x44};
+  int32_t        length  = 8;
+  ChassisDetail  cd;
   Ultrsensor4510 ultrsensor4;
   ultrsensor4.Parse(data, length, &cd);
 

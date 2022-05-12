@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/zhongyun/protocol/torque_control_a3.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ class Torquecontrola3Test : public ::testing::Test {
 };
 
 TEST_F(Torquecontrola3Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t         data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Torquecontrola3 torque;
   EXPECT_EQ(torque.GetPeriod(), 20 * 1000);
   torque.UpdateData(data);

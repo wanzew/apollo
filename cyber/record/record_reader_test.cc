@@ -28,12 +28,12 @@ namespace record {
 
 using apollo::cyber::message::RawMessage;
 
-constexpr char kChannelName1[] = "/test/channel1";
-constexpr char kMessageType1[] = "apollo.cyber.proto.Test";
-constexpr char kProtoDesc[] = "1234567890";
-constexpr char kStr10B[] = "1234567890";
-constexpr char kTestFile[] = "record_reader_test.record";
-constexpr uint32_t kMessageNum = 16;
+constexpr char     kChannelName1[] = "/test/channel1";
+constexpr char     kMessageType1[] = "apollo.cyber.proto.Test";
+constexpr char     kProtoDesc[]    = "1234567890";
+constexpr char     kStr10B[]       = "1234567890";
+constexpr char     kTestFile[]     = "record_reader_test.record";
+constexpr uint32_t kMessageNum     = 16;
 
 TEST(RecordTest, TestSingleRecordFile) {
   RecordWriter writer;
@@ -50,7 +50,7 @@ TEST(RecordTest, TestSingleRecordFile) {
   ASSERT_EQ(kProtoDesc, writer.GetProtoDesc(kChannelName1));
   writer.Close();
 
-  RecordReader reader(kTestFile);
+  RecordReader  reader(kTestFile);
   RecordMessage message;
   ASSERT_EQ(kMessageNum, reader.GetMessageNumber(kChannelName1));
   ASSERT_EQ(kMessageType1, reader.GetMessageType(kChannelName1));
@@ -104,7 +104,7 @@ TEST(RecordTest, TestReaderOrder) {
   ASSERT_EQ(kProtoDesc, writer.GetProtoDesc(kChannelName1));
   writer.Close();
 
-  RecordReader reader(kTestFile);
+  RecordReader  reader(kTestFile);
   RecordMessage message;
   ASSERT_EQ(kMessageNum, reader.GetMessageNumber(kChannelName1));
   ASSERT_EQ(kMessageType1, reader.GetMessageType(kChannelName1));

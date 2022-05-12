@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lib/thread/thread_pool.h"
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/perception/lib/thread/concurrent_queue.h"
-#include "modules/perception/lib/thread/thread_pool.h"
 
 namespace apollo {
 namespace perception {
@@ -60,8 +60,7 @@ TEST(ThreadPoolTest, Test) {
   MyCallback my_callback;
   counter.Reset(10);
   for (int idx = 0; idx < 10; ++idx) {
-    Closure* closure =
-        NewCallback(&my_callback, &MyCallback::Callback, idx, &counter);
+    Closure* closure = NewCallback(&my_callback, &MyCallback::Callback, idx, &counter);
     thread_pool.Add(closure);
   }
 
@@ -70,8 +69,7 @@ TEST(ThreadPoolTest, Test) {
   counter.Reset(10);
   vector<Closure*> closures;
   for (int idx = 0; idx < 10; ++idx) {
-    Closure* closure =
-        NewCallback(&my_callback, &MyCallback::Callback, idx, &counter);
+    Closure* closure = NewCallback(&my_callback, &MyCallback::Callback, idx, &counter);
     closures.push_back(closure);
   }
   thread_pool.Add(closures);

@@ -46,10 +46,10 @@ void Turncmd130::UpdateData(uint8_t* data) {
 void Turncmd130::Reset() {
   // TODO(QiL) you should check this manually
   ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
-  clear_faults_ = false;
-  turn_signal_cmd_ = Turn_cmd_130::TURN_SIGNAL_CMD_RIGHT;
+  enable_           = false;
+  clear_override_   = false;
+  clear_faults_     = false;
+  turn_signal_cmd_  = Turn_cmd_130::TURN_SIGNAL_CMD_RIGHT;
 }
 
 Turncmd130* Turncmd130::set_ignore_overrides(bool ignore_overrides) {
@@ -112,8 +112,7 @@ void Turncmd130::set_p_clear_faults(uint8_t* data, bool clear_faults) {
   to_set.set_value(static_cast<uint8_t>(x), 3, 1);
 }
 
-Turncmd130* Turncmd130::set_turn_signal_cmd(
-    Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd) {
+Turncmd130* Turncmd130::set_turn_signal_cmd(Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd) {
   turn_signal_cmd_ = turn_signal_cmd;
   return this;
 }
@@ -123,8 +122,8 @@ Turncmd130* Turncmd130::set_turn_signal_cmd(
 // 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
 // 'bit': 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Turncmd130::set_p_turn_signal_cmd(
-    uint8_t* data, Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd) {
+void Turncmd130::set_p_turn_signal_cmd(uint8_t*                          data,
+                                       Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd) {
   uint8_t x = turn_signal_cmd;
 
   Byte to_set(data + 1);

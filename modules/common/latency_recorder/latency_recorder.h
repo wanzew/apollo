@@ -20,9 +20,9 @@
 #include <mutex>
 #include <string>
 
-#include "cyber/cyber.h"
-
 #include "modules/common/latency_recorder/proto/latency_record.pb.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace common {
@@ -31,20 +31,20 @@ class LatencyRecorder {
  public:
   explicit LatencyRecorder(const std::string& module_name);
 
-  void AppendLatencyRecord(const uint64_t message_id,
+  void AppendLatencyRecord(const uint64_t             message_id,
                            const apollo::cyber::Time& begin_time,
                            const apollo::cyber::Time& end_time);
 
  private:
   LatencyRecorder() = default;
   std::shared_ptr<apollo::cyber::Writer<LatencyRecordMap>> CreateWriter();
-  void PublishLatencyRecords(
-      const std::shared_ptr<apollo::cyber::Writer<LatencyRecordMap>>& writer);
+  void
+  PublishLatencyRecords(const std::shared_ptr<apollo::cyber::Writer<LatencyRecordMap>>& writer);
 
-  std::string module_name_;
-  std::mutex mutex_;
-  std::unique_ptr<LatencyRecordMap> records_;
-  apollo::cyber::Time current_time_;
+  std::string                          module_name_;
+  std::mutex                           mutex_;
+  std::unique_ptr<LatencyRecordMap>    records_;
+  apollo::cyber::Time                  current_time_;
   std::shared_ptr<apollo::cyber::Node> node_;
 };
 

@@ -30,8 +30,10 @@ namespace common {
 
 using cyber::common::PathExists;
 
-bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
-                  int *frame_id, double *time_stamp) {
+bool ReadPoseFile(const std::string& filename,
+                  Eigen::Affine3d*   pose,
+                  int*               frame_id,
+                  double*            time_stamp) {
   if (pose == nullptr || frame_id == nullptr || time_stamp == nullptr) {
     AERROR << "Nullptr error.";
     return false;
@@ -43,10 +45,10 @@ bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
     return false;
   }
 
-  Eigen::Vector3d translation;
+  Eigen::Vector3d    translation;
   Eigen::Quaterniond quat;
-  fin >> *frame_id >> *time_stamp >> translation(0) >> translation(1) >>
-      translation(2) >> quat.x() >> quat.y() >> quat.z() >> quat.w();
+  fin >> *frame_id >> *time_stamp >> translation(0) >> translation(1) >> translation(2) >>
+      quat.x() >> quat.y() >> quat.z() >> quat.w();
 
   *pose = Eigen::Affine3d::Identity();
   pose->prerotate(quat);
@@ -56,11 +58,9 @@ bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
   return true;
 }
 
-bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
-                              base::BrownCameraDistortionModel *model) {
-  if (!PathExists(yaml_file) || model == nullptr) {
-    return false;
-  }
+bool LoadBrownCameraIntrinsic(const std::string&                yaml_file,
+                              base::BrownCameraDistortionModel* model) {
+  if (!PathExists(yaml_file) || model == nullptr) { return false; }
 
   YAML::Node node = YAML::LoadFile(yaml_file);
   if (node.IsNull()) {
@@ -68,11 +68,11 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
     return false;
   }
 
-  float camera_width = 0.0f;
-  float camera_height = 0.0f;
+  float           camera_width  = 0.0f;
+  float           camera_height = 0.0f;
   Eigen::VectorXf params(9 + 5);
   try {
-    camera_width = node["width"].as<float>();
+    camera_width  = node["width"].as<float>();
     camera_height = node["height"].as<float>();
     for (size_t i = 0; i < 9; ++i) {
       params(i) = node["K"][i].as<float>();
@@ -81,9 +81,9 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
       params(9 + i) = node["D"][i].as<float>();
     }
 
-    model->set_params(static_cast<size_t>(camera_width),
-                      static_cast<size_t>(camera_height), params);
-  } catch (YAML::Exception &e) {
+    model->set_params(static_cast<size_t>(camera_width), static_cast<size_t>(camera_height),
+                      params);
+  } catch (YAML::Exception& e) {
     AERROR << "load camera intrisic file " << yaml_file
            << " with error, YAML exception: " << e.what();
     return false;
@@ -92,12 +92,9 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
   return true;
 }
 
-bool LoadOmnidirectionalCameraIntrinsics(
-    const std::string &yaml_file,
-    base::OmnidirectionalCameraDistortionModel *model) {
-  if (!PathExists(yaml_file) || model == nullptr) {
-    return false;
-  }
+bool LoadOmnidirectionalCameraIntrinsics(const std::string&                          yaml_file,
+                                         base::OmnidirectionalCameraDistortionModel* model) {
+  if (!PathExists(yaml_file) || model == nullptr) { return false; }
 
   YAML::Node node = YAML::LoadFile(yaml_file);
   if (node.IsNull()) {
@@ -105,21 +102,21 @@ bool LoadOmnidirectionalCameraIntrinsics(
     return false;
   }
 
-  if (!node["width"].IsDefined() || !node["height"].IsDefined() ||
-      !node["center"].IsDefined() || !node["affine"].IsDefined() ||
-      !node["cam2world"].IsDefined() || !node["world2cam"].IsDefined() ||
-      !node["focallength"].IsDefined() || !node["principalpoint"].IsDefined()) {
+  if (!node["width"].IsDefined() || !node["height"].IsDefined() || !node["center"].IsDefined() ||
+      !node["affine"].IsDefined() || !node["cam2world"].IsDefined() ||
+      !node["world2cam"].IsDefined() || !node["focallength"].IsDefined() ||
+      !node["principalpoint"].IsDefined()) {
     AINFO << "Invalid intrinsics file for an omnidirectional camera.";
     return false;
   }
 
   try {
-    int camera_width = 0;
+    int camera_width  = 0;
     int camera_height = 0;
 
     std::vector<float> params;  // center|affine|f|p|i,cam2world|j,world2cam
 
-    camera_width = node["width"].as<int>();
+    camera_width  = node["width"].as<int>();
     camera_height = node["height"].as<int>();
 
     params.push_back(node["center"]["x"].as<float>());
@@ -151,7 +148,7 @@ bool LoadOmnidirectionalCameraIntrinsics(
     }
 
     model->set_params(camera_width, camera_height, eigen_params);
-  } catch (YAML::Exception &e) {
+  } catch (YAML::Exception& e) {
     AERROR << "load camera intrisic file " << yaml_file
            << " with error, YAML exception: " << e.what();
     return false;
@@ -160,8 +157,9 @@ bool LoadOmnidirectionalCameraIntrinsics(
   return true;
 }
 
-bool GetFileList(const std::string &path, const std::string &suffix,
-                 std::vector<std::string> *files) {
+bool GetFileList(const std::string&        path,
+                 const std::string&        suffix,
+                 std::vector<std::string>* files) {
   if (!PathExists(path)) {
     AINFO << path << " not exist.";
     return false;
@@ -170,11 +168,9 @@ bool GetFileList(const std::string &path, const std::string &suffix,
   boost::filesystem::recursive_directory_iterator itr(path);
   while (itr != boost::filesystem::recursive_directory_iterator()) {
     try {
-      if (absl::EndsWith(itr->path().string(), suffix)) {
-        files->push_back(itr->path().string());
-      }
+      if (absl::EndsWith(itr->path().string(), suffix)) { files->push_back(itr->path().string()); }
       ++itr;
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
       AWARN << "Caught execption: " << ex.what();
       continue;
     }

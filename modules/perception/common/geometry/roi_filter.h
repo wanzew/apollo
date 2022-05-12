@@ -27,26 +27,22 @@ namespace perception {
 namespace common {
 
 // @brief: whether a point is in ROI.
-bool IsPtInRoi(
-    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
-    const apollo::perception::base::PointD pt);
+bool IsPtInRoi(const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
+               const apollo::perception::base::PointD                             pt);
 
 // @brief: whether an object's center is in ROI.
-bool IsObjectInRoi(
-    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
-    const std::shared_ptr<const apollo::perception::base::Object> obj);
+bool IsObjectInRoi(const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
+                   const std::shared_ptr<const apollo::perception::base::Object>      obj);
 
 // @brief: whether an object's bbox is in ROI.
-bool IsObjectBboxInRoi(
-    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
-    const std::shared_ptr<const apollo::perception::base::Object> obj);
+bool IsObjectBboxInRoi(const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
+                       const std::shared_ptr<const apollo::perception::base::Object>      obj);
 
 // @brief: whether objects' center are in ROI. If return True,
 //         you can get objects in ROI by param valid_objects.
-bool ObjectInRoiCheck(
-    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
-    const std::vector<std::shared_ptr<apollo::perception::base::Object>>& objs,
-    std::vector<std::shared_ptr<apollo::perception::base::Object>>* valid_objs);
+bool ObjectInRoiCheck(const std::shared_ptr<const apollo::perception::base::HdmapStruct>    roi,
+                      const std::vector<std::shared_ptr<apollo::perception::base::Object>>& objs,
+                      std::vector<std::shared_ptr<apollo::perception::base::Object>>* valid_objs);
 
 }  // namespace common
 }  // namespace perception

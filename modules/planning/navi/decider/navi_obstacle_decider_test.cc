@@ -24,12 +24,14 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 using apollo::common::util::PointFactory;
 using apollo::perception::PerceptionObstacle;
@@ -39,14 +41,14 @@ namespace apollo {
 namespace planning {
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
-  PathDecision path_decision;
-  SLBoundary obstacle_boundary;
-  ReferenceLine reference_line;
-  common::VehicleState vehicle_state;
+  PerceptionObstacle             perception_obstacle;
+  PathDecision                   path_decision;
+  SLBoundary                     obstacle_boundary;
+  ReferenceLine                  reference_line;
+  common::VehicleState           vehicle_state;
 
   perception_obstacle.set_width(1.0);
   perception_obstacle.set_length(1.0);
@@ -68,23 +70,22 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
   double nudge_dist;
   for (int i = 0; i < 6; i++) {
     lane_obstacles_num = 0;
-    nudge_dist = obstacle_decider.GetNudgeDistance(
-        vec_obstacle, reference_line, path_decision, vec_points, vehicle_state,
-        &lane_obstacles_num);
+    nudge_dist = obstacle_decider.GetNudgeDistance(vec_obstacle, reference_line, path_decision,
+                                                   vec_points, vehicle_state, &lane_obstacles_num);
   }
   EXPECT_FLOAT_EQ(nudge_dist, 0.755);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 1);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
-  PathDecision path_decision;
-  SLBoundary obstacle_boundary;
-  ReferenceLine reference_line;
-  common::VehicleState vehicle_state;
+  PerceptionObstacle             perception_obstacle;
+  PathDecision                   path_decision;
+  SLBoundary                     obstacle_boundary;
+  ReferenceLine                  reference_line;
+  common::VehicleState           vehicle_state;
 
   perception_obstacle.set_width(1.0);
   perception_obstacle.set_length(1.0);
@@ -104,23 +105,22 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
   double nudge_dist;
   for (int i = 0; i < 6; i++) {
     lane_obstacles_num = 0;
-    nudge_dist = obstacle_decider.GetNudgeDistance(
-        vec_obstacle, reference_line, path_decision, vec_points, vehicle_state,
-        &lane_obstacles_num);
+    nudge_dist = obstacle_decider.GetNudgeDistance(vec_obstacle, reference_line, path_decision,
+                                                   vec_points, vehicle_state, &lane_obstacles_num);
   }
   EXPECT_FLOAT_EQ(nudge_dist, -0.755);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 1);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
-  PathDecision path_decision;
-  SLBoundary obstacle_boundary;
-  ReferenceLine reference_line;
-  common::VehicleState vehicle_state;
+  PerceptionObstacle             perception_obstacle;
+  PathDecision                   path_decision;
+  SLBoundary                     obstacle_boundary;
+  ReferenceLine                  reference_line;
+  common::VehicleState           vehicle_state;
 
   // obstacle 1
   perception_obstacle.set_width(1.0);
@@ -161,23 +161,22 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   double nudge_dist;
   for (int i = 0; i < 6; i++) {
     lane_obstacles_num = 0;
-    nudge_dist = obstacle_decider.GetNudgeDistance(
-        vec_obstacle, reference_line, path_decision, vec_points, vehicle_state,
-        &lane_obstacles_num);
+    nudge_dist = obstacle_decider.GetNudgeDistance(vec_obstacle, reference_line, path_decision,
+                                                   vec_points, vehicle_state, &lane_obstacles_num);
   }
   EXPECT_FLOAT_EQ(nudge_dist, 0.72657289);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 2);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist4) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
-  PathDecision path_decision;
-  SLBoundary obstacle_boundary;
-  ReferenceLine reference_line;
-  common::VehicleState vehicle_state;
+  PerceptionObstacle             perception_obstacle;
+  PathDecision                   path_decision;
+  SLBoundary                     obstacle_boundary;
+  ReferenceLine                  reference_line;
+  common::VehicleState           vehicle_state;
 
   perception_obstacle.set_width(1.0);
   perception_obstacle.set_length(1.0);
@@ -193,23 +192,22 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist4) {
   vec_obstacle.emplace_back(&b1);
   vehicle_state.set_linear_velocity(20);
 
-  int lane_obstacles_num = 0;
+  int    lane_obstacles_num = 0;
   double nudge_dist;
   for (int i = 0; i < 6; i++) {
     lane_obstacles_num = 0;
-    nudge_dist = obstacle_decider.GetNudgeDistance(
-        vec_obstacle, reference_line, path_decision, vec_points, vehicle_state,
-        &lane_obstacles_num);
+    nudge_dist = obstacle_decider.GetNudgeDistance(vec_obstacle, reference_line, path_decision,
+                                                   vec_points, vehicle_state, &lane_obstacles_num);
   }
   EXPECT_FLOAT_EQ(nudge_dist, 0);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 0);
 }
 
 TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
-  NaviObstacleDecider obstacle_decider;
-  std::vector<const Obstacle*> vec_obstacle;
+  NaviObstacleDecider            obstacle_decider;
+  std::vector<const Obstacle*>   vec_obstacle;
   std::vector<common::PathPoint> vec_points;
-  PerceptionObstacle perception_obstacle;
+  PerceptionObstacle             perception_obstacle;
 
   // obstacle 1
   perception_obstacle.set_width(1.0);

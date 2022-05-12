@@ -41,27 +41,24 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 // constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-Stage::Stage(const ScenarioConfig::StageConfig& config,
+Stage::Stage(const ScenarioConfig::StageConfig&         config,
              const std::shared_ptr<DependencyInjector>& injector)
-    : config_(config), injector_(injector) {
+    : config_(config)
+    , injector_(injector) {
   // set stage_type in PlanningContext
-  injector->planning_context()
-      ->mutable_planning_status()
-      ->mutable_scenario()
-      ->set_stage_type(stage_type());
+  injector->planning_context()->mutable_planning_status()->mutable_scenario()->set_stage_type(
+      stage_type());
 
-  name_ = ScenarioConfig::StageType_Name(config_.stage_type());
+  name_       = ScenarioConfig::StageType_Name(config_.stage_type());
   next_stage_ = config_.stage_type();
-  std::unordered_map<TaskConfig::TaskType, const TaskConfig*, std::hash<int>>
-      config_map;
+  std::unordered_map<TaskConfig::TaskType, const TaskConfig*, std::hash<int>> config_map;
   for (const auto& task_config : config_.task_config()) {
     config_map[task_config.task_type()] = &task_config;
   }
   for (int i = 0; i < config_.task_type_size(); ++i) {
     auto task_type = config_.task_type(i);
     ACHECK(config_map.find(task_type) != config_map.end())
-        << "Task: " << TaskConfig::TaskType_Name(task_type)
-        << " used but not configured";
+        << "Task: " << TaskConfig::TaskType_Name(task_type) << " used but not configured";
     auto iter = tasks_.find(task_type);
     if (iter == tasks_.end()) {
       auto ptr = TaskFactory::CreateTask(*config_map[task_type], injector_);
@@ -84,8 +81,8 @@ Task* Stage::FindTask(TaskConfig::TaskType task_type) const {
   }
 }
 
-bool Stage::ExecuteTaskOnReferenceLine(
-    const common::TrajectoryPoint& planning_start_point, Frame* frame) {
+bool Stage::ExecuteTaskOnReferenceLine(const common::TrajectoryPoint& planning_start_point,
+                                       Frame*                         frame) {
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (!reference_line_info.IsDrivable()) {
       AERROR << "The generated path is not drivable";
@@ -98,7 +95,7 @@ bool Stage::ExecuteTaskOnReferenceLine(
       const auto ret = task->Execute(frame, &reference_line_info);
 
       const double end_timestamp = Clock::NowInSeconds();
-      const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+      const double time_diff_ms  = (end_timestamp - start_timestamp) * 1000;
       ADEBUG << "after task[" << task->Name()
              << "]: " << reference_line_info.PathSpeedDebugString();
       ADEBUG << task->Name() << " time spend: " << time_diff_ms << " ms.";
@@ -120,9 +117,9 @@ bool Stage::ExecuteTaskOnReferenceLine(
       reference_line_info.set_trajectory_type(ADCTrajectory::NORMAL);
     }
     DiscretizedTrajectory trajectory;
-    if (!reference_line_info.CombinePathAndSpeedProfile(
-            planning_start_point.relative_time(),
-            planning_start_point.path_point().s(), &trajectory)) {
+    if (!reference_line_info.CombinePathAndSpeedProfile(planning_start_point.relative_time(),
+                                                        planning_start_point.path_point().s(),
+                                                        &trajectory)) {
       AERROR << "Fail to aggregate planning trajectory.";
       return false;
     }
@@ -142,17 +139,15 @@ bool Stage::ExecuteTaskOnReferenceLineForOnlineLearning(
 
   // FIXME(all): current only pick up the first reference line to use
   // learning model trajectory
-  auto& picked_reference_line_info =
-      frame->mutable_reference_line_info()->front();
+  auto& picked_reference_line_info = frame->mutable_reference_line_info()->front();
   for (auto* task : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
 
     const auto ret = task->Execute(frame, &picked_reference_line_info);
 
     const double end_timestamp = Clock::NowInSeconds();
-    const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
-    ADEBUG << "task[" << task->Name() << "] time spent: " << time_diff_ms
-           << " ms.";
+    const double time_diff_ms  = (end_timestamp - start_timestamp) * 1000;
+    ADEBUG << "task[" << task->Name() << "] time spent: " << time_diff_ms << " ms.";
     RecordDebugInfo(&picked_reference_line_info, task->Name(), time_diff_ms);
 
     if (!ret.ok()) {
@@ -187,24 +182,18 @@ bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
   }
 
   if (frame->open_space_info().fallback_flag()) {
-    auto& trajectory = frame->open_space_info().fallback_trajectory().first;
-    auto& gear = frame->open_space_info().fallback_trajectory().second;
-    PublishableTrajectory publishable_trajectory(
-        Clock::NowInSeconds(), trajectory);
-    auto publishable_traj_and_gear =
-        std::make_pair(std::move(publishable_trajectory), gear);
+    auto&                 trajectory = frame->open_space_info().fallback_trajectory().first;
+    auto&                 gear       = frame->open_space_info().fallback_trajectory().second;
+    PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(), trajectory);
+    auto publishable_traj_and_gear = std::make_pair(std::move(publishable_trajectory), gear);
 
     *(frame->mutable_open_space_info()->mutable_publishable_trajectory_data()) =
         std::move(publishable_traj_and_gear);
   } else {
-    auto& trajectory =
-        frame->open_space_info().chosen_partitioned_trajectory().first;
-    auto& gear =
-        frame->open_space_info().chosen_partitioned_trajectory().second;
-    PublishableTrajectory publishable_trajectory(
-        Clock::NowInSeconds(), trajectory);
-    auto publishable_traj_and_gear =
-        std::make_pair(std::move(publishable_trajectory), gear);
+    auto& trajectory = frame->open_space_info().chosen_partitioned_trajectory().first;
+    auto& gear       = frame->open_space_info().chosen_partitioned_trajectory().second;
+    PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(), trajectory);
+    auto publishable_traj_and_gear = std::make_pair(std::move(publishable_trajectory), gear);
 
     *(frame->mutable_open_space_info()->mutable_publishable_trajectory_data()) =
         std::move(publishable_traj_and_gear);
@@ -219,7 +208,7 @@ Stage::StageStatus Stage::FinishScenario() {
 
 void Stage::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
                             const std::string& name,
-                            const double time_diff_ms) {
+                            const double       time_diff_ms) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;

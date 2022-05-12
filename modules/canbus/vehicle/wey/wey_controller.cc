@@ -15,10 +15,12 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/wey_controller.h"
+
+#include "modules/common/proto/vehicle_signal.pb.h"
+
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus/vehicle/wey/wey_message_manager.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -32,22 +34,21 @@ using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
-double angle_init = 0;
+double        angle_init                     = 0;
 }  // namespace
 
-ErrorCode WeyController::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+WeyController::Init(const VehicleParameter&                                params,
+                    CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+                    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "WeyController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
   }
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -67,36 +68,34 @@ ErrorCode WeyController::Init(
   message_manager_ = message_manager;
 
   // sender part
-  ads1_111_ = dynamic_cast<Ads1111*>(
-      message_manager_->GetMutableProtocolDataById(Ads1111::ID));
+  ads1_111_ = dynamic_cast<Ads1111*>(message_manager_->GetMutableProtocolDataById(Ads1111::ID));
   if (ads1_111_ == nullptr) {
     AERROR << "Ads1111 does not exist in the WeyMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  ads3_38e_ = dynamic_cast<Ads338e*>(
-      message_manager_->GetMutableProtocolDataById(Ads338e::ID));
+  ads3_38e_ = dynamic_cast<Ads338e*>(message_manager_->GetMutableProtocolDataById(Ads338e::ID));
   if (ads3_38e_ == nullptr) {
     AERROR << "Ads338e does not exist in the WeyMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  ads_eps_113_ = dynamic_cast<Adseps113*>(
-      message_manager_->GetMutableProtocolDataById(Adseps113::ID));
+  ads_eps_113_ =
+      dynamic_cast<Adseps113*>(message_manager_->GetMutableProtocolDataById(Adseps113::ID));
   if (ads_eps_113_ == nullptr) {
     AERROR << "Adseps113 does not exist in the WeyMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  ads_req_vin_390_ = dynamic_cast<Adsreqvin390*>(
-      message_manager_->GetMutableProtocolDataById(Adsreqvin390::ID));
+  ads_req_vin_390_ =
+      dynamic_cast<Adsreqvin390*>(message_manager_->GetMutableProtocolDataById(Adsreqvin390::ID));
   if (ads_req_vin_390_ == nullptr) {
     AERROR << "Adsreqvin390 does not exist in the WeyMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  ads_shifter_115_ = dynamic_cast<Adsshifter115*>(
-      message_manager_->GetMutableProtocolDataById(Adsshifter115::ID));
+  ads_shifter_115_ =
+      dynamic_cast<Adsshifter115*>(message_manager_->GetMutableProtocolDataById(Adsshifter115::ID));
   if (ads_shifter_115_ == nullptr) {
     AERROR << "Adsshifter115 does not exist in the WeyMessageManager!";
     return ErrorCode::CANBUS_ERROR;
@@ -148,9 +147,7 @@ Chassis WeyController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -172,10 +169,10 @@ Chassis WeyController::chassis() {
   }
 
   // 5 6
-  if (wey.has_fbs2_240() && wey.fbs2_240().has_vehiclespd() &&
-      wey.has_fbs1_243() && wey.has_status_310()) {
-    Fbs2_240 fbs2_240 = wey.fbs2_240();
-    Fbs1_243 fbs1_243 = wey.fbs1_243();
+  if (wey.has_fbs2_240() && wey.fbs2_240().has_vehiclespd() && wey.has_fbs1_243() &&
+      wey.has_status_310()) {
+    Fbs2_240   fbs2_240   = wey.fbs2_240();
+    Fbs1_243   fbs1_243   = wey.fbs1_243();
     Status_310 status_310 = wey.status_310();
     // speed_mps
     chassis_.set_speed_mps(static_cast<float>(fbs2_240.vehiclespd()));
@@ -183,74 +180,52 @@ Chassis WeyController::chassis() {
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
         static_cast<bool>(status_310.rrwheelspdvalid()));
     if (fbs2_240.rrwheeldirection() == Fbs2_240::RRWHEELDIRECTION_FORWARD) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
-          WheelSpeed::FORWARD);
-    } else if (fbs2_240.rrwheeldirection() ==
-               Fbs2_240::RRWHEELDIRECTION_BACKWARD) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
-          WheelSpeed::BACKWARD);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(WheelSpeed::FORWARD);
+    } else if (fbs2_240.rrwheeldirection() == Fbs2_240::RRWHEELDIRECTION_BACKWARD) {
+      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(WheelSpeed::BACKWARD);
     } else if (fbs2_240.rrwheeldirection() == Fbs2_240::RRWHEELDIRECTION_STOP) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
-          WheelSpeed::STANDSTILL);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(WheelSpeed::STANDSTILL);
     } else {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
-          WheelSpeed::INVALID);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(WheelSpeed::INVALID);
     }
     chassis_.mutable_wheel_speed()->set_wheel_spd_rr(fbs2_240.rrwheelspd());
     // rl
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
         static_cast<bool>(status_310.rlwheelspdvalid()));
-    if (fbs2_240.rlwheeldrivedirection() ==
-        Fbs2_240::RLWHEELDRIVEDIRECTION_FORWARD) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
-          WheelSpeed::FORWARD);
-    } else if (fbs2_240.rlwheeldrivedirection() ==
-               Fbs2_240::RLWHEELDRIVEDIRECTION_BACKWARD) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
-          WheelSpeed::BACKWARD);
-    } else if (fbs2_240.rlwheeldrivedirection() ==
-               Fbs2_240::RLWHEELDRIVEDIRECTION_STOP) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
-          WheelSpeed::STANDSTILL);
+    if (fbs2_240.rlwheeldrivedirection() == Fbs2_240::RLWHEELDRIVEDIRECTION_FORWARD) {
+      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(WheelSpeed::FORWARD);
+    } else if (fbs2_240.rlwheeldrivedirection() == Fbs2_240::RLWHEELDRIVEDIRECTION_BACKWARD) {
+      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(WheelSpeed::BACKWARD);
+    } else if (fbs2_240.rlwheeldrivedirection() == Fbs2_240::RLWHEELDRIVEDIRECTION_STOP) {
+      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(WheelSpeed::STANDSTILL);
     } else {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
-          WheelSpeed::INVALID);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(WheelSpeed::INVALID);
     }
     chassis_.mutable_wheel_speed()->set_wheel_spd_rl(fbs2_240.rlwheelspd());
     // fr
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
         static_cast<bool>(status_310.frwheelspdvalid()));
     if (fbs1_243.frwheeldirection() == Fbs1_243::FRWHEELDIRECTION_FORWARD) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
-          WheelSpeed::FORWARD);
-    } else if (fbs1_243.frwheeldirection() ==
-               Fbs1_243::FRWHEELDIRECTION_BACKWARD) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
-          WheelSpeed::BACKWARD);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(WheelSpeed::FORWARD);
+    } else if (fbs1_243.frwheeldirection() == Fbs1_243::FRWHEELDIRECTION_BACKWARD) {
+      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(WheelSpeed::BACKWARD);
     } else if (fbs1_243.frwheeldirection() == Fbs1_243::FRWHEELDIRECTION_STOP) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
-          WheelSpeed::STANDSTILL);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(WheelSpeed::STANDSTILL);
     } else {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
-          WheelSpeed::INVALID);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(WheelSpeed::INVALID);
     }
     chassis_.mutable_wheel_speed()->set_wheel_spd_fr(fbs2_240.frwheelspd());
     // fl
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
         static_cast<bool>(status_310.flwheelspdvalid()));
     if (fbs2_240.flwheeldirection() == Fbs2_240::FLWHEELDIRECTION_FORWARD) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
-          WheelSpeed::FORWARD);
-    } else if (fbs2_240.flwheeldirection() ==
-               Fbs2_240::FLWHEELDIRECTION_BACKWARD) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
-          WheelSpeed::BACKWARD);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(WheelSpeed::FORWARD);
+    } else if (fbs2_240.flwheeldirection() == Fbs2_240::FLWHEELDIRECTION_BACKWARD) {
+      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(WheelSpeed::BACKWARD);
     } else if (fbs2_240.flwheeldirection() == Fbs2_240::FLWHEELDIRECTION_STOP) {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
-          WheelSpeed::STANDSTILL);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(WheelSpeed::STANDSTILL);
     } else {
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
-          WheelSpeed::INVALID);
+      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(WheelSpeed::INVALID);
     }
     chassis_.mutable_wheel_speed()->set_wheel_spd_fl(fbs1_243.flwheelspd());
   } else {
@@ -260,8 +235,7 @@ Chassis WeyController::chassis() {
   chassis_.set_fuel_range_m(0);
   // 8
   if (wey.has_fbs3_237() && wey.fbs3_237().has_accpedalpos()) {
-    chassis_.set_throttle_percentage(
-        static_cast<float>(wey.fbs3_237().accpedalpos()));
+    chassis_.set_throttle_percentage(static_cast<float>(wey.fbs3_237().accpedalpos()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
@@ -280,21 +254,18 @@ Chassis WeyController::chassis() {
       case Fbs3_237::CURRENTGEAR_P: {
         chassis_.set_gear_location(Chassis::GEAR_PARKING);
       } break;
-      default:
-        chassis_.set_gear_location(Chassis::GEAR_INVALID);
-        break;
+      default: chassis_.set_gear_location(Chassis::GEAR_INVALID); break;
     }
   } else {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
   // 11
-  if (wey.has_fbs4_235() && wey.fbs4_235().has_steerwheelangle() &&
-      wey.has_status_310() && wey.status_310().has_steerwheelanglesign()) {
-    if (wey.status_310().steerwheelanglesign() ==
-        Status_310::STEERWHEELANGLESIGN_LEFT_POSITIVE) {
-      chassis_.set_steering_percentage(
-          static_cast<float>(wey.fbs4_235().steerwheelangle() * 100.0 /
-                             vehicle_params_.max_steer_angle() * M_PI / 180));
+  if (wey.has_fbs4_235() && wey.fbs4_235().has_steerwheelangle() && wey.has_status_310() &&
+      wey.status_310().has_steerwheelanglesign()) {
+    if (wey.status_310().steerwheelanglesign() == Status_310::STEERWHEELANGLESIGN_LEFT_POSITIVE) {
+      chassis_.set_steering_percentage(static_cast<float>(wey.fbs4_235().steerwheelangle() * 100.0 /
+                                                          vehicle_params_.max_steer_angle() * M_PI /
+                                                          180));
       angle_init = wey.fbs4_235().steerwheelangle();
     } else if (wey.status_310().steerwheelanglesign() ==
                Status_310::STEERWHEELANGLESIGN_RIGHT_NEGATIVE) {
@@ -311,15 +282,13 @@ Chassis WeyController::chassis() {
 
   // 12
   if (wey.has_fbs3_237() && wey.fbs3_237().has_epsdrvinputtrqvalue()) {
-    chassis_.set_steering_torque_nm(
-        static_cast<float>(wey.fbs3_237().epsdrvinputtrqvalue()));
+    chassis_.set_steering_torque_nm(static_cast<float>(wey.fbs3_237().epsdrvinputtrqvalue()));
   } else {
     chassis_.set_steering_torque_nm(0);
   }
   // 13
   if (wey.has_status_310() && wey.status_310().has_epbsts()) {
-    chassis_.set_parking_brake(wey.status_310().epbsts() ==
-                               Status_310::EPBSTS_CLOSED);
+    chassis_.set_parking_brake(wey.status_310().epbsts() == Status_310::EPBSTS_CLOSED);
   } else {
     chassis_.set_parking_brake(false);
   }
@@ -334,47 +303,38 @@ Chassis WeyController::chassis() {
   if (wey.has_status_310()) {
     if (wey.status_310().has_leftturnlampsts() &&
         wey.status_310().leftturnlampsts() == Status_310::LEFTTURNLAMPSTS_ON) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_LEFT);
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_LEFT);
     } else if (wey.status_310().has_rightturnlampsts() &&
-               wey.status_310().rightturnlampsts() ==
-                   Status_310::RIGHTTURNLAMPSTS_ON) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_RIGHT);
+               wey.status_310().rightturnlampsts() == Status_310::RIGHTTURNLAMPSTS_ON) {
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_RIGHT);
     } else {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_NONE);
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
     }
   } else {
-    chassis_.mutable_signal()->set_turn_signal(
-        common::VehicleSignal::TURN_NONE);
+    chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
   }
   // 18
-  if (wey.has_vin_resp1_391() && wey.has_vin_resp2_392() &&
-      wey.has_vin_resp3_393()) {
+  if (wey.has_vin_resp1_391() && wey.has_vin_resp2_392() && wey.has_vin_resp3_393()) {
     Vin_resp1_391 vin_resp1_391 = wey.vin_resp1_391();
     Vin_resp2_392 vin_resp2_392 = wey.vin_resp2_392();
     Vin_resp3_393 vin_resp3_393 = wey.vin_resp3_393();
-    if (vin_resp1_391.has_vin00() && vin_resp1_391.has_vin01() &&
-        vin_resp1_391.has_vin02() && vin_resp1_391.has_vin03() &&
-        vin_resp1_391.has_vin04() && vin_resp1_391.has_vin05() &&
-        vin_resp1_391.has_vin06() && vin_resp1_391.has_vin07() &&
-        vin_resp2_392.has_vin08() && vin_resp2_392.has_vin09() &&
-        vin_resp2_392.has_vin10() && vin_resp2_392.has_vin11() &&
-        vin_resp2_392.has_vin12() && vin_resp2_392.has_vin13() &&
-        vin_resp2_392.has_vin14() && vin_resp2_392.has_vin15() &&
-        vin_resp3_393.has_vin16()) {
+    if (vin_resp1_391.has_vin00() && vin_resp1_391.has_vin01() && vin_resp1_391.has_vin02() &&
+        vin_resp1_391.has_vin03() && vin_resp1_391.has_vin04() && vin_resp1_391.has_vin05() &&
+        vin_resp1_391.has_vin06() && vin_resp1_391.has_vin07() && vin_resp2_392.has_vin08() &&
+        vin_resp2_392.has_vin09() && vin_resp2_392.has_vin10() && vin_resp2_392.has_vin11() &&
+        vin_resp2_392.has_vin12() && vin_resp2_392.has_vin13() && vin_resp2_392.has_vin14() &&
+        vin_resp2_392.has_vin15() && vin_resp3_393.has_vin16()) {
       int n[17];
-      n[0] = vin_resp1_391.vin07();
-      n[1] = vin_resp1_391.vin06();
-      n[2] = vin_resp1_391.vin05();
-      n[3] = vin_resp1_391.vin04();
-      n[4] = vin_resp1_391.vin03();
-      n[5] = vin_resp1_391.vin02();
-      n[6] = vin_resp1_391.vin01();
-      n[7] = vin_resp1_391.vin00();
-      n[8] = vin_resp2_392.vin15();
-      n[9] = vin_resp2_392.vin14();
+      n[0]  = vin_resp1_391.vin07();
+      n[1]  = vin_resp1_391.vin06();
+      n[2]  = vin_resp1_391.vin05();
+      n[3]  = vin_resp1_391.vin04();
+      n[4]  = vin_resp1_391.vin03();
+      n[5]  = vin_resp1_391.vin02();
+      n[6]  = vin_resp1_391.vin01();
+      n[7]  = vin_resp1_391.vin00();
+      n[8]  = vin_resp2_392.vin15();
+      n[9]  = vin_resp2_392.vin14();
       n[10] = vin_resp2_392.vin13();
       n[11] = vin_resp2_392.vin12();
       n[12] = vin_resp2_392.vin11();
@@ -391,16 +351,12 @@ Chassis WeyController::chassis() {
     }
   }
 
-  if (chassis_error_mask_) {
-    chassis_.set_chassis_error_mask(chassis_error_mask_);
-  }
+  if (chassis_error_mask_) { chassis_.set_chassis_error_mask(chassis_error_mask_); }
   // Give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && !chassis_.parking_brake()) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "CANBUS not ready, epb is not released or firmware error!");
   }
@@ -432,8 +388,7 @@ ErrorCode WeyController::EnableAutoMode() {
   ads3_38e_->set_dippedbeamon(Ads3_38e::DIPPEDBEAMON_TURN_ON);
 
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -664,47 +619,37 @@ bool WeyController::CheckChassisError() {
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   if (!chassis_detail.has_wey()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO wey vehicle info."
-                      << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has NO wey vehicle info." << chassis_detail.DebugString();
     return false;
   }
   Wey wey = chassis_detail.wey();
   // check steer error
   if (wey.has_fail_241()) {
-    if (wey.fail_241().epsfail() == Fail_241::EPSFAIL_FAULT) {
-      return true;
-    }
+    if (wey.fail_241().epsfail() == Fail_241::EPSFAIL_FAULT) { return true; }
   }
   // check ems error
   if (wey.has_fail_241()) {
-    if (wey.fail_241().engfail() == Fail_241::ENGFAIL_FAIL) {
-      return true;
-    }
+    if (wey.fail_241().engfail() == Fail_241::ENGFAIL_FAIL) { return true; }
   }
   // check braking error
   if (wey.has_fail_241()) {
-    if (wey.fail_241().espfail() == Fail_241::ESPFAIL_FAILURE) {
-      return true;
-    }
+    if (wey.fail_241().espfail() == Fail_241::ESPFAIL_FAILURE) { return true; }
   }
   // check gear error question
   if (wey.has_fail_241()) {
-    if (wey.fail_241().shiftfail() ==
-        Fail_241::SHIFTFAIL_TRANSMISSION_P_ENGAGEMENT_FAULT) {
+    if (wey.fail_241().shiftfail() == Fail_241::SHIFTFAIL_TRANSMISSION_P_ENGAGEMENT_FAULT) {
       return true;
     }
   }
   // check parking error
   if (wey.has_fail_241()) {
-    if (wey.fail_241().epbfail() == Fail_241::EPBFAIL_ERROR) {
-      return true;
-    }
+    if (wey.fail_241().epbfail() == Fail_241::EPBFAIL_ERROR) { return true; }
   }
   return false;
 }
 
 void WeyController::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -717,16 +662,15 @@ void WeyController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. Horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -738,8 +682,7 @@ void WeyController::SecurityDogThreadFunc() {
     }
 
     // 2. Vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -763,18 +706,17 @@ void WeyController::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR << "Too much time consumption in WeyController looping process:"
-             << elapsed.count();
+      AERROR << "Too much time consumption in WeyController looping process:" << elapsed.count();
     }
   }
 }
 
 bool WeyController::CheckResponse(const int32_t flags, bool need_wait) {
   ChassisDetail chassis_detail;
-  bool is_eps_online = false;
-  bool is_vcu_online = false;
-  bool is_esp_online = false;
-  int retry_num = 20;
+  bool          is_eps_online = false;
+  bool          is_vcu_online = false;
+  bool          is_esp_online = false;
+  int           retry_num     = 20;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -800,18 +742,14 @@ bool WeyController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     if (need_wait) {
       --retry_num;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(20));
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
     }
-    if (check_ok) {
-      return true;
-    }
+    if (check_ok) { return true; }
     AINFO << "Need to check response again.";
   } while (need_wait && retry_num);
 
   AINFO << "check_response fail: is_eps_online: " << is_eps_online
-        << ", is_vcu_online: " << is_vcu_online
-        << ", is_esp_online: " << is_esp_online;
+        << ", is_vcu_online: " << is_vcu_online << ", is_esp_online: " << is_esp_online;
   return false;
 }
 
@@ -830,8 +768,7 @@ Chassis::ErrorCode WeyController::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void WeyController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void WeyController::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

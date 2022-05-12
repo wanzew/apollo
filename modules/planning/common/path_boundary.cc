@@ -23,24 +23,22 @@
 namespace apollo {
 namespace planning {
 
-PathBoundary::PathBoundary(const double start_s, const double delta_s,
+PathBoundary::PathBoundary(const double                           start_s,
+                           const double                           delta_s,
                            std::vector<std::pair<double, double>> path_boundary)
-    : start_s_(start_s),
-      delta_s_(delta_s),
-      boundary_(std::move(path_boundary)) {}
+    : start_s_(start_s)
+    , delta_s_(delta_s)
+    , boundary_(std::move(path_boundary)) {}
 
 double PathBoundary::start_s() const { return start_s_; }
 
 double PathBoundary::delta_s() const { return delta_s_; }
 
-void PathBoundary::set_boundary(
-    const std::vector<std::pair<double, double>>& boundary) {
+void PathBoundary::set_boundary(const std::vector<std::pair<double, double>>& boundary) {
   boundary_ = boundary;
 }
 
-const std::vector<std::pair<double, double>>& PathBoundary::boundary() const {
-  return boundary_;
-}
+const std::vector<std::pair<double, double>>& PathBoundary::boundary() const { return boundary_; }
 
 void PathBoundary::set_label(const std::string& label) { label_ = label; }
 
@@ -50,9 +48,7 @@ void PathBoundary::set_blocking_obstacle_id(const std::string& obs_id) {
   blocking_obstacle_id_ = obs_id;
 }
 
-const std::string& PathBoundary::blocking_obstacle_id() const {
-  return blocking_obstacle_id_;
-}
+const std::string& PathBoundary::blocking_obstacle_id() const { return blocking_obstacle_id_; }
 
 }  // namespace planning
 }  // namespace apollo

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/transit/protocol/llc_diag_brakecontrol_721.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/drivers/canbus/common/byte.h"
@@ -32,8 +33,8 @@ class llc_diag_brakecontrol_721Test : public ::testing ::Test {
 
 TEST_F(llc_diag_brakecontrol_721Test, part1) {
   Llcdiagbrakecontrol721 brakectrl_721_;
-  uint8_t data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-  double x = 0.0;
+  uint8_t                data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  double                 x       = 0.0;
 
   brakectrl_721_.set_p_llc_dbg_brakepidcontribution_p(data, x);
   brakectrl_721_.set_p_llc_dbg_brakepidcontribution_d(data, x);
@@ -49,9 +50,9 @@ TEST_F(llc_diag_brakecontrol_721Test, part1) {
 
 TEST_F(llc_diag_brakecontrol_721Test, part2) {
   Llcdiagbrakecontrol721 brakectrl_721_;
-  uint8_t data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-  double x = 0.0;
-  int a = 0;
+  uint8_t                data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  double                 x       = 0.0;
+  int                    a       = 0;
 
   brakectrl_721_.set_p_llc_dbg_brakepidcontribution_i(data, x);
   brakectrl_721_.set_p_llc_dbg_brakepid_error(data, a);

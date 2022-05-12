@@ -38,15 +38,12 @@ TEST(SocketCanClientRawTest, simple_test) {
   EXPECT_TRUE(socket_can_client.Init(param));
   EXPECT_EQ(socket_can_client.Start(), ErrorCode::CAN_CLIENT_ERROR_BASE);
   std::vector<CanFrame> frames;
-  int32_t num = 0;
-  EXPECT_EQ(socket_can_client.Send(frames, &num),
-            ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
-  EXPECT_EQ(socket_can_client.Receive(&frames, &num),
-            ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED);
+  int32_t               num = 0;
+  EXPECT_EQ(socket_can_client.Send(frames, &num), ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
+  EXPECT_EQ(socket_can_client.Receive(&frames, &num), ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED);
   CanFrame can_frame;
   frames.push_back(can_frame);
-  EXPECT_EQ(socket_can_client.SendSingleFrame(frames),
-            ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
+  EXPECT_EQ(socket_can_client.SendSingleFrame(frames), ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
   socket_can_client.Stop();
 }
 

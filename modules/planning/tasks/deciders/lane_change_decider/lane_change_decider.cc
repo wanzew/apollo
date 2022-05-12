@@ -31,23 +31,21 @@ using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::cyber::Clock;
 
-LaneChangeDecider::LaneChangeDecider(
-    const TaskConfig& config,
-    const std::shared_ptr<DependencyInjector>& injector)
+LaneChangeDecider::LaneChangeDecider(const TaskConfig&                          config,
+                                     const std::shared_ptr<DependencyInjector>& injector)
     : Decider(config, injector) {
   ACHECK(config_.has_lane_change_decider_config());
 }
 
 // added a dummy parameter to enable this task in ExecuteTaskOnReferenceLine
-Status LaneChangeDecider::Process(
-    Frame* frame, ReferenceLineInfo* const current_reference_line_info) {
+Status LaneChangeDecider::Process(Frame*                   frame,
+                                  ReferenceLineInfo* const current_reference_line_info) {
   // Sanity checks.
   CHECK_NOTNULL(frame);
 
   const auto& lane_change_decider_config = config_.lane_change_decider_config();
 
-  std::list<ReferenceLineInfo>* reference_line_info =
-      frame->mutable_reference_line_info();
+  std::list<ReferenceLineInfo>* reference_line_info = frame->mutable_reference_line_info();
   if (reference_line_info->empty()) {
     const std::string msg = "Reference lines empty.";
     AERROR << msg;
@@ -59,15 +57,13 @@ Status LaneChangeDecider::Process(
     return Status::OK();
   }
 
-  auto* prev_status = injector_->planning_context()
-                          ->mutable_planning_status()
-                          ->mutable_change_lane();
+  auto* prev_status =
+      injector_->planning_context()->mutable_planning_status()->mutable_change_lane();
   double now = Clock::NowInSeconds();
 
   prev_status->set_is_clear_to_change_lane(false);
   if (current_reference_line_info->IsChangeLanePath()) {
-    prev_status->set_is_clear_to_change_lane(
-        IsClearToChangeLane(current_reference_line_info));
+    prev_status->set_is_clear_to_change_lane(IsClearToChangeLane(current_reference_line_info));
   }
 
   if (!prev_status->has_status()) {
@@ -86,8 +82,7 @@ Status LaneChangeDecider::Process(
       UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_FINISHED, path_id);
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
     } else {
-      const std::string msg =
-          absl::StrCat("Unknown state: ", prev_status->ShortDebugString());
+      const std::string msg = absl::StrCat("Unknown state: ", prev_status->ShortDebugString());
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -106,8 +101,7 @@ Status LaneChangeDecider::Process(
         // RemoveChangeLane(reference_line_info);
         PrioritizeChangeLane(false, reference_line_info);
         ADEBUG << "removed change lane.";
-        UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_FINISHED,
-                     current_path_id);
+        UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_FINISHED, current_path_id);
       }
       return Status::OK();
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
@@ -123,8 +117,7 @@ Status LaneChangeDecider::Process(
         ADEBUG << "change lane again after failed";
       }
       return Status::OK();
-    } else if (prev_status->status() ==
-               ChangeLaneStatus::CHANGE_LANE_FINISHED) {
+    } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FINISHED) {
       if (now - prev_status->timestamp() <
           lane_change_decider_config.change_lane_success_freeze_time()) {
         // RemoveChangeLane(reference_line_info);
@@ -136,8 +129,7 @@ Status LaneChangeDecider::Process(
         ADEBUG << "change lane again after success";
       }
     } else {
-      const std::string msg =
-          absl::StrCat("Unknown state: ", prev_status->ShortDebugString());
+      const std::string msg = absl::StrCat("Unknown state: ", prev_status->ShortDebugString());
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -146,69 +138,60 @@ Status LaneChangeDecider::Process(
 }
 
 void LaneChangeDecider::UpdatePreparationDistance(
-    const bool is_opt_succeed, const Frame* frame,
+    const bool                     is_opt_succeed,
+    const Frame*                   frame,
     const ReferenceLineInfo* const reference_line_info,
-    PlanningContext* planning_context) {
-  auto* lane_change_status =
-      planning_context->mutable_planning_status()->mutable_change_lane();
+    PlanningContext*               planning_context) {
+  auto* lane_change_status = planning_context->mutable_planning_status()->mutable_change_lane();
   ADEBUG << "Current time: " << lane_change_status->timestamp();
   ADEBUG << "Lane Change Status: " << lane_change_status->status();
   // If lane change planning succeeded, update and return
   if (is_opt_succeed) {
-    lane_change_status->set_last_succeed_timestamp(
-        Clock::NowInSeconds());
+    lane_change_status->set_last_succeed_timestamp(Clock::NowInSeconds());
     lane_change_status->set_is_current_opt_succeed(true);
     return;
   }
   // If path optimizer or speed optimizer failed, report the status
   lane_change_status->set_is_current_opt_succeed(false);
   // If the planner just succeed recently, let's be more patient and try again
-  if (Clock::NowInSeconds() -
-          lane_change_status->last_succeed_timestamp() <
+  if (Clock::NowInSeconds() - lane_change_status->last_succeed_timestamp() <
       FLAGS_allowed_lane_change_failure_time) {
     return;
   }
   // Get ADC's current s and the lane-change start distance s
-  const ReferenceLine& reference_line = reference_line_info->reference_line();
-  const common::TrajectoryPoint& planning_start_point =
-      frame->PlanningStartPoint();
-  auto adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
-  if (!lane_change_status->exist_lane_change_start_position()) {
-    return;
-  }
+  const ReferenceLine&           reference_line       = reference_line_info->reference_line();
+  const common::TrajectoryPoint& planning_start_point = frame->PlanningStartPoint();
+  auto                           adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
+  if (!lane_change_status->exist_lane_change_start_position()) { return; }
   common::SLPoint point_sl;
-  reference_line.XYToSL(lane_change_status->lane_change_start_position(),
-                        &point_sl);
+  reference_line.XYToSL(lane_change_status->lane_change_start_position(), &point_sl);
   ADEBUG << "Current ADC s: " << adc_sl_info.first[0];
   ADEBUG << "Change lane point s: " << point_sl.s();
   // If the remaining lane-change preparation distance is too small,
   // refresh the preparation distance
-  if (adc_sl_info.first[0] + FLAGS_min_lane_change_prepare_length >
-      point_sl.s()) {
+  if (adc_sl_info.first[0] + FLAGS_min_lane_change_prepare_length > point_sl.s()) {
     lane_change_status->set_exist_lane_change_start_position(false);
     ADEBUG << "Refresh the lane-change preparation distance";
   }
 }
 
 void LaneChangeDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
-                                     const std::string& path_id) {
+                                     const std::string&       path_id) {
   UpdateStatus(Clock::NowInSeconds(), status_code, path_id);
 }
 
-void LaneChangeDecider::UpdateStatus(double timestamp,
+void LaneChangeDecider::UpdateStatus(double                   timestamp,
                                      ChangeLaneStatus::Status status_code,
-                                     const std::string& path_id) {
-  auto* lane_change_status = injector_->planning_context()
-                                 ->mutable_planning_status()
-                                 ->mutable_change_lane();
+                                     const std::string&       path_id) {
+  auto* lane_change_status =
+      injector_->planning_context()->mutable_planning_status()->mutable_change_lane();
   lane_change_status->set_timestamp(timestamp);
   lane_change_status->set_path_id(path_id);
   lane_change_status->set_status(status_code);
 }
 
 void LaneChangeDecider::PrioritizeChangeLane(
-    const bool is_prioritize_change_lane,
-    std::list<ReferenceLineInfo>* reference_line_info) const {
+    const bool is_prioritize_change_lane, std::list<ReferenceLineInfo>* reference_line_info) const {
   if (reference_line_info->empty()) {
     AERROR << "Reference line info empty";
     return;
@@ -217,9 +200,7 @@ void LaneChangeDecider::PrioritizeChangeLane(
   const auto& lane_change_decider_config = config_.lane_change_decider_config();
 
   // TODO(SHU): disable the reference line order change for now
-  if (!lane_change_decider_config.enable_prioritize_change_lane()) {
-    return;
-  }
+  if (!lane_change_decider_config.enable_prioritize_change_lane()) { return; }
   auto iter = reference_line_info->begin();
   while (iter != reference_line_info->end()) {
     ADEBUG << "iter->IsChangeLanePath(): " << iter->IsChangeLanePath();
@@ -234,20 +215,16 @@ void LaneChangeDecider::PrioritizeChangeLane(
     }
     ++iter;
   }
-  reference_line_info->splice(reference_line_info->begin(),
-                              *reference_line_info, iter);
+  reference_line_info->splice(reference_line_info->begin(), *reference_line_info, iter);
   ADEBUG << "reference_line_info->IsChangeLanePath(): "
          << reference_line_info->begin()->IsChangeLanePath();
 }
 
 // disabled for now
-void LaneChangeDecider::RemoveChangeLane(
-    std::list<ReferenceLineInfo>* reference_line_info) const {
+void LaneChangeDecider::RemoveChangeLane(std::list<ReferenceLineInfo>* reference_line_info) const {
   const auto& lane_change_decider_config = config_.lane_change_decider_config();
   // TODO(SHU): fix core dump when removing change lane
-  if (!lane_change_decider_config.enable_remove_change_lane()) {
-    return;
-  }
+  if (!lane_change_decider_config.enable_remove_change_lane()) { return; }
   ADEBUG << "removed change lane";
   auto iter = reference_line_info->begin();
   while (iter != reference_line_info->end()) {
@@ -259,50 +236,43 @@ void LaneChangeDecider::RemoveChangeLane(
   }
 }
 
-std::string LaneChangeDecider::GetCurrentPathId(
-    const std::list<ReferenceLineInfo>& reference_line_info) const {
+std::string
+LaneChangeDecider::GetCurrentPathId(const std::list<ReferenceLineInfo>& reference_line_info) const {
   for (const auto& info : reference_line_info) {
-    if (!info.IsChangeLanePath()) {
-      return info.Lanes().Id();
-    }
+    if (!info.IsChangeLanePath()) { return info.Lanes().Id(); }
   }
   return "";
 }
 
-bool LaneChangeDecider::IsClearToChangeLane(
-    ReferenceLineInfo* reference_line_info) {
+bool LaneChangeDecider::IsClearToChangeLane(ReferenceLineInfo* reference_line_info) {
   double ego_start_s = reference_line_info->AdcSlBoundary().start_s();
-  double ego_end_s = reference_line_info->AdcSlBoundary().end_s();
-  double ego_v =
-      std::abs(reference_line_info->vehicle_state().linear_velocity());
+  double ego_end_s   = reference_line_info->AdcSlBoundary().end_s();
+  double ego_v       = std::abs(reference_line_info->vehicle_state().linear_velocity());
 
-  for (const auto* obstacle :
-       reference_line_info->path_decision()->obstacles().Items()) {
+  for (const auto* obstacle : reference_line_info->path_decision()->obstacles().Items()) {
     if (obstacle->IsVirtual() || obstacle->IsStatic()) {
       ADEBUG << "skip one virtual or static obstacle";
       continue;
     }
 
     double start_s = std::numeric_limits<double>::max();
-    double end_s = -std::numeric_limits<double>::max();
+    double end_s   = -std::numeric_limits<double>::max();
     double start_l = std::numeric_limits<double>::max();
-    double end_l = -std::numeric_limits<double>::max();
+    double end_l   = -std::numeric_limits<double>::max();
 
     for (const auto& p : obstacle->PerceptionPolygon().points()) {
       SLPoint sl_point;
       reference_line_info->reference_line().XYToSL(p, &sl_point);
       start_s = std::fmin(start_s, sl_point.s());
-      end_s = std::fmax(end_s, sl_point.s());
+      end_s   = std::fmax(end_s, sl_point.s());
 
       start_l = std::fmin(start_l, sl_point.l());
-      end_l = std::fmax(end_l, sl_point.l());
+      end_l   = std::fmax(end_l, sl_point.l());
     }
 
     if (reference_line_info->IsChangeLanePath()) {
       static constexpr double kLateralShift = 2.5;
-      if (end_l < -kLateralShift || start_l > kLateralShift) {
-        continue;
-      }
+      if (end_l < -kLateralShift || start_l > kLateralShift) { continue; }
     }
 
     // Raw estimation on whether same direction with ADC or not based on
@@ -311,76 +281,66 @@ bool LaneChangeDecider::IsClearToChangeLane(
     if (obstacle->HasTrajectory()) {
       double obstacle_moving_direction =
           obstacle->Trajectory().trajectory_point(0).path_point().theta();
-      const auto& vehicle_state = reference_line_info->vehicle_state();
-      double vehicle_moving_direction = vehicle_state.heading();
+      const auto& vehicle_state            = reference_line_info->vehicle_state();
+      double      vehicle_moving_direction = vehicle_state.heading();
       if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
-        vehicle_moving_direction =
-            common::math::NormalizeAngle(vehicle_moving_direction + M_PI);
+        vehicle_moving_direction = common::math::NormalizeAngle(vehicle_moving_direction + M_PI);
       }
-      double heading_difference = std::abs(common::math::NormalizeAngle(
-          obstacle_moving_direction - vehicle_moving_direction));
+      double heading_difference = std::abs(
+          common::math::NormalizeAngle(obstacle_moving_direction - vehicle_moving_direction));
       same_direction = heading_difference < (M_PI / 2.0);
     }
 
     // TODO(All) move to confs
-    static constexpr double kSafeTimeOnSameDirection = 3.0;
-    static constexpr double kSafeTimeOnOppositeDirection = 5.0;
-    static constexpr double kForwardMinSafeDistanceOnSameDirection = 10.0;
-    static constexpr double kBackwardMinSafeDistanceOnSameDirection = 10.0;
-    static constexpr double kForwardMinSafeDistanceOnOppositeDirection = 50.0;
+    static constexpr double kSafeTimeOnSameDirection                    = 3.0;
+    static constexpr double kSafeTimeOnOppositeDirection                = 5.0;
+    static constexpr double kForwardMinSafeDistanceOnSameDirection      = 10.0;
+    static constexpr double kBackwardMinSafeDistanceOnSameDirection     = 10.0;
+    static constexpr double kForwardMinSafeDistanceOnOppositeDirection  = 50.0;
     static constexpr double kBackwardMinSafeDistanceOnOppositeDirection = 1.0;
-    static constexpr double kDistanceBuffer = 0.5;
+    static constexpr double kDistanceBuffer                             = 0.5;
 
-    double kForwardSafeDistance = 0.0;
+    double kForwardSafeDistance  = 0.0;
     double kBackwardSafeDistance = 0.0;
     if (same_direction) {
-      kForwardSafeDistance =
-          std::fmax(kForwardMinSafeDistanceOnSameDirection,
-                    (ego_v - obstacle->speed()) * kSafeTimeOnSameDirection);
-      kBackwardSafeDistance =
-          std::fmax(kBackwardMinSafeDistanceOnSameDirection,
-                    (obstacle->speed() - ego_v) * kSafeTimeOnSameDirection);
+      kForwardSafeDistance  = std::fmax(kForwardMinSafeDistanceOnSameDirection,
+                                       (ego_v - obstacle->speed()) * kSafeTimeOnSameDirection);
+      kBackwardSafeDistance = std::fmax(kBackwardMinSafeDistanceOnSameDirection,
+                                        (obstacle->speed() - ego_v) * kSafeTimeOnSameDirection);
     } else {
-      kForwardSafeDistance =
-          std::fmax(kForwardMinSafeDistanceOnOppositeDirection,
-                    (ego_v + obstacle->speed()) * kSafeTimeOnOppositeDirection);
+      kForwardSafeDistance  = std::fmax(kForwardMinSafeDistanceOnOppositeDirection,
+                                       (ego_v + obstacle->speed()) * kSafeTimeOnOppositeDirection);
       kBackwardSafeDistance = kBackwardMinSafeDistanceOnOppositeDirection;
     }
 
-    if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
-                         kDistanceBuffer, obstacle->IsLaneChangeBlocking()) &&
-        HysteresisFilter(start_s - ego_end_s, kForwardSafeDistance,
-                         kDistanceBuffer, obstacle->IsLaneChangeBlocking())) {
-      reference_line_info->path_decision()
-          ->Find(obstacle->Id())
-          ->SetLaneChangeBlocking(true);
+    if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance, kDistanceBuffer,
+                         obstacle->IsLaneChangeBlocking()) &&
+        HysteresisFilter(start_s - ego_end_s, kForwardSafeDistance, kDistanceBuffer,
+                         obstacle->IsLaneChangeBlocking())) {
+      reference_line_info->path_decision()->Find(obstacle->Id())->SetLaneChangeBlocking(true);
       ADEBUG << "Lane Change is blocked by obstacle" << obstacle->Id();
       return false;
     } else {
-      reference_line_info->path_decision()
-          ->Find(obstacle->Id())
-          ->SetLaneChangeBlocking(false);
+      reference_line_info->path_decision()->Find(obstacle->Id())->SetLaneChangeBlocking(false);
     }
   }
   return true;
 }
 
-bool LaneChangeDecider::IsPerceptionBlocked(
-    const ReferenceLineInfo& reference_line_info,
-    const double search_beam_length, const double search_beam_radius_intensity,
-    const double search_range, const double is_block_angle_threshold) {
-  const auto& vehicle_state = reference_line_info.vehicle_state();
+bool LaneChangeDecider::IsPerceptionBlocked(const ReferenceLineInfo& reference_line_info,
+                                            const double             search_beam_length,
+                                            const double             search_beam_radius_intensity,
+                                            const double             search_range,
+                                            const double             is_block_angle_threshold) {
+  const auto&               vehicle_state = reference_line_info.vehicle_state();
   const common::math::Vec2d adv_pos(vehicle_state.x(), vehicle_state.y());
-  const double adv_heading = vehicle_state.heading();
+  const double              adv_heading = vehicle_state.heading();
 
-  double left_most_angle =
-      common::math::NormalizeAngle(adv_heading + 0.5 * search_range);
-  double right_most_angle =
-      common::math::NormalizeAngle(adv_heading - 0.5 * search_range);
-  bool right_most_found = false;
+  double left_most_angle  = common::math::NormalizeAngle(adv_heading + 0.5 * search_range);
+  double right_most_angle = common::math::NormalizeAngle(adv_heading - 0.5 * search_range);
+  bool   right_most_found = false;
 
-  for (auto* obstacle :
-       reference_line_info.path_decision().obstacles().Items()) {
+  for (auto* obstacle : reference_line_info.path_decision().obstacles().Items()) {
     if (obstacle->IsVirtual()) {
       ADEBUG << "skip one virtual obstacle";
       continue;
@@ -389,8 +349,8 @@ bool LaneChangeDecider::IsPerceptionBlocked(
     for (double search_angle = 0.0; search_angle < search_range;
          search_angle += search_beam_radius_intensity) {
       common::math::Vec2d search_beam_end(search_beam_length, 0.0);
-      const double beam_heading = common::math::NormalizeAngle(
-          adv_heading - 0.5 * search_range + search_angle);
+      const double        beam_heading =
+          common::math::NormalizeAngle(adv_heading - 0.5 * search_range + search_angle);
       search_beam_end.SelfRotate(beam_heading);
       search_beam_end += adv_pos;
       common::math::LineSegment2d search_beam(adv_pos, search_beam_end);
@@ -409,8 +369,8 @@ bool LaneChangeDecider::IsPerceptionBlocked(
       // obstacle is not in search range
       continue;
     }
-    if (std::fabs(common::math::NormalizeAngle(
-            left_most_angle - right_most_angle)) > is_block_angle_threshold) {
+    if (std::fabs(common::math::NormalizeAngle(left_most_angle - right_most_angle)) >
+        is_block_angle_threshold) {
       return true;
     }
   }
@@ -421,7 +381,7 @@ bool LaneChangeDecider::IsPerceptionBlocked(
 bool LaneChangeDecider::HysteresisFilter(const double obstacle_distance,
                                          const double safe_distance,
                                          const double distance_buffer,
-                                         const bool is_obstacle_blocking) {
+                                         const bool   is_obstacle_blocking) {
   if (is_obstacle_blocking) {
     return obstacle_distance < safe_distance + distance_buffer;
   } else {

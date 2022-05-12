@@ -32,7 +32,7 @@ namespace cyber {
 namespace croutine {
 
 constexpr size_t STACK_SIZE = 2 * 1024 * 1024;
-#if defined __aarch64__
+#if defined      __aarch64__
 constexpr size_t REGISTERS_SIZE = 160;
 #else
 constexpr size_t REGISTERS_SIZE = 56;
@@ -40,7 +40,7 @@ constexpr size_t REGISTERS_SIZE = 56;
 
 typedef void (*func)(void*);
 struct RoutineContext {
-  char stack[STACK_SIZE];
+  char  stack[STACK_SIZE];
   char* sp = nullptr;
 #if defined __aarch64__
 } __attribute__((aligned(16)));

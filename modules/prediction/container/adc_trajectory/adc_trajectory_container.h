@@ -27,9 +27,10 @@
 #include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
+
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -120,14 +121,14 @@ class ADCTrajectoryContainer : public Container {
   std::string ToString(const std::vector<std::string>& lane_ids);
 
  private:
-  planning::ADCTrajectory adc_trajectory_;
-  common::math::Polygon2d adc_junction_polygon_;
+  planning::ADCTrajectory                    adc_trajectory_;
+  common::math::Polygon2d                    adc_junction_polygon_;
   std::shared_ptr<const hdmap::JunctionInfo> adc_junction_info_ptr_;
-  double s_dist_to_junction_;
-  std::unordered_set<std::string> adc_lane_ids_;
-  std::vector<std::string> adc_lane_seq_;
-  std::unordered_set<std::string> adc_target_lane_ids_;
-  std::vector<std::string> adc_target_lane_seq_;
+  double                                     s_dist_to_junction_;
+  std::unordered_set<std::string>            adc_lane_ids_;
+  std::vector<std::string>                   adc_lane_seq_;
+  std::unordered_set<std::string>            adc_target_lane_ids_;
+  std::vector<std::string>                   adc_target_lane_seq_;
 };
 
 }  // namespace prediction

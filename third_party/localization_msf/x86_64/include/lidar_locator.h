@@ -25,14 +25,17 @@ class LidarLocator {
  public:
   LidarLocator();
   ~LidarLocator();
+
  public:
-  void Init(unsigned int filter_size_x, unsigned int filter_size_y,
-            float resolution, unsigned int node_size_x,
+  void Init(unsigned int filter_size_x,
+            unsigned int filter_size_y,
+            float        resolution,
+            unsigned int node_size_x,
             unsigned int node_size_y);
 
-  void SetVelodyneExtrinsic(double x, double y, double z,
-                              double qx, double qy, double qz, double qw);
-//   void SetVehicleHeight(double height);
+  void
+  SetVelodyneExtrinsic(double x, double y, double z, double qx, double qy, double qz, double qw);
+  //   void SetVehicleHeight(double height);
   void SetValidThreshold(float valid_threashold);
   void SetImageAlignMode(int mode);
   void SetLocalizationMode(int mode);
@@ -42,32 +45,44 @@ class LidarLocator {
 
  public:
   // set map node data
-  void SetMapNodeData(int width, int height, int level_num,
-      const float *const*intensities, const float *const*intensities_var,
-      const float *const*altitudes, const unsigned int *const*counts);
+  void SetMapNodeData(int                        width,
+                      int                        height,
+                      int                        level_num,
+                      const float* const*        intensities,
+                      const float* const*        intensities_var,
+                      const float* const*        altitudes,
+                      const unsigned int* const* counts);
   void SetMapNodeLeftTopCorner(double x, double y);
 
   // set point cloud
-  void SetPointCloudData(int size, const double* pt_xs, const double* pt_ys, 
-      const double* pt_zs, const unsigned char* intensities);
+  void SetPointCloudData(int                  size,
+                         const double*        pt_xs,
+                         const double*        pt_ys,
+                         const double*        pt_zs,
+                         const unsigned char* intensities);
 
   // compute localization result
-  int Compute(double pose_x, double pose_y, double pose_z,
-              double pose_qx, double pose_qy, double pose_qz,
-              double pose_qw, bool use_avx = false);
+  int Compute(double pose_x,
+              double pose_y,
+              double pose_z,
+              double pose_qx,
+              double pose_qy,
+              double pose_qz,
+              double pose_qw,
+              bool   use_avx = false);
 
  public:
   /**@brief Get the current optimal pose result. */
-  void GetLocationPose(double *x, double *y, double *z,
-                double *qx, double *qy, double *qz, double *qw);
-  
-  /**@brief Get the covariance of the current optimal location. */
-  void GetLocationCovariance(const double **data, int *width, int *height);
+  void
+  GetLocationPose(double* x, double* y, double* z, double* qx, double* qy, double* qz, double* qw);
 
-  void GetSSDDistribution(const double **data, int *width, int *height);
+  /**@brief Get the covariance of the current optimal location. */
+  void GetLocationCovariance(const double** data, int* width, int* height);
+
+  void GetSSDDistribution(const double** data, int* width, int* height);
 
   double GetLocationScore() const;
-  
+
  protected:
   LidarLocatorImpl* _lidar_locator;
 };

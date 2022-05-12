@@ -26,8 +26,7 @@ struct BaseInitOptions {
   std::string conf_file;
 };
 
-bool GetFusionInitOptions(const std::string& module_name,
-                          BaseInitOptions* options);
+bool GetFusionInitOptions(const std::string& module_name, BaseInitOptions* options);
 
 }  // namespace fusion
 }  // namespace perception

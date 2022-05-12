@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 
@@ -36,11 +37,11 @@ class LateralQPOptimizer {
 
   virtual ~LateralQPOptimizer() = default;
 
-  virtual bool optimize(
-      const std::array<double, 3>& d_state, const double delta_s,
-      const std::vector<std::pair<double, double>>& d_bounds) = 0;
+  virtual bool optimize(const std::array<double, 3>&                  d_state,
+                        const double                                  delta_s,
+                        const std::vector<std::pair<double, double>>& d_bounds) = 0;
 
-  virtual PiecewiseJerkTrajectory1d GetOptimalTrajectory() const;
+  virtual PiecewiseJerkTrajectory1d             GetOptimalTrajectory() const;
   virtual std::vector<common::FrenetFramePoint> GetFrenetFramePath() const;
 
  protected:

@@ -19,6 +19,7 @@
 #include <list>
 #include <map>
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 
 namespace apollo {
@@ -31,7 +32,7 @@ using SequenceType = std::map<ObjectKey, ObjectPtr>;
 template <typename ObjectKey>
 class SequenceMaintainer {
  public:
-  SequenceMaintainer() = default;
+  SequenceMaintainer()  = default;
   ~SequenceMaintainer() = default;
   bool add_data(const std::vector<ObjectPtr>& objects, ObjectKey key);
   auto get_sequence(int sequence_id) -> SequenceType<ObjectKey>*;
@@ -42,18 +43,17 @@ class SequenceMaintainer {
 
  private:
   static const std::size_t _s_max_sample_num = 10;
-  static constexpr double _s_max_lift_time = 10.0;
+  static constexpr double  _s_max_lift_time  = 10.0;
 };
 
 template <typename ObjectKey>
-bool SequenceMaintainer<ObjectKey>::add_data(
-    const std::vector<ObjectPtr>& objects, ObjectKey key) {
+bool SequenceMaintainer<ObjectKey>::add_data(const std::vector<ObjectPtr>& objects, ObjectKey key) {
   for (const auto& obj : objects) {
     auto& id = obj->track_id;
     if (_sequence.size() > 0 && _sequence.begin()->first > id) {
       std::cerr << "Find track_id roll back, so clear the cache sequence, "
-                << "current id " << id << " oldest id "
-                << _sequence.begin()->first << "." << std::endl;
+                << "current id " << id << " oldest id " << _sequence.begin()->first << "."
+                << std::endl;
       _sequence.clear();
     }
     auto& sub = _sequence[id];
@@ -63,7 +63,7 @@ bool SequenceMaintainer<ObjectKey>::add_data(
       //    << std::endl;
       return false;
     }
-    sub[key] = obj;
+    sub[key]  = obj;
     auto iter = sub.begin();
     while (sub.size() > _s_max_sample_num) {
       sub.erase(iter++);
@@ -72,8 +72,7 @@ bool SequenceMaintainer<ObjectKey>::add_data(
   auto iter = _sequence.begin();
   while (iter != _sequence.end()) {
     if (iter->second.empty() ||
-        static_cast<double>(key - iter->second.rbegin()->first) >
-            _s_max_lift_time) {
+        static_cast<double>(key - iter->second.rbegin()->first) > _s_max_lift_time) {
       _sequence.erase(iter++);
     } else {
       ++iter;
@@ -83,8 +82,7 @@ bool SequenceMaintainer<ObjectKey>::add_data(
 }
 
 template <typename ObjectKey>
-auto SequenceMaintainer<ObjectKey>::get_sequence(int sequence_id)
-    -> SequenceType<ObjectKey>* {
+auto SequenceMaintainer<ObjectKey>::get_sequence(int sequence_id) -> SequenceType<ObjectKey>* {
   auto iter = _sequence.find(sequence_id);
   if (iter == _sequence.end()) {
     return nullptr;

@@ -24,10 +24,8 @@
 namespace apollo {
 namespace canbus {
 
-std::unique_ptr<VehicleController>
-Neolix_eduVehicleFactory::CreateVehicleController() {
-  return std::unique_ptr<VehicleController>(
-      new neolix_edu::Neolix_eduController());
+std::unique_ptr<VehicleController> Neolix_eduVehicleFactory::CreateVehicleController() {
+  return std::unique_ptr<VehicleController>(new neolix_edu::Neolix_eduController());
 }
 
 std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>

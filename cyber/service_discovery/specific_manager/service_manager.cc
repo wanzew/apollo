@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/service_discovery/specific_manager/service_manager.h"
+
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/common/util.h"
@@ -27,7 +28,7 @@ namespace service_discovery {
 ServiceManager::ServiceManager() {
   allowed_role_ |= 1 << RoleType::ROLE_SERVER;
   allowed_role_ |= 1 << RoleType::ROLE_CLIENT;
-  change_type_ = ChangeType::CHANGE_SERVICE;
+  change_type_  = ChangeType::CHANGE_SERVICE;
   channel_name_ = "service_change_broadcast";
 }
 
@@ -43,8 +44,7 @@ void ServiceManager::GetServers(RoleAttrVec* servers) {
   servers_.GetAllRoles(servers);
 }
 
-void ServiceManager::GetClients(const std::string& service_name,
-                                RoleAttrVec* clients) {
+void ServiceManager::GetClients(const std::string& service_name, RoleAttrVec* clients) {
   RETURN_IF_NULL(clients);
   uint64_t key = common::Hash(service_name);
   clients_.Search(key, clients);
@@ -65,8 +65,7 @@ void ServiceManager::Dispose(const ChangeMsg& msg) {
   Notify(msg);
 }
 
-void ServiceManager::OnTopoModuleLeave(const std::string& host_name,
-                                       int process_id) {
+void ServiceManager::OnTopoModuleLeave(const std::string& host_name, int process_id) {
   RETURN_IF(!is_discovery_started_.load());
 
   RoleAttributes attr;
@@ -87,14 +86,12 @@ void ServiceManager::OnTopoModuleLeave(const std::string& host_name,
 
   ChangeMsg msg;
   for (auto& server : servers_to_remove) {
-    Convert(server->attributes(), RoleType::ROLE_SERVER, OperateType::OPT_LEAVE,
-            &msg);
+    Convert(server->attributes(), RoleType::ROLE_SERVER, OperateType::OPT_LEAVE, &msg);
     Notify(msg);
   }
 
   for (auto& client : clients_to_remove) {
-    Convert(client->attributes(), RoleType::ROLE_CLIENT, OperateType::OPT_LEAVE,
-            &msg);
+    Convert(client->attributes(), RoleType::ROLE_CLIENT, OperateType::OPT_LEAVE, &msg);
     Notify(msg);
   }
 }

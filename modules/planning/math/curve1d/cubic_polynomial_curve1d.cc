@@ -28,25 +28,22 @@
 namespace apollo {
 namespace planning {
 
-CubicPolynomialCurve1d::CubicPolynomialCurve1d(
-    const std::array<double, 3>& start, const double end, const double param)
+CubicPolynomialCurve1d::CubicPolynomialCurve1d(const std::array<double, 3>& start,
+                                               const double                 end,
+                                               const double                 param)
     : CubicPolynomialCurve1d(start[0], start[1], start[2], end, param) {}
 
-CubicPolynomialCurve1d::CubicPolynomialCurve1d(const double x0,
-                                               const double dx0,
-                                               const double ddx0,
-                                               const double x1,
-                                               const double param) {
+CubicPolynomialCurve1d::CubicPolynomialCurve1d(
+    const double x0, const double dx0, const double ddx0, const double x1, const double param) {
   ComputeCoefficients(x0, dx0, ddx0, x1, param);
-  param_ = param;
+  param_              = param;
   start_condition_[0] = x0;
   start_condition_[1] = dx0;
   start_condition_[2] = ddx0;
-  end_condition_ = x1;
+  end_condition_      = x1;
 }
 
-void CubicPolynomialCurve1d::DerivedFromQuarticCurve(
-    const PolynomialCurve1d& other) {
+void CubicPolynomialCurve1d::DerivedFromQuarticCurve(const PolynomialCurve1d& other) {
   CHECK_EQ(other.Order(), 4U);
   param_ = other.ParamLength();
   for (size_t i = 1; i < 5; ++i) {
@@ -54,8 +51,7 @@ void CubicPolynomialCurve1d::DerivedFromQuarticCurve(
   }
 }
 
-double CubicPolynomialCurve1d::Evaluate(const std::uint32_t order,
-                                        const double p) const {
+double CubicPolynomialCurve1d::Evaluate(const std::uint32_t order, const double p) const {
   switch (order) {
     case 0: {
       return ((coef_[3] * p + coef_[2]) * p + coef_[1]) * p + coef_[0];
@@ -69,8 +65,7 @@ double CubicPolynomialCurve1d::Evaluate(const std::uint32_t order,
     case 3: {
       return 6.0 * coef_[3];
     }
-    default:
-      return 0.0;
+    default: return 0.0;
   }
 }
 
@@ -78,18 +73,15 @@ std::string CubicPolynomialCurve1d::ToString() const {
   return absl::StrCat(absl::StrJoin(coef_, "\t"), param_, "\n");
 }
 
-void CubicPolynomialCurve1d::ComputeCoefficients(const double x0,
-                                                 const double dx0,
-                                                 const double ddx0,
-                                                 const double x1,
-                                                 const double param) {
+void CubicPolynomialCurve1d::ComputeCoefficients(
+    const double x0, const double dx0, const double ddx0, const double x1, const double param) {
   DCHECK(param > 0.0);
   const double p2 = param * param;
   const double p3 = param * p2;
-  coef_[0] = x0;
-  coef_[1] = dx0;
-  coef_[2] = 0.5 * ddx0;
-  coef_[3] = (x1 - x0 - dx0 * param - coef_[2] * p2) / p3;
+  coef_[0]        = x0;
+  coef_[1]        = dx0;
+  coef_[2]        = 0.5 * ddx0;
+  coef_[3]        = (x1 - x0 - dx0 * param - coef_[2] * p2) / p3;
 }
 
 double CubicPolynomialCurve1d::Coef(const size_t order) const {

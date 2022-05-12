@@ -36,9 +36,7 @@ bool HesaiConvertComponent::Init() {
   }
   parser_.reset(parser);
 
-  if (!parser_->Init()) {
-    return false;
-  }
+  if (!parser_->Init()) { return false; }
   AINFO << "HesaiConvertComponent init success";
   return true;
 }

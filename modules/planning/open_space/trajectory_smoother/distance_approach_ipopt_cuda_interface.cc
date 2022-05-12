@@ -23,98 +23,95 @@
 #include <limits>
 
 #if USE_GPU == 1
-#include "modules/planning/open_space/trajectory_smoother/planning_block.h"
+#  include "modules/planning/open_space/trajectory_smoother/planning_block.h"
 #endif
 
 namespace apollo {
 namespace planning {
 
 DistanceApproachIPOPTCUDAInterface::DistanceApproachIPOPTCUDAInterface(
-    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
-    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
-    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
-    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
-    const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
-    const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+    const size_t                  horizon,
+    const double                  ts,
+    const Eigen::MatrixXd&        ego,
+    const Eigen::MatrixXd&        xWS,
+    const Eigen::MatrixXd&        uWS,
+    const Eigen::MatrixXd&        l_warm_up,
+    const Eigen::MatrixXd&        n_warm_up,
+    const Eigen::MatrixXd&        x0,
+    const Eigen::MatrixXd&        xf,
+    const Eigen::MatrixXd&        last_time_u,
+    const std::vector<double>&    XYbounds,
+    const Eigen::MatrixXi&        obstacles_edges_num,
+    const size_t                  obstacles_num,
+    const Eigen::MatrixXd&        obstacles_A,
+    const Eigen::MatrixXd&        obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
-    : ts_(ts),
-      ego_(ego),
-      xWS_(xWS),
-      uWS_(uWS),
-      l_warm_up_(l_warm_up),
-      n_warm_up_(n_warm_up),
-      x0_(x0),
-      xf_(xf),
-      last_time_u_(last_time_u),
-      XYbounds_(XYbounds),
-      obstacles_edges_num_(obstacles_edges_num),
-      obstacles_A_(obstacles_A),
-      obstacles_b_(obstacles_b) {
+    : ts_(ts)
+    , ego_(ego)
+    , xWS_(xWS)
+    , uWS_(uWS)
+    , l_warm_up_(l_warm_up)
+    , n_warm_up_(n_warm_up)
+    , x0_(x0)
+    , xf_(xf)
+    , last_time_u_(last_time_u)
+    , XYbounds_(XYbounds)
+    , obstacles_edges_num_(obstacles_edges_num)
+    , obstacles_A_(obstacles_A)
+    , obstacles_b_(obstacles_b) {
   ACHECK(horizon < std::numeric_limits<int>::max())
       << "Invalid cast on horizon in open space planner";
   horizon_ = static_cast<int>(horizon);
   ACHECK(obstacles_num < std::numeric_limits<int>::max())
       << "Invalid cast on obstacles_num in open space planner";
 
-  obstacles_num_ = static_cast<int>(obstacles_num);
-  w_ev_ = ego_(1, 0) + ego_(3, 0);
-  l_ev_ = ego_(0, 0) + ego_(2, 0);
-  g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
-  offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
+  obstacles_num_       = static_cast<int>(obstacles_num);
+  w_ev_                = ego_(1, 0) + ego_(3, 0);
+  l_ev_                = ego_(0, 0) + ego_(2, 0);
+  g_                   = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
+  offset_              = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
   obstacles_edges_sum_ = obstacles_edges_num_.sum();
-  state_result_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
-  dual_l_result_ = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
-  dual_n_result_ = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
-  control_result_ = Eigen::MatrixXd::Zero(2, horizon_ + 1);
-  time_result_ = Eigen::MatrixXd::Zero(1, horizon_ + 1);
-  state_start_index_ = 0;
+  state_result_        = Eigen::MatrixXd::Zero(4, horizon_ + 1);
+  dual_l_result_       = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
+  dual_n_result_       = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
+  control_result_      = Eigen::MatrixXd::Zero(2, horizon_ + 1);
+  time_result_         = Eigen::MatrixXd::Zero(1, horizon_ + 1);
+  state_start_index_   = 0;
   control_start_index_ = 4 * (horizon_ + 1);
-  time_start_index_ = control_start_index_ + 2 * horizon_;
-  l_start_index_ = time_start_index_ + (horizon_ + 1);
-  n_start_index_ = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
+  time_start_index_    = control_start_index_ + 2 * horizon_;
+  l_start_index_       = time_start_index_ + (horizon_ + 1);
+  n_start_index_       = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
 
   planner_open_space_config_ = planner_open_space_config;
-  distance_approach_config_ =
-      planner_open_space_config_.distance_approach_config();
-  weight_state_x_ = distance_approach_config_.weight_x();
-  weight_state_y_ = distance_approach_config_.weight_y();
-  weight_state_phi_ = distance_approach_config_.weight_phi();
-  weight_state_v_ = distance_approach_config_.weight_v();
-  weight_input_steer_ = distance_approach_config_.weight_steer();
-  weight_input_a_ = distance_approach_config_.weight_a();
-  weight_rate_steer_ = distance_approach_config_.weight_steer_rate();
-  weight_rate_a_ = distance_approach_config_.weight_a_rate();
-  weight_stitching_steer_ = distance_approach_config_.weight_steer_stitching();
-  weight_stitching_a_ = distance_approach_config_.weight_a_stitching();
-  weight_first_order_time_ =
-      distance_approach_config_.weight_first_order_time();
-  weight_second_order_time_ =
-      distance_approach_config_.weight_second_order_time();
-  min_safety_distance_ = distance_approach_config_.min_safety_distance();
-  max_steer_angle_ =
-      vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
-  max_speed_forward_ = distance_approach_config_.max_speed_forward();
-  max_speed_reverse_ = distance_approach_config_.max_speed_reverse();
-  max_acceleration_forward_ =
-      distance_approach_config_.max_acceleration_forward();
-  max_acceleration_reverse_ =
-      distance_approach_config_.max_acceleration_reverse();
-  min_time_sample_scaling_ =
-      distance_approach_config_.min_time_sample_scaling();
-  max_time_sample_scaling_ =
-      distance_approach_config_.max_time_sample_scaling();
-  max_steer_rate_ =
-      vehicle_param_.max_steer_angle_rate() / vehicle_param_.steer_ratio();
-  use_fix_time_ = distance_approach_config_.use_fix_time();
-  wheelbase_ = vehicle_param_.wheel_base();
-  enable_constraint_check_ =
-      distance_approach_config_.enable_constraint_check();
+  distance_approach_config_  = planner_open_space_config_.distance_approach_config();
+  weight_state_x_            = distance_approach_config_.weight_x();
+  weight_state_y_            = distance_approach_config_.weight_y();
+  weight_state_phi_          = distance_approach_config_.weight_phi();
+  weight_state_v_            = distance_approach_config_.weight_v();
+  weight_input_steer_        = distance_approach_config_.weight_steer();
+  weight_input_a_            = distance_approach_config_.weight_a();
+  weight_rate_steer_         = distance_approach_config_.weight_steer_rate();
+  weight_rate_a_             = distance_approach_config_.weight_a_rate();
+  weight_stitching_steer_    = distance_approach_config_.weight_steer_stitching();
+  weight_stitching_a_        = distance_approach_config_.weight_a_stitching();
+  weight_first_order_time_   = distance_approach_config_.weight_first_order_time();
+  weight_second_order_time_  = distance_approach_config_.weight_second_order_time();
+  min_safety_distance_       = distance_approach_config_.min_safety_distance();
+  max_steer_angle_           = vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
+  max_speed_forward_         = distance_approach_config_.max_speed_forward();
+  max_speed_reverse_         = distance_approach_config_.max_speed_reverse();
+  max_acceleration_forward_  = distance_approach_config_.max_acceleration_forward();
+  max_acceleration_reverse_  = distance_approach_config_.max_acceleration_reverse();
+  min_time_sample_scaling_   = distance_approach_config_.min_time_sample_scaling();
+  max_time_sample_scaling_   = distance_approach_config_.max_time_sample_scaling();
+  max_steer_rate_            = vehicle_param_.max_steer_angle_rate() / vehicle_param_.steer_ratio();
+  use_fix_time_              = distance_approach_config_.use_fix_time();
+  wheelbase_                 = vehicle_param_.wheel_base();
+  enable_constraint_check_   = distance_approach_config_.enable_constraint_check();
 }
 
 bool DistanceApproachIPOPTCUDAInterface::get_nlp_info(
-    int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
-    IndexStyleEnum& index_style) {
+    int& n, int& m, int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) {
   ADEBUG << "get_nlp_info";
   // n1 : states variables, 4 * (N+1)
   int n1 = 4 * (horizon_ + 1);
@@ -143,9 +140,8 @@ bool DistanceApproachIPOPTCUDAInterface::get_nlp_info(
   // m4 : obstacle constraints
   int m4 = 4 * obstacles_num_ * (horizon_ + 1);
 
-  num_of_variables_ = n1 + n2 + n3 + lambda_horizon_ + miu_horizon_;
-  num_of_constraints_ =
-      m1 + m2 + m3 + m4 + (num_of_variables_ - (horizon_ + 1) + 2);
+  num_of_variables_   = n1 + n2 + n3 + lambda_horizon_ + miu_horizon_;
+  num_of_constraints_ = m1 + m2 + m3 + m4 + (num_of_variables_ - (horizon_ + 1) + 2);
 
   // number of variables
   n = num_of_variables_;
@@ -171,13 +167,10 @@ bool DistanceApproachIPOPTCUDAInterface::get_nlp_info(
   return true;
 }
 
-bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
-                                                         double* x_u, int m,
-                                                         double* g_l,
-                                                         double* g_u) {
+bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(
+    int n, double* x_l, double* x_u, int m, double* g_l, double* g_u) {
   ADEBUG << "get_bounds_info";
-  ACHECK(XYbounds_.size() == 4)
-      << "XYbounds_ size is not 4, but" << XYbounds_.size();
+  ACHECK(XYbounds_.size() == 4) << "XYbounds_ size is not 4, but" << XYbounds_.size();
 
   // Variables: includes state, u, sample time and lagrange multipliers
   // 1. state variables, 4 * [0, horizon]
@@ -230,8 +223,7 @@ bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
 
     variable_index += 2;
   }
-  ADEBUG << "variable_index after adding control variables : "
-         << variable_index;
+  ADEBUG << "variable_index after adding control variables : " << variable_index;
 
   // 3. sampling time variables, 1 * [0, horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
@@ -286,8 +278,7 @@ bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
     ++constraint_index;
   }
 
-  ADEBUG << "constraint_index after adding steering rate constraints: "
-         << constraint_index;
+  ADEBUG << "constraint_index after adding steering rate constraints: " << constraint_index;
 
   // 3. Time constraints 1 * [0, horizons-1]
   for (int i = 0; i < horizon_; ++i) {
@@ -296,8 +287,7 @@ bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
     ++constraint_index;
   }
 
-  ADEBUG << "constraint_index after adding time constraints: "
-         << constraint_index;
+  ADEBUG << "constraint_index after adding time constraints: " << constraint_index;
 
   // 4. Three obstacles related equal constraints, one equality constraints,
   // [0, horizon_] * [0, obstacles_num_-1] * 4
@@ -322,8 +312,8 @@ bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
 
   // 5. load variable bounds as constraints
   // start configuration
-  g_l[constraint_index] = x0_(0, 0);
-  g_u[constraint_index] = x0_(0, 0);
+  g_l[constraint_index]     = x0_(0, 0);
+  g_u[constraint_index]     = x0_(0, 0);
   g_l[constraint_index + 1] = x0_(1, 0);
   g_u[constraint_index + 1] = x0_(1, 0);
   g_l[constraint_index + 2] = x0_(2, 0);
@@ -333,8 +323,8 @@ bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
   constraint_index += 4;
 
   for (int i = 1; i < horizon_; ++i) {
-    g_l[constraint_index] = XYbounds_[0];
-    g_u[constraint_index] = XYbounds_[1];
+    g_l[constraint_index]     = XYbounds_[0];
+    g_u[constraint_index]     = XYbounds_[1];
     g_l[constraint_index + 1] = XYbounds_[2];
     g_u[constraint_index + 1] = XYbounds_[3];
     g_l[constraint_index + 2] = -max_speed_reverse_;
@@ -343,8 +333,8 @@ bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
   }
 
   // end configuration
-  g_l[constraint_index] = xf_(0, 0);
-  g_u[constraint_index] = xf_(0, 0);
+  g_l[constraint_index]     = xf_(0, 0);
+  g_u[constraint_index]     = xf_(0, 0);
   g_l[constraint_index + 1] = xf_(1, 0);
   g_u[constraint_index + 1] = xf_(1, 0);
   g_l[constraint_index + 2] = xf_(2, 0);
@@ -354,8 +344,8 @@ bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
   constraint_index += 4;
 
   for (int i = 0; i < horizon_; ++i) {
-    g_l[constraint_index] = -max_steer_angle_;
-    g_u[constraint_index] = max_steer_angle_;
+    g_l[constraint_index]     = -max_steer_angle_;
+    g_u[constraint_index]     = max_steer_angle_;
     g_l[constraint_index + 1] = -max_acceleration_reverse_;
     g_u[constraint_index + 1] = max_acceleration_forward_;
     constraint_index += 2;
@@ -384,15 +374,20 @@ bool DistanceApproachIPOPTCUDAInterface::get_bounds_info(int n, double* x_l,
     constraint_index++;
   }
 
-  ADEBUG << "constraint_index after adding obstacles constraints: "
-         << constraint_index;
+  ADEBUG << "constraint_index after adding obstacles constraints: " << constraint_index;
   ADEBUG << "get_bounds_info_ out";
   return true;
 }
 
-bool DistanceApproachIPOPTCUDAInterface::get_starting_point(
-    int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
-    bool init_lambda, double* lambda) {
+bool DistanceApproachIPOPTCUDAInterface::get_starting_point(int     n,
+                                                            bool    init_x,
+                                                            double* x,
+                                                            bool    init_z,
+                                                            double* z_L,
+                                                            double* z_U,
+                                                            int     m,
+                                                            bool    init_lambda,
+                                                            double* lambda) {
   ADEBUG << "get_starting_point";
   ACHECK(init_x) << "Warm start init_x setting failed";
 
@@ -409,15 +404,14 @@ bool DistanceApproachIPOPTCUDAInterface::get_starting_point(
 
   // 2. control variable initialization, 2 * horizon_
   for (int i = 0; i < horizon_; ++i) {
-    int index = i * 2;
-    x[control_start_index_ + index] = uWS_(0, i);
+    int index                           = i * 2;
+    x[control_start_index_ + index]     = uWS_(0, i);
     x[control_start_index_ + index + 1] = uWS_(1, i);
   }
 
   // 2. time scale variable initialization, horizon_ + 1
   for (int i = 0; i < horizon_ + 1; ++i) {
-    x[time_start_index_ + i] =
-        0.5 * (min_time_sample_scaling_ + max_time_sample_scaling_);
+    x[time_start_index_ + i] = 0.5 * (min_time_sample_scaling_ + max_time_sample_scaling_);
   }
 
   // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
@@ -439,23 +433,26 @@ bool DistanceApproachIPOPTCUDAInterface::get_starting_point(
   return true;
 }
 
-bool DistanceApproachIPOPTCUDAInterface::eval_f(int n, const double* x,
-                                                bool new_x, double& obj_value) {
+bool DistanceApproachIPOPTCUDAInterface::eval_f(int           n,
+                                                const double* x,
+                                                bool          new_x,
+                                                double&       obj_value) {
   eval_obj(n, x, &obj_value);
   return true;
 }
 
-bool DistanceApproachIPOPTCUDAInterface::eval_grad_f(int n, const double* x,
-                                                     bool new_x,
-                                                     double* grad_f) {
+bool DistanceApproachIPOPTCUDAInterface::eval_grad_f(int           n,
+                                                     const double* x,
+                                                     bool          new_x,
+                                                     double*       grad_f) {
   gradient(tag_f, n, x, grad_f);
   return true;
 }
 
-bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int n,
+bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int           n,
                                                           const double* x,
-                                                          bool new_x,
-                                                          double* grad_f) {
+                                                          bool          new_x,
+                                                          double*       grad_f) {
   ADEBUG << "eval_grad_f by hand";
   // Objective is from eval_f:
   // min control inputs
@@ -464,8 +461,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int n,
   // regularization wrt warm start trajectory
   DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
   int control_index = control_start_index_;
-  int time_index = time_start_index_;
-  int state_index = state_start_index_;
+  int time_index    = time_start_index_;
+  int state_index   = state_start_index_;
 
   if (grad_f == nullptr) {
     AERROR << "grad_f pt is nullptr";
@@ -474,12 +471,9 @@ bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int n,
     std::fill(grad_f, grad_f + n, 0.0);
     // 1. objective to minimize state diff to warm up
     for (int i = 0; i < horizon_ + 1; ++i) {
-      grad_f[state_index] +=
-          2 * weight_state_x_ * (x[state_index] - xWS_(0, i));
-      grad_f[state_index + 1] +=
-          2 * weight_state_y_ * (x[state_index + 1] - xWS_(1, i));
-      grad_f[state_index + 2] +=
-          2 * weight_state_phi_ * (x[state_index + 2] - xWS_(2, i));
+      grad_f[state_index] += 2 * weight_state_x_ * (x[state_index] - xWS_(0, i));
+      grad_f[state_index + 1] += 2 * weight_state_y_ * (x[state_index + 1] - xWS_(1, i));
+      grad_f[state_index + 2] += 2 * weight_state_phi_ * (x[state_index + 2] - xWS_(2, i));
       grad_f[state_index + 3] = 2 * weight_state_v_ * x[state_index + 3];
       state_index += 4;
     }
@@ -493,43 +487,33 @@ bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int n,
 
     // 3. objective to minimize input change rate for first horizon
     // assume: x[time_index] > 0
-    control_index = control_start_index_;
-    double last_time_steer_rate =
-        (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
-    double last_time_a_rate =
-        (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
+    control_index               = control_start_index_;
+    double last_time_steer_rate = (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
+    double last_time_a_rate     = (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
 
-    grad_f[control_index] += 2.0 * last_time_steer_rate *
-                             (weight_stitching_steer_ / x[time_index] / ts_);
+    grad_f[control_index] +=
+        2.0 * last_time_steer_rate * (weight_stitching_steer_ / x[time_index] / ts_);
     grad_f[control_index + 1] +=
         2.0 * last_time_a_rate * (weight_stitching_a_ / x[time_index] / ts_);
-    grad_f[time_index] +=
-        -2.0 *
-        (weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
-         weight_stitching_a_ * last_time_a_rate * last_time_a_rate) /
-        x[time_index];
+    grad_f[time_index] += -2.0 *
+                          (weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+                           weight_stitching_a_ * last_time_a_rate * last_time_a_rate) /
+                          x[time_index];
 
     // 4. objective to minimize input change rates, [0- horizon_ -2]
     // assume: x[time_index] > 0
     time_index++;
     for (int i = 0; i < horizon_ - 1; ++i) {
-      double steering_rate =
-          (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
-      grad_f[control_index + 2] +=
-          2.0 * steering_rate * (weight_rate_steer_ / x[time_index] / ts_);
-      grad_f[control_index] +=
-          -2.0 * steering_rate * (weight_rate_steer_ / x[time_index] / ts_);
-      grad_f[time_index] += -2.0 * weight_rate_steer_ * steering_rate *
-                            steering_rate / x[time_index];
-
-      double a_rate =
-          (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
-      grad_f[control_index + 3] +=
-          2.0 * a_rate * (weight_rate_a_ / x[time_index] / ts_);
-      grad_f[control_index + 1] +=
-          -2.0 * a_rate * (weight_rate_a_ / x[time_index] / ts_);
+      double steering_rate = (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
+      grad_f[control_index + 2] += 2.0 * steering_rate * (weight_rate_steer_ / x[time_index] / ts_);
+      grad_f[control_index] += -2.0 * steering_rate * (weight_rate_steer_ / x[time_index] / ts_);
       grad_f[time_index] +=
-          -2.0 * weight_rate_a_ * a_rate * a_rate / x[time_index];
+          -2.0 * weight_rate_steer_ * steering_rate * steering_rate / x[time_index];
+
+      double a_rate = (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
+      grad_f[control_index + 3] += 2.0 * a_rate * (weight_rate_a_ / x[time_index] / ts_);
+      grad_f[control_index + 1] += -2.0 * a_rate * (weight_rate_a_ / x[time_index] / ts_);
+      grad_f[time_index] += -2.0 * weight_rate_a_ * a_rate * a_rate / x[time_index];
 
       control_index += 2;
       time_index++;
@@ -538,8 +522,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int n,
     // 5. objective to minimize total time [0, horizon_]
     time_index = time_start_index_;
     for (int i = 0; i < horizon_ + 1; ++i) {
-      grad_f[time_index] += weight_first_order_time_ +
-                            2.0 * weight_second_order_time_ * x[time_index];
+      grad_f[time_index] +=
+          weight_first_order_time_ + 2.0 * weight_second_order_time_ * x[time_index];
       time_index++;
     }
   }
@@ -547,39 +531,30 @@ bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int n,
   return true;
 }
 
-bool DistanceApproachIPOPTCUDAInterface::eval_g(int n, const double* x,
-                                                bool new_x, int m, double* g) {
+bool DistanceApproachIPOPTCUDAInterface::eval_g(
+    int n, const double* x, bool new_x, int m, double* g) {
   eval_constraints(n, x, m, g);
-  if (enable_constraint_check_) {
-    check_g(n, x, m, g);
-  }
+  if (enable_constraint_check_) { check_g(n, x, m, g); }
   return true;
 }
 
-bool DistanceApproachIPOPTCUDAInterface::eval_jac_g(int n, const double* x,
-                                                    bool new_x, int m,
-                                                    int nele_jac, int* iRow,
-                                                    int* jCol, double* values) {
+bool DistanceApproachIPOPTCUDAInterface::eval_jac_g(
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow, int* jCol, double* values) {
   return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
 }
 
-bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
-                                                        bool new_x, int m,
-                                                        int nele_jac, int* iRow,
-                                                        int* jCol,
-                                                        double* values) {
+bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow, int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
-  CHECK_EQ(n, num_of_variables_)
-      << "No. of variables wrong in eval_jac_g. n : " << n;
-  CHECK_EQ(m, num_of_constraints_)
-      << "No. of constraints wrong in eval_jac_g. n : " << m;
+  CHECK_EQ(n, num_of_variables_) << "No. of variables wrong in eval_jac_g. n : " << n;
+  CHECK_EQ(m, num_of_constraints_) << "No. of constraints wrong in eval_jac_g. n : " << m;
 
   if (values == nullptr) {
-    int nz_index = 0;
+    int nz_index         = 0;
     int constraint_index = 0;
-    int state_index = state_start_index_;
-    int control_index = control_start_index_;
-    int time_index = time_start_index_;
+    int state_index      = state_start_index_;
+    int control_index    = control_start_index_;
+    int time_index       = time_start_index_;
 
     // 1. State Constraint with respect to variables
     for (int i = 0; i < horizon_; ++i) {
@@ -699,8 +674,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
 
     // 2. only have control rate constraints on u0 , range [0, horizon_-1]
     control_index = control_start_index_;
-    state_index = state_start_index_;
-    time_index = time_start_index_;
+    state_index   = state_start_index_;
+    time_index    = time_start_index_;
 
     // First one, with respect to u(0, 0)
     iRow[nz_index] = constraint_index;
@@ -764,11 +739,11 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
 
 #pragma omp parallel for schedule(dynamic, 1) num_threads(4)
     for (int iter = 0; iter < (horizon_ + 1) * obstacles_num_; iter++) {
-      int i = iter / obstacles_num_;
-      int j = iter % obstacles_num_;
+      int i                 = iter / obstacles_num_;
+      int j                 = iter % obstacles_num_;
       int current_edges_num = obstacles_edges_num_(j, 0);
-      int nz_index_tmp = nz_index;
-      int l_index_tmp = l_index;
+      int nz_index_tmp      = nz_index;
+      int l_index_tmp       = l_index;
       // count nz_len
       for (int jj = 0; jj < obstacles_num_; ++jj) {
         if (jj < j) {
@@ -781,10 +756,9 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
           l_index_tmp += i * obstacles_edges_num_(jj, 0);
         }
       }
-      int n_index_tmp = n_index + (i * obstacles_num_ + j) * 4;
-      int constraint_index_tmp =
-          constraint_index + (i * obstacles_num_ + j) * 4;
-      int state_index_tmp = state_index + i * 4;
+      int n_index_tmp          = n_index + (i * obstacles_num_ + j) * 4;
+      int constraint_index_tmp = constraint_index + (i * obstacles_num_ + j) * 4;
+      int state_index_tmp      = state_index + i * 4;
 
       // 1. norm(A* lambda == 1)
       for (int k = 0; k < current_edges_num; ++k) {
@@ -875,11 +849,11 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
     state_index += 4 * (horizon_ + 1);
 
     // 5. load variable bounds as constraints
-    state_index = state_start_index_;
+    state_index   = state_start_index_;
     control_index = control_start_index_;
-    time_index = time_start_index_;
-    l_index = l_start_index_;
-    n_index = n_start_index_;
+    time_index    = time_start_index_;
+    l_index       = l_start_index_;
+    n_index       = n_start_index_;
 
     // start configuration
     iRow[nz_index] = constraint_index;
@@ -968,8 +942,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
     std::fill(values, values + nele_jac, 0.0);
     int nz_index = 0;
 
-    int time_index = time_start_index_;
-    int state_index = state_start_index_;
+    int time_index    = time_start_index_;
+    int state_index   = state_start_index_;
     int control_index = control_start_index_;
     // TODO(QiL) : initially implemented to be debug friendly, later iterate
     // towards better efficiency
@@ -980,27 +954,21 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           x[time_index] * ts_ *
-          (x[state_index + 3] +
-           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-          std::sin(x[state_index + 2] +
-                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                       std::tan(x[control_index]) / wheelbase_);  // a.
+          (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                            std::tan(x[control_index]) / wheelbase_);  // a.
       ++nz_index;
 
       values[nz_index] =
           -1.0 *
           (x[time_index] * ts_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               (-1) * x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // b
+               (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) * (-1) *
+               x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) / wheelbase_ *
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_));  // b
       ++nz_index;
 
       values[nz_index] = 1.0;
@@ -1008,71 +976,55 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           x[time_index] * ts_ *
-          (x[state_index + 3] +
-           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-          std::sin(x[state_index + 2] +
-                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                       std::tan(x[control_index]) / wheelbase_) *
+          (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                            std::tan(x[control_index]) / wheelbase_) *
           x[time_index] * ts_ * 0.5 * x[state_index + 3] /
-          (std::cos(x[control_index]) * std::cos(x[control_index])) /
-          wheelbase_;  // c
+          (std::cos(x[control_index]) * std::cos(x[control_index])) / wheelbase_;  // c
       ++nz_index;
 
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // d
+                  std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                    std::tan(x[control_index]) / wheelbase_));  // d
       ++nz_index;
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+          (ts_ * (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) -
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) -
            x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // e
+               (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) / wheelbase_ *
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_));  // e
       ++nz_index;
 
       values[nz_index] = -1.0;
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // f.
       ++nz_index;
 
       values[nz_index] =
           -1.0 *
           (x[time_index] * ts_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+           (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+           std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                             std::tan(x[control_index]) / wheelbase_));  // f.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (x[time_index] * ts_ *
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // g
+               (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) / wheelbase_ *
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_));  // g
       ++nz_index;
 
       values[nz_index] = 1.0;
@@ -1080,50 +1032,39 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_) *
+                  (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                  std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                    std::tan(x[control_index]) / wheelbase_) *
                   x[time_index] * ts_ * 0.5 * x[state_index + 3] /
-                  (std::cos(x[control_index]) * std::cos(x[control_index])) /
-                  wheelbase_);  // h
+                  (std::cos(x[control_index]) * std::cos(x[control_index])) / wheelbase_);  // h
       ++nz_index;
 
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::sin(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // i
+                  std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                    std::tan(x[control_index]) / wheelbase_));  // i
       ++nz_index;
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+          (ts_ * (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // j
+               (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) / wheelbase_ *
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_));  // j
       ++nz_index;
 
       values[nz_index] = -1.0;
       ++nz_index;
 
-      values[nz_index] = -1.0 * x[time_index] * ts_ *
-                         std::tan(x[control_index]) / wheelbase_;  // k.
+      values[nz_index] =
+          -1.0 * x[time_index] * ts_ * std::tan(x[control_index]) / wheelbase_;  // k.
       ++nz_index;
 
       values[nz_index] = 1.0;
@@ -1131,21 +1072,16 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) /
-                  (std::cos(x[control_index]) * std::cos(x[control_index])) /
-                  wheelbase_);  // l.
+                  (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) /
+                  (std::cos(x[control_index]) * std::cos(x[control_index])) / wheelbase_);  // l.
+      ++nz_index;
+
+      values[nz_index] = -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+                                 std::tan(x[control_index]) / wheelbase_);  // m.
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::tan(x[control_index]) / wheelbase_);  // m.
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          -1.0 * (ts_ * (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                       std::tan(x[control_index]) / wheelbase_ +
                   x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
                       std::tan(x[control_index]) / wheelbase_);  // n.
@@ -1170,8 +1106,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
 
     // 2. control rate constraints 1 * [0, horizons-1]
     control_index = control_start_index_;
-    state_index = state_start_index_;
-    time_index = time_start_index_;
+    state_index   = state_start_index_;
+    time_index    = time_start_index_;
 
     // First horizon
 
@@ -1180,8 +1116,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
     ++nz_index;
 
     // with respect to time
-    values[nz_index] = -1.0 * (x[control_index] - last_time_u_(0, 0)) /
-                       x[time_index] / x[time_index] / ts_;
+    values[nz_index] =
+        -1.0 * (x[control_index] - last_time_u_(0, 0)) / x[time_index] / x[time_index] / ts_;
     ++nz_index;
     time_index++;
     control_index += 2;
@@ -1197,16 +1133,16 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
       ++nz_index;
 
       // with respect to time
-      values[nz_index] = -1.0 * (x[control_index] - x[control_index - 2]) /
-                         x[time_index] / x[time_index] / ts_;
+      values[nz_index] =
+          -1.0 * (x[control_index] - x[control_index - 2]) / x[time_index] / x[time_index] / ts_;
       ++nz_index;
 
       control_index += 2;
       time_index++;
     }
 
-    ADEBUG << "After fulfilled control rate constraints derivative, nz_index : "
-           << nz_index << " nele_jac : " << nele_jac;
+    ADEBUG << "After fulfilled control rate constraints derivative, nz_index : " << nz_index
+           << " nele_jac : " << nele_jac;
 
     // 3. Time constraints [0, horizon_ -1]
     time_index = time_start_index_;
@@ -1222,8 +1158,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
       time_index++;
     }
 
-    ADEBUG << "After fulfilled time constraints derivative, nz_index : "
-           << nz_index << " nele_jac : " << nele_jac;
+    ADEBUG << "After fulfilled time constraints derivative, nz_index : " << nz_index
+           << " nele_jac : " << nele_jac;
 
     // 4. Three obstacles related equal constraints, one equality constraints,
     // [0, horizon_] * [0, obstacles_num_-1] * 4
@@ -1238,9 +1174,9 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
       int j = iter % obstacles_num_;
 
       int current_edges_num = obstacles_edges_num_(j, 0);
-      int edges_counter = 0;
-      int nz_index_tmp = nz_index;
-      int l_index_tmp = l_index;
+      int edges_counter     = 0;
+      int nz_index_tmp      = nz_index;
+      int l_index_tmp       = l_index;
 
       // count nz_len
       for (int jj = 0; jj < obstacles_num_; ++jj) {
@@ -1255,13 +1191,11 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
           l_index_tmp += i * obstacles_edges_num_(jj, 0);
         }
       }
-      int n_index_tmp = n_index + (i * obstacles_num_ + j) * 4;
+      int n_index_tmp     = n_index + (i * obstacles_num_ + j) * 4;
       int state_index_tmp = state_index + i * 4;
 
-      Eigen::MatrixXd Aj =
-          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-      Eigen::MatrixXd bj =
-          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+      Eigen::MatrixXd Aj = obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+      Eigen::MatrixXd bj = obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
       // TODO(QiL) : Remove redundant calculation
       double tmp1 = 0;
@@ -1275,23 +1209,21 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
       // 1. norm(A* lambda == 1)
       for (int k = 0; k < current_edges_num; ++k) {
         // with respect to l
-        values[nz_index_tmp] =
-            2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
-        ++nz_index_tmp;                                 // current_edges_num
+        values[nz_index_tmp] = 2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
+        ++nz_index_tmp;                                                    // current_edges_num
       }
 
       // 2. G' * mu + R' * lambda == 0, part 1
       // With respect to x
-      values[nz_index_tmp] = -std::sin(x[state_index_tmp + 2]) * tmp1 +
-                             std::cos(x[state_index_tmp + 2]) * tmp2;  // u
-      ++nz_index_tmp;                                                  // 1
+      values[nz_index_tmp] =
+          -std::sin(x[state_index_tmp + 2]) * tmp1 + std::cos(x[state_index_tmp + 2]) * tmp2;  // u
+      ++nz_index_tmp;                                                                          // 1
 
       // with respect to l
       for (int k = 0; k < current_edges_num; ++k) {
-        values[nz_index_tmp] =
-            std::cos(x[state_index_tmp + 2]) * Aj(k, 0) +
-            std::sin(x[state_index_tmp + 2]) * Aj(k, 1);  // v0~vn
-        ++nz_index_tmp;                                   // current_edges_num
+        values[nz_index_tmp] = std::cos(x[state_index_tmp + 2]) * Aj(k, 0) +
+                               std::sin(x[state_index_tmp + 2]) * Aj(k, 1);  // v0~vn
+        ++nz_index_tmp;                                                      // current_edges_num
       }
 
       // With respect to n
@@ -1303,16 +1235,15 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
 
       // 3. G' * mu + R' * lambda == 0, part 2
       // With respect to x
-      values[nz_index_tmp] = -std::cos(x[state_index_tmp + 2]) * tmp1 -
-                             std::sin(x[state_index_tmp + 2]) * tmp2;  // x
-      ++nz_index_tmp;                                                  // 1
+      values[nz_index_tmp] =
+          -std::cos(x[state_index_tmp + 2]) * tmp1 - std::sin(x[state_index_tmp + 2]) * tmp2;  // x
+      ++nz_index_tmp;                                                                          // 1
 
       // with respect to l
       for (int k = 0; k < current_edges_num; ++k) {
-        values[nz_index_tmp] =
-            -std::sin(x[state_index_tmp + 2]) * Aj(k, 0) +
-            std::cos(x[state_index_tmp + 2]) * Aj(k, 1);  // y0~yn
-        ++nz_index_tmp;                                   // current_edges_num
+        values[nz_index_tmp] = -std::sin(x[state_index_tmp + 2]) * Aj(k, 0) +
+                               std::cos(x[state_index_tmp + 2]) * Aj(k, 1);  // y0~yn
+        ++nz_index_tmp;                                                      // current_edges_num
       }
 
       // With respect to n
@@ -1340,19 +1271,15 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
       values[nz_index_tmp] = tmp2;  // bb1
       ++nz_index_tmp;               // 1
 
-      values[nz_index_tmp] =
-          -std::sin(x[state_index_tmp + 2]) * offset_ * tmp1 +
-          std::cos(x[state_index_tmp + 2]) * offset_ * tmp2;  // cc1
-      ++nz_index_tmp;                                         // 1
+      values[nz_index_tmp] = -std::sin(x[state_index_tmp + 2]) * offset_ * tmp1 +
+                             std::cos(x[state_index_tmp + 2]) * offset_ * tmp2;  // cc1
+      ++nz_index_tmp;                                                            // 1
 
       // with respect to l
       for (int k = 0; k < current_edges_num; ++k) {
         values[nz_index_tmp] =
-            (x[state_index_tmp] + std::cos(x[state_index_tmp + 2]) * offset_) *
-                Aj(k, 0) +
-            (x[state_index_tmp + 1] +
-             std::sin(x[state_index_tmp + 2]) * offset_) *
-                Aj(k, 1) -
+            (x[state_index_tmp] + std::cos(x[state_index_tmp + 2]) * offset_) * Aj(k, 0) +
+            (x[state_index_tmp + 1] + std::sin(x[state_index_tmp + 2]) * offset_) * Aj(k, 1) -
             bj(k, 0);    // ddk
         ++nz_index_tmp;  // current_edges_num
       }
@@ -1370,11 +1297,11 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
     }
 
     // 5. load variable bounds as constraints
-    state_index = state_start_index_;
+    state_index   = state_start_index_;
     control_index = control_start_index_;
-    time_index = time_start_index_;
-    l_index = l_start_index_;
-    n_index = n_start_index_;
+    time_index    = time_start_index_;
+    l_index       = l_start_index_;
+    n_index       = n_start_index_;
 
     // start configuration
     values[nz_index] = 1.0;
@@ -1435,23 +1362,18 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
   return true;
 }  // NOLINT
 
-bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
-                                                        bool new_x, int m,
-                                                        int nele_jac, int* iRow,
-                                                        int* jCol,
-                                                        double* values) {
+bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow, int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
-  CHECK_EQ(n, num_of_variables_)
-      << "No. of variables wrong in eval_jac_g. n : " << n;
-  CHECK_EQ(m, num_of_constraints_)
-      << "No. of constraints wrong in eval_jac_g. n : " << m;
+  CHECK_EQ(n, num_of_variables_) << "No. of variables wrong in eval_jac_g. n : " << n;
+  CHECK_EQ(m, num_of_constraints_) << "No. of constraints wrong in eval_jac_g. n : " << m;
 
   if (values == nullptr) {
-    int nz_index = 0;
+    int nz_index         = 0;
     int constraint_index = 0;
-    int state_index = state_start_index_;
-    int control_index = control_start_index_;
-    int time_index = time_start_index_;
+    int state_index      = state_start_index_;
+    int control_index    = control_start_index_;
+    int time_index       = time_start_index_;
 
     // 1. State Constraint with respect to variables
     for (int i = 0; i < horizon_; ++i) {
@@ -1571,8 +1493,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
 
     // 2. only have control rate constraints on u0 , range [0, horizon_-1]
     control_index = control_start_index_;
-    state_index = state_start_index_;
-    time_index = time_start_index_;
+    state_index   = state_start_index_;
+    time_index    = time_start_index_;
 
     // First one, with respect to u(0, 0)
     iRow[nz_index] = constraint_index;
@@ -1726,11 +1648,11 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
     }
 
     // 5. load variable bounds as constraints
-    state_index = state_start_index_;
+    state_index   = state_start_index_;
     control_index = control_start_index_;
-    time_index = time_start_index_;
-    l_index = l_start_index_;
-    n_index = n_start_index_;
+    time_index    = time_start_index_;
+    l_index       = l_start_index_;
+    n_index       = n_start_index_;
 
     // start configuration
     iRow[nz_index] = constraint_index;
@@ -1819,8 +1741,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
     std::fill(values, values + nele_jac, 0.0);
     int nz_index = 0;
 
-    int time_index = time_start_index_;
-    int state_index = state_start_index_;
+    int time_index    = time_start_index_;
+    int state_index   = state_start_index_;
     int control_index = control_start_index_;
 
     // TODO(QiL) : initially implemented to be debug friendly, later iterate
@@ -1832,27 +1754,21 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           x[time_index] * ts_ *
-          (x[state_index + 3] +
-           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-          std::sin(x[state_index + 2] +
-                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                       std::tan(x[control_index]) / wheelbase_);  // a.
+          (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                            std::tan(x[control_index]) / wheelbase_);  // a.
       ++nz_index;
 
       values[nz_index] =
           -1.0 *
           (x[time_index] * ts_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               (-1) * x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // b
+               (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) * (-1) *
+               x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) / wheelbase_ *
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_));  // b
       ++nz_index;
 
       values[nz_index] = 1.0;
@@ -1860,71 +1776,55 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           x[time_index] * ts_ *
-          (x[state_index + 3] +
-           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-          std::sin(x[state_index + 2] +
-                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                       std::tan(x[control_index]) / wheelbase_) *
+          (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                            std::tan(x[control_index]) / wheelbase_) *
           x[time_index] * ts_ * 0.5 * x[state_index + 3] /
-          (std::cos(x[control_index]) * std::cos(x[control_index])) /
-          wheelbase_;  // c
+          (std::cos(x[control_index]) * std::cos(x[control_index])) / wheelbase_;  // c
       ++nz_index;
 
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // d
+                  std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                    std::tan(x[control_index]) / wheelbase_));  // d
       ++nz_index;
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+          (ts_ * (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) -
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) -
            x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // e
+               (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) / wheelbase_ *
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_));  // e
       ++nz_index;
 
       values[nz_index] = -1.0;
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // f.
       ++nz_index;
 
       values[nz_index] =
           -1.0 *
           (x[time_index] * ts_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+           (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+           std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                             std::tan(x[control_index]) / wheelbase_));  // f.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (x[time_index] * ts_ *
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // g
+               (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) / wheelbase_ *
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_));  // g
       ++nz_index;
 
       values[nz_index] = 1.0;
@@ -1932,50 +1832,39 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_) *
+                  (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                  std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                    std::tan(x[control_index]) / wheelbase_) *
                   x[time_index] * ts_ * 0.5 * x[state_index + 3] /
-                  (std::cos(x[control_index]) * std::cos(x[control_index])) /
-                  wheelbase_);  // h
+                  (std::cos(x[control_index]) * std::cos(x[control_index])) / wheelbase_);  // h
       ++nz_index;
 
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::sin(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // i
+                  std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                    std::tan(x[control_index]) / wheelbase_));  // i
       ++nz_index;
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+          (ts_ * (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
+               std::sin(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_) +
            x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // j
+               (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) / wheelbase_ *
+               std::cos(x[state_index + 2] + x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                                                 std::tan(x[control_index]) / wheelbase_));  // j
       ++nz_index;
 
       values[nz_index] = -1.0;
       ++nz_index;
 
-      values[nz_index] = -1.0 * x[time_index] * ts_ *
-                         std::tan(x[control_index]) / wheelbase_;  // k.
+      values[nz_index] =
+          -1.0 * x[time_index] * ts_ * std::tan(x[control_index]) / wheelbase_;  // k.
       ++nz_index;
 
       values[nz_index] = 1.0;
@@ -1983,21 +1872,16 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) /
-                  (std::cos(x[control_index]) * std::cos(x[control_index])) /
-                  wheelbase_);  // l.
+                  (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) /
+                  (std::cos(x[control_index]) * std::cos(x[control_index])) / wheelbase_);  // l.
+      ++nz_index;
+
+      values[nz_index] = -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+                                 std::tan(x[control_index]) / wheelbase_);  // m.
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::tan(x[control_index]) / wheelbase_);  // m.
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          -1.0 * (ts_ * (x[state_index + 3] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                       std::tan(x[control_index]) / wheelbase_ +
                   x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
                       std::tan(x[control_index]) / wheelbase_);  // n.
@@ -2022,8 +1906,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
 
     // 2. control rate constraints 1 * [0, horizons-1]
     control_index = control_start_index_;
-    state_index = state_start_index_;
-    time_index = time_start_index_;
+    state_index   = state_start_index_;
+    time_index    = time_start_index_;
 
     // First horizon
 
@@ -2032,8 +1916,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
     ++nz_index;
 
     // with respect to time
-    values[nz_index] = -1.0 * (x[control_index] - last_time_u_(0, 0)) /
-                       x[time_index] / x[time_index] / ts_;
+    values[nz_index] =
+        -1.0 * (x[control_index] - last_time_u_(0, 0)) / x[time_index] / x[time_index] / ts_;
     ++nz_index;
     time_index++;
     control_index += 2;
@@ -2049,16 +1933,16 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
       ++nz_index;
 
       // with respect to time
-      values[nz_index] = -1.0 * (x[control_index] - x[control_index - 2]) /
-                         x[time_index] / x[time_index] / ts_;
+      values[nz_index] =
+          -1.0 * (x[control_index] - x[control_index - 2]) / x[time_index] / x[time_index] / ts_;
       ++nz_index;
 
       control_index += 2;
       time_index++;
     }
 
-    ADEBUG << "After fulfilled control rate constraints derivative, nz_index : "
-           << nz_index << " nele_jac : " << nele_jac;
+    ADEBUG << "After fulfilled control rate constraints derivative, nz_index : " << nz_index
+           << " nele_jac : " << nele_jac;
 
     // 3. Time constraints [0, horizon_ -1]
     time_index = time_start_index_;
@@ -2074,8 +1958,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
       time_index++;
     }
 
-    ADEBUG << "After fulfilled time constraints derivative, nz_index : "
-           << nz_index << " nele_jac : " << nele_jac;
+    ADEBUG << "After fulfilled time constraints derivative, nz_index : " << nz_index
+           << " nele_jac : " << nele_jac;
 
     // 4. Three obstacles related equal constraints, one equality constraints,
     // [0, horizon_] * [0, obstacles_num_-1] * 4
@@ -2087,11 +1971,9 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
     for (int i = 0; i < horizon_ + 1; ++i) {
       int edges_counter = 0;
       for (int j = 0; j < obstacles_num_; ++j) {
-        int current_edges_num = obstacles_edges_num_(j, 0);
-        Eigen::MatrixXd Aj =
-            obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-        Eigen::MatrixXd bj =
-            obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+        int             current_edges_num = obstacles_edges_num_(j, 0);
+        Eigen::MatrixXd Aj = obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+        Eigen::MatrixXd bj = obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
         // TODO(QiL) : Remove redundant calculation
         double tmp1 = 0;
@@ -2105,15 +1987,14 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
         // 1. norm(A* lambda == 1)
         for (int k = 0; k < current_edges_num; ++k) {
           // with respect to l
-          values[nz_index] =
-              2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
+          values[nz_index] = 2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
           ++nz_index;
         }
 
         // 2. G' * mu + R' * lambda == 0, part 1
         // With respect to x
-        values[nz_index] = -std::sin(x[state_index + 2]) * tmp1 +
-                           std::cos(x[state_index + 2]) * tmp2;  // u
+        values[nz_index] =
+            -std::sin(x[state_index + 2]) * tmp1 + std::cos(x[state_index + 2]) * tmp2;  // u
         ++nz_index;
 
         // with respect to l
@@ -2132,8 +2013,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
 
         // 3. G' * mu + R' * lambda == 0, part 2
         // With respect to x
-        values[nz_index] = -std::cos(x[state_index + 2]) * tmp1 -
-                           std::sin(x[state_index + 2]) * tmp2;  // x
+        values[nz_index] =
+            -std::cos(x[state_index + 2]) * tmp1 - std::sin(x[state_index + 2]) * tmp2;  // x
         ++nz_index;
 
         // with respect to l
@@ -2168,18 +2049,15 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
         values[nz_index] = tmp2;  // bb1
         ++nz_index;
 
-        values[nz_index] =
-            -std::sin(x[state_index + 2]) * offset_ * tmp1 +
-            std::cos(x[state_index + 2]) * offset_ * tmp2;  // cc1
+        values[nz_index] = -std::sin(x[state_index + 2]) * offset_ * tmp1 +
+                           std::cos(x[state_index + 2]) * offset_ * tmp2;  // cc1
         ++nz_index;
 
         // with respect to l
         for (int k = 0; k < current_edges_num; ++k) {
           values[nz_index] =
-              (x[state_index] + std::cos(x[state_index + 2]) * offset_) *
-                  Aj(k, 0) +
-              (x[state_index + 1] + std::sin(x[state_index + 2]) * offset_) *
-                  Aj(k, 1) -
+              (x[state_index] + std::cos(x[state_index + 2]) * offset_) * Aj(k, 0) +
+              (x[state_index + 1] + std::sin(x[state_index + 2]) * offset_) * Aj(k, 1) -
               bj(k, 0);  // ddk
           ++nz_index;
         }
@@ -2199,11 +2077,11 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
     }
 
     // 5. load variable bounds as constraints
-    state_index = state_start_index_;
+    state_index   = state_start_index_;
     control_index = control_start_index_;
-    time_index = time_start_index_;
-    l_index = l_start_index_;
-    n_index = n_start_index_;
+    time_index    = time_start_index_;
+    l_index       = l_start_index_;
+    n_index       = n_start_index_;
 
     // start configuration
     values[nz_index] = 1.0;
@@ -2264,12 +2142,17 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
   return true;
 }  // NOLINT
 
-bool DistanceApproachIPOPTCUDAInterface::eval_h(int n, const double* x,
-                                                bool new_x, double obj_factor,
-                                                int m, const double* lambda,
-                                                bool new_lambda, int nele_hess,
-                                                int* iRow, int* jCol,
-                                                double* values) {
+bool DistanceApproachIPOPTCUDAInterface::eval_h(int           n,
+                                                const double* x,
+                                                bool          new_x,
+                                                double        obj_factor,
+                                                int           m,
+                                                const double* lambda,
+                                                bool          new_lambda,
+                                                int           nele_hess,
+                                                int*          iRow,
+                                                int*          jCol,
+                                                double*       values) {
   if (values == nullptr) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
@@ -2290,8 +2173,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_h(int n, const double* x,
 #endif
 
     set_param_vec(tag_L, m + 1, obj_lam);
-    sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
-                &hessval, options_L);
+    sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L, &hessval, options_L);
 
 #if USE_GPU == 1
     if (!data_transfer(values, hessval, nnz_L)) {
@@ -2306,29 +2188,36 @@ bool DistanceApproachIPOPTCUDAInterface::eval_h(int n, const double* x,
 }
 
 void DistanceApproachIPOPTCUDAInterface::finalize_solution(
-    Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
-    const double* z_U, int m, const double* g, const double* lambda,
-    double obj_value, const Ipopt::IpoptData* ip_data,
+    Ipopt::SolverReturn               status,
+    int                               n,
+    const double*                     x,
+    const double*                     z_L,
+    const double*                     z_U,
+    int                               m,
+    const double*                     g,
+    const double*                     lambda,
+    double                            obj_value,
+    const Ipopt::IpoptData*           ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
   ADEBUG << "finalize_solution";
-  int state_index = state_start_index_;
+  int state_index   = state_start_index_;
   int control_index = control_start_index_;
-  int time_index = time_start_index_;
-  int dual_l_index = l_start_index_;
-  int dual_n_index = n_start_index_;
+  int time_index    = time_start_index_;
+  int dual_l_index  = l_start_index_;
+  int dual_n_index  = n_start_index_;
   // 1. state variables, 4 * [0, horizon]
   // 2. control variables, 2 * [0, horizon_-1]
   // 3. sampling time variables, 1 * [0, horizon_]
   // 4. dual_l obstacles_edges_sum_ * [0, horizon]
   // 5. dual_n obstacles_num * [0, horizon]
   for (int i = 0; i < horizon_; ++i) {
-    state_result_(0, i) = x[state_index];
-    state_result_(1, i) = x[state_index + 1];
-    state_result_(2, i) = x[state_index + 2];
-    state_result_(3, i) = x[state_index + 3];
+    state_result_(0, i)   = x[state_index];
+    state_result_(1, i)   = x[state_index + 1];
+    state_result_(2, i)   = x[state_index + 2];
+    state_result_(3, i)   = x[state_index + 3];
     control_result_(0, i) = x[control_index];
     control_result_(1, i) = x[control_index + 1];
-    time_result_(0, i) = x[time_index];
+    time_result_(0, i)    = x[time_index];
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
       dual_l_result_(j, i) = x[dual_l_index + j];
     }
@@ -2350,8 +2239,8 @@ void DistanceApproachIPOPTCUDAInterface::finalize_solution(
   state_result_(1, horizon_) = xf_(1, 0);
   state_result_(2, horizon_) = xf_(2, 0);
   state_result_(3, horizon_) = xf_(3, 0);
-  time_result_(0, horizon_) = x[time_index];
-  time_result_ = ts_ * time_result_;
+  time_result_(0, horizon_)  = x[time_index];
+  time_result_               = ts_ * time_result_;
   for (int j = 0; j < obstacles_edges_sum_; ++j) {
     dual_l_result_(j, horizon_) = x[dual_l_index + j];
   }
@@ -2368,26 +2257,25 @@ void DistanceApproachIPOPTCUDAInterface::finalize_solution(
 }
 
 void DistanceApproachIPOPTCUDAInterface::get_optimization_results(
-    Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
-    Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
+    Eigen::MatrixXd* state_result,
+    Eigen::MatrixXd* control_result,
+    Eigen::MatrixXd* time_result,
+    Eigen::MatrixXd* dual_l_result,
     Eigen::MatrixXd* dual_n_result) const {
   ADEBUG << "get_optimization_results";
-  *state_result = state_result_;
+  *state_result   = state_result_;
   *control_result = control_result_;
-  *time_result = time_result_;
-  *dual_l_result = dual_l_result_;
-  *dual_n_result = dual_n_result_;
+  *time_result    = time_result_;
+  *dual_l_result  = dual_l_result_;
+  *dual_n_result  = dual_n_result_;
 
-  if (!distance_approach_config_.enable_initial_final_check()) {
-    return;
-  }
+  if (!distance_approach_config_.enable_initial_final_check()) { return; }
   CHECK_EQ(state_result_.cols(), xWS_.cols());
   CHECK_EQ(state_result_.rows(), xWS_.rows());
   double state_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4; ++j) {
-      state_diff_max =
-          std::max(std::abs(xWS_(j, i) - state_result_(j, i)), state_diff_max);
+      state_diff_max = std::max(std::abs(xWS_(j, i) - state_result_(j, i)), state_diff_max);
     }
   }
 
@@ -2396,10 +2284,8 @@ void DistanceApproachIPOPTCUDAInterface::get_optimization_results(
   CHECK_EQ(control_result_.rows(), uWS_.rows());
   double control_diff_max = 0.0;
   for (int i = 0; i < horizon_; ++i) {
-    control_diff_max = std::max(std::abs(uWS_(0, i) - control_result_(0, i)),
-                                control_diff_max);
-    control_diff_max = std::max(std::abs(uWS_(1, i) - control_result_(1, i)),
-                                control_diff_max);
+    control_diff_max = std::max(std::abs(uWS_(0, i) - control_result_(0, i)), control_diff_max);
+    control_diff_max = std::max(std::abs(uWS_(1, i) - control_result_(1, i)), control_diff_max);
   }
 
   // 2. time scale variable initialization, horizon_ + 1, no
@@ -2410,8 +2296,7 @@ void DistanceApproachIPOPTCUDAInterface::get_optimization_results(
   double l_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      l_diff_max = std::max(std::abs(l_warm_up_(j, i) - dual_l_result_(j, i)),
-                            l_diff_max);
+      l_diff_max = std::max(std::abs(l_warm_up_(j, i) - dual_l_result_(j, i)), l_diff_max);
     }
   }
 
@@ -2421,8 +2306,7 @@ void DistanceApproachIPOPTCUDAInterface::get_optimization_results(
   double n_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      n_diff_max = std::max(std::abs(n_warm_up_(j, i) - dual_n_result_(j, i)),
-                            n_diff_max);
+      n_diff_max = std::max(std::abs(n_warm_up_(j, i) - dual_n_result_(j, i)), n_diff_max);
     }
   }
 
@@ -2434,8 +2318,7 @@ void DistanceApproachIPOPTCUDAInterface::get_optimization_results(
 
 //***************    start ADOL-C part ***********************************
 template <class T>
-bool DistanceApproachIPOPTCUDAInterface::eval_obj(int n, const T* x,
-                                                  T* obj_value) {
+bool DistanceApproachIPOPTCUDAInterface::eval_obj(int n, const T* x, T* obj_value) {
   ADEBUG << "eval_obj";
   // Objective is :
   // min control inputs
@@ -2444,8 +2327,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_obj(int n, const T* x,
   // regularization wrt warm start trajectory
   DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
   int control_index = control_start_index_;
-  int time_index = time_start_index_;
-  int state_index = state_start_index_;
+  int time_index    = time_start_index_;
+  int state_index   = state_start_index_;
 
   // TODO(QiL): Initial implementation towards earlier understanding and debug
   // purpose, later code refine towards improving efficiency
@@ -2456,11 +2339,9 @@ bool DistanceApproachIPOPTCUDAInterface::eval_obj(int n, const T* x,
     T x1_diff = x[state_index] - xWS_(0, i);
     T x2_diff = x[state_index + 1] - xWS_(1, i);
     T x3_diff = x[state_index + 2] - xWS_(2, i);
-    T x4_abs = x[state_index + 3];
-    *obj_value += weight_state_x_ * x1_diff * x1_diff +
-                  weight_state_y_ * x2_diff * x2_diff +
-                  weight_state_phi_ * x3_diff * x3_diff +
-                  weight_state_v_ * x4_abs * x4_abs;
+    T x4_abs  = x[state_index + 3];
+    *obj_value += weight_state_x_ * x1_diff * x1_diff + weight_state_y_ * x2_diff * x2_diff +
+                  weight_state_phi_ * x3_diff * x3_diff + weight_state_v_ * x4_abs * x4_abs;
     state_index += 4;
   }
 
@@ -2472,24 +2353,19 @@ bool DistanceApproachIPOPTCUDAInterface::eval_obj(int n, const T* x,
   }
 
   // 3. objective to minimize input change rate for first horizon
-  control_index = control_start_index_;
-  T last_time_steer_rate =
-      (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
-  T last_time_a_rate =
-      (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
-  *obj_value +=
-      weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
-      weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
+  control_index          = control_start_index_;
+  T last_time_steer_rate = (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
+  T last_time_a_rate     = (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
+  *obj_value += weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+                weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
 
   // 4. objective to minimize input change rates, [0- horizon_ -2]
   time_index++;
   for (int i = 0; i < horizon_ - 1; ++i) {
-    T steering_rate =
-        (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
-    T a_rate =
-        (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
-    *obj_value += weight_rate_steer_ * steering_rate * steering_rate +
-                  weight_rate_a_ * a_rate * a_rate;
+    T steering_rate = (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
+    T a_rate        = (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
+    *obj_value +=
+        weight_rate_steer_ * steering_rate * steering_rate + weight_rate_a_ * a_rate * a_rate;
     control_index += 2;
     time_index++;
   }
@@ -2497,9 +2373,8 @@ bool DistanceApproachIPOPTCUDAInterface::eval_obj(int n, const T* x,
   // 5. objective to minimize total time [0, horizon_]
   time_index = time_start_index_;
   for (int i = 0; i < horizon_ + 1; ++i) {
-    T first_order_penalty = weight_first_order_time_ * x[time_index];
-    T second_order_penalty =
-        weight_second_order_time_ * x[time_index] * x[time_index];
+    T first_order_penalty  = weight_first_order_time_ * x[time_index];
+    T second_order_penalty = weight_second_order_time_ * x[time_index] * x[time_index];
     *obj_value += first_order_penalty + second_order_penalty;
     time_index++;
   }
@@ -2509,8 +2384,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_obj(int n, const T* x,
 }
 
 template <class T>
-bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
-                                                          int m, T* g) {
+bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x, int m, T* g) {
   ADEBUG << "eval_constraints";
   // state start index
   int state_index = state_start_index_;
@@ -2532,20 +2406,16 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
         x[state_index + 4] -
         (x[state_index] +
          ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             cos(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
-                                          x[state_index + 3] *
+             (x[state_index + 3] + ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             cos(x[state_index + 2] + ts_ * x[time_index] * 0.5 * x[state_index + 3] *
                                           tan(x[control_index]) / wheelbase_));
     // x2
     g[constraint_index + 1] =
         x[state_index + 5] -
         (x[state_index + 1] +
          ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             sin(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
-                                          x[state_index + 3] *
+             (x[state_index + 3] + ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             sin(x[state_index + 2] + ts_ * x[time_index] * 0.5 * x[state_index + 3] *
                                           tan(x[control_index]) / wheelbase_));
 
     // x3
@@ -2553,14 +2423,12 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
         x[state_index + 6] -
         (x[state_index + 2] +
          ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             (x[state_index + 3] + ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
              tan(x[control_index]) / wheelbase_);
 
     // x4
     g[constraint_index + 3] =
-        x[state_index + 7] -
-        (x[state_index + 3] + ts_ * x[time_index] * x[control_index + 1]);
+        x[state_index + 7] - (x[state_index + 3] + ts_ * x[time_index] * x[control_index + 1]);
 
     control_index += 2;
     constraint_index += 4;
@@ -2575,18 +2443,16 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
   // 2. Control rate limit constraints, 1 * [0, horizons-1], only apply
   // steering rate as of now
   control_index = control_start_index_;
-  time_index = time_start_index_;
+  time_index    = time_start_index_;
 
   // First rate is compare first with stitch point
-  g[constraint_index] =
-      (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
+  g[constraint_index] = (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
   control_index += 2;
   constraint_index++;
   time_index++;
 
   for (int i = 1; i < horizon_; ++i) {
-    g[constraint_index] =
-        (x[control_index] - x[control_index - 2]) / x[time_index] / ts_;
+    g[constraint_index] = (x[control_index] - x[control_index - 2]) / x[time_index] / ts_;
     constraint_index++;
     control_index += 2;
     time_index++;
@@ -2613,11 +2479,9 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
   for (int i = 0; i < horizon_ + 1; ++i) {
     int edges_counter = 0;
     for (int j = 0; j < obstacles_num_; ++j) {
-      int current_edges_num = obstacles_edges_num_(j, 0);
-      Eigen::MatrixXd Aj =
-          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-      Eigen::MatrixXd bj =
-          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+      int             current_edges_num = obstacles_edges_num_(j, 0);
+      Eigen::MatrixXd Aj = obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+      Eigen::MatrixXd bj = obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
       // norm(A* lambda) <= 1
       T tmp1 = 0.0;
@@ -2630,12 +2494,10 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
       g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2;
 
       // G' * mu + R' * lambda == 0
-      g[constraint_index + 1] = x[n_index] - x[n_index + 2] +
-                                cos(x[state_index + 2]) * tmp1 +
+      g[constraint_index + 1] = x[n_index] - x[n_index + 2] + cos(x[state_index + 2]) * tmp1 +
                                 sin(x[state_index + 2]) * tmp2;
 
-      g[constraint_index + 2] = x[n_index + 1] - x[n_index + 3] -
-                                sin(x[state_index + 2]) * tmp1 +
+      g[constraint_index + 2] = x[n_index + 1] - x[n_index + 3] - sin(x[state_index + 2]) * tmp1 +
                                 cos(x[state_index + 2]) * tmp2;
 
       //  -g'*mu + (A*t - b)*lambda > 0
@@ -2649,10 +2511,9 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
         tmp4 += bj(k, 0) * x[l_index + k];
       }
 
-      g[constraint_index + 3] =
-          tmp3 + (x[state_index] + cos(x[state_index + 2]) * offset_) * tmp1 +
-          (x[state_index + 1] + sin(x[state_index + 2]) * offset_) * tmp2 -
-          tmp4;
+      g[constraint_index + 3] = tmp3 + (x[state_index] + cos(x[state_index + 2]) * offset_) * tmp1 +
+                                (x[state_index + 1] + sin(x[state_index + 2]) * offset_) * tmp2 -
+                                tmp4;
 
       // Update index
       edges_counter += current_edges_num;
@@ -2667,14 +2528,14 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
          << constraint_index;
 
   // 5. load variable bounds as constraints
-  state_index = state_start_index_;
+  state_index   = state_start_index_;
   control_index = control_start_index_;
-  time_index = time_start_index_;
-  l_index = l_start_index_;
-  n_index = n_start_index_;
+  time_index    = time_start_index_;
+  l_index       = l_start_index_;
+  n_index       = n_start_index_;
 
   // start configuration
-  g[constraint_index] = x[state_index];
+  g[constraint_index]     = x[state_index];
   g[constraint_index + 1] = x[state_index + 1];
   g[constraint_index + 2] = x[state_index + 2];
   g[constraint_index + 3] = x[state_index + 3];
@@ -2683,7 +2544,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
 
   // constraints on x,y,v
   for (int i = 1; i < horizon_; ++i) {
-    g[constraint_index] = x[state_index];
+    g[constraint_index]     = x[state_index];
     g[constraint_index + 1] = x[state_index + 1];
     g[constraint_index + 2] = x[state_index + 3];
     constraint_index += 3;
@@ -2691,7 +2552,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
   }
 
   // end configuration
-  g[constraint_index] = x[state_index];
+  g[constraint_index]     = x[state_index];
   g[constraint_index + 1] = x[state_index + 1];
   g[constraint_index + 2] = x[state_index + 2];
   g[constraint_index + 3] = x[state_index + 3];
@@ -2699,7 +2560,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
   state_index += 4;
 
   for (int i = 0; i < horizon_; ++i) {
-    g[constraint_index] = x[control_index];
+    g[constraint_index]     = x[control_index];
     g[constraint_index + 1] = x[control_index + 1];
     constraint_index += 2;
     control_index += 2;
@@ -2726,10 +2587,9 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
   return true;
 }
 
-bool DistanceApproachIPOPTCUDAInterface::check_g(int n, const double* x, int m,
-                                                 const double* g) {
-  int kN = n;
-  int kM = m;
+bool DistanceApproachIPOPTCUDAInterface::check_g(int n, const double* x, int m, const double* g) {
+  int    kN = n;
+  int    kM = m;
   double x_u_tmp[kN];
   double x_l_tmp[kN];
   double g_u_tmp[kM];
@@ -2742,8 +2602,8 @@ bool DistanceApproachIPOPTCUDAInterface::check_g(int n, const double* x, int m,
     x_u_tmp[idx] = x_u_tmp[idx] + delta_v;
     x_l_tmp[idx] = x_l_tmp[idx] - delta_v;
     if (x[idx] > x_u_tmp[idx] || x[idx] < x_l_tmp[idx]) {
-      ADEBUG << "x idx unfeasible: " << idx << ", x: " << x[idx]
-             << ", lower: " << x_l_tmp[idx] << ", upper: " << x_u_tmp[idx];
+      ADEBUG << "x idx unfeasible: " << idx << ", x: " << x[idx] << ", lower: " << x_l_tmp[idx]
+             << ", upper: " << x_u_tmp[idx];
     }
   }
 
@@ -2803,8 +2663,7 @@ bool DistanceApproachIPOPTCUDAInterface::check_g(int n, const double* x, int m,
   return true;
 }
 
-void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
-                                                        int* nnz_h_lag) {
+void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m, int* nnz_h_lag) {
   std::vector<double> xp(n);
   std::vector<double> lamp(m);
   std::vector<double> zl(m);
@@ -2812,9 +2671,9 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
 
   std::vector<adouble> xa(n);
   std::vector<adouble> g(m);
-  std::vector<double> lam(m);
-  double sig;
-  adouble obj_value;
+  std::vector<double>  lam(m);
+  double               sig;
+  adouble              obj_value;
 
   double dummy = 0.0;
 
@@ -2879,8 +2738,7 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
   options_L[0] = 0;
   options_L[1] = 1;
 
-  sparse_hess(tag_L, n, 0, &xp[0], &nnz_L, &rind_L, &cind_L, &hessval,
-              options_L);
+  sparse_hess(tag_L, n, 0, &xp[0], &nnz_L, &rind_L, &cind_L, &hessval, options_L);
   *nnz_h_lag = nnz_L;
 }
 //***************    end   ADOL-C part ***********************************

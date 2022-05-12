@@ -40,8 +40,8 @@ class VelodyneDriverComponent : public Component<> {
   bool Init() override;
 
  private:
-  volatile bool runing_;  ///< device thread is running
-  uint32_t seq_ = 0;
+  volatile bool                   runing_;  ///< device thread is running
+  uint32_t                        seq_ = 0;
   std::shared_ptr<VelodyneDriver> dvr_;  ///< driver implementation class
 };
 

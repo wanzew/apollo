@@ -33,7 +33,7 @@ namespace apollo {
 namespace cyber {
 
 TEST(WriterReaderTest, constructor) {
-  const std::string channel_name("constructor");
+  const std::string     channel_name("constructor");
   proto::RoleAttributes attr;
   attr.set_channel_name(channel_name);
 
@@ -129,22 +129,20 @@ TEST(WriterReaderTest, messaging) {
   Writer<proto::UnitTest> writer(attr);
   EXPECT_TRUE(writer.Init());
 
-  std::mutex mtx;
+  std::mutex                   mtx;
   std::vector<proto::UnitTest> recv_msgs;
   attr.set_node_name("reader_a");
-  Reader<proto::UnitTest> reader_a(
-      attr, [&](const std::shared_ptr<proto::UnitTest>& msg) {
-        std::lock_guard<std::mutex> lck(mtx);
-        recv_msgs.emplace_back(*msg);
-      });
+  Reader<proto::UnitTest> reader_a(attr, [&](const std::shared_ptr<proto::UnitTest>& msg) {
+    std::lock_guard<std::mutex> lck(mtx);
+    recv_msgs.emplace_back(*msg);
+  });
   EXPECT_TRUE(reader_a.Init());
 
   attr.set_node_name("reader_b");
-  Reader<proto::UnitTest> reader_b(
-      attr, [&](const std::shared_ptr<proto::UnitTest>& msg) {
-        std::lock_guard<std::mutex> lck(mtx);
-        recv_msgs.emplace_back(*msg);
-      });
+  Reader<proto::UnitTest> reader_b(attr, [&](const std::shared_ptr<proto::UnitTest>& msg) {
+    std::lock_guard<std::mutex> lck(mtx);
+    recv_msgs.emplace_back(*msg);
+  });
   EXPECT_TRUE(reader_b.Init());
 
   auto msg = std::make_shared<proto::UnitTest>();
@@ -253,7 +251,7 @@ TEST(WriterReaderTest, get_delay_sec) {
 
 class Message {
  public:
-  uint64_t timestamp;
+  uint64_t    timestamp;
   std::string content;
   // void GetDescriptorString(const std::string& type, std::string* desc_str) {}
 };
@@ -274,9 +272,9 @@ TEST(WriterReaderTest, user_defined_message) {
   auto writer = node->CreateWriter<Message>(attr);
   auto reader = node->CreateReader<Message>(attr);
 
-  auto msg = std::make_shared<Message>();
+  auto msg       = std::make_shared<Message>();
   msg->timestamp = 100;
-  msg->content = "message";
+  msg->content   = "message";
 
   writer->Write(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(10));

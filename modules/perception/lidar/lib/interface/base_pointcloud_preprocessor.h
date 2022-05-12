@@ -15,12 +15,13 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
+
+#include "modules/drivers/proto/pointcloud.pb.h"
 
 #include "cyber/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 
 namespace apollo {
@@ -43,24 +44,23 @@ class BasePointCloudPreprocessor {
 
   virtual ~BasePointCloudPreprocessor() = default;
 
-  virtual bool Init(const PointCloudPreprocessorInitOptions& options =
-                PointCloudPreprocessorInitOptions()) = 0;
+  virtual bool
+  Init(const PointCloudPreprocessorInitOptions& options = PointCloudPreprocessorInitOptions()) = 0;
 
   // @brief: preprocess point cloud
   // @param [in]: options
   // @param [in]: point cloud message
   // @param [in/out]: frame
   // cloud should be filled, required,
-  virtual bool Preprocess(
-      const PointCloudPreprocessorOptions& options,
-      const std::shared_ptr<apollo::drivers::PointCloud const>& message,
-      LidarFrame* frame) const = 0;
+  virtual bool Preprocess(const PointCloudPreprocessorOptions&                      options,
+                          const std::shared_ptr<apollo::drivers::PointCloud const>& message,
+                          LidarFrame* frame) const = 0;
 
   // @brief: preprocess point cloud
   // @param [in/out]: frame
   // cloud should be filled, required,
   virtual bool Preprocess(const PointCloudPreprocessorOptions& options,
-                  LidarFrame* frame) const = 0;
+                          LidarFrame*                          frame) const = 0;
 
   virtual std::string Name() const = 0;
 
@@ -69,7 +69,7 @@ class BasePointCloudPreprocessor {
 };  // class BasePointCloudPreprocessor
 
 PERCEPTION_REGISTER_REGISTERER(BasePointCloudPreprocessor);
-#define PERCEPTION_REGISTER_POINTCLOUDPREPROCESSOR(name) \
+#define PERCEPTION_REGISTER_POINTCLOUDPREPROCESSOR(name)                                           \
   PERCEPTION_REGISTER_CLASS(BasePointCloudPreprocessor, name)
 
 }  // namespace lidar

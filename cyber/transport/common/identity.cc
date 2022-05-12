@@ -24,7 +24,8 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-Identity::Identity(bool need_generate) : hash_value_(0) {
+Identity::Identity(bool need_generate)
+    : hash_value_(0) {
   std::memset(data_, 0, ID_SIZE);
   if (need_generate) {
     uuid_t uuid;
@@ -63,9 +64,7 @@ size_t Identity::Length() const { return ID_SIZE; }
 
 uint64_t Identity::HashValue() const { return hash_value_; }
 
-void Identity::Update() {
-  hash_value_ = common::Hash(std::string(data_, ID_SIZE));
-}
+void Identity::Update() { hash_value_ = common::Hash(std::string(data_, ID_SIZE)); }
 
 }  // namespace transport
 }  // namespace cyber

@@ -18,7 +18,6 @@
 #include <string>
 
 #include "cyber/common/macros.h"
-
 #include "modules/perception/radar/common/radar_util.h"
 #include "modules/perception/radar/lib/interface/base_detector.h"
 
@@ -28,20 +27,22 @@ namespace radar {
 
 class ContiArsDetector : public BaseDetector {
  public:
-  ContiArsDetector() : BaseDetector() {}
+  ContiArsDetector()
+      : BaseDetector() {}
   virtual ~ContiArsDetector() {}
 
   bool Init() override;
 
   bool Detect(const drivers::ContiRadar& corrected_obstacles,
-              const DetectorOptions& options,
-              base::FramePtr detected_frame) override;
+              const DetectorOptions&     options,
+              base::FramePtr             detected_frame) override;
 
   std::string Name() const override;
 
  private:
   void RawObs2Frame(const drivers::ContiRadar& corrected_obstacles,
-                    const DetectorOptions& options, base::FramePtr radar_frame);
+                    const DetectorOptions&     options,
+                    base::FramePtr             radar_frame);
 
   DISALLOW_COPY_AND_ASSIGN(ContiArsDetector);
 };

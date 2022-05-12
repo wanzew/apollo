@@ -96,10 +96,10 @@ TEST(HistoryTest, history_test) {
   spare_id.set_data(buff);
   MessageInfo message_info(sender_id, 0, spare_id);
 
-  HistoryAttributes attr;
+  HistoryAttributes   attr;
   History<RawMessage> history(attr);
-  MessageInfo info;
-  auto message = std::shared_ptr<RawMessage>(new RawMessage);
+  MessageInfo         info;
+  auto                message = std::shared_ptr<RawMessage>(new RawMessage);
 
   history.Disable();
   history.Add(message, message_info);
@@ -109,8 +109,8 @@ TEST(HistoryTest, history_test) {
   EXPECT_EQ(1, history.GetSize());
   message_info.set_seq_num(1);
 
-  int depth = 10;
-  HistoryAttributes attr2(proto::QosHistoryPolicy::HISTORY_KEEP_LAST, depth);
+  int                 depth = 10;
+  HistoryAttributes   attr2(proto::QosHistoryPolicy::HISTORY_KEEP_LAST, depth);
   History<RawMessage> history2(attr2);
   EXPECT_EQ(depth, history2.depth());
   EXPECT_EQ(1000, history2.max_depth());
@@ -124,10 +124,10 @@ TEST(HistoryTest, history_test) {
   history2.GetCachedMessage(&messages);
   EXPECT_EQ(depth, messages.size());
 
-  HistoryAttributes attr3(proto::QosHistoryPolicy::HISTORY_KEEP_ALL, depth);
+  HistoryAttributes   attr3(proto::QosHistoryPolicy::HISTORY_KEEP_ALL, depth);
   History<RawMessage> history3(attr3);
   EXPECT_EQ(1000, history3.depth());
-  HistoryAttributes attr4(proto::QosHistoryPolicy::HISTORY_KEEP_LAST, 1024);
+  HistoryAttributes   attr4(proto::QosHistoryPolicy::HISTORY_KEEP_LAST, 1024);
   History<RawMessage> history4(attr4);
   EXPECT_EQ(1000, history4.depth());
 }
@@ -141,20 +141,19 @@ TEST(ListenerHandlerTest, listener_handler_test) {
   Identity spare_id;
   std::strncpy(buff, "spare", sizeof(buff));
   spare_id.set_data(buff);
-  MessageInfo message_info(sender_id, 0, spare_id);
-  auto message = std::shared_ptr<RawMessage>(new RawMessage);
-  int call_count = 0;
+  MessageInfo                           message_info(sender_id, 0, spare_id);
+  auto                                  message    = std::shared_ptr<RawMessage>(new RawMessage);
+  int                                   call_count = 0;
   ListenerHandler<RawMessage>::Listener listener =
-      [&call_count](const std::shared_ptr<RawMessage>& message,
-                    const MessageInfo& message_info) {
+      [&call_count](const std::shared_ptr<RawMessage>& message, const MessageInfo& message_info) {
         ++call_count;
         AINFO << "Got Message from " << message_info.sender_id().data()
               << ", sequence_num: " << message_info.seq_num()
               << ", to spare: " << message_info.spare_id().data();
       };
 
-  uint64_t self_id = 123;
-  uint64_t opposite_id = 456;
+  uint64_t                    self_id     = 123;
+  uint64_t                    opposite_id = 456;
   ListenerHandler<RawMessage> listener_handler;
   EXPECT_TRUE(listener_handler.IsRawMessage());
   listener_handler.Run(message, message_info);
@@ -162,8 +161,7 @@ TEST(ListenerHandlerTest, listener_handler_test) {
   listener_handler.Connect(self_id, listener);
   listener_handler.Connect(self_id, opposite_id, listener);
   listener_handler.Connect(self_id, opposite_id, listener);
-  listener_handler.Connect(self_id, message_info.spare_id().HashValue(),
-                           listener);
+  listener_handler.Connect(self_id, message_info.spare_id().HashValue(), listener);
   listener_handler.Run(message, message_info);
   EXPECT_EQ(1, call_count);
   Identity sender_id2;

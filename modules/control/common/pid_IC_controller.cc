@@ -30,7 +30,7 @@ double PIDICController::Control(const double error, const double dt) {
     AWARN << "dt <= 0, will use the last output";
     return previous_output_;
   }
-  double diff = 0;
+  double diff   = 0;
   double output = 0;
 
   if (first_hit_) {
@@ -43,8 +43,7 @@ double PIDICController::Control(const double error, const double dt) {
     integral_ = 0;
   } else {
     double u = error * kp_ + integral_ + error * dt * ki_ + diff * kd_;
-    if (((error * u) > 0) &&
-        ((u > output_saturation_high_) || (u < output_saturation_low_))) {
+    if (((error * u) > 0) && ((u > output_saturation_high_) || (u < output_saturation_low_))) {
     } else {
       // Only update integral then
       integral_ += error * dt * ki_;
@@ -52,7 +51,7 @@ double PIDICController::Control(const double error, const double dt) {
   }
 
   previous_error_ = error;
-  output = error * kp_ + integral_ + diff * kd_;
+  output          = error * kp_ + integral_ + diff * kd_;
 
   if (output >= output_saturation_high_) {
     output_saturation_status_ = 1;
@@ -62,16 +61,13 @@ double PIDICController::Control(const double error, const double dt) {
     output_saturation_status_ = 0;
   }
 
-  output = common::math::Clamp(error * kp_ + integral_ + diff * kd_,
-                               output_saturation_high_,
+  output = common::math::Clamp(error * kp_ + integral_ + diff * kd_, output_saturation_high_,
                                output_saturation_low_);  // Ki already applied
   previous_output_ = output;
   return output;
 }
 
-int PIDICController::OutputSaturationStatus() {
-  return output_saturation_status_;
-}
+int PIDICController::OutputSaturationStatus() { return output_saturation_status_; }
 
 }  // namespace control
 }  // namespace apollo

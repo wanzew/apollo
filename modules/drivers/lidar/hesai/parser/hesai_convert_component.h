@@ -38,7 +38,7 @@ class HesaiConvertComponent : public ::apollo::cyber::Component<HesaiScan> {
 
  private:
   std::shared_ptr<Parser> parser_;
-  Config conf_;
+  Config                  conf_;
 };
 
 CYBER_REGISTER_COMPONENT(HesaiConvertComponent)

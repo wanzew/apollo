@@ -18,11 +18,13 @@
 
 #include <memory>
 
-#include "cyber/common/file.h"
 #include "google/protobuf/text_format.h"
+
+#include "modules/control/proto/control_cmd.pb.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/util/util.h"
 #include "modules/control/common/dependency_injector.h"
-#include "modules/control/proto/control_cmd.pb.h"
 
 DEFINE_string(test_chassis_file, "", "chassis input file");
 DEFINE_string(test_data_dir, "", "the test data folder");
@@ -43,8 +45,7 @@ using apollo::planning::ADCTrajectory;
 uint32_t ControlTestBase::s_seq_num_ = 0;
 
 bool ControlTestBase::test_control() {
-  if (!cyber::common::GetProtoFromFile(FLAGS_control_conf_file,
-                                       &control_.control_conf_)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_control_conf_file, &control_.control_conf_)) {
     AERROR << "Unable to load control conf file: " << FLAGS_control_conf_file;
     exit(EXIT_FAILURE);
   }
@@ -53,9 +54,7 @@ bool ControlTestBase::test_control() {
 
   // set controller
   control_.injector_ = std::make_shared<DependencyInjector>();
-  if (!control_.controller_agent_
-           .Init(control_.injector_, &(control_.control_conf_))
-           .ok()) {
+  if (!control_.controller_agent_.Init(control_.injector_, &(control_.control_conf_)).ok()) {
     AERROR << "Control init controller failed! Stopping...";
     exit(EXIT_FAILURE);
   }
@@ -64,8 +63,7 @@ bool ControlTestBase::test_control() {
   // Pad message
   if (!FLAGS_test_pad_file.empty()) {
     PadMessage pad_message;
-    if (!cyber::common::GetProtoFromFile(
-            FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message)) {
+    if (!cyber::common::GetProtoFromFile(FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message)) {
       AERROR << "Failed to load PadMesssage from file " << FLAGS_test_data_dir
              << FLAGS_test_pad_file;
       return false;
@@ -76,38 +74,32 @@ bool ControlTestBase::test_control() {
   // Localization
   if (!FLAGS_test_localization_file.empty()) {
     LocalizationEstimate localization;
-    if (!cyber::common::GetProtoFromFile(
-            FLAGS_test_data_dir + FLAGS_test_localization_file,
-            &localization)) {
+    if (!cyber::common::GetProtoFromFile(FLAGS_test_data_dir + FLAGS_test_localization_file,
+                                         &localization)) {
       AERROR << "Failed to load localization file " << FLAGS_test_data_dir
              << FLAGS_test_localization_file;
       return false;
     }
     control_.OnLocalization(
-        std::make_shared<apollo::localization::LocalizationEstimate>(
-            localization));
+        std::make_shared<apollo::localization::LocalizationEstimate>(localization));
   }
 
   // Planning
   if (!FLAGS_test_planning_file.empty()) {
     ADCTrajectory trajectory;
-    if (!cyber::common::GetProtoFromFile(
-            FLAGS_test_data_dir + FLAGS_test_planning_file, &trajectory)) {
-      AERROR << "Failed to load planning file " << FLAGS_test_data_dir
-             << FLAGS_test_planning_file;
+    if (!cyber::common::GetProtoFromFile(FLAGS_test_data_dir + FLAGS_test_planning_file,
+                                         &trajectory)) {
+      AERROR << "Failed to load planning file " << FLAGS_test_data_dir << FLAGS_test_planning_file;
       return false;
     }
-    control_.OnPlanning(
-        std::make_shared<apollo::planning::ADCTrajectory>(trajectory));
+    control_.OnPlanning(std::make_shared<apollo::planning::ADCTrajectory>(trajectory));
   }
 
   // Chassis
   if (!FLAGS_test_chassis_file.empty()) {
     Chassis chassis;
-    if (!cyber::common::GetProtoFromFile(
-            FLAGS_test_data_dir + FLAGS_test_chassis_file, &chassis)) {
-      AERROR << "Failed to load chassis file " << FLAGS_test_data_dir
-             << FLAGS_test_chassis_file;
+    if (!cyber::common::GetProtoFromFile(FLAGS_test_data_dir + FLAGS_test_chassis_file, &chassis)) {
+      AERROR << "Failed to load chassis file " << FLAGS_test_data_dir << FLAGS_test_chassis_file;
       return false;
     }
     control_.OnChassis(std::make_shared<apollo::canbus::Chassis>(chassis));
@@ -116,20 +108,17 @@ bool ControlTestBase::test_control() {
   // Monitor
   if (!FLAGS_test_monitor_file.empty()) {
     MonitorMessage monitor_message;
-    if (!cyber::common::GetProtoFromFile(
-            FLAGS_test_data_dir + FLAGS_test_monitor_file, &monitor_message)) {
-      AERROR << "Failed to load monitor file " << FLAGS_test_data_dir
-             << FLAGS_test_monitor_file;
+    if (!cyber::common::GetProtoFromFile(FLAGS_test_data_dir + FLAGS_test_monitor_file,
+                                         &monitor_message)) {
+      AERROR << "Failed to load monitor file " << FLAGS_test_data_dir << FLAGS_test_monitor_file;
       return false;
     }
     control_.OnMonitor(monitor_message);
   }
 
   control_.local_view_.mutable_chassis()->CopyFrom(control_.latest_chassis_);
-  control_.local_view_.mutable_trajectory()->CopyFrom(
-      control_.latest_trajectory_);
-  control_.local_view_.mutable_localization()->CopyFrom(
-      control_.latest_localization_);
+  control_.local_view_.mutable_trajectory()->CopyFrom(control_.latest_trajectory_);
+  control_.local_view_.mutable_localization()->CopyFrom(control_.latest_localization_);
 
   auto err = control_.ProduceControlCommand(&control_command_);
   if (!err.ok()) {
@@ -139,18 +128,17 @@ bool ControlTestBase::test_control() {
   return true;
 }
 
-void ControlTestBase::trim_control_command(ControlCommand *origin) {
+void ControlTestBase::trim_control_command(ControlCommand* origin) {
   origin->mutable_header()->clear_radar_timestamp();
   origin->mutable_header()->clear_lidar_timestamp();
   origin->mutable_header()->clear_timestamp_sec();
   origin->mutable_header()->clear_camera_timestamp();
 }
 
-bool ControlTestBase::test_control(const std::string &test_case_name,
-                                   int case_num) {
+bool ControlTestBase::test_control(const std::string& test_case_name, int case_num) {
   const std::string golden_result_file =
       absl::StrCat("result_", test_case_name, "_", case_num, ".pb.txt");
-  std::string tmp_golden_path = "/tmp/" + golden_result_file;
+  std::string tmp_golden_path  = "/tmp/" + golden_result_file;
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   control_command_.Clear();
 
@@ -167,30 +155,25 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
     cyber::common::SetProtoToASCIIFile(control_command_, golden_result_file);
   } else {
     ControlCommand golden_result;
-    bool load_success =
-        cyber::common::GetProtoFromASCIIFile(full_golden_path, &golden_result);
+    bool load_success = cyber::common::GetProtoFromASCIIFile(full_golden_path, &golden_result);
     if (!load_success) {
       AERROR << "Failed to load golden file: " << full_golden_path;
       cyber::common::SetProtoToASCIIFile(control_command_, tmp_golden_path);
       AINFO << "Current result is written to " << tmp_golden_path;
       return false;
     }
-    bool same_result =
-        common::util::IsProtoEqual(golden_result, control_command_);
+    bool same_result = common::util::IsProtoEqual(golden_result, control_command_);
     if (!same_result) {
       std::string tmp_test_result_file = tmp_golden_path + ".tmp";
-      cyber::common::SetProtoToASCIIFile(control_command_,
-                                         tmp_test_result_file);
-      AERROR << "found diff " << tmp_test_result_file << " "
-             << full_golden_path;
+      cyber::common::SetProtoToASCIIFile(control_command_, tmp_test_result_file);
+      AERROR << "found diff " << tmp_test_result_file << " " << full_golden_path;
     }
   }
   return true;
 }
 
 void ControlTestBase::SetUpTestCase() {
-  FLAGS_control_conf_file =
-      "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
+  FLAGS_control_conf_file    = "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
   FLAGS_is_control_test_mode = true;
 }
 

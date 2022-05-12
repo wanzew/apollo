@@ -64,11 +64,13 @@ class SimulationWorldUpdater {
    * of hdmap.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
-                         WebSocketHandler *camera_ws, SimControl *sim_control,
-                         const MapService *map_service,
-                         PerceptionCameraUpdater *perception_camera_updater,
-                         bool routing_from_file = false);
+  SimulationWorldUpdater(WebSocketHandler*        websocket,
+                         WebSocketHandler*        map_ws,
+                         WebSocketHandler*        camera_ws,
+                         SimControl*              sim_control,
+                         const MapService*        map_service,
+                         PerceptionCameraUpdater* perception_camera_updater,
+                         bool                     routing_from_file = false);
 
   /**
    * @brief Starts to push simulation_world to frontend.
@@ -94,9 +96,8 @@ class SimulationWorldUpdater {
    * @param routing_request
    * @return True if routing request is constructed successfully
    */
-  bool ConstructRoutingRequest(
-      const nlohmann::json &json,
-      apollo::routing::RoutingRequest *routing_request);
+  bool ConstructRoutingRequest(const nlohmann::json&            json,
+                               apollo::routing::RoutingRequest* routing_request);
 
   /**
    * @brief The function to construct a parking routing task from the given
@@ -105,9 +106,8 @@ class SimulationWorldUpdater {
    * @param parking_routing_task
    * @return True if parking routing task is constructed successfully
    */
-  bool ConstructParkingRoutingTask(
-      const nlohmann::json &json,
-      apollo::task_manager::ParkingRoutingTask *parking_routing_task);
+  bool ConstructParkingRoutingTask(const nlohmann::json&                     json,
+                                   apollo::task_manager::ParkingRoutingTask* parking_routing_task);
 
   /**
    * @brief The function to construct a dead end junction routing task from the
@@ -117,26 +117,25 @@ class SimulationWorldUpdater {
    * @param dead_junction_routing_task
    * @return True if dead junction routing task is constructed successfully
    */
-  bool ConstructDeadJunctionRoutingTask(
-      const nlohmann::json &json,
-      apollo::task_manager::DeadEndRoutingTask
-          *dead_end_routing_task);
+  bool
+  ConstructDeadJunctionRoutingTask(const nlohmann::json&                     json,
+                                   apollo::task_manager::DeadEndRoutingTask* dead_end_routing_task);
 
-  bool ValidateCoordinate(const nlohmann::json &json);
+  bool ValidateCoordinate(const nlohmann::json& json);
 
   /**
    * @brief Check if routing point is located on a lane that is CITY_DRIVING
    * @param json that contains point's coordinate x and y
    * @return True if the lane is CITY_DRIVING
    */
-  nlohmann::json CheckRoutingPoint(const nlohmann::json &json);
+  nlohmann::json CheckRoutingPoint(const nlohmann::json& json);
 
   /**
    * @brief Check if routing point is located on a lane that included by arr
    * @param json that contains point and ids array
    * @return json contains error means check failed else means check succeed
    */
-  nlohmann::json CheckDeadEndJunctionPoints(const nlohmann::json &json);
+  nlohmann::json CheckDeadEndJunctionPoints(const nlohmann::json& json);
 
   /**
    * @brief Tries to load the points of interest from the file if it has
@@ -146,13 +145,12 @@ class SimulationWorldUpdater {
    */
   bool LoadPOI();
 
-    /**
+  /**
    * @brief get point from lanewaypoint in poi or default routings
    * @param lanewaypoint
    * @return json that contains point's coordinate x and y
    */
-  nlohmann::json GetPointJsonFromLaneWaypoint(
-      const apollo::routing::LaneWaypoint &waypoint);
+  nlohmann::json GetPointJsonFromLaneWaypoint(const apollo::routing::LaneWaypoint& waypoint);
 
   /**
    * @brief Tries to load the user-defined default routings from the txt file
@@ -167,24 +165,24 @@ class SimulationWorldUpdater {
    * @return False if failed to save,
    * true otherwise or if it's already saved.
    */
-  bool AddDefaultRouting(const nlohmann::json &json);
+  bool AddDefaultRouting(const nlohmann::json& json);
 
   void RegisterMessageHandlers();
 
-  SimulationWorldService sim_world_service_;
-  const MapService *map_service_ = nullptr;
-  WebSocketHandler *websocket_ = nullptr;
-  WebSocketHandler *map_ws_ = nullptr;
-  WebSocketHandler *camera_ws_ = nullptr;
-  SimControl *sim_control_ = nullptr;
-  PerceptionCameraUpdater *perception_camera_updater_ = nullptr;
+  SimulationWorldService   sim_world_service_;
+  const MapService*        map_service_               = nullptr;
+  WebSocketHandler*        websocket_                 = nullptr;
+  WebSocketHandler*        map_ws_                    = nullptr;
+  WebSocketHandler*        camera_ws_                 = nullptr;
+  SimControl*              sim_control_               = nullptr;
+  PerceptionCameraUpdater* perception_camera_updater_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;
 
   // default routings
-  apollo::routing::POI default_routings_;
-  apollo::routing::Landmark *default_routing_;
+  apollo::routing::POI       default_routings_;
+  apollo::routing::Landmark* default_routing_;
 
   // The simulation_world in wire format to be pushed to frontend, which is
   // updated by timer.

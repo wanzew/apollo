@@ -16,10 +16,11 @@
 
 #include "modules/monitor/hardware/gps_monitor.h"
 
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/map_util.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
@@ -37,7 +38,7 @@ GpsMonitor::GpsMonitor()
     : RecurrentRunner(FLAGS_gps_monitor_name, FLAGS_gps_monitor_interval) {}
 
 void GpsMonitor::RunOnce(const double current_time) {
-  auto manager = MonitorManager::Instance();
+  auto       manager   = MonitorManager::Instance();
   Component* component = apollo::common::util::FindOrNull(
       *manager->GetStatus()->mutable_components(), FLAGS_gps_component_name);
   if (component == nullptr) {
@@ -52,8 +53,8 @@ void GpsMonitor::RunOnce(const double current_time) {
   gnss_best_pose_reader->Observe();
   const auto gnss_best_pose_status = gnss_best_pose_reader->GetLatestObserved();
   if (gnss_best_pose_status == nullptr) {
-    SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
-                                   "No GnssBestPose message", component_status);
+    SummaryMonitor::EscalateStatus(ComponentStatus::ERROR, "No GnssBestPose message",
+                                   component_status);
     return;
   }
   switch (gnss_best_pose_status->sol_type()) {
@@ -61,12 +62,12 @@ void GpsMonitor::RunOnce(const double current_time) {
       SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", component_status);
       break;
     case SolutionType::SINGLE:
-      SummaryMonitor::EscalateStatus(
-          ComponentStatus::WARN, "SolutionType is SINGLE", component_status);
+      SummaryMonitor::EscalateStatus(ComponentStatus::WARN, "SolutionType is SINGLE",
+                                     component_status);
       break;
     default:
-      SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
-                                     "SolutionType is wrong", component_status);
+      SummaryMonitor::EscalateStatus(ComponentStatus::ERROR, "SolutionType is wrong",
+                                     component_status);
       break;
   }
 }

@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Vcureport505 : public ::apollo::drivers::canbus::ProtocolData<
-                         ::apollo::canbus::ChassisDetail> {
+class Vcureport505
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vcureport505();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'bit': 36, 'enum': {0:
@@ -39,29 +39,28 @@ class Vcureport505 : public ::apollo::drivers::canbus::ProtocolData<
   // 'name': 'Vehicle_Mode_State', 'offset': 0.0, 'order': 'motorola',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'enum'}
-  Vcu_report_505::Vehicle_mode_stateType vehicle_mode_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vcu_report_505::Vehicle_mode_stateType vehicle_mode_state(const std::uint8_t* bytes,
+                                                            const int32_t       length) const;
 
   // config detail: {'bit': 33, 'enum': {0: 'FRONTCRASH_STATE_NO_EVENT', 1:
   // 'FRONTCRASH_STATE_CRASH_EVENT'}, 'is_signed_var': False, 'len': 1, 'name':
   // 'FrontCrash_State', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  Vcu_report_505::Frontcrash_stateType frontcrash_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vcu_report_505::Frontcrash_stateType frontcrash_state(const std::uint8_t* bytes,
+                                                        const int32_t       length) const;
 
   // config detail: {'bit': 34, 'enum': {0: 'BACKCRASH_STATE_NO_EVENT', 1:
   // 'BACKCRASH_STATE_CRASH_EVENT'}, 'is_signed_var': False, 'len': 1, 'name':
   // 'BackCrash_State', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  Vcu_report_505::Backcrash_stateType backcrash_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vcu_report_505::Backcrash_stateType backcrash_state(const std::uint8_t* bytes,
+                                                      const int32_t       length) const;
 
   // config detail: {'bit': 32, 'enum': {0: 'AEB_STATE_INACTIVE', 1:
   // 'AEB_STATE_ACTIVE'}, 'is_signed_var': False, 'len': 1, 'name': 'AEB_State',
   // 'offset': 0.0, 'order': 'motorola', 'physical_range': '[0|0]',
   // 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  Vcu_report_505::Aeb_stateType aeb_state(const std::uint8_t* bytes,
-                                          const int32_t length) const;
+  Vcu_report_505::Aeb_stateType aeb_state(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'bit': 7, 'is_signed_var': True, 'len': 12, 'name': 'ACC',
   // 'offset': 0.0, 'order': 'motorola', 'physical_range': '[-10|10]',

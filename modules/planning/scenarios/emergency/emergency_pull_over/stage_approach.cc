@@ -42,12 +42,11 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
 
 EmergencyPullOverStageApproach::EmergencyPullOverStageApproach(
-    const ScenarioConfig::StageConfig& config,
-    const std::shared_ptr<DependencyInjector>& injector)
+    const ScenarioConfig::StageConfig& config, const std::shared_ptr<DependencyInjector>& injector)
     : Stage(config, injector) {}
 
-Stage::StageStatus EmergencyPullOverStageApproach::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus
+EmergencyPullOverStageApproach::Process(const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
 
@@ -61,44 +60,39 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
   double stop_line_s = 0.0;
 
   // add a stop fence
-  const auto& pull_over_status =
-      injector_->planning_context()->planning_status().pull_over();
+  const auto& pull_over_status = injector_->planning_context()->planning_status().pull_over();
   if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
       pull_over_status.position().has_y()) {
-    const auto& reference_line = reference_line_info.reference_line();
+    const auto&     reference_line = reference_line_info.reference_line();
     common::SLPoint pull_over_sl;
     reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
     const double stop_distance = scenario_config_.stop_distance();
-    stop_line_s =
-        pull_over_sl.s() + stop_distance +
-        VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center();
-    const std::string virtual_obstacle_id = "EMERGENCY_PULL_OVER";
+    stop_line_s                = pull_over_sl.s() + stop_distance +
+                  VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center();
+    const std::string              virtual_obstacle_id = "EMERGENCY_PULL_OVER";
     const std::vector<std::string> wait_for_obstacle_ids;
-    planning::util::BuildStopDecision(
-        virtual_obstacle_id, stop_line_s, stop_distance,
-        StopReasonCode::STOP_REASON_PULL_OVER, wait_for_obstacle_ids,
-        "EMERGENCY_PULL_OVER-scenario", frame,
-        &(frame->mutable_reference_line_info()->front()));
+    planning::util::BuildStopDecision(virtual_obstacle_id, stop_line_s, stop_distance,
+                                      StopReasonCode::STOP_REASON_PULL_OVER, wait_for_obstacle_ids,
+                                      "EMERGENCY_PULL_OVER-scenario", frame,
+                                      &(frame->mutable_reference_line_info()->front()));
 
-    ADEBUG << "Build a stop fence for emergency_pull_over: id["
-           << virtual_obstacle_id << "] s[" << stop_line_s << "]";
+    ADEBUG << "Build a stop fence for emergency_pull_over: id[" << virtual_obstacle_id << "] s["
+           << stop_line_s << "]";
   }
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "EmergencyPullOverStageApproach planning error";
-  }
+  if (!plan_ok) { AERROR << "EmergencyPullOverStageApproach planning error"; }
 
   if (stop_line_s > 0.0) {
-    const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-    double distance = stop_line_s - adc_front_edge_s;
-    const double adc_speed = injector_->vehicle_state()->linear_velocity();
+    const double adc_front_edge_s   = reference_line_info.AdcSlBoundary().end_s();
+    double       distance           = stop_line_s - adc_front_edge_s;
+    const double adc_speed          = injector_->vehicle_state()->linear_velocity();
     const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                           ->GetConfig()
                                           .vehicle_param()
                                           .max_abs_speed_when_stopped();
     ADEBUG << "adc_speed[" << adc_speed << "] distance[" << distance << "]";
-    static constexpr double kStopSpeedTolerance = 0.4;
+    static constexpr double kStopSpeedTolerance    = 0.4;
     static constexpr double kStopDistanceTolerance = 3.0;
     if (adc_speed <= max_adc_stop_speed + kStopSpeedTolerance &&
         std::fabs(distance) <= kStopDistanceTolerance) {

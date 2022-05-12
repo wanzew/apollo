@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_bcm_201.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -46,17 +47,16 @@ void Pcbcm201::UpdateData(uint8_t* data) {
 
 void Pcbcm201::Reset() {
   // you should check this manually
-  pc_reverselampreq_ = Pc_bcm_201::PC_REVERSELAMPREQ_NOREQ;
-  pc_lowbeamreq_ = Pc_bcm_201::PC_LOWBEAMREQ_NOREQ;
-  pc_highbeamreq_ = Pc_bcm_201::PC_HIGHBEAMREQ_NOREQ;
+  pc_reverselampreq_   = Pc_bcm_201::PC_REVERSELAMPREQ_NOREQ;
+  pc_lowbeamreq_       = Pc_bcm_201::PC_LOWBEAMREQ_NOREQ;
+  pc_highbeamreq_      = Pc_bcm_201::PC_HIGHBEAMREQ_NOREQ;
   pc_rightturnlampreq_ = Pc_bcm_201::PC_RIGHTTURNLAMPREQ_NOREQ;
-  pc_leftturnlampreq_ = Pc_bcm_201::PC_LEFTTURNLAMPREQ_NOREQ;
-  pc_hornreq_ = Pc_bcm_201::PC_HORNREQ_NOREQ;
-  pc_hazardlampreq_ = Pc_bcm_201::PC_HAZARDLAMPREQ_NOREQ;
+  pc_leftturnlampreq_  = Pc_bcm_201::PC_LEFTTURNLAMPREQ_NOREQ;
+  pc_hornreq_          = Pc_bcm_201::PC_HORNREQ_NOREQ;
+  pc_hazardlampreq_    = Pc_bcm_201::PC_HAZARDLAMPREQ_NOREQ;
 }
 
-Pcbcm201* Pcbcm201::set_pc_reverselampreq(
-    Pc_bcm_201::Pc_reverselampreqType pc_reverselampreq) {
+Pcbcm201* Pcbcm201::set_pc_reverselampreq(Pc_bcm_201::Pc_reverselampreqType pc_reverselampreq) {
   pc_reverselampreq_ = pc_reverselampreq;
   return this;
 }
@@ -66,16 +66,15 @@ Pcbcm201* Pcbcm201::set_pc_reverselampreq(
 // 'len': 1, 'name': 'PC_ReverseLampReq', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcbcm201::set_p_pc_reverselampreq(
-    uint8_t* data, Pc_bcm_201::Pc_reverselampreqType pc_reverselampreq) {
+void Pcbcm201::set_p_pc_reverselampreq(uint8_t*                          data,
+                                       Pc_bcm_201::Pc_reverselampreqType pc_reverselampreq) {
   int x = pc_reverselampreq;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
-Pcbcm201* Pcbcm201::set_pc_lowbeamreq(
-    Pc_bcm_201::Pc_lowbeamreqType pc_lowbeamreq) {
+Pcbcm201* Pcbcm201::set_pc_lowbeamreq(Pc_bcm_201::Pc_lowbeamreqType pc_lowbeamreq) {
   pc_lowbeamreq_ = pc_lowbeamreq;
   return this;
 }
@@ -85,16 +84,14 @@ Pcbcm201* Pcbcm201::set_pc_lowbeamreq(
 // 'name': 'PC_LowBeamReq', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 2, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcbcm201::set_p_pc_lowbeamreq(
-    uint8_t* data, Pc_bcm_201::Pc_lowbeamreqType pc_lowbeamreq) {
+void Pcbcm201::set_p_pc_lowbeamreq(uint8_t* data, Pc_bcm_201::Pc_lowbeamreqType pc_lowbeamreq) {
   int x = pc_lowbeamreq;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 2, 1);
 }
 
-Pcbcm201* Pcbcm201::set_pc_highbeamreq(
-    Pc_bcm_201::Pc_highbeamreqType pc_highbeamreq) {
+Pcbcm201* Pcbcm201::set_pc_highbeamreq(Pc_bcm_201::Pc_highbeamreqType pc_highbeamreq) {
   pc_highbeamreq_ = pc_highbeamreq;
   return this;
 }
@@ -104,16 +101,15 @@ Pcbcm201* Pcbcm201::set_pc_highbeamreq(
 // 'name': 'PC_HighBeamReq', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 3, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcbcm201::set_p_pc_highbeamreq(
-    uint8_t* data, Pc_bcm_201::Pc_highbeamreqType pc_highbeamreq) {
+void Pcbcm201::set_p_pc_highbeamreq(uint8_t* data, Pc_bcm_201::Pc_highbeamreqType pc_highbeamreq) {
   int x = pc_highbeamreq;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 3, 1);
 }
 
-Pcbcm201* Pcbcm201::set_pc_rightturnlampreq(
-    Pc_bcm_201::Pc_rightturnlampreqType pc_rightturnlampreq) {
+Pcbcm201*
+Pcbcm201::set_pc_rightturnlampreq(Pc_bcm_201::Pc_rightturnlampreqType pc_rightturnlampreq) {
   pc_rightturnlampreq_ = pc_rightturnlampreq;
   return this;
 }
@@ -123,16 +119,15 @@ Pcbcm201* Pcbcm201::set_pc_rightturnlampreq(
 // 'len': 1, 'name': 'PC_RightTurnLampReq', 'is_signed_var': False, 'offset':
 // 0.0, 'physical_range': '[0|3]', 'bit': 4, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
-void Pcbcm201::set_p_pc_rightturnlampreq(
-    uint8_t* data, Pc_bcm_201::Pc_rightturnlampreqType pc_rightturnlampreq) {
+void Pcbcm201::set_p_pc_rightturnlampreq(uint8_t*                            data,
+                                         Pc_bcm_201::Pc_rightturnlampreqType pc_rightturnlampreq) {
   int x = pc_rightturnlampreq;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 4, 1);
 }
 
-Pcbcm201* Pcbcm201::set_pc_leftturnlampreq(
-    Pc_bcm_201::Pc_leftturnlampreqType pc_leftturnlampreq) {
+Pcbcm201* Pcbcm201::set_pc_leftturnlampreq(Pc_bcm_201::Pc_leftturnlampreqType pc_leftturnlampreq) {
   pc_leftturnlampreq_ = pc_leftturnlampreq;
   return this;
 }
@@ -142,8 +137,8 @@ Pcbcm201* Pcbcm201::set_pc_leftturnlampreq(
 // 'len': 1, 'name': 'PC_LeftTurnLampReq', 'is_signed_var': False, 'offset':
 // 0.0, 'physical_range': '[0|1]', 'bit': 5, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
-void Pcbcm201::set_p_pc_leftturnlampreq(
-    uint8_t* data, Pc_bcm_201::Pc_leftturnlampreqType pc_leftturnlampreq) {
+void Pcbcm201::set_p_pc_leftturnlampreq(uint8_t*                           data,
+                                        Pc_bcm_201::Pc_leftturnlampreqType pc_leftturnlampreq) {
   int x = pc_leftturnlampreq;
 
   Byte to_set(data + 0);
@@ -159,16 +154,14 @@ Pcbcm201* Pcbcm201::set_pc_hornreq(Pc_bcm_201::Pc_hornreqType pc_hornreq) {
 // 'PC_HORNREQ_NOREQ', 1: 'PC_HORNREQ_REQ'}, 'precision': 1.0, 'len': 1, 'name':
 // 'PC_HornReq', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|1]', 'bit': 6, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Pcbcm201::set_p_pc_hornreq(uint8_t* data,
-                                Pc_bcm_201::Pc_hornreqType pc_hornreq) {
+void Pcbcm201::set_p_pc_hornreq(uint8_t* data, Pc_bcm_201::Pc_hornreqType pc_hornreq) {
   int x = pc_hornreq;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 6, 1);
 }
 
-Pcbcm201* Pcbcm201::set_pc_hazardlampreq(
-    Pc_bcm_201::Pc_hazardlampreqType pc_hazardlampreq) {
+Pcbcm201* Pcbcm201::set_pc_hazardlampreq(Pc_bcm_201::Pc_hazardlampreqType pc_hazardlampreq) {
   pc_hazardlampreq_ = pc_hazardlampreq;
   return this;
 }
@@ -178,8 +171,8 @@ Pcbcm201* Pcbcm201::set_pc_hazardlampreq(
 // 'len': 1, 'name': 'PC_HazardLampReq', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcbcm201::set_p_pc_hazardlampreq(
-    uint8_t* data, Pc_bcm_201::Pc_hazardlampreqType pc_hazardlampreq) {
+void Pcbcm201::set_p_pc_hazardlampreq(uint8_t*                         data,
+                                      Pc_bcm_201::Pc_hazardlampreqType pc_hazardlampreq) {
   int x = pc_hazardlampreq;
 
   Byte to_set(data + 0);

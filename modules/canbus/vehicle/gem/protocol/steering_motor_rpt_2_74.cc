@@ -30,14 +30,13 @@ using ::apollo::drivers::canbus::Byte;
 Steeringmotorrpt274::Steeringmotorrpt274() {}
 const int32_t Steeringmotorrpt274::ID = 0x74;
 
-void Steeringmotorrpt274::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
-  chassis->mutable_gem()
-      ->mutable_steering_motor_rpt_2_74()
-      ->set_encoder_temperature(encoder_temperature(bytes, length));
-  chassis->mutable_gem()
-      ->mutable_steering_motor_rpt_2_74()
-      ->set_motor_temperature(motor_temperature(bytes, length));
+void Steeringmotorrpt274::Parse(const std::uint8_t* bytes,
+                                int32_t             length,
+                                ChassisDetail*      chassis) const {
+  chassis->mutable_gem()->mutable_steering_motor_rpt_2_74()->set_encoder_temperature(
+      encoder_temperature(bytes, length));
+  chassis->mutable_gem()->mutable_steering_motor_rpt_2_74()->set_motor_temperature(
+      motor_temperature(bytes, length));
   chassis->mutable_gem()->mutable_steering_motor_rpt_2_74()->set_angular_speed(
       angular_speed(bytes, length));
 }
@@ -46,12 +45,11 @@ void Steeringmotorrpt274::Parse(const std::uint8_t* bytes, int32_t length,
 // 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
 // '[-32808|32727]', 'bit': 7, 'type': 'int', 'order': 'motorola',
 // 'physical_unit': 'deg C'}
-int Steeringmotorrpt274::encoder_temperature(const std::uint8_t* bytes,
-                                             int32_t length) const {
-  Byte t0(bytes + 0);
+int Steeringmotorrpt274::encoder_temperature(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -67,12 +65,11 @@ int Steeringmotorrpt274::encoder_temperature(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
 // '[-32808|32727]', 'bit': 23, 'type': 'int', 'order': 'motorola',
 // 'physical_unit': 'deg C'}
-int Steeringmotorrpt274::motor_temperature(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 2);
+int Steeringmotorrpt274::motor_temperature(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -88,12 +85,11 @@ int Steeringmotorrpt274::motor_temperature(const std::uint8_t* bytes,
 // 'len': 32, 'is_signed_var': True, 'physical_range':
 // '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'rev/s'}
-double Steeringmotorrpt274::angular_speed(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 4);
+double Steeringmotorrpt274::angular_speed(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

@@ -28,51 +28,44 @@ inline T ByteTo(const Byte& byte) {
   return static_cast<T>(byte.get_byte(0, 8));
 }
 
-inline std::string ByteToString(const Byte& byte) {
-  return std::string(1, ByteTo<char>(byte));
-}
+inline std::string ByteToString(const Byte& byte) { return std::string(1, ByteTo<char>(byte)); }
 
 }  // namespace
 
 const int32_t License7e::ID = 0x7E;
 
 License7e::License7e()
-    : vin_part0_(""),
-      vin_part1_(""),
-      vin_part2_(""),
-      vin_part0_flag_(false),
-      vin_part1_flag_(false),
-      vin_part2_flag_(false),
-      parse_success_(false) {}
+    : vin_part0_("")
+    , vin_part1_("")
+    , vin_part2_("")
+    , vin_part0_flag_(false)
+    , vin_part1_flag_(false)
+    , vin_part2_flag_(false)
+    , parse_success_(false) {}
 
-void License7e::Parse(const std::uint8_t* bytes, int length,
-                      ChassisDetail* chassis_detail) const {
+void License7e::Parse(const std::uint8_t* bytes, int length, ChassisDetail* chassis_detail) const {
   if (!parse_success_) {
     switch (mux(bytes, length)) {
       case 0x83:
-        vin_part0_ = vin00(bytes, length) + vin01(bytes, length) +
-                     vin02(bytes, length) + vin03(bytes, length) +
-                     vin04(bytes, length) + vin05(bytes, length);
+        vin_part0_ = vin00(bytes, length) + vin01(bytes, length) + vin02(bytes, length) +
+                     vin03(bytes, length) + vin04(bytes, length) + vin05(bytes, length);
         vin_part0_flag_ = true;
         break;
       case 0x84:
-        vin_part1_ = vin06(bytes, length) + vin07(bytes, length) +
-                     vin08(bytes, length) + vin09(bytes, length) +
-                     vin10(bytes, length) + vin11(bytes, length);
+        vin_part1_ = vin06(bytes, length) + vin07(bytes, length) + vin08(bytes, length) +
+                     vin09(bytes, length) + vin10(bytes, length) + vin11(bytes, length);
         vin_part1_flag_ = true;
         break;
       case 0x85:
-        vin_part2_ = vin12(bytes, length) + vin13(bytes, length) +
-                     vin14(bytes, length) + vin15(bytes, length) +
-                     vin16(bytes, length);
+        vin_part2_ = vin12(bytes, length) + vin13(bytes, length) + vin14(bytes, length) +
+                     vin15(bytes, length) + vin16(bytes, length);
         vin_part2_flag_ = true;
         break;
     }
 
     if (vin_part0_flag_ && vin_part1_flag_ && vin_part2_flag_) {
       parse_success_ = true;
-      chassis_detail->mutable_vehicle_id()->set_vin(
-          (vin_part0_ + vin_part1_ + vin_part2_));
+      chassis_detail->mutable_vehicle_id()->set_vin((vin_part0_ + vin_part1_ + vin_part2_));
     }
   }
 }
@@ -112,8 +105,7 @@ bool License7e::is_expired(const std::uint8_t* bytes, int length) const {
 // config detail: {'name': 'feat_base_enabled', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'f_type': 'valid', 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 16, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
-bool License7e::is_feat_base_enabled(const std::uint8_t* bytes,
-                                     int length) const {
+bool License7e::is_feat_base_enabled(const std::uint8_t* bytes, int length) const {
   Byte frame(bytes + 2);
   return frame.is_bit_1(0);
 }
@@ -169,8 +161,7 @@ std::string License7e::vin12(const std::uint8_t* bytes, int length) const {
 // config detail: {'name': 'feat_base_trial', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'f_type': 'valid', 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 17, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
-bool License7e::is_feat_base_trial(const std::uint8_t* bytes,
-                                   int length) const {
+bool License7e::is_feat_base_trial(const std::uint8_t* bytes, int length) const {
   Byte frame(bytes + 2);
   return frame.is_bit_1(1);
 }
@@ -275,12 +266,11 @@ std::string License7e::vin14(const std::uint8_t* bytes, int length) const {
 // 'precision': 1.0, 'len': 16, 'f_type': 'value', 'is_signed_var': False,
 // 'physical_range': '[0|0]', 'bit': 32, 'type': 'int', 'order': 'intel',
 // 'physical_unit': '""'}
-int License7e::feat_base_trials_used(const std::uint8_t* bytes,
-                                     int length) const {
+int License7e::feat_base_trials_used(const std::uint8_t* bytes, int length) const {
   Byte t0(bytes + 5);
-  int x = t0.get_byte(0, 8);
+  int  x = t0.get_byte(0, 8);
   Byte t1(bytes + 4);
-  int t = t1.get_byte(0, 8);
+  int  t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
   return x;
@@ -378,12 +368,11 @@ std::string License7e::vin16(const std::uint8_t* bytes, int length) const {
 // 'precision': 1.0, 'len': 16, 'f_type': 'value', 'is_signed_var': False,
 // 'physical_range': '[0|0]', 'bit': 48, 'type': 'int', 'order': 'intel',
 // 'physical_unit': '""'}
-int License7e::feat_base_trials_remaining(const std::uint8_t* bytes,
-                                          int length) const {
+int License7e::feat_base_trials_remaining(const std::uint8_t* bytes, int length) const {
   Byte t0(bytes + 7);
-  int x = t0.get_byte(0, 8);
+  int  x = t0.get_byte(0, 8);
   Byte t1(bytes + 6);
-  int t = t1.get_byte(0, 8);
+  int  t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
   return x;

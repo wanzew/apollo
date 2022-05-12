@@ -20,9 +20,10 @@
 
 #include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -39,16 +40,15 @@ class YieldSignScenarioTest : public ::testing::Test {
 };
 
 TEST_F(YieldSignScenarioTest, VerifyConf) {
-  FLAGS_scenario_yield_sign_config_file =
-      "/apollo/modules/planning/conf/"
-      "scenario/yield_sign_config.pb.txt";
+  FLAGS_scenario_yield_sign_config_file = "/apollo/modules/planning/conf/"
+                                          "scenario/yield_sign_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_yield_sign_config_file, &config));
+  EXPECT_TRUE(
+      apollo::cyber::common::GetProtoFromFile(FLAGS_scenario_yield_sign_config_file, &config));
 
   ScenarioContext context;
-  auto injector = std::make_shared<DependencyInjector>();
+  auto            injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new YieldSignScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::YIELD_SIGN);
 }

@@ -26,13 +26,12 @@ namespace routing {
 
 class TopoRangeManager {
  public:
-  TopoRangeManager() = default;
+  TopoRangeManager()          = default;
   virtual ~TopoRangeManager() = default;
 
-  const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>& RangeMap()
-      const;
+  const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>& RangeMap() const;
   const std::vector<NodeSRange>* Find(const TopoNode* node) const;
-  void PrintDebugInfo() const;
+  void                           PrintDebugInfo() const;
 
   void Clear();
   void Add(const TopoNode* node, double start_s, double end_s);

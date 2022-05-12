@@ -17,9 +17,10 @@
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
 #include "absl/strings/str_cat.h"
+#include "gflags/gflags.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gflags/gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 
 DEFINE_string(vehicle_data_config_filename,
@@ -33,25 +34,21 @@ using cyber::common::GetProtoFromFile;
 
 VehicleManager::VehicleManager() {
   ACHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))
-      << "Unable to parse VehicleData config file "
-      << FLAGS_vehicle_data_config_filename;
+      << "Unable to parse VehicleData config file " << FLAGS_vehicle_data_config_filename;
 }
 
-const std::string &VehicleManager::GetVehicleDataPath() const {
-  return vehicle_data_path_;
-}
+const std::string& VehicleManager::GetVehicleDataPath() const { return vehicle_data_path_; }
 
-bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
+bool VehicleManager::UseVehicle(const std::string& vehicle_data_path) {
   if (!cyber::common::DirectoryExists(vehicle_data_path)) {
     AERROR << "Cannot find vehicle data: " << vehicle_data_path;
     return false;
   }
   vehicle_data_path_ = vehicle_data_path;
 
-  for (const auto &data_file : vehicle_data_.data_files()) {
-    const auto source_path =
-        absl::StrCat(vehicle_data_path, "/", data_file.source_path());
-    const auto &dest_path = data_file.dest_path();
+  for (const auto& data_file : vehicle_data_.data_files()) {
+    const auto  source_path = absl::StrCat(vehicle_data_path, "/", data_file.source_path());
+    const auto& dest_path   = data_file.dest_path();
 
     const bool ret = cyber::common::Copy(source_path, dest_path);
     AINFO_IF(ret) << "Copied " << source_path << " to " << dest_path;

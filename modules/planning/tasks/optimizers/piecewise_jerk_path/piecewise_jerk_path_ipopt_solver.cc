@@ -26,8 +26,11 @@ namespace apollo {
 namespace planning {
 
 PiecewiseJerkPathIpoptSolver::PiecewiseJerkPathIpoptSolver(
-    const double x_init, const double dx_init, const double ddx_init,
-    const double delta_s, const double dddx_max,
+    const double                           x_init,
+    const double                           dx_init,
+    const double                           ddx_init,
+    const double                           delta_s,
+    const double                           dddx_max,
     std::vector<std::pair<double, double>> d_bounds) {
   CHECK_GT(d_bounds.size(), 1U);
 
@@ -68,9 +71,8 @@ void PiecewiseJerkPathIpoptSolver::set_objective_weights(const double w_x,
   w_obs_ = w_obs;
 }
 
-bool PiecewiseJerkPathIpoptSolver::get_nlp_info(int& n, int& m, int& nnz_jac_g,
-                                                int& nnz_h_lag,
-                                                IndexStyleEnum& index_style) {
+bool PiecewiseJerkPathIpoptSolver::get_nlp_info(
+    int& n, int& m, int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) {
   // variables
   n = num_of_variables_;
 
@@ -87,9 +89,8 @@ bool PiecewiseJerkPathIpoptSolver::get_nlp_info(int& n, int& m, int& nnz_jac_g,
   return true;
 }
 
-bool PiecewiseJerkPathIpoptSolver::get_bounds_info(int n, double* x_l,
-                                                   double* x_u, int m,
-                                                   double* g_l, double* g_u) {
+bool PiecewiseJerkPathIpoptSolver::get_bounds_info(
+    int n, double* x_l, double* x_u, int m, double* g_l, double* g_u) {
   const double LARGE_VALUE = 1.0;
   // bounds for variables
   // x bounds;
@@ -139,32 +140,35 @@ bool PiecewiseJerkPathIpoptSolver::get_bounds_info(int n, double* x_l,
   return true;
 }
 
-bool PiecewiseJerkPathIpoptSolver::get_starting_point(int n, bool init_x,
-                                                      double* x, bool init_z,
-                                                      double* z_L, double* z_U,
-                                                      int m, bool init_lambda,
+bool PiecewiseJerkPathIpoptSolver::get_starting_point(int     n,
+                                                      bool    init_x,
+                                                      double* x,
+                                                      bool    init_z,
+                                                      double* z_L,
+                                                      double* z_U,
+                                                      int     m,
+                                                      bool    init_lambda,
                                                       double* lambda) {
   CHECK_EQ(num_of_variables_, n);
 
-  auto offset_dx = num_of_points_;
+  auto offset_dx  = num_of_points_;
   auto offset_ddx = num_of_points_ + num_of_points_;
   for (int i = 0; i < num_of_points_; ++i) {
-    x[i] = 0.0;
-    x[offset_dx + i] = 0.0;
+    x[i]              = 0.0;
+    x[offset_dx + i]  = 0.0;
     x[offset_ddx + i] = 0.0;
   }
 
-  x[0] = x_init_;
-  x[offset_dx] = dx_init_;
+  x[0]          = x_init_;
+  x[offset_dx]  = dx_init_;
   x[offset_ddx] = ddx_init_;
   return true;
 }
 
-bool PiecewiseJerkPathIpoptSolver::eval_f(int n, const double* x, bool new_x,
-                                          double& obj_value) {
+bool PiecewiseJerkPathIpoptSolver::eval_f(int n, const double* x, bool new_x, double& obj_value) {
   obj_value = 0.0;
 
-  int offset_dx = num_of_points_;
+  int offset_dx  = num_of_points_;
   int offset_ddx = 2 * num_of_points_;
   for (int i = 0; i < num_of_points_; ++i) {
     // d
@@ -190,17 +194,14 @@ bool PiecewiseJerkPathIpoptSolver::eval_f(int n, const double* x, bool new_x,
   return true;
 }
 
-bool PiecewiseJerkPathIpoptSolver::eval_grad_f(int n, const double* x,
-                                               bool new_x, double* grad_f) {
+bool PiecewiseJerkPathIpoptSolver::eval_grad_f(int n, const double* x, bool new_x, double* grad_f) {
   std::fill(grad_f, grad_f + n, 0.0);
 
-  int offset_dx = num_of_points_;
+  int offset_dx  = num_of_points_;
   int offset_ddx = 2 * num_of_points_;
   for (int i = 0; i < num_of_points_; ++i) {
     grad_f[i] = 2.0 * x[i] * w_x_ +
-                2.0 *
-                    (x[i] - (d_bounds_[i].first + d_bounds_[i].second) * 0.5) *
-                    w_obs_;
+                2.0 * (x[i] - (d_bounds_[i].first + d_bounds_[i].second) * 0.5) * w_obs_;
 
     grad_f[offset_dx + i] = 2.0 * x[offset_dx + i] * w_dx_;
 
@@ -209,15 +210,13 @@ bool PiecewiseJerkPathIpoptSolver::eval_grad_f(int n, const double* x,
 
   for (int i = 1; i < num_of_points_; ++i) {
     auto delta_ddx = x[offset_ddx + i] - x[offset_ddx + i - 1];
-    grad_f[offset_ddx + i - 1] +=
-        -2.0 * delta_ddx / delta_s_ / delta_s_ * w_dddx_;
+    grad_f[offset_ddx + i - 1] += -2.0 * delta_ddx / delta_s_ / delta_s_ * w_dddx_;
     grad_f[offset_ddx + i] += 2.0 * delta_ddx / delta_s_ / delta_s_ * w_dddx_;
   }
   return true;
 }
 
-bool PiecewiseJerkPathIpoptSolver::eval_g(int n, const double* x, bool new_x,
-                                          int m, double* g) {
+bool PiecewiseJerkPathIpoptSolver::eval_g(int n, const double* x, bool new_x, int m, double* g) {
   std::fill(g, g + m, 0.0);
   int offset_v = num_of_points_;
   int offset_a = 2 * num_of_points_;
@@ -241,19 +240,17 @@ bool PiecewiseJerkPathIpoptSolver::eval_g(int n, const double* x, bool new_x,
     double end_p = p0 + v0 * delta_s_ + 0.5 * a0 * delta_s_ * delta_s_ +
                    j * delta_s_ * delta_s_ * delta_s_ / 6.0;
 
-    auto v_diff = v1 - end_v;
+    auto v_diff               = v1 - end_v;
     g[num_of_points_ - 1 + i] = v_diff;
 
-    auto p_diff = p1 - end_p;
+    auto p_diff                     = p1 - end_p;
     g[2 * (num_of_points_ - 1) + i] = p_diff;
   }
   return true;
 }
 
-bool PiecewiseJerkPathIpoptSolver::eval_jac_g(int n, const double* x,
-                                              bool new_x, int m, int nele_jac,
-                                              int* iRow, int* jCol,
-                                              double* values) {
+bool PiecewiseJerkPathIpoptSolver::eval_jac_g(
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow, int* jCol, double* values) {
   CHECK_EQ(n, num_of_variables_);
   CHECK_EQ(m, num_of_constraints_);
 
@@ -261,13 +258,12 @@ bool PiecewiseJerkPathIpoptSolver::eval_jac_g(int n, const double* x,
   auto offset_a = 2 * num_of_points_;
 
   if (values == nullptr) {
-    int nz_index = 0;
+    int nz_index         = 0;
     int constraint_index = 0;
 
     // jerk constraint
     // d_i+1'' - d_i''
-    for (int variable_index = 0; variable_index + 1 < num_of_points_;
-         ++variable_index) {
+    for (int variable_index = 0; variable_index + 1 < num_of_points_; ++variable_index) {
       // d_i''
       iRow[nz_index] = constraint_index;
       jCol[nz_index] = offset_a + variable_index;
@@ -283,8 +279,7 @@ bool PiecewiseJerkPathIpoptSolver::eval_jac_g(int n, const double* x,
 
     // velocity constraint
     // d_i+1' - d_i' - 0.5 * ds * (d_i'' + d_i+1'')
-    for (int variable_index = 0; variable_index + 1 < num_of_points_;
-         ++variable_index) {
+    for (int variable_index = 0; variable_index + 1 < num_of_points_; ++variable_index) {
       // d_i'
       iRow[nz_index] = constraint_index;
       jCol[nz_index] = offset_v + variable_index;
@@ -307,8 +302,7 @@ bool PiecewiseJerkPathIpoptSolver::eval_jac_g(int n, const double* x,
 
     // position constraint
     // d_i+1 - d_i - d_i' * ds - 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2
-    for (int variable_index = 0; variable_index + 1 < num_of_points_;
-         ++variable_index) {
+    for (int variable_index = 0; variable_index + 1 < num_of_points_; ++variable_index) {
       // d_i
       iRow[nz_index] = constraint_index;
       jCol[nz_index] = variable_index;
@@ -390,11 +384,17 @@ bool PiecewiseJerkPathIpoptSolver::eval_jac_g(int n, const double* x,
   return true;
 }
 
-bool PiecewiseJerkPathIpoptSolver::eval_h(int n, const double* x, bool new_x,
-                                          double obj_factor, int m,
-                                          const double* lambda, bool new_lambda,
-                                          int nele_hess, int* iRow, int* jCol,
-                                          double* values) {
+bool PiecewiseJerkPathIpoptSolver::eval_h(int           n,
+                                          const double* x,
+                                          bool          new_x,
+                                          double        obj_factor,
+                                          int           m,
+                                          const double* lambda,
+                                          bool          new_lambda,
+                                          int           nele_hess,
+                                          int*          iRow,
+                                          int*          jCol,
+                                          double*       values) {
   CHECK_EQ(num_of_variables_ + num_of_points_ - 1, nele_hess);
   if (values == nullptr) {
     for (int i = 0; i < num_of_variables_; ++i) {
@@ -403,7 +403,7 @@ bool PiecewiseJerkPathIpoptSolver::eval_h(int n, const double* x, bool new_x,
     }
 
     auto offset_nnz_index = num_of_variables_;
-    auto offset_ddx = num_of_points_ * 2;
+    auto offset_ddx       = num_of_points_ * 2;
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       iRow[offset_nnz_index + i] = offset_ddx + i;
       jCol[offset_nnz_index + i] = offset_ddx + i + 1;
@@ -424,8 +424,8 @@ bool PiecewiseJerkPathIpoptSolver::eval_h(int n, const double* x, bool new_x,
     }
 
     auto delta_s_square = delta_s_ * delta_s_;
-    auto t = 2.0 * w_dddx_ / delta_s_square;
-    auto t2 = t * 2;
+    auto t              = 2.0 * w_dddx_ / delta_s_square;
+    auto t2             = t * 2;
 
     for (int i = 2 * num_of_points_; i < 3 * num_of_points_; ++i) {
       if (i == 2 * num_of_points_) {
@@ -443,16 +443,22 @@ bool PiecewiseJerkPathIpoptSolver::eval_h(int n, const double* x, bool new_x,
   return true;
 }
 
-void PiecewiseJerkPathIpoptSolver::finalize_solution(
-    Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
-    const double* z_U, int m, const double* g, const double* lambda,
-    double obj_value, const Ipopt::IpoptData* ip_data,
-    Ipopt::IpoptCalculatedQuantities* ip_cq) {
+void PiecewiseJerkPathIpoptSolver::finalize_solution(Ipopt::SolverReturn               status,
+                                                     int                               n,
+                                                     const double*                     x,
+                                                     const double*                     z_L,
+                                                     const double*                     z_U,
+                                                     int                               m,
+                                                     const double*                     g,
+                                                     const double*                     lambda,
+                                                     double                            obj_value,
+                                                     const Ipopt::IpoptData*           ip_data,
+                                                     Ipopt::IpoptCalculatedQuantities* ip_cq) {
   opt_x_.reserve(num_of_points_);
   opt_dx_.reserve(num_of_points_);
   opt_ddx_.reserve(num_of_points_);
 
-  int offset_prime = num_of_points_;
+  int offset_prime  = num_of_points_;
   int offset_pprime = offset_prime + num_of_points_;
 
   for (int i = 0; i < num_of_points_; ++i) {
@@ -463,10 +469,11 @@ void PiecewiseJerkPathIpoptSolver::finalize_solution(
 }
 
 void PiecewiseJerkPathIpoptSolver::GetOptimizationResult(
-    std::vector<double>* ptr_opt_d, std::vector<double>* ptr_opt_d_prime,
+    std::vector<double>* ptr_opt_d,
+    std::vector<double>* ptr_opt_d_prime,
     std::vector<double>* ptr_opt_d_pprime) const {
-  *ptr_opt_d = opt_x_;
-  *ptr_opt_d_prime = opt_dx_;
+  *ptr_opt_d        = opt_x_;
+  *ptr_opt_d_prime  = opt_dx_;
   *ptr_opt_d_pprime = opt_ddx_;
 }
 

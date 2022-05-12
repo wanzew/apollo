@@ -40,12 +40,11 @@ class FreeMovePredictorTest : public KMLMapBasedTest {
 };
 
 TEST_F(FreeMovePredictorTest, General) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 15);
-  ObstaclesContainer container;
+  ObstaclesContainer     container;
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(15);
@@ -60,10 +59,10 @@ TEST_F(FreeMovePredictorTest, Pedestrian) {
       ::apollo::perception::PerceptionObstacle::PEDESTRIAN);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
-  ObstaclesContainer container;
+  ObstaclesContainer     container;
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
-  Obstacle* obstacle_ptr = container.GetObstacle(15);
+  Obstacle*         obstacle_ptr = container.GetObstacle(15);
   FreeMovePredictor predictor;
   predictor.Predict(&adc_trajectory_container, obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);

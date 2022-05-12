@@ -26,7 +26,6 @@
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
 #include "cyber/cyber.h"
-
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"
 
@@ -37,15 +36,13 @@ namespace gnss {
 class Rtcm3Parser : public Parser {
  public:
   explicit Rtcm3Parser(bool is_base_satation);
-  virtual MessageType GetMessage(MessagePtr *message_ptr);
+  virtual MessageType GetMessage(MessagePtr* message_ptr);
 
  private:
   void SetObservationTime();
   bool SetStationPosition();
-  void FillKepplerOrbit(const eph_t &eph,
-                        apollo::drivers::gnss::KepplerOrbit *keppler_orbit);
-  void FillGlonassOrbit(const geph_t &eph,
-                        apollo::drivers::gnss::GlonassOrbit *keppler_orbit);
+  void FillKepplerOrbit(const eph_t& eph, apollo::drivers::gnss::KepplerOrbit* keppler_orbit);
+  void FillGlonassOrbit(const geph_t& eph, apollo::drivers::gnss::GlonassOrbit* keppler_orbit);
   bool ProcessObservation();
   bool ProcessEphemerides();
   bool ProcessStationParameters();
@@ -54,9 +51,9 @@ class Rtcm3Parser : public Parser {
   std::vector<uint8_t> buffer_;
 
   rtcm_t rtcm_;
-  bool is_base_station_ = false;
+  bool   is_base_station_ = false;
 
-  apollo::drivers::gnss::GnssEphemeris ephemeris_;
+  apollo::drivers::gnss::GnssEphemeris    ephemeris_;
   apollo::drivers::gnss::EpochObservation observation_;
 
   struct Point3D {

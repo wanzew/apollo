@@ -17,7 +17,9 @@
 #pragma once
 
 #include "gtest/gtest.h"
+
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -25,8 +27,7 @@ namespace canbus {
 namespace transit {
 
 class Adcmotioncontrollimits112
-    : public ::apollo::drivers::canbus::ProtocolData<
-          ::apollo::canbus::ChassisDetail> {
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -44,31 +45,27 @@ class Adcmotioncontrollimits112
   // 0.0, 'precision': 0.5, 'len': 8, 'name': 'ADC_CMD_ThrottleCommandLimit',
   // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 24, 'type':
   // 'double', 'order': 'intel', 'physical_unit': '%'}
-  Adcmotioncontrollimits112* set_adc_cmd_throttlecommandlimit(
-      double adc_cmd_throttlecommandlimit);
+  Adcmotioncontrollimits112* set_adc_cmd_throttlecommandlimit(double adc_cmd_throttlecommandlimit);
 
   // config detail: {'description': 'Set steering rate', 'offset': 0.0,
   // 'precision': 0.05, 'len': 16, 'name': 'ADC_CMD_SteeringRate',
   // 'is_signed_var': False, 'physical_range': '[0|3276.75]', 'bit': 0, 'type':
   // 'double', 'order': 'intel', 'physical_unit': 'deg/s'}
-  Adcmotioncontrollimits112* set_adc_cmd_steeringrate(
-      double adc_cmd_steeringrate);
+  Adcmotioncontrollimits112* set_adc_cmd_steeringrate(double adc_cmd_steeringrate);
 
   // config detail: {'description': 'Set limit for steering wheel angle. Applies
   // in both positive and negative', 'offset': 0.0, 'precision': 5.0, 'len': 8,
   // 'name': 'ADC_CMD_SteerWheelAngleLimit', 'is_signed_var': False,
   // 'physical_range': '[0|1275]', 'bit': 16, 'type': 'double', 'order':
   // 'intel', 'physical_unit': 'deg'}
-  Adcmotioncontrollimits112* set_adc_cmd_steerwheelanglelimit(
-      double adc_cmd_steerwheelanglelimit);
+  Adcmotioncontrollimits112* set_adc_cmd_steerwheelanglelimit(double adc_cmd_steerwheelanglelimit);
 
  private:
   // config detail: {'description': 'Set limit for throttle position', 'offset':
   // 0.0, 'precision': 0.5, 'len': 8, 'name': 'ADC_CMD_ThrottleCommandLimit',
   // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 24, 'type':
   // 'double', 'order': 'intel', 'physical_unit': '%'}
-  void set_p_adc_cmd_throttlecommandlimit(uint8_t* data,
-                                          double adc_cmd_throttlecommandlimit);
+  void set_p_adc_cmd_throttlecommandlimit(uint8_t* data, double adc_cmd_throttlecommandlimit);
 
   // config detail: {'description': 'Set steering rate', 'offset': 0.0,
   // 'precision': 0.05, 'len': 16, 'name': 'ADC_CMD_SteeringRate',
@@ -81,8 +78,7 @@ class Adcmotioncontrollimits112
   // 'name': 'ADC_CMD_SteerWheelAngleLimit', 'is_signed_var': False,
   // 'physical_range': '[0|1275]', 'bit': 16, 'type': 'double', 'order':
   // 'intel', 'physical_unit': 'deg'}
-  void set_p_adc_cmd_steerwheelanglelimit(uint8_t* data,
-                                          double adc_cmd_steerwheelanglelimit);
+  void set_p_adc_cmd_steerwheelanglelimit(uint8_t* data, double adc_cmd_steerwheelanglelimit);
 
  private:
   double adc_cmd_throttlecommandlimit_;

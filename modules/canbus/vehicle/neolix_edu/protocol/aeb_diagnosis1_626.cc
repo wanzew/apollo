@@ -30,23 +30,21 @@ using ::apollo::drivers::canbus::Byte;
 Aebdiagnosis1626::Aebdiagnosis1626() {}
 const int32_t Aebdiagnosis1626::ID = 0x626;
 
-void Aebdiagnosis1626::Parse(const std::uint8_t* bytes, int32_t length,
-                             ChassisDetail* chassis) const {
-  chassis->mutable_neolix_edu()
-      ->mutable_aeb_diagnosis1_626()
-      ->set_aeb_softwareversion(aeb_softwareversion(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_aeb_diagnosis1_626()
-      ->set_aeb_hardwareversion(aeb_hardwareversion(bytes, length));
+void Aebdiagnosis1626::Parse(const std::uint8_t* bytes,
+                             int32_t             length,
+                             ChassisDetail*      chassis) const {
+  chassis->mutable_neolix_edu()->mutable_aeb_diagnosis1_626()->set_aeb_softwareversion(
+      aeb_softwareversion(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_aeb_diagnosis1_626()->set_aeb_hardwareversion(
+      aeb_hardwareversion(bytes, length));
 }
 
 // config detail: {'name': 'aeb_softwareversion', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0.0|255.0]', 'bit': 55, 'type': 'double', 'order': 'motorola',
 // 'physical_unit': 'bit'}
-double Aebdiagnosis1626::aeb_softwareversion(const std::uint8_t* bytes,
-                                             int32_t length) const {
-  Byte t0(bytes + 6);
+double Aebdiagnosis1626::aeb_softwareversion(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
   double ret = x;
@@ -57,9 +55,8 @@ double Aebdiagnosis1626::aeb_softwareversion(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0.0|255.0]', 'bit': 63, 'type': 'double', 'order': 'motorola',
 // 'physical_unit': 'bit'}
-double Aebdiagnosis1626::aeb_hardwareversion(const std::uint8_t* bytes,
-                                             int32_t length) const {
-  Byte t0(bytes + 7);
+double Aebdiagnosis1626::aeb_hardwareversion(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   double ret = x;

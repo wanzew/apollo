@@ -17,6 +17,7 @@
 #include "modules/canbus/vehicle/devkit/protocol/brake_report_501.h"
 
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -29,29 +30,26 @@ using ::apollo::drivers::canbus::Byte;
 Brakereport501::Brakereport501() {}
 const int32_t Brakereport501::ID = 0x501;
 
-void Brakereport501::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
+void Brakereport501::Parse(const std::uint8_t* bytes,
+                           int32_t             length,
+                           ChassisDetail*      chassis) const {
   chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_pedal_actual(
       brake_pedal_actual(bytes, length));
-  chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_flt2(
-      brake_flt2(bytes, length));
-  chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_flt1(
-      brake_flt1(bytes, length));
+  chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_flt2(brake_flt2(bytes, length));
+  chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_flt1(brake_flt1(bytes, length));
   chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_en_state(
       brake_en_state(bytes, length));
-  chassis->mutable_check_response()->set_is_esp_online(
-      brake_en_state(bytes, length) == 1);
+  chassis->mutable_check_response()->set_is_esp_online(brake_en_state(bytes, length) == 1);
 }
 
 // config detail: {'name': 'brake_pedal_actual', 'offset': 0.0, 'precision':
 // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
 // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
-double Brakereport501::brake_pedal_actual(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 3);
+double Brakereport501::brake_pedal_actual(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 4);
+  Byte    t1(bytes + 4);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -65,13 +63,12 @@ double Brakereport501::brake_pedal_actual(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 8, 'name': 'brake_flt2', 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 23, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
-Brake_report_501::Brake_flt2Type Brakereport501::brake_flt2(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+Brake_report_501::Brake_flt2Type Brakereport501::brake_flt2(const std::uint8_t* bytes,
+                                                            int32_t             length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Brake_report_501::Brake_flt2Type ret =
-      static_cast<Brake_report_501::Brake_flt2Type>(x);
+  Brake_report_501::Brake_flt2Type ret = static_cast<Brake_report_501::Brake_flt2Type>(x);
   return ret;
 }
 
@@ -80,13 +77,12 @@ Brake_report_501::Brake_flt2Type Brakereport501::brake_flt2(
 // 'precision': 1.0, 'len': 8, 'name': 'brake_flt1', 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 15, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
-Brake_report_501::Brake_flt1Type Brakereport501::brake_flt1(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Brake_report_501::Brake_flt1Type Brakereport501::brake_flt1(const std::uint8_t* bytes,
+                                                            int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Brake_report_501::Brake_flt1Type ret =
-      static_cast<Brake_report_501::Brake_flt1Type>(x);
+  Brake_report_501::Brake_flt1Type ret = static_cast<Brake_report_501::Brake_flt1Type>(x);
   return ret;
 }
 
@@ -95,13 +91,12 @@ Brake_report_501::Brake_flt1Type Brakereport501::brake_flt1(
 // 'BRAKE_EN_STATE_TAKEOVER', 3: 'BRAKE_EN_STATE_STANDBY'}, 'precision': 1.0,
 // 'len': 2, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]',
 // 'bit': 1, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Brake_report_501::Brake_en_stateType Brakereport501::brake_en_state(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Brake_report_501::Brake_en_stateType Brakereport501::brake_en_state(const std::uint8_t* bytes,
+                                                                    int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 2);
 
-  Brake_report_501::Brake_en_stateType ret =
-      static_cast<Brake_report_501::Brake_en_stateType>(x);
+  Brake_report_501::Brake_en_stateType ret = static_cast<Brake_report_501::Brake_en_stateType>(x);
   return ret;
 }
 }  // namespace devkit

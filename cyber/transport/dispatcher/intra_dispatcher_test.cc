@@ -17,11 +17,13 @@
 #include "cyber/transport/dispatcher/intra_dispatcher.h"
 
 #include <memory>
+
 #include "gtest/gtest.h"
+
+#include "cyber/proto/unit_test.pb.h"
 
 #include "cyber/common/util.h"
 #include "cyber/message/raw_message.h"
-#include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/common/identity.h"
 
 namespace apollo {
@@ -29,32 +31,30 @@ namespace cyber {
 namespace transport {
 
 TEST(DispatcherTest, on_message) {
-  auto dispatcher = IntraDispatcher::Instance();
-  std::vector<std::shared_ptr<proto::Chatter>> chatter_msgs;
+  auto                                              dispatcher = IntraDispatcher::Instance();
+  std::vector<std::shared_ptr<proto::Chatter>>      chatter_msgs;
   std::vector<std::shared_ptr<message::RawMessage>> raw_msgs;
-  auto chatter = std::make_shared<proto::Chatter>();
+  auto                                              chatter = std::make_shared<proto::Chatter>();
   chatter->set_content("chatter");
   auto chatter2 = std::make_shared<proto::Chatter>();
   chatter2->set_content("raw message");
   std::string str;
   chatter2->SerializeToString(&str);
-  auto raw = std::make_shared<message::RawMessage>(str);
-  auto chatter_callback = [&chatter_msgs](
-                              const std::shared_ptr<proto::Chatter>& msg,
-                              const MessageInfo&) {
+  auto raw              = std::make_shared<message::RawMessage>(str);
+  auto chatter_callback = [&chatter_msgs](const std::shared_ptr<proto::Chatter>& msg,
+                                          const MessageInfo&) {
     AINFO << "chatter callback";
     chatter_msgs.push_back(msg);
   };
-  auto raw_callback = [&raw_msgs](
-                          const std::shared_ptr<message::RawMessage>& msg,
-                          const MessageInfo&) {
+  auto raw_callback = [&raw_msgs](const std::shared_ptr<message::RawMessage>& msg,
+                                  const MessageInfo&) {
     AINFO << "raw callback";
     raw_msgs.push_back(msg);
   };
   MessageInfo msg_info;
 
-  const std::string channel_name = "channel";
-  const uint64_t channel_id = common::Hash(channel_name);
+  const std::string     channel_name = "channel";
+  const uint64_t        channel_id   = common::Hash(channel_name);
   proto::RoleAttributes self_attr1;
   self_attr1.set_channel_name(channel_name);
   self_attr1.set_channel_id(channel_id);
@@ -65,10 +65,10 @@ TEST(DispatcherTest, on_message) {
   self_none.set_channel_name("channel1");
   self_none.set_channel_id(common::Hash("channel1"));
   proto::RoleAttributes oppo_attr1(self_attr1);
-  Identity identity1;
+  Identity              identity1;
   oppo_attr1.set_id(identity1.HashValue());
   proto::RoleAttributes oppo_attr2(self_attr1);
-  Identity identity2;
+  Identity              identity2;
   oppo_attr2.set_id(identity2.HashValue());
 
   // AddListener
@@ -77,11 +77,9 @@ TEST(DispatcherTest, on_message) {
   // add raw
   dispatcher->AddListener<message::RawMessage>(self_attr2, raw_callback);
   // add chatter opposite
-  dispatcher->AddListener<proto::Chatter>(self_attr1, oppo_attr1,
-                                          chatter_callback);
+  dispatcher->AddListener<proto::Chatter>(self_attr1, oppo_attr1, chatter_callback);
   // add raw opposite
-  dispatcher->AddListener<message::RawMessage>(self_attr2, oppo_attr1,
-                                               raw_callback);
+  dispatcher->AddListener<message::RawMessage>(self_attr2, oppo_attr1, raw_callback);
 
   // run 1 + 2
   dispatcher->OnMessage<proto::Chatter>(channel_id, chatter, msg_info);

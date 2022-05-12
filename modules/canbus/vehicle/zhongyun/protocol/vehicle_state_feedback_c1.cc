@@ -30,22 +30,19 @@ using ::apollo::drivers::canbus::Byte;
 Vehiclestatefeedbackc1::Vehiclestatefeedbackc1() {}
 const int32_t Vehiclestatefeedbackc1::ID = 0xC1;
 
-void Vehiclestatefeedbackc1::Parse(const std::uint8_t* bytes, int32_t length,
-                                   ChassisDetail* chassis) const {
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_c1()
-      ->set_parking_actual(parking_actual(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_c1()
-      ->set_brake_torque_feedback(brake_torque_feedback(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_c1()
-      ->set_gear_state_actual(gear_state_actual(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_c1()
-      ->set_steering_actual(steering_actual(bytes, length));
-  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_c1()->set_speed(
-      speed(bytes, length) / 3.6);
+void Vehiclestatefeedbackc1::Parse(const std::uint8_t* bytes,
+                                   int32_t             length,
+                                   ChassisDetail*      chassis) const {
+  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_c1()->set_parking_actual(
+      parking_actual(bytes, length));
+  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_c1()->set_brake_torque_feedback(
+      brake_torque_feedback(bytes, length));
+  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_c1()->set_gear_state_actual(
+      gear_state_actual(bytes, length));
+  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_c1()->set_steering_actual(
+      steering_actual(bytes, length));
+  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_c1()->set_speed(speed(bytes, length) /
+                                                                              3.6);
 }
 
 // config detail: {'name': 'parking_actual', 'enum': {0:
@@ -54,9 +51,8 @@ void Vehiclestatefeedbackc1::Parse(const std::uint8_t* bytes, int32_t length,
 // 'physical_range': '[0|1]', 'bit': 56, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
 Vehicle_state_feedback_c1::Parking_actualType
-Vehiclestatefeedbackc1::parking_actual(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes + 7);
+Vehiclestatefeedbackc1::parking_actual(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   Vehicle_state_feedback_c1::Parking_actualType ret =
@@ -68,11 +64,11 @@ Vehiclestatefeedbackc1::parking_actual(const std::uint8_t* bytes,
 // 0.05, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
 // 40, 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
 double Vehiclestatefeedbackc1::brake_torque_feedback(const std::uint8_t* bytes,
-                                                     int32_t length) const {
-  Byte t0(bytes + 6);
+                                                     int32_t             length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -87,9 +83,8 @@ double Vehiclestatefeedbackc1::brake_torque_feedback(const std::uint8_t* bytes,
 // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|5]',
 // 'bit': 32, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 Vehicle_state_feedback_c1::Gear_state_actualType
-Vehiclestatefeedbackc1::gear_state_actual(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 4);
+Vehiclestatefeedbackc1::gear_state_actual(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
   Vehicle_state_feedback_c1::Gear_state_actualType ret =
@@ -100,12 +95,11 @@ Vehiclestatefeedbackc1::gear_state_actual(const std::uint8_t* bytes,
 // config detail: {'name': 'steering_actual', 'offset': -1638.35, 'precision':
 // 0.05, 'len': 16, 'is_signed_var': False, 'physical_range': '[-40|40]', 'bit':
 // 16, 'type': 'double', 'order': 'intel', 'physical_unit': 'deg'}
-double Vehiclestatefeedbackc1::steering_actual(const std::uint8_t* bytes,
-                                               int32_t length) const {
-  Byte t0(bytes + 3);
+double Vehiclestatefeedbackc1::steering_actual(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -117,12 +111,11 @@ double Vehiclestatefeedbackc1::steering_actual(const std::uint8_t* bytes,
 // config detail: {'name': 'speed', 'offset': 0.0, 'precision': 0.01, 'len': 16,
 // 'is_signed_var': False, 'physical_range': '[0|35]', 'bit': 0, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'kph'}
-double Vehiclestatefeedbackc1::speed(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte t0(bytes + 1);
+double Vehiclestatefeedbackc1::speed(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 0);
+  Byte    t1(bytes + 0);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

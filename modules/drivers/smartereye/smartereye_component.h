@@ -21,16 +21,18 @@
 #include <memory>
 #include <vector>
 
-#include "cyber/cyber.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/drivers/proto/smartereye.pb.h"
-#include "modules/drivers/smartereye/proto/config.pb.h"
-#include "modules/drivers/smartereye/smartereye_device.h"
 #include "third_party/camera_library/smartereye/include/frameext.h"
 #include "third_party/camera_library/smartereye/include/obstacleData.h"
 #include "third_party/camera_library/smartereye/include/obstaclepainter.h"
 #include "third_party/camera_library/smartereye/include/roadwaypainter.h"
 #include "third_party/camera_library/smartereye/include/yuv2rgb.h"
+
+#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/drivers/proto/smartereye.pb.h"
+#include "modules/drivers/smartereye/proto/config.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/drivers/smartereye/smartereye_device.h"
 
 namespace apollo {
 namespace drivers {
@@ -50,25 +52,22 @@ class SmartereyeComponent : public Component<> {
  protected:
   void run();
   bool SetCallback();
-  bool Callback(RawImageFrame *rawFrame);
-  void processFrame(int frameId, char *image, char *extended, int64_t time,
-                    int width, int height);
-  void processFrame(int frameId, char *image, uint32_t dataSize, int width,
-                    int height, int frameFormat);
+  bool Callback(RawImageFrame* rawFrame);
+  void processFrame(int frameId, char* image, char* extended, int64_t time, int width, int height);
+  void
+  processFrame(int frameId, char* image, uint32_t dataSize, int width, int height, int frameFormat);
 
  private:
-  std::shared_ptr<Writer<Image>> writer_ = nullptr;
-  std::shared_ptr<Writer<SmartereyeObstacles>> SmartereyeObstacles_writer_ =
-      nullptr;
-  std::shared_ptr<Writer<SmartereyeLanemark>> SmartereyeLanemark_writer_ =
-      nullptr;
-  std::unique_ptr<SmartereyeDevice> camera_device_ = nullptr;
-  std::shared_ptr<Config> camera_config_ = nullptr;
-  uint32_t spin_rate_ = 200;
-  uint32_t device_wait_ = 2000;
-  std::future<void> async_result_;
-  std::atomic<bool> running_ = {false};
-  bool b_ispolling_ = false;
+  std::shared_ptr<Writer<Image>>               writer_                     = nullptr;
+  std::shared_ptr<Writer<SmartereyeObstacles>> SmartereyeObstacles_writer_ = nullptr;
+  std::shared_ptr<Writer<SmartereyeLanemark>>  SmartereyeLanemark_writer_  = nullptr;
+  std::unique_ptr<SmartereyeDevice>            camera_device_              = nullptr;
+  std::shared_ptr<Config>                      camera_config_              = nullptr;
+  uint32_t                                     spin_rate_                  = 200;
+  uint32_t                                     device_wait_                = 2000;
+  std::future<void>                            async_result_;
+  std::atomic<bool>                            running_     = {false};
+  bool                                         b_ispolling_ = false;
 };
 
 CYBER_REGISTER_COMPONENT(SmartereyeComponent)

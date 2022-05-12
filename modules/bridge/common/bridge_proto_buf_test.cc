@@ -29,11 +29,11 @@ TEST(BridgeProtoBufTest, Simple) {
   cyber::Init("bridge_proto_buf_test");
   BridgeProtoSerializedBuf<planning::ADCTrajectory> proto_buf;
 
-  auto adc_trajectory = std::make_shared<planning::ADCTrajectory>();
-  double x = 1.0;
-  double y = 1.0;
+  auto   adc_trajectory = std::make_shared<planning::ADCTrajectory>();
+  double x              = 1.0;
+  double y              = 1.0;
   for (size_t i = 0; i < 100; ++i) {
-    auto *point = adc_trajectory->add_trajectory_point();
+    auto*  point  = adc_trajectory->add_trajectory_point();
     double offset = 0.1 * static_cast<double>(i);
     point->mutable_path_point()->set_x(x + offset);
     point->mutable_path_point()->set_y(y + offset);
@@ -45,29 +45,29 @@ TEST(BridgeProtoBufTest, Simple) {
 
   size_t frame_count = proto_buf.GetSerializedBufCount();
   for (size_t i = 0; i < frame_count; i++) {
-    char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
-    bsize offset = 0;
+    char  header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
+    bsize offset                                      = 0;
     memcpy(header_flag, proto_buf.GetSerializedBuf(i), HEADER_FLAG_SIZE);
     EXPECT_STREQ(header_flag, BRIDGE_HEADER_FLAG);
     offset += static_cast<bsize>(sizeof(BRIDGE_HEADER_FLAG) + 1);
 
-    char header_size_buf[sizeof(hsize) + 1] = {0};
-    const char *cursor = proto_buf.GetSerializedBuf(i) + offset;
+    char        header_size_buf[sizeof(hsize) + 1] = {0};
+    const char* cursor                             = proto_buf.GetSerializedBuf(i) + offset;
     memcpy(header_size_buf, cursor, sizeof(hsize));
-    hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
+    hsize header_size = *(reinterpret_cast<hsize*>(header_size_buf));
     EXPECT_EQ(header_size, 184);
     offset += static_cast<bsize>(sizeof(hsize) + 1);
 
     BridgeHeader header;
-    bsize buf_size = header_size - offset;
-    cursor = proto_buf.GetSerializedBuf(i) + offset;
+    bsize        buf_size = header_size - offset;
+    cursor                = proto_buf.GetSerializedBuf(i) + offset;
     EXPECT_TRUE(header.Diserialize(cursor, buf_size));
     EXPECT_STREQ(header.GetMsgName().c_str(), "planning::ADCTrajectory");
     EXPECT_EQ(header.GetMsgID(), 123);
 
     proto_recv_buf.Initialize(header);
-    char *buf = proto_recv_buf.GetBuf(header.GetFramePos());
-    cursor = proto_buf.GetSerializedBuf(i) + header_size;
+    char* buf = proto_recv_buf.GetBuf(header.GetFramePos());
+    cursor    = proto_buf.GetSerializedBuf(i) + header_size;
     memcpy(buf, cursor, header.GetFrameSize());
     proto_recv_buf.UpdateStatus(header.GetIndex());
     if (i < frame_count - 1) {
@@ -78,10 +78,8 @@ TEST(BridgeProtoBufTest, Simple) {
   }
   auto pb_msg = std::make_shared<planning::ADCTrajectory>();
   proto_recv_buf.Diserialized(pb_msg);
-  EXPECT_EQ(pb_msg->header().sequence_num(),
-            adc_trajectory->header().sequence_num());
-  EXPECT_EQ(pb_msg->trajectory_point_size(),
-            adc_trajectory->trajectory_point_size());
+  EXPECT_EQ(pb_msg->header().sequence_num(), adc_trajectory->header().sequence_num());
+  EXPECT_EQ(pb_msg->trajectory_point_size(), adc_trajectory->trajectory_point_size());
 
   int traj_size = adc_trajectory->trajectory_point_size();
   EXPECT_EQ(traj_size, 100);

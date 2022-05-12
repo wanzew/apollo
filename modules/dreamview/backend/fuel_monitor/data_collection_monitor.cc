@@ -43,51 +43,45 @@ namespace {
  * It is okay to lost precision since this conversion is used
  * for criteria comparison.
  */
-bool GetProtobufFloatByFieldName(const google::protobuf::Message& message,
+bool GetProtobufFloatByFieldName(const google::protobuf::Message&    message,
                                  const google::protobuf::Descriptor* descriptor,
                                  const google::protobuf::Reflection* reflection,
-                                 const std::string& field_name, float* value) {
+                                 const std::string&                  field_name,
+                                 float*                              value) {
   if (!descriptor) {
     AERROR << "Protobuf descriptor not found";
     return false;
   }
 
   const auto* field_descriptor = descriptor->FindFieldByName(field_name);
-  const auto cpp_type = field_descriptor->cpp_type();
+  const auto  cpp_type         = field_descriptor->cpp_type();
   if (cpp_type == FieldDescriptor::CppType::CPPTYPE_FLOAT) {
     *value = reflection->GetFloat(message, field_descriptor);
   } else if (cpp_type == FieldDescriptor::CppType::CPPTYPE_DOUBLE) {
     double value_in_double = reflection->GetDouble(message, field_descriptor);
-    *value = static_cast<float>(value_in_double);
+    *value                 = static_cast<float>(value_in_double);
   } else if (cpp_type == FieldDescriptor::CppType::CPPTYPE_ENUM) {
     int value_in_int = reflection->GetEnumValue(message, field_descriptor);
-    *value = static_cast<float>(value_in_int);
+    *value           = static_cast<float>(value_in_int);
   } else {
-    AERROR << field_name << " has unsupported conversion type: "
-           << field_descriptor->cpp_type();
+    AERROR << field_name << " has unsupported conversion type: " << field_descriptor->cpp_type();
     return false;
   }
 
   return true;
 }
 
-bool IsCompliedWithCriterion(float actual_value,
+bool IsCompliedWithCriterion(float                     actual_value,
                              const ComparisonOperator& comparison_operator,
-                             float target_value) {
+                             float                     target_value) {
   switch (comparison_operator) {
     case ComparisonOperator::EQUAL:
-      return std::fabs(actual_value - target_value) <
-             common::math::kMathEpsilon;
-    case ComparisonOperator::GREATER_THAN:
-      return (actual_value > target_value);
-    case ComparisonOperator::GREATER_THAN_OR_EQUAL:
-      return (actual_value >= target_value);
-    case ComparisonOperator::LESS_THAN:
-      return (actual_value < target_value);
-    case ComparisonOperator::LESS_THAN_OR_EQUAL:
-      return (actual_value <= target_value);
-    case ComparisonOperator::NOT_EQUAL:
-      return (actual_value != target_value);
+      return std::fabs(actual_value - target_value) < common::math::kMathEpsilon;
+    case ComparisonOperator::GREATER_THAN: return (actual_value > target_value);
+    case ComparisonOperator::GREATER_THAN_OR_EQUAL: return (actual_value >= target_value);
+    case ComparisonOperator::LESS_THAN: return (actual_value < target_value);
+    case ComparisonOperator::LESS_THAN_OR_EQUAL: return (actual_value <= target_value);
+    case ComparisonOperator::NOT_EQUAL: return (actual_value != target_value);
     default:
       AERROR << "Unsupported comparison operator found:" << comparison_operator;
       return false;
@@ -97,8 +91,8 @@ bool IsCompliedWithCriterion(float actual_value,
 }  // namespace
 
 DataCollectionMonitor::DataCollectionMonitor()
-    : FuelMonitor(FLAGS_data_collection_monitor_name),
-      node_(cyber::CreateNode("data_collection_monitor")) {
+    : FuelMonitor(FLAGS_data_collection_monitor_name)
+    , node_(cyber::CreateNode("data_collection_monitor")) {
   InitReaders();
   LoadConfiguration();
 }
@@ -106,27 +100,22 @@ DataCollectionMonitor::DataCollectionMonitor()
 DataCollectionMonitor::~DataCollectionMonitor() { Stop(); }
 
 void DataCollectionMonitor::InitReaders() {
-  node_->CreateReader<Chassis>(FLAGS_chassis_topic,
-                               [this](const std::shared_ptr<Chassis>& chassis) {
-                                 this->OnChassis(chassis);
-                               });
+  node_->CreateReader<Chassis>(
+      FLAGS_chassis_topic,
+      [this](const std::shared_ptr<Chassis>& chassis) { this->OnChassis(chassis); });
 }
 
 void DataCollectionMonitor::LoadConfiguration() {
-  const std::string& vehicle_dir =
-      VehicleManager::Instance()->GetVehicleDataPath();
-  std::string data_collection_config_path =
-      vehicle_dir + "/data_collection_table.pb.txt";
+  const std::string& vehicle_dir                 = VehicleManager::Instance()->GetVehicleDataPath();
+  std::string        data_collection_config_path = vehicle_dir + "/data_collection_table.pb.txt";
   if (!PathExists(data_collection_config_path)) {
-    AWARN << "No corresponding data collection table file found in "
-          << vehicle_dir << ". Using default one instead.";
+    AWARN << "No corresponding data collection table file found in " << vehicle_dir
+          << ". Using default one instead.";
     data_collection_config_path = FLAGS_default_data_collection_config_path;
   }
 
-  ACHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
-                                         &data_collection_table_))
-      << "Unable to parse data collection configuration from file "
-      << data_collection_config_path;
+  ACHECK(cyber::common::GetProtoFromFile(data_collection_config_path, &data_collection_table_))
+      << "Unable to parse data collection configuration from file " << data_collection_config_path;
 
   ConstructCategories();
 
@@ -138,24 +127,24 @@ void DataCollectionMonitor::ConstructCategories() {
 
   for (const auto& scenario_iter : data_collection_table_.scenario()) {
     const std::string& scenario_name = scenario_iter.first;
-    const Scenario& scenario = scenario_iter.second;
+    const Scenario&    scenario      = scenario_iter.second;
 
     Category category;
     ConstructCategoriesHelper(scenario_name, scenario, 0, "", category);
   }
 }
 
-void DataCollectionMonitor::ConstructCategoriesHelper(
-    const std::string& scenario_name, const Scenario& scenario, int feature_idx,
-    std::string current_category_name, const Category& current_category) {
+void DataCollectionMonitor::ConstructCategoriesHelper(const std::string& scenario_name,
+                                                      const Scenario&    scenario,
+                                                      int                feature_idx,
+                                                      std::string        current_category_name,
+                                                      const Category&    current_category) {
   if (feature_idx == scenario.feature_size()) {
-    scenario_to_categories_[scenario_name].insert(
-        {current_category_name, current_category});
+    scenario_to_categories_[scenario_name].insert({current_category_name, current_category});
 
-    category_consecutive_frame_count_[scenario_name][current_category_name] =
-        0.0;
-    category_frame_count_[scenario_name][current_category_name] = 0.0;
-    current_progress_json_[scenario_name][current_category_name] = 0.0;
+    category_consecutive_frame_count_[scenario_name][current_category_name] = 0.0;
+    category_frame_count_[scenario_name][current_category_name]             = 0.0;
+    current_progress_json_[scenario_name][current_category_name]            = 0.0;
     return;
   }
 
@@ -165,17 +154,15 @@ void DataCollectionMonitor::ConstructCategoriesHelper(
     new_category.push_back(range);
 
     // set new category name by appending it with the current range name
-    std::string new_category_name(current_category_name);
+    std::string        new_category_name(current_category_name);
     const std::string& range_name = range.name();
     if (feature.range().size() > 1 && !range_name.empty()) {
-      if (!new_category_name.empty()) {
-        new_category_name += ", ";
-      }
+      if (!new_category_name.empty()) { new_category_name += ", "; }
       new_category_name += range_name;
     }
 
-    ConstructCategoriesHelper(scenario_name, scenario, feature_idx + 1,
-                              new_category_name, new_category);
+    ConstructCategoriesHelper(scenario_name, scenario, feature_idx + 1, new_category_name,
+                              new_category);
   }
 }
 
@@ -195,24 +182,20 @@ void DataCollectionMonitor::Stop() {
 }
 
 void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
-  if (!enabled_) {
-    return;
-  }
+  if (!enabled_) { return; }
 
   const size_t frame_threshold = data_collection_table_.frame_threshold();
-  const auto total_frames = data_collection_table_.total_frames();
+  const auto   total_frames    = data_collection_table_.total_frames();
   for (const auto& scenario_iter : scenario_to_categories_) {
     const std::string& scenario_name = scenario_iter.first;
-    const auto& categories = scenario_iter.second;
+    const auto&        categories    = scenario_iter.second;
 
     for (const auto& category_iter : categories) {
       const std::string& category_name = category_iter.first;
-      const Category& category = category_iter.second;
+      const Category&    category      = category_iter.second;
 
       // This category is done, skip
-      if (category_frame_count_[scenario_name][category_name] >= total_frames) {
-        continue;
-      }
+      if (category_frame_count_[scenario_name][category_name] >= total_frames) { continue; }
 
       if (!IsCompliedWithCriteria(chassis, category)) {
         category_consecutive_frame_count_[scenario_name][category_name] = 0;
@@ -223,30 +206,26 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
       const size_t consecutive_count =
           ++category_consecutive_frame_count_[scenario_name][category_name];
       if (consecutive_count == frame_threshold) {
-        category_frame_count_[scenario_name][category_name] +=
-            consecutive_count;
+        category_frame_count_[scenario_name][category_name] += consecutive_count;
       } else if (consecutive_count >= frame_threshold) {
         category_frame_count_[scenario_name][category_name] += 1;
       }
 
       // Update category progress
       const double progress_percentage =
-          100.0 *
-          static_cast<double>(
-              category_frame_count_[scenario_name][category_name]) /
+          100.0 * static_cast<double>(category_frame_count_[scenario_name][category_name]) /
           static_cast<double>(total_frames);
       {
         boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-        current_progress_json_[scenario_name][category_name] =
-            progress_percentage;
+        current_progress_json_[scenario_name][category_name] = progress_percentage;
       }
     }
   }
 }
 
-bool DataCollectionMonitor::IsCompliedWithCriteria(
-    const std::shared_ptr<Chassis>& chassis, const Category& category) {
-  const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
+bool DataCollectionMonitor::IsCompliedWithCriteria(const std::shared_ptr<Chassis>& chassis,
+                                                   const Category&                 category) {
+  const auto& vehicle_param            = VehicleConfigHelper::GetConfig().vehicle_param();
   const auto* vehicle_param_descriptor = vehicle_param.GetDescriptor();
   const auto* vehicle_param_reflection = vehicle_param.GetReflection();
 
@@ -258,22 +237,19 @@ bool DataCollectionMonitor::IsCompliedWithCriteria(
       float target_value;
       if (criterion.has_value()) {
         target_value = criterion.value();
-      } else if (!GetProtobufFloatByFieldName(
-                     vehicle_param, vehicle_param_descriptor,
-                     vehicle_param_reflection, criterion.vehicle_config(),
-                     &target_value)) {
+      } else if (!GetProtobufFloatByFieldName(vehicle_param, vehicle_param_descriptor,
+                                              vehicle_param_reflection, criterion.vehicle_config(),
+                                              &target_value)) {
         return false;
       }
 
       float actual_value;
-      if (!GetProtobufFloatByFieldName(*chassis, chassis_descriptor,
-                                       chassis_reflection, criterion.field(),
-                                       &actual_value)) {
+      if (!GetProtobufFloatByFieldName(*chassis, chassis_descriptor, chassis_reflection,
+                                       criterion.field(), &actual_value)) {
         return false;
       }
 
-      if (!IsCompliedWithCriterion(
-              actual_value, criterion.comparison_operator(), target_value)) {
+      if (!IsCompliedWithCriterion(actual_value, criterion.comparison_operator(), target_value)) {
         return false;
       }
     }

@@ -22,38 +22,32 @@ namespace hdmap {
 
 StaticAlign::StaticAlign(std::shared_ptr<JsonConf> sp_conf)
     : Alignment(sp_conf) {
-  sp_conf_ = sp_conf;
+  sp_conf_                    = sp_conf;
   static_align_detect_method_ = StaticAlignDetectMethod::DYNAMIC_CENTROID;
   Reset();
 }
 
 void StaticAlign::Reset() {
-  progress_ = 0.0;
-  last_progress_ = 0.0;
-  start_time_ = -1.0;
-  end_time_ = -1.0;
-  start_index_ = -1;
-  end_index_ = -1;
-  sp_bad_pose_info_ = std::make_shared<BadOrGoodPoseInfo>();
+  progress_          = 0.0;
+  last_progress_     = 0.0;
+  start_time_        = -1.0;
+  end_time_          = -1.0;
+  start_index_       = -1;
+  end_index_         = -1;
+  sp_bad_pose_info_  = std::make_shared<BadOrGoodPoseInfo>();
   sp_good_pose_info_ = std::make_shared<BadOrGoodPoseInfo>();
-  dynamic_centroid_ = Centroid3D();
+  dynamic_centroid_  = Centroid3D();
 }
 
 bool StaticAlign::IsStaticPose(const FramePose& pose) {
-  if (dynamic_centroid_.count == 0) {
-    return true;
-  }
+  if (dynamic_centroid_.count == 0) { return true; }
   double move_dist_x = pose.tx - dynamic_centroid_.center.x;
   double move_dist_y = pose.ty - dynamic_centroid_.center.y;
   double move_dist_z = pose.tz - dynamic_centroid_.center.z;
   double move_dist =
-      std::sqrt(move_dist_x * move_dist_x + move_dist_y * move_dist_y +
-                move_dist_z * move_dist_z);
-  AINFO << "dist thresh: " << sp_conf_->static_align_dist_thresh
-        << ", dist: " << move_dist;
-  if (move_dist <= sp_conf_->static_align_dist_thresh) {
-    return true;
-  }
+      std::sqrt(move_dist_x * move_dist_x + move_dist_y * move_dist_y + move_dist_z * move_dist_z);
+  AINFO << "dist thresh: " << sp_conf_->static_align_dist_thresh << ", dist: " << move_dist;
+  if (move_dist <= sp_conf_->static_align_dist_thresh) { return true; }
   return false;
 }
 
@@ -72,7 +66,7 @@ void StaticAlign::UpdateDynamicCentroid(const FramePose& pose) {
   double z = dynamic_centroid_.center.z * count + pose.tz;
   ++count;
 
-  dynamic_centroid_.count = count;
+  dynamic_centroid_.count    = count;
   dynamic_centroid_.center.x = x / count;
   dynamic_centroid_.center.y = y / count;
   dynamic_centroid_.center.z = z / count;
@@ -85,12 +79,9 @@ double StaticAlign::GetCentroidTimeDuring() {
   return 0.0;
 }
 
-void StaticAlign::UpdateGoodPoseInfo(const FramePose& pose) {
-  UpdateDynamicCentroid(pose);
-}
+void StaticAlign::UpdateGoodPoseInfo(const FramePose& pose) { UpdateDynamicCentroid(pose); }
 
-double StaticAlign::StaticAlignDynamicCentroid(
-    const std::vector<FramePose>& poses) {
+double StaticAlign::StaticAlignDynamicCentroid(const std::vector<FramePose>& poses) {
   int start_index = TimeToIndex(poses, start_time_);
   AINFO << "start_index:" << start_index << ",pose size:" << poses.size();
   dynamic_centroid_ = Centroid3D();
@@ -110,9 +101,7 @@ double StaticAlign::StaticAlignDynamicCentroid(
   }
 
   double progress = GetCentroidTimeDuring() / sp_conf_->static_align_duration;
-  if (progress > 1.0) {
-    progress = 1.0;
-  }
+  if (progress > 1.0) { progress = 1.0; }
   return progress;
 }
 
@@ -121,18 +110,14 @@ double StaticAlign::StaticAlignRansac(const std::vector<FramePose>& poses) {
   return 0.0;
 }
 
-double StaticAlign::GetStaticAlignProgress(
-    const std::vector<FramePose>& poses) {
+double StaticAlign::GetStaticAlignProgress(const std::vector<FramePose>& poses) {
   double progress = 0.0;
   switch (static_align_detect_method_) {
     case StaticAlignDetectMethod::DYNAMIC_CENTROID:
       progress = StaticAlignDynamicCentroid(poses);
       break;
-    case StaticAlignDetectMethod::RANSAC:
-      progress = StaticAlignRansac(poses);
-      break;
-    default:
-      break;
+    case StaticAlignDetectMethod::RANSAC: progress = StaticAlignRansac(poses); break;
+    default: break;
   }
   ClearGoodPoseInfo();
   return progress;

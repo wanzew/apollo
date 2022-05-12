@@ -100,10 +100,10 @@ TEST_F(MeanFilterTest, SameNumber) {
 
 TEST_F(MeanFilterTest, LargeNumber) {
   MeanFilter mean_filter(10);
-  double ret = 0.0;
+  double     ret = 0.0;
   for (int i = 0; i < 100; ++i) {
     double input = static_cast<double>(i);
-    ret = mean_filter.Update(input);
+    ret          = mean_filter.Update(input);
   }
   EXPECT_DOUBLE_EQ(ret, 94.5);
 }

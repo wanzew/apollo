@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/localization/msf/common/util/base_map_cache.h"
+
 #include <string>
 #include <vector>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -24,20 +26,19 @@ namespace msf {
 
 class NodeIndex {
  public:
-  NodeIndex() : m_(0), n_(0) {}
-  NodeIndex(int m, int n) : m_(m), n_(n) {}
+  NodeIndex()
+      : m_(0)
+      , n_(0) {}
+  NodeIndex(int m, int n)
+      : m_(m)
+      , n_(n) {}
 
  public:
   bool operator<(const NodeIndex& index) const {
-    return std::forward_as_tuple(m_, n_) <
-           std::forward_as_tuple(index.m_, index.n_);
+    return std::forward_as_tuple(m_, n_) < std::forward_as_tuple(index.m_, index.n_);
   }
-  bool operator==(const NodeIndex& index) const {
-    return m_ == index.m_ && n_ == index.n_;
-  }
-  bool operator!=(const NodeIndex& index) const {
-    return m_ != index.m_ || n_ != index.n_;
-  }
+  bool operator==(const NodeIndex& index) const { return m_ == index.m_ && n_ == index.n_; }
+  bool operator!=(const NodeIndex& index) const { return m_ != index.m_ || n_ != index.n_; }
 
  private:
   int m_;
@@ -46,19 +47,22 @@ class NodeIndex {
 
 class NodeData {
  public:
-  NodeData() : is_reserved_(false), name_("") {}
+  NodeData()
+      : is_reserved_(false)
+      , name_("") {}
   explicit NodeData(const std::string& name)
-      : is_reserved_(false), name_(name) {}
+      : is_reserved_(false)
+      , name_(name) {}
 
  public:
   void SetIsReserved(bool b) { is_reserved_ = b; }
   bool GetIsReserved() { return is_reserved_; }
 
-  void SetName(const std::string& name) { name_ = name; }
+  void        SetName(const std::string& name) { name_ = name; }
   std::string GetName() { return name_; }
 
  private:
-  bool is_reserved_;
+  bool        is_reserved_;
   std::string name_;
 };
 
@@ -69,14 +73,11 @@ class MapNodeCacheTest : public ::testing::Test {
  protected:
   void Init() {
     destroy_func_lvl1_ =
-        std::bind(MapNodeCache<NodeIndex, NodeData>::CacheL1Destroy,
-                  std::placeholders::_1);
+        std::bind(MapNodeCache<NodeIndex, NodeData>::CacheL1Destroy, std::placeholders::_1);
     destroy_func_lvl2_ =
-        std::bind(MapNodeCache<NodeIndex, NodeData>::CacheL2Destroy,
-                  std::placeholders::_1);
+        std::bind(MapNodeCache<NodeIndex, NodeData>::CacheL2Destroy, std::placeholders::_1);
 
-    map_node_cache_lvl_.reset(
-        new MapNodeCache<NodeIndex, NodeData>(3, destroy_func_lvl1_));
+    map_node_cache_lvl_.reset(new MapNodeCache<NodeIndex, NodeData>(3, destroy_func_lvl1_));
 
     std::string name_a("aaa");
     std::string name_b("bbb");
@@ -89,8 +90,8 @@ class MapNodeCacheTest : public ::testing::Test {
     node_pool_.push_back(std::make_pair(NodeIndex(4, 5), NodeData(name_d)));
   }
 
-  MapNodeCache<NodeIndex, NodeData>::DestroyFunc destroy_func_lvl1_;
-  MapNodeCache<NodeIndex, NodeData>::DestroyFunc destroy_func_lvl2_;
+  MapNodeCache<NodeIndex, NodeData>::DestroyFunc     destroy_func_lvl1_;
+  MapNodeCache<NodeIndex, NodeData>::DestroyFunc     destroy_func_lvl2_;
   std::unique_ptr<MapNodeCache<NodeIndex, NodeData>> map_node_cache_lvl_;
 
   std::vector<std::pair<NodeIndex, NodeData>> node_pool_;

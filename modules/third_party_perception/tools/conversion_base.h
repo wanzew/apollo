@@ -30,14 +30,14 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion_base {
 
-std::map<std::int32_t, apollo::hdmap::LaneBoundaryType_Type>
-    lane_conversion_map = {{0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
-                           {1, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
-                           {2, apollo::hdmap::LaneBoundaryType::UNKNOWN},
-                           {3, apollo::hdmap::LaneBoundaryType::CURB},
-                           {4, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
-                           {5, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
-                           {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
+std::map<std::int32_t, apollo::hdmap::LaneBoundaryType_Type> lane_conversion_map = {
+    {0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
+    {1, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
+    {2, apollo::hdmap::LaneBoundaryType::UNKNOWN},
+    {3, apollo::hdmap::LaneBoundaryType::CURB},
+    {4, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
+    {5, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
+    {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
 
 }  // namespace conversion_base
 }  // namespace third_party_perception

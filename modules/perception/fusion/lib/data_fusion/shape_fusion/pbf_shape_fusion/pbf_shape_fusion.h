@@ -27,19 +27,19 @@ namespace fusion {
 
 class PbfShapeFusion : public BaseShapeFusion {
  public:
-  explicit PbfShapeFusion(TrackPtr track) : BaseShapeFusion(track) {}
+  explicit PbfShapeFusion(TrackPtr track)
+      : BaseShapeFusion(track) {}
   virtual ~PbfShapeFusion() {}
   PbfShapeFusion(const PbfShapeFusion&) = delete;
   PbfShapeFusion& operator=(const PbfShapeFusion&) = delete;
 
   bool Init() override;
 
-  void UpdateWithMeasurement(const SensorObjectPtr measurement,
-                             double target_timestamp) override;
+  void UpdateWithMeasurement(const SensorObjectPtr measurement, double target_timestamp) override;
 
   void UpdateWithoutMeasurement(const std::string& sensor_id,
-                                double measurement_timestamp,
-                                double target_timestamp) override;
+                                double             measurement_timestamp,
+                                double             target_timestamp) override;
 
   std::string Name() const override;
 
@@ -51,7 +51,7 @@ class PbfShapeFusion : public BaseShapeFusion {
   void UpdateShape(const SensorObjectConstPtr& measurement);
   void UpdateCenter(const SensorObjectConstPtr& measurement);
 
-  static bool s_use_camera_3d_;
+  static bool  s_use_camera_3d_;
   static float s_camera_radar_time_diff_th_;
 };
 

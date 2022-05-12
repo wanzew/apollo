@@ -21,11 +21,12 @@
 
 #include <string>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -42,62 +43,50 @@ using apollo::common::TrajectoryPoint;
 using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 
-Stage::StageStatus StopSignUnprotectedStageCreep::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus
+StopSignUnprotectedStageCreep::Process(const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  if (!config_.enabled()) {
-    return FinishStage();
-  }
+  if (!config_.enabled()) { return FinishStage(); }
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StopSignUnprotectedStageCreep planning error";
-  }
+  if (!plan_ok) { AERROR << "StopSignUnprotectedStageCreep planning error"; }
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
   std::string stop_sign_overlap_id = GetContext()->current_stop_sign_overlap_id;
 
   // get overlap along reference line
-  PathOverlap* current_stop_sign_overlap =
-      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
-                                                stop_sign_overlap_id,
-                                                ReferenceLineInfo::STOP_SIGN);
-  if (!current_stop_sign_overlap) {
-    return FinishScenario();
-  }
+  PathOverlap* current_stop_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
+      reference_line_info, stop_sign_overlap_id, ReferenceLineInfo::STOP_SIGN);
+  if (!current_stop_sign_overlap) { return FinishScenario(); }
 
   // set right_of_way_status
   const double stop_sign_start_s = current_stop_sign_overlap->start_s;
   reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
 
   const double stop_sign_end_s = current_stop_sign_overlap->end_s;
-  const double wait_time =
-      Clock::NowInSeconds() - GetContext()->creep_start_time;
-  const double timeout_sec = scenario_config_.creep_timeout_sec();
-  auto* task = dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER));
+  const double wait_time       = Clock::NowInSeconds() - GetContext()->creep_start_time;
+  const double timeout_sec     = scenario_config_.creep_timeout_sec();
+  auto*        task            = dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER));
 
   if (task == nullptr) {
     AERROR << "task is nullptr";
     return FinishStage();
   }
 
-  double creep_stop_s =
-      stop_sign_end_s + task->FindCreepDistance(*frame, reference_line_info);
-  const double distance =
-      creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
+  double creep_stop_s   = stop_sign_end_s + task->FindCreepDistance(*frame, reference_line_info);
+  const double distance = creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
   if (distance <= 0.0) {
     auto& rfl_info = frame->mutable_reference_line_info()->front();
     *(rfl_info.mutable_speed_data()) =
         SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(0.0, 0);
   }
 
-  if (task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s,
-                           wait_time, timeout_sec)) {
+  if (task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s, wait_time, timeout_sec)) {
     return FinishStage();
   }
 

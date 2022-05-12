@@ -31,7 +31,7 @@ class SpeedLimitTest : public ::testing::Test {
     speed_limit_.Clear();
     for (int i = 0; i < 100; ++i) {
       std::pair<double, double> sp;
-      sp.first = i * 1.0;
+      sp.first  = i * 1.0;
       sp.second = (i % 2 == 0) ? 5.0 : 10.0;
       speed_limit_.AppendSpeedLimit(sp.first, sp.second);
     }
@@ -49,17 +49,15 @@ TEST_F(SpeedLimitTest, SimpleSpeedLimitCreation) {
 
 TEST_F(SpeedLimitTest, GetSpeedLimitByS) {
   EXPECT_EQ(speed_limit_.speed_limit_points().size(), 100);
-  double s = 0.0;
+  double       s  = 0.0;
   const double ds = 0.01;
   while (s < 99.0) {
     double v_limit = speed_limit_.GetSpeedLimitByS(s);
 
-    auto it_lower = std::lower_bound(
-        speed_limit_.speed_limit_points().begin(),
-        speed_limit_.speed_limit_points().end(), s,
-        [](const std::pair<double, double>& point, const double curr_s) {
-          return point.first < curr_s;
-        });
+    auto it_lower = std::lower_bound(speed_limit_.speed_limit_points().begin(),
+                                     speed_limit_.speed_limit_points().end(), s,
+                                     [](const std::pair<double, double>& point,
+                                        const double curr_s) { return point.first < curr_s; });
 
     EXPECT_DOUBLE_EQ(v_limit, it_lower->second);
     s += ds;

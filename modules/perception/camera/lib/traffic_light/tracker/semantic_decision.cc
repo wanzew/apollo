@@ -18,37 +18,35 @@
 #include <map>
 
 #include "boost/bind.hpp"
+
 #include "cyber/common/file.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-std::map<base::TLColor, std::string> s_color_strs = {
-    {base::TLColor::TL_UNKNOWN_COLOR, "unknown"},
-    {base::TLColor::TL_RED, "red"},
-    {base::TLColor::TL_GREEN, "green"},
-    {base::TLColor::TL_YELLOW, "yellow"},
-    {base::TLColor::TL_BLACK, "black"}};
+std::map<base::TLColor, std::string> s_color_strs = {{base::TLColor::TL_UNKNOWN_COLOR, "unknown"},
+                                                     {base::TLColor::TL_RED, "red"},
+                                                     {base::TLColor::TL_GREEN, "green"},
+                                                     {base::TLColor::TL_YELLOW, "yellow"},
+                                                     {base::TLColor::TL_BLACK, "black"}};
 
-bool compare(const SemanticTable &s1, const SemanticTable &s2) {
+bool compare(const SemanticTable& s1, const SemanticTable& s2) {
   return s1.semantic == s2.semantic;
 }
 
-bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
-  std::string proto_path =
-      cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
+bool SemanticReviser::Init(const TrafficLightTrackerInitOptions& options) {
+  std::string proto_path = cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
   if (!cyber::common::GetProtoFromFile(proto_path, &semantic_param_)) {
     AERROR << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }
 
-  int non_blink_coef = 2;
-  revise_time_s_ = semantic_param_.revise_time_second();
-  blink_threshold_s_ = semantic_param_.blink_threshold_second();
-  hysteretic_threshold_ = semantic_param_.hysteretic_threshold_count();
-  non_blink_threshold_s_ =
-      blink_threshold_s_ * static_cast<float>(non_blink_coef);
+  int non_blink_coef     = 2;
+  revise_time_s_         = semantic_param_.revise_time_second();
+  blink_threshold_s_     = semantic_param_.blink_threshold_second();
+  hysteretic_threshold_  = semantic_param_.hysteretic_threshold_count();
+  non_blink_threshold_s_ = blink_threshold_s_ * static_cast<float>(non_blink_coef);
 
   ADEBUG << "revise_time_s_: " << revise_time_s_;
   ADEBUG << "blink_threshold_s_: " << blink_threshold_s_;
@@ -57,9 +55,9 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
   return true;
 }
 
-void SemanticReviser::UpdateHistoryAndLights(
-    const SemanticTable &cur, std::vector<base::TrafficLightPtr> *lights,
-    std::vector<SemanticTable>::iterator *history) {
+void SemanticReviser::UpdateHistoryAndLights(const SemanticTable&                  cur,
+                                             std::vector<base::TrafficLightPtr>*   lights,
+                                             std::vector<SemanticTable>::iterator* history) {
   (*history)->time_stamp = cur.time_stamp;
   if ((*history)->color == base::TLColor::TL_BLACK) {
     if ((*history)->hystertic_window.hysteretic_color == cur.color) {
@@ -68,12 +66,12 @@ void SemanticReviser::UpdateHistoryAndLights(
       (*history)->hystertic_window.hysteretic_color = cur.color;
       (*history)->hystertic_window.hysteretic_count = 1;
     }
-    ADEBUG << "Black lights hysteretic change to " << s_color_strs[cur.color]
-           << " count " << (*history)->hystertic_window.hysteretic_count
-           << " threshold " << hysteretic_threshold_;
+    ADEBUG << "Black lights hysteretic change to " << s_color_strs[cur.color] << " count "
+           << (*history)->hystertic_window.hysteretic_count << " threshold "
+           << hysteretic_threshold_;
 
     if ((*history)->hystertic_window.hysteretic_count > hysteretic_threshold_) {
-      (*history)->color = cur.color;
+      (*history)->color                             = cur.color;
       (*history)->hystertic_window.hysteretic_count = 0;
       ADEBUG << "Black lights hysteretic change to " << s_color_strs[cur.color];
     } else {
@@ -84,16 +82,16 @@ void SemanticReviser::UpdateHistoryAndLights(
   }
 }
 
-base::TLColor SemanticReviser::ReviseBySemantic(
-    SemanticTable semantic_table, std::vector<base::TrafficLightPtr> *lights) {
-  std::vector<int> vote(static_cast<int>(base::TLColor::TL_TOTAL_COLOR_NUM), 0);
-  std::vector<base::TrafficLightPtr> &lights_ref = *lights;
-  base::TLColor max_color = base::TLColor::TL_UNKNOWN_COLOR;
+base::TLColor SemanticReviser::ReviseBySemantic(SemanticTable                       semantic_table,
+                                                std::vector<base::TrafficLightPtr>* lights) {
+  std::vector<int>                    vote(static_cast<int>(base::TLColor::TL_TOTAL_COLOR_NUM), 0);
+  std::vector<base::TrafficLightPtr>& lights_ref = *lights;
+  base::TLColor                       max_color  = base::TLColor::TL_UNKNOWN_COLOR;
 
   for (size_t i = 0; i < semantic_table.light_ids.size(); ++i) {
-    int index = semantic_table.light_ids.at(i);
+    int                   index = semantic_table.light_ids.at(i);
     base::TrafficLightPtr light = lights_ref[index];
-    auto color = light->status.color;
+    auto                  color = light->status.color;
     vote.at(static_cast<int>(color))++;
   }
 
@@ -107,13 +105,13 @@ base::TLColor SemanticReviser::ReviseBySemantic(
     }
   }
 
-  vote.at(static_cast<size_t>(base::TLColor::TL_BLACK)) = 0;
+  vote.at(static_cast<size_t>(base::TLColor::TL_BLACK))         = 0;
   vote.at(static_cast<size_t>(base::TLColor::TL_UNKNOWN_COLOR)) = 0;
 
   auto biggest = std::max_element(std::begin(vote), std::end(vote));
 
   int max_color_num = *biggest;
-  max_color = base::TLColor(std::distance(std::begin(vote), biggest));
+  max_color         = base::TLColor(std::distance(std::begin(vote), biggest));
 
   vote.erase(biggest);
 
@@ -128,28 +126,27 @@ base::TLColor SemanticReviser::ReviseBySemantic(
   }
 }
 
-void SemanticReviser::ReviseLights(std::vector<base::TrafficLightPtr> *lights,
-                                   const std::vector<int> &light_ids,
-                                   base::TLColor dst_color) {
+void SemanticReviser::ReviseLights(std::vector<base::TrafficLightPtr>* lights,
+                                   const std::vector<int>&             light_ids,
+                                   base::TLColor                       dst_color) {
   for (auto index : light_ids) {
     lights->at(index)->status.color = dst_color;
   }
 
-  ADEBUG << "revise " << light_ids.size() << " lights to "
-         << s_color_strs[dst_color];
+  ADEBUG << "revise " << light_ids.size() << " lights to " << s_color_strs[dst_color];
 }
 
-void SemanticReviser::ReviseByTimeSeries(
-    double time_stamp, SemanticTable semantic_table,
-    std::vector<base::TrafficLightPtr> *lights) {
+void SemanticReviser::ReviseByTimeSeries(double                              time_stamp,
+                                         SemanticTable                       semantic_table,
+                                         std::vector<base::TrafficLightPtr>* lights) {
   ADEBUG << "revise " << semantic_table.semantic
          << ", lights number:" << semantic_table.light_ids.size();
 
-  std::vector<base::TrafficLightPtr> &lights_ref = *lights;
-  base::TLColor cur_color = ReviseBySemantic(semantic_table, lights);
-  base::TLColor pre_color = base::TLColor::TL_UNKNOWN_COLOR;
-  semantic_table.color = cur_color;
-  semantic_table.time_stamp = time_stamp;
+  std::vector<base::TrafficLightPtr>& lights_ref = *lights;
+  base::TLColor                       cur_color  = ReviseBySemantic(semantic_table, lights);
+  base::TLColor                       pre_color  = base::TLColor::TL_UNKNOWN_COLOR;
+  semantic_table.color                           = cur_color;
+  semantic_table.time_stamp                      = time_stamp;
   ADEBUG << "revise same semantic lights";
   ReviseLights(lights, semantic_table.light_ids, cur_color);
 
@@ -165,7 +162,7 @@ void SemanticReviser::ReviseByTimeSeries(
         case base::TLColor::TL_YELLOW:
           if (iter->color == base::TLColor::TL_RED) {
             ReviseLights(lights, semantic_table.light_ids, iter->color);
-            iter->time_stamp = time_stamp;
+            iter->time_stamp                        = time_stamp;
             iter->hystertic_window.hysteretic_count = 0;
           } else {
             UpdateHistoryAndLights(semantic_table, lights, &iter);
@@ -183,7 +180,7 @@ void SemanticReviser::ReviseByTimeSeries(
           ADEBUG << "High confidence color " << s_color_strs[cur_color];
           break;
         case base::TLColor::TL_BLACK:
-          iter->last_dark_time_stamp = time_stamp;
+          iter->last_dark_time_stamp              = time_stamp;
           iter->hystertic_window.hysteretic_count = 0;
           if (iter->color == base::TLColor::TL_UNKNOWN_COLOR ||
               iter->color == base::TLColor::TL_BLACK) {
@@ -194,44 +191,38 @@ void SemanticReviser::ReviseByTimeSeries(
           }
           break;
         case base::TLColor::TL_UNKNOWN_COLOR:
-        default:
-          ReviseLights(lights, semantic_table.light_ids, iter->color);
-          break;
+        default: ReviseLights(lights, semantic_table.light_ids, iter->color); break;
       }
     } else {
       iter->time_stamp = time_stamp;
-      iter->color = cur_color;
+      iter->color      = cur_color;
     }
 
     // set blink status
     if (pre_color != iter->color ||
-        fabs(iter->last_dark_time_stamp - iter->last_bright_time_stamp) >
-            non_blink_threshold_s_) {
+        fabs(iter->last_dark_time_stamp - iter->last_bright_time_stamp) > non_blink_threshold_s_) {
       iter->blink = false;
     }
 
     for (auto index : semantic_table.light_ids) {
-      lights_ref[index]->status.blink =
-          (iter->blink && iter->color == base::TLColor::TL_GREEN);
+      lights_ref[index]->status.blink = (iter->blink && iter->color == base::TLColor::TL_GREEN);
     }
-    ADEBUG << "semantic " << semantic_table.semantic << " color "
-           << s_color_strs[iter->color] << " blink " << iter->blink << " cur "
-           << s_color_strs[cur_color];
+    ADEBUG << "semantic " << semantic_table.semantic << " color " << s_color_strs[iter->color]
+           << " blink " << iter->blink << " cur " << s_color_strs[cur_color];
     ADEBUG << "cur ts " << time_stamp;
     ADEBUG << "bri ts " << iter->last_bright_time_stamp;
     ADEBUG << "dar ts " << iter->last_dark_time_stamp;
   } else {
-    semantic_table.last_dark_time_stamp = semantic_table.time_stamp;
+    semantic_table.last_dark_time_stamp   = semantic_table.time_stamp;
     semantic_table.last_bright_time_stamp = semantic_table.time_stamp;
     history_semantic_.push_back(semantic_table);
   }
 }
 
-bool SemanticReviser::Track(const TrafficLightTrackerOptions &options,
-                            CameraFrame *frame) {
-  double time_stamp = frame->timestamp;
-  std::vector<base::TrafficLightPtr> &lights_ref = frame->traffic_lights;
-  std::vector<SemanticTable> semantic_table;
+bool SemanticReviser::Track(const TrafficLightTrackerOptions& options, CameraFrame* frame) {
+  double                              time_stamp = frame->timestamp;
+  std::vector<base::TrafficLightPtr>& lights_ref = frame->traffic_lights;
+  std::vector<SemanticTable>          semantic_table;
   ADEBUG << "start revise ";
 
   if (lights_ref.empty()) {
@@ -241,11 +232,11 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions &options,
   }
 
   for (size_t i = 0; i < lights_ref.size(); i++) {
-    base::TrafficLightPtr light = lights_ref.at(i);
-    int cur_semantic = light->semantic;
+    base::TrafficLightPtr light        = lights_ref.at(i);
+    int                   cur_semantic = light->semantic;
     ADEBUG << "light " << light->id << " semantic " << cur_semantic;
 
-    SemanticTable tmp;
+    SemanticTable     tmp;
     std::stringstream ss;
 
     if (cur_semantic > 0) {
@@ -256,12 +247,11 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions &options,
 
     tmp.semantic = ss.str();
     tmp.light_ids.push_back(static_cast<int>(i));
-    tmp.color = light->status.color;
+    tmp.color      = light->status.color;
     tmp.time_stamp = time_stamp;
-    tmp.blink = false;
-    auto iter =
-        std::find_if(std::begin(semantic_table), std::end(semantic_table),
-                     boost::bind(compare, _1, tmp));
+    tmp.blink      = false;
+    auto iter      = std::find_if(std::begin(semantic_table), std::end(semantic_table),
+                             boost::bind(compare, _1, tmp));
 
     if (iter != semantic_table.end()) {
       iter->light_ids.push_back(static_cast<int>(i));

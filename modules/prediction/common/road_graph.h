@@ -21,9 +21,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/prediction/proto/lane_graph.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -37,8 +38,9 @@ class RoadGraph {
    * @param If consider all successor lanes after dividing.
    * @param lane_info_ptr The starting lane.
    */
-  RoadGraph(const double start_s, const double length,
-            const bool consider_divide,
+  RoadGraph(const double                           start_s,
+            const double                           length,
+            const bool                             consider_divide,
             std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
 
   /**
@@ -58,7 +60,7 @@ class RoadGraph {
    * @return If the given lane ID and lane s is on the lane graph
    */
   bool IsOnLaneGraph(std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
-                     const LaneGraph& lane_graph);
+                     const LaneGraph&                       lane_graph);
 
  private:
   /** @brief Combine the lane-graph of forward direction and that of backward
@@ -81,22 +83,24 @@ class RoadGraph {
    * @param The vector of lane_segments visited (DFS).
    * @param The LaneGraph that we need to write in.
    */
-  void ConstructLaneSequence(
-      const bool search_forward_direction, const double accumulated_s,
-      const double curr_lane_seg_s,
-      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
-      const int graph_search_horizon, const bool consider_lane_split,
-      std::list<LaneSegment>* const lane_segments,
-      LaneGraph* const lane_graph_ptr) const;
+  void ConstructLaneSequence(const bool                             search_forward_direction,
+                             const double                           accumulated_s,
+                             const double                           curr_lane_seg_s,
+                             std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+                             const int                              graph_search_horizon,
+                             const bool                             consider_lane_split,
+                             std::list<LaneSegment>* const          lane_segments,
+                             LaneGraph* const                       lane_graph_ptr) const;
 
   /** @brief If direction unspecified, by default construct forward direction.
    */
-  void ConstructLaneSequence(
-      const double accumulated_s, const double curr_lane_seg_s,
-      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
-      const int graph_search_horizon, const bool consider_lane_split,
-      std::list<LaneSegment>* const lane_segments,
-      LaneGraph* const lane_graph_ptr) const;
+  void ConstructLaneSequence(const double                           accumulated_s,
+                             const double                           curr_lane_seg_s,
+                             std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+                             const int                              graph_search_horizon,
+                             const bool                             consider_lane_split,
+                             std::list<LaneSegment>* const          lane_segments,
+                             LaneGraph* const                       lane_graph_ptr) const;
 
  private:
   // The s of the obstacle on its own lane_segment.

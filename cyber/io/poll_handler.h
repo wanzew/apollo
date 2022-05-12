@@ -35,7 +35,7 @@ class PollHandler {
   bool Block(int timeout_ms, bool is_read);
   bool Unblock();
 
-  int fd() const { return fd_; }
+  int  fd() const { return fd_; }
   void set_fd(int fd) { fd_ = fd; }
 
  private:
@@ -43,11 +43,11 @@ class PollHandler {
   void Fill(int timeout_ms, bool is_read);
   void ResponseCallback(const PollResponse& rsp);
 
-  int fd_;
-  PollRequest request_;
-  PollResponse response_;
-  std::atomic<bool> is_read_;
-  std::atomic<bool> is_blocking_;
+  int                 fd_;
+  PollRequest         request_;
+  PollResponse        response_;
+  std::atomic<bool>   is_read_;
+  std::atomic<bool>   is_blocking_;
   croutine::CRoutine* routine_;
 };
 

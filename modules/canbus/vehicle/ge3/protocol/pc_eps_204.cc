@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_eps_204.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -58,8 +59,8 @@ Pceps204* Pceps204::set_pc_steerspdreq(int pc_steerspdreq) {
 // 'motorola', 'physical_unit': 'deg/s'}
 void Pceps204::set_p_pc_steerspdreq(uint8_t* data, int pc_steerspdreq) {
   pc_steerspdreq = ProtocolData::BoundedValue(0, 500, pc_steerspdreq);
-  int x = pc_steerspdreq;
-  uint8_t t = 0;
+  int     x      = pc_steerspdreq;
+  uint8_t t      = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 4);
@@ -71,8 +72,7 @@ void Pceps204::set_p_pc_steerspdreq(uint8_t* data, int pc_steerspdreq) {
   to_set1.set_value(t, 0, 8);
 }
 
-Pceps204* Pceps204::set_pc_steerenable(
-    Pc_eps_204::Pc_steerenableType pc_steerenable) {
+Pceps204* Pceps204::set_pc_steerenable(Pc_eps_204::Pc_steerenableType pc_steerenable) {
   pc_steerenable_ = pc_steerenable;
   return this;
 }
@@ -82,8 +82,7 @@ Pceps204* Pceps204::set_pc_steerenable(
 // 'len': 1, 'name': 'PC_SteerEnable', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pceps204::set_p_pc_steerenable(
-    uint8_t* data, Pc_eps_204::Pc_steerenableType pc_steerenable) {
+void Pceps204::set_p_pc_steerenable(uint8_t* data, Pc_eps_204::Pc_steerenableType pc_steerenable) {
   int x = pc_steerenable;
 
   Byte to_set(data + 0);
@@ -101,8 +100,8 @@ Pceps204* Pceps204::set_pc_steerangreq(double pc_steerangreq) {
 // 'motorola', 'physical_unit': 'deg'}
 void Pceps204::set_p_pc_steerangreq(uint8_t* data, double pc_steerangreq) {
   pc_steerangreq = ProtocolData::BoundedValue(-500.0, 500.0, pc_steerangreq);
-  int x = static_cast<int>((pc_steerangreq - -500.000000) / 0.100000);
-  uint8_t t = 0;
+  int     x      = static_cast<int>((pc_steerangreq - -500.000000) / 0.100000);
+  uint8_t t      = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 2);

@@ -62,9 +62,7 @@ class IndexedList {
    * @return the raw pointer to the object if found.
    * @return nullptr if the object is not found.
    */
-  T* Find(const I id) {
-    return apollo::common::util::FindOrNull(object_dict_, id);
-  }
+  T* Find(const I id) { return apollo::common::util::FindOrNull(object_dict_, id); }
 
   /**
    * @brief Find object by id in the container
@@ -72,9 +70,7 @@ class IndexedList {
    * @return the raw pointer to the object if found.
    * @return nullptr if the object is not found.
    */
-  const T* Find(const I id) const {
-    return apollo::common::util::FindOrNull(object_dict_, id);
-  }
+  const T* Find(const I id) const { return apollo::common::util::FindOrNull(object_dict_, id); }
 
   /**
    * @brief List all the items in the container.
@@ -101,7 +97,7 @@ class IndexedList {
   }
 
  private:
-  std::vector<const T*> object_list_;
+  std::vector<const T*>    object_list_;
   std::unordered_map<I, T> object_dict_;
 };
 

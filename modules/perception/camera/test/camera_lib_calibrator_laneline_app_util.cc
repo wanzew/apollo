@@ -36,30 +36,24 @@ namespace obstacle {
 //   change_suffix(path, suffix, file_path_changed);
 // }
 
-bool load_filename(std::string path, std::string suffix,
-                   std::vector<std::string> *name_list) {
+bool load_filename(std::string path, std::string suffix, std::vector<std::string>* name_list) {
   assert(name_list != nullptr);
   name_list->clear();
   boost::filesystem::directory_iterator end_itr;
   boost::filesystem::directory_iterator iter(path);
-  boost::filesystem::path file;
+  boost::filesystem::path               file;
   while (iter != end_itr) {
     file = *iter;
     if (!suffix.empty()) {
       std::string extension = file.extension().string();
-      std::transform(extension.begin(), extension.end(), extension.begin(),
-                     ::tolower);
-      if (extension != suffix) {
-        continue;
-      }
+      std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+      if (extension != suffix) { continue; }
     }
     std::string filename = file.string();
     name_list->push_back(filename);
     iter++;
   }
-  if (name_list->size() == 0) {
-    return false;
-  }
+  if (name_list->size() == 0) { return false; }
   std::sort(name_list->begin(), name_list->end());  // in dictionary order
   return true;
 }
@@ -78,8 +72,7 @@ bool load_filename(std::string path, std::string suffix,
 //   return true;
 // }
 
-bool load_ref_camera_k_mat(const std::string &filename, float k_mat[9], int *w,
-                           int *h) {
+bool load_ref_camera_k_mat(const std::string& filename, float k_mat[9], int* w, int* h) {
   std::fstream fin(filename);
   if (!fin.is_open()) {
     std::cerr << "Fail to load the camera k matrix: " << filename << std::endl;
@@ -89,8 +82,8 @@ bool load_ref_camera_k_mat(const std::string &filename, float k_mat[9], int *w,
   fin >> wh_flt[0] >> wh_flt[1];
   *w = common::IRound(wh_flt[0]);
   *h = common::IRound(wh_flt[1]);
-  fin >> k_mat[0] >> k_mat[1] >> k_mat[2] >> k_mat[3] >> k_mat[4] >> k_mat[5] >>
-      k_mat[6] >> k_mat[7] >> k_mat[8];
+  fin >> k_mat[0] >> k_mat[1] >> k_mat[2] >> k_mat[3] >> k_mat[4] >> k_mat[5] >> k_mat[6] >>
+      k_mat[7] >> k_mat[8];
   fin.close();
   return true;
 }
@@ -117,12 +110,14 @@ bool load_ref_camera_k_mat(const std::string &filename, float k_mat[9], int *w,
 //   }
 // }
 
-void write_text_on_image(cv::Mat *image, float left, float top,
-                         const char *text, const CvFont &font,
-                         const cv::Scalar &color) {
+void write_text_on_image(cv::Mat*          image,
+                         float             left,
+                         float             top,
+                         const char*       text,
+                         const CvFont&     font,
+                         const cv::Scalar& color) {
   IplImage ipl_img = *image;
-  cvPutText(&ipl_img, text, cvPoint(common::IRound(left), common::IRound(top)),
-            &font, color);
+  cvPutText(&ipl_img, text, cvPoint(common::IRound(left), common::IRound(top)), &font, color);
 }
 
 // void add_noise_to_vector_radius(float *x, int n, float radius, bool set_seed)

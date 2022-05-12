@@ -25,7 +25,7 @@ class ScenarioAnalyzerTest : public KMLMapBasedTest {};
 
 TEST_F(ScenarioAnalyzerTest, unknown) {
   EnvironmentFeatures environment_features;
-  auto ptr_scenario_features = ScenarioAnalyzer::Analyze(environment_features);
+  auto                ptr_scenario_features = ScenarioAnalyzer::Analyze(environment_features);
   EXPECT_EQ(ptr_scenario_features->scenario().type(), Scenario::UNKNOWN);
 }
 

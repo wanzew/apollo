@@ -18,23 +18,22 @@
 
 #include <memory>
 
-#include "cyber/component/component.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/drivers/tools/image_decompress/proto/config.pb.h"
+
+#include "cyber/component/component.h"
 
 namespace apollo {
 namespace image_decompress {
 
-class ImageDecompressComponent final
-    : public cyber::Component<apollo::drivers::CompressedImage> {
+class ImageDecompressComponent final : public cyber::Component<apollo::drivers::CompressedImage> {
  public:
   bool Init() override;
-  bool Proc(
-      const std::shared_ptr<apollo::drivers::CompressedImage>& image) override;
+  bool Proc(const std::shared_ptr<apollo::drivers::CompressedImage>& image) override;
 
  private:
   std::shared_ptr<cyber::Writer<apollo::drivers::Image>> writer_;
-  Config config_;
+  Config                                                 config_;
 };
 
 CYBER_REGISTER_COMPONENT(ImageDecompressComponent)

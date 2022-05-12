@@ -28,7 +28,7 @@ class FreeCamera : public AbstractCamera {
   virtual void UpdateWorld(void);
 
   const QVector3D& tanslation(void) { return translation_; }
-  void set_translation(const QVector3D& t) { translation_ = t; }
+  void             set_translation(const QVector3D& t) { translation_ = t; }
 
   void Walk(const float dt) { translation_ += (look_ * dt); }
   void Starfe(const float dt) { translation_ += (right_ * dt); }

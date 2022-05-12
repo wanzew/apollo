@@ -23,13 +23,11 @@ namespace camera {
 
 template <typename Dtype>
 inline Dtype sigmoid(Dtype x) {
-  return static_cast<Dtype>(1.0) /
-         static_cast<Dtype>(1.0 + exp(static_cast<double>(-x)));
+  return static_cast<Dtype>(1.0) / static_cast<Dtype>(1.0 + exp(static_cast<double>(-x)));
 }
 template <typename Dtype>
 inline Dtype gaussian(Dtype x, Dtype mu, Dtype sigma) {
-  return static_cast<Dtype>(
-      std::exp(-(x - mu) * (x - mu) / (2 * sigma * sigma)));
+  return static_cast<Dtype>(std::exp(-(x - mu) * (x - mu) / (2 * sigma * sigma)));
 }
 template <typename Dtype>
 Dtype sqr(Dtype x) {

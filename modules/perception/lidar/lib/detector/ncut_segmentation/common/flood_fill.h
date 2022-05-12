@@ -29,36 +29,35 @@ class FloodFill {
  public:
   FloodFill() = default;
   FloodFill(float grid_radius, float cell_size)
-      : _grid_radius(grid_radius), _cell_size(cell_size) {}
-  void GetSegments(base::PointFCloudConstPtr cloud,
+      : _grid_radius(grid_radius)
+      , _cell_size(cell_size) {}
+  void GetSegments(base::PointFCloudConstPtr      cloud,
                    std::vector<std::vector<int>>* segments_indices,
-                   std::vector<int>* num_cells_per_segment);
+                   std::vector<int>*              num_cells_per_segment);
   // The grids at the boundary are valid.
-  int Pos(float x, float y) const;
-  bool Pos2d(float x, float y, int* irow, int* jcol) const;
-  void BuildGrid(base::PointFCloudConstPtr cloud);
-  void SetGridRadius(float grid_radius) { _grid_radius = grid_radius; }
-  void SetCellSize(float cell_size) { _cell_size = cell_size; }
-  int GetNumRows() const { return _grid_num_rows; }
-  int GetNumCols() const { return _grid_num_cols; }
-  int GetNumCells() const { return _grid_size; }
-  const std::vector<int>& GetPointIdxInGrid() const {
-    return _point_cloud_grid_idx;
-  }
+  int                     Pos(float x, float y) const;
+  bool                    Pos2d(float x, float y, int* irow, int* jcol) const;
+  void                    BuildGrid(base::PointFCloudConstPtr cloud);
+  void                    SetGridRadius(float grid_radius) { _grid_radius = grid_radius; }
+  void                    SetCellSize(float cell_size) { _cell_size = cell_size; }
+  int                     GetNumRows() const { return _grid_num_rows; }
+  int                     GetNumCols() const { return _grid_num_cols; }
+  int                     GetNumCells() const { return _grid_size; }
+  const std::vector<int>& GetPointIdxInGrid() const { return _point_cloud_grid_idx; }
 
  private:
-  bool IsValidRowIndex(int i) const { return (i >= 0 && i < _grid_num_rows); }
-  bool IsValidColIndex(int j) const { return (j >= 0 && j < _grid_num_cols); }
-  int GetConnectedComponents();
-  void DfsColoring(int i, int j, int curr_component);
-  float _grid_radius = 0.0;
-  float _cell_size = 0.0;
-  float _offset_x = 0.0;
-  float _offset_y = 0.0;
-  int _grid_num_rows = 0;
-  int _grid_num_cols = 0;
-  int _grid_size = 0;
-  int _num_points = 0;
+  bool             IsValidRowIndex(int i) const { return (i >= 0 && i < _grid_num_rows); }
+  bool             IsValidColIndex(int j) const { return (j >= 0 && j < _grid_num_cols); }
+  int              GetConnectedComponents();
+  void             DfsColoring(int i, int j, int curr_component);
+  float            _grid_radius   = 0.0;
+  float            _cell_size     = 0.0;
+  float            _offset_x      = 0.0;
+  float            _offset_y      = 0.0;
+  int              _grid_num_rows = 0;
+  int              _grid_num_cols = 0;
+  int              _grid_size     = 0;
+  int              _num_points    = 0;
   std::vector<int> _point_cloud_grid_idx;
   std::vector<int> _label;
 };

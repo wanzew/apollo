@@ -30,10 +30,10 @@ namespace data {
 auto channel0 = common::Hash("/channel0");
 
 TEST(ChannelBufferTest, Fetch) {
-  auto cache_buffer = new CacheBuffer<std::shared_ptr<int>>(2);
-  auto buffer = std::make_shared<ChannelBuffer<int>>(channel0, cache_buffer);
+  auto                 cache_buffer = new CacheBuffer<std::shared_ptr<int>>(2);
+  auto                 buffer       = std::make_shared<ChannelBuffer<int>>(channel0, cache_buffer);
   std::shared_ptr<int> msg;
-  uint64_t index = 0;
+  uint64_t             index = 0;
   EXPECT_FALSE(buffer->Fetch(&index, msg));
   buffer->Buffer()->Fill(std::make_shared<int>(1));
   EXPECT_TRUE(buffer->Fetch(&index, msg));
@@ -53,8 +53,8 @@ TEST(ChannelBufferTest, Fetch) {
 }
 
 TEST(ChannelBufferTest, Latest) {
-  auto cache_buffer = new CacheBuffer<std::shared_ptr<int>>(10);
-  auto buffer = std::make_shared<ChannelBuffer<int>>(channel0, cache_buffer);
+  auto                 cache_buffer = new CacheBuffer<std::shared_ptr<int>>(10);
+  auto                 buffer       = std::make_shared<ChannelBuffer<int>>(channel0, cache_buffer);
   std::shared_ptr<int> msg;
   EXPECT_FALSE(buffer->Latest(msg));
 
@@ -71,7 +71,7 @@ TEST(ChannelBufferTest, Latest) {
 
 TEST(ChannelBufferTest, FetchMulti) {
   auto cache_buffer = new CacheBuffer<std::shared_ptr<int>>(2);
-  auto buffer = std::make_shared<ChannelBuffer<int>>(channel0, cache_buffer);
+  auto buffer       = std::make_shared<ChannelBuffer<int>>(channel0, cache_buffer);
   std::vector<std::shared_ptr<int>> vector;
   EXPECT_FALSE(buffer->FetchMulti(1, &vector));
   buffer->Buffer()->Fill(std::make_shared<int>(1));

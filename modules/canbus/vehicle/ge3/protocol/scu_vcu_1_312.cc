@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_vcu_1_312.h"
+
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -28,41 +30,28 @@ using ::apollo::drivers::canbus::Byte;
 Scuvcu1312::Scuvcu1312() {}
 const int32_t Scuvcu1312::ID = 0x312;
 
-void Scuvcu1312::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
+void Scuvcu1312::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_elcsysfault(
       vcu_elcsysfault(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_brkpedst(
-      vcu_brkpedst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_intidx(
-      vcu_intidx(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_brkpedst(vcu_brkpedst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_intidx(vcu_intidx(bytes, length));
   chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearintidx(
       vcu_gearintidx(bytes, length));
   chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_geardrvmode(
       vcu_geardrvmode(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_accpedact(
-      vcu_accpedact(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_brkpedpst(
-      vcu_brkpedpst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_vehrng(
-      vcu_vehrng(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_accpedpst(
-      vcu_accpedpst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_vehrdyst(
-      vcu_vehrdyst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_faultst(
-      vcu_faultst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_drvmode(
-      vcu_drvmode(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearpst(
-      vcu_gearpst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_accpedact(vcu_accpedact(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_brkpedpst(vcu_brkpedpst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_vehrng(vcu_vehrng(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_accpedpst(vcu_accpedpst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_vehrdyst(vcu_vehrdyst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_faultst(vcu_faultst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_drvmode(vcu_drvmode(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearpst(vcu_gearpst(bytes, length));
   chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearfaultst(
       vcu_gearfaultst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearact(
-      vcu_gearact(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearact(vcu_gearact(bytes, length));
   // newcode
-  chassis->mutable_check_response()->set_is_vcu_online(
-      vcu_drvmode(bytes, length) == 3);
+  chassis->mutable_check_response()->set_is_vcu_online(vcu_drvmode(bytes, length) == 3);
 }
 
 // config detail: {'description': 'Gear fault status', 'enum': {0:
@@ -70,13 +59,12 @@ void Scuvcu1312::Parse(const std::uint8_t* bytes, int32_t length,
 // 'len': 1, 'name': 'vcu_elcsysfault', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|0]', 'bit': 49, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_elcsysfaultType Scuvcu1312::vcu_elcsysfault(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 6);
+Scu_vcu_1_312::Vcu_elcsysfaultType Scuvcu1312::vcu_elcsysfault(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_vcu_1_312::Vcu_elcsysfaultType ret =
-      static_cast<Scu_vcu_1_312::Vcu_elcsysfaultType>(x);
+  Scu_vcu_1_312::Vcu_elcsysfaultType ret = static_cast<Scu_vcu_1_312::Vcu_elcsysfaultType>(x);
   return ret;
 }
 
@@ -85,13 +73,12 @@ Scu_vcu_1_312::Vcu_elcsysfaultType Scuvcu1312::vcu_elcsysfault(
 // 'len': 1, 'name': 'vcu_brkpedst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 48, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_brkpedstType Scuvcu1312::vcu_brkpedst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 6);
+Scu_vcu_1_312::Vcu_brkpedstType Scuvcu1312::vcu_brkpedst(const std::uint8_t* bytes,
+                                                         int32_t             length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 1);
 
-  Scu_vcu_1_312::Vcu_brkpedstType ret =
-      static_cast<Scu_vcu_1_312::Vcu_brkpedstType>(x);
+  Scu_vcu_1_312::Vcu_brkpedstType ret = static_cast<Scu_vcu_1_312::Vcu_brkpedstType>(x);
   return ret;
 }
 
@@ -102,12 +89,11 @@ Scu_vcu_1_312::Vcu_brkpedstType Scuvcu1312::vcu_brkpedst(
 // 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 58, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
 Scu_vcu_1_312::Vcu_intidxType Scuvcu1312::vcu_intidx(const std::uint8_t* bytes,
-                                                     int32_t length) const {
-  Byte t0(bytes + 7);
+                                                     int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 3);
 
-  Scu_vcu_1_312::Vcu_intidxType ret =
-      static_cast<Scu_vcu_1_312::Vcu_intidxType>(x);
+  Scu_vcu_1_312::Vcu_intidxType ret = static_cast<Scu_vcu_1_312::Vcu_intidxType>(x);
   return ret;
 }
 
@@ -116,13 +102,12 @@ Scu_vcu_1_312::Vcu_intidxType Scuvcu1312::vcu_intidx(const std::uint8_t* bytes,
 // 'VCU_GEARINTIDX_TIMEOUT'}, 'precision': 1.0, 'len': 3, 'name':
 // 'vcu_gearintidx', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|7]', 'bit': 61, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_gearintidxType Scuvcu1312::vcu_gearintidx(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+Scu_vcu_1_312::Vcu_gearintidxType Scuvcu1312::vcu_gearintidx(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(3, 3);
 
-  Scu_vcu_1_312::Vcu_gearintidxType ret =
-      static_cast<Scu_vcu_1_312::Vcu_gearintidxType>(x);
+  Scu_vcu_1_312::Vcu_gearintidxType ret = static_cast<Scu_vcu_1_312::Vcu_gearintidxType>(x);
   return ret;
 }
 
@@ -132,13 +117,12 @@ Scu_vcu_1_312::Vcu_gearintidxType Scuvcu1312::vcu_gearintidx(
 // 'len': 2, 'name': 'vcu_geardrvmode', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|3]', 'bit': 63, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_geardrvmodeType Scuvcu1312::vcu_geardrvmode(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+Scu_vcu_1_312::Vcu_geardrvmodeType Scuvcu1312::vcu_geardrvmode(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(6, 2);
 
-  Scu_vcu_1_312::Vcu_geardrvmodeType ret =
-      static_cast<Scu_vcu_1_312::Vcu_geardrvmodeType>(x);
+  Scu_vcu_1_312::Vcu_geardrvmodeType ret = static_cast<Scu_vcu_1_312::Vcu_geardrvmodeType>(x);
   return ret;
 }
 
@@ -146,12 +130,11 @@ Scu_vcu_1_312::Vcu_geardrvmodeType Scuvcu1312::vcu_geardrvmode(
 // 'offset': 0.0, 'precision': 0.05, 'len': 12, 'name': 'vcu_accpedact',
 // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 47, 'type':
 // 'double', 'order': 'motorola', 'physical_unit': '%'}
-double Scuvcu1312::vcu_accpedact(const std::uint8_t* bytes,
-                                 int32_t length) const {
-  Byte t0(bytes + 5);
+double Scuvcu1312::vcu_accpedact(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 6);
+  Byte    t1(bytes + 6);
   int32_t t = t1.get_byte(4, 4);
   x <<= 4;
   x |= t;
@@ -164,9 +147,8 @@ double Scuvcu1312::vcu_accpedact(const std::uint8_t* bytes,
 // 'precision': 0.392, 'len': 8, 'name': 'vcu_brkpedpst', 'is_signed_var':
 // False, 'physical_range': '[0|99.96]', 'bit': 39, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': '%'}
-double Scuvcu1312::vcu_brkpedpst(const std::uint8_t* bytes,
-                                 int32_t length) const {
-  Byte t0(bytes + 4);
+double Scuvcu1312::vcu_brkpedpst(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
   double ret = x * 0.392000;
@@ -178,10 +160,10 @@ double Scuvcu1312::vcu_brkpedpst(const std::uint8_t* bytes,
 // '[0|1000]', 'bit': 9, 'type': 'int', 'order': 'motorola', 'physical_unit':
 // 'km'}
 int Scuvcu1312::vcu_vehrng(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 2);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -194,9 +176,8 @@ int Scuvcu1312::vcu_vehrng(const std::uint8_t* bytes, int32_t length) const {
 // 'offset': 0.0, 'precision': 0.392, 'len': 8, 'name': 'vcu_accpedpst',
 // 'is_signed_var': False, 'physical_range': '[0|99.96]', 'bit': 31, 'type':
 // 'double', 'order': 'motorola', 'physical_unit': '%'}
-double Scuvcu1312::vcu_accpedpst(const std::uint8_t* bytes,
-                                 int32_t length) const {
-  Byte t0(bytes + 3);
+double Scuvcu1312::vcu_accpedpst(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
   double ret = x * 0.392000;
@@ -208,13 +189,12 @@ double Scuvcu1312::vcu_accpedpst(const std::uint8_t* bytes,
 // 1, 'name': 'vcu_vehrdyst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_vehrdystType Scuvcu1312::vcu_vehrdyst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_vcu_1_312::Vcu_vehrdystType Scuvcu1312::vcu_vehrdyst(const std::uint8_t* bytes,
+                                                         int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
-  Scu_vcu_1_312::Vcu_vehrdystType ret =
-      static_cast<Scu_vcu_1_312::Vcu_vehrdystType>(x);
+  Scu_vcu_1_312::Vcu_vehrdystType ret = static_cast<Scu_vcu_1_312::Vcu_vehrdystType>(x);
   return ret;
 }
 
@@ -224,13 +204,12 @@ Scu_vcu_1_312::Vcu_vehrdystType Scuvcu1312::vcu_vehrdyst(
 // 'precision': 1.0, 'len': 4, 'name': 'vcu_faultst', 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 5, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_faultstType Scuvcu1312::vcu_faultst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_vcu_1_312::Vcu_faultstType Scuvcu1312::vcu_faultst(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(2, 4);
 
-  Scu_vcu_1_312::Vcu_faultstType ret =
-      static_cast<Scu_vcu_1_312::Vcu_faultstType>(x);
+  Scu_vcu_1_312::Vcu_faultstType ret = static_cast<Scu_vcu_1_312::Vcu_faultstType>(x);
   return ret;
 }
 
@@ -239,13 +218,12 @@ Scu_vcu_1_312::Vcu_faultstType Scuvcu1312::vcu_faultst(
 // 3: 'VCU_DRVMODE_AUTO'}, 'precision': 1.0, 'len': 2, 'name': 'vcu_drvmode',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 7,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_drvmodeType Scuvcu1312::vcu_drvmode(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_vcu_1_312::Vcu_drvmodeType Scuvcu1312::vcu_drvmode(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(6, 2);
 
-  Scu_vcu_1_312::Vcu_drvmodeType ret =
-      static_cast<Scu_vcu_1_312::Vcu_drvmodeType>(x);
+  Scu_vcu_1_312::Vcu_drvmodeType ret = static_cast<Scu_vcu_1_312::Vcu_drvmodeType>(x);
   return ret;
 }
 
@@ -255,13 +233,12 @@ Scu_vcu_1_312::Vcu_drvmodeType Scuvcu1312::vcu_drvmode(
 // 'name': 'vcu_gearpst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|7]', 'bit': 12, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_gearpstType Scuvcu1312::vcu_gearpst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_vcu_1_312::Vcu_gearpstType Scuvcu1312::vcu_gearpst(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(2, 3);
 
-  Scu_vcu_1_312::Vcu_gearpstType ret =
-      static_cast<Scu_vcu_1_312::Vcu_gearpstType>(x);
+  Scu_vcu_1_312::Vcu_gearpstType ret = static_cast<Scu_vcu_1_312::Vcu_gearpstType>(x);
   return ret;
 }
 
@@ -270,13 +247,12 @@ Scu_vcu_1_312::Vcu_gearpstType Scuvcu1312::vcu_gearpst(
 // 'len': 1, 'name': 'vcu_gearfaultst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|0]', 'bit': 1, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_gearfaultstType Scuvcu1312::vcu_gearfaultst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_vcu_1_312::Vcu_gearfaultstType Scuvcu1312::vcu_gearfaultst(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_vcu_1_312::Vcu_gearfaultstType ret =
-      static_cast<Scu_vcu_1_312::Vcu_gearfaultstType>(x);
+  Scu_vcu_1_312::Vcu_gearfaultstType ret = static_cast<Scu_vcu_1_312::Vcu_gearfaultstType>(x);
   return ret;
 }
 
@@ -286,13 +262,12 @@ Scu_vcu_1_312::Vcu_gearfaultstType Scuvcu1312::vcu_gearfaultst(
 // 'name': 'vcu_gearact', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|7]', 'bit': 15, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_vcu_1_312::Vcu_gearactType Scuvcu1312::vcu_gearact(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_vcu_1_312::Vcu_gearactType Scuvcu1312::vcu_gearact(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(5, 3);
 
-  Scu_vcu_1_312::Vcu_gearactType ret =
-      static_cast<Scu_vcu_1_312::Vcu_gearactType>(x);
+  Scu_vcu_1_312::Vcu_gearactType ret = static_cast<Scu_vcu_1_312::Vcu_gearactType>(x);
   return ret;
 }
 }  // namespace ge3

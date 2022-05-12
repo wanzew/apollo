@@ -20,18 +20,18 @@
 #include <vector>
 
 #include "cyber/common/macros.h"
-#include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/base/traffic_light.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
 #include "modules/perception/camera/lib/traffic_light/preprocessor/pose.h"
-#include "modules/perception/base/traffic_light.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
 struct TrafficLightPreprocessorInitOptions : public BaseInitOptions {
-  int gpu_id = 0;
-  float sync_interval_seconds;
+  int                      gpu_id = 0;
+  float                    sync_interval_seconds;
   std::vector<std::string> camera_names;
 };
 
@@ -41,41 +41,36 @@ struct TLPreprocessorOption {
 
 class BaseTLPreprocessor {
  public:
-  BaseTLPreprocessor() = default;
+  BaseTLPreprocessor()          = default;
   virtual ~BaseTLPreprocessor() = default;
 
   virtual bool Init(const TrafficLightPreprocessorInitOptions& options) = 0;
 
   virtual std::string Name() const = 0;
 
-  virtual bool UpdateCameraSelection(const CarPose& pose,
-                             const TLPreprocessorOption& option,
-                             std::vector<base::TrafficLightPtr>* lights) = 0;
+  virtual bool UpdateCameraSelection(const CarPose&                      pose,
+                                     const TLPreprocessorOption&         option,
+                                     std::vector<base::TrafficLightPtr>* lights) = 0;
 
-  virtual bool SyncInformation(const double ts,
-                                const std::string& camera_name) = 0;
+  virtual bool SyncInformation(const double ts, const std::string& camera_name) = 0;
 
-  virtual bool UpdateLightsProjection(const CarPose& pose,
-                              const TLPreprocessorOption& option,
-                              const std::string& camera_name,
-                              std::vector<base::TrafficLightPtr>* lights) = 0;
+  virtual bool UpdateLightsProjection(const CarPose&                      pose,
+                                      const TLPreprocessorOption&         option,
+                                      const std::string&                  camera_name,
+                                      std::vector<base::TrafficLightPtr>* lights) = 0;
 
-  virtual bool SetCameraWorkingFlag(const std::string& camera_name,
-                                    bool is_working) = 0;
+  virtual bool SetCameraWorkingFlag(const std::string& camera_name, bool is_working) = 0;
 
-  virtual bool GetCameraWorkingFlag(const std::string& camera_name,
-                            bool* is_working) const = 0;
+  virtual bool GetCameraWorkingFlag(const std::string& camera_name, bool* is_working) const = 0;
 
-  virtual const std::vector<std::string>&
-                GetCameraNamesByDescendingFocalLen() const = 0;
+  virtual const std::vector<std::string>& GetCameraNamesByDescendingFocalLen() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseTLPreprocessor);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseTLPreprocessor);
-#define PERCEPTION_REGISTER_TLPREPROCESSOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseTLPreprocessor, name)
+#define PERCEPTION_REGISTER_TLPREPROCESSOR(name) PERCEPTION_REGISTER_CLASS(BaseTLPreprocessor, name)
 
 }  // namespace camera
 }  // namespace perception

@@ -16,8 +16,9 @@
 
 #include "modules/perception/common/graph/secure_matrix.h"
 
-#include "Eigen/Core"
 #include "gtest/gtest.h"
+
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {

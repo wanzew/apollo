@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "modules/drivers/proto/smartereye.pb.h"
+
 #include "modules/third_party_perception/third_party_perception_base.h"
 
 /**
@@ -35,17 +36,16 @@ namespace third_party_perception {
 class ThirdPartyPerceptionSmartereye : public ThirdPartyPerception {
  public:
   explicit ThirdPartyPerceptionSmartereye(apollo::cyber::Node* const node);
-  ThirdPartyPerceptionSmartereye() = default;
+  ThirdPartyPerceptionSmartereye()  = default;
   ~ThirdPartyPerceptionSmartereye() = default;
   // Upon receiving smartereye data
   void OnSmartereye(const apollo::drivers::SmartereyeObstacles& message);
   void OnSmartereyeLanemark(const apollo::drivers::SmartereyeLanemark&);
-  bool Process(
-      apollo::perception::PerceptionObstacles* const response) override;
+  bool Process(apollo::perception::PerceptionObstacles* const response) override;
 
  private:
   apollo::perception::PerceptionObstacles eye_obstacles_;
-  apollo::drivers::SmartereyeLanemark smartereye_lanemark_;
+  apollo::drivers::SmartereyeLanemark     smartereye_lanemark_;
   std::shared_ptr<apollo::cyber::Reader<apollo::drivers::SmartereyeObstacles>>
       smartereye_obstacles_reader_ = nullptr;
   std::shared_ptr<apollo::cyber::Reader<apollo::drivers::SmartereyeLanemark>>

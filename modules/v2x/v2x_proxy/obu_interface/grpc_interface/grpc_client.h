@@ -50,13 +50,13 @@ class GrpcClientImpl {
   /*function that send car status msg through grpc
   @param input car_status type msg shared ptr
   */
-  void SendMsgToGrpc(const std::shared_ptr<::apollo::v2x::CarStatus> &msg);
+  void SendMsgToGrpc(const std::shared_ptr<::apollo::v2x::CarStatus>& msg);
 
  private:
   //  grpc service stub
   std::unique_ptr<::apollo::v2x::CarToObu::Stub> stub_;
-  int car_status_tv_nsec_ = 0;
-  bool init_flag_ = false;
+  int                                            car_status_tv_nsec_ = 0;
+  bool                                           init_flag_          = false;
 };
 
 }  // namespace v2x

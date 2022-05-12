@@ -25,16 +25,18 @@
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
+
+#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -56,12 +58,11 @@ class PointCloudUpdater {
    * the server.
    * @param simulationworldupdater pointer
    */
-  PointCloudUpdater(WebSocketHandler *websocket,
-                    SimulationWorldUpdater *sim_world_updater);
+  PointCloudUpdater(WebSocketHandler* websocket, SimulationWorldUpdater* sim_world_updater);
 
   ~PointCloudUpdater();
 
-  static void LoadLidarHeight(const std::string &file_path);
+  static void LoadLidarHeight(const std::string& file_path);
 
   /**
    * @brief Starts to push PointCloud to frontend.
@@ -79,22 +80,20 @@ class PointCloudUpdater {
  private:
   void RegisterMessageHandlers();
 
-  void UpdatePointCloud(
-      const std::shared_ptr<drivers::PointCloud> &point_cloud);
+  void UpdatePointCloud(const std::shared_ptr<drivers::PointCloud>& point_cloud);
 
   void FilterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr);
 
   void UpdateLocalizationTime(
-      const std::shared_ptr<apollo::localization::LocalizationEstimate>
-          &localization);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr ConvertPCLPointCloud(
-      const std::shared_ptr<drivers::PointCloud> &point_cloud);
+      const std::shared_ptr<apollo::localization::LocalizationEstimate>& localization);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr
+  ConvertPCLPointCloud(const std::shared_ptr<drivers::PointCloud>& point_cloud);
 
   constexpr static float kDefaultLidarHeight = 1.91f;
 
   std::unique_ptr<cyber::Node> node_;
 
-  WebSocketHandler *websocket_;
+  WebSocketHandler* websocket_;
 
   bool enabled_ = false;
 
@@ -105,13 +104,12 @@ class PointCloudUpdater {
   std::atomic<bool> future_ready_;
 
   // Cyber messsage readers.
-  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
-      localization_reader_;
-  std::shared_ptr<cyber::Reader<drivers::PointCloud>> point_cloud_reader_;
-  double last_point_cloud_time_ = 0.0;
-  double last_localization_time_ = 0.0;
-  SimulationWorldUpdater *simworld_updater_;
-  bool enable_voxel_filter_ = false;
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>> localization_reader_;
+  std::shared_ptr<cyber::Reader<drivers::PointCloud>>                        point_cloud_reader_;
+  double                  last_point_cloud_time_  = 0.0;
+  double                  last_localization_time_ = 0.0;
+  SimulationWorldUpdater* simworld_updater_;
+  bool                    enable_voxel_filter_ = false;
 };
 }  // namespace dreamview
 }  // namespace apollo

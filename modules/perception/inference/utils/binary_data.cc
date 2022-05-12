@@ -24,20 +24,14 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-inline std::string get_dtype(const base::Blob<double> &blob) {
-  return "float64";
-}
+inline std::string get_dtype(const base::Blob<double>& blob) { return "float64"; }
 
-inline std::string get_dtype(const base::Blob<float> &blob) {
-  return "float32";
-}
+inline std::string get_dtype(const base::Blob<float>& blob) { return "float32"; }
 
-size_t BinaryReadString(FILE *fp, char *name) {
-  size_t len = 0;
+size_t BinaryReadString(FILE* fp, char* name) {
+  size_t len   = 0;
   size_t nmemb = fread(&len, sizeof(len), 1, fp);
-  if (nmemb != 1 || len == 0) {
-    return 0;
-  }
+  if (nmemb != 1 || len == 0) { return 0; }
   CHECK_LT(len, kMaxStrLen);
   nmemb = fread(name, sizeof(name[0]), len, fp);
   CHECK_EQ(nmemb, len);
@@ -45,7 +39,7 @@ size_t BinaryReadString(FILE *fp, char *name) {
   return len;
 }
 
-size_t BinaryWriteString(FILE *fp, const std::string &str) {
+size_t BinaryWriteString(FILE* fp, const std::string& str) {
   size_t len = str.length();
   fwrite(&len, sizeof(len), 1, fp);
   fwrite(str.c_str(), sizeof(str[0]), len, fp);
@@ -53,10 +47,10 @@ size_t BinaryWriteString(FILE *fp, const std::string &str) {
 }
 
 template <typename Dtype>
-std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
-  int ndim;
+std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE* fp) {
+  int                                ndim;
   std::shared_ptr<base::Blob<Dtype>> blob(new base::Blob<Dtype>());
-  char dtype[kMaxStrLen];
+  char                               dtype[kMaxStrLen];
 
   // read dtype
   size_t nmemb = BinaryReadString(fp, dtype);
@@ -71,9 +65,7 @@ std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
     nmemb = fread(&shape[i], sizeof(shape[i]), 1, fp);
     CHECK_EQ(nmemb, 1U);
   }
-  if (ndim == 0) {
-    return blob;
-  }
+  if (ndim == 0) { return blob; }
 
   // init blob
   blob->Reshape(shape);
@@ -87,7 +79,7 @@ std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
 }
 
 template <typename Dtype>
-void BinaryWriteBlob(FILE *fp, const base::Blob<Dtype> &blob) {
+void BinaryWriteBlob(FILE* fp, const base::Blob<Dtype>& blob) {
   int ndim, dim;
   // write dtype
   BinaryWriteString(fp, get_dtype(blob));
@@ -100,24 +92,21 @@ void BinaryWriteBlob(FILE *fp, const base::Blob<Dtype> &blob) {
   }
 
   // write data
-  if (blob.count() > 0) {
-    fwrite(blob.cpu_data(), sizeof(Dtype), blob.count(), fp);
-  }
+  if (blob.count() > 0) { fwrite(blob.cpu_data(), sizeof(Dtype), blob.count(), fp); }
 }
 
-template std::shared_ptr<base::Blob<float>> BinaryReadBlob(FILE *fp);
-template std::shared_ptr<base::Blob<double>> BinaryReadBlob(FILE *fp);
+template std::shared_ptr<base::Blob<float>>  BinaryReadBlob(FILE* fp);
+template std::shared_ptr<base::Blob<double>> BinaryReadBlob(FILE* fp);
 
-template void BinaryWriteBlob(FILE *fp, const base::Blob<float> &blob);
-template void BinaryWriteBlob(FILE *fp, const base::Blob<double> &blob);
+template void BinaryWriteBlob(FILE* fp, const base::Blob<float>& blob);
+template void BinaryWriteBlob(FILE* fp, const base::Blob<double>& blob);
 
 template <typename Dtype>
-std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
-    const char *file_path) {
-  char name[kMaxStrLen];
+std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(const char* file_path) {
+  char                                                      name[kMaxStrLen];
   std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> data_dict;
 
-  FILE *fp = fopen(file_path, "rb");
+  FILE* fp = fopen(file_path, "rb");
   if (NULL == fp) {
     AERROR << "Failed opening Binaryary file: " << file_path;
     return data_dict;
@@ -134,9 +123,8 @@ std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
 }
 
 template <typename Btype>
-bool BinaryWriteFile(const char *file_path,
-                     const std::map<std::string, Btype> &data_dict) {
-  FILE *fp = fopen(file_path, "wb");
+bool BinaryWriteFile(const char* file_path, const std::map<std::string, Btype>& data_dict) {
+  FILE* fp = fopen(file_path, "wb");
   if (NULL == fp) {
     AERROR << "Failed opening Binaryary file: " << file_path;
     return false;
@@ -159,24 +147,21 @@ bool BinaryWriteFile(const char *file_path,
 }
 
 template std::map<std::string, std::shared_ptr<base::Blob<float>>>
-BinaryReadFile(const char *file_path);
+BinaryReadFile(const char* file_path);
 template std::map<std::string, std::shared_ptr<base::Blob<double>>>
-BinaryReadFile(const char *file_path);
+BinaryReadFile(const char* file_path);
 
-template bool BinaryWriteFile(
-    const char *file_path,
-    const std::map<std::string, std::shared_ptr<base::Blob<float>>> &data_dict);
-template bool BinaryWriteFile(
-    const char *file_path,
-    const std::map<std::string, std::shared_ptr<base::Blob<double>>>
-        &data_dict);
+template bool
+BinaryWriteFile(const char*                                                      file_path,
+                const std::map<std::string, std::shared_ptr<base::Blob<float>>>& data_dict);
+template bool
+BinaryWriteFile(const char*                                                       file_path,
+                const std::map<std::string, std::shared_ptr<base::Blob<double>>>& data_dict);
 
-template bool BinaryWriteFile(
-    const char *file_path,
-    const std::map<std::string, base::Blob<float> *> &data_dict);
-template bool BinaryWriteFile(
-    const char *file_path,
-    const std::map<std::string, base::Blob<double> *> &data_dict);
+template bool BinaryWriteFile(const char*                                      file_path,
+                              const std::map<std::string, base::Blob<float>*>& data_dict);
+template bool BinaryWriteFile(const char*                                       file_path,
+                              const std::map<std::string, base::Blob<double>*>& data_dict);
 
 }  // namespace inference
 }  // namespace perception

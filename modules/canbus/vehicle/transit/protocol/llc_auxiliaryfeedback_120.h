@@ -19,19 +19,19 @@
 #include "gtest/gtest_prod.h"
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace transit {
 
-class Llcauxiliaryfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
-                                    ::apollo::canbus::ChassisDetail> {
+class Llcauxiliaryfeedback120
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Llcauxiliaryfeedback120();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
   FRIEND_TEST(llc_auxiliaryfeedback_120Test, General);
 
@@ -94,15 +94,13 @@ class Llcauxiliaryfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'name': 'LLC_FBK_HazardLights',
   // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 28, 'type':
   // 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-  bool llc_fbk_hazardlights(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool llc_fbk_hazardlights(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Autonomy indicator green LED on', 'offset':
   // 0.0, 'precision': 1.0, 'len': 1, 'name': 'LLC_FBK_LedGreenOn',
   // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 17, 'type':
   // 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-  bool llc_fbk_ledgreenon(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  bool llc_fbk_ledgreenon(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Horn enabled', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'LLC_FBK_Horn', 'is_signed_var': False,
@@ -122,8 +120,8 @@ class Llcauxiliaryfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 2, 'name': 'LLC_FBK_TurnSignal', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 24, 'type': 'enum',
   // 'order': 'intel', 'physical_unit': ''}
-  Llc_auxiliaryfeedback_120::Llc_fbk_turnsignalType llc_fbk_turnsignal(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Llc_auxiliaryfeedback_120::Llc_fbk_turnsignalType llc_fbk_turnsignal(const std::uint8_t* bytes,
+                                                                       const int32_t length) const;
 
   // config detail: {'description': 'Low beam enabled', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'LLC_FBK_LowBeam', 'is_signed_var':
@@ -147,8 +145,7 @@ class Llcauxiliaryfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'name': 'LLC_FBK_AutonomyButtonPressed',
   // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 16, 'type':
   // 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-  bool llc_fbk_autonomybuttonpressed(const std::uint8_t* bytes,
-                                     const int32_t length) const;
+  bool llc_fbk_autonomybuttonpressed(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace transit

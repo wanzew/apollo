@@ -43,33 +43,30 @@ class HeaderItemBase {
   virtual ~HeaderItemBase() {}
 
  public:
-  virtual char *SerializeItem(char *buf, size_t buf_size) = 0;
-  virtual const char *DiserializeItem(const char *buf,
-                                      size_t *diserialized_size) = 0;
-  virtual HType GetType() const = 0;
+  virtual char*       SerializeItem(char* buf, size_t buf_size)                   = 0;
+  virtual const char* DiserializeItem(const char* buf, size_t* diserialized_size) = 0;
+  virtual HType       GetType() const                                             = 0;
 };
 
 template <enum HType t, typename T>
 struct HeaderItem;
 
 template <enum HType t, typename T>
-char *SerializeItemImp(const HeaderItem<t, T> &item, char *buf,
-                       size_t buf_size) {
-  if (!buf || buf_size == 0 ||
-      buf_size < size_t(sizeof(t) + item.ValueSize() + 3)) {
+char* SerializeItemImp(const HeaderItem<t, T>& item, char* buf, size_t buf_size) {
+  if (!buf || buf_size == 0 || buf_size < size_t(sizeof(t) + item.ValueSize() + 3)) {
     return nullptr;
   }
-  char *res = buf;
+  char*  res       = buf;
   size_t item_size = item.ValueSize();
 
   HType type = t;
   memcpy(res, &type, sizeof(HType));
   res[sizeof(HType)] = ':';
-  res = res + sizeof(HType) + 1;
+  res                = res + sizeof(HType) + 1;
 
   memcpy(res, &item_size, sizeof(size_t));
   res[sizeof(bsize)] = ':';
-  res = res + sizeof(bsize) + 1;
+  res                = res + sizeof(bsize) + 1;
 
   memcpy(res, item.GetValuePtr(), item.ValueSize());
   res[item.ValueSize()] = '\n';
@@ -78,25 +75,20 @@ char *SerializeItemImp(const HeaderItem<t, T> &item, char *buf,
 }
 
 template <enum HType t, typename T>
-const char *DiserializeItemImp(HeaderItem<t, T> *item, const char *buf,
-                               size_t *diserialized_size) {
-  if (!buf || !diserialized_size) {
-    return nullptr;
-  }
-  const char *res = buf;
+const char* DiserializeItemImp(HeaderItem<t, T>* item, const char* buf, size_t* diserialized_size) {
+  if (!buf || !diserialized_size) { return nullptr; }
+  const char* res = buf;
 
   char p_type[sizeof(HType)] = {0};
   memcpy(p_type, buf, sizeof(HType));
-  HType type = *(reinterpret_cast<HType *>(p_type));
-  if (type != t) {
-    return nullptr;
-  }
+  HType type = *(reinterpret_cast<HType*>(p_type));
+  if (type != t) { return nullptr; }
   res += sizeof(HType) + 1;
   *diserialized_size += sizeof(HType) + 1;
 
   char p_size[sizeof(bsize)] = {0};
   memcpy(p_size, res, sizeof(bsize));
-  bsize size = *(reinterpret_cast<bsize *>(p_size));
+  bsize size = *(reinterpret_cast<bsize*>(p_size));
   res += sizeof(bsize) + 1;
   *diserialized_size += sizeof(bsize) + 1;
 
@@ -110,27 +102,24 @@ template <enum HType t, typename T>
 struct HeaderItem : public HeaderItemBase {
   T value_;
 
-  operator T() { return value_; }
-  HeaderItem &operator=(const T &val) {
+              operator T() { return value_; }
+  HeaderItem& operator=(const T& val) {
     value_ = val;
     return *this;
   }
-  HType GetType() const override { return t; }
-  size_t ValueSize() const { return sizeof(value_); }
-  const T *GetValuePtr() const { return &value_; }
-  void SetValue(const char *buf) {
-    if (!buf) {
-      return;
-    }
-    value_ = *(reinterpret_cast<const T *>(buf));
+  HType    GetType() const override { return t; }
+  size_t   ValueSize() const { return sizeof(value_); }
+  const T* GetValuePtr() const { return &value_; }
+  void     SetValue(const char* buf) {
+    if (!buf) { return; }
+    value_ = *(reinterpret_cast<const T*>(buf));
   }
 
-  char *SerializeItem(char *buf, size_t buf_size) override {
+  char* SerializeItem(char* buf, size_t buf_size) override {
     return SerializeItemImp(*this, buf, buf_size);
   }
 
-  const char *DiserializeItem(const char *buf,
-                              size_t *diserialized_size) override {
+  const char* DiserializeItem(const char* buf, size_t* diserialized_size) override {
     return DiserializeItemImp(this, buf, diserialized_size);
   }
 };
@@ -138,27 +127,24 @@ struct HeaderItem : public HeaderItemBase {
 template <enum HType t>
 struct HeaderItem<t, std::string> : public HeaderItemBase {
   std::string value_;
-  operator std::string() { return value_; }
-  HeaderItem &operator=(const std::string &val) {
+              operator std::string() { return value_; }
+  HeaderItem& operator=(const std::string& val) {
     value_ = val;
     return *this;
   }
-  size_t ValueSize() const { return value_.length() + 1; }
-  HType GetType() const override { return t; }
-  const char *GetValuePtr() const { return value_.c_str(); }
-  void SetValue(const char *buf) {
-    if (!buf) {
-      return;
-    }
+  size_t      ValueSize() const { return value_.length() + 1; }
+  HType       GetType() const override { return t; }
+  const char* GetValuePtr() const { return value_.c_str(); }
+  void        SetValue(const char* buf) {
+    if (!buf) { return; }
     value_ = std::string(buf);
   }
 
-  char *SerializeItem(char *buf, size_t buf_size) override {
+  char* SerializeItem(char* buf, size_t buf_size) override {
     return SerializeItemImp(*this, buf, buf_size);
   }
 
-  const char *DiserializeItem(const char *buf,
-                              size_t *diserialized_size) override {
+  const char* DiserializeItem(const char* buf, size_t* diserialized_size) override {
     return DiserializeItemImp(this, buf, diserialized_size);
   }
 };

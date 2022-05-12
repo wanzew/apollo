@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "absl/strings/str_split.h"
+
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
@@ -26,13 +27,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool config_parser(const std::string& config_file,
+bool config_parser(const std::string&        config_file,
                    std::vector<std::string>* channels,
                    std::vector<std::string>* child_frame_ids) {
   std::ifstream fin(config_file);
-  if (!fin.is_open()) {
-    return false;
-  }
+  if (!fin.is_open()) { return false; }
   channels->clear();
   child_frame_ids->clear();
   std::string line;
@@ -68,8 +67,7 @@ int main(int argc, char** argv) {
   }
   // apollo::cyber::Logger::Init(argv[0]);
   apollo::cyber::Init(argv[0]);  // cybertron init function
-  std::shared_ptr<apollo::cyber::Node> node(
-      apollo::cyber::CreateNode("export_node"));
+  std::shared_ptr<apollo::cyber::Node> node(apollo::cyber::CreateNode("export_node"));
   if (!node) {
     std::cout << "Failed to create export node." << std::endl;
     return -1;
@@ -77,13 +75,11 @@ int main(int argc, char** argv) {
   std::vector<std::string> channels;
   std::vector<std::string> child_frame_ids;
   std::cout << "start to load config file: " << argv[1] << std::endl;
-  if (!apollo::perception::lidar::config_parser(argv[1], &channels,
-                                                &child_frame_ids)) {
+  if (!apollo::perception::lidar::config_parser(argv[1], &channels, &child_frame_ids)) {
     std::cout << "Failed to read config file" << std::endl;
     return -1;
   }
-  apollo::perception::lidar::MsgExporter msg_exporter(node, channels,
-                                                      child_frame_ids);
+  apollo::perception::lidar::MsgExporter msg_exporter(node, channels, child_frame_ids);
   while (apollo::cyber::OK()) {
     sleep(1);
   }

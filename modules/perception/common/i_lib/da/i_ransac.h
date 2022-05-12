@@ -15,10 +15,10 @@
  *****************************************************************************/
 #pragma once
 
+#include <limits>
+
 #include "modules/perception/common/i_lib/core/i_blas.h"
 #include "modules/perception/common/i_lib/core/i_rand.h"
-
-#include <limits>
 
 namespace apollo {
 namespace perception {
@@ -27,67 +27,76 @@ namespace common {
 // sufficiently high to ensure with a probability "confidence" that at
 // least one of the random samples  of data is free from outliers.
 // "inlierprob" is the probability that any selected data point is an inlier
-inline int IRansacTrials(int sample_size, double confidence,
-                         double inlierprob) {
-  return inlierprob > 0.0
-             ? IRound(IDiv(ILog(1.0 - confidence),
-                           ILog(1.0 - IPow(inlierprob, sample_size))))
-             : std::numeric_limits<int>::max();
+inline int IRansacTrials(int sample_size, double confidence, double inlierprob) {
+  return inlierprob > 0.0 ?
+             IRound(IDiv(ILog(1.0 - confidence), ILog(1.0 - IPow(inlierprob, sample_size)))) :
+             std::numeric_limits<int>::max();
 }
 
 // Using Ransac to fit a model to data set which contains outliers
 // The function needs 2n entries of scratch space in inliers
-template <typename T, int l, int lp, int k, int s,
+template <typename T,
+          int l,
+          int lp,
+          int k,
+          int s,
           void (*HypogenFunc)(const T* x, const T* xp, T* model),
-          void (*CostFunc)(const T* model, const T* x, const T* xp, int n,
-                           int* nr_liner, int* inliers, T* cost, T error_tol),
-          void (*RefitFunc)(T* x, T* xp, int* inliers, T* model, int n,
-                            int nr_liner)>
-bool RobustBinaryFitRansac(T* x, T* xp, int n, T* model, int* consensus_size,
-                           int* inliers, T error_tol,
-                           bool re_est_model_w_inliers = false,
-                           bool adaptive_trial_count = false,
-                           double confidence = 0.99, double inlierprob = 0.5,
-                           int min_nr_inliers = s,
-                           bool random_shuffle_inputs = false) {
-  const int kSize = s;
+          void (*CostFunc)(const T* model,
+                           const T* x,
+                           const T* xp,
+                           int      n,
+                           int*     nr_liner,
+                           int*     inliers,
+                           T*       cost,
+                           T        error_tol),
+          void (*RefitFunc)(T* x, T* xp, int* inliers, T* model, int n, int nr_liner)>
+bool RobustBinaryFitRansac(T*     x,
+                           T*     xp,
+                           int    n,
+                           T*     model,
+                           int*   consensus_size,
+                           int*   inliers,
+                           T      error_tol,
+                           bool   re_est_model_w_inliers = false,
+                           bool   adaptive_trial_count   = false,
+                           double confidence             = 0.99,
+                           double inlierprob             = 0.5,
+                           int    min_nr_inliers         = s,
+                           bool   random_shuffle_inputs  = false) {
+  const int kSize   = s;
   const int kLength = l;
-  const int kLp = lp;
-  const int kKsize = k;
-  int indices[kSize];
-  T samples_x[kLength * kSize];
-  T samples_xp[kLp * kSize];
-  T tmp_model[kKsize];
-  T cost = std::numeric_limits<T>::max();
-  T best_cost = std::numeric_limits<T>::max();
+  const int kLp     = lp;
+  const int kKsize  = k;
+  int       indices[kSize];
+  T         samples_x[kLength * kSize];
+  T         samples_xp[kLp * kSize];
+  T         tmp_model[kKsize];
+  T         cost      = std::numeric_limits<T>::max();
+  T         best_cost = std::numeric_limits<T>::max();
 
-  if (n < min_nr_inliers) {
-    return false;
-  }
+  if (n < min_nr_inliers) { return false; }
 
   double actual_inlierprob = 0.0, tmp_inlierprob;
-  int nr_trials = IRansacTrials(s, confidence, inlierprob);
+  int    nr_trials         = IRansacTrials(s, confidence, inlierprob);
 
-  int nr_inliers = 0;
-  int rseed = I_DEFAULT_SEED;
+  int nr_inliers   = 0;
+  int rseed        = I_DEFAULT_SEED;
   int sample_count = 0;
   int i, idxl, idxlp, il, ilp;
   *consensus_size = 0;  // initialize the size of the consensus set to zero
   IZero(model, k);      // initialize the model with zeros
 
-  if (random_shuffle_inputs) {
-    IRandomizedShuffle(x, xp, n, l, lp, &rseed);
-  }
+  if (random_shuffle_inputs) { IRandomizedShuffle(x, xp, n, l, lp, &rseed); }
 
   while (nr_trials > sample_count) {
     // generate random indices
     IRandomSample(indices, s, n, &rseed);
     // prepare data for model fitting
     for (i = 0; i < s; ++i) {
-      idxl = indices[i] * l;
+      idxl  = indices[i] * l;
       idxlp = indices[i] * lp;
-      il = i * l;
-      ilp = i * lp;
+      il    = i * l;
+      ilp   = i * lp;
       ICopy(x + idxl, samples_x + il, l);
       ICopy(xp + idxlp, samples_xp + ilp, lp);
     }
@@ -97,17 +106,16 @@ bool RobustBinaryFitRansac(T* x, T* xp, int n, T* model, int* consensus_size,
 
     // validate model
     CostFunc(tmp_model, x, xp, n, &nr_inliers, inliers + n, &cost, error_tol);
-    if ((nr_inliers > *consensus_size) ||
-        (nr_inliers == *consensus_size && cost < best_cost)) {
+    if ((nr_inliers > *consensus_size) || (nr_inliers == *consensus_size && cost < best_cost)) {
       *consensus_size = nr_inliers;
-      best_cost = cost;
+      best_cost       = cost;
       ICopy(tmp_model, model, k);
       ICopy(inliers + n, inliers, *consensus_size);  // record inlier indices
       if (adaptive_trial_count) {
         tmp_inlierprob = IDiv(static_cast<double>(*consensus_size), n);
         if (tmp_inlierprob > actual_inlierprob) {
           actual_inlierprob = tmp_inlierprob;
-          nr_trials = IRansacTrials(s, confidence, actual_inlierprob);
+          nr_trials         = IRansacTrials(s, confidence, actual_inlierprob);
         }
       }
     }

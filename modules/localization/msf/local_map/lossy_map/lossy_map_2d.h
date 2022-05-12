@@ -36,15 +36,18 @@ class LossyMap2D : public BaseMap {
    * but will not wait for the loading finished, eigen version. */
   virtual void PreloadMapArea(const Eigen::Vector3d& location,
                               const Eigen::Vector3d& trans_diff,
-                              unsigned int resolution_id, unsigned int zone_id);
+                              unsigned int           resolution_id,
+                              unsigned int           zone_id);
   /**@brief Load map nodes for the location calculate of this frame.
    * If the forecasts are correct in last frame, these nodes will be all in
    * cache, if not, then need to create loading tasks, and wait for the loading
    * finish, in order to the nodes which the following calculate needed are all
    * in the memory, eigen version. */
   virtual bool LoadMapArea(const Eigen::Vector3d& seed_pt3d,
-                           unsigned int resolution_id, unsigned int zone_id,
-                           int filter_size_x, int filter_size_y);
+                           unsigned int           resolution_id,
+                           unsigned int           zone_id,
+                           int                    filter_size_x,
+                           int                    filter_size_y);
 };
 
 }  // namespace msf

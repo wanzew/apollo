@@ -25,21 +25,19 @@ using google::protobuf::Closure;
 using std::vector;
 
 ThreadPool::ThreadPool(int num_workers)
-    : num_workers_(num_workers),
-      num_available_workers_(num_workers),
-      task_queue_(num_workers),
-      started_(false) {
+    : num_workers_(num_workers)
+    , num_available_workers_(num_workers)
+    , task_queue_(num_workers)
+    , started_(false) {
   workers_.reserve(num_workers_);
   for (int idx = 0; idx < num_workers_; ++idx) {
-    ThreadPoolWorker *worker = new ThreadPoolWorker(this);
+    ThreadPoolWorker* worker = new ThreadPoolWorker(this);
     workers_.push_back(worker);
   }
 }
 
 ThreadPool::~ThreadPool() {
-  if (!started_) {
-    return;
-  }
+  if (!started_) { return; }
 
   for (int idx = 0; idx < num_workers_; ++idx) {
     Add(NULL);
@@ -58,9 +56,9 @@ void ThreadPool::Start() {
   started_ = true;
 }
 
-void ThreadPool::Add(Closure *closure) { task_queue_.Push(closure); }
+void ThreadPool::Add(Closure* closure) { task_queue_.Push(closure); }
 
-void ThreadPool::Add(const vector<Closure *> &closures) {
+void ThreadPool::Add(const vector<Closure*>& closures) {
   for (size_t idx = 0; idx < closures.size(); ++idx) {
     Add(closures[idx]);
   }
@@ -68,11 +66,9 @@ void ThreadPool::Add(const vector<Closure *> &closures) {
 
 void ThreadPoolWorker::Run() {
   while (true) {
-    Closure *closure = nullptr;
+    Closure* closure = nullptr;
     thread_pool_->task_queue_.Pop(&closure);
-    if (closure == nullptr) {
-      break;
-    }
+    if (closure == nullptr) { break; }
 
     {
       MutexLock lock(&(thread_pool_->mutex_));

@@ -44,13 +44,12 @@ void Adcmotioncontrollimits112::UpdateData(uint8_t* data) {
 void Adcmotioncontrollimits112::Reset() {
   // TODO(All) :  you should check this manually
   adc_cmd_throttlecommandlimit_ = 0.0;
-  adc_cmd_steeringrate_ = 0.0;
+  adc_cmd_steeringrate_         = 0.0;
   adc_cmd_steerwheelanglelimit_ = 0.0;
 }
 
 Adcmotioncontrollimits112*
-Adcmotioncontrollimits112::set_adc_cmd_throttlecommandlimit(
-    double adc_cmd_throttlecommandlimit) {
+Adcmotioncontrollimits112::set_adc_cmd_throttlecommandlimit(double adc_cmd_throttlecommandlimit) {
   adc_cmd_throttlecommandlimit_ = adc_cmd_throttlecommandlimit;
   return this;
 }
@@ -69,8 +68,8 @@ void Adcmotioncontrollimits112::set_p_adc_cmd_throttlecommandlimit(
   to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
-Adcmotioncontrollimits112* Adcmotioncontrollimits112::set_adc_cmd_steeringrate(
-    double adc_cmd_steeringrate) {
+Adcmotioncontrollimits112*
+Adcmotioncontrollimits112::set_adc_cmd_steeringrate(double adc_cmd_steeringrate) {
   adc_cmd_steeringrate_ = adc_cmd_steeringrate;
   return this;
 }
@@ -79,12 +78,11 @@ Adcmotioncontrollimits112* Adcmotioncontrollimits112::set_adc_cmd_steeringrate(
 // 'precision': 0.05, 'len': 16, 'name': 'ADC_CMD_SteeringRate',
 // 'is_signed_var': False, 'physical_range': '[0|3276.75]', 'bit': 0, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'deg/s'}
-void Adcmotioncontrollimits112::set_p_adc_cmd_steeringrate(
-    uint8_t* data, double adc_cmd_steeringrate) {
-  adc_cmd_steeringrate =
-      ProtocolData::BoundedValue(0.0, 3276.75, adc_cmd_steeringrate);
-  int x = static_cast<int>(adc_cmd_steeringrate / 0.050000);
-  uint8_t t = 0;
+void Adcmotioncontrollimits112::set_p_adc_cmd_steeringrate(uint8_t* data,
+                                                           double   adc_cmd_steeringrate) {
+  adc_cmd_steeringrate = ProtocolData::BoundedValue(0.0, 3276.75, adc_cmd_steeringrate);
+  int     x            = static_cast<int>(adc_cmd_steeringrate / 0.050000);
+  uint8_t t            = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 0);
@@ -97,8 +95,7 @@ void Adcmotioncontrollimits112::set_p_adc_cmd_steeringrate(
 }
 
 Adcmotioncontrollimits112*
-Adcmotioncontrollimits112::set_adc_cmd_steerwheelanglelimit(
-    double adc_cmd_steerwheelanglelimit) {
+Adcmotioncontrollimits112::set_adc_cmd_steerwheelanglelimit(double adc_cmd_steerwheelanglelimit) {
   adc_cmd_steerwheelanglelimit_ = adc_cmd_steerwheelanglelimit;
   return this;
 }

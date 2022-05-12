@@ -34,40 +34,39 @@ typedef enum {
 } PTC_COMMAND;
 
 typedef struct CommandHeader {
-  unsigned char cmd = '\0';
+  unsigned char cmd      = '\0';
   unsigned char ret_code = '\0';
-  uint32_t len = 0;
+  uint32_t      len      = 0;
 } CommandHeader;
 
 typedef struct Command {
-  CommandHeader header;
+  CommandHeader  header;
   unsigned char* data = nullptr;
   ~Command() {
-    if (data != nullptr) {
-      free(data);
-    }
+    if (data != nullptr) { free(data); }
   }
 } Command;
 
 class TcpCmdClient {
  public:
-  TcpCmdClient(const std::string& ip, uint32_t port) : ip_(ip), port_(port) {}
+  TcpCmdClient(const std::string& ip, uint32_t port)
+      : ip_(ip)
+      , port_(port) {}
   ~TcpCmdClient() { Close(); }
   bool GetCalibration(std::string* content);
 
  private:
-  bool Open();
-  void Close();
-  bool ReadCmd(Command* feedBack);
-  int Read(unsigned char* buffer, int n);
-  bool WriteCmd(const Command& cmd);
-  int BuildCmdHeader(const Command& cmd, unsigned char* buffer);
-  void ParseHeader(const unsigned char* buffer, const int len,
-                   CommandHeader* header);
+  bool        Open();
+  void        Close();
+  bool        ReadCmd(Command* feedBack);
+  int         Read(unsigned char* buffer, int n);
+  bool        WriteCmd(const Command& cmd);
+  int         BuildCmdHeader(const Command& cmd, unsigned char* buffer);
+  void        ParseHeader(const unsigned char* buffer, const int len, CommandHeader* header);
   std::string ip_;
-  uint32_t port_ = 0;
-  int socket_fd_ = -1;
-  std::mutex mutex_;
+  uint32_t    port_      = 0;
+  int         socket_fd_ = -1;
+  std::mutex  mutex_;
 };
 
 }  // namespace hesai

@@ -107,17 +107,17 @@ class SyncedMemory {
   ~SyncedMemory();
 
   const void* cpu_data();
-  void set_cpu_data(void* data);
+  void        set_cpu_data(void* data);
   const void* gpu_data();
-  void set_gpu_data(void* data);
-  void* mutable_cpu_data();
-  void* mutable_gpu_data();
+  void        set_gpu_data(void* data);
+  void*       mutable_cpu_data();
+  void*       mutable_gpu_data();
 
   SyncedHead head() const { return head_; }
-  void set_head(SyncedHead head) { head_ = head; }
-  void set_head_gpu() { set_head(HEAD_AT_GPU); }
-  void set_head_cpu() { set_head(HEAD_AT_CPU); }
-  size_t size() { return size_; }
+  void       set_head(SyncedHead head) { head_ = head; }
+  void       set_head_gpu() { set_head(HEAD_AT_GPU); }
+  void       set_head_cpu() { set_head(HEAD_AT_CPU); }
+  size_t     size() { return size_; }
 
 #if USE_GPU == 1
   void async_gpu_push(const cudaStream_t& stream);
@@ -129,14 +129,14 @@ class SyncedMemory {
   void to_gpu();
 
  private:
-  void* cpu_ptr_;
-  void* gpu_ptr_;
-  size_t size_;
+  void*      cpu_ptr_;
+  void*      gpu_ptr_;
+  size_t     size_;
   SyncedHead head_;
-  bool own_cpu_data_;
-  bool cpu_malloc_use_cuda_;
-  bool own_gpu_data_;
-  int device_;
+  bool       own_cpu_data_;
+  bool       cpu_malloc_use_cuda_;
+  bool       own_gpu_data_;
+  int        device_;
 };  // class SyncedMemory
 
 }  // namespace base

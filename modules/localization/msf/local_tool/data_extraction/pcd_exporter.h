@@ -30,17 +30,16 @@ namespace msf {
  */
 class PCDExporter {
  public:
-  explicit PCDExporter(const std::string &pcd_folder);
+  explicit PCDExporter(const std::string& pcd_folder);
   ~PCDExporter();
 
-  void CompensatedPcdCallback(const std::string &msg);
+  void CompensatedPcdCallback(const std::string& msg);
 
  private:
-  void WritePcdFile(const std::string &filename,
-                    const drivers::PointCloud &msg);
+  void WritePcdFile(const std::string& filename, const drivers::PointCloud& msg);
 
   std::string pcd_folder_;
-  FILE *stamp_file_handle_;
+  FILE*       stamp_file_handle_;
 };
 
 }  // namespace msf

@@ -36,10 +36,10 @@ class MultiHmBipartiteGraphMatcher : public BaseBipartiteGraphMatcher {
   // @params [out]: matched pair of objects & tracks
   // @params [out]: unmatched rows
   // @params [out]: unmatched cols
-  void Match(const BipartiteGraphMatcherOptions &options,
-             std::vector<NodeNodePair> *assignments,
-             std::vector<size_t> *unassigned_rows,
-             std::vector<size_t> *unassigned_cols);
+  void        Match(const BipartiteGraphMatcherOptions& options,
+                    std::vector<NodeNodePair>*          assignments,
+                    std::vector<size_t>*                unassigned_rows,
+                    std::vector<size_t>*                unassigned_cols);
   std::string Name() const { return "MultiHmBipartiteGraphMatcher"; }
 
  protected:

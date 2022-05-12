@@ -32,24 +32,23 @@ class GeneralMessage;
 class GeneralChannelMessage : public GeneralMessageBase {
  public:
   enum class ErrorCode {
-    NewSubClassFailed = -1,
-    CreateNodeFailed = -2,
-    CreateReaderFailed = -3,
-    MessageTypeIsEmpty = -4,
+    NewSubClassFailed            = -1,
+    CreateNodeFailed             = -2,
+    CreateReaderFailed           = -3,
+    MessageTypeIsEmpty           = -4,
     ChannelNameOrNodeNameIsEmpty = -5,
-    NoCloseChannel = -6
+    NoCloseChannel               = -6
   };
 
   static const char* ErrCode2Str(ErrorCode errCode);
-  static bool IsErrorCode(void* ptr);
+  static bool        IsErrorCode(void* ptr);
 
   static ErrorCode CastPtr2ErrorCode(void* ptr) {
     assert(IsErrorCode(ptr));
     return static_cast<ErrorCode>(reinterpret_cast<intptr_t>(ptr));
   }
   static GeneralChannelMessage* CastErrorCode2Ptr(ErrorCode errCode) {
-    return reinterpret_cast<GeneralChannelMessage*>(
-        static_cast<intptr_t>(errCode));
+    return reinterpret_cast<GeneralChannelMessage*>(static_cast<intptr_t>(errCode));
   }
 
   ~GeneralChannelMessage() {
@@ -62,13 +61,9 @@ class GeneralChannelMessage : public GeneralMessageBase {
     }
   }
 
-  std::string GetChannelName(void) const {
-    return channel_reader_->GetChannelName();
-  }
+  std::string GetChannelName(void) const { return channel_reader_->GetChannelName(); }
 
-  void set_message_type(const std::string& msgTypeName) {
-    message_type_ = msgTypeName;
-  }
+  void set_message_type(const std::string& msgTypeName) { message_type_ = msgTypeName; }
   const std::string& message_type(void) const { return message_type_; }
 
   bool is_enabled(void) const { return channel_reader_ != nullptr; }
@@ -84,41 +79,34 @@ class GeneralChannelMessage : public GeneralMessageBase {
   void add_writer(const std::string& writer) { DoAdd(&writers_, writer); }
   void del_writer(const std::string& writer) {
     DoDelete(&writers_, writer);
-    if (!writers_.size()) {
-      set_has_message_come(false);
-    }
+    if (!writers_.size()) { set_has_message_come(false); }
   }
 
   int Render(const Screen* s, int key) override;
 
   void CloseChannel(void) {
-    if (channel_reader_ != nullptr) {
-      channel_reader_.reset();
-    }
+    if (channel_reader_ != nullptr) { channel_reader_.reset(); }
 
-    if (channel_node_ != nullptr) {
-      channel_node_.reset();
-    }
+    if (channel_node_ != nullptr) { channel_node_.reset(); }
   }
 
  private:
-  explicit GeneralChannelMessage(const std::string& node_name,
-                                 RenderableMessage* parent = nullptr)
-      : GeneralMessageBase(parent),
-        current_state_(State::ShowDebugString),
-        has_message_come_(false),
-        message_type_(),
-        frame_counter_(0),
-        last_time_(apollo::cyber::Time::MonoTime()),
-        msg_time_(last_time_.ToNanosecond() + 1),
-        channel_node_(nullptr),
-        node_name_(node_name),
-        readers_(),
-        writers_(),
-        channel_message_(nullptr),
-        channel_reader_(nullptr),
-        inner_lock_(),
-        raw_msg_class_(nullptr) {}
+  explicit GeneralChannelMessage(const std::string& node_name, RenderableMessage* parent = nullptr)
+      : GeneralMessageBase(parent)
+      , current_state_(State::ShowDebugString)
+      , has_message_come_(false)
+      , message_type_()
+      , frame_counter_(0)
+      , last_time_(apollo::cyber::Time::MonoTime())
+      , msg_time_(last_time_.ToNanosecond() + 1)
+      , channel_node_(nullptr)
+      , node_name_(node_name)
+      , readers_()
+      , writers_()
+      , channel_message_(nullptr)
+      , channel_reader_(nullptr)
+      , inner_lock_()
+      , raw_msg_class_(nullptr) {}
 
   GeneralChannelMessage(const GeneralChannelMessage&) = delete;
   GeneralChannelMessage& operator=(const GeneralChannelMessage&) = delete;
@@ -134,16 +122,13 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   static void DoAdd(std::vector<std::string>* vec, const std::string& str) {
     for (const auto& item : *vec) {
-      if (item == str) {
-        return;
-      }
+      if (item == str) { return; }
     }
 
     vec->emplace_back(str);
   }
 
-  void UpdateRawMessage(
-      const std::shared_ptr<apollo::cyber::message::RawMessage>& raw_msg) {
+  void UpdateRawMessage(const std::shared_ptr<apollo::cyber::message::RawMessage>& raw_msg) {
     set_has_message_come(true);
     msg_time_ = apollo::cyber::Time::MonoTime();
     ++frame_counter_;
@@ -170,9 +155,9 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   enum class State { ShowDebugString, ShowInfo } current_state_;
 
-  bool has_message_come_;
-  std::string message_type_;
-  std::atomic<int> frame_counter_;
+  bool                has_message_come_;
+  std::string         message_type_;
+  std::atomic<int>    frame_counter_;
   apollo::cyber::Time last_time_;
   apollo::cyber::Time msg_time_;
   apollo::cyber::Time time_last_calc_ = apollo::cyber::Time::MonoTime();
@@ -184,10 +169,9 @@ class GeneralChannelMessage : public GeneralMessageBase {
   std::vector<std::string> readers_;
   std::vector<std::string> writers_;
 
-  std::shared_ptr<apollo::cyber::message::RawMessage> channel_message_;
-  std::shared_ptr<apollo::cyber::Reader<apollo::cyber::message::RawMessage>>
-      channel_reader_;
-  mutable std::mutex inner_lock_;
+  std::shared_ptr<apollo::cyber::message::RawMessage>                        channel_message_;
+  std::shared_ptr<apollo::cyber::Reader<apollo::cyber::message::RawMessage>> channel_reader_;
+  mutable std::mutex                                                         inner_lock_;
 
   google::protobuf::Message* raw_msg_class_;
 

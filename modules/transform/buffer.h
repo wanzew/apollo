@@ -52,9 +52,10 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
-  virtual TransformStamped lookupTransform(
-      const std::string& target_frame, const std::string& source_frame,
-      const cyber::Time& time, const float timeout_second = 0.01f) const;
+  virtual TransformStamped lookupTransform(const std::string& target_frame,
+                                           const std::string& source_frame,
+                                           const cyber::Time& time,
+                                           const float        timeout_second = 0.01f) const;
 
   /** \brief Get the transform between two frames by frame ID assuming fixed
    *frame.
@@ -72,10 +73,12 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
-  virtual TransformStamped lookupTransform(
-      const std::string& target_frame, const cyber::Time& target_time,
-      const std::string& source_frame, const cyber::Time& source_time,
-      const std::string& fixed_frame, const float timeout_second = 0.01f) const;
+  virtual TransformStamped lookupTransform(const std::string& target_frame,
+                                           const cyber::Time& target_time,
+                                           const std::string& source_frame,
+                                           const cyber::Time& source_time,
+                                           const std::string& fixed_frame,
+                                           const float        timeout_second = 0.01f) const;
 
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -89,8 +92,8 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
   virtual bool canTransform(const std::string& target_frame,
                             const std::string& source_frame,
                             const cyber::Time& target_time,
-                            const float timeout_second = 0.01f,
-                            std::string* errstr = nullptr) const;
+                            const float        timeout_second = 0.01f,
+                            std::string*       errstr         = nullptr) const;
 
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -109,31 +112,27 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
                             const std::string& source_frame,
                             const cyber::Time& source_time,
                             const std::string& fixed_frame,
-                            const float timeout_second = 0.01f,
-                            std::string* errstr = nullptr) const;
+                            const float        timeout_second = 0.01f,
+                            std::string*       errstr         = nullptr) const;
 
   bool GetLatestStaticTF(const std::string& frame_id,
                          const std::string& child_frame_id,
-                         TransformStamped* tf);
+                         TransformStamped*  tf);
 
  private:
-  void SubscriptionCallback(
-      const std::shared_ptr<const TransformStampeds>& transform);
-  void StaticSubscriptionCallback(
-      const std::shared_ptr<const TransformStampeds>& transform);
-  void SubscriptionCallbackImpl(
-      const std::shared_ptr<const TransformStampeds>& transform,
-      bool is_static);
+  void SubscriptionCallback(const std::shared_ptr<const TransformStampeds>& transform);
+  void StaticSubscriptionCallback(const std::shared_ptr<const TransformStampeds>& transform);
+  void SubscriptionCallbackImpl(const std::shared_ptr<const TransformStampeds>& transform,
+                                bool                                            is_static);
 
   void TF2MsgToCyber(const geometry_msgs::TransformStamped& tf2_trans_stamped,
-                     TransformStamped& trans_stamped) const;  // NOLINT
+                     TransformStamped&                      trans_stamped) const;  // NOLINT
 
-  std::unique_ptr<cyber::Node> node_;
+  std::unique_ptr<cyber::Node>                      node_;
   std::shared_ptr<cyber::Reader<TransformStampeds>> message_subscriber_tf_;
-  std::shared_ptr<cyber::Reader<TransformStampeds>>
-      message_subscriber_tf_static_;
+  std::shared_ptr<cyber::Reader<TransformStampeds>> message_subscriber_tf_static_;
 
-  cyber::Time last_update_;
+  cyber::Time                                  last_update_;
   std::vector<geometry_msgs::TransformStamped> static_msgs_;
 
   DECLARE_SINGLETON(Buffer)

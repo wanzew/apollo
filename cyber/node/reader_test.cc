@@ -120,7 +120,7 @@ TEST(ReaderTest, test1) {
 
 TEST(ReaderTest, test2) {
   proto::RoleAttributes role;
-  auto qos = role.mutable_qos_profile();
+  auto                  qos = role.mutable_qos_profile();
   qos->set_history(proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos->set_depth(0);
   qos->set_mps(0);

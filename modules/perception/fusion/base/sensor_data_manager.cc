@@ -27,26 +27,23 @@ namespace fusion {
 SensorDataManager::SensorDataManager() { CHECK_EQ(this->Init(), true); }
 
 bool SensorDataManager::Init() {
-  if (inited_) {
-    return true;
-  }
+  if (inited_) { return true; }
   sensor_manager_ = common::SensorManager::Instance();
-  inited_ = true;
+  inited_         = true;
   return true;
 }
 
 void SensorDataManager::Reset() {
-  inited_ = false;
+  inited_         = false;
   sensor_manager_ = nullptr;
   sensors_.clear();
 }
 
-void SensorDataManager::AddSensorMeasurements(
-    const base::FrameConstPtr& frame_ptr) {
+void SensorDataManager::AddSensorMeasurements(const base::FrameConstPtr& frame_ptr) {
   const base::SensorInfo& sensor_info = frame_ptr->sensor_info;
-  std::string sensor_id = sensor_info.name;
-  const auto it = sensors_.find(sensor_id);
-  SensorPtr sensor_ptr = nullptr;
+  std::string             sensor_id   = sensor_info.name;
+  const auto              it          = sensors_.find(sensor_id);
+  SensorPtr               sensor_ptr  = nullptr;
   if (it == sensors_.end()) {
     if (!sensor_manager_->IsSensorExist(sensor_id)) {
       AERROR << "Failed to find sensor " << sensor_id << " in sensor manager.";
@@ -76,22 +73,20 @@ bool SensorDataManager::IsCamera(const base::FrameConstPtr& frame_ptr) {
   return sensor_manager_->IsCamera(type);
 }
 
-void SensorDataManager::GetLatestSensorFrames(
-    double timestamp, const std::string& sensor_id,
-    std::vector<SensorFramePtr>* frames) const {
+void SensorDataManager::GetLatestSensorFrames(double                       timestamp,
+                                              const std::string&           sensor_id,
+                                              std::vector<SensorFramePtr>* frames) const {
   if (frames == nullptr) {
     AERROR << "Nullptr error.";
     return;
   }
   const auto it = sensors_.find(sensor_id);
-  if (it == sensors_.end()) {
-    return;
-  }
+  if (it == sensors_.end()) { return; }
   return it->second->QueryLatestFrames(timestamp, frames);
 }
 
-void SensorDataManager::GetLatestFrames(
-    double timestamp, std::vector<SensorFramePtr>* frames) const {
+void SensorDataManager::GetLatestFrames(double                       timestamp,
+                                        std::vector<SensorFramePtr>* frames) const {
   if (frames == nullptr) {
     AERROR << "Nullptr error.";
     return;
@@ -100,23 +95,19 @@ void SensorDataManager::GetLatestFrames(
   frames->clear();
   for (auto it = sensors_.begin(); it != sensors_.end(); ++it) {
     SensorFramePtr frame = it->second->QueryLatestFrame(timestamp);
-    if (frame != nullptr) {
-      frames->push_back(frame);
-    }
+    if (frame != nullptr) { frames->push_back(frame); }
   }
 
-  if (frames->empty()) {
-    return;
-  }
+  if (frames->empty()) { return; }
 
-  std::sort(frames->begin(), frames->end(),
-            [](const SensorFramePtr& p1, const SensorFramePtr& p2) {
-              return p1->GetTimestamp() < p2->GetTimestamp();
-            });
+  std::sort(frames->begin(), frames->end(), [](const SensorFramePtr& p1, const SensorFramePtr& p2) {
+    return p1->GetTimestamp() < p2->GetTimestamp();
+  });
 }
 
-bool SensorDataManager::GetPose(const std::string& sensor_id, double timestamp,
-                                Eigen::Affine3d* pose) const {
+bool SensorDataManager::GetPose(const std::string& sensor_id,
+                                double             timestamp,
+                                Eigen::Affine3d*   pose) const {
   if (pose == nullptr) {
     AERROR << "Nullptr error.";
     return false;
@@ -131,8 +122,7 @@ bool SensorDataManager::GetPose(const std::string& sensor_id, double timestamp,
   return it->second->GetPose(timestamp, pose);
 }
 
-base::BaseCameraModelPtr SensorDataManager::GetCameraIntrinsic(
-    const std::string& sensor_id) const {
+base::BaseCameraModelPtr SensorDataManager::GetCameraIntrinsic(const std::string& sensor_id) const {
   return sensor_manager_->GetUndistortCameraModel(sensor_id);
 }
 

@@ -1,4 +1,4 @@
-  /******************************************************************************
+/******************************************************************************
  * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the License);
@@ -29,13 +29,11 @@ bool SmokeObjectMaintainer::Add(int idx, base::ObjectPtr obj) {
     return true;
   }
 
-  auto prev_obj = obj_it->second;
+  auto      prev_obj  = obj_it->second;
   const int curr_type = static_cast<int>(obj->sub_type);
   const int prev_type = static_cast<int>(prev_obj->sub_type);
 
-  if (obj->sub_type_probs[curr_type] > prev_obj->sub_type_probs[prev_type]) {
-    *prev_obj = *obj;
-  }
+  if (obj->sub_type_probs[curr_type] > prev_obj->sub_type_probs[prev_type]) { *prev_obj = *obj; }
   return false;
 }
 

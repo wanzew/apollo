@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
+
 #include "modules/data/tools/smart_recorder/record_processor.h"
 
 namespace apollo {
@@ -31,11 +32,10 @@ namespace data {
  */
 class PostRecordProcessor : public RecordProcessor {
  public:
-  PostRecordProcessor(const std::string& source_record_dir,
-                      const std::string& restored_output_dir)
+  PostRecordProcessor(const std::string& source_record_dir, const std::string& restored_output_dir)
       : RecordProcessor(source_record_dir, restored_output_dir) {}
-  bool Init(const SmartRecordTrigger& trigger_conf) override;
-  bool Process() override;
+  bool        Init(const SmartRecordTrigger& trigger_conf) override;
+  bool        Process() override;
   std::string GetDefaultOutputFile() const override;
   virtual ~PostRecordProcessor() = default;
 

@@ -18,25 +18,27 @@
 
 #include <unordered_set>
 
+#include "modules/routing/proto/routing.pb.h"
+
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_range_manager.h"
-#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace routing {
 
 class BlackListRangeGenerator {
  public:
-  BlackListRangeGenerator() = default;
+  BlackListRangeGenerator()  = default;
   ~BlackListRangeGenerator() = default;
 
-  void GenerateBlackMapFromRequest(const RoutingRequest& request,
-                                   const TopoGraph* graph,
+  void GenerateBlackMapFromRequest(const RoutingRequest&   request,
+                                   const TopoGraph*        graph,
                                    TopoRangeManager* const range_manager) const;
 
-  void AddBlackMapFromTerminal(const TopoNode* src_node,
-                               const TopoNode* dest_node, double start_s,
-                               double end_s,
+  void AddBlackMapFromTerminal(const TopoNode*         src_node,
+                               const TopoNode*         dest_node,
+                               double                  start_s,
+                               double                  end_s,
                                TopoRangeManager* const range_manager) const;
 };
 

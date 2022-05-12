@@ -19,7 +19,6 @@
 #include <vector>
 
 #include "cyber/common/macros.h"
-
 #include "modules/perception/radar/lib/interface/base_tracker.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track_manager.h"
 #include "modules/perception/radar/lib/tracker/matcher/hm_matcher.h"
@@ -33,23 +32,24 @@ class ContiArsTracker : public BaseTracker {
   ContiArsTracker();
   virtual ~ContiArsTracker();
   bool Init() override;
-  bool Track(const base::Frame &detected_frame, const TrackerOptions &options,
-             base::FramePtr tracked_frame) override;
+  bool Track(const base::Frame&    detected_frame,
+             const TrackerOptions& options,
+             base::FramePtr        tracked_frame) override;
 
  private:
-  std::string matcher_name_;
-  BaseMatcher *matcher_ = nullptr;
-  RadarTrackManager *track_manager_ = nullptr;
-  static double s_tracking_time_win_;
-  void TrackObjects(const base::Frame &radar_frame);
-  void UpdateAssignedTracks(const base::Frame &radar_frame,
-                            std::vector<TrackObjectPair> assignments);
-  void UpdateUnassignedTracks(const base::Frame &radar_frame,
-                              const std::vector<size_t> &unassigned_tracks);
-  void DeleteLostTracks();
-  void CreateNewTracks(const base::Frame &radar_frame,
-                       const std::vector<size_t> &unassigned_objects);
-  void CollectTrackedFrame(base::FramePtr tracked_frame);
+  std::string        matcher_name_;
+  BaseMatcher*       matcher_       = nullptr;
+  RadarTrackManager* track_manager_ = nullptr;
+  static double      s_tracking_time_win_;
+  void               TrackObjects(const base::Frame& radar_frame);
+  void               UpdateAssignedTracks(const base::Frame&           radar_frame,
+                                          std::vector<TrackObjectPair> assignments);
+  void               UpdateUnassignedTracks(const base::Frame&         radar_frame,
+                                            const std::vector<size_t>& unassigned_tracks);
+  void               DeleteLostTracks();
+  void               CreateNewTracks(const base::Frame&         radar_frame,
+                                     const std::vector<size_t>& unassigned_objects);
+  void               CollectTrackedFrame(base::FramePtr tracked_frame);
 
   DISALLOW_COPY_AND_ASSIGN(ContiArsTracker);
 };

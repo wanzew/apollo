@@ -29,9 +29,9 @@ namespace cyber {
 namespace logger {
 
 // the C99 format
-typedef int32_t int32;
+typedef int32_t  int32;
 typedef uint32_t uint32;
-typedef int64_t int64;
+typedef int64_t  int64;
 typedef uint64_t uint64;
 
 using google::LogSeverity;
@@ -46,9 +46,10 @@ class LogFileObject : public google::base::Logger {
   LogFileObject(LogSeverity severity, const char* base_filename);
   ~LogFileObject();
 
-  void Write(bool force_flush,  // Should we force a flush here?
-             time_t timestamp,  // Timestamp for this entry
-             const char* message, int message_len) override;
+  void Write(bool        force_flush,  // Should we force a flush here?
+             time_t      timestamp,    // Timestamp for this entry
+             const char* message,
+             int         message_len) override;
 
   // Configuration options
   void SetBasename(const char* basename);
@@ -75,18 +76,18 @@ class LogFileObject : public google::base::Logger {
  private:
   static const uint32 kRolloverAttemptFrequency = 0x20;
 
-  std::mutex lock_;
-  bool base_filename_selected_;
-  string base_filename_;
-  string symlink_basename_;
-  string filename_extension_;  // option users can specify (eg to add port#)
-  FILE* file_;
-  LogSeverity severity_;
-  uint32 bytes_since_flush_;
-  uint32 file_length_;
+  std::mutex   lock_;
+  bool         base_filename_selected_;
+  string       base_filename_;
+  string       symlink_basename_;
+  string       filename_extension_;  // option users can specify (eg to add port#)
+  FILE*        file_;
+  LogSeverity  severity_;
+  uint32       bytes_since_flush_;
+  uint32       file_length_;
   unsigned int rollover_attempt_;
-  int64 next_flush_time_;  // cycle count at which to flush log
-  string hostname_;
+  int64        next_flush_time_;  // cycle count at which to flush log
+  string       hostname_;
 
   // Actually create a logfile using the value of base_filename_ and the
   // supplied argument time_pid_string

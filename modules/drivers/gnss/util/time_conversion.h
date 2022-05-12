@@ -128,9 +128,7 @@ template <typename T>
 T gps2unix(const T gps_seconds) {
   for (size_t i = 0; i < array_size(LEAP_SECONDS); ++i) {
     T result = gps_seconds + (GPS_AND_SYSTEM_DIFF_SECONDS - LEAP_SECONDS[i][1]);
-    if (result >= LEAP_SECONDS[i][0]) {
-      return result;
-    }
+    if (result >= LEAP_SECONDS[i][0]) { return result; }
   }
   return static_cast<T>(0);
 }

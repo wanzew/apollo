@@ -25,14 +25,14 @@ namespace localization {
 namespace msf {
 PosesInterpolation::PosesInterpolation() {}
 
-bool PosesInterpolation::Init(const std::string &input_poses_path,
-                              const std::string &ref_timestamps_path,
-                              const std::string &out_poses_path,
-                              const std::string &extrinsic_path) {
-  this->input_poses_path_ = input_poses_path;
+bool PosesInterpolation::Init(const std::string& input_poses_path,
+                              const std::string& ref_timestamps_path,
+                              const std::string& out_poses_path,
+                              const std::string& extrinsic_path) {
+  this->input_poses_path_    = input_poses_path;
   this->ref_timestamps_path_ = ref_timestamps_path;
-  this->out_poses_path_ = out_poses_path;
-  this->extrinsic_path_ = extrinsic_path;
+  this->out_poses_path_      = out_poses_path;
+  this->extrinsic_path_      = extrinsic_path;
 
   bool success = velodyne::LoadExtrinsic(extrinsic_path_, &velodyne_extrinsic_);
   if (!success) {
@@ -53,19 +53,18 @@ void PosesInterpolation::DoInterpolation() {
   LoadPCDTimestamp();
 
   // Interpolation
-  PoseInterpolationByTime(input_poses_, input_poses_timestamps_,
-                          ref_timestamps_, ref_ids_, &out_indexes_,
-                          &out_timestamps_, &out_poses_);
+  PoseInterpolationByTime(input_poses_, input_poses_timestamps_, ref_timestamps_, ref_ids_,
+                          &out_indexes_, &out_timestamps_, &out_poses_);
 
   // Write pcd poses
   WritePCDPoses();
 }
 
 void PosesInterpolation::LoadPCDTimestamp() {
-  FILE *file = fopen(ref_timestamps_path_.c_str(), "r");
+  FILE* file = fopen(ref_timestamps_path_.c_str(), "r");
   if (file) {
-    unsigned int index;
-    double timestamp;
+    unsigned int         index;
+    double               timestamp;
     static constexpr int kSize = 2;
     while (fscanf(file, "%u %lf\n", &index, &timestamp) == kSize) {
       ref_timestamps_.push_back(timestamp);
@@ -87,17 +86,16 @@ void PosesInterpolation::WritePCDPoses() {
     for (size_t i = 0; i < out_poses_.size(); i++) {
       double timestamp = out_timestamps_[i];
 
-      Eigen::Affine3d pose_tem = out_poses_[i] * velodyne_extrinsic_;
-      Eigen::Quaterniond quatd(pose_tem.linear());
+      Eigen::Affine3d      pose_tem = out_poses_[i] * velodyne_extrinsic_;
+      Eigen::Quaterniond   quatd(pose_tem.linear());
       Eigen::Translation3d transd(pose_tem.translation());
-      double qx = quatd.x();
-      double qy = quatd.y();
-      double qz = quatd.z();
-      double qr = quatd.w();
+      double               qx = quatd.x();
+      double               qy = quatd.y();
+      double               qz = quatd.z();
+      double               qr = quatd.w();
 
-      fout << out_indexes_[i] << " " << timestamp << " " << transd.x() << " "
-           << transd.y() << " " << transd.z() << " " << qx << " " << qy << " "
-           << qz << " " << qr << "\n";
+      fout << out_indexes_[i] << " " << timestamp << " " << transd.x() << " " << transd.y() << " "
+           << transd.z() << " " << qx << " " << qy << " " << qz << " " << qr << "\n";
     }
 
     fout.close();
@@ -106,24 +104,23 @@ void PosesInterpolation::WritePCDPoses() {
   }
 }  // namespace msf
 
-void PosesInterpolation::PoseInterpolationByTime(
-    const ::apollo::common::EigenAffine3dVec &in_poses,
-    const std::vector<double> &in_timestamps,
-    const std::vector<double> &ref_timestamps,
-    const std::vector<unsigned int> &ref_indexes,
-    std::vector<unsigned int> *out_indexes, std::vector<double> *out_timestamps,
-    ::apollo::common::EigenAffine3dVec *out_poses) {
+void PosesInterpolation::PoseInterpolationByTime(const ::apollo::common::EigenAffine3dVec& in_poses,
+                                                 const std::vector<double>&          in_timestamps,
+                                                 const std::vector<double>&          ref_timestamps,
+                                                 const std::vector<unsigned int>&    ref_indexes,
+                                                 std::vector<unsigned int>*          out_indexes,
+                                                 std::vector<double>*                out_timestamps,
+                                                 ::apollo::common::EigenAffine3dVec* out_poses) {
   out_indexes->clear();
   out_timestamps->clear();
   out_poses->clear();
 
   unsigned int index = 0;
   for (size_t i = 0; i < ref_timestamps.size(); i++) {
-    double ref_timestamp = ref_timestamps[i];
-    unsigned int ref_index = ref_indexes[i];
+    double       ref_timestamp = ref_timestamps[i];
+    unsigned int ref_index     = ref_indexes[i];
 
-    while (index < in_timestamps.size() &&
-           in_timestamps.at(index) < ref_timestamp) {
+    while (index < in_timestamps.size() && in_timestamps.at(index) < ref_timestamp) {
       ++index;
     }
 
@@ -133,16 +130,15 @@ void PosesInterpolation::PoseInterpolationByTime(
         double pre_timestamp = in_timestamps[index - 1];
         assert(cur_timestamp != pre_timestamp);
 
-        double t =
-            (cur_timestamp - ref_timestamp) / (cur_timestamp - pre_timestamp);
+        double t = (cur_timestamp - ref_timestamp) / (cur_timestamp - pre_timestamp);
         assert(t >= 0.0);
         assert(t <= 1.0);
 
-        Eigen::Affine3d pre_pose = in_poses[index - 1];
-        Eigen::Affine3d cur_pose = in_poses[index];
-        Eigen::Quaterniond pre_quatd(pre_pose.linear());
+        Eigen::Affine3d      pre_pose = in_poses[index - 1];
+        Eigen::Affine3d      cur_pose = in_poses[index];
+        Eigen::Quaterniond   pre_quatd(pre_pose.linear());
         Eigen::Translation3d pre_transd(pre_pose.translation());
-        Eigen::Quaterniond cur_quatd(cur_pose.linear());
+        Eigen::Quaterniond   cur_quatd(cur_pose.linear());
         Eigen::Translation3d cur_transd(cur_pose.translation());
 
         Eigen::Quaterniond res_quatd = pre_quatd.slerp(1 - t, cur_quatd);

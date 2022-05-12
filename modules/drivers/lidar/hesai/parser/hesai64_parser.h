@@ -27,17 +27,16 @@ namespace hesai {
 
 class Hesai64Parser : public Parser {
  public:
-  Hesai64Parser(const std::shared_ptr<::apollo::cyber::Node>& node,
-                const Config& conf);
+  Hesai64Parser(const std::shared_ptr<::apollo::cyber::Node>& node, const Config& conf);
   ~Hesai64Parser();
 
  protected:
   void ParseRawPacket(const uint8_t* buf, const int len, bool* is_end) override;
 
  private:
-  void CalcPointXYZIT(Hesai64Packet* pkt, int blockid, uint8_t chLaserNumber);
+  void   CalcPointXYZIT(Hesai64Packet* pkt, int blockid, uint8_t chLaserNumber);
   double block_offset_[BLOCKS_PER_PACKET_L64] = {0};
-  double laser_offset_[LASER_COUNT_L64] = {0};
+  double laser_offset_[LASER_COUNT_L64]       = {0};
 };
 
 }  // namespace hesai

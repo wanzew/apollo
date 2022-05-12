@@ -38,8 +38,7 @@ namespace apollo {
 namespace hdmap {
 namespace adapter {
 
-Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
-                              PbHeader* header) {
+Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node, PbHeader* header) {
   auto header_node = xml_node.FirstChildElement("header");
   if (!header_node) {
     std::string err_msg = "xml data missing header";
@@ -50,26 +49,21 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   std::string database_name;
   std::string version;
   std::string date;
-  double north = 0.0;
-  double south = 0.0;
-  double west = 0.0;
-  double east = 0.0;
+  double      north = 0.0;
+  double      south = 0.0;
+  double      west  = 0.0;
+  double      east  = 0.0;
   std::string vendor;
-  int checker =
-      UtilXmlParser::QueryStringAttribute(*header_node, "revMajor", &rev_major);
-  checker +=
-      UtilXmlParser::QueryStringAttribute(*header_node, "revMinor", &rev_minor);
-  checker +=
-      UtilXmlParser::QueryStringAttribute(*header_node, "name", &database_name);
-  checker +=
-      UtilXmlParser::QueryStringAttribute(*header_node, "version", &version);
+  int         checker = UtilXmlParser::QueryStringAttribute(*header_node, "revMajor", &rev_major);
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "revMinor", &rev_minor);
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "name", &database_name);
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "version", &version);
   checker += UtilXmlParser::QueryStringAttribute(*header_node, "date", &date);
   checker += header_node->QueryDoubleAttribute("north", &north);
   checker += header_node->QueryDoubleAttribute("south", &south);
   checker += header_node->QueryDoubleAttribute("east", &east);
   checker += header_node->QueryDoubleAttribute("west", &west);
-  checker +=
-      UtilXmlParser::QueryStringAttribute(*header_node, "vendor", &vendor);
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "vendor", &vendor);
 
   if (checker != tinyxml2::XML_SUCCESS) {
     std::string err_msg = "Error parsing header attributes";
@@ -90,15 +84,14 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   // coordinate frame
   std::string zone_id;
   std::string from_coordinate = geo_text->Value();
-  auto projection_node = header_node->FirstChildElement("projection");
+  auto        projection_node = header_node->FirstChildElement("projection");
   if (projection_node != nullptr) {
     auto utm_node = projection_node->FirstChildElement("utm");
     if (!utm_node) {
       std::string err_msg = "Error parsing header utm node";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
-    checker =
-        UtilXmlParser::QueryStringAttribute(*utm_node, "zoneID", &zone_id);
+    checker = UtilXmlParser::QueryStringAttribute(*utm_node, "zoneID", &zone_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parsing utm zone id attributes";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -114,10 +107,8 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   }
 
   std::string to_coordinate =
-      absl::StrCat("+proj=utm +zone=", zone_id,
-                   " +ellps=WGS84 +datum=WGS84 +units=m +no_defs");
-  CoordinateConvertTool::GetInstance()->SetConvertParam(from_coordinate,
-                                                        to_coordinate);
+      absl::StrCat("+proj=utm +zone=", zone_id, " +ellps=WGS84 +datum=WGS84 +units=m +no_defs");
+  CoordinateConvertTool::GetInstance()->SetConvertParam(from_coordinate, to_coordinate);
 
   header->set_version(version);
   header->set_date(date);

@@ -34,11 +34,11 @@ void func() {}
 
 TEST(SchedulerChoreoTest, choreo) {
   auto processor = std::make_shared<Processor>();
-  auto ctx = std::make_shared<ChoreographyContext>();
+  auto ctx       = std::make_shared<ChoreographyContext>();
   processor->BindContext(ctx);
 
-  std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
-  auto task_id = GlobalData::RegisterTaskName("choreo");
+  std::shared_ptr<CRoutine> cr      = std::make_shared<CRoutine>(func);
+  auto                      task_id = GlobalData::RegisterTaskName("choreo");
   cr->set_id(task_id);
   EXPECT_TRUE(static_cast<ChoreographyContext*>(ctx.get())->Enqueue(cr));
   ctx->Shutdown();
@@ -59,8 +59,7 @@ TEST(SchedulerChoreoTest, sched_choreo) {
   cr1->set_processor_id(0);
   EXPECT_TRUE(sched->DispatchTask(cr1));
 
-  auto& croutines =
-      ClassicContext::cr_group_[DEFAULT_GROUP_NAME].at(cr->priority());
+  auto& croutines = ClassicContext::cr_group_[DEFAULT_GROUP_NAME].at(cr->priority());
   std::vector<std::string> cr_names;
   for (auto& croutine : croutines) {
     cr_names.emplace_back(croutine->name());

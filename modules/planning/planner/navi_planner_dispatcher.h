@@ -35,12 +35,12 @@ namespace planning {
  */
 class NaviPlannerDispatcher final : public PlannerDispatcher {
  public:
-  NaviPlannerDispatcher() = default;
+  NaviPlannerDispatcher()          = default;
   virtual ~NaviPlannerDispatcher() = default;
 
-  std::unique_ptr<Planner> DispatchPlanner(
-      const PlanningConfig& planning_config,
-      const std::shared_ptr<DependencyInjector>& injector) override;
+  std::unique_ptr<Planner>
+  DispatchPlanner(const PlanningConfig&                      planning_config,
+                  const std::shared_ptr<DependencyInjector>& injector) override;
 };
 
 }  // namespace planning

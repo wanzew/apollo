@@ -47,33 +47,33 @@ namespace apollo {
 namespace perception {
 namespace camera {
 // draw detected lane point_set
-void show_detect_point_set(
-    const cv::Mat& image,
-    const std::vector<std::vector<LanePointInfo>>& detect_laneline_point_set,
-    const std::string& save_path);
+void show_detect_point_set(const cv::Mat&                                 image,
+                           const std::vector<std::vector<LanePointInfo>>& detect_laneline_point_set,
+                           const std::string&                             save_path);
 
-void show_all_infer_point_set(const cv::Mat& image,
+void show_all_infer_point_set(const cv::Mat&                    image,
                               const std::vector<LanePointInfo>& infer_point_set,
-                              const std::string& save_path);
+                              const std::string&                save_path);
 
 //
-void show_lane_lines(const cv::Mat& image,
+void show_lane_lines(const cv::Mat&                     image,
                      const std::vector<base::LaneLine>& lane_marks,
-                     const std::string& save_path);
+                     const std::string&                 save_path);
 
 //
-void show_lane_ccs(const std::vector<unsigned char>& lane_map,
-                   const int lane_map_width, const int lane_map_height,
+void show_lane_ccs(const std::vector<unsigned char>&      lane_map,
+                   const int                              lane_map_width,
+                   const int                              lane_map_height,
                    const std::vector<ConnectedComponent>& lane_ccs,
                    const std::vector<ConnectedComponent>& select_lane_ccs,
-                   const std::string& save_path);
+                   const std::string&                     save_path);
 //
 //  save the lane line and points to json format
 void output_laneline_to_json(const std::vector<base::LaneLine>& lane_objects,
-                             const std::string& save_path);
+                             const std::string&                 save_path);
 
 void output_laneline_to_txt(const std::vector<base::LaneLine>& lane_objects,
-                            const std::string& save_path);
+                            const std::string&                 save_path);
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

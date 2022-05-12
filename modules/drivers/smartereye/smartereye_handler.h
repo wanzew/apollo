@@ -20,33 +20,32 @@
 #include <iostream>
 #include <string>
 
-#include "cyber/cyber.h"
 #include "third_party/camera_library/smartereye/include/calibrationparams.h"
 #include "third_party/camera_library/smartereye/include/camerahandler.h"
 #include "third_party/camera_library/smartereye/include/rotationmatrix.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace drivers {
 namespace smartereye {
 
-typedef std::function<bool(RawImageFrame *rawFrame)> CallbackFunc;
+typedef std::function<bool(RawImageFrame* rawFrame)> CallbackFunc;
 
 class SmartereyeHandler : public CameraHandler {
  public:
   explicit SmartereyeHandler(std::string name);
   ~SmartereyeHandler();
-  void handleRawFrame(const RawImageFrame *rawFrame);
+  void handleRawFrame(const RawImageFrame* rawFrame);
   bool SetCallback(CallbackFunc ptr);
   void handleUpdateFinished(Result result) {}
 
  protected:
-  void handleDisparityPointByPoint(unsigned char *image, int width, int height,
-                                   int bitNum) {}
-  void handleDisparityByLookupTable(unsigned char *image, int width, int height,
-                                    int bitNum) {}
+  void handleDisparityPointByPoint(unsigned char* image, int width, int height, int bitNum) {}
+  void handleDisparityByLookupTable(unsigned char* image, int width, int height, int bitNum) {}
 
  private:
-  std::string mName = nullptr;
+  std::string  mName         = nullptr;
   CallbackFunc pCallbackFunc = nullptr;
 };
 

@@ -19,10 +19,12 @@ limitations under the License.
 #include <string>
 
 #include "absl/strings/str_cat.h"
-#include "modules/common/configs/config_gflags.h"
-#include "modules/map/hdmap/hdmap.h"
+
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
+
+#include "modules/common/configs/config_gflags.h"
+#include "modules/map/hdmap/hdmap.h"
 
 /**
  * @namespace apollo::hdmap
@@ -66,7 +68,7 @@ inline std::string EndWayPointFile() {
  * @return default routing points file path
  */
 inline std::string DefaultRoutingFile() {
-    return absl::StrCat(FLAGS_map_dir, "_", FLAGS_default_routing_filename);
+  return absl::StrCat(FLAGS_map_dir, "_", FLAGS_default_routing_filename);
 }
 
 /**
@@ -105,11 +107,11 @@ class HDMapUtil {
   HDMapUtil() = delete;
 
   static std::unique_ptr<HDMap> base_map_;
-  static uint64_t base_map_seq_;
-  static std::mutex base_map_mutex_;
+  static uint64_t               base_map_seq_;
+  static std::mutex             base_map_mutex_;
 
   static std::unique_ptr<HDMap> sim_map_;
-  static std::mutex sim_map_mutex_;
+  static std::mutex             sim_map_mutex_;
 };
 
 }  // namespace hdmap

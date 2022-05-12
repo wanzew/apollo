@@ -21,11 +21,10 @@
 
 namespace SATP {
 
-class FileReceiverHandler
-{
-public:
-    virtual void handleReceiveFile(const QString &fileName) = 0;
+class FileReceiverHandler {
+ public:
+  virtual void handleReceiveFile(const QString& fileName) = 0;
 };
 
-}
-#endif // FILERECEIVERHANDLER_H
+}  // namespace SATP
+#endif  // FILERECEIVERHANDLER_H

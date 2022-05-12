@@ -37,11 +37,10 @@ bool Mapdatachecker::Start() {
   Init();
 
   AINFO << "creating agent";
-  std::shared_ptr<MapDataCheckerAgent> agent =
-      std::make_shared<MapDataCheckerAgent>();
+  std::shared_ptr<MapDataCheckerAgent> agent = std::make_shared<MapDataCheckerAgent>();
 
   AINFO << "creating node";
-  bool cyber_node_inited = false;
+  bool                                     cyber_node_inited = false;
   std::shared_ptr<MapDataCheckerCyberNode> cyber_node =
       std::make_shared<MapDataCheckerCyberNode>(agent, &cyber_node_inited);
   if (!cyber_node_inited) {

@@ -33,9 +33,9 @@ SingleLanePredictor::SingleLanePredictor() {
   predictor_type_ = ObstacleConf::SINGLE_LANE_PREDICTOR;
 }
 
-bool SingleLanePredictor::Predict(
-    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container) {
+bool SingleLanePredictor::Predict(const ADCTrajectoryContainer* adc_trajectory_container,
+                                  Obstacle*                     obstacle,
+                                  ObstaclesContainer*           obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
@@ -51,9 +51,7 @@ bool SingleLanePredictor::Predict(
   }
 
   std::string lane_id = "";
-  if (feature.lane().has_lane_feature()) {
-    lane_id = feature.lane().lane_feature().lane_id();
-  }
+  if (feature.lane().has_lane_feature()) { lane_id = feature.lane().lane_feature().lane_id(); }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
 
   for (int i = 0; i < num_lane_sequence; ++i) {
@@ -63,71 +61,62 @@ bool SingleLanePredictor::Predict(
       continue;
     }
 
-    ADEBUG << "Obstacle [" << obstacle->id()
-           << "] will draw a lane sequence trajectory [" << ToString(sequence)
-           << "] with probability [" << sequence.probability() << "].";
+    ADEBUG << "Obstacle [" << obstacle->id() << "] will draw a lane sequence trajectory ["
+           << ToString(sequence) << "] with probability [" << sequence.probability() << "].";
 
     std::vector<TrajectoryPoint> points;
-    GenerateTrajectoryPoints(
-        *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
-        FLAGS_prediction_trajectory_time_resolution, &points);
+    GenerateTrajectoryPoints(*obstacle, sequence, FLAGS_prediction_trajectory_time_length,
+                             FLAGS_prediction_trajectory_time_resolution, &points);
 
-    if (points.empty()) {
-      continue;
-    }
+    if (points.empty()) { continue; }
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
-    obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
-        trajectory);
+    obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(trajectory);
   }
   return true;
 }
 
-void SingleLanePredictor::GenerateTrajectoryPoints(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double time_length, const double time_resolution,
-    std::vector<TrajectoryPoint>* points) {
+void SingleLanePredictor::GenerateTrajectoryPoints(const Obstacle&               obstacle,
+                                                   const LaneSequence&           lane_sequence,
+                                                   const double                  time_length,
+                                                   const double                  time_resolution,
+                                                   std::vector<TrajectoryPoint>* points) {
   const Feature& feature = obstacle.latest_feature();
-  if (!feature.has_position() || !feature.has_velocity() ||
-      !feature.position().has_x() || !feature.position().has_y()) {
-    AERROR << "Obstacle [" << obstacle.id()
-           << " is missing position or velocity";
+  if (!feature.has_position() || !feature.has_velocity() || !feature.position().has_x() ||
+      !feature.position().has_y()) {
+    AERROR << "Obstacle [" << obstacle.id() << " is missing position or velocity";
     return;
   }
 
-  double probability = lane_sequence.probability();
+  double probability   = lane_sequence.probability();
   double approach_rate = FLAGS_go_approach_rate;
-  if (probability < FLAGS_lane_sequence_threshold_cruise) {
-    approach_rate = 1.0;
-  }
+  if (probability < FLAGS_lane_sequence_threshold_cruise) { approach_rate = 1.0; }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  double speed = feature.speed();
+  double          speed = feature.speed();
 
-  int lane_segment_index = 0;
-  std::string lane_id =
-      lane_sequence.lane_segment(lane_segment_index).lane_id();
+  int         lane_segment_index = 0;
+  std::string lane_id            = lane_sequence.lane_segment(lane_segment_index).lane_id();
   std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById(lane_id);
-  double lane_s = 0.0;
-  double lane_l = 0.0;
+  double                          lane_s    = 0.0;
+  double                          lane_l    = 0.0;
   if (!PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l)) {
     AERROR << "Failed in getting lane s and lane l";
     return;
   }
   size_t num_of_points = static_cast<size_t>(time_length / time_resolution);
   for (size_t i = 0; i < num_of_points; ++i) {
-    double relative_time = static_cast<double>(i) * time_resolution;
+    double          relative_time = static_cast<double>(i) * time_resolution;
     Eigen::Vector2d point;
-    double theta = M_PI;
-    if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
-                                            &theta)) {
-      AERROR << "Unable to get smooth point from lane [" << lane_id
-             << "] with s [" << lane_s << "] and l [" << lane_l << "]";
+    double          theta = M_PI;
+    if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
+      AERROR << "Unable to get smooth point from lane [" << lane_id << "] with s [" << lane_s
+             << "] and l [" << lane_l << "]";
       break;
     }
     TrajectoryPoint trajectory_point;
-    PathPoint path_point;
+    PathPoint       path_point;
     path_point.set_x(point.x());
     path_point.set_y(point.y());
     path_point.set_z(0.0);
@@ -144,7 +133,7 @@ void SingleLanePredictor::GenerateTrajectoryPoints(
     while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
            lane_segment_index + 1 < lane_sequence.lane_segment_size()) {
       lane_segment_index += 1;
-      lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
+      lane_s  = lane_s - PredictionMap::LaneById(lane_id)->total_length();
       lane_id = lane_sequence.lane_segment(lane_segment_index).lane_id();
     }
 

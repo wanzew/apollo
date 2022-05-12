@@ -18,9 +18,8 @@
 #include <string>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -36,8 +35,7 @@ class BaseLaneTracker {
 
   virtual ~BaseLaneTracker() = default;
 
-  virtual bool Init(
-      const LaneTrackerInitOptions& options = LaneTrackerInitOptions()) = 0;
+  virtual bool Init(const LaneTrackerInitOptions& options = LaneTrackerInitOptions()) = 0;
 
   // @brief: track detected lanes.
   // @param [in]: options
@@ -52,8 +50,7 @@ class BaseLaneTracker {
 };  // class BaseLaneTracker
 
 PERCEPTION_REGISTER_REGISTERER(BaseLaneTracker);
-#define REGISTER_LANE_TRACKER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseLaneTracker, name)
+#define REGISTER_LANE_TRACKER(name) PERCEPTION_REGISTER_CLASS(BaseLaneTracker, name)
 
 }  // namespace camera
 }  // namespace perception

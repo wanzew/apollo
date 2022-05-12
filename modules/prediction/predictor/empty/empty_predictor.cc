@@ -19,13 +19,11 @@
 namespace apollo {
 namespace prediction {
 
-EmptyPredictor::EmptyPredictor() {
-  predictor_type_ = ObstacleConf::EMPTY_PREDICTOR;
-}
+EmptyPredictor::EmptyPredictor() { predictor_type_ = ObstacleConf::EMPTY_PREDICTOR; }
 
-bool EmptyPredictor::Predict(
-    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container) {
+bool EmptyPredictor::Predict(const ADCTrajectoryContainer* adc_trajectory_container,
+                             Obstacle*                     obstacle,
+                             ObstaclesContainer*           obstacles_container) {
   obstacle->SetPredictorType(predictor_type_);
   return true;
 }

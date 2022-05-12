@@ -30,53 +30,41 @@ using ::apollo::drivers::canbus::Byte;
 Vcudrivereport52::Vcudrivereport52() {}
 const int32_t Vcudrivereport52::ID = 0x52;
 
-void Vcudrivereport52::Parse(const std::uint8_t* bytes, int32_t length,
-                             ChassisDetail* chassis) const {
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_drive_enable_resp(drive_enable_resp(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_control_mode_resp(control_mode_resp(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_vcu_real_shift(vcu_real_shift(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_vcu_real_shift_valid(vcu_real_shift_valid(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_vcu_real_torque_valid(vcu_real_torque_valid(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_vcu_real_torque(vcu_real_torque(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_vcu_limitedtorquemode(vcu_limitedtorquemode(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_vcu_driverept_alivecounter(
-          vcu_driverept_alivecounter(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_drive_report_52()
-      ->set_vcu_driverept_checksum(vcu_driverept_checksum(bytes, length));
+void Vcudrivereport52::Parse(const std::uint8_t* bytes,
+                             int32_t             length,
+                             ChassisDetail*      chassis) const {
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_drive_enable_resp(
+      drive_enable_resp(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_control_mode_resp(
+      control_mode_resp(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_vcu_real_shift(
+      vcu_real_shift(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_vcu_real_shift_valid(
+      vcu_real_shift_valid(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_vcu_real_torque_valid(
+      vcu_real_torque_valid(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_vcu_real_torque(
+      vcu_real_torque(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_vcu_limitedtorquemode(
+      vcu_limitedtorquemode(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_vcu_driverept_alivecounter(
+      vcu_driverept_alivecounter(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_drive_report_52()->set_vcu_driverept_checksum(
+      vcu_driverept_checksum(bytes, length));
 
   chassis->mutable_safety()->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  chassis->mutable_gas()->set_gas_pedal_position(
-      vcu_real_torque(bytes, length));
+  chassis->mutable_gas()->set_gas_pedal_position(vcu_real_torque(bytes, length));
   chassis->mutable_gear()->set_gear_state(
       (apollo::canbus::Chassis_GearPosition)vcu_real_shift(bytes, length));
-  chassis->mutable_check_response()->set_is_vcu_online(
-      drive_enable_resp(bytes, length) == 1);
+  chassis->mutable_check_response()->set_is_vcu_online(drive_enable_resp(bytes, length) == 1);
 }
 
 // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'name': 'drive_enable_resp', 'is_signed_var':
 // False, 'physical_range': '[0|0]', 'bit': 0, 'type': 'bool', 'order':
 // 'motorola', 'physical_unit': ''}
-bool Vcudrivereport52::drive_enable_resp(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 0);
+bool Vcudrivereport52::drive_enable_resp(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;
@@ -90,9 +78,9 @@ bool Vcudrivereport52::drive_enable_resp(const std::uint8_t* bytes,
 // 'CONTROL_MODE_RESP_EMERGENCY_BRAKE'}, 'precision': 1.0, 'len': 3, 'name':
 // 'control_mode_resp', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|7]', 'bit': 6, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Vcu_drive_report_52::Control_mode_respType Vcudrivereport52::control_mode_resp(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Vcu_drive_report_52::Control_mode_respType
+Vcudrivereport52::control_mode_resp(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(4, 3);
 
   Vcu_drive_report_52::Control_mode_respType ret =
@@ -106,9 +94,9 @@ Vcu_drive_report_52::Control_mode_respType Vcudrivereport52::control_mode_resp(
 // 'VCU_REAL_SHIFT_RESERVED'}, 'precision': 1.0, 'len': 2, 'name':
 // 'vcu_real_shift', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|3]', 'bit': 9, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Vcu_drive_report_52::Vcu_real_shiftType Vcudrivereport52::vcu_real_shift(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Vcu_drive_report_52::Vcu_real_shiftType Vcudrivereport52::vcu_real_shift(const std::uint8_t* bytes,
+                                                                         int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 2);
 
   Vcu_drive_report_52::Vcu_real_shiftType ret =
@@ -120,9 +108,8 @@ Vcu_drive_report_52::Vcu_real_shiftType Vcudrivereport52::vcu_real_shift(
 // 'precision': 1.0, 'len': 1, 'name': 'vcu_real_shift_valid', 'is_signed_var':
 // False, 'physical_range': '[0|0]', 'bit': 10, 'type': 'bool', 'order':
 // 'motorola', 'physical_unit': ''}
-bool Vcudrivereport52::vcu_real_shift_valid(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 1);
+bool Vcudrivereport52::vcu_real_shift_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -133,9 +120,8 @@ bool Vcudrivereport52::vcu_real_shift_valid(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'vcu_real_torque_valid', 'is_signed_var':
 // False, 'physical_range': '[0|0]', 'bit': 11, 'type': 'bool', 'order':
 // 'motorola', 'physical_unit': ''}
-bool Vcudrivereport52::vcu_real_torque_valid(const std::uint8_t* bytes,
-                                             int32_t length) const {
-  Byte t0(bytes + 1);
+bool Vcudrivereport52::vcu_real_torque_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -145,12 +131,11 @@ bool Vcudrivereport52::vcu_real_torque_valid(const std::uint8_t* bytes,
 // config detail: {'name': 'vcu_real_torque', 'offset': -665.0, 'precision':
 // 0.02, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
 // 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'Nm'}
-double Vcudrivereport52::vcu_real_torque(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 2);
+double Vcudrivereport52::vcu_real_torque(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -163,9 +148,8 @@ double Vcudrivereport52::vcu_real_torque(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'vcu_limitedtorquemode', 'is_signed_var':
 // False, 'physical_range': '[0|0]', 'bit': 32, 'type': 'bool', 'order':
 // 'motorola', 'physical_unit': ''}
-bool Vcudrivereport52::vcu_limitedtorquemode(const std::uint8_t* bytes,
-                                             int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcudrivereport52::vcu_limitedtorquemode(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;
@@ -175,9 +159,8 @@ bool Vcudrivereport52::vcu_limitedtorquemode(const std::uint8_t* bytes,
 // config detail: {'name': 'vcu_driverept_alivecounter', 'offset': 0.0,
 // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Vcudrivereport52::vcu_driverept_alivecounter(const std::uint8_t* bytes,
-                                                 int32_t length) const {
-  Byte t0(bytes + 6);
+int Vcudrivereport52::vcu_driverept_alivecounter(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 4);
 
   int ret = x;
@@ -187,9 +170,8 @@ int Vcudrivereport52::vcu_driverept_alivecounter(const std::uint8_t* bytes,
 // config detail: {'name': 'vcu_driverept_checksum', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Vcudrivereport52::vcu_driverept_checksum(const std::uint8_t* bytes,
-                                             int32_t length) const {
-  Byte t0(bytes + 7);
+int Vcudrivereport52::vcu_driverept_checksum(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;

@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
+
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -30,8 +31,8 @@ namespace planning {
 
 struct AnchorPoint {
   common::PathPoint path_point;
-  double lateral_bound = 0.0;
-  double longitudinal_bound = 0.0;
+  double            lateral_bound      = 0.0;
+  double            longitudinal_bound = 0.0;
   // enforce smoother to strictly follow this reference point
   bool enforced = false;
 };
@@ -44,8 +45,7 @@ class ReferenceLineSmoother {
   /**
    * Smoothing constraints
    */
-  virtual void SetAnchorPoints(
-      const std::vector<AnchorPoint>& achor_points) = 0;
+  virtual void SetAnchorPoints(const std::vector<AnchorPoint>& achor_points) = 0;
 
   /**
    * Smooth a given reference line

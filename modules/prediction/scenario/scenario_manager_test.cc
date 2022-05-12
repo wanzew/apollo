@@ -26,7 +26,7 @@ class ScenarioManagerTest : public ::testing::Test {
   virtual void SetUp() { container_manager_.reset(new ContainerManager()); }
 
  protected:
-  ScenarioManager manager_;
+  ScenarioManager                   manager_;
   std::unique_ptr<ContainerManager> container_manager_ = nullptr;
 };
 

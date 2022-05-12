@@ -17,12 +17,14 @@
 #include <boost/filesystem.hpp>
 
 #include "absl/strings/str_split.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/pipeline/evaluator.h"
 
-DEFINE_string(planning_source_dirs, "",
+DEFINE_string(planning_source_dirs,
+              "",
               "a list of source files or directories for offline mode. "
               "The items need to be separated by colon ':'. ");
 
@@ -30,9 +32,8 @@ namespace apollo {
 namespace planning {
 
 void EvaluateTrajectory() {
-  const std::vector<std::string> inputs =
-      absl::StrSplit(FLAGS_planning_source_dirs, ':');
-  Evaluator evaluator;
+  const std::vector<std::string> inputs = absl::StrSplit(FLAGS_planning_source_dirs, ':');
+  Evaluator                      evaluator;
   evaluator.Init();
   for (const auto& input : inputs) {
     std::vector<std::string> source_files;
@@ -45,8 +46,7 @@ void EvaluateTrajectory() {
         ++it;
       }
     }
-    AINFO << "For input " << input << ", found " << source_files.size()
-          << " files to process";
+    AINFO << "For input " << input << ", found " << source_files.size() << " files to process";
     for (std::size_t i = 0; i < source_files.size(); ++i) {
       AINFO << "\tProcessing: [ " << i + 1 << " / " << source_files.size()
             << " ]: " << source_files[i];

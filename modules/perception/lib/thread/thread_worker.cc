@@ -19,14 +19,10 @@ namespace apollo {
 namespace perception {
 namespace lib {
 
-void ThreadWorker::Bind(const std::function<bool()> &func) {
-  work_func_ = func;
-}
+void ThreadWorker::Bind(const std::function<bool()>& func) { work_func_ = func; }
 
 void ThreadWorker::Start() {
-  if (thread_ptr_ == nullptr) {
-    thread_ptr_.reset(new std::thread(&ThreadWorker::Core, this));
-  }
+  if (thread_ptr_ == nullptr) { thread_ptr_.reset(new std::thread(&ThreadWorker::Core, this)); }
   std::lock_guard<std::mutex> lock(mutex_);
   work_flag_ = false;
   exit_flag_ = false;
@@ -46,9 +42,7 @@ void ThreadWorker::Join() {
 }
 
 void ThreadWorker::Release() {
-  if (thread_ptr_ == nullptr) {
-    return;
-  }
+  if (thread_ptr_ == nullptr) { return; }
   {
     std::lock_guard<std::mutex> lock(mutex_);
     work_flag_ = true;
@@ -65,9 +59,7 @@ void ThreadWorker::Core() {
       std::unique_lock<std::mutex> lock(mutex_);
       condition_.wait(lock, [&]() { return work_flag_; });
     }
-    if (exit_flag_) {
-      break;
-    }
+    if (exit_flag_) { break; }
     work_func_();
     {
       std::lock_guard<std::mutex> lock(mutex_);

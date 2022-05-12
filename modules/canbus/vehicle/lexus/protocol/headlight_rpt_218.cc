@@ -30,24 +30,22 @@ using ::apollo::drivers::canbus::Byte;
 Headlightrpt218::Headlightrpt218() {}
 const int32_t Headlightrpt218::ID = 0x218;
 
-void Headlightrpt218::Parse(const std::uint8_t* bytes, int32_t length,
-                            ChassisDetail* chassis) const {
+void Headlightrpt218::Parse(const std::uint8_t* bytes,
+                            int32_t             length,
+                            ChassisDetail*      chassis) const {
   chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_vehicle_fault(
       vehicle_fault(bytes, length));
   chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_pacmod_fault(
       pacmod_fault(bytes, length));
   chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_override_active(
       override_active(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_headlight_rpt_218()
-      ->set_output_reported_fault(output_reported_fault(bytes, length));
+  chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_output_reported_fault(
+      output_reported_fault(bytes, length));
   chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_input_output_fault(
       input_output_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_enabled(
-      enabled(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_headlight_rpt_218()
-      ->set_command_output_fault(command_output_fault(bytes, length));
+  chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_enabled(enabled(bytes, length));
+  chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_command_output_fault(
+      command_output_fault(bytes, length));
   chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_output_value(
       output_value(bytes, length));
   chassis->mutable_lexus()->mutable_headlight_rpt_218()->set_manual_input(
@@ -59,9 +57,8 @@ void Headlightrpt218::Parse(const std::uint8_t* bytes, int32_t length,
 // config detail: {'name': 'vehicle_fault', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 6,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Headlightrpt218::vehicle_fault(const std::uint8_t* bytes,
-                                    int32_t length) const {
-  Byte t0(bytes + 0);
+bool Headlightrpt218::vehicle_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(6, 1);
 
   bool ret = x;
@@ -71,9 +68,8 @@ bool Headlightrpt218::vehicle_fault(const std::uint8_t* bytes,
 // config detail: {'name': 'pacmod_fault', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 5,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Headlightrpt218::pacmod_fault(const std::uint8_t* bytes,
-                                   int32_t length) const {
-  Byte t0(bytes + 0);
+bool Headlightrpt218::pacmod_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(5, 1);
 
   bool ret = x;
@@ -83,9 +79,8 @@ bool Headlightrpt218::pacmod_fault(const std::uint8_t* bytes,
 // config detail: {'name': 'override_active', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Headlightrpt218::override_active(const std::uint8_t* bytes,
-                                      int32_t length) const {
-  Byte t0(bytes + 0);
+bool Headlightrpt218::override_active(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(1, 1);
 
   bool ret = x;
@@ -95,9 +90,8 @@ bool Headlightrpt218::override_active(const std::uint8_t* bytes,
 // config detail: {'name': 'output_reported_fault', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Headlightrpt218::output_reported_fault(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 0);
+bool Headlightrpt218::output_reported_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(4, 1);
 
   bool ret = x;
@@ -107,9 +101,8 @@ bool Headlightrpt218::output_reported_fault(const std::uint8_t* bytes,
 // config detail: {'name': 'input_output_fault', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 3, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Headlightrpt218::input_output_fault(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 0);
+bool Headlightrpt218::input_output_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -120,7 +113,7 @@ bool Headlightrpt218::input_output_fault(const std::uint8_t* bytes,
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
 bool Headlightrpt218::enabled(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;
@@ -130,9 +123,8 @@ bool Headlightrpt218::enabled(const std::uint8_t* bytes, int32_t length) const {
 // config detail: {'name': 'command_output_fault', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 2, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Headlightrpt218::command_output_fault(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 0);
+bool Headlightrpt218::command_output_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -144,13 +136,12 @@ bool Headlightrpt218::command_output_fault(const std::uint8_t* bytes,
 // 'OUTPUT_VALUE_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 31, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Headlight_rpt_218::Output_valueType Headlightrpt218::output_value(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Headlight_rpt_218::Output_valueType Headlightrpt218::output_value(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  Headlight_rpt_218::Output_valueType ret =
-      static_cast<Headlight_rpt_218::Output_valueType>(x);
+  Headlight_rpt_218::Output_valueType ret = static_cast<Headlight_rpt_218::Output_valueType>(x);
   return ret;
 }
 
@@ -159,13 +150,12 @@ Headlight_rpt_218::Output_valueType Headlightrpt218::output_value(
 // 'MANUAL_INPUT_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 15, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Headlight_rpt_218::Manual_inputType Headlightrpt218::manual_input(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Headlight_rpt_218::Manual_inputType Headlightrpt218::manual_input(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Headlight_rpt_218::Manual_inputType ret =
-      static_cast<Headlight_rpt_218::Manual_inputType>(x);
+  Headlight_rpt_218::Manual_inputType ret = static_cast<Headlight_rpt_218::Manual_inputType>(x);
   return ret;
 }
 
@@ -174,9 +164,9 @@ Headlight_rpt_218::Manual_inputType Headlightrpt218::manual_input(
 // 'COMMANDED_VALUE_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 23, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Headlight_rpt_218::Commanded_valueType Headlightrpt218::commanded_value(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+Headlight_rpt_218::Commanded_valueType Headlightrpt218::commanded_value(const std::uint8_t* bytes,
+                                                                        int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
   Headlight_rpt_218::Commanded_valueType ret =

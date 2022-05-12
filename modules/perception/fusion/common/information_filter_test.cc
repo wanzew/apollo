@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/fusion/common/information_filter.h"
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
-#include "modules/perception/fusion/common/information_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -29,8 +30,8 @@ TEST(FusionCommonTest, return_name_test) {
 
 TEST(FusionCommonTest, test_init) {
   InformationFilter imf;
-  Eigen::VectorXd states;
-  Eigen::MatrixXd uncertainty;
+  Eigen::VectorXd   states;
+  Eigen::MatrixXd   uncertainty;
   EXPECT_FALSE(imf.Init(states, uncertainty));
   states.setIdentity(3, 1);
   uncertainty.setIdentity(3, 4);
@@ -43,61 +44,52 @@ TEST(FusionCommonTest, test_init) {
 
 TEST(FusionCommonTest, test_set_last_observation) {
   InformationFilter imf;
-  Eigen::VectorXd last_observation;
-  Eigen::MatrixXd last_observation_uncertainty;
-  Eigen::MatrixXd last_to_cur_transform_matrix;
-  Eigen::MatrixXd last_to_cur_env_uncertainty;
-  Eigen::VectorXd states;
-  Eigen::MatrixXd uncertainty;
-  EXPECT_FALSE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  Eigen::VectorXd   last_observation;
+  Eigen::MatrixXd   last_observation_uncertainty;
+  Eigen::MatrixXd   last_to_cur_transform_matrix;
+  Eigen::MatrixXd   last_to_cur_env_uncertainty;
+  Eigen::VectorXd   states;
+  Eigen::MatrixXd   uncertainty;
+  EXPECT_FALSE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
   states.setIdentity(4, 1);
   uncertainty.setIdentity(4, 4);
   EXPECT_TRUE(imf.Init(states, uncertainty));
   last_observation.setIdentity(3, 1);
-  EXPECT_FALSE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  EXPECT_FALSE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
   last_observation.setIdentity(4, 1);
   last_observation_uncertainty.setIdentity(3, 4);
-  EXPECT_FALSE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  EXPECT_FALSE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
   last_observation_uncertainty.setIdentity(4, 3);
-  EXPECT_FALSE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  EXPECT_FALSE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
   last_observation_uncertainty.setIdentity(4, 4);
   last_to_cur_transform_matrix.setIdentity(3, 4);
-  EXPECT_FALSE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  EXPECT_FALSE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
   last_to_cur_transform_matrix.setIdentity(4, 3);
-  EXPECT_FALSE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  EXPECT_FALSE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
   last_to_cur_transform_matrix.setIdentity(4, 4);
   last_to_cur_env_uncertainty.setIdentity(3, 4);
-  EXPECT_FALSE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  EXPECT_FALSE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
   last_to_cur_env_uncertainty.setIdentity(4, 3);
-  EXPECT_FALSE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  EXPECT_FALSE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
   last_to_cur_env_uncertainty.setIdentity(4, 4);
-  EXPECT_TRUE(imf.SetLastObservation(
-      last_observation, last_observation_uncertainty,
-      last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
+  EXPECT_TRUE(imf.SetLastObservation(last_observation, last_observation_uncertainty,
+                                     last_to_cur_transform_matrix, last_to_cur_env_uncertainty));
 }
 
 TEST(FusionCommonTest, test_predict) {
   InformationFilter imf;
-  Eigen::VectorXd states;
-  Eigen::MatrixXd uncertainty;
-  Eigen::MatrixXd transform_matrix;
-  Eigen::MatrixXd env_uncertainty;
+  Eigen::VectorXd   states;
+  Eigen::MatrixXd   uncertainty;
+  Eigen::MatrixXd   transform_matrix;
+  Eigen::MatrixXd   env_uncertainty;
   EXPECT_FALSE(imf.Predict(transform_matrix, env_uncertainty));
   states.setIdentity(4, 1);
   uncertainty.setIdentity(4, 4);
@@ -117,7 +109,7 @@ TEST(FusionCommonTest, test_predict) {
 
 TEST(FusionCommonTest, test_set_cmat) {
   InformationFilter imf;
-  Eigen::MatrixXd c_mat;
+  Eigen::MatrixXd   c_mat;
   c_mat.setIdentity(6, 1);
   bool state = imf.SetControlMatrix(c_mat);
   EXPECT_FALSE(state);
@@ -137,8 +129,8 @@ TEST(FusionCommonTest, test_set_cmat) {
 
 TEST(FusionCommonTest, test_correct) {
   InformationFilter imf;
-  Eigen::VectorXd obs_states;
-  Eigen::MatrixXd obs_uncertainty;
+  Eigen::VectorXd   obs_states;
+  Eigen::MatrixXd   obs_uncertainty;
   EXPECT_FALSE(imf.Correct(obs_states, obs_uncertainty));
   Eigen::VectorXd states;
   Eigen::MatrixXd uncertainty;
@@ -157,18 +149,18 @@ TEST(FusionCommonTest, test_correct) {
 }
 
 TEST(FusionCommonTest, test_value_correct) {
-  double time_diff = 0.05;
+  double            time_diff = 0.05;
   InformationFilter imf;
-  Eigen::VectorXd states;
-  Eigen::MatrixXd uncertainty;
+  Eigen::VectorXd   states;
+  Eigen::MatrixXd   uncertainty;
   states.setIdentity(6, 1);
   uncertainty.setIdentity(6, 6);
-  states(0) = 10.0;
-  states(1) = 20.0;
-  states(2) = 2.5;
-  states(3) = 2.5;
-  states(4) = 0.5;
-  states(5) = 0.5;
+  states(0)         = 10.0;
+  states(1)         = 20.0;
+  states(2)         = 2.5;
+  states(3)         = 2.5;
+  states(4)         = 0.5;
+  states(5)         = 0.5;
   uncertainty(0, 2) = 0.5;
   uncertainty(1, 3) = 0.25;
   uncertainty(2, 0) = 0.5;

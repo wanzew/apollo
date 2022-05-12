@@ -14,18 +14,19 @@
 #include <utility>
 
 #include "boost/bind.hpp"
-#include "cyber/common/log.h"
 #include "gflags/gflags.h"
+
+#include "cyber/common/log.h"
 #include "modules/contrib/cyber_bridge/client.h"
 
 DEFINE_int32(port, 9090, "tcp listen port");
 
 Server::Server(Node* node)
-    : node(*node),
-      signals(io),
-      endpoint(boost::asio::ip::tcp::v4(), (uint16_t)FLAGS_port),
-      acceptor(io, endpoint),
-      socket(io) {
+    : node(*node)
+    , signals(io)
+    , endpoint(boost::asio::ip::tcp::v4(), (uint16_t)FLAGS_port)
+    , acceptor(io, endpoint)
+    , socket(io) {
   signals.add(SIGTERM);
   signals.add(SIGINT);
 }
@@ -53,15 +54,12 @@ void Server::stop(const boost::system::error_code& ec, int signal_number) {
 }
 
 void Server::begin_accept() {
-  acceptor.async_accept(socket,
-                        boost::bind(&Server::end_accept, shared_from_this(),
-                                    boost::asio::placeholders::error));
+  acceptor.async_accept(socket, boost::bind(&Server::end_accept, shared_from_this(),
+                                            boost::asio::placeholders::error));
 }
 
 void Server::end_accept(const boost::system::error_code& ec) {
-  if (!acceptor.is_open()) {
-    return;
-  }
+  if (!acceptor.is_open()) { return; }
 
   if (ec) {
     AERROR << "Error accepting connection: " << ec.message();

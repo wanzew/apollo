@@ -35,14 +35,13 @@ struct TrafficLightUnprotectedRightTurnContext;
 
 class TrafficLightUnprotectedRightTurnStageStop : public Stage {
  public:
-  TrafficLightUnprotectedRightTurnStageStop(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  TrafficLightUnprotectedRightTurnStageStop(const ScenarioConfig::StageConfig&         config,
+                                            const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+                             Frame*                         frame) override;
   TrafficLightUnprotectedRightTurnContext* GetContext() {
     return GetContextAs<TrafficLightUnprotectedRightTurnContext>();
   }

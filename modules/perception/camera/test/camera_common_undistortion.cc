@@ -16,6 +16,7 @@
 #include "modules/perception/camera/test/camera_common_undistortion.h"
 
 #include <npp.h>
+
 #include <boost/filesystem.hpp>
 #include <opencv2/opencv.hpp>
 
@@ -32,11 +33,8 @@ namespace camera {
  *          dev - dev number of the GPU device
  * Note: returns OK if already been inited.
  */
-int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
-                                    int dev) {
-  if (_inited) {
-    return 0;
-  }
+int ImageGpuPreprocessHandler::init(const std::string& intrinsics_path, int dev) {
+  if (_inited) { return 0; }
 
   std::vector<double> D;
   std::vector<double> K;
@@ -47,12 +45,10 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
 
   _dev_no = dev;
 
-  if (set_device(_dev_no) != 0) {
-    return -1;
-  }
+  if (set_device(_dev_no) != 0) { return -1; }
 
   size_t img_size = _height * _width;
-  _in_size = static_cast<int>(img_size * CHANNEL * sizeof(uint8_t));
+  _in_size        = static_cast<int>(img_size * CHANNEL * sizeof(uint8_t));
 
   _out_size = static_cast<int>(img_size * CHANNEL * sizeof(uint8_t));
   // if input is rgb, its size is same as output's
@@ -60,15 +56,14 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
   BASE_CUDA_CHECK(cudaMalloc(&_d_dst, _out_size));
 
   cv::Mat_<double> I = cv::Mat_<double>::eye(3, 3);
-  cv::Mat map1(_height, _width, CV_32FC1);
-  cv::Mat map2(_height, _width, CV_32FC1);
+  cv::Mat          map1(_height, _width, CV_32FC1);
+  cv::Mat          map2(_height, _width, CV_32FC1);
 
-  cv::Mat cm = cv::Mat(3, 3, CV_64F, K.data()).clone();
-  cv::Mat dc = cv::Mat(1, 5, CV_64F, D.data()).clone();
+  cv::Mat cm  = cv::Mat(3, 3, CV_64F, K.data()).clone();
+  cv::Mat dc  = cv::Mat(1, 5, CV_64F, D.data()).clone();
   cv::Mat ncm = cm.clone();
 
-  cv::initUndistortRectifyMap(cm, dc, I, ncm, cv::Size(_width, _height),
-                              CV_32FC1, map1, map2);
+  cv::initUndistortRectifyMap(cm, dc, I, ncm, cv::Size(_width, _height), CV_32FC1, map1, map2);
 
   std::vector<float> mapx;
   std::vector<float> mapy;
@@ -85,10 +80,10 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
   BASE_CUDA_CHECK(cudaMalloc(&_d_mapx, img_size * sizeof(float)));
   BASE_CUDA_CHECK(cudaMalloc(&_d_mapy, img_size * sizeof(float)));
 
-  BASE_CUDA_CHECK(cudaMemcpy(_d_mapx, mapx.data(), img_size * sizeof(float),
-                             cudaMemcpyHostToDevice));
-  BASE_CUDA_CHECK(cudaMemcpy(_d_mapy, mapy.data(), img_size * sizeof(float),
-                             cudaMemcpyHostToDevice));
+  BASE_CUDA_CHECK(
+      cudaMemcpy(_d_mapx, mapx.data(), img_size * sizeof(float), cudaMemcpyHostToDevice));
+  BASE_CUDA_CHECK(
+      cudaMemcpy(_d_mapy, mapy.data(), img_size * sizeof(float), cudaMemcpyHostToDevice));
   _inited = true;
   return 0;
 }
@@ -100,24 +95,21 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
  *         dst - output image array (of type rgb)
  *
  */
-int ImageGpuPreprocessHandler::handle(uint8_t *src, uint8_t *dst) {
-  if (!_inited) {
-    return -1;
-  }
+int ImageGpuPreprocessHandler::handle(uint8_t* src, uint8_t* dst) {
+  if (!_inited) { return -1; }
 
   BASE_CUDA_CHECK(cudaMemcpy(_d_rgb, src, _in_size, cudaMemcpyHostToDevice));
 
-  NppiSize Remapsize;
+  NppiSize              Remapsize;
   NppiInterpolationMode RemapMode = NPPI_INTER_LINEAR;
-  Remapsize.width = _width;
-  Remapsize.height = _height;
-  NppiRect RemapRect = {0, 0, _width, _height};
+  Remapsize.width                 = _width;
+  Remapsize.height                = _height;
+  NppiRect RemapRect              = {0, 0, _width, _height};
 
-  NppStatus eStatusNPP =
-      nppiRemap_8u_C3R(_d_rgb, Remapsize, (_width * CHANNEL), RemapRect,
-                       _d_mapx, (_width * static_cast<int>(sizeof(float))),
-                       _d_mapy, (_width * static_cast<int>(sizeof(float))),
-                       _d_dst, (_width * CHANNEL), Remapsize, RemapMode);
+  NppStatus eStatusNPP = nppiRemap_8u_C3R(_d_rgb, Remapsize, (_width * CHANNEL), RemapRect, _d_mapx,
+                                          (_width * static_cast<int>(sizeof(float))), _d_mapy,
+                                          (_width * static_cast<int>(sizeof(float))), _d_dst,
+                                          (_width * CHANNEL), Remapsize, RemapMode);
 
   if (eStatusNPP != NPP_SUCCESS) {
     std::cerr << "NPP_CHECK_NPP - eStatusNPP = " << eStatusNPP << std::endl;
@@ -154,16 +146,14 @@ int ImageGpuPreprocessHandler::release(void) {
   return 0;
 }
 
-int ImageGpuPreprocessHandler::load_camera_intrinsics(
-    const std::string &intrinsics_path, int *width, int *height,
-    std::vector<double> *D, std::vector<double> *K) {
-  if (!(boost::filesystem::exists(intrinsics_path))) {
-    return -1;
-  }
+int ImageGpuPreprocessHandler::load_camera_intrinsics(const std::string&   intrinsics_path,
+                                                      int*                 width,
+                                                      int*                 height,
+                                                      std::vector<double>* D,
+                                                      std::vector<double>* K) {
+  if (!(boost::filesystem::exists(intrinsics_path))) { return -1; }
   YAML::Node node = YAML::LoadFile(intrinsics_path);
-  if (node.IsNull()) {
-    return -1;
-  }
+  if (node.IsNull()) { return -1; }
   D->resize(node["D"].size());
   for (int i = 0; i < static_cast<int>(node["D"].size()); ++i) {
     (*D)[i] = node["D"][i].as<double>();
@@ -172,7 +162,7 @@ int ImageGpuPreprocessHandler::load_camera_intrinsics(
   for (int i = 0; i < static_cast<int>(node["K"].size()); ++i) {
     (*K)[i] = node["K"][i].as<double>();
   }
-  *width = node["width"].as<int>();
+  *width  = node["width"].as<int>();
   *height = node["height"].as<int>();
   return 0;
 }

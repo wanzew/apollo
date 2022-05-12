@@ -18,13 +18,14 @@
 
 #include <string>
 
+#include "modules/map/relative_map/proto/navigation.pb.h"
+#include "modules/map/relative_map/proto/relative_map_config.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/relative_map/navigation_lane.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
-#include "modules/map/relative_map/proto/relative_map_config.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace relative_map {
@@ -42,8 +43,7 @@ class RelativeMap {
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init(
-      common::VehicleStateProvider* vehicle_state_provider);
+  apollo::common::Status Init(common::VehicleStateProvider* vehicle_state_provider);
 
   /**
    * @brief module start function
@@ -67,23 +67,22 @@ class RelativeMap {
    */
   bool Process(MapMsg* const map_msg);
 
-  void OnPerception(
-      const perception::PerceptionObstacles& perception_obstacles);
+  void OnPerception(const perception::PerceptionObstacles& perception_obstacles);
   void OnChassis(const canbus::Chassis& chassis);
   void OnLocalization(const localization::LocalizationEstimate& localization);
   void OnNavigationInfo(const NavigationInfo& navigation_info);
 
  private:
-  bool CreateMapFromNavigationLane(MapMsg* map_msg);
-  RelativeMapConfig config_;
+  bool                                      CreateMapFromNavigationLane(MapMsg* map_msg);
+  RelativeMapConfig                         config_;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
-  NavigationLane navigation_lane_;
-  perception::PerceptionObstacles perception_obstacles_;
-  canbus::Chassis chassis_;
+  NavigationLane                     navigation_lane_;
+  perception::PerceptionObstacles    perception_obstacles_;
+  canbus::Chassis                    chassis_;
   localization::LocalizationEstimate localization_;
 
-  std::mutex navigation_lane_mutex_;
+  std::mutex                    navigation_lane_mutex_;
   common::VehicleStateProvider* vehicle_state_provider_;
 };
 

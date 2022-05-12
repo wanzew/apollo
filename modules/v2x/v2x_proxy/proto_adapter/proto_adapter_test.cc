@@ -26,14 +26,10 @@ namespace apollo {
 namespace v2x {
 
 TEST(v2x_proxy_app, v2x_proxy_adapter_convert_enum) {
-  EXPECT_EQ(OSLightype::SingleTrafficLight_Type_LEFT,
-            ProtoAdapter::LightTypeObu2Sys(2));
-  EXPECT_EQ(OSLightype::SingleTrafficLight_Type_RIGHT,
-            ProtoAdapter::LightTypeObu2Sys(3));
-  EXPECT_EQ(OSLightype::SingleTrafficLight_Type_U_TURN,
-            ProtoAdapter::LightTypeObu2Sys(4));
-  EXPECT_EQ(OSLightype::SingleTrafficLight_Type_STRAIGHT,
-            ProtoAdapter::LightTypeObu2Sys(1));
+  EXPECT_EQ(OSLightype::SingleTrafficLight_Type_LEFT, ProtoAdapter::LightTypeObu2Sys(2));
+  EXPECT_EQ(OSLightype::SingleTrafficLight_Type_RIGHT, ProtoAdapter::LightTypeObu2Sys(3));
+  EXPECT_EQ(OSLightype::SingleTrafficLight_Type_U_TURN, ProtoAdapter::LightTypeObu2Sys(4));
+  EXPECT_EQ(OSLightype::SingleTrafficLight_Type_STRAIGHT, ProtoAdapter::LightTypeObu2Sys(1));
 }
 
 }  // namespace v2x

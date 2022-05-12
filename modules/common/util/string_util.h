@@ -24,10 +24,10 @@
 #include <string>
 
 #include "absl/strings/str_format.h"
+
 #include "modules/common/util/future.h"
 
-#define FORMAT_TIMESTAMP(timestamp) \
-  std::fixed << std::setprecision(9) << timestamp
+#define FORMAT_TIMESTAMP(timestamp) std::fixed << std::setprecision(9) << timestamp
 
 /**
  * @namespace apollo::common::util

@@ -36,19 +36,18 @@ struct BareIntersectionUnprotectedContext;
 
 class BareIntersectionUnprotectedStageApproach : public Stage {
  public:
-  BareIntersectionUnprotectedStageApproach(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  BareIntersectionUnprotectedStageApproach(const ScenarioConfig::StageConfig&         config,
+                                           const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+  Stage::StageStatus                  Process(const common::TrajectoryPoint& planning_init_point,
+                                              Frame*                         frame) override;
   BareIntersectionUnprotectedContext* GetContext() {
     return GetContextAs<BareIntersectionUnprotectedContext>();
   }
 
-  bool CheckClear(const ReferenceLineInfo& reference_line_info,
+  bool CheckClear(const ReferenceLineInfo&  reference_line_info,
                   std::vector<std::string>* wait_for_obstacle_ids);
 
   Stage::StageStatus FinishStage(Frame* frame);

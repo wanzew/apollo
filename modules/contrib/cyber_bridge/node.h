@@ -35,35 +35,31 @@ class Node {
 
   void remove(std::shared_ptr<Client> client);
 
-  void add_reader(const std::string& channel, const std::string& type,
-                  std::shared_ptr<Client> client);
-  void add_writer(const std::string& channel, const std::string& type,
-                  std::shared_ptr<Client> client);
+  void
+  add_reader(const std::string& channel, const std::string& type, std::shared_ptr<Client> client);
+  void
+  add_writer(const std::string& channel, const std::string& type, std::shared_ptr<Client> client);
 
   void publish(const std::string& channel, const std::string& data);
 
  private:
   std::unique_ptr<apollo::cyber::Node> node;
-  std::mutex mutex;
+  std::mutex                           mutex;
 
   struct Writer {
-    std::string desc;
-    std::string type;
-    std::shared_ptr<
-        apollo::cyber::Writer<apollo::cyber::message::PyMessageWrap>>
-        writer;
-    std::unordered_set<std::shared_ptr<Client>> clients;
+    std::string                                                                   desc;
+    std::string                                                                   type;
+    std::shared_ptr<apollo::cyber::Writer<apollo::cyber::message::PyMessageWrap>> writer;
+    std::unordered_set<std::shared_ptr<Client>>                                   clients;
   };
 
   struct Reader {
-    std::shared_ptr<
-        apollo::cyber::Reader<apollo::cyber::message::PyMessageWrap>>
-        reader;
-    std::unordered_set<std::shared_ptr<Client>> clients;
+    std::shared_ptr<apollo::cyber::Reader<apollo::cyber::message::PyMessageWrap>> reader;
+    std::unordered_set<std::shared_ptr<Client>>                                   clients;
   };
 
   typedef std::unordered_map<std::string, Writer> Writers;
   typedef std::unordered_map<std::string, Reader> Readers;
-  Writers writers;
-  Readers readers;
+  Writers                                         writers;
+  Readers                                         readers;
 };

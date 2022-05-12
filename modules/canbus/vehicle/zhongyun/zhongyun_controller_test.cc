@@ -14,16 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/canbus/vehicle/zhongyun/zhongyun_controller.h"
+
 #include <string>
 
 #include "gtest/gtest.h"
 
-#include "cyber/common/file.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/canbus/vehicle/zhongyun/zhongyun_controller.h"
-#include "modules/canbus/vehicle/zhongyun/zhongyun_message_manager.h"
 #include "modules/control/proto/control_cmd.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/canbus/vehicle/zhongyun/zhongyun_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
@@ -43,12 +45,12 @@ class ZhongyunControllerTest : public ::testing::Test {
   }
 
  protected:
-  ZhongyunController controller_;
+  ZhongyunController       controller_;
   CanSender<ChassisDetail> sender_;
-  CanbusConf canbus_conf_;
-  VehicleParameter params_;
-  ZhongyunMessageManager msg_manager_;
-  ControlCommand control_cmd_;
+  CanbusConf               canbus_conf_;
+  VehicleParameter         params_;
+  ZhongyunMessageManager   msg_manager_;
+  ControlCommand           control_cmd_;
 };
 
 TEST_F(ZhongyunControllerTest, Init) {
@@ -83,8 +85,7 @@ TEST_F(ZhongyunControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
-            ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL), ErrorCode::OK);
 }
 
 }  // namespace zhongyun

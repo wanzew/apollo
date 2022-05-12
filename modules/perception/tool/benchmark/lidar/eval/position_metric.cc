@@ -25,13 +25,11 @@ namespace apollo {
 namespace perception {
 namespace benchmark {
 
-void PositionMetric::cal_position_metric(const ObjectPtr& object,
+void PositionMetric::cal_position_metric(const ObjectPtr&            object,
                                          const PositionMetricOption& option) {
-  if (object->cloud->points.empty()) {
-    return;
-  }
+  if (object->cloud->points.empty()) { return; }
   std::vector<double> distance;
-  Eigen::Vector2d center(0.0, 0.0);
+  Eigen::Vector2d     center(0.0, 0.0);
   distance.reserve(object->cloud->size());
   for (auto& point : object->cloud->points) {
     distance.push_back(sqrt(point.x * point.x + point.y * point.y));
@@ -41,36 +39,31 @@ void PositionMetric::cal_position_metric(const ObjectPtr& object,
   center /= static_cast<int>(object->cloud->size());
   std::sort(distance.begin(), distance.end());
   unsigned int sample1 = 0;
-  unsigned int sample2 =
-      static_cast<unsigned int>(0.2 * static_cast<int>(distance.size()));
+  unsigned int sample2 = static_cast<unsigned int>(0.2 * static_cast<int>(distance.size()));
 
-  radial_distance = 0.5 * (distance[sample1] + distance[sample2]);
+  radial_distance     = 0.5 * (distance[sample1] + distance[sample2]);
   horizontal_distance = fabs(center(1));
-  vertical_distance = center(0);
-  angle =
-      acos(center.dot(Eigen::Vector2d(1, 0)) / center.norm()) * 180.0 / M_PI;
-  is_in_roi =
-      option.roi_is_main_lanes ? object->is_in_main_lanes : object->is_in_roi;
-  is_valid = true;
+  vertical_distance   = center(0);
+  angle               = acos(center.dot(Eigen::Vector2d(1, 0)) / center.norm()) * 180.0 / M_PI;
+  is_in_roi           = option.roi_is_main_lanes ? object->is_in_main_lanes : object->is_in_roi;
+  is_valid            = true;
 }
 
-double DistanceBasedRangeInterface::_s_distance = 60.0;
+double DistanceBasedRangeInterface::_s_distance      = 60.0;
 double DistanceBasedRangeInterface::_s_half_distance = 30.0;
 
 void DistanceBasedRangeInterface::set_distance(double distance) {
-  _s_distance = distance;
+  _s_distance      = distance;
   _s_half_distance = 0.5 * distance;
 }
 
-unsigned int DistanceBasedRangeInterface::get_index(
-    const PositionMetric& position) const {
+unsigned int DistanceBasedRangeInterface::get_index(const PositionMetric& position) const {
   // unsigned int index = static_cast<unsigned int>(position.radial_distance /
   // 30.0);
   // index = index > 2 ? 2 : index;
   // return index;
-  unsigned int index =
-      static_cast<unsigned int>(position.radial_distance / _s_half_distance);
-  index = index > 2 ? 2 : index;
+  unsigned int index = static_cast<unsigned int>(position.radial_distance / _s_half_distance);
+  index              = index > 2 ? 2 : index;
   return index;
 }
 
@@ -81,19 +74,16 @@ std::string DistanceBasedRangeInterface::get_element(unsigned int index) const {
     return "Total";
   } else {
     switch (index) {
-      case 0:
-        return absl::StrCat("0 - ", static_cast<int>(_s_half_distance), "m");
+      case 0: return absl::StrCat("0 - ", static_cast<int>(_s_half_distance), "m");
       case 1:
         return absl::StrCat(static_cast<int>(_s_half_distance), " - ",
                             static_cast<int>(_s_distance), "m");
-      default:
-        return absl::StrCat(static_cast<int>(_s_distance), " - 500m");
+      default: return absl::StrCat(static_cast<int>(_s_distance), " - 500m");
     }
   }
 }
 
-unsigned int DistanceBasedRangeRadarInterface::get_index(
-    const PositionMetric& position) const {
+unsigned int DistanceBasedRangeRadarInterface::get_index(const PositionMetric& position) const {
   // unsigned int index = static_cast<unsigned int>(position.radial_distance /
   // 30.0);
   // index = index > 2 ? 2 : index;
@@ -114,38 +104,28 @@ unsigned int DistanceBasedRangeRadarInterface::get_index(
 
 unsigned int DistanceBasedRangeRadarInterface::get_dim() const { return 5; }
 
-std::string DistanceBasedRangeRadarInterface::get_element(
-    unsigned int index) const {
+std::string DistanceBasedRangeRadarInterface::get_element(unsigned int index) const {
   if (index >= get_dim()) {
     return "Total";
   } else {
     switch (index) {
-      case 0:
-        return "  0 - 30m";
-      case 1:
-        return " 30 - 60m";
-      case 2:
-        return " 60 - 120m";
-      case 3:
-        return " 120 - 200m";
-      default:
-        return "200 - 500m";
+      case 0: return "  0 - 30m";
+      case 1: return " 30 - 60m";
+      case 2: return " 60 - 120m";
+      case 3: return " 120 - 200m";
+      default: return "200 - 500m";
     }
   }
 }
 
-double ViewBasedRangeInterface::_s_front_view_angle = 60.0;
-double ViewBasedRangeInterface::_s_rear_view_angle = 60.0;
+double ViewBasedRangeInterface::_s_front_view_angle    = 60.0;
+double ViewBasedRangeInterface::_s_rear_view_angle     = 60.0;
 double ViewBasedRangeInterface::_s_front_view_distance = 60.0;
-double ViewBasedRangeInterface::_s_rear_view_distance = 60.0;
+double ViewBasedRangeInterface::_s_rear_view_distance  = 60.0;
 
-void ViewBasedRangeInterface::set_front_view_angle(double angle) {
-  _s_front_view_angle = angle;
-}
+void ViewBasedRangeInterface::set_front_view_angle(double angle) { _s_front_view_angle = angle; }
 
-void ViewBasedRangeInterface::set_rear_view_angle(double angle) {
-  _s_rear_view_angle = angle;
-}
+void ViewBasedRangeInterface::set_rear_view_angle(double angle) { _s_rear_view_angle = angle; }
 
 void ViewBasedRangeInterface::set_front_view_distance(double distance) {
   _s_front_view_distance = distance;
@@ -155,11 +135,8 @@ void ViewBasedRangeInterface::set_rear_view_distance(double distance) {
   _s_rear_view_distance = distance;
 }
 
-unsigned int ViewBasedRangeInterface::get_index(
-    const PositionMetric& position) const {
-  if (position.radial_distance >= 60.0) {
-    return 3;
-  }
+unsigned int ViewBasedRangeInterface::get_index(const PositionMetric& position) const {
+  if (position.radial_distance >= 60.0) { return 3; }
   // if (position.angle <= _s_front_view_angle * 0.5) {
   //    return 0;
   //} else if (position.angle >= 180.0 - _s_rear_view_angle * 0.5) {
@@ -175,8 +152,7 @@ unsigned int ViewBasedRangeInterface::get_index(
   } else if (position.angle >= 180.0 - _s_rear_view_angle * 0.5 &&
              position.radial_distance <= _s_rear_view_distance) {
     return 1;
-  } else if (position.horizontal_distance <= 30 &&
-             position.radial_distance <= 60) {
+  } else if (position.horizontal_distance <= 30 && position.radial_distance <= 60) {
     return 2;
   }
   return 3;
@@ -190,23 +166,20 @@ std::string ViewBasedRangeInterface::get_element(unsigned int index) const {
   } else {
     switch (index) {
       case 0:
-        return absl::StrCat("Front(", static_cast<int>(_s_front_view_angle),
-                            "d", static_cast<int>(_s_front_view_distance),
-                            "m)");
+        return absl::StrCat("Front(", static_cast<int>(_s_front_view_angle), "d",
+                            static_cast<int>(_s_front_view_distance), "m)");
       case 1:
         return absl::StrCat("Rear(", static_cast<int>(_s_rear_view_angle), "d",
                             static_cast<int>(_s_rear_view_distance), "m)");
-      case 2:
-        return "Side(30m)";
-      default:
-        return "Outside  ";
+      case 2: return "Side(30m)";
+      default: return "Outside  ";
     }
   }
 }
 
 double BoxBasedRangeInterface::_s_front_box_distance = 120.0;
-double BoxBasedRangeInterface::_s_rear_box_distance = 45.0;
-double BoxBasedRangeInterface::_s_side_box_distance = 10.0;
+double BoxBasedRangeInterface::_s_rear_box_distance  = 45.0;
+double BoxBasedRangeInterface::_s_side_box_distance  = 10.0;
 
 void BoxBasedRangeInterface::set_front_box_distance(double distance) {
   _s_front_box_distance = distance;
@@ -220,8 +193,7 @@ void BoxBasedRangeInterface::set_side_box_distance(double distance) {
   _s_side_box_distance = distance;
 }
 
-unsigned int BoxBasedRangeInterface::get_index(
-    const PositionMetric& position) const {
+unsigned int BoxBasedRangeInterface::get_index(const PositionMetric& position) const {
   if (position.vertical_distance <= _s_front_box_distance &&
       position.vertical_distance >= -_s_rear_box_distance &&
       position.horizontal_distance <= _s_side_box_distance) {
@@ -239,12 +211,11 @@ std::string BoxBasedRangeInterface::get_element(unsigned int index) const {
   } else {
     switch (index) {
       case 0:
-        return absl::StrCat("Box(F", static_cast<int>(_s_front_box_distance),
-                            "R", static_cast<int>(_s_rear_box_distance), "S",
+        return absl::StrCat("Box(F", static_cast<int>(_s_front_box_distance), "R",
+                            static_cast<int>(_s_rear_box_distance), "S",
                             static_cast<int>(_s_side_box_distance), ")");
       case 1:
-      default:
-        return "Outside-box";
+      default: return "Outside-box";
     }
   }
 }
@@ -255,17 +226,13 @@ void RoiDistanceBasedRangeInterface::set_ignore_roi_outside(bool ignore) {
   _s_ignore_roi_outside = ignore;
 }
 
-unsigned int RoiDistanceBasedRangeInterface::get_index(
-    const PositionMetric& position) const {
-  unsigned int index =
-      static_cast<unsigned int>(position.radial_distance / _s_half_distance);
+unsigned int RoiDistanceBasedRangeInterface::get_index(const PositionMetric& position) const {
+  unsigned int index = static_cast<unsigned int>(position.radial_distance / _s_half_distance);
   if (_s_ignore_roi_outside) {
     index = (index > 2 || !position.is_in_roi) ? 2 : index;
   } else {
     index = index > 1 ? 4 : index;
-    if (index != 4) {
-      index = position.is_in_roi ? index : index + 2;
-    }
+    if (index != 4) { index = position.is_in_roi ? index : index + 2; }
   }
   return index;
 }
@@ -274,35 +241,27 @@ unsigned int RoiDistanceBasedRangeInterface::get_dim() const {
   return _s_ignore_roi_outside ? 3 : 5;
 }
 
-std::string RoiDistanceBasedRangeInterface::get_element(
-    unsigned int index) const {
-  if (index >= get_dim()) {
-    return "Total";
-  }
+std::string RoiDistanceBasedRangeInterface::get_element(unsigned int index) const {
+  if (index >= get_dim()) { return "Total"; }
   if (_s_ignore_roi_outside) {
     switch (index) {
-      case 0:
-        return absl::StrCat("I.0-", static_cast<int>(_s_half_distance), "m");
+      case 0: return absl::StrCat("I.0-", static_cast<int>(_s_half_distance), "m");
       case 1:
         return absl::StrCat("I.", static_cast<int>(_s_half_distance), "-",
                             static_cast<int>(_s_distance), "m");
-      default:
-        return "Outside";
+      default: return "Outside";
     }
   } else {
     switch (index) {
-      case 0:
-        return absl::StrCat("I.0-", static_cast<int>(_s_half_distance), "m");
+      case 0: return absl::StrCat("I.0-", static_cast<int>(_s_half_distance), "m");
       case 1:
         return absl::StrCat("I.", static_cast<int>(_s_half_distance), "-",
                             static_cast<int>(_s_distance), "m");
-      case 2:
-        return absl::StrCat("O.0-", static_cast<int>(_s_half_distance), "m");
+      case 2: return absl::StrCat("O.0-", static_cast<int>(_s_half_distance), "m");
       case 3:
         return absl::StrCat("O.", static_cast<int>(_s_half_distance), "-",
                             static_cast<int>(_s_distance), "m");
-      default:
-        return absl::StrCat(static_cast<int>(_s_distance), "-500m");
+      default: return absl::StrCat(static_cast<int>(_s_distance), "-500m");
     }
   }
 }

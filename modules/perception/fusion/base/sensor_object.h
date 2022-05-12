@@ -18,8 +18,9 @@
 #include <memory>
 #include <string>
 
-#include "Eigen/Core"
 #include "gtest/gtest_prod.h"
+
+#include "Eigen/Core"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/sensor_meta.h"
@@ -35,23 +36,21 @@ class SensorObject {
 
   explicit SensorObject(const std::shared_ptr<const base::Object>& object_ptr);
 
-  SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
+  SensorObject(const std::shared_ptr<const base::Object>&      object_ptr,
                const std::shared_ptr<const SensorFrameHeader>& frame_header);
 
   SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
-               const std::shared_ptr<SensorFrame>& frame_ptr);
+               const std::shared_ptr<SensorFrame>&        frame_ptr);
 
   // Getter
   // @brief get frame timestamp which might be different with object timestamp
   double GetTimestamp() const;
-  bool GetRelatedFramePose(Eigen::Affine3d* pose) const;
+  bool   GetRelatedFramePose(Eigen::Affine3d* pose) const;
 
-  std::string GetSensorId() const;
+  std::string      GetSensorId() const;
   base::SensorType GetSensorType() const;
 
-  inline std::shared_ptr<const base::Object> GetBaseObject() const {
-    return object_;
-  }
+  inline std::shared_ptr<const base::Object> GetBaseObject() const { return object_; }
 
   inline double GetInvisiblePeriod() const { return invisible_period_; }
 
@@ -60,12 +59,12 @@ class SensorObject {
  private:
   FRIEND_TEST(SensorObjectTest, test);
 
-  std::shared_ptr<const base::Object> object_;
-  double invisible_period_ = 0.0;
-  std::shared_ptr<const SensorFrameHeader> frame_header_ = nullptr;
+  std::shared_ptr<const base::Object>      object_;
+  double                                   invisible_period_ = 0.0;
+  std::shared_ptr<const SensorFrameHeader> frame_header_     = nullptr;
 };
 
-typedef std::shared_ptr<SensorObject> SensorObjectPtr;
+typedef std::shared_ptr<SensorObject>       SensorObjectPtr;
 typedef std::shared_ptr<const SensorObject> SensorObjectConstPtr;
 
 class FusedObject {

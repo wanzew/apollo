@@ -42,7 +42,8 @@ class WriterBase {
    * @param role_attr role attributes for this Writer
    */
   explicit WriterBase(const proto::RoleAttributes& role_attr)
-      : role_attr_(role_attr), init_(false) {}
+      : role_attr_(role_attr)
+      , init_(false) {}
   virtual ~WriterBase() {}
 
   /**
@@ -79,9 +80,7 @@ class WriterBase {
    *
    * @return const std::string& const reference to the channel name
    */
-  const std::string& GetChannelName() const {
-    return role_attr_.channel_name();
-  }
+  const std::string& GetChannelName() const { return role_attr_.channel_name(); }
 
   /**
    * @brief Is Writer initialized?
@@ -96,8 +95,8 @@ class WriterBase {
 
  protected:
   proto::RoleAttributes role_attr_;
-  mutable std::mutex lock_;
-  bool init_;
+  mutable std::mutex    lock_;
+  bool                  init_;
 };
 
 }  // namespace cyber

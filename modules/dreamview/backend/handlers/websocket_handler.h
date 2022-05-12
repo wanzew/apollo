@@ -46,16 +46,17 @@ namespace dreamview {
 class WebSocketHandler : public CivetWebSocketHandler {
   // In case of receiving fragmented message,
   // websocket opcode and accumulated data are stored.
-  thread_local static unsigned char current_opcode_;
+  thread_local static unsigned char     current_opcode_;
   thread_local static std::stringstream data_;
 
  public:
-  using Json = nlohmann::json;
-  using Connection = struct mg_connection;
-  using MessageHandler = std::function<void(const Json &, Connection *)>;
-  using ConnectionReadyHandler = std::function<void(Connection *)>;
+  using Json                   = nlohmann::json;
+  using Connection             = struct mg_connection;
+  using MessageHandler         = std::function<void(const Json&, Connection*)>;
+  using ConnectionReadyHandler = std::function<void(Connection*)>;
 
-  explicit WebSocketHandler(const std::string &name) : name_(name) {}
+  explicit WebSocketHandler(const std::string& name)
+      : name_(name) {}
 
   /**
    * @brief Callback method for when the client intends to establish a websocket
@@ -65,9 +66,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * @param conn the connection information
    * @returns true to keep socket open, false to close it
    */
-  bool handleConnection(CivetServer *server, const Connection *conn) override {
-    return true;
-  }
+  bool handleConnection(CivetServer* server, const Connection* conn) override { return true; }
 
   /**
    * @brief Callback method for when websocket handshake is successfully
@@ -76,7 +75,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * @param server the calling server
    * @param conn the connection information
    */
-  void handleReadyState(CivetServer *server, Connection *conn) override;
+  void handleReadyState(CivetServer* server, Connection* conn) override;
 
   /**
    * @brief Callback method for when a data frame has been received from the
@@ -98,11 +97,11 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * @param data_len length of data
    * @returns true to keep socket open, false to close it
    */
-  bool handleData(CivetServer *server, Connection *conn, int bits, char *data,
-                  size_t data_len) override;
+  bool
+  handleData(CivetServer* server, Connection* conn, int bits, char* data, size_t data_len) override;
 
-  bool handleJsonData(Connection *conn, const std::string &data);
-  bool handleBinaryData(Connection *conn, const std::string &data);
+  bool handleJsonData(Connection* conn, const std::string& data);
+  bool handleBinaryData(Connection* conn, const std::string& data);
 
   /**
    * @brief Callback method for when the connection is closed.
@@ -110,13 +109,13 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * @param server the calling server
    * @param conn the connection information
    */
-  void handleClose(CivetServer *server, const Connection *conn) override;
+  void handleClose(CivetServer* server, const Connection* conn) override;
 
   /**
    * @brief Sends the provided data to all the connected clients.
    * @param data The message string to be sent.
    */
-  bool BroadcastData(const std::string &data, bool skippable = false);
+  bool BroadcastData(const std::string& data, bool skippable = false);
 
   /**
    * @brief Sends the provided data to a specific connected client.
@@ -126,11 +125,12 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * @param skippable whether the data is allowed to be skipped if some other is
    * being sent to this connection.
    */
-  bool SendData(Connection *conn, const std::string &data,
-                bool skippable = false, int op_code = MG_WEBSOCKET_OPCODE_TEXT);
+  bool SendData(Connection*        conn,
+                const std::string& data,
+                bool               skippable = false,
+                int                op_code   = MG_WEBSOCKET_OPCODE_TEXT);
 
-  bool SendBinaryData(Connection *conn, const std::string &data,
-                      bool skippable = false);
+  bool SendBinaryData(Connection* conn, const std::string& data, bool skippable = false);
 
   /**
    * @brief Add a new message handler for a message type.
@@ -166,7 +166,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
 
   // The pool of all maintained connections. Each connection has a lock to
   // guard against simultaneous write.
-  std::unordered_map<Connection *, std::shared_ptr<std::mutex>> connections_;
+  std::unordered_map<Connection*, std::shared_ptr<std::mutex>> connections_;
 };
 
 }  // namespace dreamview

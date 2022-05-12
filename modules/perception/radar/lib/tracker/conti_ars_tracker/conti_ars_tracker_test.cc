@@ -26,9 +26,8 @@ namespace radar {
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_init_test) {
   std::unique_ptr<BaseTracker> tracker(new ContiArsTracker());
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "radar/conti_ars_tracker";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+                    "radar/conti_ars_tracker";
   EXPECT_TRUE(tracker->Init());
   EXPECT_EQ(tracker->Name(), "ContiArsTracker");
 }
@@ -50,7 +49,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_track_test) {
   radar_frame.objects[1]->velocity << 3.0, 4.0, 0.0;
   TrackerOptions options;
   base::FramePtr tracked_frame(new base::Frame);
-  bool state = tracker->Track(radar_frame, options, tracked_frame);
+  bool           state = tracker->Track(radar_frame, options, tracked_frame);
   EXPECT_TRUE(state);
 }
 
@@ -59,7 +58,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_collect_test) {
   object->track_id = 100;
   object->center << 10.0, 20.0, 0.0;
   object->velocity << 3.0, 4.0, 0.0;
-  double timestamp = 123456789.0;
+  double        timestamp = 123456789.0;
   RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
 
   std::unique_ptr<ContiArsTracker> tracker(new ContiArsTracker());
@@ -80,15 +79,14 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_unassigned_test) {
   object->track_id = 100;
   object->center << 10.0, 20.0, 0.0;
   object->velocity << 3.0, 4.0, 0.0;
-  double timestamp = 123456789.0;
+  double        timestamp = 123456789.0;
   RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
 
   std::vector<size_t> unassigned_tracks;
   unassigned_tracks.push_back(0);
 
   base::Frame radar_frame;
-  radar_frame.timestamp =
-      timestamp + ContiArsTracker::s_tracking_time_win_ + 1e-5;
+  radar_frame.timestamp = timestamp + ContiArsTracker::s_tracking_time_win_ + 1e-5;
 
   std::unique_ptr<ContiArsTracker> tracker(new ContiArsTracker());
   FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
@@ -102,8 +100,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_unassigned_test) {
   tracker->track_manager_->ClearTracks();
   RadarTrackPtr radar_track2(new RadarTrack(object, timestamp));
   tracker->track_manager_->AddTrack(radar_track2);
-  radar_frame.timestamp =
-      timestamp + ContiArsTracker::s_tracking_time_win_ - 1e-5;
+  radar_frame.timestamp = timestamp + ContiArsTracker::s_tracking_time_win_ - 1e-5;
   tracker->UpdateUnassignedTracks(radar_frame, unassigned_tracks);
   tracker->track_manager_->RemoveLostTracks();
   EXPECT_EQ(tracker->track_manager_->GetTracks().size(), 1);
@@ -112,8 +109,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_unassigned_test) {
   RadarTrackPtr radar_track3(new RadarTrack(object, timestamp));
   radar_track3->SetObsRadarNullptr();
   tracker->track_manager_->AddTrack(radar_track3);
-  radar_frame.timestamp =
-      timestamp + ContiArsTracker::s_tracking_time_win_ - 1e-5;
+  radar_frame.timestamp = timestamp + ContiArsTracker::s_tracking_time_win_ - 1e-5;
   tracker->UpdateUnassignedTracks(radar_frame, unassigned_tracks);
   tracker->track_manager_->RemoveLostTracks();
   EXPECT_EQ(tracker->track_manager_->GetTracks().size(), 0);

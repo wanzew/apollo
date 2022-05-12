@@ -21,15 +21,16 @@ namespace camera {
 // @description an angle in [-pi/2, pi/2)
 class HalfCircleAngle {
  public:
-  HalfCircleAngle() : theta_(10000) {}
-  void SetDirection(float theta);
-  float operator+(const float &theta) const;
-  float operator*(const float &scale) const;
-  HalfCircleAngle &operator=(const float &theta);
-  HalfCircleAngle &operator=(const HalfCircleAngle &theta);
-  bool operator==(const HalfCircleAngle &theta) const;
-  bool operator==(const float &theta) const;
-  float value() const;
+  HalfCircleAngle()
+      : theta_(10000) {}
+  void             SetDirection(float theta);
+  float            operator+(const float& theta) const;
+  float            operator*(const float& scale) const;
+  HalfCircleAngle& operator=(const float& theta);
+  HalfCircleAngle& operator=(const HalfCircleAngle& theta);
+  bool             operator==(const HalfCircleAngle& theta) const;
+  bool             operator==(const float& theta) const;
+  float            value() const;
 
  private:
   float theta_;

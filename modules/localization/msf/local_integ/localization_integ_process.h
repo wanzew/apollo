@@ -21,12 +21,13 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "cyber/cyber.h"
-
 #include "localization_msf/sins.h"
+
+#include "modules/localization/proto/localization.pb.h"
+
+#include "cyber/cyber.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::localization::msf
@@ -52,27 +53,25 @@ class LocalizationIntegProcess {
   ~LocalizationIntegProcess();
 
   // Initialization.
-  apollo::common::Status Init(const LocalizationIntegParam &params);
+  apollo::common::Status Init(const LocalizationIntegParam& params);
 
   // Raw Imu process.
-  void RawImuProcess(const ImuData &imu_msg);
-  void GetState(IntegState *state);
-  void GetResult(IntegState *state, LocalizationEstimate *localization);
-  void GetResult(IntegState *state, InsPva *sins_pva,
-                 double pva_covariance[9][9]);
-  void GetCorrectedImu(ImuData *imu_data);
-  void GetEarthParameter(InertialParameter *earth_param);
+  void RawImuProcess(const ImuData& imu_msg);
+  void GetState(IntegState* state);
+  void GetResult(IntegState* state, LocalizationEstimate* localization);
+  void GetResult(IntegState* state, InsPva* sins_pva, double pva_covariance[9][9]);
+  void GetCorrectedImu(ImuData* imu_data);
+  void GetEarthParameter(InertialParameter* earth_param);
 
   // itegration measure data process
-  void MeasureDataProcess(const MeasureData &measure_msg);
+  void MeasureDataProcess(const MeasureData& measure_msg);
 
  private:
-  bool CheckIntegMeasureData(const MeasureData &measure_data);
+  bool CheckIntegMeasureData(const MeasureData& measure_data);
 
-  bool LoadGnssAntennaExtrinsic(const std::string &file_path,
-                                TransformD *extrinsic) const;
+  bool LoadGnssAntennaExtrinsic(const std::string& file_path, TransformD* extrinsic) const;
 
-  void MeasureDataProcessImpl(const MeasureData &measure_msg);
+  void MeasureDataProcessImpl(const MeasureData& measure_msg);
   void MeasureDataThreadLoop();
   void StartThreadLoop();
   void StopThreadLoop();
@@ -80,7 +79,7 @@ class LocalizationIntegProcess {
   void GetValidFromOK();
 
  private:
-  Sins *sins_;
+  Sins* sins_;
 
   // config
   TransformD gnss_antenna_extrinsic_;
@@ -88,16 +87,16 @@ class LocalizationIntegProcess {
   // double imu_rate_;
 
   IntegState integ_state_;
-  InsPva ins_pva_;
-  double pva_covariance_[9][9];
+  InsPva     ins_pva_;
+  double     pva_covariance_[9][9];
 
-  ImuData corrected_imu_;
+  ImuData           corrected_imu_;
   InertialParameter earth_param_;
 
-  std::atomic<bool> keep_running_;
+  std::atomic<bool>       keep_running_;
   std::queue<MeasureData> measure_data_queue_;
-  int measure_data_queue_size_ = 150;
-  std::mutex measure_data_queue_mutex_;
+  int                     measure_data_queue_size_ = 150;
+  std::mutex              measure_data_queue_mutex_;
 
   int delay_output_counter_ = 0;
 

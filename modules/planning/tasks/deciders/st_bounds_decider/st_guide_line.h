@@ -24,6 +24,7 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
@@ -45,15 +46,13 @@ class STGuideLine {
 
   void Init(double desired_v);
 
-  void Init(double desired_v,
-            const std::vector<common::TrajectoryPoint> &speed_reference);
+  void Init(double desired_v, const std::vector<common::TrajectoryPoint>& speed_reference);
 
   virtual ~STGuideLine() = default;
 
   double GetGuideSFromT(double t);
 
-  void UpdateBlockingInfo(const double t, const double s_block,
-                          const bool is_lower_block);
+  void UpdateBlockingInfo(const double t, const double s_block, const bool is_lower_block);
 
  private:
   // Variables for simple guide-line calculation.

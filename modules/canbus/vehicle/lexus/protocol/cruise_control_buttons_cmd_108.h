@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,8 +25,7 @@ namespace canbus {
 namespace lexus {
 
 class Cruisecontrolbuttonscmd108
-    : public ::apollo::drivers::canbus::ProtocolData<
-          ::apollo::canbus::ChassisDetail> {
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -48,8 +48,7 @@ class Cruisecontrolbuttonscmd108
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Cruisecontrolbuttonscmd108* set_cruise_control_button(
-      Cruise_control_buttons_cmd_108::Cruise_control_buttonType
-          cruise_control_button);
+      Cruise_control_buttons_cmd_108::Cruise_control_buttonType cruise_control_button);
 
   // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
@@ -84,8 +83,8 @@ class Cruisecontrolbuttonscmd108
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   void set_p_cruise_control_button(
-      uint8_t* data, Cruise_control_buttons_cmd_108::Cruise_control_buttonType
-                         cruise_control_button);
+      uint8_t*                                                  data,
+      Cruise_control_buttons_cmd_108::Cruise_control_buttonType cruise_control_button);
 
   // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
@@ -109,12 +108,11 @@ class Cruisecontrolbuttonscmd108
   void set_p_clear_faults(uint8_t* data, bool clear_faults);
 
  private:
-  Cruise_control_buttons_cmd_108::Cruise_control_buttonType
-      cruise_control_button_;
-  bool ignore_overrides_;
-  bool clear_override_;
-  bool enable_;
-  bool clear_faults_;
+  Cruise_control_buttons_cmd_108::Cruise_control_buttonType cruise_control_button_;
+  bool                                                      ignore_overrides_;
+  bool                                                      clear_override_;
+  bool                                                      enable_;
+  bool                                                      clear_faults_;
 };
 
 }  // namespace lexus

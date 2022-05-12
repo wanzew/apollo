@@ -26,16 +26,16 @@ namespace perception {
 namespace camera {
 TEST(FeatureExtractorTest, demo_test) {
   std::shared_ptr<BaseFeatureExtractor> feature_extractor_;
-  FeatureExtractorInitOptions feat_options;
+  FeatureExtractorInitOptions           feat_options;
   feat_options.conf_file = "";
-  feat_options.root_dir = "";
-  feat_options.gpu_id = 0;
+  feat_options.root_dir  = "";
+  feat_options.gpu_id    = 0;
   std::shared_ptr<base::Blob<float>> blob_feature(new base::Blob<float>());
 
   blob_feature->Reshape({7, 11, 1, 1});
-  feat_options.feat_blob = blob_feature;
+  feat_options.feat_blob    = blob_feature;
   feat_options.input_height = 0;
-  feat_options.input_width = 0;
+  feat_options.input_width  = 0;
   // feature_extractor_.reset(BaseFeatureExtractorRegisterer::GetInstanceByName(
   //    "TrackingFeatureExtractor"));
   feature_extractor_.reset(new TrackingFeatureExtractor);

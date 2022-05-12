@@ -19,9 +19,7 @@
 namespace apollo {
 namespace prediction {
 
-JunctionScenarioFeatures::JunctionScenarioFeatures() {
-  scenario_.set_type(Scenario::JUNCTION);
-}
+JunctionScenarioFeatures::JunctionScenarioFeatures() { scenario_.set_type(Scenario::JUNCTION); }
 
 JunctionScenarioFeatures::~JunctionScenarioFeatures() {}
 

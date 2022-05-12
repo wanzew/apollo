@@ -28,8 +28,7 @@ namespace routing {
 
 class SubTopoGraph {
  public:
-  SubTopoGraph(const std::unordered_map<const TopoNode*,
-               std::vector<NodeSRange>>& black_map);
+  SubTopoGraph(const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>& black_map);
   ~SubTopoGraph();
 
   // edge: A -> B         not sub edge
@@ -45,9 +44,8 @@ class SubTopoGraph {
   //      return empty set
   // edge: A -> B is sub edge
   // 1. return empty set
-  void GetSubInEdgesIntoSubGraph(
-      const TopoEdge* edge,
-      std::unordered_set<const TopoEdge*>* const sub_edges) const;
+  void GetSubInEdgesIntoSubGraph(const TopoEdge*                            edge,
+                                 std::unordered_set<const TopoEdge*>* const sub_edges) const;
 
   // edge: A -> B         not sub edge
   // 1. A has no sub node, B has no sub node
@@ -62,42 +60,34 @@ class SubTopoGraph {
   //      return empty set
   // edge: A -> B is sub edge
   // 1. return empty set
-  void GetSubOutEdgesIntoSubGraph(
-      const TopoEdge* edge,
-      std::unordered_set<const TopoEdge*>* const sub_edges) const;
+  void GetSubOutEdgesIntoSubGraph(const TopoEdge*                            edge,
+                                  std::unordered_set<const TopoEdge*>* const sub_edges) const;
 
   const TopoNode* GetSubNodeWithS(const TopoNode* topo_node, double s) const;
 
  private:
-  void InitSubNodeByValidRange(const TopoNode* topo_node,
+  void InitSubNodeByValidRange(const TopoNode*                topo_node,
                                const std::vector<NodeSRange>& valid_range);
   void InitSubEdge(const TopoNode* topo_node);
 
-  void InitInSubNodeSubEdge(
-      TopoNode* const sub_node,
-      const std::unordered_set<const TopoEdge*> origin_edge);
-  void InitOutSubNodeSubEdge(
-      TopoNode* const sub_node,
-      const std::unordered_set<const TopoEdge*> origin_edge);
+  void InitInSubNodeSubEdge(TopoNode* const                           sub_node,
+                            const std::unordered_set<const TopoEdge*> origin_edge);
+  void InitOutSubNodeSubEdge(TopoNode* const                           sub_node,
+                             const std::unordered_set<const TopoEdge*> origin_edge);
 
-  bool GetSubNodes(const TopoNode* node,
-                   std::unordered_set<TopoNode*>* const sub_nodes) const;
+  bool GetSubNodes(const TopoNode* node, std::unordered_set<TopoNode*>* const sub_nodes) const;
 
   void AddPotentialEdge(const TopoNode* topo_node);
-  void AddPotentialInEdge(
-      TopoNode* const sub_node,
-      const std::unordered_set<const TopoEdge*> origin_edge);
-  void AddPotentialOutEdge(
-      TopoNode* const sub_node,
-      const std::unordered_set<const TopoEdge*> origin_edge);
+  void AddPotentialInEdge(TopoNode* const                           sub_node,
+                          const std::unordered_set<const TopoEdge*> origin_edge);
+  void AddPotentialOutEdge(TopoNode* const                           sub_node,
+                           const std::unordered_set<const TopoEdge*> origin_edge);
 
  private:
-  std::vector<std::shared_ptr<TopoNode>> topo_nodes_;
-  std::vector<std::shared_ptr<TopoEdge>> topo_edges_;
-  std::unordered_map<const TopoNode*, std::vector<NodeWithRange>>
-      sub_node_range_sorted_map_;
-  std::unordered_map<const TopoNode*, std::unordered_set<TopoNode*>>
-      sub_node_map_;
+  std::vector<std::shared_ptr<TopoNode>>                             topo_nodes_;
+  std::vector<std::shared_ptr<TopoEdge>>                             topo_edges_;
+  std::unordered_map<const TopoNode*, std::vector<NodeWithRange>>    sub_node_range_sorted_map_;
+  std::unordered_map<const TopoNode*, std::unordered_set<TopoNode*>> sub_node_map_;
 };
 
 }  // namespace routing

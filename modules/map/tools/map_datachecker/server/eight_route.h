@@ -32,11 +32,11 @@ class EightRoute : public Alignment {
  public:
   explicit EightRoute(std::shared_ptr<JsonConf> sp_conf);
   ErrorCode Process(const std::vector<FramePose>& poses);
-  double GetProgress() const;
+  double    GetProgress() const;
 
  private:
-  void Reset();
-  bool IsEightRoutePose(const std::vector<FramePose>& poses, int pose_index);
+  void   Reset();
+  bool   IsEightRoutePose(const std::vector<FramePose>& poses, int pose_index);
   double GetGoodPoseDuring();
   double GetEightRouteProgress(const std::vector<FramePose>& poses);
 

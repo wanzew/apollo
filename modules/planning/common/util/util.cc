@@ -35,42 +35,34 @@ using apollo::routing::RoutingResponse;
 bool IsVehicleStateValid(const VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
+      std::isnan(vehicle_state.kappa()) || std::isnan(vehicle_state.linear_velocity()) ||
       std::isnan(vehicle_state.linear_acceleration())) {
     return false;
   }
   return true;
 }
 
-bool IsDifferentRouting(const RoutingResponse& first,
-                        const RoutingResponse& second) {
+bool IsDifferentRouting(const RoutingResponse& first, const RoutingResponse& second) {
   if (first.has_header() && second.has_header()) {
     return first.header().sequence_num() != second.header().sequence_num();
   }
   return true;
 }
 
-double GetADCStopDeceleration(
-    apollo::common::VehicleStateProvider* vehicle_state,
-    const double adc_front_edge_s, const double stop_line_s) {
-  double adc_speed = vehicle_state->linear_velocity();
+double GetADCStopDeceleration(apollo::common::VehicleStateProvider* vehicle_state,
+                              const double                          adc_front_edge_s,
+                              const double                          stop_line_s) {
+  double       adc_speed          = vehicle_state->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
                                         .max_abs_speed_when_stopped();
-  if (adc_speed < max_adc_stop_speed) {
-    return 0.0;
-  }
+  if (adc_speed < max_adc_stop_speed) { return 0.0; }
 
   double stop_distance = 0;
 
-  if (stop_line_s > adc_front_edge_s) {
-    stop_distance = stop_line_s - adc_front_edge_s;
-  }
-  if (stop_distance < 1e-5) {
-    return std::numeric_limits<double>::max();
-  }
+  if (stop_line_s > adc_front_edge_s) { stop_distance = stop_line_s - adc_front_edge_s; }
+  if (stop_distance < 1e-5) { return std::numeric_limits<double>::max(); }
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
@@ -78,23 +70,21 @@ double GetADCStopDeceleration(
  * @brief: check if a stop_sign_overlap is still along reference_line
  */
 bool CheckStopSignOnReferenceLine(const ReferenceLineInfo& reference_line_info,
-                                  const std::string& stop_sign_overlap_id) {
+                                  const std::string&       stop_sign_overlap_id) {
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it =
-      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == stop_sign_overlap_id;
-                   });
+  auto stop_sign_overlap_it = std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
+                                           [&stop_sign_overlap_id](const PathOverlap& overlap) {
+                                             return overlap.object_id == stop_sign_overlap_id;
+                                           });
   return (stop_sign_overlap_it != stop_sign_overlaps.end());
 }
 
 /*
  * @brief: check if a traffic_light_overlap is still along reference_line
  */
-bool CheckTrafficLightOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& traffic_light_overlap_id) {
+bool CheckTrafficLightOnReferenceLine(const ReferenceLineInfo& reference_line_info,
+                                      const std::string&       traffic_light_overlap_id) {
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
   auto traffic_light_overlap_it =
@@ -110,20 +100,17 @@ bool CheckTrafficLightOnReferenceLine(
  */
 bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
+  const double adc_back_edge_s  = reference_line_info.AdcSlBoundary().start_s();
 
   hdmap::PathOverlap pnc_junction_overlap;
   reference_line_info.GetPnCJunction(adc_front_edge_s, &pnc_junction_overlap);
-  if (pnc_junction_overlap.object_id.empty()) {
-    return false;
-  }
+  if (pnc_junction_overlap.object_id.empty()) { return false; }
 
   static constexpr double kIntersectionPassDist = 2.0;  // unit: m
-  const double distance_adc_pass_intersection =
-      adc_back_edge_s - pnc_junction_overlap.end_s;
+  const double distance_adc_pass_intersection   = adc_back_edge_s - pnc_junction_overlap.end_s;
   ADEBUG << "distance_adc_pass_intersection[" << distance_adc_pass_intersection
-         << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id
-         << "] start_s[" << pnc_junction_overlap.start_s << "]";
+         << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id << "] start_s["
+         << pnc_junction_overlap.start_s << "]";
 
   return distance_adc_pass_intersection < kIntersectionPassDist;
 }
@@ -131,20 +118,17 @@ bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
 /*
  * @brief: get files at a path
  */
-void GetFilesByPath(const boost::filesystem::path& path,
-                    std::vector<std::string>* files) {
+void GetFilesByPath(const boost::filesystem::path& path, std::vector<std::string>* files) {
   ACHECK(files);
-  if (!boost::filesystem::exists(path)) {
-    return;
-  }
+  if (!boost::filesystem::exists(path)) { return; }
   if (boost::filesystem::is_regular_file(path)) {
     AINFO << "Found record file: " << path.c_str();
     files->push_back(path.c_str());
     return;
   }
   if (boost::filesystem::is_directory(path)) {
-    for (auto& entry : boost::make_iterator_range(
-             boost::filesystem::directory_iterator(path), {})) {
+    for (auto& entry :
+         boost::make_iterator_range(boost::filesystem::directory_iterator(path), {})) {
       GetFilesByPath(entry.path(), files);
     }
   }

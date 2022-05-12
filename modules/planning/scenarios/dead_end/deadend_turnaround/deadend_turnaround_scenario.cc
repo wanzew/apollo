@@ -18,6 +18,7 @@
  * @file
  **/
 #include "modules/planning/scenarios/dead_end/deadend_turnaround/deadend_turnaround_scenario.h"
+
 #include "modules/planning/scenarios/dead_end/deadend_turnaround/stage_approaching_turning_point.h"
 #include "modules/planning/scenarios/dead_end/deadend_turnaround/stage_turning.h"
 
@@ -26,94 +27,76 @@ namespace planning {
 namespace scenario {
 namespace deadend_turnaround {
 
+using apollo::common::PointENU;
 using apollo::common::VehicleState;
+using apollo::common::math::LineSegment2d;
+using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
+using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 using apollo::hdmap::PathOverlap;
-using apollo::common::PointENU;
-using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::routing::RoutingRequest;
-using apollo::common::math::Polygon2d;
-using apollo::common::math::LineSegment2d;
 
-apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
-               const std::shared_ptr<DependencyInjector>& injector)>
+apollo::common::util::Factory<ScenarioConfig::StageType,
+                              Stage,
+                              Stage* (*)(const ScenarioConfig::StageConfig&         stage_config,
+                                         const std::shared_ptr<DependencyInjector>& injector)>
     DeadEndTurnAroundScenario::s_stage_factory_;
 
 void DeadEndTurnAroundScenario::Init() {
-  if (init_) {
-    return;
-  }
+  if (init_) { return; }
   Scenario::Init();
-  if (!GetScenarioConfig()) {
-    return;
-  }
+  if (!GetScenarioConfig()) { return; }
 
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
 }
 
 void DeadEndTurnAroundScenario::RegisterStages() {
-  if (s_stage_factory_.Empty()) {
-    s_stage_factory_.Clear();
-  }
-  s_stage_factory_.Register(
-      ScenarioConfig::DEADEND_TURNAROUND_APPROACHING_TURNING_POINT,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new StageApproachingTurningPoint(config, injector);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::DEADEND_TURNAROUND_TURNING,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new StageTurning(config, injector);
-      });
+  if (s_stage_factory_.Empty()) { s_stage_factory_.Clear(); }
+  s_stage_factory_.Register(ScenarioConfig::DEADEND_TURNAROUND_APPROACHING_TURNING_POINT,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new StageApproachingTurningPoint(config, injector);
+                            });
+  s_stage_factory_.Register(ScenarioConfig::DEADEND_TURNAROUND_TURNING,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new StageTurning(config, injector);
+                            });
 }
 
-std::unique_ptr<Stage> DeadEndTurnAroundScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
-  if (s_stage_factory_.Empty()) {
-    RegisterStages();
-  }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config, injector);
-  if (ptr) {
-    ptr->SetContext(&context_);
-  }
+std::unique_ptr<Stage>
+DeadEndTurnAroundScenario::CreateStage(const ScenarioConfig::StageConfig&         stage_config,
+                                       const std::shared_ptr<DependencyInjector>& injector) {
+  if (s_stage_factory_.Empty()) { RegisterStages(); }
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(), stage_config, injector);
+  if (ptr) { ptr->SetContext(&context_); }
   return ptr;
 }
 
 bool DeadEndTurnAroundScenario::GetScenarioConfig() {
-  if (!config_.has_deadend_turnaround_config()) {
-    return false;
-  }
+  if (!config_.has_deadend_turnaround_config()) { return false; }
   context_.scenario_config.CopyFrom(config_.deadend_turnaround_config());
   return true;
 }
 
-bool DeadEndTurnAroundScenario::IsTransferable(
-  const Frame& frame,
-  const PointENU& dead_end_point,
-  const double dead_end_start_range) {
+bool DeadEndTurnAroundScenario::IsTransferable(const Frame&    frame,
+                                               const PointENU& dead_end_point,
+                                               const double    dead_end_start_range) {
   std::string target_dead_end_id;
   const auto& routing_type =
-      frame.local_view().routing->routing_request().dead_end_info().
-      dead_end_routing_type();
-  if (routing_type != routing::ROUTING_IN &&
-      routing_type != routing::ROUTING_OUT) {
+      frame.local_view().routing->routing_request().dead_end_info().dead_end_routing_type();
+  if (routing_type != routing::ROUTING_IN && routing_type != routing::ROUTING_OUT) {
     ADEBUG << "falied to get dead end routing task";
     return false;
   }
   // vaild check
-  const hdmap::HDMap* base_map_ptr = hdmap::HDMapUtil::BaseMapPtr();
+  const hdmap::HDMap*               base_map_ptr = hdmap::HDMapUtil::BaseMapPtr();
   std::vector<JunctionInfoConstPtr> junctions;
-  JunctionInfoConstPtr junction;
+  JunctionInfoConstPtr              junction;
   if (base_map_ptr->GetJunctions(dead_end_point, 1.0, &junctions) != 0) {
     ADEBUG << "Fail to get junctions from base_map.";
     return false;
@@ -126,14 +109,10 @@ bool DeadEndTurnAroundScenario::IsTransferable(
     ADEBUG << "Target Dead End not found";
     return false;
   }
-  target_dead_end_id = junction->id().id();
+  target_dead_end_id        = junction->id().id();
   const auto& vehicle_state = frame.vehicle_state();
-  const auto& nearby_path =
-      frame.reference_line_info().front().reference_line().map_path();
-  if (!CheckDistanceToDeadEnd(vehicle_state,
-                              nearby_path,
-                              dead_end_start_range,
-                              &junction)) {
+  const auto& nearby_path   = frame.reference_line_info().front().reference_line().map_path();
+  if (!CheckDistanceToDeadEnd(vehicle_state, nearby_path, dead_end_start_range, &junction)) {
     ADEBUG << "Dead end found, but too far, distance larger than "
               "pre-defined distance "
            << target_dead_end_id;
@@ -144,8 +123,8 @@ bool DeadEndTurnAroundScenario::IsTransferable(
 
 bool DeadEndTurnAroundScenario::SelectTargetDeadEndJunction(
     std::vector<JunctionInfoConstPtr>* junctions,
-    const apollo::common::PointENU& dead_end_point,
-    JunctionInfoConstPtr* target_junction) {
+    const apollo::common::PointENU&    dead_end_point,
+    JunctionInfoConstPtr*              target_junction) {
   Vec2d start_point;
   start_point.set_x(dead_end_point.x());
   start_point.set_y(dead_end_point.y());
@@ -173,18 +152,15 @@ bool DeadEndTurnAroundScenario::SelectTargetDeadEndJunction(
   return true;
 }
 
-bool DeadEndTurnAroundScenario::CheckDistanceToDeadEnd(
-    const VehicleState& vehicle_state,
-    const Path& nearby_path,
-    const double dead_end_start_range,
-    JunctionInfoConstPtr* junction) {
-  const Vec2d& car_position = {vehicle_state.x(), vehicle_state.y()};
-  auto junction_polygon = (*junction)->polygon();
+bool DeadEndTurnAroundScenario::CheckDistanceToDeadEnd(const VehicleState&   vehicle_state,
+                                                       const Path&           nearby_path,
+                                                       const double          dead_end_start_range,
+                                                       JunctionInfoConstPtr* junction) {
+  const Vec2d& car_position     = {vehicle_state.x(), vehicle_state.y()};
+  auto         junction_polygon = (*junction)->polygon();
   AERROR << "dead_end_start_range is: " << dead_end_start_range;
-  AERROR << "car dis is: " <<
-  std::abs(junction_polygon.DistanceTo(car_position));
-  return std::abs(junction_polygon.DistanceTo(car_position)) <
-         dead_end_start_range;
+  AERROR << "car dis is: " << std::abs(junction_polygon.DistanceTo(car_position));
+  return std::abs(junction_polygon.DistanceTo(car_position)) < dead_end_start_range;
 }
 
 }  // namespace deadend_turnaround

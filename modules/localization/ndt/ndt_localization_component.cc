@@ -46,13 +46,13 @@ bool NDTLocalizationComponent::Init() {
 }
 
 bool NDTLocalizationComponent::InitConfig() {
-  localization_topic_ = FLAGS_localization_topic;
-  lidar_topic_ = FLAGS_lidar_topic;
-  lidar_pose_topic_ = FLAGS_localization_ndt_topic;
-  broadcast_tf_frame_id_ = FLAGS_broadcast_tf_frame_id;
+  localization_topic_          = FLAGS_localization_topic;
+  lidar_topic_                 = FLAGS_lidar_topic;
+  lidar_pose_topic_            = FLAGS_localization_ndt_topic;
+  broadcast_tf_frame_id_       = FLAGS_broadcast_tf_frame_id;
   broadcast_tf_child_frame_id_ = FLAGS_broadcast_tf_child_frame_id;
-  odometry_status_topic_ = FLAGS_ins_stat_topic;
-  localization_status_topic_ = FLAGS_localization_msf_status;
+  odometry_status_topic_       = FLAGS_ins_stat_topic;
+  localization_status_topic_   = FLAGS_localization_msf_status;
 
   localization_->Init();
 
@@ -61,29 +61,24 @@ bool NDTLocalizationComponent::InitConfig() {
 
 bool NDTLocalizationComponent::InitIO() {
   cyber::ReaderConfig reader_config;
-  reader_config.channel_name = lidar_topic_;
+  reader_config.channel_name       = lidar_topic_;
   reader_config.pending_queue_size = 1;
 
-  std::function<void(const std::shared_ptr<drivers::PointCloud>&)>
-      lidar_register_call = std::bind(&NDTLocalizationComponent::LidarCallback,
-                                      this, std::placeholders::_1);
-  lidar_listener_ = this->node_->CreateReader<drivers::PointCloud>(
-      reader_config, lidar_register_call);
+  std::function<void(const std::shared_ptr<drivers::PointCloud>&)> lidar_register_call =
+      std::bind(&NDTLocalizationComponent::LidarCallback, this, std::placeholders::_1);
+  lidar_listener_ =
+      this->node_->CreateReader<drivers::PointCloud>(reader_config, lidar_register_call);
 
-  reader_config.channel_name = odometry_status_topic_;
+  reader_config.channel_name       = odometry_status_topic_;
   reader_config.pending_queue_size = 1;
-  std::function<void(const std::shared_ptr<drivers::gnss::InsStat>&)>
-      odometry_status_call =
-          std::bind(&NDTLocalizationComponent::OdometryStatusCallback, this,
-                    std::placeholders::_1);
-  odometry_status_listener_ = this->node_->CreateReader<drivers::gnss::InsStat>(
-      reader_config, odometry_status_call);
+  std::function<void(const std::shared_ptr<drivers::gnss::InsStat>&)> odometry_status_call =
+      std::bind(&NDTLocalizationComponent::OdometryStatusCallback, this, std::placeholders::_1);
+  odometry_status_listener_ =
+      this->node_->CreateReader<drivers::gnss::InsStat>(reader_config, odometry_status_call);
 
-  localization_talker_ =
-      this->node_->CreateWriter<LocalizationEstimate>(localization_topic_);
+  localization_talker_ = this->node_->CreateWriter<LocalizationEstimate>(localization_topic_);
 
-  lidar_pose_talker_ =
-      this->node_->CreateWriter<LocalizationEstimate>(lidar_pose_topic_);
+  lidar_pose_talker_ = this->node_->CreateWriter<LocalizationEstimate>(lidar_pose_topic_);
 
   localization_status_talker_ =
       this->node_->CreateWriter<LocalizationStatus>(localization_status_topic_);
@@ -91,8 +86,7 @@ bool NDTLocalizationComponent::InitIO() {
   return true;
 }
 
-bool NDTLocalizationComponent::Proc(
-    const std::shared_ptr<localization::Gps>& gps_msg) {
+bool NDTLocalizationComponent::Proc(const std::shared_ptr<localization::Gps>& gps_msg) {
   localization_->OdometryCallback(gps_msg);
 
   if (localization_->IsServiceStarted()) {
@@ -129,8 +123,7 @@ void NDTLocalizationComponent::OdometryStatusCallback(
   localization_->OdometryStatusCallback(status_msg);
 }
 
-void NDTLocalizationComponent::PublishPoseBroadcastTF(
-    const LocalizationEstimate& localization) {
+void NDTLocalizationComponent::PublishPoseBroadcastTF(const LocalizationEstimate& localization) {
   // broadcast tf message
   apollo::transform::TransformStamped tf2_msg;
 
@@ -153,8 +146,7 @@ void NDTLocalizationComponent::PublishPoseBroadcastTF(
   tf2_broadcaster_->SendTransform(tf2_msg);
 }
 
-void NDTLocalizationComponent::PublishPoseBroadcastTopic(
-    const LocalizationEstimate& localization) {
+void NDTLocalizationComponent::PublishPoseBroadcastTopic(const LocalizationEstimate& localization) {
   localization_talker_->Write(localization);
 }
 

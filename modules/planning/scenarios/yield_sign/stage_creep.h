@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 
@@ -35,17 +36,15 @@ struct YieldSignContext;
 
 class YieldSignStageCreep : public Stage {
  public:
-  YieldSignStageCreep(const ScenarioConfig::StageConfig& config,
+  YieldSignStageCreep(const ScenarioConfig::StageConfig&         config,
                       const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+                             Frame*                         frame) override;
 
-  YieldSignContext* GetContext() {
-    return Stage::GetContextAs<YieldSignContext>();
-  }
+  YieldSignContext* GetContext() { return Stage::GetContextAs<YieldSignContext>(); }
 
  private:
   Stage::StageStatus FinishStage();

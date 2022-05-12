@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/lidar/hesai/parser/parser.h"
+
 #include <cmath>
 #include <memory>
 #include <string>
-
-#include "modules/drivers/lidar/hesai/parser/parser.h"
 
 namespace apollo {
 namespace drivers {
@@ -26,40 +26,34 @@ namespace hesai {
 
 using apollo::drivers::PointCloud;
 
-Parser::Parser(const std::shared_ptr<::apollo::cyber::Node>& node,
-               const Config& conf)
-    : node_(node), conf_(conf) {
-  tz_second_ = conf_.time_zone() * 3600;
+Parser::Parser(const std::shared_ptr<::apollo::cyber::Node>& node, const Config& conf)
+    : node_(node)
+    , conf_(conf) {
+  tz_second_   = conf_.time_zone() * 3600;
   start_angle_ = static_cast<int>(conf_.start_angle() * 100);
 }
 
 Parser::~Parser() { Stop(); }
 
 bool Parser::Init() {
-  if (inited_) {
-    return true;
-  }
+  if (inited_) { return true; }
 
   // init calibration
   if (!conf_.is_online_calibration() && conf_.calibration_file() != "") {
     if (!LoadCalibration(conf_.calibration_file().c_str())) {
-      AERROR << "load local calibration file[" << conf_.calibration_file()
-             << "] error";
+      AERROR << "load local calibration file[" << conf_.calibration_file() << "] error";
       return false;
     }
     is_calibration_ = true;
   } else {
-    online_calibration_thread_ =
-        std::thread(&Parser::LoadCalibrationThread, this);
+    online_calibration_thread_ = std::thread(&Parser::LoadCalibrationThread, this);
   }
 
   // init writer
-  raw_pointcloud_writer_ =
-      node_->CreateWriter<PointCloud>(conf_.pointcloud_channel());
+  raw_pointcloud_writer_ = node_->CreateWriter<PointCloud>(conf_.pointcloud_channel());
 
   if (raw_pointcloud_writer_ == nullptr) {
-    AERROR << "create writer:" << conf_.pointcloud_channel()
-           << " error, check cyber is init?";
+    AERROR << "create writer:" << conf_.pointcloud_channel() << " error, check cyber is init?";
     return false;
   }
 
@@ -109,9 +103,8 @@ bool Parser::Parse(const std::shared_ptr<HesaiScan>& scan) {
   ResetRawPointCloud();
   bool is_end = false;
   for (int i = 0; i < scan->firing_pkts_size(); ++i) {
-    const auto& pkt = scan->firing_pkts(i);
-    uint8_t* data =
-        reinterpret_cast<uint8_t*>(const_cast<char*>(pkt.data().c_str()));
+    const auto& pkt  = scan->firing_pkts(i);
+    uint8_t*    data = reinterpret_cast<uint8_t*>(const_cast<char*>(pkt.data().c_str()));
     ParseRawPacket(data, pkt.data().size(), &is_end);
   }
   PublishRawPointCloud(scan->header().sequence_num());
@@ -123,9 +116,7 @@ void Parser::Parse(const uint8_t* data, int size, bool* is_end) {
   ParseRawPacket(data, size, &t_is_end);
   ++packet_nums_;
   *is_end = CheckIsEnd(t_is_end);
-  if (*is_end == false) {
-    return;
-  }
+  if (*is_end == false) { return; }
   packet_nums_ = 0;
   PublishRawPointCloud();
   ResetRawPointCloud();
@@ -133,8 +124,7 @@ void Parser::Parse(const uint8_t* data, int size, bool* is_end) {
 
 bool Parser::CheckIsEnd(bool is_end) {
   if (packet_nums_ >= max_packets_) {
-    AWARN << "over max packets, packets:" << packet_nums_
-          << ", max packets:" << max_packets_;
+    AWARN << "over max packets, packets:" << packet_nums_ << ", max packets:" << max_packets_;
     return true;
   }
   if (is_end && packet_nums_ < min_packets_) {
@@ -153,25 +143,20 @@ void Parser::PublishRawPointCloud(int seq) {
   }
 
   raw_pointcloud_out_->mutable_header()->set_sequence_num(seq_index_++);
-  if (seq > 0) {
-    raw_pointcloud_out_->mutable_header()->set_sequence_num(seq);
-  }
+  if (seq > 0) { raw_pointcloud_out_->mutable_header()->set_sequence_num(seq); }
   raw_pointcloud_out_->mutable_header()->set_frame_id(conf_.frame_id());
-  raw_pointcloud_out_->mutable_header()->set_timestamp_sec(
-      cyber::Time().Now().ToSecond());
+  raw_pointcloud_out_->mutable_header()->set_timestamp_sec(cyber::Time().Now().ToSecond());
   raw_pointcloud_out_->set_height(1);
   raw_pointcloud_out_->set_width(size);
-  const auto timestamp =
-      raw_pointcloud_out_->point(static_cast<int>(size) - 1).timestamp();
-  raw_pointcloud_out_->set_measurement_time(static_cast<double>(timestamp) /
-                                            1e9);
+  const auto timestamp = raw_pointcloud_out_->point(static_cast<int>(size) - 1).timestamp();
+  raw_pointcloud_out_->set_measurement_time(static_cast<double>(timestamp) / 1e9);
   raw_pointcloud_out_->mutable_header()->set_lidar_timestamp(timestamp);
   raw_pointcloud_writer_->Write(raw_pointcloud_out_);
 }
 
 void Parser::LoadCalibrationThread() {
   TcpCmdClient tcp_cmd(conf_.ip(), conf_.tcp_cmd_port());
-  std::string content;
+  std::string  content;
   AINFO << "start LoadCalibrationThread";
   while (running_) {
     AWARN << "calibration has not inited";
@@ -194,9 +179,7 @@ void Parser::LoadCalibrationThread() {
 
 void Parser::Stop() {
   running_.store(false);
-  if (online_calibration_thread_.joinable()) {
-    online_calibration_thread_.join();
-  }
+  if (online_calibration_thread_.joinable()) { online_calibration_thread_.join(); }
 }
 
 bool Parser::LoadCalibration(const char* path_file) {
@@ -212,7 +195,7 @@ bool Parser::LoadCalibration(const char* path_file) {
 bool Parser::LoadCalibration(const std::string& content) {
   AINFO << "parse calibration content:" << content;
   std::istringstream ifs(content);
-  std::string line;
+  std::string        line;
   if (!std::getline(ifs, line)) {  // first line "Laser id,Elevation,Azimuth"
     AERROR << "lidar calibration content is empty, content:" << content;
     return false;
@@ -223,15 +206,13 @@ bool Parser::LoadCalibration(const std::string& content) {
 
   int line_counter = 0;
   while (std::getline(ifs, line)) {
-    if (line_counter++ >= LASER_COUNT_L64) {
-      break;
-    }
+    if (line_counter++ >= LASER_COUNT_L64) { break; }
 
     double elev = 0, azimuth = 0;
-    int line_id = 0;
+    int    line_id = 0;
 
     std::stringstream ss(line);
-    std::string subline;
+    std::string       subline;
     std::getline(ss, subline, ',');
     std::stringstream(subline) >> line_id;
     std::getline(ss, subline, ',');
@@ -245,7 +226,7 @@ bool Parser::LoadCalibration(const std::string& content) {
       return false;
     }
 
-    elev_angle[line_id - 1] = elev;
+    elev_angle[line_id - 1]    = elev;
     azimuthOffset[line_id - 1] = azimuth;
   }
 
@@ -256,14 +237,14 @@ bool Parser::LoadCalibration(const std::string& content) {
   }
 
   for (int i = 0; i < line_counter; ++i) {
-    elev_angle_map_[i] = elev_angle[i];
+    elev_angle_map_[i]               = elev_angle[i];
     horizatal_azimuth_offset_map_[i] = azimuthOffset[i];
   }
   return true;
 }
 
 void Parser::CheckPktTime(double time_sec) {
-  double now = apollo::cyber::Time().Now().ToSecond();
+  double now  = apollo::cyber::Time().Now().ToSecond();
   double diff = std::abs(now - time_sec);
   if (diff > 0.1) {
     // AWARN << conf_.frame_id() << " time too big, diff:" << diff

@@ -32,8 +32,8 @@ using ::apollo::planning::ADCTrajectory;
 using ::apollo::v2x::IntersectionTrafficLightData;
 
 OsInterFace::OsInterFace()
-    : node_(::apollo::cyber::CreateNode("v2x_os_interface")),
-      init_flag_(false) {
+    : node_(::apollo::cyber::CreateNode("v2x_os_interface"))
+    , init_flag_(false) {
   init_flag_ = !!node_ && InitReaders() && InitWriters();
 }
 
@@ -41,15 +41,13 @@ OsInterFace::~OsInterFace() {}
 
 bool OsInterFace::InitReaders() {
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      FLAGS_localization_topic,
-      [this](const std::shared_ptr<const LocalizationEstimate> &msg) {
+      FLAGS_localization_topic, [this](const std::shared_ptr<const LocalizationEstimate>& msg) {
         std::lock_guard<std::mutex> lg(mutex_localization_);
         current_localization_.Clear();
         current_localization_.CopyFrom(*msg);
       });
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
-      FLAGS_planning_trajectory_topic,
-      [this](const std::shared_ptr<const ADCTrajectory> &msg) {
+      FLAGS_planning_trajectory_topic, [this](const std::shared_ptr<const ADCTrajectory>& msg) {
         {
           std::lock_guard<std::mutex> lg(mutex_planning_);
           adc_trajectory_msg_.Clear();
@@ -63,32 +61,25 @@ bool OsInterFace::InitReaders() {
 
 bool OsInterFace::InitWriters() {
   v2x_obu_traffic_light_writer_ =
-      node_->CreateWriter<::apollo::v2x::obu::ObuTrafficLight>(
-          FLAGS_v2x_obu_traffic_light_topic);
-  v2x_traffic_light_writer_ =
-      node_->CreateWriter<::apollo::v2x::IntersectionTrafficLightData>(
-          FLAGS_v2x_traffic_light_topic);
-  v2x_traffic_light_hmi_writer_ =
-      node_->CreateWriter<::apollo::perception::TrafficLightDetection>(
-          FLAGS_v2x_traffic_light_for_hmi_topic);
+      node_->CreateWriter<::apollo::v2x::obu::ObuTrafficLight>(FLAGS_v2x_obu_traffic_light_topic);
+  v2x_traffic_light_writer_ = node_->CreateWriter<::apollo::v2x::IntersectionTrafficLightData>(
+      FLAGS_v2x_traffic_light_topic);
+  v2x_traffic_light_hmi_writer_ = node_->CreateWriter<::apollo::perception::TrafficLightDetection>(
+      FLAGS_v2x_traffic_light_for_hmi_topic);
   v2x_obstacles_internal_writer_ =
-      node_->CreateWriter<apollo::v2x::V2XObstacles>(
-          FLAGS_v2x_internal_obstacle_topic);
-  return nullptr != v2x_obu_traffic_light_writer_ &&
-         nullptr != v2x_traffic_light_hmi_writer_ &&
-         nullptr != v2x_obstacles_internal_writer_ &&
-         nullptr != v2x_traffic_light_writer_;
+      node_->CreateWriter<apollo::v2x::V2XObstacles>(FLAGS_v2x_internal_obstacle_topic);
+  return nullptr != v2x_obu_traffic_light_writer_ && nullptr != v2x_traffic_light_hmi_writer_ &&
+         nullptr != v2x_obstacles_internal_writer_ && nullptr != v2x_traffic_light_writer_;
 }
 
-void OsInterFace::GetLocalizationFromOs(
-    const std::shared_ptr<LocalizationEstimate> &msg) {
+void OsInterFace::GetLocalizationFromOs(const std::shared_ptr<LocalizationEstimate>& msg) {
   AINFO << "get localization result from os";
   std::lock_guard<std::mutex> lg(mutex_localization_);
   msg->CopyFrom(current_localization_);
 }
 
 void OsInterFace::GetPlanningAdcFromOs(
-    const std::shared_ptr<::apollo::planning::ADCTrajectory> &msg) {
+    const std::shared_ptr<::apollo::planning::ADCTrajectory>& msg) {
   AINFO << "get planning adc from os";
   std::unique_lock<std::mutex> lg(mutex_planning_);
   cond_planning_.wait(lg, [this]() { return flag_planning_new_; });
@@ -97,40 +88,31 @@ void OsInterFace::GetPlanningAdcFromOs(
 }
 
 void OsInterFace::SendV2xObuTrafficLightToOs(
-    const std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> &msg) {
-  if (nullptr == msg) {
-    return;
-  }
+    const std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight>& msg) {
+  if (nullptr == msg) { return; }
   AINFO << "send v2x obu traffic_light to os";
   SendMsgToOs(v2x_obu_traffic_light_writer_.get(), msg);
   AINFO << "v2x obu traffic_light result: " << msg->DebugString();
 }
 
-void OsInterFace::SendV2xObstacles2Sys(
-    const std::shared_ptr<apollo::v2x::V2XObstacles> &msg) {
-  if (nullptr == msg) {
-    return;
-  }
+void OsInterFace::SendV2xObstacles2Sys(const std::shared_ptr<apollo::v2x::V2XObstacles>& msg) {
+  if (nullptr == msg) { return; }
   AINFO << "send v2x obu traffic_light to os";
   SendMsgToOs(v2x_obstacles_internal_writer_.get(), msg);
   AINFO << "v2x obu traffic_light result: " << msg->DebugString();
 }
 
 void OsInterFace::SendV2xTrafficLightToOs(
-    const std::shared_ptr<IntersectionTrafficLightData> &msg) {
-  if (nullptr == msg) {
-    return;
-  }
+    const std::shared_ptr<IntersectionTrafficLightData>& msg) {
+  if (nullptr == msg) { return; }
   AINFO << "send v2x traffic_light to os";
   SendMsgToOs(v2x_traffic_light_writer_.get(), msg);
   AINFO << "v2x traffic_light result: " << msg->DebugString();
 }
 
 void OsInterFace::SendV2xTrafficLight4Hmi2Sys(
-    const std::shared_ptr<::apollo::perception::TrafficLightDetection> &msg) {
-  if (nullptr == msg) {
-    return;
-  }
+    const std::shared_ptr<::apollo::perception::TrafficLightDetection>& msg) {
+  if (nullptr == msg) { return; }
   AINFO << "send v2x tl4hmi to os";
   SendMsgToOs(v2x_traffic_light_hmi_writer_.get(), msg);
   AINFO << "v2x tl4hmi result: " << msg->DebugString();

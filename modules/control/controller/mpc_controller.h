@@ -26,7 +26,9 @@
 #include <string>
 
 #include "Eigen/Core"
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/common/filters/mean_filter.h"
@@ -66,7 +68,7 @@ class MPCController : public Controller {
    * @return Status initialization status
    */
   common::Status Init(std::shared_ptr<DependencyInjector> injector,
-                      const ControlConf *control_conf) override;
+                      const ControlConf*                  control_conf) override;
 
   /**
    * @brief compute steering target and throttle/ brake based on current vehicle
@@ -77,10 +79,10 @@ class MPCController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      ControlCommand *cmd) override;
+  common::Status ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                                       const canbus::Chassis*                    chassis,
+                                       const planning::ADCTrajectory*            trajectory,
+                                       ControlCommand*                           cmd) override;
 
   /**
    * @brief reset MPC Controller
@@ -100,28 +102,30 @@ class MPCController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleMPCDebug *debug);
+  void UpdateState(SimpleMPCDebug* debug);
 
-  void UpdateMatrix(SimpleMPCDebug *debug);
+  void UpdateMatrix(SimpleMPCDebug* debug);
 
-  void FeedforwardUpdate(SimpleMPCDebug *debug);
+  void FeedforwardUpdate(SimpleMPCDebug* debug);
 
-  void ComputeLateralErrors(const double x, const double y, const double theta,
-                            const double linear_v, const double angular_v,
-                            const double linear_a,
-                            const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleMPCDebug *debug);
+  void ComputeLateralErrors(const double              x,
+                            const double              y,
+                            const double              theta,
+                            const double              linear_v,
+                            const double              angular_v,
+                            const double              linear_a,
+                            const TrajectoryAnalyzer& trajectory_analyzer,
+                            SimpleMPCDebug*           debug);
 
-  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
-                                 SimpleMPCDebug *debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer* trajectory, SimpleMPCDebug* debug);
 
-  bool LoadControlConf(const ControlConf *control_conf);
+  bool LoadControlConf(const ControlConf* control_conf);
 
-  void InitializeFilters(const ControlConf *control_conf);
+  void InitializeFilters(const ControlConf* control_conf);
 
   void LogInitParameters();
 
-  void ProcessLogs(const SimpleMPCDebug *debug, const canbus::Chassis *chassis);
+  void ProcessLogs(const SimpleMPCDebug* debug, const canbus::Chassis* chassis);
 
   void CloseLogFile();
 
@@ -133,10 +137,9 @@ class MPCController : public Controller {
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
 
-  void LoadControlCalibrationTable(
-      const MPCControllerConf &mpc_controller_conf);
+  void LoadControlCalibrationTable(const MPCControllerConf& mpc_controller_conf);
 
-  void LoadMPCGainScheduler(const MPCControllerConf &mpc_controller_conf);
+  void LoadMPCGainScheduler(const MPCControllerConf& mpc_controller_conf);
 
   std::unique_ptr<Interpolation2D> control_interpolation_;
 
@@ -214,15 +217,15 @@ class MPCController : public Controller {
   // estimate acceleration and jerk
   double previous_lateral_acceleration_ = 0.0;
 
-  double previous_heading_rate_ = 0.0;
+  double previous_heading_rate_     = 0.0;
   double previous_ref_heading_rate_ = 0.0;
 
-  double previous_heading_acceleration_ = 0.0;
+  double previous_heading_acceleration_     = 0.0;
   double previous_ref_heading_acceleration_ = 0.0;
 
   // longitudinal dynamic variables for computing the differential valute to
   // estimate acceleration and jerk
-  double previous_acceleration_ = 0.0;
+  double previous_acceleration_           = 0.0;
   double previous_acceleration_reference_ = 0.0;
 
   // parameters for mpc solver; number of iterations

@@ -32,17 +32,15 @@ TEST(BatchStreamTest, test_init) {
   }
 
   {
-    BatchStream batch_stream(
-        0, 0,
-        "modules/perception/inference/inference_test_data/tensorrt/nonexists");
+    BatchStream batch_stream(0, 0,
+                             "modules/perception/inference/inference_test_data/tensorrt/nonexists");
     EXPECT_EQ(batch_stream.getBatchSize(), 0);
     EXPECT_EQ(batch_stream.getBatchesRead(), 0);
   }
 
   {
     BatchStream batch_stream(
-        1, 5,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 5, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     auto dims = batch_stream.getDims();
     batch_stream.reset(0);
     EXPECT_EQ(1, dims.n());
@@ -55,8 +53,7 @@ TEST(BatchStreamTest, test_init) {
 TEST(BatchStreamTest, test_update) {
   {
     BatchStream batch_stream(
-        1, 3,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 3, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     batch_stream.reset(0);
     EXPECT_TRUE(batch_stream.update());
     EXPECT_TRUE(batch_stream.update());
@@ -71,8 +68,7 @@ TEST(BatchStreamTest, test_update) {
 TEST(BatchStreamTest, test_next) {
   {
     BatchStream batch_stream(
-        1, 3,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 3, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     batch_stream.reset(0);
     EXPECT_TRUE(batch_stream.next());
     EXPECT_TRUE(batch_stream.next());
@@ -83,8 +79,7 @@ TEST(BatchStreamTest, test_next) {
   }
   {
     BatchStream batch_stream(
-        1, 5,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 5, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     EXPECT_TRUE(batch_stream.next());
     EXPECT_TRUE(batch_stream.next());
     EXPECT_TRUE(batch_stream.next());
@@ -96,8 +91,7 @@ TEST(BatchStreamTest, test_next) {
 TEST(BatchStreamTest, test_skip) {
   {
     BatchStream batch_stream(
-        2, 2,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        2, 2, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     batch_stream.skip(1);
     EXPECT_EQ(batch_stream.mFileCount, 2);
     batch_stream.skip(1);
@@ -105,8 +99,7 @@ TEST(BatchStreamTest, test_skip) {
   }
   {
     BatchStream batch_stream(
-        1, 2,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
+        1, 2, "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     batch_stream.skip(1);
     EXPECT_EQ(batch_stream.mFileCount, 1);
     batch_stream.skip(0);
@@ -114,8 +107,7 @@ TEST(BatchStreamTest, test_skip) {
   }
   {
     BatchStream batch_stream(
-        1, 6,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_2x1x1x1");
+        1, 6, "modules/perception/inference/inference_test_data/tensorrt/bs_2x1x1x1");
     batch_stream.skip(1);
     EXPECT_EQ(batch_stream.mFileCount, 1);
     batch_stream.skip(1);
@@ -123,8 +115,7 @@ TEST(BatchStreamTest, test_skip) {
   }
   {
     BatchStream batch_stream(
-        3, 2,
-        "modules/perception/inference/inference_test_data/tensorrt/bs_2x1x1x1");
+        3, 2, "modules/perception/inference/inference_test_data/tensorrt/bs_2x1x1x1");
     batch_stream.skip(1);
     EXPECT_EQ(batch_stream.mFileCount, 2);
     batch_stream.skip(1);

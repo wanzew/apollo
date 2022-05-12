@@ -40,26 +40,23 @@ const char car_img_path[3][1024] = {
     "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
 
 // =================VisualizationEngine=================
-bool MapImageKey::operator<(const MapImageKey &key) const {
+bool MapImageKey::operator<(const MapImageKey& key) const {
   // Compare elements by priority.
   return std::forward_as_tuple(level, zone_id, node_north_id, node_east_id) <
-         std::forward_as_tuple(key.level, key.zone_id, key.node_north_id,
-                               key.node_east_id);
+         std::forward_as_tuple(key.level, key.zone_id, key.node_north_id, key.node_east_id);
 }
 
 // =================MapImageCache=================
-bool MapImageCache::Get(const MapImageKey &key, cv::Mat *image) {
+bool MapImageCache::Get(const MapImageKey& key, cv::Mat* image) {
   auto found_iter = _map.find(key);
-  if (found_iter == _map.end()) {
-    return false;
-  }
+  if (found_iter == _map.end()) { return false; }
   // move the corresponding key to list front
   _list.splice(_list.begin(), _list, found_iter->second);
   *image = found_iter->second->second;
   return true;
 }
 
-void MapImageCache::Set(const MapImageKey &key, const cv::Mat &image) {
+void MapImageCache::Set(const MapImageKey& key, const cv::Mat& image) {
   auto found_iter = _map.find(key);
   if (found_iter != _map.end()) {
     // move the corresponding key to list front
@@ -80,23 +77,23 @@ void MapImageCache::Set(const MapImageKey &key, const cv::Mat &image) {
 
 // =================VisualizationEngine=================
 VisualizationEngine::VisualizationEngine()
-    : map_image_cache_(20),
-      image_window_(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
-      big_window_(3072, 3072, CV_8UC3),
-      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)) {}
+    : map_image_cache_(20)
+    , image_window_(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0))
+    , big_window_(3072, 3072, CV_8UC3)
+    , tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)) {}
 
-bool VisualizationEngine::Init(const std::string &map_folder,
-                               const std::string &map_visual_folder,
-                               const VisualMapParam &map_param,
-                               const unsigned int resolution_id,
-                               const int zone_id,
-                               const Eigen::Affine3d &extrinsic,
-                               const unsigned int loc_info_num) {
-  map_folder_ = map_folder;
-  map_visual_folder_ = map_visual_folder;
-  map_param_ = map_param;
-  velodyne_extrinsic_ = extrinsic;
-  loc_info_num_ = loc_info_num;
+bool VisualizationEngine::Init(const std::string&     map_folder,
+                               const std::string&     map_visual_folder,
+                               const VisualMapParam&  map_param,
+                               const unsigned int     resolution_id,
+                               const int              zone_id,
+                               const Eigen::Affine3d& extrinsic,
+                               const unsigned int     loc_info_num) {
+  map_folder_          = map_folder;
+  map_visual_folder_   = map_visual_folder;
+  map_param_           = map_param;
+  velodyne_extrinsic_  = extrinsic;
+  loc_info_num_        = loc_info_num;
   expected_car_loc_id_ = loc_info_num;
 
   trajectory_groups_.resize(loc_info_num_);
@@ -115,23 +112,18 @@ bool VisualizationEngine::Init(const std::string &map_folder,
     return false;
   }
 
-  zone_id_ = zone_id;
+  zone_id_       = zone_id;
   resolution_id_ = resolution_id;
 
-  cloud_img_ =
-      cv::Mat(cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
-              CV_8UC3);
+  cloud_img_ = cv::Mat(cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y), CV_8UC3);
   cloud_img_mask_ =
-      cv::Mat(cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y),
-              CV_8UC1);
+      cv::Mat(cv::Size(map_param_.map_node_size_x, map_param_.map_node_size_y), CV_8UC1);
 
   Preprocess(map_folder, map_visual_folder);
 
   std::string params_file = image_visual_resolution_path_ + "/param.txt";
-  bool success = InitOtherParams(params_file);
-  if (!success) {
-    AERROR << "Init other params failed.";
-  }
+  bool        success     = InitOtherParams(params_file);
+  if (!success) { AERROR << "Init other params failed."; }
 
   cv::namedWindow(window_name_, cv::WINDOW_NORMAL);
   cv::resizeWindow(window_name_, 1024, 1024);
@@ -141,9 +133,8 @@ bool VisualizationEngine::Init(const std::string &map_folder,
   return true;
 }
 
-void VisualizationEngine::Visualize(
-    ::apollo::common::EigenVector<LocalizatonInfo> &&loc_infos,
-    const ::apollo::common::EigenVector3dVec &cloud) {
+void VisualizationEngine::Visualize(::apollo::common::EigenVector<LocalizatonInfo>&& loc_infos,
+                                    const ::apollo::common::EigenVector3dVec&        cloud) {
   if (!is_init_) {
     AERROR << "Visualziation should be init first.";
     return;
@@ -158,13 +149,9 @@ void VisualizationEngine::Visualize(
 
   if (!UpdateCarLocId(expected_car_loc_id_)) {
     if (!UpdateCarLocId(car_loc_id_)) {
-      if (!UpdateCarLocId()) {
-        return;
-      }
+      if (!UpdateCarLocId()) { return; }
     } else {
-      if (expected_car_loc_id_ == loc_info_num_) {
-        expected_car_loc_id_ = car_loc_id_;
-      }
+      if (expected_car_loc_id_ == loc_info_num_) { expected_car_loc_id_ = car_loc_id_; }
     }
   }
 
@@ -173,15 +160,13 @@ void VisualizationEngine::Visualize(
   Draw();
 }
 
-void VisualizationEngine::SetAutoPlay(bool auto_play) {
-  auto_play_ = auto_play;
-}
+void VisualizationEngine::SetAutoPlay(bool auto_play) { auto_play_ = auto_play; }
 
-void VisualizationEngine::Preprocess(const std::string &map_folder,
-                                     const std::string &map_visual_folder) {
-  std::string image_path = map_folder_ + "/image";
+void VisualizationEngine::Preprocess(const std::string& map_folder,
+                                     const std::string& map_visual_folder) {
+  std::string image_path        = map_folder_ + "/image";
   std::string image_visual_path = map_visual_folder;
-  char buf[256];
+  char        buf[256];
   snprintf(buf, sizeof(buf), "/%03u", resolution_id_);
   image_visual_resolution_path_ = image_visual_path + buf;
   AINFO << "image_visual_resolution_path: " << image_visual_resolution_path_;
@@ -189,14 +174,12 @@ void VisualizationEngine::Preprocess(const std::string &map_folder,
   AINFO << "image_resolution_path: " << image_resolution_path;
 
   if (!EnsureDirectory(image_visual_path)) {
-    AERROR << "image_visual_path: " << image_visual_path
-           << " cannot be created.";
+    AERROR << "image_visual_path: " << image_visual_path << " cannot be created.";
     return;
   }
 
   if (DirectoryExists(image_visual_resolution_path_)) {
-    AINFO << "image_visual_resolution_path: " << image_visual_resolution_path_
-          << "already exists.";
+    AINFO << "image_visual_resolution_path: " << image_visual_resolution_path_ << "already exists.";
     return;
   }
   if (!EnsureDirectory(image_visual_resolution_path_)) {
@@ -207,38 +190,30 @@ void VisualizationEngine::Preprocess(const std::string &map_folder,
 
   boost::filesystem::path image_resolution_path_boost(image_resolution_path);
   // push path of map's images to vector
-  std::vector<std::string> map_bin_path;
+  std::vector<std::string>                        map_bin_path;
   boost::filesystem::recursive_directory_iterator end_iter;
-  boost::filesystem::recursive_directory_iterator iter(
-      image_resolution_path_boost);
+  boost::filesystem::recursive_directory_iterator iter(image_resolution_path_boost);
   for (; iter != end_iter; ++iter) {
     if (!boost::filesystem::is_directory(*iter)) {
-      if (iter->path().extension() == ".png") {
-        map_bin_path.push_back(iter->path().string());
-      }
+      if (iter->path().extension() == ".png") { map_bin_path.push_back(iter->path().string()); }
     } else {
       std::string tmp = iter->path().string();
-      tmp = tmp.substr(image_resolution_path.length(), tmp.length());
-      tmp = image_visual_resolution_path_ + tmp;
+      tmp             = tmp.substr(image_resolution_path.length(), tmp.length());
+      tmp             = image_visual_resolution_path_ + tmp;
       EnsureDirectory(tmp);
     }
   }
 
-  if (map_bin_path.empty()) {
-    return;
-  }
+  if (map_bin_path.empty()) { return; }
 
-  GenerateMutiResolutionImages(map_bin_path,
-                               static_cast<int>(image_resolution_path.length()),
+  GenerateMutiResolutionImages(map_bin_path, static_cast<int>(image_resolution_path.length()),
                                image_visual_resolution_path_);
 }
 
 void VisualizationEngine::Draw() {
   UpdateLevel();
 
-  if (follow_car_) {
-    SetViewCenter(car_pose_.translation()[0], car_pose_.translation()[1]);
-  }
+  if (follow_car_) { SetViewCenter(car_pose_.translation()[0], car_pose_.translation()[1]); }
 
   MapImageKey iamge_key;
   CoordToImageKey(_view_center, &iamge_key);
@@ -252,36 +227,33 @@ void VisualizationEngine::Draw() {
       if (LoadImageToCache(key)) {
         map_image_cache_.Get(key, &subMat_[i + 1][j + 1]);
       } else {
-        subMat_[i + 1][j + 1] =
-            cv::Mat(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0));
+        subMat_[i + 1][j + 1] = cv::Mat(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0));
       }
     }
   }
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      subMat_[i][j].copyTo(
-          big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
+      subMat_[i][j].copyTo(big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
     }
   }
 
-  cv::Point map_grid_index =
-      CoordToMapGridIndex(_view_center, resolution_id_, cur_stride_);
+  cv::Point map_grid_index  = CoordToMapGridIndex(_view_center, resolution_id_, cur_stride_);
   cv::Point node_grid_index = MapGridIndexToNodeGridIndex(map_grid_index);
-  cv::Point bias = node_grid_index - map_grid_index;
+  cv::Point bias            = node_grid_index - map_grid_index;
 
   DrawTrajectory(bias);
   DrawCloud(bias);
   DrawLoc(bias);
   DrawStd(bias);
 
-  int width = static_cast<int>(1024 * cur_scale_) / cur_stride_;
-  int dis = width / 2;
+  int width      = static_cast<int>(1024 * cur_scale_) / cur_stride_;
+  int dis        = width / 2;
   int left_top_x = node_grid_index.x + 1024 - dis;
   int left_top_y = node_grid_index.y + 1024 - dis;
 
-  cv::resize(big_window_(cv::Rect(left_top_x, left_top_y, width, width)),
-             image_window_, cv::Size(1024, 1024), 0, 0, cv::INTER_LINEAR);
+  cv::resize(big_window_(cv::Rect(left_top_x, left_top_y, width, width)), image_window_,
+             cv::Size(1024, 1024), 0, 0, cv::INTER_LINEAR);
   cv::flip(image_window_, image_window_, 0);
 
   DrawLegend();
@@ -293,30 +265,28 @@ void VisualizationEngine::Draw() {
   cv::imshow(window_name_, image_window_);
 
   int waitTime = 0;
-  if (auto_play_) {
-    waitTime = 10;
-  }
+  if (auto_play_) { waitTime = 10; }
   ProcessKey(cv::waitKey(waitTime));
 }
 
-void VisualizationEngine::DrawTrajectory(const cv::Point &bias) {
+void VisualizationEngine::DrawTrajectory(const cv::Point& bias) {
   AINFO << "Draw trajectory.";
   if (cur_level_ == 0 && is_draw_trajectory_) {
     unsigned int i = (car_loc_id_ + 1) % loc_info_num_;
     for (unsigned int k = 0; k < loc_info_num_; k++) {
-      std::map<double, Eigen::Vector2d> &trj = trajectory_groups_[i];
+      std::map<double, Eigen::Vector2d>& trj = trajectory_groups_[i];
       if (trj.empty()) {
         i = (i + 1) % loc_info_num_;
         continue;
       }
 
-      cv::Point lt;
-      cv::Point pre_lt;
+      cv::Point                                   lt;
+      cv::Point                                   pre_lt;
       std::map<double, Eigen::Vector2d>::iterator iter = trj.end();
       --iter;
-      const Eigen::Vector2d &loc_2d = iter->second;
-      lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
-      lt = lt + bias + cv::Point(1024, 1024);
+      const Eigen::Vector2d& loc_2d = iter->second;
+      lt                            = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
+      lt                            = lt + bias + cv::Point(1024, 1024);
 
       if (lt.x >= 0 && lt.y >= 0 && lt.x < 1024 * 3 && lt.y < 1024 * 3) {
         unsigned char b = color_table[i % 3][0];
@@ -328,9 +298,9 @@ void VisualizationEngine::DrawTrajectory(const cv::Point &bias) {
         int count = 0;
         while (iter != trj.begin() && count < 500) {
           --iter;
-          const Eigen::Vector2d &loc_2d = iter->second;
-          lt = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
-          lt = lt + bias + cv::Point(1024, 1024);
+          const Eigen::Vector2d& loc_2d = iter->second;
+          lt                            = CoordToMapGridIndex(loc_2d, resolution_id_, cur_stride_);
+          lt                            = lt + bias + cv::Point(1024, 1024);
 
           if (lt.x >= 0 && lt.y >= 0 && lt.x < 1024 * 3 && lt.y < 1024 * 3) {
             unsigned char b = color_table[i % 3][0];
@@ -351,14 +321,14 @@ void VisualizationEngine::DrawTrajectory(const cv::Point &bias) {
   }
 }
 
-void VisualizationEngine::DrawLoc(const cv::Point &bias) {
+void VisualizationEngine::DrawLoc(const cv::Point& bias) {
   AINFO << "Draw loc.";
   if (cur_level_ == 0) {
     unsigned int i = (car_loc_id_ + 1) % loc_info_num_;
     for (unsigned int k = 0; k < loc_info_num_; k++) {
-      LocalizatonInfo &loc_info = cur_loc_infos_[i];
-      cv::Point lt;
-      const Eigen::Translation3d &loc = loc_info.location;
+      LocalizatonInfo&            loc_info = cur_loc_infos_[i];
+      cv::Point                   lt;
+      const Eigen::Translation3d& loc = loc_info.location;
 
       Eigen::Vector2d loc_2d;
       loc_2d[0] = loc.x();
@@ -369,9 +339,9 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
 
       if (lt.x >= 0 && lt.y >= 0 && lt.x < 1024 * 3 && lt.y < 1024 * 3) {
         if (is_draw_car_ && loc_info.is_has_attitude) {
-          const Eigen::Quaterniond &quatd = loc_info.attitude;
-          double quaternion[] = {quatd.w(), quatd.x(), quatd.y(), quatd.z()};
-          double euler_angle[3] = {0};
+          const Eigen::Quaterniond& quatd          = loc_info.attitude;
+          double                    quaternion[]   = {quatd.w(), quatd.x(), quatd.y(), quatd.z()};
+          double                    euler_angle[3] = {0};
           QuaternionToEuler(quaternion, euler_angle);
           euler_angle[0] = euler_angle[0] * 180 / PI;
           euler_angle[1] = euler_angle[1] * 180 / PI;
@@ -382,25 +352,20 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
           double yaw = euler_angle[2];
 
           cv::Mat mat_tem;
-          cv::resize(car_img_mats_[i], mat_tem, cv::Size(48, 24), 0, 0,
-                     cv::INTER_LINEAR);
+          cv::resize(car_img_mats_[i], mat_tem, cv::Size(48, 24), 0, 0, cv::INTER_LINEAR);
           cv::Mat rotated_mat;
           // AINFO << "yaw: " << yaw;
           // RotateImg(mat_tem, rotated_mat, 90 - yaw);
           // RotateImg(mat_tem, rotated_mat, - yaw - 90);
           // RotateImg(mat_tem, rotated_mat, yaw + 90);
           RotateImg(mat_tem, &rotated_mat, yaw - 90);
-          cv::Point car_lt =
-              lt - cv::Point(rotated_mat.cols / 2, rotated_mat.rows / 2);
-          cv::Point car_rb =
-              car_lt + cv::Point(rotated_mat.cols, rotated_mat.rows);
-          if (car_lt.x >= 0 && car_lt.y >= 0 && car_rb.x <= 1024 * 3 &&
-              car_rb.y <= 1024 * 3) {
+          cv::Point car_lt = lt - cv::Point(rotated_mat.cols / 2, rotated_mat.rows / 2);
+          cv::Point car_rb = car_lt + cv::Point(rotated_mat.cols, rotated_mat.rows);
+          if (car_lt.x >= 0 && car_lt.y >= 0 && car_rb.x <= 1024 * 3 && car_rb.y <= 1024 * 3) {
             cv::Mat mat_mask;
             cv::cvtColor(rotated_mat, mat_mask, cv::COLOR_BGR2GRAY);
             rotated_mat.copyTo(
-                big_window_(cv::Rect(car_lt.x, car_lt.y, rotated_mat.cols,
-                                     rotated_mat.rows)),
+                big_window_(cv::Rect(car_lt.x, car_lt.y, rotated_mat.cols, rotated_mat.rows)),
                 mat_mask);
           }
         } else {
@@ -416,17 +381,17 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
   }
 }
 
-void VisualizationEngine::DrawStd(const cv::Point &bias) {
+void VisualizationEngine::DrawStd(const cv::Point& bias) {
   AINFO << "Draw std.";
   if (cur_level_ == 0 && is_draw_std_) {
     unsigned int i = (car_loc_id_ + 1) % loc_info_num_;
     for (unsigned int k = 0; k < loc_info_num_; k++) {
-      LocalizatonInfo &loc_info = cur_loc_infos_[i];
+      LocalizatonInfo& loc_info = cur_loc_infos_[i];
       if (loc_info.is_has_std) {
-        cv::Point lt;
-        const Eigen::Translation3d &loc = loc_info.location;
-        const Eigen::Vector3d &std = loc_info.std_var;
-        Eigen::Vector2d loc_2d;
+        cv::Point                   lt;
+        const Eigen::Translation3d& loc = loc_info.location;
+        const Eigen::Vector3d&      std = loc_info.std_var;
+        Eigen::Vector2d             loc_2d;
         loc_2d[0] = loc.x();
         loc_2d[1] = loc.y();
 
@@ -440,8 +405,7 @@ void VisualizationEngine::DrawStd(const cv::Point &bias) {
 
           cv::Size size(static_cast<int>(std::sqrt(std[0]) * 200.0 + 1.0),
                         static_cast<int>(std::sqrt(std[1]) * 200.0 + 1.0));
-          cv::ellipse(big_window_, lt, size, 0, 0, 360, cv::Scalar(b, g, r), 2,
-                      8);
+          cv::ellipse(big_window_, lt, size, 0, 0, 360, cv::Scalar(b, g, r), 2, 8);
         }
       }
 
@@ -450,23 +414,19 @@ void VisualizationEngine::DrawStd(const cv::Point &bias) {
   }
 }
 
-void VisualizationEngine::DrawCloud(const cv::Point &bias) {
-  if (!cur_loc_infos_[car_loc_id_].is_has_attitude) {
-    return;
-  }
+void VisualizationEngine::DrawCloud(const cv::Point& bias) {
+  if (!cur_loc_infos_[car_loc_id_].is_has_attitude) { return; }
 
   AINFO << "Draw cloud.";
   if (cur_level_ == 0) {
-    CloudToMat(car_pose_, velodyne_extrinsic_, cloud_, &cloud_img_,
-               &cloud_img_mask_);
+    CloudToMat(car_pose_, velodyne_extrinsic_, cloud_, &cloud_img_, &cloud_img_mask_);
     cv::Point lt;
     lt = CoordToMapGridIndex(cloud_img_lt_coord_, resolution_id_, cur_stride_);
     lt = lt + bias + cv::Point(1024, 1024);
 
     cv::Point rb = lt + cv::Point(1024, 1024);
     if (lt.x >= 0 && lt.y >= 0 && rb.x <= 1024 * 3 && rb.y <= 1024 * 3) {
-      cloud_img_.copyTo(big_window_(cv::Rect(lt.x, lt.y, 1024, 1024)),
-                        cloud_img_mask_);
+      cloud_img_.copyTo(big_window_(cv::Rect(lt.x, lt.y, 1024, 1024)), cloud_img_mask_);
       // cloud_img_.copyTo(big_window_(cv::Rect(lt.x, lt.y, 1024, 1024)));
     }
   }
@@ -474,42 +434,39 @@ void VisualizationEngine::DrawCloud(const cv::Point &bias) {
 
 void VisualizationEngine::DrawLegend() {
   AINFO << "Draw legend.";
-  int fontFace = cv::FONT_HERSHEY_SIMPLEX;
-  double fontScale = 0.6;
-  int thickness = 2.0;
-  int baseline = 0;
+  int      fontFace  = cv::FONT_HERSHEY_SIMPLEX;
+  double   fontScale = 0.6;
+  int      thickness = 2.0;
+  int      baseline  = 0;
   cv::Size textSize;
 
   for (unsigned int i = 0; i < loc_info_num_; i++) {
-    LocalizatonInfo &loc_info = cur_loc_infos_[i];
-    if (!loc_info.is_valid) {
-      continue;
-    }
+    LocalizatonInfo& loc_info = cur_loc_infos_[i];
+    if (!loc_info.is_valid) { continue; }
 
     std::string text = loc_info.description;
-    textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
+    textSize         = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
     cv::Point textOrg(790, (15 + textSize.height) * (i + 1));
-    cv::putText(image_window_, text, textOrg, fontFace, fontScale,
-                cv::Scalar(255, 0, 0), thickness, 8);
+    cv::putText(image_window_, text, textOrg, fontFace, fontScale, cv::Scalar(255, 0, 0), thickness,
+                8);
 
     unsigned char b = color_table[i % 3][0];
     unsigned char g = color_table[i % 3][1];
     unsigned char r = color_table[i % 3][2];
-    cv::circle(
-        image_window_,
-        cv::Point(755, (15 + textSize.height) * (i + 1) - textSize.height / 2),
-        8, cv::Scalar(b, g, r), 3);
+    cv::circle(image_window_,
+               cv::Point(755, (15 + textSize.height) * (i + 1) - textSize.height / 2), 8,
+               cv::Scalar(b, g, r), 3);
   }
 }
 
 void VisualizationEngine::DrawInfo() {
   AINFO << "Draw info.";
-  LocalizatonInfo &loc_info = cur_loc_infos_[car_loc_id_];
+  LocalizatonInfo& loc_info = cur_loc_infos_[car_loc_id_];
 
-  int fontFace = cv::FONT_HERSHEY_SIMPLEX;
-  double fontScale = 0.8;
-  int thickness = 2.0;
-  int baseline = 0;
+  int      fontFace  = cv::FONT_HERSHEY_SIMPLEX;
+  double   fontScale = 0.8;
+  int      thickness = 2.0;
+  int      baseline  = 0;
   cv::Size textSize;
 
   std::string text;
@@ -517,19 +474,19 @@ void VisualizationEngine::DrawInfo() {
   // draw frame id.
   char info[256];
   snprintf(info, sizeof(info), "Frame: %d.", loc_info.frame_id);
-  text = info;
+  text     = info;
   textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
   cv::Point textOrg(10, 10 + textSize.height);
-  cv::putText(image_window_, text, textOrg, fontFace, fontScale,
-              cv::Scalar(255, 0, 0), thickness, 8);
+  cv::putText(image_window_, text, textOrg, fontFace, fontScale, cv::Scalar(255, 0, 0), thickness,
+              8);
 
   // draw timestamp.
   snprintf(info, sizeof(info), "Timestamp: %lf.", loc_info.timestamp);
-  text = info;
+  text     = info;
   textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
-  textOrg = cv::Point(10, 2 * (10 + textSize.height));
-  cv::putText(image_window_, text, textOrg, fontFace, fontScale,
-              cv::Scalar(255, 0, 0), thickness, 8);
+  textOrg  = cv::Point(10, 2 * (10 + textSize.height));
+  cv::putText(image_window_, text, textOrg, fontFace, fontScale, cv::Scalar(255, 0, 0), thickness,
+              8);
 }
 
 void VisualizationEngine::DrawTips() {
@@ -537,10 +494,10 @@ void VisualizationEngine::DrawTips() {
 
   tips_window_.setTo(cv::Scalar(0, 0, 0));
 
-  int fontFace = cv::FONT_HERSHEY_SIMPLEX;
-  double fontScale = 0.5;
-  int thickness = 1.0;
-  int baseline = 0;
+  int      fontFace  = cv::FONT_HERSHEY_SIMPLEX;
+  double   fontScale = 0.5;
+  int      thickness = 1.0;
+  int      baseline  = 0;
   cv::Size textSize;
 
   std::string text;
@@ -550,34 +507,30 @@ void VisualizationEngine::DrawTips() {
   snprintf(info, sizeof(info),
            "e: zoom out; q: zoom in; m: max scale; n: origin scale; w: up; s: "
            "down; a: move left; d: move right; r: move center");
-  text = info;
+  text     = info;
   textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
   cv::Point textOrg(5, 5 + textSize.height);
-  cv::putText(tips_window_, text, textOrg, fontFace, fontScale,
-              cv::Scalar(255, 255, 255), thickness, 8);
+  cv::putText(tips_window_, text, textOrg, fontFace, fontScale, cv::Scalar(255, 255, 255),
+              thickness, 8);
 
   snprintf(info, sizeof(info),
            "f: follow car/free view; p: play/pause; c: change current loc; 1: "
            "draw car/not; 2: draw trajectory/not; others: next");
-  text = info;
+  text     = info;
   textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
-  textOrg = cv::Point(5, 2 * (5 + textSize.height));
-  cv::putText(tips_window_, text, textOrg, fontFace, fontScale,
-              cv::Scalar(255, 255, 255), thickness, 8);
+  textOrg  = cv::Point(5, 2 * (5 + textSize.height));
+  cv::putText(tips_window_, text, textOrg, fontFace, fontScale, cv::Scalar(255, 255, 255),
+              thickness, 8);
 
   tips_window_.copyTo(image_window_(cv::Rect(0, 976, 1024, 48)));
 }
 
 void VisualizationEngine::UpdateLevel() {
-  if (cur_scale_ > max_stride_ * 1.5) {
-    SetScale(max_stride_ * 1.5);
-  }
-  if (cur_scale_ < 0.5) {
-    SetScale(0.5);
-  }
+  if (cur_scale_ > max_stride_ * 1.5) { SetScale(max_stride_ * 1.5); }
+  if (cur_scale_ < 0.5) { SetScale(0.5); }
   // calculate which image level to use
-  cur_level_ = 0;
-  cur_stride_ = 1;
+  cur_level_    = 0;
+  cur_stride_   = 1;
   double radius = cur_scale_ / 2;
   while (radius >= 1.0) {
     radius /= 2;
@@ -586,9 +539,9 @@ void VisualizationEngine::UpdateLevel() {
   }
 }
 
-void VisualizationEngine::GenerateMutiResolutionImages(
-    const std::vector<std::string> &src_files, const int base_path_length,
-    const std::string &dst_folder) {
+void VisualizationEngine::GenerateMutiResolutionImages(const std::vector<std::string>& src_files,
+                                                       const int          base_path_length,
+                                                       const std::string& dst_folder) {
   int x_min = std::numeric_limits<int>::max();
   int x_max = -1;
   int y_min = std::numeric_limits<int>::max();
@@ -617,16 +570,16 @@ void VisualizationEngine::GenerateMutiResolutionImages(
 
   // for image level 0, just copy from raw image
   for (unsigned int i = 0; i < src_files.size(); i++) {
-    std::string p = src_files[i].substr(
-        base_path_length, src_files[i].length() - 4 - base_path_length);
-    p = dst_folder + p;
+    std::string p =
+        src_files[i].substr(base_path_length, src_files[i].length() - 4 - base_path_length);
+    p           = dst_folder + p;
     cv::Mat tmp = cv::imread(src_files[i]);
     cv::imwrite(p + "_0.png", tmp);
   }
 
   // generate higher image level;
-  std::string image_visual_path_dst = src_files[0].substr(
-      base_path_length, src_files[0].length() - 22 - base_path_length);
+  std::string image_visual_path_dst =
+      src_files[0].substr(base_path_length, src_files[0].length() - 22 - base_path_length);
   image_visual_path_dst = dst_folder + image_visual_path_dst;
 
   int pt_x = x_min;
@@ -644,21 +597,19 @@ void VisualizationEngine::GenerateMutiResolutionImages(
 
         for (int i = 0; i < 2; i++) {
           for (int j = 0; j < 2; j++) {
-            snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png",
-                     image_visual_path_dst.c_str(), pt_y + i * step,
-                     pt_x + j * step, lvl - 1);
+            snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png", image_visual_path_dst.c_str(),
+                     pt_y + i * step, pt_x + j * step, lvl - 1);
             if (cyber::common::PathExists(ss)) {
-              flag = true;
+              flag        = true;
               cv::Mat img = cv::imread(ss);
               img.copyTo(large(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
             }
           }
         }
         if (flag) {
-          snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png",
-                   image_visual_path_dst.c_str(), pt_y, pt_x, lvl);
-          cv::resize(large, small, cv::Size(1024, 1024), 0, 0,
-                     cv::INTER_LINEAR);
+          snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png", image_visual_path_dst.c_str(), pt_y, pt_x,
+                   lvl);
+          cv::resize(large, small, cv::Size(1024, 1024), 0, 0, cv::INTER_LINEAR);
           cv::imwrite(ss, small);
         }
       }
@@ -671,20 +622,19 @@ void VisualizationEngine::GenerateMutiResolutionImages(
   outf << x_min << " " << y_min << std::endl;
   outf << x_max << " " << y_max << std::endl;
   outf << level << std::endl;
-  outf << image_visual_path_dst.substr(
-              dst_folder.length(),
-              image_visual_path_dst.length() - dst_folder.length() - 3)
+  outf << image_visual_path_dst.substr(dst_folder.length(),
+                                       image_visual_path_dst.length() - dst_folder.length() - 3)
        << std::endl;
   outf.close();
 }
 
-bool VisualizationEngine::InitOtherParams(const std::string &params_file) {
-  int x_min = 0;
-  int y_min = 0;
-  int x_max = 0;
-  int y_max = 0;
-  int level = 0;
-  std::string path = "";
+bool VisualizationEngine::InitOtherParams(const std::string& params_file) {
+  int         x_min = 0;
+  int         y_min = 0;
+  int         x_max = 0;
+  int         y_max = 0;
+  int         level = 0;
+  std::string path  = "";
 
   std::ifstream inf(params_file);
   if (!inf.is_open()) {
@@ -695,34 +645,32 @@ bool VisualizationEngine::InitOtherParams(const std::string &params_file) {
   inf >> x_min >> y_min >> x_max >> y_max >> level >> path;
   inf.close();
 
-  if (level > 5) {
-    level = 5;
-  }
+  if (level > 5) { level = 5; }
 
   InitOtherParams(x_min, y_min, x_max, y_max, level, path);
 
   return true;
 }
 
-void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
-                                          const int x_max, const int y_max,
-                                          const int level,
-                                          const std::string &path) {
-  lt_node_index_.x = x_min;
-  lt_node_index_.y = y_min;
+void VisualizationEngine::InitOtherParams(const int          x_min,
+                                          const int          y_min,
+                                          const int          x_max,
+                                          const int          y_max,
+                                          const int          level,
+                                          const std::string& path) {
+  lt_node_index_.x      = x_min;
+  lt_node_index_.y      = y_min;
   lt_node_grid_index_.x = lt_node_index_.x * map_param_.map_node_size_x;
   lt_node_grid_index_.y = lt_node_index_.y * map_param_.map_node_size_y;
 
   double init_center_x = (static_cast<double>(x_max + x_min) / 2 *
-                          map_param_.map_resolutions[resolution_id_] *
-                          map_param_.map_node_size_x) +
+                          map_param_.map_resolutions[resolution_id_] * map_param_.map_node_size_x) +
                          map_param_.map_min_x;
   double init_center_y = (static_cast<double>(y_max + y_min) / 2 *
-                          map_param_.map_resolutions[resolution_id_] *
-                          map_param_.map_node_size_y) +
+                          map_param_.map_resolutions[resolution_id_] * map_param_.map_node_size_y) +
                          map_param_.map_min_y;
   SetViewCenter(init_center_x, init_center_y);
-  max_level_ = level;
+  max_level_  = level;
   max_stride_ = 1;
   for (int i = 1; i < level; ++i) {
     max_stride_ *= 2;
@@ -732,86 +680,80 @@ void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
   AINFO << "image_visual_leaf_path: " << image_visual_leaf_path_;
 }
 
-void VisualizationEngine::CloudToMat(
-    const Eigen::Affine3d &cur_pose, const Eigen::Affine3d &velodyne_extrinsic,
-    const ::apollo::common::EigenVector3dVec &cloud, cv::Mat *cloud_img,
-    cv::Mat *cloud_img_mask) {
-  unsigned int img_width = map_param_.map_node_size_x;
-  unsigned int img_height = map_param_.map_node_size_y;
-  Eigen::Vector3d cen = car_pose_.translation();
-  cloud_img_lt_coord_[0] = cen[0] - map_param_.map_resolutions[resolution_id_] *
-                                        (static_cast<float>(img_width) / 2.0f);
-  cloud_img_lt_coord_[1] = cen[1] - map_param_.map_resolutions[resolution_id_] *
-                                        (static_cast<float>(img_height) / 2.0f);
+void VisualizationEngine::CloudToMat(const Eigen::Affine3d&                    cur_pose,
+                                     const Eigen::Affine3d&                    velodyne_extrinsic,
+                                     const ::apollo::common::EigenVector3dVec& cloud,
+                                     cv::Mat*                                  cloud_img,
+                                     cv::Mat*                                  cloud_img_mask) {
+  unsigned int    img_width  = map_param_.map_node_size_x;
+  unsigned int    img_height = map_param_.map_node_size_y;
+  Eigen::Vector3d cen        = car_pose_.translation();
+  cloud_img_lt_coord_[0] =
+      cen[0] - map_param_.map_resolutions[resolution_id_] * (static_cast<float>(img_width) / 2.0f);
+  cloud_img_lt_coord_[1] =
+      cen[1] - map_param_.map_resolutions[resolution_id_] * (static_cast<float>(img_height) / 2.0f);
 
   cloud_img_.setTo(cv::Scalar(0, 0, 0));
   cloud_img_mask_.setTo(cv::Scalar(0));
 
   for (unsigned int i = 0; i < cloud.size(); i++) {
-    const Eigen::Vector3d &pt = cloud[i];
-    Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
+    const Eigen::Vector3d& pt        = cloud[i];
+    Eigen::Vector3d        pt_global = cur_pose * velodyne_extrinsic * pt;
 
     int col = static_cast<int>((pt_global[0] - cloud_img_lt_coord_[0]) /
                                map_param_.map_resolutions[resolution_id_]);
     int row = static_cast<int>((pt_global[1] - cloud_img_lt_coord_[1]) /
                                map_param_.map_resolutions[resolution_id_]);
-    if (col < 0 || row < 0 ||
-        col >= static_cast<int>(map_param_.map_node_size_x) ||
+    if (col < 0 || row < 0 || col >= static_cast<int>(map_param_.map_node_size_x) ||
         row >= static_cast<int>(map_param_.map_node_size_y)) {
       continue;
     }
 
-    unsigned char b = color_table[car_loc_id_ % 3][0];
-    unsigned char g = color_table[car_loc_id_ % 3][1];
-    unsigned char r = color_table[car_loc_id_ % 3][2];
-    cloud_img->at<cv::Vec3b>(row, col) = cv::Vec3b(b, g, r);
+    unsigned char b                             = color_table[car_loc_id_ % 3][0];
+    unsigned char g                             = color_table[car_loc_id_ % 3][1];
+    unsigned char r                             = color_table[car_loc_id_ % 3][2];
+    cloud_img->at<cv::Vec3b>(row, col)          = cv::Vec3b(b, g, r);
     cloud_img_mask->at<unsigned char>(row, col) = 1;
   }
 }
 
-void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
-                                          MapImageKey *key) {
+void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d& coord, MapImageKey* key) {
   key->level = cur_level_;
 
   DCHECK_LT(resolution_id_, map_param_.map_resolutions.size());
   key->zone_id = zone_id_;
-  int n = static_cast<int>((coord[0] - map_param_.map_min_x) /
+  int n        = static_cast<int>((coord[0] - map_param_.map_min_x) /
                            (static_cast<float>(map_param_.map_node_size_x) *
                             map_param_.map_resolutions[resolution_id_]));
-  int m = static_cast<int>((coord[1] - map_param_.map_min_y) /
+  int m        = static_cast<int>((coord[1] - map_param_.map_min_y) /
                            (static_cast<float>(map_param_.map_node_size_y) *
                             map_param_.map_resolutions[resolution_id_]));
-  int max_n = static_cast<int>((map_param_.map_max_x - map_param_.map_min_x) /
+  int max_n    = static_cast<int>((map_param_.map_max_x - map_param_.map_min_x) /
                                (static_cast<float>(map_param_.map_node_size_x) *
                                 map_param_.map_resolutions[resolution_id_]));
-  int max_m = static_cast<unsigned int>(
-      (map_param_.map_max_y - map_param_.map_min_y) /
-      (static_cast<float>(map_param_.map_node_size_y) *
-       map_param_.map_resolutions[resolution_id_]));
+  int max_m    = static_cast<unsigned int>((map_param_.map_max_y - map_param_.map_min_y) /
+                                        (static_cast<float>(map_param_.map_node_size_y) *
+                                         map_param_.map_resolutions[resolution_id_]));
 
   if (n >= 0 && m >= 0 && n < max_n && m < max_m) {
     key->node_north_id = m;
-    key->node_east_id = n;
+    key->node_east_id  = n;
   } else {
     DCHECK(false);  // should never reach here
   }
 
   m = static_cast<int>(key->node_north_id) - lt_node_index_.y;
-  if (m < 0) {
-    m = m - (cur_stride_ - 1);
-  }
+  if (m < 0) { m = m - (cur_stride_ - 1); }
   key->node_north_id = m / cur_stride_ * cur_stride_ + lt_node_index_.y;
 
   n = static_cast<int>(key->node_east_id) - lt_node_index_.x;
-  if (n < 0) {
-    n = n - (cur_stride_ - 1);
-  }
+  if (n < 0) { n = n - (cur_stride_ - 1); }
   key->node_east_id = n / cur_stride_ * cur_stride_ + lt_node_index_.x;
 }
 
-cv::Point VisualizationEngine::CoordToMapGridIndex(
-    const Eigen::Vector2d &coord, const unsigned int resolution_id,
-    const int stride) {
+cv::Point VisualizationEngine::CoordToMapGridIndex(const Eigen::Vector2d& coord,
+                                                   const unsigned int     resolution_id,
+                                                   const int              stride) {
   cv::Point p;
   p.x = static_cast<int>((coord[0] - map_param_.map_min_x) /
                          map_param_.map_resolutions[resolution_id]);
@@ -827,7 +769,7 @@ cv::Point VisualizationEngine::CoordToMapGridIndex(
   return pr;
 }
 
-cv::Point VisualizationEngine::MapGridIndexToNodeGridIndex(const cv::Point &p) {
+cv::Point VisualizationEngine::MapGridIndexToNodeGridIndex(const cv::Point& p) {
   cv::Point pi;
   pi.x = p.x % map_param_.map_node_size_x;
   pi.x = pi.x < 0 ? pi.x + map_param_.map_node_size_x : pi.x;
@@ -837,14 +779,13 @@ cv::Point VisualizationEngine::MapGridIndexToNodeGridIndex(const cv::Point &p) {
   return pi;
 }
 
-bool VisualizationEngine::LoadImageToCache(const MapImageKey &key) {
+bool VisualizationEngine::LoadImageToCache(const MapImageKey& key) {
   cv::Mat img;
 
   if (!map_image_cache_.Get(key, &img)) {
     char path[1024];
-    snprintf(path, sizeof(path), "%s/%02d/%08d/%08d_%d.png",
-             image_visual_leaf_path_.c_str(), key.zone_id, key.node_north_id,
-             key.node_east_id, key.level);
+    snprintf(path, sizeof(path), "%s/%02d/%08d/%08d_%d.png", image_visual_leaf_path_.c_str(),
+             key.zone_id, key.node_north_id, key.node_east_id, key.level);
     if (cyber::common::PathExists(path)) {
       img = cv::imread(path);
       AINFO << "visualizer load: " << path;
@@ -857,45 +798,38 @@ bool VisualizationEngine::LoadImageToCache(const MapImageKey &key) {
   return true;
 }
 
-void VisualizationEngine::RotateImg(const cv::Mat &in_img, cv::Mat *out_img,
-                                    double angle) {
+void VisualizationEngine::RotateImg(const cv::Mat& in_img, cv::Mat* out_img, double angle) {
   int width = (in_img.cols > in_img.rows) ? in_img.cols : in_img.rows;
   width += 4;
   cv::Mat mat_tem(width, width, CV_8UC3);
   mat_tem.setTo(cv::Scalar(0, 0, 0));
-  in_img.copyTo(
-      mat_tem(cv::Rect(width / 2 - in_img.cols / 2, width / 2 - in_img.rows / 2,
-                       in_img.cols, in_img.rows)));
-  cv::Point2f pt(static_cast<float>(width) / 2.0f,
-                 static_cast<float>(width) / 2.0f);
-  cv::Mat rotation_mat = cv::getRotationMatrix2D(pt, angle, 1.0);
+  in_img.copyTo(mat_tem(cv::Rect(width / 2 - in_img.cols / 2, width / 2 - in_img.rows / 2,
+                                 in_img.cols, in_img.rows)));
+  cv::Point2f pt(static_cast<float>(width) / 2.0f, static_cast<float>(width) / 2.0f);
+  cv::Mat     rotation_mat = cv::getRotationMatrix2D(pt, angle, 1.0);
   cv::warpAffine(mat_tem, *out_img, rotation_mat, cv::Size(width, width));
 }
 
-void VisualizationEngine::SetViewCenter(const double center_x,
-                                        const double center_y) {
+void VisualizationEngine::SetViewCenter(const double center_x, const double center_y) {
   _view_center[0] = center_x;
   _view_center[1] = center_y;
 }
 
-void VisualizationEngine::UpdateViewCenter(const double move_x,
-                                           const double move_y) {
+void VisualizationEngine::UpdateViewCenter(const double move_x, const double move_y) {
   _view_center[0] += move_x;
   _view_center[1] += move_y;
 }
 
 void VisualizationEngine::SetScale(const double scale) { cur_scale_ = scale; }
 
-void VisualizationEngine::UpdateScale(const double factor) {
-  cur_scale_ *= factor;
-}
+void VisualizationEngine::UpdateScale(const double factor) { cur_scale_ *= factor; }
 
 bool VisualizationEngine::UpdateCarLocId() {
   for (unsigned int i = 0; i < loc_info_num_ - 1; i++) {
     unsigned int tem_car_loc_id = (car_loc_id_ + i + 1) % loc_info_num_;
     if (cur_loc_infos_[tem_car_loc_id].is_valid) {
       car_loc_id_ = tem_car_loc_id;
-      car_pose_ = cur_loc_infos_[car_loc_id_].pose;
+      car_pose_   = cur_loc_infos_[car_loc_id_].pose;
       return true;
     }
   }
@@ -903,13 +837,11 @@ bool VisualizationEngine::UpdateCarLocId() {
 }
 
 bool VisualizationEngine::UpdateCarLocId(const unsigned int car_loc_id) {
-  if (car_loc_id >= loc_info_num_) {
-    return false;
-  }
+  if (car_loc_id >= loc_info_num_) { return false; }
 
   if (cur_loc_infos_[car_loc_id].is_valid) {
     car_loc_id_ = car_loc_id;
-    car_pose_ = cur_loc_infos_[car_loc_id_].pose;
+    car_pose_   = cur_loc_infos_[car_loc_id_].pose;
     return true;
   }
 
@@ -919,12 +851,12 @@ bool VisualizationEngine::UpdateCarLocId(const unsigned int car_loc_id) {
 bool VisualizationEngine::UpdateTrajectoryGroups() {
   for (unsigned int i = 0; i < loc_info_num_; i++) {
     if (cur_loc_infos_[i].is_valid) {
-      Eigen::Vector2d loc;
-      LocalizatonInfo &loc_info = cur_loc_infos_[i];
-      loc[0] = loc_info.location.x();
-      loc[1] = loc_info.location.y();
-      std::map<double, Eigen::Vector2d> &trajectory = trajectory_groups_[i];
-      trajectory[loc_info.timestamp] = loc;
+      Eigen::Vector2d  loc;
+      LocalizatonInfo& loc_info                     = cur_loc_infos_[i];
+      loc[0]                                        = loc_info.location.x();
+      loc[1]                                        = loc_info.location.y();
+      std::map<double, Eigen::Vector2d>& trajectory = trajectory_groups_[i];
+      trajectory[loc_info.timestamp]                = loc;
     }
   }
 
@@ -932,8 +864,8 @@ bool VisualizationEngine::UpdateTrajectoryGroups() {
 }
 
 void VisualizationEngine::ProcessKey(int key) {
-  const int move = 20;
-  char c_key = static_cast<char>(key);
+  const int move  = 20;
+  char      c_key = static_cast<char>(key);
   switch (c_key) {
     case 'e': {
       UpdateScale(1.1);
@@ -976,7 +908,7 @@ void VisualizationEngine::ProcessKey(int key) {
       break;
     }
     case 'r': {
-      const Eigen::Vector3d &loc = car_pose_.translation();
+      const Eigen::Vector3d& loc = car_pose_.translation();
       SetViewCenter(loc[0], loc[1]);
       Draw();
       break;
@@ -1004,8 +936,7 @@ void VisualizationEngine::ProcessKey(int key) {
       is_draw_trajectory_ = !is_draw_trajectory_;
       break;
     }
-    default:
-      break;
+    default: break;
   }
 }
 

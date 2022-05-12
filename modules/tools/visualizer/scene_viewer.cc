@@ -23,10 +23,12 @@
 #include "modules/tools/visualizer/scene_camera_dialog.h"
 
 struct SceneViewer::TempRenderableObjGroup {
-  bool isEnabled_;
-  QList<RenderableObject *> objGroupList_;
+  bool                     isEnabled_;
+  QList<RenderableObject*> objGroupList_;
 
-  TempRenderableObjGroup(void) : isEnabled_(true), objGroupList_() {}
+  TempRenderableObjGroup(void)
+      : isEnabled_(true)
+      , objGroupList_() {}
   ~TempRenderableObjGroup(void) {
     while (!objGroupList_.isEmpty()) {
       delete objGroupList_.takeFirst();
@@ -39,27 +41,27 @@ struct SceneViewer::TempRenderableObjGroup {
 
   bool isEnabled(void) const { return isEnabled_; }
 
-  void append(RenderableObject *obj) { objGroupList_.append(obj); }
-  RenderableObject *takeFirst(void) { return objGroupList_.takeFirst(); }
-  RenderableObject *takeLast(void) { return objGroupList_.takeLast(); }
+  void              append(RenderableObject* obj) { objGroupList_.append(obj); }
+  RenderableObject* takeFirst(void) { return objGroupList_.takeFirst(); }
+  RenderableObject* takeLast(void) { return objGroupList_.takeLast(); }
 };
 
-SceneViewer::SceneViewer(QWidget *parent)
-    : QOpenGLWidget(parent),
-      QOpenGLFunctions(),
-      is_init_(false),
-      right_key_is_moved_(false),
-      sensitivity_(0.08f),
-      refreshTimer_(nullptr),
-      left_key_last_pos_(),
-      right_key_last_y_(0),
-      camera_dialog_(nullptr),
-      current_cameraPtr_(nullptr),
-      free_camera_(),
-      target_camera_(),
-      managed_shader_prog_(),
-      tmp_renderable_obj_list_(),
-      permanent_renderable_obj_list_() {
+SceneViewer::SceneViewer(QWidget* parent)
+    : QOpenGLWidget(parent)
+    , QOpenGLFunctions()
+    , is_init_(false)
+    , right_key_is_moved_(false)
+    , sensitivity_(0.08f)
+    , refreshTimer_(nullptr)
+    , left_key_last_pos_()
+    , right_key_last_y_(0)
+    , camera_dialog_(nullptr)
+    , current_cameraPtr_(nullptr)
+    , free_camera_()
+    , target_camera_()
+    , managed_shader_prog_()
+    , tmp_renderable_obj_list_()
+    , permanent_renderable_obj_list_() {
   current_cameraPtr_ = &target_camera_;
 }
 
@@ -80,7 +82,7 @@ SceneViewer::~SceneViewer() {
 
     managed_shader_prog_.clear();
 
-    for (auto &iter : tmp_renderable_obj_list_) {
+    for (auto& iter : tmp_renderable_obj_list_) {
       delete iter.second;
     }
 
@@ -94,25 +96,21 @@ SceneViewer::~SceneViewer() {
   }
 }
 
-void SceneViewer::setTempObjGroupEnabled(const std::string &tmpObjGroupName,
-                                         bool b) {
+void SceneViewer::setTempObjGroupEnabled(const std::string& tmpObjGroupName, bool b) {
   auto iter = tmp_renderable_obj_list_.find(tmpObjGroupName);
-  if (iter != tmp_renderable_obj_list_.cend()) {
-    iter->second->isEnabled_ = b;
-  }
+  if (iter != tmp_renderable_obj_list_.cend()) { iter->second->isEnabled_ = b; }
 }
 
-bool SceneViewer::AddTempRenderableObj(const std::string &tmpObjGroupName,
-                                       RenderableObject *renderObj) {
+bool SceneViewer::AddTempRenderableObj(const std::string& tmpObjGroupName,
+                                       RenderableObject*  renderObj) {
   bool ret = false;
   if (renderObj && renderObj->haveShaderProgram() && is_init_) {
     auto iter = tmp_renderable_obj_list_.find(tmpObjGroupName);
     if (iter == tmp_renderable_obj_list_.cend()) {
-      TempRenderableObjGroup *objGroup = new TempRenderableObjGroup();
+      TempRenderableObjGroup* objGroup = new TempRenderableObjGroup();
       if (objGroup) {
         objGroup->append(renderObj);
-        tmp_renderable_obj_list_.insert(
-            std::make_pair(tmpObjGroupName, objGroup));
+        tmp_renderable_obj_list_.insert(std::make_pair(tmpObjGroupName, objGroup));
         ret = true;
       }
     } else {
@@ -124,20 +122,15 @@ bool SceneViewer::AddTempRenderableObj(const std::string &tmpObjGroupName,
   return ret;
 }
 
-void SceneViewer::AddNewShaderProg(
-    const std::string &shaderProgName,
-    const std::shared_ptr<QOpenGLShaderProgram> &newShaderProg) {
-  if (newShaderProg == nullptr) {
-    return;
-  }
+void SceneViewer::AddNewShaderProg(const std::string&                           shaderProgName,
+                                   const std::shared_ptr<QOpenGLShaderProgram>& newShaderProg) {
+  if (newShaderProg == nullptr) { return; }
 
   auto iter = managed_shader_prog_.find(shaderProgName);
-  if (iter != managed_shader_prog_.end()) {
-    iter->second.reset();
-  }
+  if (iter != managed_shader_prog_.end()) { iter->second.reset(); }
 
-  QMatrix4x4 mvp = current_cameraPtr_->projection_matrix() *
-                   current_cameraPtr_->model_view_matrix();
+  QMatrix4x4 mvp =
+      current_cameraPtr_->projection_matrix() * current_cameraPtr_->model_view_matrix();
 
   newShaderProg->bind();
   newShaderProg->setUniformValue("mvp", mvp);
@@ -154,9 +147,7 @@ void SceneViewer::initializeGL() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   refreshTimer_ = new QTimer(this);
-  if (!refreshTimer_) {
-    return;
-  }
+  if (!refreshTimer_) { return; }
 
   refreshTimer_->setObjectName(tr("_refreshTimer"));
   refreshTimer_->setInterval(40);
@@ -182,8 +173,8 @@ void SceneViewer::resizeGL(int width, int height) {
     target_camera_.set_near_plane_height(GLfloat(height));
     target_camera_.UpdateProjection();
 
-    QMatrix4x4 mvp = current_cameraPtr_->projection_matrix() *
-                     current_cameraPtr_->model_view_matrix();
+    QMatrix4x4 mvp =
+        current_cameraPtr_->projection_matrix() * current_cameraPtr_->model_view_matrix();
 
     UpdateAllShaderProgMVP(mvp);
   }
@@ -191,39 +182,31 @@ void SceneViewer::resizeGL(int width, int height) {
 
 void SceneViewer::paintGL() {
   if (is_init_) {
-    for (RenderableObject *item : permanent_renderable_obj_list_) {
-      if (item->Init()) {
-        item->Render();
-      }
+    for (RenderableObject* item : permanent_renderable_obj_list_) {
+      if (item->Init()) { item->Render(); }
     }
 
-    for (auto &iter : tmp_renderable_obj_list_) {
+    for (auto& iter : tmp_renderable_obj_list_) {
       if (!iter.second->isEmpty()) {
-        RenderableObject *lastItem = nullptr;
+        RenderableObject* lastItem = nullptr;
 
         if (iter.second->isEnabled()) {
           lastItem = iter.second->takeLast();
-          if (lastItem->Init()) {
-            lastItem->Render();
-          }
+          if (lastItem->Init()) { lastItem->Render(); }
         }
 
         while (!iter.second->isEmpty()) {
           delete iter.second->takeFirst();
         }
 
-        if (lastItem) {
-          iter.second->append(lastItem);
-        }
+        if (lastItem) { iter.second->append(lastItem); }
       }
     }
   }
 }
 
 void SceneViewer::ChangeCameraType(int index) {
-  if (index < TARGET || index > FREE) {
-    return;
-  }
+  if (index < TARGET || index > FREE) { return; }
   if (index == FREE) {
     current_cameraPtr_ = &free_camera_;
   } else {
@@ -265,12 +248,8 @@ void SceneViewer::UpdateCameraZ(double z) {
 }
 
 void SceneViewer::UpdateCameraYaw(double yawInDegrees) {
-  if (yawInDegrees > 360.0) {
-    yawInDegrees -= 360.0;
-  }
-  if (yawInDegrees < -360.0) {
-    yawInDegrees += 360.0;
-  }
+  if (yawInDegrees > 360.0) { yawInDegrees -= 360.0; }
+  if (yawInDegrees < -360.0) { yawInDegrees += 360.0; }
 
   free_camera_.set_yaw(static_cast<float>(yawInDegrees));
   target_camera_.set_yaw(static_cast<float>(yawInDegrees));
@@ -278,24 +257,16 @@ void SceneViewer::UpdateCameraYaw(double yawInDegrees) {
 }
 
 void SceneViewer::UpdateCameraPitch(double pitchInDegrees) {
-  if (pitchInDegrees > 90.0) {
-    pitchInDegrees = 90.0;
-  }
-  if (pitchInDegrees < -90.0) {
-    pitchInDegrees = -90.0;
-  }
+  if (pitchInDegrees > 90.0) { pitchInDegrees = 90.0; }
+  if (pitchInDegrees < -90.0) { pitchInDegrees = -90.0; }
 
   free_camera_.set_pitch(static_cast<float>(pitchInDegrees));
   target_camera_.set_pitch(static_cast<float>(pitchInDegrees));
   UpdateCameraWorld();
 }
 void SceneViewer::UpdateCameraRoll(double rollInDegrees) {
-  if (rollInDegrees > 360.0) {
-    rollInDegrees -= 360.0;
-  }
-  if (rollInDegrees < -360.0) {
-    rollInDegrees += 360.0;
-  }
+  if (rollInDegrees > 360.0) { rollInDegrees -= 360.0; }
+  if (rollInDegrees < -360.0) { rollInDegrees += 360.0; }
 
   free_camera_.set_roll(static_cast<float>(rollInDegrees));
   free_camera_.set_roll(static_cast<float>(rollInDegrees));
@@ -306,48 +277,47 @@ void SceneViewer::UpdateCameraWorld(void) {
   free_camera_.UpdateWorld();
   target_camera_.UpdateWorld();
 
-  QMatrix4x4 mvp = current_cameraPtr_->projection_matrix() *
-                   current_cameraPtr_->model_view_matrix();
+  QMatrix4x4 mvp =
+      current_cameraPtr_->projection_matrix() * current_cameraPtr_->model_view_matrix();
 
   UpdateAllShaderProgMVP(mvp);
 
   update();
 }
 
-void SceneViewer::UpdateAllShaderProgMVP(const QMatrix4x4 &mvp) {
-  for (auto iter = managed_shader_prog_.begin();
-       iter != managed_shader_prog_.end(); ++iter) {
+void SceneViewer::UpdateAllShaderProgMVP(const QMatrix4x4& mvp) {
+  for (auto iter = managed_shader_prog_.begin(); iter != managed_shader_prog_.end(); ++iter) {
     iter->second->bind();
     iter->second->setUniformValue("mvp", mvp);
     iter->second->release();
   }
 }
 
-void SceneViewer::enterEvent(QEvent *event) {
+void SceneViewer::enterEvent(QEvent* event) {
   setCursor(Qt::SizeAllCursor);
   QOpenGLWidget::enterEvent(event);
 }
 
-void SceneViewer::leaveEvent(QEvent *event) {
+void SceneViewer::leaveEvent(QEvent* event) {
   unsetCursor();
   QOpenGLWidget::leaveEvent(event);
 }
 
-void SceneViewer::mousePressEvent(QMouseEvent *event) {
+void SceneViewer::mousePressEvent(QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     left_key_last_pos_ = QCursor::pos();
   } else if (event->button() == Qt::RightButton) {
     right_key_is_moved_ = false;
-    right_key_last_y_ = static_cast<float>(QCursor::pos().y());
+    right_key_last_y_   = static_cast<float>(QCursor::pos().y());
   }
 
   QOpenGLWidget::mousePressEvent(event);
 }
 
-void SceneViewer::mouseMoveEvent(QMouseEvent *mouseEvent) {
+void SceneViewer::mouseMoveEvent(QMouseEvent* mouseEvent) {
   if (mouseEvent->buttons() == Qt::LeftButton) {
-    QPoint tmp = QCursor::pos();
-    QPoint dd = tmp - left_key_last_pos_;
+    QPoint tmp         = QCursor::pos();
+    QPoint dd          = tmp - left_key_last_pos_;
     left_key_last_pos_ = tmp;
 
     float x = static_cast<float>(dd.x()) * sensitivity();
@@ -362,19 +332,11 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *mouseEvent) {
       x = target_camera_.yaw() - x;
       y = target_camera_.pitch() - y;
 
-      if (x > 360.0f) {
-        x -= 360.0f;
-      }
-      if (x < -360.0f) {
-        x += 360.0f;
-      }
+      if (x > 360.0f) { x -= 360.0f; }
+      if (x < -360.0f) { x += 360.0f; }
 
-      if (y > 90.0f) {
-        y = 90.0f;
-      }
-      if (y < -90.0f) {
-        y = 90.0f;
-      }
+      if (y > 90.0f) { y = 90.0f; }
+      if (y < -90.0f) { y = 90.0f; }
 
       target_camera_.set_yaw(x);
       target_camera_.set_pitch(y);
@@ -387,8 +349,8 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *mouseEvent) {
     right_key_is_moved_ = true;
     if (IsFreeCamera()) {
       {
-        float tmp = static_cast<float>(QCursor::pos().y());
-        float dd = right_key_last_y_ - tmp;
+        float tmp         = static_cast<float>(QCursor::pos().y());
+        float dd          = right_key_last_y_ - tmp;
         right_key_last_y_ = tmp;
 
         float z = dd * sensitivity();
@@ -406,19 +368,15 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *mouseEvent) {
   QOpenGLWidget::mousePressEvent(mouseEvent);
 }
 
-void SceneViewer::wheelEvent(QWheelEvent *event) {
+void SceneViewer::wheelEvent(QWheelEvent* event) {
   float delta = static_cast<float>(event->angleDelta().y());
   delta *= sensitivity();
 
   target_camera_.set_distance(target_camera_.distance() + delta);
 
   delta += free_camera_.pitch();
-  if (delta > 90.0f) {
-    delta = 90.0f;
-  }
-  if (delta < -90.0f) {
-    delta = -90.0f;
-  }
+  if (delta > 90.0f) { delta = 90.0f; }
+  if (delta < -90.0f) { delta = -90.0f; }
   free_camera_.set_pitch(delta);
 
   if (IsFreeCamera()) {
@@ -432,32 +390,26 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
   QOpenGLWidget::wheelEvent(event);
 }
 
-void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
+void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
   if (!right_key_is_moved_ && event->button() == Qt::RightButton) {
     if (camera_dialog_ == nullptr) {
       camera_dialog_ = new SceneCameraDialog(this);
       if (!camera_dialog_) {
-        QMessageBox::warning(this, tr("Error"),
-                             tr("No Enough for creating Camera Dialog!!!"),
+        QMessageBox::warning(this, tr("Error"), tr("No Enough for creating Camera Dialog!!!"),
                              QMessageBox::Ok);
         goto retLabel;
       } else {
-        connect(camera_dialog_, SIGNAL(resetcamera()), this,
-                SLOT(ResetCameraPosAttitude()));
-        connect(camera_dialog_, SIGNAL(xValueChanged(double)), this,
-                SLOT(UpdateCameraX(double)));
-        connect(camera_dialog_, SIGNAL(yValueChanged(double)), this,
-                SLOT(UpdateCameraY(double)));
-        connect(camera_dialog_, SIGNAL(zValueChanged(double)), this,
-                SLOT(UpdateCameraZ(double)));
+        connect(camera_dialog_, SIGNAL(resetcamera()), this, SLOT(ResetCameraPosAttitude()));
+        connect(camera_dialog_, SIGNAL(xValueChanged(double)), this, SLOT(UpdateCameraX(double)));
+        connect(camera_dialog_, SIGNAL(yValueChanged(double)), this, SLOT(UpdateCameraY(double)));
+        connect(camera_dialog_, SIGNAL(zValueChanged(double)), this, SLOT(UpdateCameraZ(double)));
         connect(camera_dialog_, SIGNAL(yawValueChanged(double)), this,
                 SLOT(UpdateCameraYaw(double)));
         connect(camera_dialog_, SIGNAL(pitchValueChanged(double)), this,
                 SLOT(UpdateCameraPitch(double)));
         connect(camera_dialog_, SIGNAL(rollValueChanged(double)), this,
                 SLOT(UpdateCameraRoll(double)));
-        connect(camera_dialog_, SIGNAL(cameraTypeChanged(int)), this,
-                SLOT(ChangeCameraType(int)));
+        connect(camera_dialog_, SIGNAL(cameraTypeChanged(int)), this, SLOT(ChangeCameraType(int)));
         connect(camera_dialog_, SIGNAL(sensitivityChanged(float)), this,
                 SLOT(set_sensitivity(float)));
 

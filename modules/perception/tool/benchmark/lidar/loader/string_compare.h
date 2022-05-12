@@ -24,8 +24,7 @@ namespace apollo {
 namespace perception {
 namespace benchmark {
 
-static void string_split(const std::string& str, char c,
-                         std::vector<std::string>* strs) {
+static void string_split(const std::string& str, char c, std::vector<std::string>* strs) {
   strs->clear();
   std::string term;
   for (auto& cur_char : str) {
@@ -39,13 +38,10 @@ static void string_split(const std::string& str, char c,
       term.clear();
     }
   }
-  if (!term.empty()) {
-    strs->push_back(term);
-  }
+  if (!term.empty()) { strs->push_back(term); }
 }
 
-static bool string_compare_by_length(const std::string& lhs,
-                                     const std::string& rhs) {
+static bool string_compare_by_length(const std::string& lhs, const std::string& rhs) {
   if (lhs.length() < rhs.length()) {
     return true;
   } else if (lhs.length() == rhs.length()) {
@@ -55,13 +51,12 @@ static bool string_compare_by_length(const std::string& lhs,
   }
 }
 
-static void sort_strings_by_split_length(
-    const std::vector<std::string>& strs,
-    std::vector<std::size_t>* sorted_indices) {
+static void sort_strings_by_split_length(const std::vector<std::string>& strs,
+                                         std::vector<std::size_t>*       sorted_indices) {
   struct StringHelper {
-    std::string str;
+    std::string              str;
     std::vector<std::string> splits;
-    std::size_t id;
+    std::size_t              id;
   };
   std::vector<StringHelper> helper(strs.size());
   for (std::size_t i = 0; i < strs.size(); ++i) {
@@ -69,22 +64,21 @@ static void sort_strings_by_split_length(
     string_split(helper[i].str, '/', &helper[i].splits);
     helper[i].id = i;
   }
-  std::sort(helper.begin(), helper.end(),
-            [](const StringHelper& lhs, const StringHelper& rhs) {
-              if (lhs.splits.size() < rhs.splits.size()) {
-                return true;
-              } else if (lhs.splits.size() > rhs.splits.size()) {
-                return false;
-              }
-              for (std::size_t i = 0; i < lhs.splits.size(); ++i) {
-                if (lhs.splits[i] == rhs.splits[i]) {
-                  continue;
-                } else {
-                  return string_compare_by_length(lhs.splits[i], rhs.splits[i]);
-                }
-              }
-              return true;
-            });
+  std::sort(helper.begin(), helper.end(), [](const StringHelper& lhs, const StringHelper& rhs) {
+    if (lhs.splits.size() < rhs.splits.size()) {
+      return true;
+    } else if (lhs.splits.size() > rhs.splits.size()) {
+      return false;
+    }
+    for (std::size_t i = 0; i < lhs.splits.size(); ++i) {
+      if (lhs.splits[i] == rhs.splits[i]) {
+        continue;
+      } else {
+        return string_compare_by_length(lhs.splits[i], rhs.splits[i]);
+      }
+    }
+    return true;
+  });
   sorted_indices->resize(strs.size());
   for (std::size_t i = 0; i < strs.size(); ++i) {
     sorted_indices->at(i) = helper[i].id;
@@ -92,11 +86,8 @@ static void sort_strings_by_split_length(
 }
 
 template <typename T>
-void shuffle_by_indices(std::vector<T>* src,
-                        const std::vector<std::size_t>& indices) {
-  if (src->size() != indices.size()) {
-    return;
-  }
+void shuffle_by_indices(std::vector<T>* src, const std::vector<std::size_t>& indices) {
+  if (src->size() != indices.size()) { return; }
   std::vector<T> dst;
   dst.reserve(indices.size());
   for (auto& id : indices) {

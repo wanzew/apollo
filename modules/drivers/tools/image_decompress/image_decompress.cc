@@ -46,7 +46,7 @@ bool ImageDecompressComponent::Proc(
   }
   std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
                                            compressed_image->data().end());
-  cv::Mat mat_image = cv::imdecode(compressed_raw_data, cv::IMREAD_COLOR);
+  cv::Mat              mat_image = cv::imdecode(compressed_raw_data, cv::IMREAD_COLOR);
   cv::cvtColor(mat_image, mat_image, cv::COLOR_BGR2RGB);
   image->set_width(mat_image.cols);
   image->set_height(mat_image.rows);

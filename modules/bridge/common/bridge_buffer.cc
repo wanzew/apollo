@@ -34,16 +34,14 @@ BridgeBuffer<T>::BridgeBuffer(size_t size) {
 template <typename T>
 BridgeBuffer<T>::~BridgeBuffer() {
   std::lock_guard<std::mutex> lg(mutex_);
-  if (buf_) {
-    delete[] buf_;
-  }
-  buf_ = nullptr;
-  size_ = 0;
+  if (buf_) { delete[] buf_; }
+  buf_      = nullptr;
+  size_     = 0;
   capacity_ = 0;
 }
 
 template <typename T>
-BridgeBuffer<T>::operator T *() {
+BridgeBuffer<T>::operator T*() {
   return buf_;
 }
 
@@ -51,21 +49,19 @@ template <typename T>
 void BridgeBuffer<T>::reset(size_t size) {
   std::lock_guard<std::mutex> lg(mutex_);
   if (capacity_ < size) {
-    if (buf_) {
-      delete[] buf_;
-    }
+    if (buf_) { delete[] buf_; }
     capacity_ = size;
-    buf_ = new T[capacity_];
+    buf_      = new T[capacity_];
   }
   size_ = size;
   memset(buf_, 0, sizeof(T) * capacity_);
 }
 
 template <typename T>
-void BridgeBuffer<T>::write(size_t index, const T *data, size_t size) {
+void BridgeBuffer<T>::write(size_t index, const T* data, size_t size) {
   std::lock_guard<std::mutex> lg(mutex_);
   reset(size + index);
-  T *p = buf_ + index;
+  T* p = buf_ + index;
   memcpy(p, data, size);
 }
 

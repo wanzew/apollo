@@ -42,8 +42,8 @@ namespace gnss {
 
 // A helper function that returns a pointer to a protobuf message of type T.
 template <class T>
-inline T *As(::google::protobuf::Message *message_ptr) {
-  return dynamic_cast<T *>(message_ptr);
+inline T* As(::google::protobuf::Message* message_ptr) {
+  return dynamic_cast<T*>(message_ptr);
 }
 
 // An abstract class of Parser.
@@ -51,25 +51,25 @@ inline T *As(::google::protobuf::Message *message_ptr) {
 class Parser {
  public:
   // A general pointer to a protobuf message.
-  using MessagePtr = ::google::protobuf::Message *;
+  using MessagePtr = ::google::protobuf::Message*;
   // Return a pointer to a NovAtel parser. The caller should take ownership.
-  static Parser *CreateNovatel(const config::Config &config);
+  static Parser* CreateNovatel(const config::Config& config);
 
   // Return a pointer to rtcm v3 parser. The caller should take ownership.
-  static Parser *CreateRtcmV3(bool is_base_station = false);
+  static Parser* CreateRtcmV3(bool is_base_station = false);
 
   virtual ~Parser() {}
 
   // Updates the parser with new data. The caller must keep the data valid until
   // GetMessage()
   // returns NONE.
-  void Update(const uint8_t *data, size_t length) {
-    data_ = data;
+  void Update(const uint8_t* data, size_t length) {
+    data_     = data;
     data_end_ = data + length;
   }
 
-  void Update(const std::string &data) {
-    Update(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+  void Update(const std::string& data) {
+    Update(reinterpret_cast<const uint8_t*>(data.data()), data.size());
   }
 
   enum class MessageType {
@@ -94,14 +94,14 @@ class Parser {
   // Gets a parsed protobuf message. The caller must consume the message before
   // calling another
   // GetMessage() or Update();
-  virtual MessageType GetMessage(MessagePtr *message_ptr) = 0;
+  virtual MessageType GetMessage(MessagePtr* message_ptr) = 0;
 
  protected:
   Parser() {}
 
   // Point to the beginning and end of data. Do not take ownership.
-  const uint8_t *data_ = nullptr;
-  const uint8_t *data_end_ = nullptr;
+  const uint8_t* data_     = nullptr;
+  const uint8_t* data_end_ = nullptr;
 
  private:
   DISABLE_COPY_AND_ASSIGN(Parser);

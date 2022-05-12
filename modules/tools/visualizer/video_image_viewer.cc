@@ -19,14 +19,14 @@
 #include <iostream>
 
 VideoImgViewer::VideoImgViewer(QWidget* parent)
-    : QOpenGLWidget(parent),
-      QOpenGLFunctions(),
-      is_init_(false),
-      mvp_id_(),
-      plane_(),
-      ortho_camera_(),
-      default_image_(nullptr),
-      video_image_shader_prog_(nullptr) {}
+    : QOpenGLWidget(parent)
+    , QOpenGLFunctions()
+    , is_init_(false)
+    , mvp_id_()
+    , plane_()
+    , ortho_camera_()
+    , default_image_(nullptr)
+    , video_image_shader_prog_(nullptr) {}
 
 VideoImgViewer::~VideoImgViewer() {
   if (is_init_) {
@@ -51,29 +51,22 @@ void VideoImgViewer::initializeGL() {
 
   QImage noImage;
   if (!noImage.load(tr(":/images/no_image.png"))) {
-    std::cout << "--------can not load the default texture------------"
-              << std::endl;
+    std::cout << "--------can not load the default texture------------" << std::endl;
     return;
   }
 
   default_image_ = std::make_shared<Texture>();
   if (default_image_ == nullptr || !default_image_->UpdateData(noImage)) {
-    std::cout << "--------can not create the default texture------------"
-              << std::endl;
+    std::cout << "--------can not create the default texture------------" << std::endl;
     return;
   }
 
   video_image_shader_prog_ = RenderableObject::CreateShaderProgram(
-      tr(":/shaders/video_image_plane.vert"),
-      tr(":/shaders/video_image_plane.frag"));
-  if (video_image_shader_prog_ == nullptr) {
-    return;
-  }
+      tr(":/shaders/video_image_plane.vert"), tr(":/shaders/video_image_plane.frag"));
+  if (video_image_shader_prog_ == nullptr) { return; }
 
   plane_.set_texture(default_image_);
-  if (!plane_.Init(video_image_shader_prog_)) {
-    return;
-  }
+  if (!plane_.Init(video_image_shader_prog_)) { return; }
 
   ortho_camera_.set_near_plane_width(GLfloat(width()));
   ortho_camera_.set_near_plane_height(GLfloat(height()));
@@ -85,8 +78,7 @@ void VideoImgViewer::initializeGL() {
   ortho_camera_.UpdateWorld();
   ortho_camera_.UpdateProjection();
 
-  QMatrix4x4 mvp =
-      ortho_camera_.projection_matrix() * ortho_camera_.model_view_matrix();
+  QMatrix4x4 mvp = ortho_camera_.projection_matrix() * ortho_camera_.model_view_matrix();
 
   video_image_shader_prog_->bind();
   video_image_shader_prog_->setUniformValue(mvp_id_, mvp);
@@ -104,8 +96,7 @@ void VideoImgViewer::resizeGL(int width, int height) {
     ortho_camera_.set_near_plane_height(GLfloat(height));
     ortho_camera_.UpdateProjection();
 
-    QMatrix4x4 mvp =
-        ortho_camera_.projection_matrix() * ortho_camera_.model_view_matrix();
+    QMatrix4x4 mvp = ortho_camera_.projection_matrix() * ortho_camera_.model_view_matrix();
 
     video_image_shader_prog_->bind();
     video_image_shader_prog_->setUniformValue(mvp_id_, mvp);
@@ -114,7 +105,5 @@ void VideoImgViewer::resizeGL(int width, int height) {
 }
 
 void VideoImgViewer::paintGL() {
-  if (is_init_) {
-    plane_.Render();
-  }
+  if (is_init_) { plane_.Render(); }
 }

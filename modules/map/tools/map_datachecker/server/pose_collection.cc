@@ -23,20 +23,14 @@ PoseCollection::PoseCollection(std::shared_ptr<JsonConf> sp_conf) {
   Reset();
 }
 
-void PoseCollection::Reset() {
-  sp_poses_ = std::make_shared<std::vector<FramePose>>();
-}
+void PoseCollection::Reset() { sp_poses_ = std::make_shared<std::vector<FramePose>>(); }
 
 void PoseCollection::Collect(const FramePose& pose) {
-  if (sp_poses_ == nullptr) {
-    sp_poses_ = std::make_shared<std::vector<FramePose>>();
-  }
+  if (sp_poses_ == nullptr) { sp_poses_ = std::make_shared<std::vector<FramePose>>(); }
   sp_poses_->push_back(pose);
 }
 
-std::shared_ptr<std::vector<FramePose>> PoseCollection::GetPoses() const {
-  return sp_poses_;
-}
+std::shared_ptr<std::vector<FramePose>> PoseCollection::GetPoses() const { return sp_poses_; }
 
 }  // namespace hdmap
 }  // namespace apollo

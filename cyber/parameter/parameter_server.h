@@ -43,11 +43,11 @@ class Node;
  */
 class ParameterServer {
  public:
-  using Param = apollo::cyber::proto::Param;
-  using NodeName = apollo::cyber::proto::NodeName;
-  using ParamName = apollo::cyber::proto::ParamName;
+  using Param      = apollo::cyber::proto::Param;
+  using NodeName   = apollo::cyber::proto::NodeName;
+  using ParamName  = apollo::cyber::proto::ParamName;
   using BoolResult = apollo::cyber::proto::BoolResult;
-  using Params = apollo::cyber::proto::Params;
+  using Params     = apollo::cyber::proto::Params;
   /**
    * @brief Construct a new ParameterServer object
    *
@@ -80,12 +80,12 @@ class ParameterServer {
   void ListParameters(std::vector<Parameter>* parameters);
 
  private:
-  std::shared_ptr<Node> node_;
-  std::shared_ptr<Service<ParamName, Param>> get_parameter_service_;
+  std::shared_ptr<Node>                       node_;
+  std::shared_ptr<Service<ParamName, Param>>  get_parameter_service_;
   std::shared_ptr<Service<Param, BoolResult>> set_parameter_service_;
-  std::shared_ptr<Service<NodeName, Params>> list_parameters_service_;
+  std::shared_ptr<Service<NodeName, Params>>  list_parameters_service_;
 
-  std::mutex param_map_mutex_;
+  std::mutex                             param_map_mutex_;
   std::unordered_map<std::string, Param> param_map_;
 };
 

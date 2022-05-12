@@ -30,31 +30,24 @@ using ::apollo::drivers::canbus::Byte;
 Enablestatefeedbackc3::Enablestatefeedbackc3() {}
 const int32_t Enablestatefeedbackc3::ID = 0xC3;
 
-void Enablestatefeedbackc3::Parse(const std::uint8_t* bytes, int32_t length,
-                                  ChassisDetail* chassis) const {
-  chassis->mutable_zhongyun()
-      ->mutable_enable_state_feedback_c3()
-      ->set_parking_enable_state(parking_enable_state(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_enable_state_feedback_c3()
-      ->set_steering_enable_state(steering_enable_state(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_enable_state_feedback_c3()
-      ->set_gear_enable_actual(gear_enable_actual(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_enable_state_feedback_c3()
-      ->set_driven_enable_state(driven_enable_state(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_enable_state_feedback_c3()
-      ->set_brake_enable_state(brake_enable_state(bytes, length));
+void Enablestatefeedbackc3::Parse(const std::uint8_t* bytes,
+                                  int32_t             length,
+                                  ChassisDetail*      chassis) const {
+  chassis->mutable_zhongyun()->mutable_enable_state_feedback_c3()->set_parking_enable_state(
+      parking_enable_state(bytes, length));
+  chassis->mutable_zhongyun()->mutable_enable_state_feedback_c3()->set_steering_enable_state(
+      steering_enable_state(bytes, length));
+  chassis->mutable_zhongyun()->mutable_enable_state_feedback_c3()->set_gear_enable_actual(
+      gear_enable_actual(bytes, length));
+  chassis->mutable_zhongyun()->mutable_enable_state_feedback_c3()->set_driven_enable_state(
+      driven_enable_state(bytes, length));
+  chassis->mutable_zhongyun()->mutable_enable_state_feedback_c3()->set_brake_enable_state(
+      brake_enable_state(bytes, length));
   // Added for response check
-  chassis->mutable_check_response()->set_is_esp_online(
-      brake_enable_state(bytes, length) == 1);
+  chassis->mutable_check_response()->set_is_esp_online(brake_enable_state(bytes, length) == 1);
   chassis->mutable_check_response()->set_is_vcu_online(
-      ((driven_enable_state(bytes, length) == 1) &&
-       (gear_enable_actual(bytes, length) == 1)) == 1);
-  chassis->mutable_check_response()->set_is_eps_online(
-      steering_enable_state(bytes, length) == 1);
+      ((driven_enable_state(bytes, length) == 1) && (gear_enable_actual(bytes, length) == 1)) == 1);
+  chassis->mutable_check_response()->set_is_eps_online(steering_enable_state(bytes, length) == 1);
 }
 
 // config detail: {'name': 'parking_enable_state', 'enum': {0:
@@ -64,9 +57,8 @@ void Enablestatefeedbackc3::Parse(const std::uint8_t* bytes, int32_t length,
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 32,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 Enable_state_feedback_c3::Parking_enable_stateType
-Enablestatefeedbackc3::parking_enable_state(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 4);
+Enablestatefeedbackc3::parking_enable_state(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
   Enable_state_feedback_c3::Parking_enable_stateType ret =
@@ -81,9 +73,8 @@ Enablestatefeedbackc3::parking_enable_state(const std::uint8_t* bytes,
 // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]',
 // 'bit': 8, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 Enable_state_feedback_c3::Steering_enable_stateType
-Enablestatefeedbackc3::steering_enable_state(const std::uint8_t* bytes,
-                                             int32_t length) const {
-  Byte t0(bytes + 1);
+Enablestatefeedbackc3::steering_enable_state(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
   Enable_state_feedback_c3::Steering_enable_stateType ret =
@@ -98,9 +89,8 @@ Enablestatefeedbackc3::steering_enable_state(const std::uint8_t* bytes,
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 Enable_state_feedback_c3::Gear_enable_actualType
-Enablestatefeedbackc3::gear_enable_actual(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 0);
+Enablestatefeedbackc3::gear_enable_actual(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
   Enable_state_feedback_c3::Gear_enable_actualType ret =
@@ -114,9 +104,8 @@ Enablestatefeedbackc3::gear_enable_actual(const std::uint8_t* bytes,
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 16,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 Enable_state_feedback_c3::Driven_enable_stateType
-Enablestatefeedbackc3::driven_enable_state(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 2);
+Enablestatefeedbackc3::driven_enable_state(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
   Enable_state_feedback_c3::Driven_enable_stateType ret =
@@ -130,9 +119,8 @@ Enablestatefeedbackc3::driven_enable_state(const std::uint8_t* bytes,
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 24,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 Enable_state_feedback_c3::Brake_enable_stateType
-Enablestatefeedbackc3::brake_enable_state(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 3);
+Enablestatefeedbackc3::brake_enable_state(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
   Enable_state_feedback_c3::Brake_enable_stateType ret =

@@ -32,7 +32,7 @@ SmartereyeDevice::SmartereyeDevice() {}
 SmartereyeDevice::~SmartereyeDevice() { uninit(); }
 
 bool SmartereyeDevice::init(const std::shared_ptr<Config>& camera_config) {
-  pcamera_ = StereoCamera::connect("192.168.1.251");
+  pcamera_        = StereoCamera::connect("192.168.1.251");
   pcameraHandler_ = new SmartereyeHandler("camera A");
   pcamera_->enableTasks(TaskId::ObstacleTask | TaskId::DisplayTask);
   inited_ = true;
@@ -54,13 +54,11 @@ int SmartereyeDevice::poll() {
 }
 
 int SmartereyeDevice::uninit() {
-  if (!inited_) {
-    return 1;
-  }
+  if (!inited_) { return 1; }
 
   pcamera_->disconnectFromServer();
   is_capturing_ = false;
-  inited_ = false;
+  inited_       = false;
 
   return 1;
 }

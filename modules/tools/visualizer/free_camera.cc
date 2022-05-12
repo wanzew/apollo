@@ -17,7 +17,8 @@
 #include "modules/tools/visualizer/free_camera.h"
 
 FreeCamera::FreeCamera(void)
-    : AbstractCamera(), translation_(0.0, 0.0f, 0.0f) {}
+    : AbstractCamera()
+    , translation_(0.0, 0.0f, 0.0f) {}
 
 void FreeCamera::UpdateWorld(void) {
   QMatrix4x4 R = YawPitchRoll(attitude_[0], attitude_[1], attitude_[2]);
@@ -27,8 +28,8 @@ void FreeCamera::UpdateWorld(void) {
   translation_.setY(0.0f);
   translation_.setZ(0.0f);
 
-  look_ = QVector3D(R * QVector4D(0.0f, 0.0f, 1.0f, 0.0f));
-  up_ = QVector3D(R * QVector4D(0.0f, 1.0f, 0.0f, 0.0f));
+  look_  = QVector3D(R * QVector4D(0.0f, 0.0f, 1.0f, 0.0f));
+  up_    = QVector3D(R * QVector4D(0.0f, 1.0f, 0.0f, 0.0f));
   right_ = QVector3D::crossProduct(look_, up_);
 
   QVector3D tgt = position_ + look_;

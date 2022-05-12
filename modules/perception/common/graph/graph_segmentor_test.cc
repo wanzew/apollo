@@ -25,7 +25,7 @@ namespace common {
 class GraphSegmentorTest : public testing::Test {
  protected:
   void SetUp() {
-    edges_ = new Edge[10];
+    edges_      = new Edge[10];
     edges_[0].w = 6.f;
     edges_[0].a = 1;
     edges_[0].b = 2;
@@ -63,8 +63,8 @@ class GraphSegmentorTest : public testing::Test {
     edges_ = nullptr;
   }
 
-  Edge* edges_;
-  const int num_edges_ = 10;
+  Edge*     edges_;
+  const int num_edges_    = 10;
   const int num_vertices_ = 6;
 };
 

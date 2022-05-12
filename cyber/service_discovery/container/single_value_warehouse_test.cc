@@ -17,6 +17,7 @@
 #include "cyber/service_discovery/container/single_value_warehouse.h"
 
 #include <utility>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -93,7 +94,7 @@ TEST(SingleValueWarehouseTest, test1) {
     EXPECT_EQ(sh.Size(), 9);
 
     std::vector<RoleAttributes> roles_attr;
-    std::vector<RolePtr> roles;
+    std::vector<RolePtr>        roles;
 
     sh.GetAllRoles(&roles_attr);
     sh.GetAllRoles(&roles);
@@ -111,7 +112,7 @@ TEST(SingleValueWarehouseTest, test1) {
     EXPECT_EQ(roles.size(), roles_attr.size());
     EXPECT_EQ(roles.size(), 4);
 
-    RolePtr role;
+    RolePtr        role;
     RoleAttributes rattr;
     EXPECT_TRUE(sh.Search(attr, &rattr));
     EXPECT_TRUE(sh.Search(attr, &role));

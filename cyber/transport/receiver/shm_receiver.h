@@ -30,7 +30,7 @@ namespace transport {
 template <typename M>
 class ShmReceiver : public Receiver<M> {
  public:
-  ShmReceiver(const RoleAttributes& attr,
+  ShmReceiver(const RoleAttributes&                        attr,
               const typename Receiver<M>::MessageListener& msg_listener);
   virtual ~ShmReceiver();
 
@@ -45,9 +45,8 @@ class ShmReceiver : public Receiver<M> {
 };
 
 template <typename M>
-ShmReceiver<M>::ShmReceiver(
-    const RoleAttributes& attr,
-    const typename Receiver<M>::MessageListener& msg_listener)
+ShmReceiver<M>::ShmReceiver(const RoleAttributes&                        attr,
+                            const typename Receiver<M>::MessageListener& msg_listener)
     : Receiver<M>(attr, msg_listener) {
   dispatcher_ = ShmDispatcher::Instance();
 }
@@ -59,21 +58,16 @@ ShmReceiver<M>::~ShmReceiver() {
 
 template <typename M>
 void ShmReceiver<M>::Enable() {
-  if (this->enabled_) {
-    return;
-  }
+  if (this->enabled_) { return; }
 
-  dispatcher_->AddListener<M>(
-      this->attr_, std::bind(&ShmReceiver<M>::OnNewMessage, this,
-                             std::placeholders::_1, std::placeholders::_2));
+  dispatcher_->AddListener<M>(this->attr_, std::bind(&ShmReceiver<M>::OnNewMessage, this,
+                                                     std::placeholders::_1, std::placeholders::_2));
   this->enabled_ = true;
 }
 
 template <typename M>
 void ShmReceiver<M>::Disable() {
-  if (!this->enabled_) {
-    return;
-  }
+  if (!this->enabled_) { return; }
 
   dispatcher_->RemoveListener<M>(this->attr_);
   this->enabled_ = false;
@@ -83,8 +77,7 @@ template <typename M>
 void ShmReceiver<M>::Enable(const RoleAttributes& opposite_attr) {
   dispatcher_->AddListener<M>(
       this->attr_, opposite_attr,
-      std::bind(&ShmReceiver<M>::OnNewMessage, this, std::placeholders::_1,
-                std::placeholders::_2));
+      std::bind(&ShmReceiver<M>::OnNewMessage, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 template <typename M>

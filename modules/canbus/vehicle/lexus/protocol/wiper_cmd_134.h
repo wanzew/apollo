@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Wipercmd134 : public ::apollo::drivers::canbus::ProtocolData<
-                        ::apollo::canbus::ChassisDetail> {
+class Wipercmd134
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -98,11 +99,11 @@ class Wipercmd134 : public ::apollo::drivers::canbus::ProtocolData<
   void set_p_clear_faults(uint8_t* data, bool clear_faults);
 
  private:
-  bool ignore_overrides_;
-  bool enable_;
-  bool clear_override_;
+  bool                         ignore_overrides_;
+  bool                         enable_;
+  bool                         clear_override_;
   Wiper_cmd_134::Wiper_cmdType wiper_cmd_;
-  bool clear_faults_;
+  bool                         clear_faults_;
 };
 
 }  // namespace lexus

@@ -34,14 +34,12 @@ using apollo::canbus::Chassis;
 using apollo::dreamview::HMIWorker;
 
 MonitorManager::MonitorManager()
-    : hmi_config_(HMIWorker::LoadConfig()),
-      log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {}
+    : hmi_config_(HMIWorker::LoadConfig())
+    , log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {}
 
 void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
   node_ = node;
-  if (FLAGS_use_sim_time) {
-    status_.set_is_realtime_in_simulation(true);
-  }
+  if (FLAGS_use_sim_time) { status_.set_is_realtime_in_simulation(true); }
 }
 
 bool MonitorManager::StartFrame(const double current_time) {
@@ -58,7 +56,7 @@ bool MonitorManager::StartFrame(const double current_time) {
   if (current_mode_ != hmi_status->current_mode()) {
     // Mode changed, update configs and monitored.
     current_mode_ = hmi_status->current_mode();
-    mode_config_ = HMIWorker::LoadMode(hmi_config_.modes().at(current_mode_));
+    mode_config_  = HMIWorker::LoadMode(hmi_config_.modes().at(current_mode_));
     status_.clear_hmi_modules();
     for (const auto& iter : mode_config_.modules()) {
       status_.mutable_hmi_modules()->insert({iter.first, {}});
@@ -89,23 +87,17 @@ void MonitorManager::EndFrame() {
 
 bool MonitorManager::CheckAutonomousDriving(const double current_time) {
   // It's in offline mode if use_sim_time is set.
-  if (FLAGS_use_sim_time) {
-    return false;
-  }
+  if (FLAGS_use_sim_time) { return false; }
 
   // Get current DrivingMode, which will affect how we monitor modules.
   static auto chassis_reader = CreateReader<Chassis>(FLAGS_chassis_topic);
   chassis_reader->Observe();
   const auto chassis = chassis_reader->GetLatestObserved();
-  if (chassis == nullptr) {
-    return false;
-  }
+  if (chassis == nullptr) { return false; }
 
   // Ignore old messages which are likely from playback.
   const double msg_time = chassis->header().timestamp_sec();
-  if (msg_time + FLAGS_system_status_lifetime_seconds < current_time) {
-    return false;
-  }
+  if (msg_time + FLAGS_system_status_lifetime_seconds < current_time) { return false; }
 
   return chassis->driving_mode() == Chassis::COMPLETE_AUTO_DRIVE;
 }

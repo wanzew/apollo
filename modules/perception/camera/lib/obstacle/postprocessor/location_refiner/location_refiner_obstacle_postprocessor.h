@@ -17,9 +17,10 @@
 
 #include <string>
 
+#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/proto/location_refiner.pb.h"
+
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/obj_postprocessor.h"
-#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/proto/location_refiner.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -27,7 +28,8 @@ namespace camera {
 
 class LocationRefinerObstaclePostprocessor : public BaseObstaclePostprocessor {
  public:
-  LocationRefinerObstaclePostprocessor() : BaseObstaclePostprocessor() {
+  LocationRefinerObstaclePostprocessor()
+      : BaseObstaclePostprocessor() {
     postprocessor_ = new ObjPostProcessor;
   }
 
@@ -35,20 +37,18 @@ class LocationRefinerObstaclePostprocessor : public BaseObstaclePostprocessor {
     delete postprocessor_;
     postprocessor_ = nullptr;
   }
-  bool Init(const ObstaclePostprocessorInitOptions &options =
+  bool Init(const ObstaclePostprocessorInitOptions& options =
                 ObstaclePostprocessorInitOptions()) override;
 
   // @brief: post-refine location of 3D obstacles
   // @param [in]: frame
   // @param [out]: frame
-  bool Process(const ObstaclePostprocessorOptions &options,
-               CameraFrame *frame) override;
+  bool Process(const ObstaclePostprocessorOptions& options, CameraFrame* frame) override;
 
   std::string Name() const override;
 
  private:
-  bool is_in_roi(const float pt[2], float img_w, float img_h, float v,
-                 float h_down) const {
+  bool is_in_roi(const float pt[2], float img_w, float img_h, float v, float h_down) const {
     float x = pt[0];
     float y = pt[1];
     if (y < v) {
@@ -57,16 +57,16 @@ class LocationRefinerObstaclePostprocessor : public BaseObstaclePostprocessor {
       return true;
     }
     float img_w_half = img_w / 2.0f;
-    float slope = img_w_half * common::IRec(img_h - h_down - v);
-    float left = img_w_half - slope * (y - v);
-    float right = img_w_half + slope * (y - h_down);
+    float slope      = img_w_half * common::IRec(img_h - h_down - v);
+    float left       = img_w_half - slope * (y - v);
+    float right      = img_w_half + slope * (y - h_down);
     return x > left && x < right;
   }
 
  private:
   //  int image_width_ = 0;
   //  int image_height_ = 0;
-  ObjPostProcessor *postprocessor_ = nullptr;
+  ObjPostProcessor*                      postprocessor_ = nullptr;
   location_refiner::LocationRefinerParam location_refiner_param_;
 };
 

@@ -28,50 +28,46 @@
 namespace apollo {
 namespace planning {
 
-QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
-    const std::array<double, 3>& start, const std::array<double, 3>& end,
-    const double param)
-    : QuinticPolynomialCurve1d(start[0], start[1], start[2], end[0], end[1],
-                               end[2], param) {}
+QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(const std::array<double, 3>& start,
+                                                   const std::array<double, 3>& end,
+                                                   const double                 param)
+    : QuinticPolynomialCurve1d(start[0], start[1], start[2], end[0], end[1], end[2], param) {}
 
-QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
-    const double x0, const double dx0, const double ddx0, const double x1,
-    const double dx1, const double ddx1, const double param) {
+QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(const double x0,
+                                                   const double dx0,
+                                                   const double ddx0,
+                                                   const double x1,
+                                                   const double dx1,
+                                                   const double ddx1,
+                                                   const double param) {
   ComputeCoefficients(x0, dx0, ddx0, x1, dx1, ddx1, param);
   start_condition_[0] = x0;
   start_condition_[1] = dx0;
   start_condition_[2] = ddx0;
-  end_condition_[0] = x1;
-  end_condition_[1] = dx1;
-  end_condition_[2] = ddx1;
-  param_ = param;
+  end_condition_[0]   = x1;
+  end_condition_[1]   = dx1;
+  end_condition_[2]   = ddx1;
+  param_              = param;
 }
 
-QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
-    const QuinticPolynomialCurve1d& other) {
+QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(const QuinticPolynomialCurve1d& other) {
   param_ = other.param_;
-  coef_ = other.coef_;
+  coef_  = other.coef_;
 }
 
-double QuinticPolynomialCurve1d::Evaluate(const uint32_t order,
-                                          const double p) const {
+double QuinticPolynomialCurve1d::Evaluate(const uint32_t order, const double p) const {
   switch (order) {
     case 0: {
-      return ((((coef_[5] * p + coef_[4]) * p + coef_[3]) * p + coef_[2]) * p +
-              coef_[1]) *
-                 p +
+      return ((((coef_[5] * p + coef_[4]) * p + coef_[3]) * p + coef_[2]) * p + coef_[1]) * p +
              coef_[0];
     }
     case 1: {
-      return (((5.0 * coef_[5] * p + 4.0 * coef_[4]) * p + 3.0 * coef_[3]) * p +
-              2.0 * coef_[2]) *
+      return (((5.0 * coef_[5] * p + 4.0 * coef_[4]) * p + 3.0 * coef_[3]) * p + 2.0 * coef_[2]) *
                  p +
              coef_[1];
     }
     case 2: {
-      return (((20.0 * coef_[5] * p + 12.0 * coef_[4]) * p) + 6.0 * coef_[3]) *
-                 p +
-             2.0 * coef_[2];
+      return (((20.0 * coef_[5] * p + 12.0 * coef_[4]) * p) + 6.0 * coef_[3]) * p + 2.0 * coef_[2];
     }
     case 3: {
       return (60.0 * coef_[5] * p + 24.0 * coef_[4]) * p + 6.0 * coef_[3];
@@ -82,32 +78,38 @@ double QuinticPolynomialCurve1d::Evaluate(const uint32_t order,
     case 5: {
       return 120.0 * coef_[5];
     }
-    default:
-      return 0.0;
+    default: return 0.0;
   }
 }
 
-void QuinticPolynomialCurve1d::SetParam(const double x0, const double dx0,
-                                        const double ddx0, const double x1,
-                                        const double dx1, const double ddx1,
+void QuinticPolynomialCurve1d::SetParam(const double x0,
+                                        const double dx0,
+                                        const double ddx0,
+                                        const double x1,
+                                        const double dx1,
+                                        const double ddx1,
                                         const double param) {
   ComputeCoefficients(x0, dx0, ddx0, x1, dx1, ddx1, param);
   param_ = param;
 }
 
-void QuinticPolynomialCurve1d::IntegratedFromQuarticCurve(
-    const PolynomialCurve1d& other, const double init_value) {
+void QuinticPolynomialCurve1d::IntegratedFromQuarticCurve(const PolynomialCurve1d& other,
+                                                          const double             init_value) {
   CHECK_EQ(other.Order(), 4U);
-  param_ = other.ParamLength();
+  param_   = other.ParamLength();
   coef_[0] = init_value;
   for (size_t i = 0; i < 5; ++i) {
     coef_[i + 1] = other.Coef(i) / (static_cast<double>(i) + 1);
   }
 }
 
-void QuinticPolynomialCurve1d::ComputeCoefficients(
-    const double x0, const double dx0, const double ddx0, const double x1,
-    const double dx1, const double ddx1, const double p) {
+void QuinticPolynomialCurve1d::ComputeCoefficients(const double x0,
+                                                   const double dx0,
+                                                   const double ddx0,
+                                                   const double x1,
+                                                   const double dx1,
+                                                   const double ddx1,
+                                                   const double p) {
   CHECK_GT(p, 0.0);
 
   coef_[0] = x0;

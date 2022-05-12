@@ -35,8 +35,7 @@ class BaseROIFilter {
 
   virtual ~BaseROIFilter() = default;
 
-  virtual bool Init(
-      const ROIFilterInitOptions& options = ROIFilterInitOptions()) = 0;
+  virtual bool Init(const ROIFilterInitOptions& options = ROIFilterInitOptions()) = 0;
 
   // @brief: filter roi points from point cloud
   // @param [in]: options
@@ -53,8 +52,7 @@ class BaseROIFilter {
 };  // class BaseROIFilter
 
 PERCEPTION_REGISTER_REGISTERER(BaseROIFilter);
-#define PERCEPTION_REGISTER_ROIFILTER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseROIFilter, name)
+#define PERCEPTION_REGISTER_ROIFILTER(name) PERCEPTION_REGISTER_CLASS(BaseROIFilter, name)
 
 }  // namespace lidar
 }  // namespace perception

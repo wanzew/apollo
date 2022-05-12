@@ -32,16 +32,16 @@ using scheduler::ChoreographyContext;
 using scheduler::Processor;
 
 TEST(ProcessorTest, all) {
-  auto proc = std::make_shared<Processor>();
+  auto proc    = std::make_shared<Processor>();
   auto context = std::make_shared<ChoreographyContext>();
   proc->BindContext(context);
-  std::string affinity = "1to1";
+  std::string      affinity = "1to1";
   std::vector<int> cpuset;
   cpuset.emplace_back(0);
   SetSchedAffinity(proc->Thread(), cpuset, affinity, 0);
   SetSchedPolicy(proc->Thread(), "SCHED_OTHER", 0, proc->Tid());
 
-  auto proc1 = std::make_shared<Processor>();
+  auto proc1    = std::make_shared<Processor>();
   auto context1 = std::make_shared<ChoreographyContext>();
   proc1->BindContext(context1);
   affinity = "range";

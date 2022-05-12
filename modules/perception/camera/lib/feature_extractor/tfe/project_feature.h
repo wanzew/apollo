@@ -18,8 +18,9 @@
 #include <memory>
 #include <string>
 
-#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/proto/tracking_feature.pb.h"
+
+#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/utils/gemm.h"
@@ -29,16 +30,15 @@ namespace perception {
 namespace camera {
 class ProjectFeature : public BaseFeatureExtractor {
  public:
-  bool Init(const FeatureExtractorInitOptions &init_options) override;
-  bool Extract(const FeatureExtractorOptions &options,
-               CameraFrame *frame) override;
+  bool        Init(const FeatureExtractorInitOptions& init_options) override;
+  bool        Extract(const FeatureExtractorOptions& options, CameraFrame* frame) override;
   std::string Name() const override;
 
  private:
   std::shared_ptr<inference::Inference> inference_;
-  int gpu_id_ = 0;
-  tracking_feature::ExternalParam param_;
-  inference::GPUL2Norm norm_;
+  int                                   gpu_id_ = 0;
+  tracking_feature::ExternalParam       param_;
+  inference::GPUL2Norm                  norm_;
 };
 }  // namespace camera
 }  // namespace perception

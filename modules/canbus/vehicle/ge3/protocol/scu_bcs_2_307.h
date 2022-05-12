@@ -17,19 +17,18 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ge3 {
 
-class Scubcs2307 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+class Scubcs2307 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Scubcs2307();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Vehicle speed valid data', 'enum': {0:
@@ -38,7 +37,7 @@ class Scubcs2307 : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 40, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': '-'}
   Scu_bcs_2_307::Bcs_vehspdvdType bcs_vehspdvd(const std::uint8_t* bytes,
-                                               const int32_t length) const;
+                                               const int32_t       length) const;
 
   // config detail: {'description': 'Yaw rate', 'offset': -2.2243, 'precision':
   // 0.0021326, 'len': 12, 'name': 'BCS_YawRate', 'is_signed_var': False,
@@ -57,8 +56,7 @@ class Scubcs2307 : public ::apollo::drivers::canbus::ProtocolData<
   // 'BCS_VehLongAccel', 'is_signed_var': False, 'physical_range':
   // '[-21.593|21.593]', 'bit': 23, 'type': 'double', 'order': 'motorola',
   // 'physical_unit': 'm/s^2'}
-  double bcs_vehlongaccel(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  double bcs_vehlongaccel(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Vehicle lateral acceleration', 'offset':
   // -21.593, 'precision': 0.027126736, 'len': 12, 'name': 'BCS_VehLatAccel',

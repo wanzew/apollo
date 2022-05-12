@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/protocol/throttle_status__510.h"
+
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -28,19 +30,18 @@ using ::apollo::drivers::canbus::Byte;
 Throttlestatus510::Throttlestatus510() {}
 const int32_t Throttlestatus510::ID = 0x510;
 
-void Throttlestatus510::Parse(const std::uint8_t* bytes, int32_t length,
-                              ChassisDetail* chassis) const {
-  chassis->mutable_ch()
-      ->mutable_throttle_status__510()
-      ->set_throttle_pedal_en_sts(throttle_pedal_en_sts(bytes, length));
+void Throttlestatus510::Parse(const std::uint8_t* bytes,
+                              int32_t             length,
+                              ChassisDetail*      chassis) const {
+  chassis->mutable_ch()->mutable_throttle_status__510()->set_throttle_pedal_en_sts(
+      throttle_pedal_en_sts(bytes, length));
   chassis->mutable_ch()->mutable_throttle_status__510()->set_throttle_pedal_sts(
       throttle_pedal_sts(bytes, length));
   chassis->mutable_ch()->mutable_throttle_status__510()->set_drive_motor_err(
       drive_motor_err(bytes, length));
   chassis->mutable_ch()->mutable_throttle_status__510()->set_battery_bms_err(
       battery_bms_err(bytes, length));
-  chassis->mutable_check_response()->set_is_vcu_online(
-      throttle_pedal_en_sts(bytes, length) == 1);
+  chassis->mutable_check_response()->set_is_vcu_online(throttle_pedal_en_sts(bytes, length) == 1);
 }
 
 // config detail: {'description': 'throttle pedal enable bit(Status)', 'enum':
@@ -50,9 +51,8 @@ void Throttlestatus510::Parse(const std::uint8_t* bytes, int32_t length,
 // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
 Throttle_status__510::Throttle_pedal_en_stsType
-Throttlestatus510::throttle_pedal_en_sts(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 0);
+Throttlestatus510::throttle_pedal_en_sts(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
   Throttle_status__510::Throttle_pedal_en_stsType ret =
@@ -64,9 +64,8 @@ Throttlestatus510::throttle_pedal_en_sts(const std::uint8_t* bytes,
 // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'throttle_pedal_sts',
 // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type': 'int',
 // 'order': 'intel', 'physical_unit': '%'}
-int Throttlestatus510::throttle_pedal_sts(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 1);
+int Throttlestatus510::throttle_pedal_sts(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
@@ -78,9 +77,9 @@ int Throttlestatus510::throttle_pedal_sts(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 16, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
-Throttle_status__510::Drive_motor_errType Throttlestatus510::drive_motor_err(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+Throttle_status__510::Drive_motor_errType
+Throttlestatus510::drive_motor_err(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
   Throttle_status__510::Drive_motor_errType ret =
@@ -92,9 +91,9 @@ Throttle_status__510::Drive_motor_errType Throttlestatus510::drive_motor_err(
 // 'BATTERY_BMS_ERR_NOERR', 1: 'BATTERY_BMS_ERR_BATTERY_ERR'}, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]',
 // 'bit': 24, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-Throttle_status__510::Battery_bms_errType Throttlestatus510::battery_bms_err(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Throttle_status__510::Battery_bms_errType
+Throttlestatus510::battery_bms_err(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
   Throttle_status__510::Battery_bms_errType ret =

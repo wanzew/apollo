@@ -16,13 +16,13 @@
 
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 
-#include "cyber/blocker/blocker_manager.h"
-#include "cyber/time/clock.h"
-
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
+
+#include "cyber/blocker/blocker_manager.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/quaternion.h"
 
@@ -40,12 +40,10 @@ namespace dreamview {
 
 class SimControlTest : public ::testing::Test {
  public:
-  static void SetUpTestCase() {
-    cyber::GlobalData::Instance()->EnableSimulationMode();
-  }
+  static void SetUpTestCase() { cyber::GlobalData::Instance()->EnableSimulationMode(); }
 
   virtual void SetUp() {
-    FLAGS_map_dir = "modules/dreamview/backend/testdata";
+    FLAGS_map_dir           = "modules/dreamview/backend/testdata";
     FLAGS_base_map_filename = "garage.bin";
 
     map_service_.reset(new MapService(false));
@@ -57,14 +55,17 @@ class SimControlTest : public ::testing::Test {
   std::unique_ptr<SimControl> sim_control_;
 };
 
-void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
-                   const std::vector<double> &ss, const std::vector<double> &vs,
-                   const std::vector<double> &as,
-                   const std::vector<double> &ths,
-                   const std::vector<double> &ks, const std::vector<double> &ts,
-                   planning::ADCTrajectory *adc_trajectory) {
+void SetTrajectory(const std::vector<double>& xs,
+                   const std::vector<double>& ys,
+                   const std::vector<double>& ss,
+                   const std::vector<double>& vs,
+                   const std::vector<double>& as,
+                   const std::vector<double>& ths,
+                   const std::vector<double>& ks,
+                   const std::vector<double>& ts,
+                   planning::ADCTrajectory*   adc_trajectory) {
   for (size_t i = 0; i < xs.size(); ++i) {
-    auto *point = adc_trajectory->add_trajectory_point();
+    auto* point = adc_trajectory->add_trajectory_point();
     point->mutable_path_point()->set_x(xs[i]);
     point->mutable_path_point()->set_y(ys[i]);
     point->mutable_path_point()->set_s(ss[i]);
@@ -82,19 +83,18 @@ TEST_F(SimControlTest, Test) {
   sim_control_->enabled_ = true;
 
   planning::ADCTrajectory adc_trajectory;
-  std::vector<double> xs(5);
-  std::vector<double> ys(5);
-  std::vector<double> ss(5);
-  std::vector<double> vs(5);
-  std::vector<double> as = {0.0, 0.0, 0.0, 0.0, 0.0};
-  std::vector<double> ths = {M_PI / 4.0, M_PI / 4.0, M_PI / 4.0, M_PI / 4.0,
-                             M_PI / 4.0};
-  std::vector<double> kappa_s = {0.0, 0.0, 0.0, 0.0, 0.0};
-  std::vector<double> ts = {0.0, 0.1, 0.2, 0.3, 0.4};
-  ss[0] = 0.0;
-  xs[0] = 0.0;
-  ys[0] = 0.0;
-  vs[0] = 10.0;
+  std::vector<double>     xs(5);
+  std::vector<double>     ys(5);
+  std::vector<double>     ss(5);
+  std::vector<double>     vs(5);
+  std::vector<double>     as      = {0.0, 0.0, 0.0, 0.0, 0.0};
+  std::vector<double>     ths     = {M_PI / 4.0, M_PI / 4.0, M_PI / 4.0, M_PI / 4.0, M_PI / 4.0};
+  std::vector<double>     kappa_s = {0.0, 0.0, 0.0, 0.0, 0.0};
+  std::vector<double>     ts      = {0.0, 0.1, 0.2, 0.3, 0.4};
+  ss[0]                           = 0.0;
+  xs[0]                           = 0.0;
+  ys[0]                           = 0.0;
+  vs[0]                           = 10.0;
   for (std::size_t i = 1; i < ts.size(); ++i) {
     vs[i] = vs[i - 1] + as[i - 1] * ts[i];
     ss[i] = (vs[i - 1] + 0.5 * vs[i]) * ts[i];
@@ -116,10 +116,9 @@ TEST_F(SimControlTest, Test) {
     sim_control_->RunOnce();
 
     BlockerManager::Instance()->Observe();
-    auto localization =
-        BlockerManager::Instance()
-            ->GetBlocker<LocalizationEstimate>(FLAGS_localization_topic)
-            ->GetLatestObservedPtr();
+    auto localization = BlockerManager::Instance()
+                            ->GetBlocker<LocalizationEstimate>(FLAGS_localization_topic)
+                            ->GetLatestObservedPtr();
     auto chassis = BlockerManager::Instance()
                        ->GetBlocker<Chassis>(FLAGS_chassis_topic)
                        ->GetLatestObservedPtr();
@@ -132,7 +131,7 @@ TEST_F(SimControlTest, Test) {
     EXPECT_NEAR(chassis->throttle_percentage(), 0.0, 1e-6);
     EXPECT_NEAR(chassis->brake_percentage(), 0.0, 1e-6);
 
-    const auto &pose = localization->pose();
+    const auto& pose = localization->pose();
     EXPECT_NEAR(pose.position().x(), 0.10606601717803638, 1e-6);
     EXPECT_NEAR(pose.position().y(), 0.10606601717803638, 1e-6);
     EXPECT_NEAR(pose.position().z(), 0.0, 1e-6);
@@ -140,8 +139,7 @@ TEST_F(SimControlTest, Test) {
     const double theta = M_PI / 4.0;
     EXPECT_NEAR(pose.heading(), theta, 1e-6);
 
-    const Eigen::Quaternion<double> orientation =
-        HeadingToQuaternion<double>(theta);
+    const Eigen::Quaternion<double> orientation = HeadingToQuaternion<double>(theta);
     EXPECT_NEAR(pose.orientation().qw(), orientation.w(), 1e-6);
     EXPECT_NEAR(pose.orientation().qx(), orientation.x(), 1e-6);
     EXPECT_NEAR(pose.orientation().qy(), orientation.y(), 1e-6);
@@ -158,10 +156,8 @@ TEST_F(SimControlTest, Test) {
     EXPECT_NEAR(pose.angular_velocity().z(), speed * curvature, 1e-6);
 
     const double acceleration_s = 0.0;
-    EXPECT_NEAR(pose.linear_acceleration().x(),
-                std::cos(theta) * acceleration_s, 1e-6);
-    EXPECT_NEAR(pose.linear_acceleration().y(),
-                std::sin(theta) * acceleration_s, 1e-6);
+    EXPECT_NEAR(pose.linear_acceleration().x(), std::cos(theta) * acceleration_s, 1e-6);
+    EXPECT_NEAR(pose.linear_acceleration().y(), std::sin(theta) * acceleration_s, 1e-6);
     EXPECT_NEAR(pose.linear_acceleration().z(), 0.0, 1e-6);
   }
 }
@@ -203,10 +199,9 @@ TEST_F(SimControlTest, TestDummyPrediction) {
 
     EXPECT_TRUE(sim_control_->send_dummy_prediction_);
     BlockerManager::Instance()->Observe();
-    auto prediction =
-        BlockerManager::Instance()
-            ->GetBlocker<PredictionObstacles>(FLAGS_prediction_topic)
-            ->GetLatestObservedPtr();
+    auto prediction = BlockerManager::Instance()
+                          ->GetBlocker<PredictionObstacles>(FLAGS_prediction_topic)
+                          ->GetLatestObservedPtr();
     EXPECT_EQ("SimPrediction", prediction->header().module_name());
     EXPECT_DOUBLE_EQ(prediction->header().timestamp_sec(), timestamp);
   }

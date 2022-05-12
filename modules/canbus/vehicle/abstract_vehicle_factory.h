@@ -24,6 +24,7 @@
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
@@ -59,13 +60,12 @@ class AbstractVehicleFactory {
    * @brief the interface of creating a MessageManager class
    * @returns a unique pointer that points to the created MessageManager object.
    */
-  virtual std::unique_ptr<MessageManager<ChassisDetail>>
-  CreateMessageManager() = 0;
+  virtual std::unique_ptr<MessageManager<ChassisDetail>> CreateMessageManager() = 0;
 
   /**
    * @brief set VehicleParameter.
    */
-  void SetVehicleParameter(const VehicleParameter &vehicle_paramter);
+  void SetVehicleParameter(const VehicleParameter& vehicle_paramter);
 
  private:
   VehicleParameter vehicle_parameter_;

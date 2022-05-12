@@ -32,8 +32,8 @@ class NotifierBase {
  public:
   virtual ~NotifierBase() = default;
 
-  virtual void Shutdown() = 0;
-  virtual bool Notify(const ReadableInfo& info) = 0;
+  virtual void Shutdown()                                 = 0;
+  virtual bool Notify(const ReadableInfo& info)           = 0;
   virtual bool Listen(int timeout_ms, ReadableInfo* info) = 0;
 };
 

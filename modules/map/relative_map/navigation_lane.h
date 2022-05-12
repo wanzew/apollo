@@ -28,11 +28,12 @@
 #include <utility>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/map/relative_map/proto/relative_map_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 /**
  * @namespace apollo::relative_map
@@ -59,8 +60,7 @@ namespace relative_map {
 // the value is "default_right_width_". A negative value indicates illegal.
 //
 // fourth element : a shared pointer of the current navigation path.
-typedef std::tuple<int, double, double, std::shared_ptr<NavigationPath>>
-    NaviPathTuple;
+typedef std::tuple<int, double, double, std::shared_ptr<NavigationPath>> NaviPathTuple;
 
 // A stitching index pair.
 // pair.first: the start stitching index of the current navigation line.
@@ -107,8 +107,7 @@ class NavigationLane {
    */
   void SetConfig(const NavigationLaneConfig& config);
 
-  void SetVehicleStateProvider(
-      common::VehicleStateProvider* vehicle_state_provider);
+  void SetVehicleStateProvider(common::VehicleStateProvider* vehicle_state_provider);
 
   /**
    * @brief Update navigation line information.
@@ -124,7 +123,7 @@ class NavigationLane {
    * @return None.
    */
   void SetDefaultWidth(const double left_width, const double right_width) {
-    default_left_width_ = left_width;
+    default_left_width_  = left_width;
     default_right_width_ = right_width;
   }
 
@@ -140,8 +139,7 @@ class NavigationLane {
    * @param perception_obstacles Perceived lane line information to be updated.
    * @return None.
    */
-  void UpdatePerception(
-      const perception::PerceptionObstacles& perception_obstacles) {
+  void UpdatePerception(const perception::PerceptionObstacles& perception_obstacles) {
     perception_obstacles_ = perception_obstacles;
   }
 
@@ -153,9 +151,7 @@ class NavigationLane {
    */
   NavigationPath Path() const {
     const auto& current_navi_path = std::get<3>(current_navi_path_tuple_);
-    if (current_navi_path) {
-      return *current_navi_path;
-    }
+    if (current_navi_path) { return *current_navi_path; }
     return NavigationPath();
   }
 
@@ -167,8 +163,7 @@ class NavigationLane {
    * @param map_msg A pointer which outputs the real-time relative map.
    * @return True if the real-time relative map is created; false otherwise.
    */
-  bool CreateMap(const MapGenerationParam& map_config,
-                 MapMsg* const map_msg) const;
+  bool CreateMap(const MapGenerationParam& map_config, MapMsg* const map_msg) const;
 
  private:
   /**
@@ -181,9 +176,8 @@ class NavigationLane {
    * @param x Independent variable.
    * @return Calculated value of the cubic polynomial.
    */
-  double EvaluateCubicPolynomial(const double c0, const double c1,
-                                 const double c2, const double c3,
-                                 const double x) const;
+  double EvaluateCubicPolynomial(
+      const double c0, const double c1, const double c2, const double c3, const double x) const;
 
   /**
    * @brief Calculate the curvature value based on the cubic polynomial's
@@ -194,8 +188,7 @@ class NavigationLane {
    * @param x Independent variable.
    * @return Calculated curvature value.
    */
-  double GetKappa(const double c1, const double c2, const double c3,
-                  const double x);
+  double GetKappa(const double c1, const double c2, const double c3, const double x);
 
   /**
    * @brief In a navigation line segment, starting from the point given by
@@ -208,8 +201,9 @@ class NavigationLane {
    * @return The matched point after the distance `s`.
    */
   common::PathPoint GetPathPointByS(const common::Path& path,
-                                    const int start_index, const double s,
-                                    int* const matched_index);
+                                    const int           start_index,
+                                    const double        s,
+                                    int* const          matched_index);
 
   /**
    * @brief Generate a lane centerline from the perceived lane markings and
@@ -219,7 +213,7 @@ class NavigationLane {
    * @return None.
    */
   void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker,
-                               common::Path* const path);
+                               common::Path* const            path);
 
   /**
    * @brief A navigation line segment with the length of about 250 m are cut
@@ -230,8 +224,7 @@ class NavigationLane {
    * @param path The converted navigation line segment.
    * @return True if a suitable path is created; false otherwise.
    */
-  bool ConvertNavigationLineToPath(const int line_index,
-                                   common::Path* const path);
+  bool ConvertNavigationLineToPath(const int line_index, common::Path* const path);
 
   /**
    * @brief Merge the navigation line segment of the vehicle's current lane and
@@ -240,8 +233,7 @@ class NavigationLane {
    * @param path The merged navigation line segment.
    * @return None.
    */
-  void MergeNavigationLineAndLaneMarker(const int line_index,
-                                        common::Path* const path);
+  void MergeNavigationLineAndLaneMarker(const int line_index, common::Path* const path);
 
   /**
    * @brief Update the index of the vehicle's current location in an entire
@@ -252,8 +244,7 @@ class NavigationLane {
    * `NavigationInfo` object.
    * @return Updated projection index pair.
    */
-  ProjIndexPair UpdateProjectionIndex(const common::Path& path,
-                                      const int line_index);
+  ProjIndexPair UpdateProjectionIndex(const common::Path& path, const int line_index);
 
   /**
    * @brief If an entire navigation line is a cyclic/circular
@@ -289,7 +280,7 @@ class NavigationLane {
   double perceived_right_width_ = -1.0;
 
   // The standard lane width of China's expressway is 3.75 meters.
-  double default_left_width_ = 1.875;
+  double default_left_width_  = 1.875;
   double default_right_width_ = 1.875;
 
   // key: line index,
@@ -301,7 +292,7 @@ class NavigationLane {
   std::unordered_map<int, StitchIndexPair> stitch_index_map_;
 
   // in world coordination: ENU
-  localization::Pose original_pose_;
+  localization::Pose            original_pose_;
   common::VehicleStateProvider* vehicle_state_provider_ = nullptr;
 };
 

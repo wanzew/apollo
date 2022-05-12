@@ -21,8 +21,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/proto/feature.pb.h"
+
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -64,8 +65,7 @@ class JunctionAnalyzer {
    * @param start lane IDs
    * @return junction
    */
-  JunctionFeature GetJunctionFeature(
-      const std::vector<std::string>& start_lane_ids);
+  JunctionFeature GetJunctionFeature(const std::vector<std::string>& start_lane_ids);
 
  private:
   /**

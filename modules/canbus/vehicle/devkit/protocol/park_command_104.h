@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Parkcommand104
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -45,15 +46,13 @@ class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
   // 1: 'PARK_TARGET_PARKING_TRIGGER'}, 'precision': 1.0, 'len': 1,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 8,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Parkcommand104* set_park_target(
-      Park_command_104::Park_targetType park_target);
+  Parkcommand104* set_park_target(Park_command_104::Park_targetType park_target);
 
   // config detail: {'name': 'Park_EN_CTRL', 'enum': {0: 'PARK_EN_CTRL_DISABLE',
   // 1: 'PARK_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 1, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Parkcommand104* set_park_en_ctrl(
-      Park_command_104::Park_en_ctrlType park_en_ctrl);
+  Parkcommand104* set_park_en_ctrl(Park_command_104::Park_en_ctrlType park_en_ctrl);
 
  private:
   // config detail: {'name': 'CheckSum_104', 'offset': 0.0, 'precision': 1.0,
@@ -65,19 +64,17 @@ class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
   // 1: 'PARK_TARGET_PARKING_TRIGGER'}, 'precision': 1.0, 'len': 1,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 8,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_park_target(uint8_t* data,
-                         Park_command_104::Park_targetType park_target);
+  void set_p_park_target(uint8_t* data, Park_command_104::Park_targetType park_target);
 
   // config detail: {'name': 'Park_EN_CTRL', 'enum': {0: 'PARK_EN_CTRL_DISABLE',
   // 1: 'PARK_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 1, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  void set_p_park_en_ctrl(uint8_t* data,
-                          Park_command_104::Park_en_ctrlType park_en_ctrl);
+  void set_p_park_en_ctrl(uint8_t* data, Park_command_104::Park_en_ctrlType park_en_ctrl);
 
  private:
-  int checksum_104_;
-  Park_command_104::Park_targetType park_target_;
+  int                                checksum_104_;
+  Park_command_104::Park_targetType  park_target_;
   Park_command_104::Park_en_ctrlType park_en_ctrl_;
 };
 

@@ -21,12 +21,9 @@
 namespace apollo {
 namespace planning {
 
-void LearningBasedData::Clear() {
-  learning_data_.Clear();
-}
+void LearningBasedData::Clear() { learning_data_.Clear(); }
 
-void LearningBasedData::InsertLearningDataFrame(
-    const LearningDataFrame& learning_data_frame) {
+void LearningBasedData::InsertLearningDataFrame(const LearningDataFrame& learning_data_frame) {
   learning_data_.add_learning_data_frame()->CopyFrom(learning_data_frame);
 
   while (learning_data_.learning_data_frame_size() > 10) {
@@ -36,8 +33,7 @@ void LearningBasedData::InsertLearningDataFrame(
 
 LearningDataFrame* LearningBasedData::GetLatestLearningDataFrame() {
   const int size = learning_data_.learning_data_frame_size();
-  return size > 0 ? learning_data_.mutable_learning_data_frame(size - 1)
-                  : nullptr;
+  return size > 0 ? learning_data_.mutable_learning_data_frame(size - 1) : nullptr;
 }
 
 }  // namespace planning

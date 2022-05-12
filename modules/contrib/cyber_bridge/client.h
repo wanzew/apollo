@@ -26,17 +26,17 @@ class Client : public std::enable_shared_from_this<Client> {
   void publish(const std::string& channel, const std::string& msg);
 
  private:
-  Node& node;
+  Node&    node;
   Clients& clients;
 
   boost::asio::ip::tcp::socket socket;
 
-  uint8_t temp[1024 * 1024];
+  uint8_t              temp[1024 * 1024];
   std::vector<uint8_t> buffer;
   std::vector<uint8_t> writing;
   std::vector<uint8_t> pending;
-  std::mutex publish_mutex;
-  const uint MAX_PENDING_SIZE = 1073741824;  // 1GB
+  std::mutex           publish_mutex;
+  const uint           MAX_PENDING_SIZE = 1073741824;  // 1GB
 
   void handle_read(const boost::system::error_code& ec, std::size_t length);
   void handle_write(const boost::system::error_code& ec);

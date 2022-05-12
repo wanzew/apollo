@@ -74,7 +74,8 @@ class BaseMap {
    * but will not wait for the loading finished, eigen version. */
   virtual void PreloadMapArea(const Eigen::Vector3d& location,
                               const Eigen::Vector3d& trans_diff,
-                              unsigned int resolution_id, unsigned int zone_id);
+                              unsigned int           resolution_id,
+                              unsigned int           zone_id);
   /**@brief Load map nodes for the location calculate of this frame.
    * If the forecasts are correct in last frame, these nodes will be all in
    * cache, if not, then need to create loading tasks, and wait for the loading
@@ -82,8 +83,10 @@ class BaseMap {
    * in order to the nodes which the following calculate needed are all in the
    * memory, eigen version. */
   virtual bool LoadMapArea(const Eigen::Vector3d& seed_pt3d,
-                           unsigned int resolution_id, unsigned int zone_id,
-                           int filter_size_x, int filter_size_y);
+                           unsigned int           resolution_id,
+                           unsigned int           zone_id,
+                           int                    filter_size_x,
+                           int                    filter_size_y);
 
   /**@brief Compute md5 for all map node file in map. */
   void ComputeMd5ForAllMapNodes();
@@ -98,16 +101,12 @@ class BaseMap {
   /**@brief Get the map config. */
   inline BaseMapConfig& GetMapConfig() { return *map_config_; }
   /**@brief Get all map node paths. */
-  inline const std::vector<std::string>& GetAllMapNodePaths() const {
-    return all_map_node_paths_;
-  }
+  inline const std::vector<std::string>& GetAllMapNodePaths() const { return all_map_node_paths_; }
   /**@brief Get all map node md5s. */
-  inline const std::vector<std::string>& GetAllMapNodeMd5s() const {
-    return all_map_node_md5s_;
-  }
+  inline const std::vector<std::string>& GetAllMapNodeMd5s() const { return all_map_node_md5s_; }
 
  protected:
-  void GetAllMapIndexAndPath();
+  void         GetAllMapIndexAndPath();
   MapNodeIndex GetMapIndexFromMapPath(const std::string& map_path);
 
  protected:
@@ -116,8 +115,7 @@ class BaseMap {
   /**@brief Load map node by index.*/
   void PreloadMapNodes(std::set<MapNodeIndex>* map_ids);
   /**@brief Load map node by index, thread_safety. */
-  void LoadMapNodeThreadSafety(const MapNodeIndex& index,
-                               bool is_reserved = false);
+  void LoadMapNodeThreadSafety(const MapNodeIndex& index, bool is_reserved = false);
   /**@brief Check map node in L2 Cache.*/
   void CheckAndUpdateCache(std::set<MapNodeIndex>* map_ids);
 
@@ -127,11 +125,9 @@ class BaseMap {
   MapNodeCache<MapNodeIndex, BaseMapNode>::DestroyFunc destroy_func_lvl1_;
   MapNodeCache<MapNodeIndex, BaseMapNode>::DestroyFunc destroy_func_lvl2_;
   /**@brief The cache for map node preload. */
-  std::unique_ptr<MapNodeCache<MapNodeIndex, BaseMapNode>>
-      map_node_cache_lvl1_ = nullptr;
+  std::unique_ptr<MapNodeCache<MapNodeIndex, BaseMapNode>> map_node_cache_lvl1_ = nullptr;
   /**brief The dynamic map node preloading thread pool pointer. */
-  std::unique_ptr<MapNodeCache<MapNodeIndex, BaseMapNode>>
-      map_node_cache_lvl2_ = nullptr;
+  std::unique_ptr<MapNodeCache<MapNodeIndex, BaseMapNode>> map_node_cache_lvl2_ = nullptr;
   /**@brief The map node memory pool pointer. */
   BaseMapNodePool* map_node_pool_ = nullptr;
   /**@bried Keep the index of preloading nodes. */
@@ -141,7 +137,7 @@ class BaseMap {
 
   /**@brief All the map nodes in the Map (in the disk). */
   std::vector<MapNodeIndex> all_map_node_indices_;
-  std::vector<std::string> all_map_node_paths_;
+  std::vector<std::string>  all_map_node_paths_;
 
   /**@brief All the map nodes' md5 in the Map (in the disk). */
   std::vector<std::string> all_map_node_md5s_;

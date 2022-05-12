@@ -24,12 +24,13 @@
 #include <memory>
 #include <string>
 
-#include "modules/common/status/status.h"
-#include "modules/control/common/dependency_injector.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "modules/common/status/status.h"
+#include "modules/control/common/dependency_injector.h"
 
 /**
  * @namespace apollo::control
@@ -61,7 +62,7 @@ class Controller {
    * @return Status initialization status
    */
   virtual common::Status Init(std::shared_ptr<DependencyInjector> injector,
-                              const ControlConf *control_conf) = 0;
+                              const ControlConf*                  control_conf) = 0;
 
   /**
    * @brief compute control command based on current vehicle status
@@ -72,10 +73,11 @@ class Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  virtual common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      control::ControlCommand *cmd) = 0;
+  virtual common::Status
+  ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                        const canbus::Chassis*                    chassis,
+                        const planning::ADCTrajectory*            trajectory,
+                        control::ControlCommand*                  cmd) = 0;
 
   /**
    * @brief reset Controller

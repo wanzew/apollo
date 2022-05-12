@@ -22,9 +22,10 @@
 
 #include <vector>
 
+#include "modules/planning/proto/planning.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -38,11 +39,9 @@ class DiscretizedTrajectory : public std::vector<common::TrajectoryPoint> {
    */
   explicit DiscretizedTrajectory(const ADCTrajectory& trajectory);
 
-  explicit DiscretizedTrajectory(
-      const std::vector<common::TrajectoryPoint>& trajectory_points);
+  explicit DiscretizedTrajectory(const std::vector<common::TrajectoryPoint>& trajectory_points);
 
-  void SetTrajectoryPoints(
-      const std::vector<common::TrajectoryPoint>& trajectory_points);
+  void SetTrajectoryPoints(const std::vector<common::TrajectoryPoint>& trajectory_points);
 
   virtual ~DiscretizedTrajectory() = default;
 
@@ -60,16 +59,13 @@ class DiscretizedTrajectory : public std::vector<common::TrajectoryPoint> {
   virtual size_t QueryNearestPoint(const common::math::Vec2d& position) const;
 
   size_t QueryNearestPointWithBuffer(const common::math::Vec2d& position,
-                                     const double buffer) const;
+                                     const double               buffer) const;
 
-  virtual void AppendTrajectoryPoint(
-      const common::TrajectoryPoint& trajectory_point);
+  virtual void AppendTrajectoryPoint(const common::TrajectoryPoint& trajectory_point);
 
-  void PrependTrajectoryPoints(
-      const std::vector<common::TrajectoryPoint>& trajectory_points) {
+  void PrependTrajectoryPoints(const std::vector<common::TrajectoryPoint>& trajectory_points) {
     if (!empty() && trajectory_points.size() > 1) {
-      ACHECK(trajectory_points.back().relative_time() <
-             front().relative_time());
+      ACHECK(trajectory_points.back().relative_time() < front().relative_time());
     }
     insert(begin(), trajectory_points.begin(), trajectory_points.end());
   }

@@ -17,27 +17,26 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Headlightauxrpt318 : public ::apollo::drivers::canbus::ProtocolData<
-                               ::apollo::canbus::ChassisDetail> {
+class Headlightauxrpt318
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Headlightauxrpt318();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'HEADLIGHTS_MODE_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 19, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool headlights_mode_is_valid(const std::uint8_t* bytes,
-                                const int32_t length) const;
+  bool headlights_mode_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'HEADLIGHTS_MODE', 'enum': {0:
   // 'HEADLIGHTS_MODE_HEADLIGHTS_OFF', 1: 'HEADLIGHTS_MODE_PARKING_LIGHTS_ONLY',
@@ -45,15 +44,14 @@ class Headlightauxrpt318 : public ::apollo::drivers::canbus::ProtocolData<
   // 'HEADLIGHTS_MODE_HEADLIGHTS_ON_AUTO_MODE'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit':
   // 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Headlight_aux_rpt_318::Headlights_modeType headlights_mode(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Headlight_aux_rpt_318::Headlights_modeType headlights_mode(const std::uint8_t* bytes,
+                                                             const int32_t       length) const;
 
   // config detail: {'name': 'FOG_LIGHTS_ON_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 18, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool fog_lights_on_is_valid(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  bool fog_lights_on_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'FOG_LIGHTS_ON', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 2,
@@ -64,22 +62,19 @@ class Headlightauxrpt318 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 17, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool headlights_on_bright_is_valid(const std::uint8_t* bytes,
-                                     const int32_t length) const;
+  bool headlights_on_bright_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'HEADLIGHTS_ON_BRIGHT', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 1, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool headlights_on_bright(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool headlights_on_bright(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'HEADLIGHTS_ON_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 16, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool headlights_on_is_valid(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  bool headlights_on_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'HEADLIGHTS_ON', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0,

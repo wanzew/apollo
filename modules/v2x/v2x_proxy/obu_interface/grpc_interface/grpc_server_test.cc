@@ -28,7 +28,7 @@ namespace v2x {
 
 TEST(GrpcServerImplTest, Construct) {
   apollo::cyber::Init("grpc_server_test");
-  bool init_succ = false;
+  bool           init_succ = false;
   GrpcServerImpl grpc_server;
   init_succ = grpc_server.InitFlag();
   EXPECT_TRUE(init_succ);

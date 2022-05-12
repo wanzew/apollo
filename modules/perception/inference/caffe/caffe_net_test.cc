@@ -16,9 +16,10 @@
 
 #include "modules/perception/inference/caffe/caffe_net.h"
 
-#include "caffe/util/math_functions.hpp"
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
+
+#include "caffe/util/math_functions.hpp"
 
 #include "modules/perception/inference/utils/util.h"
 
@@ -29,9 +30,10 @@ namespace inference {
 class TestableCaffeNet : public CaffeNet {
  public:
  public:
-  TestableCaffeNet(const std::string &net_file, const std::string &modelfile,
-                   const std::vector<std::string> &outputs,
-                   const std::vector<std::string> &inputs)
+  TestableCaffeNet(const std::string&              net_file,
+                   const std::string&              modelfile,
+                   const std::vector<std::string>& outputs,
+                   const std::vector<std::string>& inputs)
       : CaffeNet(net_file, modelfile, outputs, inputs) {}
   using CaffeNet::net_;
   using CaffeNet::reshape;

@@ -25,21 +25,21 @@
 #include "grpc++/grpc++.h"
 #include "yaml-cpp/yaml.h"
 
+#include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_common.h"
 #include "modules/map/tools/map_datachecker/client/client_gflags.h"
 #include "modules/map/tools/map_datachecker/client/exception_handler.h"
-#include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
 
 namespace apollo {
 namespace hdmap {
 
 ChannelChecker::ChannelChecker(const std::string& stop_flag_file)
     : stop_flag_file_(stop_flag_file) {
-  YAML::Node node = YAML::LoadFile(FLAGS_client_conf_yaml);
-  std::string server_addr =
-      node["grpc_host_port"]["grpc_host"].as<std::string>() + ":" +
-      node["grpc_host_port"]["grpc_port"].as<std::string>();
+  YAML::Node  node        = YAML::LoadFile(FLAGS_client_conf_yaml);
+  std::string server_addr = node["grpc_host_port"]["grpc_host"].as<std::string>() + ":" +
+                            node["grpc_host_port"]["grpc_port"].as<std::string>();
   check_period_ = node["channel_check"]["check_period"].as<int>();
   service_stub_ = CollectionCheckerService::NewStub(
       grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials()));
@@ -74,9 +74,7 @@ int ChannelChecker::PeriodicCheck() {
   int ret = 0;
   while (!boost::filesystem::exists(stop_flag_file_)) {
     ret = Check();
-    if (ret != 0) {
-      break;
-    }
+    if (ret != 0) { break; }
     AINFO << "channel checker sleep " << check_period_ << " seconds";
     std::this_thread::sleep_for(std::chrono::seconds(check_period_));
   }
@@ -88,10 +86,9 @@ int ChannelChecker::PeriodicCheck() {
   return ret;
 }
 
-int ChannelChecker::GrpcStub(ChannelVerifyRequest* request,
-                             ChannelVerifyResponse* response) {
+int ChannelChecker::GrpcStub(ChannelVerifyRequest* request, ChannelVerifyResponse* response) {
   grpc::ClientContext context;
-  grpc::Status status;
+  grpc::Status        status;
   status = service_stub_->ServiceChannelVerify(&context, *request, response);
   if (status.error_code() == grpc::StatusCode::UNAVAILABLE) {
     AERROR << "FATAL Error. Map grpc service is UNAVAILABLE.";
@@ -122,10 +119,8 @@ int ChannelChecker::Check() {
   AINFO << "channel check request: "
         << "cmd: [" << request.cmd() << "]";
   ChannelVerifyResponse response;
-  int ret = GrpcStub(&request, &response);
-  if (ret != 0) {
-    ProcessAbnormal(&response);
-  }
+  int                   ret = GrpcStub(&request, &response);
+  if (ret != 0) { ProcessAbnormal(&response); }
   return ret;
 }
 
@@ -145,8 +140,7 @@ int ChannelChecker::ProcessAbnormal(ChannelVerifyResponse* response) {
       const VerifyResult& result = response->result();
       for (int i = 0; i < result.rates_size(); ++i) {
         const FrameRate& rate = result.rates(i);
-        fprintf(USER_STREAM, "Channels with insufficient frame rate:%s\n",
-                rate.topic().c_str());
+        fprintf(USER_STREAM, "Channels with insufficient frame rate:%s\n", rate.topic().c_str());
         fprintf(USER_STREAM, "-expected_rate:%lf\n", rate.expected_rate());
         fprintf(USER_STREAM, "-current_rate:%lf\n", rate.current_rate());
         fprintf(USER_STREAM, "-bad_record_name:\n");

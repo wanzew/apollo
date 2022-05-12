@@ -61,7 +61,7 @@ TEST(SchedulerTest, notify_task) {
   auto sched = Instance();
   cyber::Init("scheduler_test");
   std::string name = "croutine";
-  auto id = GlobalData::RegisterTaskName(name);
+  auto        id   = GlobalData::RegisterTaskName(name);
   // notify task that the id is not exist
   EXPECT_FALSE(sched->NotifyTask(id));
   EXPECT_TRUE(sched->CreateTask(&proc, name));
@@ -71,9 +71,9 @@ TEST(SchedulerTest, notify_task) {
 TEST(SchedulerTest, set_inner_thread_attr) {
   auto sched = Instance();
   cyber::Init("scheduler_test");
-  std::thread t = std::thread([]() {});
+  std::thread                                  t = std::thread([]() {});
   std::unordered_map<std::string, InnerThread> thread_confs;
-  InnerThread inner_thread;
+  InnerThread                                  inner_thread;
   inner_thread.set_cpuset("0-1");
   inner_thread.set_policy("SCHED_FIFO");
   inner_thread.set_prio(10);
@@ -81,9 +81,7 @@ TEST(SchedulerTest, set_inner_thread_attr) {
   sched->SetInnerThreadConfs(thread_confs);
   sched->SetInnerThreadAttr("inner_thread_test", &t);
   std::this_thread::sleep_for(std::chrono::milliseconds(5));
-  if (t.joinable()) {
-    t.join();
-  }
+  if (t.joinable()) { t.join(); }
   sched->Shutdown();
 }
 

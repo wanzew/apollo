@@ -18,11 +18,12 @@
 #include <memory>
 #include <vector>
 
+#include "modules/storytelling/proto/storytelling_config.pb.h"
+
 #include "cyber/component/component.h"
 #include "cyber/component/timer_component.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/storytelling/frame_manager.h"
-#include "modules/storytelling/proto/storytelling_config.pb.h"
 #include "modules/storytelling/story_tellers/base_teller.h"
 
 namespace apollo {
@@ -30,7 +31,7 @@ namespace storytelling {
 
 class Storytelling final : public apollo::cyber::TimerComponent {
  public:
-  Storytelling() = default;
+  Storytelling()  = default;
   ~Storytelling() = default;
 
   bool Init() override;
@@ -38,10 +39,10 @@ class Storytelling final : public apollo::cyber::TimerComponent {
   bool Proc() override;
 
  private:
-  std::vector<std::unique_ptr<BaseTeller>> story_tellers_;
-  Stories stories_;
-  StorytellingConfig config_;
-  std::shared_ptr<FrameManager> frame_manager_;
+  std::vector<std::unique_ptr<BaseTeller>>          story_tellers_;
+  Stories                                           stories_;
+  StorytellingConfig                                config_;
+  std::shared_ptr<FrameManager>                     frame_manager_;
   std::shared_ptr<::apollo::cyber::Writer<Stories>> story_writer_ = nullptr;
 };
 

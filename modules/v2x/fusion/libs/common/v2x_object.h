@@ -40,16 +40,16 @@ using apollo::perception::base::ObjectType;
 using apollo::perception::base::SensorType;
 
 enum class V2xType {
-  UNKNOWN = 0,
-  ZOMBIES_CAR = 1,
-  BLIND_ZONE = 2,
+  UNKNOWN      = 0,
+  ZOMBIES_CAR  = 1,
+  BLIND_ZONE   = 2,
   HOST_VEHICLE = 13,
 };
 
 enum class MessageType {
   UNKNOWN_MESSAGE_TYPE = -1,
-  ROADSIDE = 0,
-  VEHICLE = 1,
+  ROADSIDE             = 0,
+  VEHICLE              = 1,
 };
 
 // Value and Variance
@@ -58,24 +58,24 @@ class Info {
  public:
   Info() = default;
   Info(Val val, Var var) {
-    value_ = val;
+    value_    = val;
     variance_ = var;
   }
   ~Info() = default;
   // Info(const Info &) = delete;
-  Info(const Info &rhs) {
-    value_ = rhs.value_;
+  Info(const Info& rhs) {
+    value_    = rhs.value_;
     variance_ = rhs.variance_;
   }
   // Info &operator=(const Info &) = delete;
-  Info &operator=(const Info &rhs) {
-    value_ = rhs.value_;
+  Info& operator=(const Info& rhs) {
+    value_    = rhs.value_;
     variance_ = rhs.variance_;
     return *this;
   }
 
   void Set(Val value, Var variance) {
-    value_ = value;
+    value_    = value;
     variance_ = variance;
   }
   Val Value() const { return value_; }
@@ -83,7 +83,7 @@ class Info {
   Var Variance() const { return variance_; }
 
  protected:
-  Val value_ = {};
+  Val value_    = {};
   Var variance_ = {};
 };
 
@@ -124,24 +124,23 @@ class Info3d : public Info<Eigen::Vector3d, Eigen::Matrix3d> {
 };
 
 struct alignas(16) Object {
-  typedef Info<bool, float> Infob;
-  typedef Info<float, float> Infof;
-  typedef Info<double, double> Infod;
+  typedef Info<bool, float>                      Infob;
+  typedef Info<float, float>                     Infof;
+  typedef Info<double, double>                   Infod;
   typedef Info<Eigen::Vector2f, Eigen::Matrix2f> Info2f;
   typedef Info<Eigen::Vector2d, Eigen::Matrix2d> Info2d;
-  typedef Eigen::Vector2f Point2f;
-  typedef Eigen::Vector3f Point3f;
-  Object() : is_temporary_lost(false, 0.0) {}
-  ~Object() = default;
-  Object(const Object &) = default;
-  Object &operator=(const Object &) = default;
-  bool operator<(const Object &rhs) const { return timestamp < rhs.timestamp; }
-  bool operator>(const Object &rhs) const { return timestamp > rhs.timestamp; }
-  bool operator==(const Object &rhs) const {
-    return timestamp == rhs.timestamp;
-  }
+  typedef Eigen::Vector2f                        Point2f;
+  typedef Eigen::Vector3f                        Point3f;
+  Object()
+      : is_temporary_lost(false, 0.0) {}
+  ~Object()             = default;
+  Object(const Object&) = default;
+  Object&     operator=(const Object&) = default;
+  bool        operator<(const Object& rhs) const { return timestamp < rhs.timestamp; }
+  bool        operator>(const Object& rhs) const { return timestamp > rhs.timestamp; }
+  bool        operator==(const Object& rhs) const { return timestamp == rhs.timestamp; }
   std::string ToString() const;
-  void Reset();
+  void        Reset();
   // camera, lidar, radar and others
   SensorType sensor_type = SensorType::UNKNOWN_SENSOR_TYPE;
   // ROADSIDE
@@ -156,8 +155,8 @@ struct alignas(16) Object {
   // @brief age of the tracked object, required
   double tracking_time = 0.0;
   // @brief timestamp of latest measurement, required
-  double latest_tracked_time = 0.0;
-  std::string frame_id = "";
+  double      latest_tracked_time = 0.0;
+  std::string frame_id            = "";
   // @brief track id, required
   int track_id = -1;
   // @breif object id per frame, required
@@ -205,7 +204,7 @@ struct alignas(16) Object {
   // @brief motion state of the tracked object, required
   Infob is_stationary;
 
-  Infob is_temporary_lost;
+  Infob       is_temporary_lost;
   std::string DebugString() const {
     return absl::StrCat("id: ", track_id, ", ",              //
                         "time: ", timestamp, ", ",           //
@@ -218,23 +217,17 @@ struct alignas(16) Object {
   }
 };
 
-typedef std::shared_ptr<Object> ObjectPtr;
+typedef std::shared_ptr<Object>       ObjectPtr;
 typedef std::shared_ptr<const Object> ObjectConstPtr;
 
 struct alignas(16) ObjectList {
-  ObjectList() = default;
-  ~ObjectList() = default;
-  ObjectList(const ObjectList &) = default;
-  ObjectList &operator=(const ObjectList &) = default;
-  bool operator<(const ObjectList &rhs) const {
-    return timestamp < rhs.timestamp;
-  }
-  bool operator>(const ObjectList &rhs) const {
-    return timestamp > rhs.timestamp;
-  }
-  bool operator==(const ObjectList &rhs) const {
-    return timestamp == rhs.timestamp;
-  }
+  ObjectList()                  = default;
+  ~ObjectList()                 = default;
+  ObjectList(const ObjectList&) = default;
+  ObjectList& operator=(const ObjectList&) = default;
+  bool        operator<(const ObjectList& rhs) const { return timestamp < rhs.timestamp; }
+  bool        operator>(const ObjectList& rhs) const { return timestamp > rhs.timestamp; }
+  bool        operator==(const ObjectList& rhs) const { return timestamp == rhs.timestamp; }
 
   SensorType sensor_type;
   // @brief sensor-specific object supplements, optional
@@ -253,7 +246,7 @@ struct alignas(16) ObjectList {
   std::vector<ObjectPtr> objects;
 };
 
-typedef std::shared_ptr<ObjectList> ObjectListPtr;
+typedef std::shared_ptr<ObjectList>       ObjectListPtr;
 typedef std::shared_ptr<const ObjectList> ObjectListConstPtr;
 
 }  // namespace base

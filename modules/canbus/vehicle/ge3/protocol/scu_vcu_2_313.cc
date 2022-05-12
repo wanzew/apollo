@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_vcu_2_313.h"
+
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -28,28 +30,24 @@ using ::apollo::drivers::canbus::Byte;
 Scuvcu2313::Scuvcu2313() {}
 const int32_t Scuvcu2313::ID = 0x313;
 
-void Scuvcu2313::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
+void Scuvcu2313::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_torqposmax(
       vcu_torqposmax(bytes, length));
   chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_torqnegmax(
       vcu_torqnegmax(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_torqact(
-      vcu_torqact(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_engspd(
-      vcu_engspd(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_torqact(vcu_torqact(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_engspd(vcu_engspd(bytes, length));
 }
 
 // config detail: {'description': 'Max positive torque', 'offset': 0.0,
 // 'precision': 1.5, 'len': 11, 'name': 'vcu_torqposmax', 'is_signed_var':
 // False, 'physical_range': '[0|3000]', 'bit': 55, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'Nm'}
-double Scuvcu2313::vcu_torqposmax(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 6);
+double Scuvcu2313::vcu_torqposmax(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 7);
+  Byte    t1(bytes + 7);
   int32_t t = t1.get_byte(5, 3);
   x <<= 3;
   x |= t;
@@ -62,12 +60,11 @@ double Scuvcu2313::vcu_torqposmax(const std::uint8_t* bytes,
 // 'precision': 1.5, 'len': 11, 'name': 'vcu_torqnegmax', 'is_signed_var':
 // False, 'physical_range': '[-3000|0]', 'bit': 39, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'Nm'}
-double Scuvcu2313::vcu_torqnegmax(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 4);
+double Scuvcu2313::vcu_torqnegmax(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(5, 3);
   x <<= 3;
   x |= t;
@@ -80,12 +77,11 @@ double Scuvcu2313::vcu_torqnegmax(const std::uint8_t* bytes,
 // 'precision': 1.5, 'len': 12, 'name': 'vcu_torqact', 'is_signed_var': False,
 // 'physical_range': '[-3000|3000]', 'bit': 23, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'Nm'}
-double Scuvcu2313::vcu_torqact(const std::uint8_t* bytes,
-                               int32_t length) const {
-  Byte t0(bytes + 2);
+double Scuvcu2313::vcu_torqact(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(4, 4);
   x <<= 4;
   x |= t;
@@ -99,10 +95,10 @@ double Scuvcu2313::vcu_torqact(const std::uint8_t* bytes,
 // 'physical_range': '[0|65535]', 'bit': 7, 'type': 'int', 'order': 'motorola',
 // 'physical_unit': 'rpm'}
 int Scuvcu2313::vcu_engspd(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

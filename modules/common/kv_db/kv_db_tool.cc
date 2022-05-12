@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/common/kv_db/kv_db.h"
-
 #include <iostream>
 
 #include "gflags/gflags.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/kv_db/kv_db.h"
 
 DEFINE_string(op, "get", "Operation to execute, should be put, get or del.");
 DEFINE_string(key, "", "The key to query.");
@@ -27,20 +26,16 @@ DEFINE_string(value, "", "The value to query.");
 
 using apollo::common::KVDB;
 
-int main(int32_t argc, char **argv) {
+int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  if (FLAGS_key.empty()) {
-    AFATAL << "Please specify --key.";
-  }
+  if (FLAGS_key.empty()) { AFATAL << "Please specify --key."; }
 
   if (FLAGS_op == "get") {
     std::cout << KVDB::Get(FLAGS_key).value() << std::endl;
   } else if (FLAGS_op == "put") {
-    if (FLAGS_value.empty()) {
-      AFATAL << "Please specify --value.";
-    }
+    if (FLAGS_value.empty()) { AFATAL << "Please specify --value."; }
     std::cout << KVDB::Put(FLAGS_key, FLAGS_value) << std::endl;
   } else if (FLAGS_op == "del") {
     std::cout << KVDB::Delete(FLAGS_key) << std::endl;

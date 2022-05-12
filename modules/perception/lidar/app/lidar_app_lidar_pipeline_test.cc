@@ -43,12 +43,11 @@ class LidarAppPipelineTest : public testing::Test {
   void TearDown() {}
 
   LidarObstacleDetection segmentation_;
-  LidarObstacleTracking tracking_;
+  LidarObstacleTracking  tracking_;
 };  // class DecisionForestClassifierTest
 
 #ifdef PERCEPTION_LIDAR_USE_COMMON_MESSAGE
-void ToMessage(const base::PointFCloud& cloud,
-               adu::common::sensor::PointCloud* message) {
+void ToMessage(const base::PointFCloud& cloud, adu::common::sensor::PointCloud* message) {
   message->set_measurement_time(0.0);
   for (size_t i = 0; i < cloud.size(); ++i) {
     const auto& pt = cloud[i];
@@ -57,8 +56,7 @@ void ToMessage(const base::PointFCloud& cloud,
     message->mutable_point(i)->set_y(pt.y);
     message->mutable_point(i)->set_z(pt.z);
     message->mutable_point(i)->set_intensity(pt.intensity);
-    message->mutable_point(i)->set_stamp(
-        static_cast<uint64_t>(cloud.points_timestamp(i) * 1e9));
+    message->mutable_point(i)->set_stamp(static_cast<uint64_t>(cloud.points_timestamp(i) * 1e9));
   }
 }
 #endif

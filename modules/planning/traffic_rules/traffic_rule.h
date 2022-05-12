@@ -22,28 +22,30 @@
 
 #include <memory>
 
+#include "modules/planning/proto/traffic_rule_config.pb.h"
+
 #include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/proto/traffic_rule_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
 class TrafficRule {
  public:
-  explicit TrafficRule(const TrafficRuleConfig& config) : config_(config) {}
-  TrafficRule(const TrafficRuleConfig& config,
-              const std::shared_ptr<DependencyInjector>& injector)
-      : config_(config), injector_(injector) {}
+  explicit TrafficRule(const TrafficRuleConfig& config)
+      : config_(config) {}
+  TrafficRule(const TrafficRuleConfig& config, const std::shared_ptr<DependencyInjector>& injector)
+      : config_(config)
+      , injector_(injector) {}
   virtual ~TrafficRule() = default;
   virtual TrafficRuleConfig::RuleId Id() const { return config_.rule_id(); }
-  const TrafficRuleConfig& GetConfig() const { return config_; }
-  virtual common::Status ApplyRule(
-      Frame* const frame, ReferenceLineInfo* const reference_line_info) = 0;
+  const TrafficRuleConfig&          GetConfig() const { return config_; }
+  virtual common::Status            ApplyRule(Frame* const             frame,
+                                              ReferenceLineInfo* const reference_line_info) = 0;
 
  protected:
-  TrafficRuleConfig config_;
+  TrafficRuleConfig                   config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 

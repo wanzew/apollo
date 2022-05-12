@@ -22,9 +22,12 @@ namespace apollo {
 namespace cyber {
 namespace io {
 
-Session::Session() : Session(-1) {}
+Session::Session()
+    : Session(-1) {}
 
-Session::Session(int fd) : fd_(fd), poll_handler_(nullptr) {
+Session::Session(int fd)
+    : fd_(fd)
+    , poll_handler_(nullptr) {
   poll_handler_.reset(new PollHandler(fd_));
 }
 
@@ -34,9 +37,7 @@ int Session::Socket(int domain, int type, int protocol) {
     return -1;
   }
   int sock_fd = socket(domain, type | SOCK_NONBLOCK, protocol);
-  if (sock_fd != -1) {
-    set_fd(sock_fd);
-  }
+  if (sock_fd != -1) { set_fd(sock_fd); }
   return sock_fd;
 }
 
@@ -45,13 +46,13 @@ int Session::Listen(int backlog) {
   return listen(fd_, backlog);
 }
 
-int Session::Bind(const struct sockaddr *addr, socklen_t addrlen) {
+int Session::Bind(const struct sockaddr* addr, socklen_t addrlen) {
   ACHECK(fd_ != -1);
   ACHECK(addr != nullptr);
   return bind(fd_, addr, addrlen);
 }
 
-auto Session::Accept(struct sockaddr *addr, socklen_t *addrlen) -> SessionPtr {
+auto Session::Accept(struct sockaddr* addr, socklen_t* addrlen) -> SessionPtr {
   ACHECK(fd_ != -1);
 
   int sock_fd = accept4(fd_, addr, addrlen, SOCK_NONBLOCK);
@@ -60,23 +61,20 @@ auto Session::Accept(struct sockaddr *addr, socklen_t *addrlen) -> SessionPtr {
     sock_fd = accept4(fd_, addr, addrlen, SOCK_NONBLOCK);
   }
 
-  if (sock_fd == -1) {
-    return nullptr;
-  }
+  if (sock_fd == -1) { return nullptr; }
 
   return std::make_shared<Session>(sock_fd);
 }
 
-int Session::Connect(const struct sockaddr *addr, socklen_t addrlen) {
+int Session::Connect(const struct sockaddr* addr, socklen_t addrlen) {
   ACHECK(fd_ != -1);
 
-  int optval;
+  int       optval;
   socklen_t optlen = sizeof(optval);
-  int res = connect(fd_, addr, addrlen);
+  int       res    = connect(fd_, addr, addrlen);
   if (res == -1 && errno == EINPROGRESS) {
     poll_handler_->Block(-1, false);
-    getsockopt(fd_, SOL_SOCKET, SO_ERROR, reinterpret_cast<void *>(&optval),
-               &optlen);
+    getsockopt(fd_, SOL_SOCKET, SO_ERROR, reinterpret_cast<void*>(&optval), &optlen);
     if (optval == 0) {
       res = 0;
     } else {
@@ -91,131 +89,105 @@ int Session::Close() {
 
   poll_handler_->Unblock();
   int res = close(fd_);
-  fd_ = -1;
+  fd_     = -1;
   return res;
 }
 
-ssize_t Session::Recv(void *buf, size_t len, int flags, int timeout_ms) {
+ssize_t Session::Recv(void* buf, size_t len, int flags, int timeout_ms) {
   ACHECK(buf != nullptr);
   ACHECK(fd_ != -1);
 
   ssize_t nbytes = recv(fd_, buf, len, flags);
-  if (timeout_ms == 0) {
-    return nbytes;
-  }
+  if (timeout_ms == 0) { return nbytes; }
 
   while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    if (poll_handler_->Block(timeout_ms, true)) {
-      nbytes = recv(fd_, buf, len, flags);
-    }
-    if (timeout_ms > 0) {
-      break;
-    }
+    if (poll_handler_->Block(timeout_ms, true)) { nbytes = recv(fd_, buf, len, flags); }
+    if (timeout_ms > 0) { break; }
   }
   return nbytes;
 }
 
-ssize_t Session::RecvFrom(void *buf, size_t len, int flags,
-                          struct sockaddr *src_addr, socklen_t *addrlen,
-                          int timeout_ms) {
+ssize_t Session::RecvFrom(void*            buf,
+                          size_t           len,
+                          int              flags,
+                          struct sockaddr* src_addr,
+                          socklen_t*       addrlen,
+                          int              timeout_ms) {
   ACHECK(buf != nullptr);
   ACHECK(fd_ != -1);
 
   ssize_t nbytes = recvfrom(fd_, buf, len, flags, src_addr, addrlen);
-  if (timeout_ms == 0) {
-    return nbytes;
-  }
+  if (timeout_ms == 0) { return nbytes; }
 
   while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
     if (poll_handler_->Block(timeout_ms, true)) {
       nbytes = recvfrom(fd_, buf, len, flags, src_addr, addrlen);
     }
-    if (timeout_ms > 0) {
-      break;
-    }
+    if (timeout_ms > 0) { break; }
   }
   return nbytes;
 }
 
-ssize_t Session::Send(const void *buf, size_t len, int flags, int timeout_ms) {
+ssize_t Session::Send(const void* buf, size_t len, int flags, int timeout_ms) {
   ACHECK(buf != nullptr);
   ACHECK(fd_ != -1);
 
   ssize_t nbytes = send(fd_, buf, len, flags);
-  if (timeout_ms == 0) {
-    return nbytes;
-  }
+  if (timeout_ms == 0) { return nbytes; }
 
   while ((nbytes == -1) && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    if (poll_handler_->Block(timeout_ms, false)) {
-      nbytes = send(fd_, buf, len, flags);
-    }
-    if (timeout_ms > 0) {
-      break;
-    }
+    if (poll_handler_->Block(timeout_ms, false)) { nbytes = send(fd_, buf, len, flags); }
+    if (timeout_ms > 0) { break; }
   }
   return nbytes;
 }
 
-ssize_t Session::SendTo(const void *buf, size_t len, int flags,
-                        const struct sockaddr *dest_addr, socklen_t addrlen,
-                        int timeout_ms) {
+ssize_t Session::SendTo(const void*            buf,
+                        size_t                 len,
+                        int                    flags,
+                        const struct sockaddr* dest_addr,
+                        socklen_t              addrlen,
+                        int                    timeout_ms) {
   ACHECK(buf != nullptr);
   ACHECK(dest_addr != nullptr);
   ACHECK(fd_ != -1);
 
   ssize_t nbytes = sendto(fd_, buf, len, flags, dest_addr, addrlen);
-  if (timeout_ms == 0) {
-    return nbytes;
-  }
+  if (timeout_ms == 0) { return nbytes; }
 
   while ((nbytes == -1) && (errno == EAGAIN || errno == EWOULDBLOCK)) {
     if (poll_handler_->Block(timeout_ms, false)) {
       nbytes = sendto(fd_, buf, len, flags, dest_addr, addrlen);
     }
-    if (timeout_ms > 0) {
-      break;
-    }
+    if (timeout_ms > 0) { break; }
   }
   return nbytes;
 }
 
-ssize_t Session::Read(void *buf, size_t count, int timeout_ms) {
+ssize_t Session::Read(void* buf, size_t count, int timeout_ms) {
   ACHECK(buf != nullptr);
   ACHECK(fd_ != -1);
 
   ssize_t nbytes = read(fd_, buf, count);
-  if (timeout_ms == 0) {
-    return nbytes;
-  }
+  if (timeout_ms == 0) { return nbytes; }
 
   while ((nbytes == -1) && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    if (poll_handler_->Block(timeout_ms, true)) {
-      nbytes = read(fd_, buf, count);
-    }
-    if (timeout_ms > 0) {
-      break;
-    }
+    if (poll_handler_->Block(timeout_ms, true)) { nbytes = read(fd_, buf, count); }
+    if (timeout_ms > 0) { break; }
   }
   return nbytes;
 }
 
-ssize_t Session::Write(const void *buf, size_t count, int timeout_ms) {
+ssize_t Session::Write(const void* buf, size_t count, int timeout_ms) {
   ACHECK(buf != nullptr);
   ACHECK(fd_ != -1);
 
   ssize_t nbytes = write(fd_, buf, count);
-  if (timeout_ms == 0) {
-    return nbytes;
-  }
+  if (timeout_ms == 0) { return nbytes; }
 
   while ((nbytes == -1) && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    if (poll_handler_->Block(timeout_ms, false)) {
-      nbytes = write(fd_, buf, count);
-    }
-    if (timeout_ms > 0) {
-      break;
-    }
+    if (poll_handler_->Block(timeout_ms, false)) { nbytes = write(fd_, buf, count); }
+    if (timeout_ms > 0) { break; }
   }
   return nbytes;
 }

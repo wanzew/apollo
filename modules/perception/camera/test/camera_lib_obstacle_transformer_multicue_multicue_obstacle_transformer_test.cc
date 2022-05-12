@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include <opencv2/opencv.hpp>
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/distortion_model.h"
@@ -36,63 +37,55 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
   ACHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   inference::CudaUtil::set_device_id(0);
-  cv::Mat cv_img = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/transformer/multicue/test.jpg");
+  cv::Mat       cv_img = cv::imread("/apollo/modules/perception/testdata/"
+                              "camera/lib/obstacle/transformer/multicue/test.jpg");
   base::Image8U image(cv_img.rows, cv_img.cols, base::Color::BGR);
   for (int y = 0; y < cv_img.rows; ++y) {
-    memcpy(image.mutable_cpu_ptr(y), cv_img.ptr<uint8_t>(y),
-           image.width_step());
+    memcpy(image.mutable_cpu_ptr(y), cv_img.ptr<uint8_t>(y), image.width_step());
   }
 
-  CameraFrame frame;
+  CameraFrame  frame;
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   if (frame.track_feature_blob == nullptr) {
     frame.track_feature_blob.reset(new base::Blob<float>());
   }
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.sensor_name = "onsemi_obstacle";
+  dp_init_options.sensor_name  = "onsemi_obstacle";
   dp_init_options.image_height = cv_img.rows;
-  dp_init_options.image_width = cv_img.cols;
-  dp_init_options.device_id = 0;
+  dp_init_options.image_width  = cv_img.cols;
+  dp_init_options.device_id    = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(cv_img.rows, cv_img.cols, image.gpu_data(),
-                                     "bgr8");
+  frame.data_provider->FillImageData(cv_img.rows, cv_img.cols, image.gpu_data(), "bgr8");
 
-  ObstacleDetectorOptions detector_options;
-  ObstacleTransformerOptions transformer_options;
-  ObstacleDetectorInitOptions detector_init_options;
+  ObstacleDetectorOptions        detector_options;
+  ObstacleTransformerOptions     transformer_options;
+  ObstacleDetectorInitOptions    detector_init_options;
   ObstacleTransformerInitOptions transformer_init_options;
 
-  detector_init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/transformer/multicue/data/";
+  detector_init_options.root_dir = "/apollo/modules/perception/testdata/"
+                                   "camera/lib/obstacle/transformer/multicue/data/";
   detector_init_options.conf_file = "config.pt";
 
   base::BrownCameraDistortionModel model;
-  common::LoadBrownCameraIntrinsic(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/transformer/multicue/params/"
-      "onsemi_obstacle_intrinsics.yaml",
-      &model);
+  common::LoadBrownCameraIntrinsic("/apollo/modules/perception/testdata/"
+                                   "camera/lib/obstacle/transformer/multicue/params/"
+                                   "onsemi_obstacle_intrinsics.yaml",
+                                   &model);
   detector_init_options.base_camera_model = model.get_camera_model();
-  auto pinhole =
-      static_cast<base::PinholeCameraModel *>(model.get_camera_model().get());
+  auto            pinhole = static_cast<base::PinholeCameraModel*>(model.get_camera_model().get());
   Eigen::Matrix3f intrinsic = pinhole->get_intrinsic_params();
-  frame.camera_k_matrix = intrinsic;
+  frame.camera_k_matrix     = intrinsic;
 
   // transformer
-  BaseObstacleTransformer *transformer =
-      BaseObstacleTransformerRegisterer::GetInstanceByName(
-          "MultiCueObstacleTransformer");
+  BaseObstacleTransformer* transformer =
+      BaseObstacleTransformerRegisterer::GetInstanceByName("MultiCueObstacleTransformer");
   EXPECT_EQ(transformer->Name(), "MultiCueObstacleTransformer");
 
   EXPECT_FALSE(transformer->Init(transformer_init_options));
 
-  transformer_init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/transformer/multicue/";
+  transformer_init_options.root_dir = "/apollo/modules/perception/testdata/"
+                                      "camera/lib/obstacle/transformer/multicue/";
   transformer_init_options.conf_file = "config.pt";
   EXPECT_TRUE(transformer->Init(transformer_init_options));
 
@@ -100,7 +93,7 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
   EXPECT_TRUE(transformer->Transform(transformer_options, &frame));
 
   // detection
-  BaseObstacleDetector *detector =
+  BaseObstacleDetector* detector =
       BaseObstacleDetectorRegisterer::GetInstanceByName("YoloObstacleDetector");
   EXPECT_TRUE(detector->Init(detector_init_options));
   EXPECT_TRUE(detector->Detect(detector_options, &frame));
@@ -123,7 +116,7 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
   EXPECT_TRUE(transformer->Transform(transformer_options, &frame));
 
   // alpha is out of range
-  const float PI = common::Constant<float>::PI();
+  const float PI               = common::Constant<float>::PI();
   obj->camera_supplement.alpha = -2 * PI;
   EXPECT_TRUE(transformer->Transform(transformer_options, &frame));
   obj->camera_supplement.alpha = 2 * PI;
@@ -158,16 +151,16 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
   EXPECT_TRUE(transformer->Transform(transformer_options, &frame));
 
   // bounding box is out of image boundaries
-  const int width_image = frame.data_provider->src_width();
-  const int height_image = frame.data_provider->src_height();
+  const int       width_image  = frame.data_provider->src_width();
+  const int       height_image = frame.data_provider->src_height();
   ObjMapperParams params;
-  float min_x = static_cast<float>(params.boundary_len);
-  float min_y = static_cast<float>(params.boundary_len);
-  float max_x = static_cast<float>(width_image - params.boundary_len);
-  float max_y = static_cast<float>(height_image - params.boundary_len);
-  obj->size(2) = 1.6182f;
-  obj->size(1) = 0.4825f;
-  obj->size(0) = 1.4886f;
+  float           min_x           = static_cast<float>(params.boundary_len);
+  float           min_y           = static_cast<float>(params.boundary_len);
+  float           max_x           = static_cast<float>(width_image - params.boundary_len);
+  float           max_y           = static_cast<float>(height_image - params.boundary_len);
+  obj->size(2)                    = 1.6182f;
+  obj->size(1)                    = 0.4825f;
+  obj->size(0)                    = 1.4886f;
   obj->camera_supplement.box.xmin = min_x + 1.0f;
   obj->camera_supplement.box.ymin = min_y + 1.0f;
   obj->camera_supplement.box.xmax = max_x - 1.0f;
@@ -199,9 +192,9 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
   obj->camera_supplement.box.ymin = min_y + 1.0f;
   obj->camera_supplement.box.xmax = max_x - 1.0f;
   obj->camera_supplement.box.ymax = max_y - 1.0f;
-  obj->size(2) = -1.0f;
-  obj->size(1) = 0.4825f;
-  obj->size(0) = 1.4886f;
+  obj->size(2)                    = -1.0f;
+  obj->size(1)                    = 0.4825f;
+  obj->size(0)                    = 1.4886f;
   EXPECT_TRUE(transformer->Transform(transformer_options, &frame));
   obj->size(2) = 1.6182f;
   obj->size(1) = -1.0f;

@@ -23,21 +23,21 @@
 namespace apollo {
 namespace planning {
 
-bool LateralOSQPOptimizer::optimize(
-    const std::array<double, 3>& d_state, const double delta_s,
-    const std::vector<std::pair<double, double>>& d_bounds) {
+bool LateralOSQPOptimizer::optimize(const std::array<double, 3>&                  d_state,
+                                    const double                                  delta_s,
+                                    const std::vector<std::pair<double, double>>& d_bounds) {
   std::vector<c_float> P_data;
-  std::vector<c_int> P_indices;
-  std::vector<c_int> P_indptr;
+  std::vector<c_int>   P_indices;
+  std::vector<c_int>   P_indptr;
   CalculateKernel(d_bounds, &P_data, &P_indices, &P_indptr);
-  delta_s_ = delta_s;
-  const int num_var = static_cast<int>(d_bounds.size());
-  const int kNumParam = 3 * static_cast<int>(d_bounds.size());
+  delta_s_                 = delta_s;
+  const int num_var        = static_cast<int>(d_bounds.size());
+  const int kNumParam      = 3 * static_cast<int>(d_bounds.size());
   const int kNumConstraint = kNumParam + 3 * (num_var - 1) + 3;
-  c_float lower_bounds[kNumConstraint];
-  c_float upper_bounds[kNumConstraint];
+  c_float   lower_bounds[kNumConstraint];
+  c_float   upper_bounds[kNumConstraint];
 
-  const int prime_offset = num_var;
+  const int prime_offset  = num_var;
   const int pprime_offset = 2 * num_var;
 
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
@@ -50,10 +50,8 @@ bool LateralOSQPOptimizer::optimize(
     columns[pprime_offset + i].emplace_back(constraint_index, -1.0);
     columns[pprime_offset + i + 1].emplace_back(constraint_index, 1.0);
 
-    lower_bounds[constraint_index] =
-        -FLAGS_lateral_third_order_derivative_max * delta_s_;
-    upper_bounds[constraint_index] =
-        FLAGS_lateral_third_order_derivative_max * delta_s_;
+    lower_bounds[constraint_index] = -FLAGS_lateral_third_order_derivative_max * delta_s_;
+    upper_bounds[constraint_index] = FLAGS_lateral_third_order_derivative_max * delta_s_;
     ++constraint_index;
   }
 
@@ -62,8 +60,7 @@ bool LateralOSQPOptimizer::optimize(
     columns[prime_offset + i].emplace_back(constraint_index, -1.0);
     columns[prime_offset + i + 1].emplace_back(constraint_index, 1.0);
     columns[pprime_offset + i].emplace_back(constraint_index, -0.5 * delta_s_);
-    columns[pprime_offset + i + 1].emplace_back(constraint_index,
-                                                -0.5 * delta_s_);
+    columns[pprime_offset + i + 1].emplace_back(constraint_index, -0.5 * delta_s_);
 
     lower_bounds[constraint_index] = 0.0;
     upper_bounds[constraint_index] = 0.0;
@@ -75,10 +72,8 @@ bool LateralOSQPOptimizer::optimize(
     columns[i].emplace_back(constraint_index, -1.0);
     columns[i + 1].emplace_back(constraint_index, 1.0);
     columns[prime_offset + i].emplace_back(constraint_index, -delta_s_);
-    columns[pprime_offset + i].emplace_back(constraint_index,
-                                            -delta_s_ * delta_s_ / 3.0);
-    columns[pprime_offset + i + 1].emplace_back(constraint_index,
-                                                -delta_s_ * delta_s_ / 6.0);
+    columns[pprime_offset + i].emplace_back(constraint_index, -delta_s_ * delta_s_ / 3.0);
+    columns[pprime_offset + i + 1].emplace_back(constraint_index, -delta_s_ * delta_s_ / 6.0);
 
     lower_bounds[constraint_index] = 0.0;
     upper_bounds[constraint_index] = 0.0;
@@ -117,9 +112,9 @@ bool LateralOSQPOptimizer::optimize(
 
   // change affine_constraint to CSC format
   std::vector<c_float> A_data;
-  std::vector<c_int> A_indices;
-  std::vector<c_int> A_indptr;
-  int ind_p = 0;
+  std::vector<c_int>   A_indices;
+  std::vector<c_int>   A_indptr;
+  int                  ind_p = 0;
   for (int j = 0; j < kNumParam; ++j) {
     A_indptr.push_back(ind_p);
     for (const auto& row_data_pair : columns[j]) {
@@ -134,35 +129,34 @@ bool LateralOSQPOptimizer::optimize(
   double q[kNumParam];
   for (int i = 0; i < kNumParam; ++i) {
     if (i < num_var) {
-      q[i] = -2.0 * FLAGS_weight_lateral_obstacle_distance *
-             (d_bounds[i].first + d_bounds[i].second);
+      q[i] =
+          -2.0 * FLAGS_weight_lateral_obstacle_distance * (d_bounds[i].first + d_bounds[i].second);
     } else {
       q[i] = 0.0;
     }
   }
 
   // Problem settings
-  OSQPSettings* settings =
-      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  OSQPSettings* settings = reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
 
   // Define Solver settings as default
   osqp_set_default_settings(settings);
-  settings->alpha = 1.0;  // Change alpha parameter
-  settings->eps_abs = 1.0e-05;
-  settings->eps_rel = 1.0e-05;
+  settings->alpha    = 1.0;  // Change alpha parameter
+  settings->eps_abs  = 1.0e-05;
+  settings->eps_rel  = 1.0e-05;
   settings->max_iter = 5000;
-  settings->polish = true;
-  settings->verbose = FLAGS_enable_osqp_debug;
+  settings->polish   = true;
+  settings->verbose  = FLAGS_enable_osqp_debug;
 
   // Populate data
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
-  data->n = kNumParam;
-  data->m = kNumConstraint;
-  data->P = csc_matrix(data->n, data->n, P_data.size(), P_data.data(),
-                       P_indices.data(), P_indptr.data());
+  data->n        = kNumParam;
+  data->m        = kNumConstraint;
+  data->P =
+      csc_matrix(data->n, data->n, P_data.size(), P_data.data(), P_indices.data(), P_indptr.data());
   data->q = q;
-  data->A = csc_matrix(data->m, data->n, A_data.size(), A_data.data(),
-                       A_indices.data(), A_indptr.data());
+  data->A =
+      csc_matrix(data->m, data->n, A_data.size(), A_data.data(), A_indices.data(), A_indptr.data());
   data->l = lower_bounds;
   data->u = upper_bounds;
 
@@ -180,7 +174,7 @@ bool LateralOSQPOptimizer::optimize(
     opt_d_prime_.push_back(work->solution->x[i + num_var]);
     opt_d_pprime_.push_back(work->solution->x[i + 2 * num_var]);
   }
-  opt_d_prime_[num_var - 1] = 0.0;
+  opt_d_prime_[num_var - 1]  = 0.0;
   opt_d_pprime_[num_var - 1] = 0.0;
 
   // Cleanup
@@ -193,10 +187,10 @@ bool LateralOSQPOptimizer::optimize(
   return true;
 }
 
-void LateralOSQPOptimizer::CalculateKernel(
-    const std::vector<std::pair<double, double>>& d_bounds,
-    std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
-    std::vector<c_int>* P_indptr) {
+void LateralOSQPOptimizer::CalculateKernel(const std::vector<std::pair<double, double>>& d_bounds,
+                                           std::vector<c_float>*                         P_data,
+                                           std::vector<c_int>*                           P_indices,
+                                           std::vector<c_int>*                           P_indptr) {
   const int kNumParam = 3 * static_cast<int>(d_bounds.size());
   P_data->resize(kNumParam);
   P_indices->resize(kNumParam);
@@ -204,15 +198,15 @@ void LateralOSQPOptimizer::CalculateKernel(
 
   for (int i = 0; i < kNumParam; ++i) {
     if (i < static_cast<int>(d_bounds.size())) {
-      P_data->at(i) = 2.0 * FLAGS_weight_lateral_offset +
-                      2.0 * FLAGS_weight_lateral_obstacle_distance;
+      P_data->at(i) =
+          2.0 * FLAGS_weight_lateral_offset + 2.0 * FLAGS_weight_lateral_obstacle_distance;
     } else if (i < 2 * static_cast<int>(d_bounds.size())) {
       P_data->at(i) = 2.0 * FLAGS_weight_lateral_derivative;
     } else {
       P_data->at(i) = 2.0 * FLAGS_weight_lateral_second_order_derivative;
     }
     P_indices->at(i) = i;
-    P_indptr->at(i) = i;
+    P_indptr->at(i)  = i;
   }
   P_indptr->at(kNumParam) = kNumParam;
   CHECK_EQ(P_data->size(), P_indices->size());

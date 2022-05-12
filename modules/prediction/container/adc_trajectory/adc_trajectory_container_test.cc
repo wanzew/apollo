@@ -29,7 +29,8 @@ using ::apollo::planning::ADCTrajectory;
 
 class ADCTrajectoryTest : public KMLMapBasedTest {
  public:
-  ADCTrajectoryTest() : container_() {}
+  ADCTrajectoryTest()
+      : container_() {}
 
   virtual void SetUp() {
     PathPoint path_point;
@@ -48,7 +49,7 @@ class ADCTrajectoryTest : public KMLMapBasedTest {
 
  protected:
   ADCTrajectoryContainer container_;
-  ADCTrajectory trajectory_;
+  ADCTrajectory          trajectory_;
 };
 
 TEST_F(ADCTrajectoryTest, InsertionWithProtection) {
@@ -67,7 +68,7 @@ TEST_F(ADCTrajectoryTest, InsertionWithProtection) {
   EXPECT_EQ(container_.ADCJunction(), nullptr);
 
   LaneSequence non_overlap_lane_sequence;
-  LaneSegment lane_segment;
+  LaneSegment  lane_segment;
   lane_segment.set_lane_id("l22");
   non_overlap_lane_sequence.add_lane_segment()->CopyFrom(lane_segment);
   EXPECT_FALSE(container_.HasOverlap(non_overlap_lane_sequence));

@@ -17,69 +17,61 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Doorrpt417 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+class Doorrpt417 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Doorrpt417();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'FUEL_DOOR_OPEN_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 14, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool fuel_door_open_is_valid(const std::uint8_t* bytes,
-                               const int32_t length) const;
+  bool fuel_door_open_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'TRUNK_OPEN_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 13, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool trunk_open_is_valid(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  bool trunk_open_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'HOOD_OPEN_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 12, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool hood_open_is_valid(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  bool hood_open_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'REAR_PASS_DOOR_OPEN_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 11, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool rear_pass_door_open_is_valid(const std::uint8_t* bytes,
-                                    const int32_t length) const;
+  bool rear_pass_door_open_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'REAR_DRIVER_DOOR_OPEN_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 10, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool rear_driver_door_open_is_valid(const std::uint8_t* bytes,
-                                      const int32_t length) const;
+  bool rear_driver_door_open_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'PASS_DOOR_OPEN_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 9, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool pass_door_open_is_valid(const std::uint8_t* bytes,
-                               const int32_t length) const;
+  bool pass_door_open_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'DRIVER_DOOR_OPEN_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 8, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool driver_door_open_is_valid(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+  bool driver_door_open_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'FUEL_DOOR_OPEN', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 6,
@@ -100,15 +92,13 @@ class Doorrpt417 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 3, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool rear_pass_door_open(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  bool rear_pass_door_open(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'REAR_DRIVER_DOOR_OPEN', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 2, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool rear_driver_door_open(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool rear_driver_door_open(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'PASS_DOOR_OPEN', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,

@@ -14,16 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
-#include "cyber/time/time.h"
-
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/control/proto/pad_msg.pb.h"
-
 #include "cyber/time/clock.h"
+#include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/control/common/control_gflags.h"
@@ -41,12 +40,12 @@ using apollo::cyber::Writer;
 
 class PadTerminal {
  public:
-  PadTerminal() : node_(CreateNode("pad_terminal")) {}
+  PadTerminal()
+      : node_(CreateNode("pad_terminal")) {}
   void init() {
     chassis_reader_ = node_->CreateReader<Chassis>(
-        FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
-          on_chassis(*chassis);
-        });
+        FLAGS_chassis_topic,
+        [this](const std::shared_ptr<Chassis>& chassis) { on_chassis(*chassis); });
 
     pad_writer_ = node_->CreateWriter<PadMessage>(FLAGS_pad_topic);
     terminal_thread_.reset(new std::thread([this] { terminal_thread_func(); }));
@@ -72,23 +71,22 @@ class PadTerminal {
     AINFO << "send pad_message OK";
   }
 
-  void on_chassis(const Chassis &chassis) {
-    static bool is_first_emergency_mode = true;
-    static int64_t count_start = 0;
-    static bool waiting_reset = false;
+  void on_chassis(const Chassis& chassis) {
+    static bool    is_first_emergency_mode = true;
+    static int64_t count_start             = 0;
+    static bool    waiting_reset           = false;
 
     // check if chassis enter security mode, if enter, after 10s should reset to
     // manual
     if (chassis.driving_mode() == Chassis::EMERGENCY_MODE) {
       if (is_first_emergency_mode) {
-        count_start = Clock::Now().ToNanosecond() / 1e3;
+        count_start             = Clock::Now().ToNanosecond() / 1e3;
         is_first_emergency_mode = false;
         AINFO << "detect emergency mode.";
       } else {
-        int64_t diff =
-            Clock::Now().ToNanosecond() / 1e3 - count_start;
+        int64_t diff = Clock::Now().ToNanosecond() / 1e3 - count_start;
         if (diff > EMERGENCY_MODE_HOLD_TIME) {
-          count_start = Clock::Now().ToNanosecond() / 1e3;
+          count_start   = Clock::Now().ToNanosecond() / 1e3;
           waiting_reset = true;
           // send a reset command to control
           send(RESET_COMMAND);
@@ -100,54 +98,44 @@ class PadTerminal {
     } else if (chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
       if (waiting_reset) {
         is_first_emergency_mode = true;
-        waiting_reset = false;
+        waiting_reset           = false;
         AINFO << "emergency mode reset to manual ok.";
       }
     }
   }
 
   void terminal_thread_func() {
-    int mode = 0;
+    int  mode        = 0;
     bool should_exit = false;
     while (std::cin >> mode) {
       switch (mode) {
-        case 0:
-          send(RESET_COMMAND);
-          break;
-        case 1:
-          send(AUTO_DRIVE_COMMAND);
-          break;
-        case 9:
-          should_exit = true;
-          break;
-        default:
-          help();
-          break;
+        case 0: send(RESET_COMMAND); break;
+        case 1: send(AUTO_DRIVE_COMMAND); break;
+        case 9: should_exit = true; break;
+        default: help(); break;
       }
-      if (should_exit) {
-        break;
-      }
+      if (should_exit) { break; }
     }
   }
 
   void stop() { terminal_thread_->join(); }
 
  private:
-  std::unique_ptr<std::thread> terminal_thread_;
-  const int ROS_QUEUE_SIZE = 1;
-  const int RESET_COMMAND = 1;
-  const int AUTO_DRIVE_COMMAND = 2;
-  const int EMERGENCY_MODE_HOLD_TIME = 4 * 1000000;
-  std::shared_ptr<Reader<Chassis>> chassis_reader_;
+  std::unique_ptr<std::thread>        terminal_thread_;
+  const int                           ROS_QUEUE_SIZE           = 1;
+  const int                           RESET_COMMAND            = 1;
+  const int                           AUTO_DRIVE_COMMAND       = 2;
+  const int                           EMERGENCY_MODE_HOLD_TIME = 4 * 1000000;
+  std::shared_ptr<Reader<Chassis>>    chassis_reader_;
   std::shared_ptr<Writer<PadMessage>> pad_writer_;
-  std::shared_ptr<Node> node_;
+  std::shared_ptr<Node>               node_;
 };
 }  // namespace
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   apollo::cyber::Init("pad_terminal");
   FLAGS_alsologtostderr = true;
-  FLAGS_v = 3;
+  FLAGS_v               = 3;
   google::ParseCommandLineFlags(&argc, &argv, true);
   PadTerminal pad_terminal;
   pad_terminal.init();

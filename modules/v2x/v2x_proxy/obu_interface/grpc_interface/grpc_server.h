@@ -55,53 +55,51 @@ class GrpcServerImpl final : public ::apollo::v2x::ObuToCar::Service {
   @param input v2x traffic_light grpc request
   @param output grpc response
   */
-  grpc::Status SendV2xTrafficLight(
-      grpc::ServerContext *context,
-      const ::apollo::v2x::obu::ObuTrafficLight *request,
-      ::apollo::v2x::StatusResponse *response) override;
+  grpc::Status SendV2xTrafficLight(grpc::ServerContext*                       context,
+                                   const ::apollo::v2x::obu::ObuTrafficLight* request,
+                                   ::apollo::v2x::StatusResponse*             response) override;
 
   /* function that send v2x monitor messages through grpc
   @param input v2x monitor grpc request
   @param output grpc response
   */
-  grpc::Status SendObuAlarm(grpc::ServerContext *context,
-                            const ::apollo::v2x::ObuAlarm *request,
-                            ::apollo::v2x::StatusResponse *response) override;
+  grpc::Status SendObuAlarm(grpc::ServerContext*           context,
+                            const ::apollo::v2x::ObuAlarm* request,
+                            ::apollo::v2x::StatusResponse* response) override;
 
   /* function that send perception obstacles through grpc
      @param input perception obstacles grpc request
      @param output grpc response
     */
-  grpc::Status SendPerceptionObstacles(grpc::ServerContext *context,
-                                       const apollo::v2x::V2XObstacles *request,
-                                       StatusResponse *response) override;
+  grpc::Status SendPerceptionObstacles(grpc::ServerContext*             context,
+                                       const apollo::v2x::V2XObstacles* request,
+                                       StatusResponse*                  response) override;
 
-  grpc::Status SendV2xRSI(grpc::ServerContext *context,
-                          const ::apollo::v2x::obu::ObuRsi *request,
-                          ::apollo::v2x::StatusResponse *response);
+  grpc::Status SendV2xRSI(grpc::ServerContext*              context,
+                          const ::apollo::v2x::obu::ObuRsi* request,
+                          ::apollo::v2x::StatusResponse*    response);
 
-  void GetMsgFromGrpc(
-      std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> *ptr);
+  void GetMsgFromGrpc(std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight>* ptr);
 
-  void GetMsgFromGrpc(std::shared_ptr<::apollo::v2x::obu::ObuRsi> *ptr);
-  void GetMsgFromGrpc(std::shared_ptr<::apollo::v2x::V2XObstacles> *ptr);
+  void GetMsgFromGrpc(std::shared_ptr<::apollo::v2x::obu::ObuRsi>* ptr);
+  void GetMsgFromGrpc(std::shared_ptr<::apollo::v2x::V2XObstacles>* ptr);
 
  private:
-  std::mutex traffic_light_mutex_;
-  std::mutex rsi_mutex_;
-  std::mutex obstacles_mutex_;
-  std::condition_variable traffic_light_condition_;
-  std::condition_variable rsi_condition_;
-  std::condition_variable obs_condition_;
+  std::mutex                          traffic_light_mutex_;
+  std::mutex                          rsi_mutex_;
+  std::mutex                          obstacles_mutex_;
+  std::condition_variable             traffic_light_condition_;
+  std::condition_variable             rsi_condition_;
+  std::condition_variable             obs_condition_;
   ::apollo::v2x::obu::ObuTrafficLight latest_traffic_light_;
-  ::apollo::v2x::obu::ObuRsi latest_rsi_;
-  ::apollo::v2x::V2XObstacles latest_obstacles_;
+  ::apollo::v2x::obu::ObuRsi          latest_rsi_;
+  ::apollo::v2x::V2XObstacles         latest_obstacles_;
 
-  bool init_flag_ = false;
-  bool refresh_ = false;
-  bool rsi_refresh_ = false;
-  bool obs_refresh_ = false;
-  std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
+  bool                                   init_flag_   = false;
+  bool                                   refresh_     = false;
+  bool                                   rsi_refresh_ = false;
+  bool                                   obs_refresh_ = false;
+  std::unique_ptr<::apollo::cyber::Node> node_        = nullptr;
 };
 
 }  // namespace v2x

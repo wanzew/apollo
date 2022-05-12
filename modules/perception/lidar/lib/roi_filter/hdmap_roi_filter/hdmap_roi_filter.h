@@ -32,11 +32,11 @@ class HdmapROIFilterTest;
 class HdmapROIFilter : public BaseROIFilter {
  public:
   HdmapROIFilter()
-      : BaseROIFilter(),
-        range_(120.0),
-        cell_size_(0.25),
-        extend_dist_(0.0),
-        no_edge_table_(false) {}
+      : BaseROIFilter()
+      , range_(120.0)
+      , cell_size_(0.25)
+      , extend_dist_(0.0)
+      , no_edge_table_(false) {}
   ~HdmapROIFilter() = default;
 
   bool Init(const ROIFilterInitOptions& options) override;
@@ -46,30 +46,30 @@ class HdmapROIFilter : public BaseROIFilter {
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
 
  private:
-  void TransformFrame(
-      const base::PointFCloudPtr& cloud, const Eigen::Affine3d& vel_pose,
-      const apollo::common::EigenVector<base::PolygonDType*>& polygons_world,
-      apollo::common::EigenVector<base::PolygonDType>* polygons_local,
-      base::PointFCloudPtr* cloud_local);
+  void TransformFrame(const base::PointFCloudPtr&                             cloud,
+                      const Eigen::Affine3d&                                  vel_pose,
+                      const apollo::common::EigenVector<base::PolygonDType*>& polygons_world,
+                      apollo::common::EigenVector<base::PolygonDType>*        polygons_local,
+                      base::PointFCloudPtr*                                   cloud_local);
 
-  bool FilterWithPolygonMask(
-      const base::PointFCloudPtr& cloud,
-      const apollo::common::EigenVector<base::PolygonDType>& map_polygons,
-      base::PointIndices* roi_indices);
+  bool FilterWithPolygonMask(const base::PointFCloudPtr&                            cloud,
+                             const apollo::common::EigenVector<base::PolygonDType>& map_polygons,
+                             base::PointIndices*                                    roi_indices);
 
   bool Bitmap2dFilter(const base::PointFCloudPtr& in_cloud,
-                      const Bitmap2D& bitmap, base::PointIndices* roi_indices);
+                      const Bitmap2D&             bitmap,
+                      base::PointIndices*         roi_indices);
 
   // parameters for polygons scans convert
-  double range_ = 120.0;
-  double cell_size_ = 0.25;
-  double extend_dist_ = 0.0;
-  bool no_edge_table_ = false;
-  bool set_roi_service_ = false;
+  double                                           range_           = 120.0;
+  double                                           cell_size_       = 0.25;
+  double                                           extend_dist_     = 0.0;
+  bool                                             no_edge_table_   = false;
+  bool                                             set_roi_service_ = false;
   apollo::common::EigenVector<base::PolygonDType*> polygons_world_;
-  apollo::common::EigenVector<base::PolygonDType> polygons_local_;
-  Bitmap2D bitmap_;
-  ROIServiceContent roi_service_content_;
+  apollo::common::EigenVector<base::PolygonDType>  polygons_local_;
+  Bitmap2D                                         bitmap_;
+  ROIServiceContent                                roi_service_content_;
 
   // unit tests only
   friend class HdmapROIFilterTest;

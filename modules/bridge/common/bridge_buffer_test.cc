@@ -26,12 +26,12 @@ namespace bridge {
 
 TEST(BridgeBufferTest, bridge_buf_test) {
   BridgeBuffer<char> buf;
-  char *p = buf;
+  char*              p = buf;
   EXPECT_EQ(0, buf.capacity());
   EXPECT_EQ(0, buf.size());
 
   buf.reset(100);
-  char *p1 = buf;
+  char* p1 = buf;
   EXPECT_EQ(100, buf.capacity());
   EXPECT_EQ(100, buf.size());
   EXPECT_NE(p, p1);
@@ -41,7 +41,7 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   EXPECT_STREQ(buf, str.c_str());
 
   buf.reset(80);
-  char *p2 = buf;
+  char* p2 = buf;
   EXPECT_EQ(100, buf.capacity());
   EXPECT_EQ(80, buf.size());
   EXPECT_EQ(p2, p1);

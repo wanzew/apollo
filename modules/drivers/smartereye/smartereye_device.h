@@ -24,9 +24,6 @@
 #include <sstream>
 #include <string>
 
-#include "cyber/cyber.h"
-#include "modules/drivers/smartereye/proto/config.pb.h"
-#include "modules/drivers/smartereye/smartereye_handler.h"
 #include "third_party/camera_library/smartereye/include/LdwDataInterface.h"
 #include "third_party/camera_library/smartereye/include/calibrationparams.h"
 #include "third_party/camera_library/smartereye/include/camerahandler.h"
@@ -38,6 +35,11 @@
 #include "third_party/camera_library/smartereye/include/stereocamera.h"
 #include "third_party/camera_library/smartereye/include/taskiddef.h"
 
+#include "modules/drivers/smartereye/proto/config.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/drivers/smartereye/smartereye_handler.h"
+
 namespace apollo {
 namespace drivers {
 namespace smartereye {
@@ -48,19 +50,19 @@ class SmartereyeDevice {
  public:
   SmartereyeDevice();
   virtual ~SmartereyeDevice();
-  virtual bool init(const std::shared_ptr<Config> &camera_config);
-  bool is_capturing();
-  bool wait_for_device();
-  int uninit();
-  bool SetCallback(CallbackFunc ptr);
-  int poll();
+  virtual bool init(const std::shared_ptr<Config>& camera_config);
+  bool         is_capturing();
+  bool         wait_for_device();
+  int          uninit();
+  bool         SetCallback(CallbackFunc ptr);
+  int          poll();
 
  private:
-  bool is_capturing_ = false;
-  bool inited_ = false;
+  bool                    is_capturing_ = false;
+  bool                    inited_       = false;
   std::shared_ptr<Config> config_;
-  StereoCamera *pcamera_ = nullptr;
-  SmartereyeHandler *pcameraHandler_ = nullptr;
+  StereoCamera*           pcamera_        = nullptr;
+  SmartereyeHandler*      pcameraHandler_ = nullptr;
 };
 
 }  // namespace smartereye

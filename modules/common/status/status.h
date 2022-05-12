@@ -23,7 +23,9 @@
 #include <string>
 
 #include "google/protobuf/descriptor.h"
+
 #include "modules/common/proto/error_code.pb.h"
+
 #include "modules/common/util/future.h"
 
 /**
@@ -49,7 +51,8 @@ class Status {
    * @param msg the message associated with the error.
    */
   explicit Status(ErrorCode code = ErrorCode::OK, std::string_view msg = "")
-      : code_(code), msg_(msg.data()) {}
+      : code_(code)
+      , msg_(msg.data()) {}
 
   ~Status() = default;
 
@@ -75,20 +78,20 @@ class Status {
   /**
    * @brief defines the logic of testing if two Status are equal
    */
-  bool operator==(const Status &rh) const {
+  bool operator==(const Status& rh) const {
     return (this->code_ == rh.code_) && (this->msg_ == rh.msg_);
   }
 
   /**
    * @brief defines the logic of testing if two Status are unequal
    */
-  bool operator!=(const Status &rh) const { return !(*this == rh); }
+  bool operator!=(const Status& rh) const { return !(*this == rh); }
 
   /**
    * @brief returns the error message of the status, empty if the status is OK.
    * @returns the error message
    */
-  const std::string &error_message() const { return msg_; }
+  const std::string& error_message() const { return msg_; }
 
   /**
    * @brief returns a string representation in a readable format.
@@ -96,9 +99,7 @@ class Status {
    *          the internal error message otherwise.
    */
   std::string ToString() const {
-    if (ok()) {
-      return "OK";
-    }
+    if (ok()) { return "OK"; }
     return ErrorCode_Name(code_) + ": " + msg_;
   }
 
@@ -106,22 +107,18 @@ class Status {
    * @brief save the error_code and error message to protobuf
    * @param the Status protobuf that will store the message.
    */
-  void Save(StatusPb *status_pb) {
-    if (!status_pb) {
-      return;
-    }
+  void Save(StatusPb* status_pb) {
+    if (!status_pb) { return; }
     status_pb->set_error_code(code_);
-    if (!msg_.empty()) {
-      status_pb->set_msg(msg_);
-    }
+    if (!msg_.empty()) { status_pb->set_msg(msg_); }
   }
 
  private:
-  ErrorCode code_;
+  ErrorCode   code_;
   std::string msg_;
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Status &s) {
+inline std::ostream& operator<<(std::ostream& os, const Status& s) {
   os << s.ToString();
   return os;
 }

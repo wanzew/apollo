@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/fusion/base/sensor_frame.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/fusion/base/sensor.h"
-#include "modules/perception/fusion/base/sensor_frame.h"
 
 namespace apollo {
 namespace perception {
@@ -28,15 +29,15 @@ TEST(SensorFrameTest, test) {
   sensor_info.type = base::SensorType::VELODYNE_64;
   SensorPtr sensor_ptr(new Sensor(sensor_info));
 
-  double timestamp = 7012;
+  double          timestamp         = 7012;
   Eigen::Affine3d sensor2world_pose = Eigen::Affine3d::Identity();
   base::ObjectPtr base_object(new base::Object());
   base::ObjectPtr base_object_2(new base::Object());
   base_object_2->lidar_supplement.is_background = true;
   base::FramePtr base_frame(new base::Frame());
-  base_frame->timestamp = timestamp;
+  base_frame->timestamp         = timestamp;
   base_frame->sensor2world_pose = sensor2world_pose;
-  base_frame->sensor_info = sensor_info;
+  base_frame->sensor_info       = sensor_info;
   base_frame->objects.emplace_back(base_object);
   base_frame->objects.emplace_back(base_object_2);
 

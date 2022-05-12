@@ -26,7 +26,7 @@ namespace apollo {
 namespace planning {
 
 TEST(AutotuningMLPNetModeltest, test_case_one) {
-  AutotuningMLPModel model;
+  AutotuningMLPModel       model;
   prediction::NetParameter net_parameter;
   EXPECT_TRUE(model.LoadModel(net_parameter));
 }

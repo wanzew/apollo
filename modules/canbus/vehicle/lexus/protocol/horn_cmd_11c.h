@@ -17,14 +17,14 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Horncmd11c : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+class Horncmd11c : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -92,10 +92,10 @@ class Horncmd11c : public ::apollo::drivers::canbus::ProtocolData<
   void set_p_horn_cmd(uint8_t* data, Horn_cmd_11c::Horn_cmdType horn_cmd);
 
  private:
-  bool ignore_overrides_;
-  bool enable_;
-  bool clear_override_;
-  bool clear_faults_;
+  bool                       ignore_overrides_;
+  bool                       enable_;
+  bool                       clear_override_;
+  bool                       clear_faults_;
   Horn_cmd_11c::Horn_cmdType horn_cmd_;
 };
 

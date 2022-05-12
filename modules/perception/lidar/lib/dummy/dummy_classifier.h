@@ -30,8 +30,7 @@ class DummyClassifier : public BaseClassifier {
 
   virtual ~DummyClassifier() = default;
 
-  bool Init(
-      const ClassifierInitOptions& options = ClassifierInitOptions()) override;
+  bool Init(const ClassifierInitOptions& options = ClassifierInitOptions()) override;
 
   // @brief: classify object list, and fill type in object.
   // @param [in]: options

@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <utility>
+
 #include "gtest/gtest.h"
 
 #include "cyber/transport/common/identity.h"
@@ -29,11 +30,11 @@ namespace cyber {
 namespace transport {
 
 TEST(MessageInfoTest, test) {
-  Identity id, id2, id3;
+  Identity    id, id2, id3;
   MessageInfo msgInfo(id, 123);
   MessageInfo msgInfoX;
 
-  msgInfo = msgInfo;
+  msgInfo  = msgInfo;
   msgInfoX = msgInfo;
 
   msgInfo.set_spare_id(id3);
@@ -57,8 +58,7 @@ TEST(MessageInfoTest, test) {
   msgStr2.resize(msgStr.size());
 
   EXPECT_FALSE(msgInfo.SerializeTo(const_cast<char*>(msgStr2.data()), 2));
-  EXPECT_TRUE(
-      msgInfo.SerializeTo(const_cast<char*>(msgStr2.data()), msgStr2.size()));
+  EXPECT_TRUE(msgInfo.SerializeTo(const_cast<char*>(msgStr2.data()), msgStr2.size()));
 
   EXPECT_EQ(msgStr, msgStr2);
 

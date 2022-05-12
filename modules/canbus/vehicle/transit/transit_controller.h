@@ -19,8 +19,6 @@
 #include <memory>
 #include <thread>
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
@@ -32,6 +30,7 @@
 #include "modules/canbus/vehicle/transit/protocol/adc_motioncontrollimits1_12.h"
 #include "modules/canbus/vehicle/transit/protocol/llc_diag_brakecontrol_721.h"
 #include "modules/canbus/vehicle/transit/protocol/llc_diag_steeringcontrol_722.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {
 namespace canbus {
@@ -43,11 +42,10 @@ class TransitController final : public VehicleController {
 
   virtual ~TransitController();
 
-  ::apollo::common::ErrorCode Init(
-      const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
-      override;
+  ::apollo::common::ErrorCode
+  Init(const VehicleParameter&                                params,
+       CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+       MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) override;
 
   bool Start() override;
 
@@ -67,7 +65,7 @@ class TransitController final : public VehicleController {
 
  private:
   // main logical function for operation the car enter or exit the auto driving
-  void Emergency() override;
+  void                        Emergency() override;
   ::apollo::common::ErrorCode EnableAutoMode() override;
   ::apollo::common::ErrorCode DisableAutoMode() override;
   ::apollo::common::ErrorCode EnableSteeringOnlyMode() override;
@@ -102,8 +100,7 @@ class TransitController final : public VehicleController {
   void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
   void SetBeam(const ::apollo::control::ControlCommand& command) override;
   void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetTurningSignal(const ::apollo::control::ControlCommand& command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
@@ -112,32 +109,32 @@ class TransitController final : public VehicleController {
   void SetLimits() override;
 
  private:
-  void SecurityDogThreadFunc();
-  virtual bool CheckResponse();
-  void set_chassis_error_mask(const int32_t mask);
-  int32_t chassis_error_mask();
+  void               SecurityDogThreadFunc();
+  virtual bool       CheckResponse();
+  void               set_chassis_error_mask(const int32_t mask);
+  int32_t            chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
-  void set_chassis_error_code(const Chassis::ErrorCode& error_code);
+  void               set_chassis_error_code(const Chassis::ErrorCode& error_code);
 
  private:
   // control protocol
-  Adcauxiliarycontrol110* adc_auxiliarycontrol_110_ = nullptr;
-  Adcmotioncontrol110* adc_motioncontrol1_10_ = nullptr;
-  Adcmotioncontrollimits112* adc_motioncontrollimits1_12_ = nullptr;
-  Llcdiagbrakecontrol721* llc_diag_brakecontrol_721_ = nullptr;
+  Adcauxiliarycontrol110*    adc_auxiliarycontrol_110_     = nullptr;
+  Adcmotioncontrol110*       adc_motioncontrol1_10_        = nullptr;
+  Adcmotioncontrollimits112* adc_motioncontrollimits1_12_  = nullptr;
+  Llcdiagbrakecontrol721*    llc_diag_brakecontrol_721_    = nullptr;
   Llcdiagsteeringcontrol722* llc_diag_steeringcontrol_722_ = nullptr;
 
-  Chassis chassis_;
+  Chassis                      chassis_;
   std::unique_ptr<std::thread> thread_;
-  bool is_chassis_error_ = false;
+  bool                         is_chassis_error_ = false;
 
-  std::mutex chassis_error_code_mutex_;
+  std::mutex         chassis_error_code_mutex_;
   Chassis::ErrorCode chassis_error_code_ = Chassis::NO_ERROR;
 
   std::mutex chassis_mask_mutex_;
-  int32_t chassis_error_mask_ = 0;
-  bool received_vin_ = false;
-  bool button_pressed_ = false;
+  int32_t    chassis_error_mask_ = 0;
+  bool       received_vin_       = false;
+  bool       button_pressed_     = false;
 };
 
 }  // namespace transit

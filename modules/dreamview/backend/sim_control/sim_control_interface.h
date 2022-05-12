@@ -38,8 +38,7 @@ class SimControlInterface {
   /**
    * @brief Initialization.
    */
-  virtual void Init(double start_velocity = 0.0,
-                    double start_acceleration = 0.0) = 0;
+  virtual void Init(double start_velocity = 0.0, double start_acceleration = 0.0) = 0;
 
   /**
    * @brief Starts running the simulated control algorithm, e.g., publish

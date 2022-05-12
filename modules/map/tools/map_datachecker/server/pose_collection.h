@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "modules/map/tools/map_datachecker/server/common.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ enum class PoseCollectionState { IDLE, RUNNING };
 class PoseCollection {
  public:
   explicit PoseCollection(std::shared_ptr<JsonConf> sp_conf);
-  void Collect(const FramePose& pose);
+  void                                    Collect(const FramePose& pose);
   std::shared_ptr<std::vector<FramePose>> GetPoses() const;
 
  private:
@@ -35,7 +36,7 @@ class PoseCollection {
 
  private:
   std::shared_ptr<std::vector<FramePose>> sp_poses_ = nullptr;
-  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf>               sp_conf_  = nullptr;
 };
 
 }  // namespace hdmap

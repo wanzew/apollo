@@ -51,7 +51,7 @@ class Polygon2d {
    * @brief Constructor which takes a box.
    * @param box The box to construct the polygon.
    */
-  explicit Polygon2d(const Box2d &box);
+  explicit Polygon2d(const Box2d& box);
 
   /**
    * @brief Constructor which takes a vector of points as its vertices.
@@ -63,15 +63,13 @@ class Polygon2d {
    * @brief Get the vertices of the polygon.
    * @return The vertices of the polygon.
    */
-  const std::vector<Vec2d> &points() const { return points_; }
+  const std::vector<Vec2d>& points() const { return points_; }
 
   /**
    * @brief Get the edges of the polygon.
    * @return The edges of the polygon.
    */
-  const std::vector<LineSegment2d> &line_segments() const {
-    return line_segments_;
-  }
+  const std::vector<LineSegment2d>& line_segments() const { return line_segments_; }
 
   /**
    * @brief Get the number of vertices of the polygon.
@@ -98,7 +96,7 @@ class Polygon2d {
    * @param point The point to compute whose distance to the polygon.
    * @return The distance from the point to the polygon's boundary.
    */
-  double DistanceToBoundary(const Vec2d &point) const;
+  double DistanceToBoundary(const Vec2d& point) const;
 
   /**
    * @brief Compute the distance from a point to the polygon. If the point is
@@ -107,7 +105,7 @@ class Polygon2d {
    * @param point The point to compute whose distance to the polygon.
    * @return The distance from the point to the polygon.
    */
-  double DistanceTo(const Vec2d &point) const;
+  double DistanceTo(const Vec2d& point) const;
 
   /**
    * @brief Compute the distance from a line segment to the polygon.
@@ -119,7 +117,7 @@ class Polygon2d {
    *        the polygon.
    * @return The distance from the line segment to the polygon.
    */
-  double DistanceTo(const LineSegment2d &line_segment) const;
+  double DistanceTo(const LineSegment2d& line_segment) const;
 
   /**
    * @brief Compute the distance from a box to the polygon.
@@ -130,7 +128,7 @@ class Polygon2d {
    * @param box The box to compute whose distance to the polygon.
    * @return The distance from the box to the polygon.
    */
-  double DistanceTo(const Box2d &box) const;
+  double DistanceTo(const Box2d& box) const;
 
   /**
    * @brief Compute the distance from another polygon to the polygon.
@@ -141,7 +139,7 @@ class Polygon2d {
    * @param polygon The polygon to compute whose distance to this polygon.
    * @return The distance from the other polygon to this polygon.
    */
-  double DistanceTo(const Polygon2d &polygon) const;
+  double DistanceTo(const Polygon2d& polygon) const;
 
   /**
    * @brief Compute the square of distance from a point to the polygon.
@@ -151,14 +149,14 @@ class Polygon2d {
    * @param point The point to compute whose square of distance to the polygon.
    * @return The square of distance from the point to the polygon.
    */
-  double DistanceSquareTo(const Vec2d &point) const;
+  double DistanceSquareTo(const Vec2d& point) const;
 
   /**
    * @brief Check if a point is within the polygon.
    * @param point The target point. To check if it is within the polygon.
    * @return Whether a point is within the polygon or not.
    */
-  bool IsPointIn(const Vec2d &point) const;
+  bool IsPointIn(const Vec2d& point) const;
 
   /**
    * @brief Check if a point is on the boundary of the polygon.
@@ -166,7 +164,7 @@ class Polygon2d {
    *        of the polygon.
    * @return Whether a point is on the boundary of the polygon or not.
    */
-  bool IsPointOnBoundary(const Vec2d &point) const;
+  bool IsPointOnBoundary(const Vec2d& point) const;
 
   /**
    * @brief Check if the polygon contains a line segment.
@@ -174,14 +172,14 @@ class Polygon2d {
    *        contains it.
    * @return Whether the polygon contains the line segment or not.
    */
-  bool Contains(const LineSegment2d &line_segment) const;
+  bool Contains(const LineSegment2d& line_segment) const;
 
   /**
    * @brief Check if the polygon contains another polygon.
    * @param polygon The target polygon. To check if this polygon contains it.
    * @return Whether this polygon contains another polygon or not.
    */
-  bool Contains(const Polygon2d &polygon) const;
+  bool Contains(const Polygon2d& polygon) const;
 
   /**
    * @brief Compute the convex hull of a group of points.
@@ -189,8 +187,7 @@ class Polygon2d {
    * @param polygon The convex hull of the points.
    * @return If successfully compute the convex hull.
    */
-  static bool ComputeConvexHull(const std::vector<Vec2d> &points,
-                                Polygon2d *const polygon);
+  static bool ComputeConvexHull(const std::vector<Vec2d>& points, Polygon2d* const polygon);
 
   /**
    * @brief Check if a line segment has overlap with this polygon.
@@ -199,7 +196,7 @@ class Polygon2d {
    * @return Whether the target line segment has overlap with this
    *         polygon or not.
    */
-  bool HasOverlap(const LineSegment2d &line_segment) const;
+  bool HasOverlap(const LineSegment2d& line_segment) const;
 
   /**
    * @brief Get the overlap of a line segment and this polygon. If they have
@@ -210,14 +207,13 @@ class Polygon2d {
    * @param second Second end of the overlapped line segment.
    * @return If the target line segment has overlap with this polygon.
    */
-  bool GetOverlap(const LineSegment2d &line_segment, Vec2d *const first,
-                  Vec2d *const last) const;
+  bool GetOverlap(const LineSegment2d& line_segment, Vec2d* const first, Vec2d* const last) const;
 
   /**
    * @brief Get all vertices of the polygon
    * @param All vertices of the polygon
    */
-  void GetAllVertices(std::vector<Vec2d> *const vertices) const;
+  void GetAllVertices(std::vector<Vec2d>* const vertices) const;
 
   /**
    * @brief Get all vertices of the polygon
@@ -232,8 +228,7 @@ class Polygon2d {
    *        line segments with this polygon.
    * @return A group of overlapped line segments.
    */
-  std::vector<LineSegment2d> GetAllOverlaps(
-      const LineSegment2d &line_segment) const;
+  std::vector<LineSegment2d> GetAllOverlaps(const LineSegment2d& line_segment) const;
 
   /**
    * @brief Check if this polygon has overlap with another polygon.
@@ -241,7 +236,7 @@ class Polygon2d {
    *        with this polygon.
    * @return If this polygon has overlap with another polygon.
    */
-  bool HasOverlap(const Polygon2d &polygon) const;
+  bool HasOverlap(const Polygon2d& polygon) const;
 
   // Only compute overlaps between two convex polygons.
   /**
@@ -253,8 +248,7 @@ class Polygon2d {
    * @param overlap_polygon The overlapped polygon.
    * @param If there is an overlapped polygon.
    */
-  bool ComputeOverlap(const Polygon2d &other_polygon,
-                      Polygon2d *const overlap_polygon) const;
+  bool ComputeOverlap(const Polygon2d& other_polygon, Polygon2d* const overlap_polygon) const;
 
   // Only compute intersection over union ratio between two convex polygons.
   /**
@@ -266,7 +260,7 @@ class Polygon2d {
    * @return A value between 0.0 and 1.0, meaning no intersection to fully
    * overlaping
    */
-  double ComputeIoU(const Polygon2d &other_polygon) const;
+  double ComputeIoU(const Polygon2d& other_polygon) const;
 
   /**
    * @brief Get the axis-aligned bound box of the polygon.
@@ -295,8 +289,7 @@ class Polygon2d {
    * @param last The point on the boundary of this polygon with the maximal
    *        projection onto the heading direction.
    */
-  void ExtremePoints(const double heading, Vec2d *const first,
-                     Vec2d *const last) const;
+  void ExtremePoints(const double heading, Vec2d* const first, Vec2d* const last) const;
 
   /**
    * @brief Expand this polygon by a distance.
@@ -319,21 +312,20 @@ class Polygon2d {
 
  protected:
   void BuildFromPoints();
-  int Next(int at) const;
-  int Prev(int at) const;
+  int  Next(int at) const;
+  int  Prev(int at) const;
 
-  static bool ClipConvexHull(const LineSegment2d &line_segment,
-                             std::vector<Vec2d> *const points);
+  static bool ClipConvexHull(const LineSegment2d& line_segment, std::vector<Vec2d>* const points);
 
-  std::vector<Vec2d> points_;
-  int num_points_ = 0;
+  std::vector<Vec2d>         points_;
+  int                        num_points_ = 0;
   std::vector<LineSegment2d> line_segments_;
-  bool is_convex_ = false;
-  double area_ = 0.0;
-  double min_x_ = 0.0;
-  double max_x_ = 0.0;
-  double min_y_ = 0.0;
-  double max_y_ = 0.0;
+  bool                       is_convex_ = false;
+  double                     area_      = 0.0;
+  double                     min_x_     = 0.0;
+  double                     max_x_     = 0.0;
+  double                     min_y_     = 0.0;
+  double                     max_y_     = 0.0;
 };
 
 }  // namespace math

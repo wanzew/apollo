@@ -23,7 +23,7 @@
 namespace apollo {
 namespace routing {
 
-const char TEST_MAP_VERSION[] = "1.0.1";
+const char TEST_MAP_VERSION[]  = "1.0.1";
 const char TEST_MAP_DISTRICT[] = "yongfeng";
 
 const char TEST_L1[] = "L1";
@@ -38,21 +38,20 @@ const char TEST_R2[] = "R2";
 const char TEST_R3[] = "R3";
 
 const double TEST_LANE_LENGTH = 100.0;
-const double TEST_LANE_COST = 1.1;
-const double TEST_EDGE_COST = 2.2;
+const double TEST_LANE_COST   = 1.1;
+const double TEST_EDGE_COST   = 2.2;
 
-const double TEST_START_S = 0.0;
+const double TEST_START_S  = 0.0;
 const double TEST_MIDDLE_S = 0.0;
-const double TEST_END_S = TEST_LANE_LENGTH;
+const double TEST_END_S    = TEST_LANE_LENGTH;
 
-void GetNodeDetailForTest(Node* const node, const std::string& lane_id,
-                          const std::string& road_id);
+void GetNodeDetailForTest(Node* const node, const std::string& lane_id, const std::string& road_id);
 
-void GetNodeForTest(Node* const node, const std::string& lane_id,
-                    const std::string& road_id);
+void GetNodeForTest(Node* const node, const std::string& lane_id, const std::string& road_id);
 
-void GetEdgeForTest(Edge* const edge, const std::string& lane_id_1,
-                    const std::string& lane_id_2,
+void GetEdgeForTest(Edge* const                edge,
+                    const std::string&         lane_id_1,
+                    const std::string&         lane_id_2,
                     const Edge::DirectionType& type);
 
 void GetGraphForTest(Graph* graph);

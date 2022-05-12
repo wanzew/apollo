@@ -25,8 +25,11 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/cyber.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
+#include "modules/drivers/proto/racobit_radar.pb.h"
 
+#include "cyber/cyber.h"
 #include "cyber/time/time.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
@@ -36,10 +39,7 @@
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/radar/racobit_radar/protocol/radar_config_200.h"
 #include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 
@@ -82,18 +82,18 @@ class RacobitRadarCanbusComponent : public apollo::cyber::Component<> {
   bool Init() override;
 
  private:
-  void RegisterCanClients();
-  apollo::common::ErrorCode ConfigureRadar();
-  Status OnError(const std::string &error_msg);
-  std::shared_ptr<CanClient> can_client_;
-  CanReceiver<RacobitRadar> can_receiver_;
+  void                                        RegisterCanClients();
+  apollo::common::ErrorCode                   ConfigureRadar();
+  Status                                      OnError(const std::string& error_msg);
+  std::shared_ptr<CanClient>                  can_client_;
+  CanReceiver<RacobitRadar>                   can_receiver_;
   std::unique_ptr<RacobitRadarMessageManager> sensor_message_manager_;
 
-  int64_t last_timestamp_ = 0;
+  int64_t                                   last_timestamp_ = 0;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-  bool start_success_ = false;
+  bool                                      start_success_ = false;
   // cyber
-  RacobitRadarConf racobit_radar_conf_;
+  RacobitRadarConf                             racobit_radar_conf_;
   std::shared_ptr<cyber::Writer<RacobitRadar>> racobit_radar_writer_;
 };
 

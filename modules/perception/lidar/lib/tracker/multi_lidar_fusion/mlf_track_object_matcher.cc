@@ -18,35 +18,34 @@
 
 #include <numeric>
 
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool MlfTrackObjectMatcher::Init(
-    const MlfTrackObjectMatcherInitOptions &options) {
-  auto config_manager = lib::ConfigManager::Instance();
-  const lib::ModelConfig *model_config = nullptr;
+bool MlfTrackObjectMatcher::Init(const MlfTrackObjectMatcherInitOptions& options) {
+  auto                    config_manager = lib::ConfigManager::Instance();
+  const lib::ModelConfig* model_config   = nullptr;
   ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
-  std::string config_file;
-  std::string root_path;
+  std::string       config_file;
+  std::string       root_path;
   ACHECK(model_config->get_value("root_path", &root_path));
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
-  config_file = cyber::common::GetAbsolutePath(config_file,
-                                               "mlf_track_object_matcher.conf");
+  config_file = cyber::common::GetAbsolutePath(config_file, "mlf_track_object_matcher.conf");
   MlfTrackObjectMatcherConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
-  foreground_matcher_ = BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
-      config.foreground_mathcer_method());
+  foreground_matcher_ =
+      BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(config.foreground_mathcer_method());
   ACHECK(foreground_matcher_ != nullptr);
   AINFO << "MlfTrackObjectMatcher, fg: " << foreground_matcher_->Name();
-  background_matcher_ = BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
-      config.background_matcher_method());
+  background_matcher_ =
+      BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(config.background_matcher_method());
   ACHECK(background_matcher_ != nullptr);
   AINFO << "MlfTrackObjectMatcher, bg: " << background_matcher_->Name();
   foreground_matcher_->cost_matrix()->Reserve(1000, 1000);
@@ -56,18 +55,17 @@ bool MlfTrackObjectMatcher::Init(
   MlfTrackObjectDistanceInitOptions distance_init_options;
   ACHECK(track_object_distance_->Init(distance_init_options));
 
-  bound_value_ = config.bound_value();
+  bound_value_        = config.bound_value();
   max_match_distance_ = config.max_match_distance();
   return true;
 }
 
-void MlfTrackObjectMatcher::Match(
-    const MlfTrackObjectMatcherOptions &options,
-    const std::vector<TrackedObjectPtr> &objects,
-    const std::vector<MlfTrackDataPtr> &tracks,
-    std::vector<std::pair<size_t, size_t>> *assignments,
-    std::vector<size_t> *unassigned_tracks,
-    std::vector<size_t> *unassigned_objects) {
+void MlfTrackObjectMatcher::Match(const MlfTrackObjectMatcherOptions&     options,
+                                  const std::vector<TrackedObjectPtr>&    objects,
+                                  const std::vector<MlfTrackDataPtr>&     tracks,
+                                  std::vector<std::pair<size_t, size_t>>* assignments,
+                                  std::vector<size_t>*                    unassigned_tracks,
+                                  std::vector<size_t>*                    unassigned_objects) {
   assignments->clear();
   unassigned_objects->clear();
   unassigned_tracks->clear();
@@ -83,31 +81,27 @@ void MlfTrackObjectMatcher::Match(
   matcher_options.cost_thresh = max_match_distance_;
   matcher_options.bound_value = bound_value_;
 
-  BaseBipartiteGraphMatcher *matcher =
+  BaseBipartiteGraphMatcher* matcher =
       objects[0]->is_background ? background_matcher_ : foreground_matcher_;
 
-  common::SecureMat<float> *association_mat = matcher->cost_matrix();
+  common::SecureMat<float>* association_mat = matcher->cost_matrix();
 
   association_mat->Resize(tracks.size(), objects.size());
   ComputeAssociateMatrix(tracks, objects, association_mat);
-  matcher->Match(matcher_options, assignments, unassigned_tracks,
-                 unassigned_objects);
+  matcher->Match(matcher_options, assignments, unassigned_tracks, unassigned_objects);
   for (size_t i = 0; i < assignments->size(); ++i) {
     objects[assignments->at(i).second]->association_score =
-        (*association_mat)(assignments->at(i).first,
-                           assignments->at(i).second) /
+        (*association_mat)(assignments->at(i).first, assignments->at(i).second) /
         max_match_distance_;
   }
 }
 
-void MlfTrackObjectMatcher::ComputeAssociateMatrix(
-    const std::vector<MlfTrackDataPtr> &tracks,
-    const std::vector<TrackedObjectPtr> &new_objects,
-    common::SecureMat<float> *association_mat) {
+void MlfTrackObjectMatcher::ComputeAssociateMatrix(const std::vector<MlfTrackDataPtr>&  tracks,
+                                                   const std::vector<TrackedObjectPtr>& new_objects,
+                                                   common::SecureMat<float>* association_mat) {
   for (size_t i = 0; i < tracks.size(); ++i) {
     for (size_t j = 0; j < new_objects.size(); ++j) {
-      (*association_mat)(i, j) =
-          track_object_distance_->ComputeDistance(new_objects[j], tracks[i]);
+      (*association_mat)(i, j) = track_object_distance_->ComputeDistance(new_objects[j], tracks[i]);
     }
   }
 }

@@ -20,9 +20,10 @@
 
 #include "modules/drivers/radar/racobit_radar/racobit_radar_canbus_component.h"
 
+#include "modules/drivers/proto/racobit_radar.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 
 /**
@@ -34,8 +35,7 @@ namespace drivers {
 namespace racobit_radar {
 
 RacobitRadarCanbusComponent::RacobitRadarCanbusComponent()
-    : monitor_logger_buffer_(
-          common::monitor::MonitorMessageItem::RACOBIT_RADAR) {}
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::RACOBIT_RADAR) {}
 
 bool RacobitRadarCanbusComponent::Init() {
   if (!GetProtoConfig(&racobit_radar_conf_)) {
@@ -44,10 +44,8 @@ bool RacobitRadarCanbusComponent::Init() {
 
   AINFO << "The canbus conf file is loaded: " << ConfigFilePath();
   ADEBUG << "Canbus_conf:" << racobit_radar_conf_.ShortDebugString();
-  racobit_radar_writer_ =
-      node_->CreateWriter<RacobitRadar>(FLAGS_racobit_radar_topic);
-  if (!cyber::common::GetProtoFromFile(ConfigFilePath(),
-                                       &racobit_radar_conf_)) {
+  racobit_radar_writer_ = node_->CreateWriter<RacobitRadar>(FLAGS_racobit_radar_topic);
+  if (!cyber::common::GetProtoFromFile(ConfigFilePath(), &racobit_radar_conf_)) {
     return OnError("Unable to load canbus conf file: " + ConfigFilePath()).ok();
   }
 
@@ -56,11 +54,8 @@ bool RacobitRadarCanbusComponent::Init() {
 
   auto can_factory = CanClientFactory::Instance();
   can_factory->RegisterCanClients();
-  can_client_ = can_factory->CreateCANClient(
-      racobit_radar_conf_.can_conf().can_card_parameter());
-  if (!can_client_) {
-    return OnError("Failed to create can client.").ok();
-  }
+  can_client_ = can_factory->CreateCANClient(racobit_radar_conf_.can_conf().can_card_parameter());
+  if (!can_client_) { return OnError("Failed to create can client.").ok(); }
   AINFO << "Can client is successfully created.";
 
   sensor_message_manager_ = std::unique_ptr<RacobitRadarMessageManager>(
@@ -72,22 +67,16 @@ bool RacobitRadarCanbusComponent::Init() {
   sensor_message_manager_->set_can_client(can_client_);
   AINFO << "Sensor message manager is successfully created.";
 
-  if (can_receiver_.Init(
-          can_client_.get(), sensor_message_manager_.get(),
-          racobit_radar_conf_.can_conf().enable_receiver_log()) !=
-      ErrorCode::OK) {
+  if (can_receiver_.Init(can_client_.get(), sensor_message_manager_.get(),
+                         racobit_radar_conf_.can_conf().enable_receiver_log()) != ErrorCode::OK) {
     return OnError("Failed to init can receiver.").ok();
   }
   AINFO << "The can receiver is successfully initialized.";
 
-  if (can_client_->Start() != ErrorCode::OK) {
-    return OnError("Failed to start can client").ok();
-  }
+  if (can_client_->Start() != ErrorCode::OK) { return OnError("Failed to start can client").ok(); }
 
   AINFO << "Can client is started.";
-  if (ConfigureRadar() != ErrorCode::OK) {
-    return OnError("Failed to configure radar.").ok();
-  }
+  if (ConfigureRadar() != ErrorCode::OK) { return OnError("Failed to configure radar.").ok(); }
   AINFO << "The radar is successfully configured.";
 
   if (can_receiver_.Start() != ErrorCode::OK) {
@@ -114,7 +103,7 @@ RacobitRadarCanbusComponent::~RacobitRadarCanbusComponent() {
   }
 }
 
-Status RacobitRadarCanbusComponent::OnError(const std::string &error_msg) {
+Status RacobitRadarCanbusComponent::OnError(const std::string& error_msg) {
   monitor_logger_buffer_.ERROR(error_msg);
   return Status(ErrorCode::CANBUS_ERROR, error_msg);
 }

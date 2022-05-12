@@ -15,11 +15,11 @@
  *****************************************************************************/
 #pragma once
 
+#include <limits>
 #include <vector>
 
-#include <limits>
-
 #include "Eigen/Core"
+
 #include "cyber/common/log.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/point.h"
@@ -31,7 +31,7 @@ typedef std::vector<base::Point3DF> Point3DSet;
 typedef std::vector<base::Point2DF> Point2DSet;
 
 static const double lane_eps_value = 1e-6;
-static const int max_poly_order = 3;
+static const int    max_poly_order = 3;
 
 struct LanePointInfo {
   int type;
@@ -45,9 +45,9 @@ struct LanePointInfo {
 // fit polynomial function with QR decomposition (using Eigen 3)
 template <typename Dtype>
 bool PolyFit(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
-             const int& order,
-             Eigen::Matrix<Dtype, max_poly_order + 1, 1>* coeff,
-             const bool& is_x_axis = true) {
+             const int&                                     order,
+             Eigen::Matrix<Dtype, max_poly_order + 1, 1>*   coeff,
+             const bool&                                    is_x_axis = true) {
   if (coeff == nullptr) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
@@ -60,19 +60,17 @@ bool PolyFit(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
 
   int n = static_cast<int>(pos_vec.size());
   if (n <= order) {
-    AERROR << "The number of points should be larger than the order. #points = "
-           << pos_vec.size();
+    AERROR << "The number of points should be larger than the order. #points = " << pos_vec.size();
     return false;
   }
 
   // create data matrix
   Eigen::Matrix<Dtype, Eigen::Dynamic, Eigen::Dynamic> A(n, order + 1);
-  Eigen::Matrix<Dtype, Eigen::Dynamic, 1> y(n);
-  Eigen::Matrix<Dtype, Eigen::Dynamic, 1> result;
+  Eigen::Matrix<Dtype, Eigen::Dynamic, 1>              y(n);
+  Eigen::Matrix<Dtype, Eigen::Dynamic, 1>              result;
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j <= order; ++j) {
-      A(i, j) = static_cast<Dtype>(
-          std::pow(is_x_axis ? pos_vec[i].x() : pos_vec[i].y(), j));
+      A(i, j) = static_cast<Dtype>(std::pow(is_x_axis ? pos_vec[i].x() : pos_vec[i].y(), j));
     }
     y(i) = is_x_axis ? pos_vec[i].y() : pos_vec[i].x();
   }
@@ -89,13 +87,13 @@ bool PolyFit(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
 }
 
 template <typename Dtype>
-bool PolyEval(const Dtype& x, int order,
+bool PolyEval(const Dtype&                                       x,
+              int                                                order,
               const Eigen::Matrix<Dtype, max_poly_order + 1, 1>& coeff,
-              Dtype* y) {
+              Dtype*                                             y) {
   int poly_order = order;
   if (order > max_poly_order) {
-    AERROR << "the order of polynomial function must be smaller than "
-           << max_poly_order;
+    AERROR << "the order of polynomial function must be smaller than " << max_poly_order;
     return false;
   }
 
@@ -110,9 +108,10 @@ bool PolyEval(const Dtype& x, int order,
 // @brief: ransac fitting to estimate the coefficients of linear system
 template <typename Dtype>
 bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
-                   std::vector<Eigen::Matrix<Dtype, 2, 1>>* selected_points,
-                   Eigen::Matrix<Dtype, 4, 1>* coeff, const int max_iters = 100,
-                   const int N = 5,
+                   std::vector<Eigen::Matrix<Dtype, 2, 1>>*       selected_points,
+                   Eigen::Matrix<Dtype, 4, 1>*                    coeff,
+                   const int                                      max_iters = 100,
+                   const int                                      N         = 5,
                    const Dtype inlier_thres = static_cast<Dtype>(0.1)) {
   if (coeff == nullptr) {
     AERROR << "The coefficient pointer is NULL.";
@@ -121,29 +120,28 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
 
   selected_points->clear();
 
-  int n = static_cast<int>(pos_vec.size());
+  int n  = static_cast<int>(pos_vec.size());
   int q1 = static_cast<int>(n / 4);
   int q2 = static_cast<int>(n / 2);
   int q3 = static_cast<int>(n * 3 / 4);
   if (n < N) {
-    AERROR << "The number of points should be larger than the order. #points = "
-           << pos_vec.size();
+    AERROR << "The number of points should be larger than the order. #points = " << pos_vec.size();
     return false;
   }
 
   std::vector<int> index(3, 0);
-  int max_inliers = 0;
-  Dtype min_residual = std::numeric_limits<float>::max();
-  Dtype early_stop_ratio = 0.95f;
-  Dtype good_lane_ratio = 0.666f;
+  int              max_inliers      = 0;
+  Dtype            min_residual     = std::numeric_limits<float>::max();
+  Dtype            early_stop_ratio = 0.95f;
+  Dtype            good_lane_ratio  = 0.666f;
   for (int j = 0; j < max_iters; ++j) {
     index[0] = std::rand() % q2;
     index[1] = q2 + std::rand() % q1;
     index[2] = q3 + std::rand() % q1;
 
     Eigen::Matrix<Dtype, 3, 3> matA;
-    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0), pos_vec[index[0]](0),
-        1, pos_vec[index[1]](0) * pos_vec[index[1]](0), pos_vec[index[1]](0), 1,
+    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0), pos_vec[index[0]](0), 1,
+        pos_vec[index[1]](0) * pos_vec[index[1]](0), pos_vec[index[1]](0), 1,
         pos_vec[index[2]](0) * pos_vec[index[2]](0), pos_vec[index[2]](0), 1;
 
     Eigen::FullPivLU<Eigen::Matrix<Dtype, 3, 3>> mat(matA);
@@ -158,29 +156,27 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
     // Note that Eigen::inverse of 3x3 and 4x4 is a closed form solution
     Eigen::Matrix<Dtype, 3, 1> matB;
     matB << pos_vec[index[0]](1), pos_vec[index[1]](1), pos_vec[index[2]](1);
-    Eigen::Vector3f c =
-        static_cast<Eigen::Matrix<Dtype, 3, 1>>(matA.inverse() * matB);
+    Eigen::Vector3f c = static_cast<Eigen::Matrix<Dtype, 3, 1>>(matA.inverse() * matB);
     if (!(matA * c).isApprox(matB)) {
       ADEBUG << "No solution.";
       continue;
     }
 
-    int num_inliers = 0;
-    Dtype residual = 0;
-    Dtype y = 0;
+    int   num_inliers = 0;
+    Dtype residual    = 0;
+    Dtype y           = 0;
     for (int i = 0; i < n; ++i) {
       y = pos_vec[i](0) * pos_vec[i](0) * c(0) + pos_vec[i](0) * c(1) + c(2);
       if (std::abs(y - pos_vec[i](1)) <= inlier_thres) ++num_inliers;
       residual += std::abs(y - pos_vec[i](1));
     }
 
-    if (num_inliers > max_inliers ||
-        (num_inliers == max_inliers && residual < min_residual)) {
-      (*coeff)(3) = 0;
-      (*coeff)(2) = c(0);
-      (*coeff)(1) = c(1);
-      (*coeff)(0) = c(2);
-      max_inliers = num_inliers;
+    if (num_inliers > max_inliers || (num_inliers == max_inliers && residual < min_residual)) {
+      (*coeff)(3)  = 0;
+      (*coeff)(2)  = c(0);
+      (*coeff)(1)  = c(1);
+      (*coeff)(0)  = c(2);
+      max_inliers  = num_inliers;
       min_residual = residual;
     }
 
@@ -192,19 +188,21 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
   // std::vector<Eigen::Matrix<Dtype, 2, 1>> tmp = *pos_vec;
   // pos_vec.clear();
   for (int i = 0; i < n; ++i) {
-    Dtype y = pos_vec[i](0) * pos_vec[i](0) * (*coeff)(2) +
-              pos_vec[i](0) * (*coeff)(1) + (*coeff)(0);
-    if (std::abs(y - pos_vec[i](1)) <= inlier_thres) {
-      selected_points->push_back(pos_vec[i]);
-    }
+    Dtype y =
+        pos_vec[i](0) * pos_vec[i](0) * (*coeff)(2) + pos_vec[i](0) * (*coeff)(1) + (*coeff)(0);
+    if (std::abs(y - pos_vec[i](1)) <= inlier_thres) { selected_points->push_back(pos_vec[i]); }
   }
   return true;
 }
 
 class DisjointSet {
  public:
-  DisjointSet() : disjoint_array_(), subset_num_(0) {}
-  explicit DisjointSet(size_t size) : disjoint_array_(), subset_num_(0) {
+  DisjointSet()
+      : disjoint_array_()
+      , subset_num_(0) {}
+  explicit DisjointSet(size_t size)
+      : disjoint_array_()
+      , subset_num_(0) {
     disjoint_array_.reserve(size);
   }
   ~DisjointSet() {}
@@ -220,22 +218,24 @@ class DisjointSet {
     subset_num_ = 0;
   }
 
-  int Add();        // add a new element, which is a subset by itself;
-  int Find(int x);  // return the root of x
-  void Unite(int x, int y);
-  int Size() const { return subset_num_; }
+  int    Add();        // add a new element, which is a subset by itself;
+  int    Find(int x);  // return the root of x
+  void   Unite(int x, int y);
+  int    Size() const { return subset_num_; }
   size_t Num() const { return disjoint_array_.size(); }
 
  private:
   std::vector<int> disjoint_array_;
-  int subset_num_;
+  int              subset_num_;
 };
 
 class ConnectedComponent {
  public:
-  ConnectedComponent() : pixel_count_(0) {}
+  ConnectedComponent()
+      : pixel_count_(0) {}
 
-  ConnectedComponent(int x, int y) : pixel_count_(1) {
+  ConnectedComponent(int x, int y)
+      : pixel_count_(1) {
     base::Point2DI point;
     point.x = x;
     point.y = y;
@@ -249,44 +249,45 @@ class ConnectedComponent {
   ~ConnectedComponent() {}
 
   // CC pixels
-  void AddPixel(int x, int y);
-  int GetPixelCount() const { return pixel_count_; }
-  base::BBox2DI GetBBox() const { return bbox_; }
+  void                        AddPixel(int x, int y);
+  int                         GetPixelCount() const { return pixel_count_; }
+  base::BBox2DI               GetBBox() const { return bbox_; }
   std::vector<base::Point2DI> GetPixels() const { return pixels_; }
 
  private:
-  int pixel_count_;
+  int                         pixel_count_;
   std::vector<base::Point2DI> pixels_;
-  base::BBox2DI bbox_;
+  base::BBox2DI               bbox_;
 };
 
-bool FindCC(const std::vector<unsigned char>& src, int width, int height,
-            const base::RectI& roi, std::vector<ConnectedComponent>* cc);
+bool FindCC(const std::vector<unsigned char>& src,
+            int                               width,
+            int                               height,
+            const base::RectI&                roi,
+            std::vector<ConnectedComponent>*  cc);
 
-bool ImagePoint2Camera(const base::Point2DF& img_point, float pitch_angle,
-                       float camera_ground_height,
+bool ImagePoint2Camera(const base::Point2DF&  img_point,
+                       float                  pitch_angle,
+                       float                  camera_ground_height,
                        const Eigen::Matrix3f& intrinsic_params_inverse,
-                       Eigen::Vector3d* camera_point);
+                       Eigen::Vector3d*       camera_point);
 
 bool CameraPoint2Image(const Eigen::Vector3d& camera_point,
                        const Eigen::Matrix3f& intrinsic_params,
-                       base::Point2DF* img_point);
+                       base::Point2DF*        img_point);
 
-bool ComparePoint2DY(const base::Point2DF& point1,
-                     const base::Point2DF& point2);
+bool ComparePoint2DY(const base::Point2DF& point1, const base::Point2DF& point2);
 
 template <class T>
 void QSwap_(T* a, T* b) {
   T temp = *a;
-  *a = *b;
-  *b = temp;
+  *a     = *b;
+  *b     = temp;
 }
 
 template <class T>
 void QuickSort(int* index, const T* values, int start, int end) {
-  if (start >= end - 1) {
-    return;
-  }
+  if (start >= end - 1) { return; }
 
   const T& pivot = values[index[(start + end - 1) / 2]];
   // first, split into two parts: less than the pivot
@@ -301,9 +302,7 @@ void QuickSort(int* index, const T* values, int start, int end) {
     while (lo < hi && values[index[hi - 1]] >= pivot) {
       hi--;
     }
-    if (lo == hi || lo == hi - 1) {
-      break;
-    }
+    if (lo == hi || lo == hi - 1) { break; }
     QSwap_(&(index[lo]), &(index[hi - 1]));
     lo++;
     hi--;
@@ -320,9 +319,7 @@ void QuickSort(int* index, const T* values, int start, int end) {
     while (lo < hi && values[index[hi - 1]] > pivot) {
       hi--;
     }
-    if (lo == hi || lo == hi - 1) {
-      break;
-    }
+    if (lo == hi || lo == hi - 1) { break; }
     QSwap_(&(index[lo]), &(index[hi - 1]));
     lo++;
     hi--;

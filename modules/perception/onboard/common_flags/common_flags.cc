@@ -20,13 +20,11 @@ namespace perception {
 namespace onboard {
 
 DEFINE_bool(obs_enable_hdmap_input, true, "enable hdmap input for roi filter");
-DEFINE_bool(obs_enable_visualization, false,
-            "whether to send message for visualization");
-DEFINE_string(obs_screen_output_dir, "./",
-              "output dir. for saving visualization screenshots");
-DEFINE_bool(obs_benchmark_mode, false,
-            "whether open benchmark mode, default false");
-DEFINE_bool(obs_save_fusion_supplement, false,
+DEFINE_bool(obs_enable_visualization, false, "whether to send message for visualization");
+DEFINE_string(obs_screen_output_dir, "./", "output dir. for saving visualization screenshots");
+DEFINE_bool(obs_benchmark_mode, false, "whether open benchmark mode, default false");
+DEFINE_bool(obs_save_fusion_supplement,
+            false,
             "whether save fusion supplement data, default false");
 DEFINE_bool(start_visualizer, false, "Whether to start visualizer");
 

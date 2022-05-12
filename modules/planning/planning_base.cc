@@ -16,11 +16,12 @@
 
 #include "modules/planning/planning_base.h"
 
+#include "modules/planning/proto/planning_internal.pb.h"
+
 #include "cyber/time/clock.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
@@ -39,8 +40,7 @@ Status PlanningBase::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-void PlanningBase::FillPlanningPb(const double timestamp,
-                                  ADCTrajectory* const trajectory_pb) {
+void PlanningBase::FillPlanningPb(const double timestamp, ADCTrajectory* const trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   if (local_view_.prediction_obstacles->has_header()) {
     trajectory_pb->mutable_header()->set_lidar_timestamp(
@@ -50,8 +50,7 @@ void PlanningBase::FillPlanningPb(const double timestamp,
     trajectory_pb->mutable_header()->set_radar_timestamp(
         local_view_.prediction_obstacles->header().radar_timestamp());
   }
-  trajectory_pb->mutable_routing_header()->CopyFrom(
-      local_view_.routing->header());
+  trajectory_pb->mutable_routing_header()->CopyFrom(local_view_.routing->header());
 }
 }  // namespace planning
 }  // namespace apollo

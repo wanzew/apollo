@@ -47,17 +47,16 @@ bool Info::Display(const std::string& file) {
   std::cout << std::setw(w) << "record_file: " << file << std::endl;
 
   // version
-  std::cout << std::setw(w) << "version: " << hdr.major_version() << "."
-            << hdr.minor_version() << std::endl;
+  std::cout << std::setw(w) << "version: " << hdr.major_version() << "." << hdr.minor_version()
+            << std::endl;
 
   // time and duration
-  auto begin_time_s = static_cast<double>(hdr.begin_time()) / 1e9;
-  auto end_time_s = static_cast<double>(hdr.end_time()) / 1e9;
-  auto duration_s = end_time_s - begin_time_s;
+  auto begin_time_s   = static_cast<double>(hdr.begin_time()) / 1e9;
+  auto end_time_s     = static_cast<double>(hdr.end_time()) / 1e9;
+  auto duration_s     = end_time_s - begin_time_s;
   auto begin_time_str = UnixSecondsToString(static_cast<int>(begin_time_s));
-  auto end_time_str = UnixSecondsToString(static_cast<int>(end_time_s));
-  std::cout << std::setw(w) << "duration: " << duration_s << " Seconds"
-            << std::endl;
+  auto end_time_str   = UnixSecondsToString(static_cast<int>(end_time_s));
+  std::cout << std::setw(w) << "duration: " << duration_s << " Seconds" << std::endl;
   std::cout << std::setw(w) << "begin_time: " << begin_time_str << std::endl;
   std::cout << std::setw(w) << "end_time: " << end_time_str << std::endl;
 
@@ -82,12 +81,10 @@ bool Info::Display(const std::string& file) {
   std::cout << std::endl;
 
   // message_number
-  std::cout << std::setw(w) << "message_number: " << hdr.message_number()
-            << std::endl;
+  std::cout << std::setw(w) << "message_number: " << hdr.message_number() << std::endl;
 
   // channel_number
-  std::cout << std::setw(w) << "channel_number: " << hdr.channel_number()
-            << std::endl;
+  std::cout << std::setw(w) << "channel_number: " << hdr.channel_number() << std::endl;
 
   // read index section
   if (!file_reader.ReadIndex()) {

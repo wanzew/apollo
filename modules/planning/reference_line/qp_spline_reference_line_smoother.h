@@ -23,9 +23,10 @@
 #include <memory>
 #include <vector>
 
-#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
+
+#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -35,8 +36,7 @@ namespace planning {
 
 class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
  public:
-  explicit QpSplineReferenceLineSmoother(
-      const ReferenceLineSmootherConfig& config);
+  explicit QpSplineReferenceLineSmoother(const ReferenceLineSmootherConfig& config);
 
   virtual ~QpSplineReferenceLineSmoother() = default;
 
@@ -56,17 +56,17 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
 
   bool Solve();
 
-  bool ExtractEvaluatedPoints(
-      const ReferenceLine& raw_reference_line, const std::vector<double>& vec_t,
-      std::vector<common::PathPoint>* const path_points) const;
+  bool ExtractEvaluatedPoints(const ReferenceLine&                  raw_reference_line,
+                              const std::vector<double>&            vec_t,
+                              std::vector<common::PathPoint>* const path_points) const;
 
   bool GetSFromParamT(const double t, double* const s) const;
 
   std::uint32_t FindIndex(const double t) const;
 
  private:
-  std::vector<double> t_knots_;
-  std::vector<AnchorPoint> anchor_points_;
+  std::vector<double>             t_knots_;
+  std::vector<AnchorPoint>        anchor_points_;
   std::unique_ptr<Spline2dSolver> spline_solver_;
 
   double ref_x_ = 0.0;

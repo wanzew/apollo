@@ -16,30 +16,26 @@
 
 #include "modules/data/tools/smart_recorder/emergency_mode_trigger.h"
 
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/control/proto/control_cmd.pb.h"
 
 namespace apollo {
 namespace data {
 
 using apollo::canbus::Chassis;
 
-EmergencyModeTrigger::EmergencyModeTrigger() {
-  trigger_name_ = "EmergencyModeTrigger";
-}
+EmergencyModeTrigger::EmergencyModeTrigger() { trigger_name_ = "EmergencyModeTrigger"; }
 
 void EmergencyModeTrigger::Pull(const cyber::record::RecordMessage& msg) {
-  if (!trigger_obj_->enabled()) {
-    return;
-  }
+  if (!trigger_obj_->enabled()) { return; }
   if (msg.channel_name == FLAGS_chassis_topic) {
     apollo::canbus::Chassis chassis_msg;
     chassis_msg.ParseFromString(msg.content);
     if (cur_driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE &&
         chassis_msg.driving_mode() == Chassis::EMERGENCY_MODE) {
-      AINFO << "emergency mode trigger is pulled: " << msg.time << " - "
-            << msg.channel_name;
+      AINFO << "emergency mode trigger is pulled: " << msg.time << " - " << msg.channel_name;
       TriggerIt(msg.time);
     }
     cur_driving_mode_ = chassis_msg.driving_mode();

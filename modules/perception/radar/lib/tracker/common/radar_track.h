@@ -22,7 +22,6 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/radar/common/types.h"
@@ -34,41 +33,41 @@ namespace radar {
 
 class RadarTrack {
  public:
-  RadarTrack(const base::ObjectPtr &obs, const double timestamp);
+  RadarTrack(const base::ObjectPtr& obs, const double timestamp);
   ~RadarTrack() {}
   // update the object after association with a radar obervation
-  void UpdataObsRadar(const base::ObjectPtr &obs_radar, const double timestamp);
-  void SetObsRadarNullptr();
-  int GetObsId() const;
+  void            UpdataObsRadar(const base::ObjectPtr& obs_radar, const double timestamp);
+  void            SetObsRadarNullptr();
+  int             GetObsId() const;
   base::ObjectPtr GetObsRadar();
   base::ObjectPtr GetObs();
-  double GetTimestamp();
-  double GetTrackingTime();
-  bool IsDead() { return is_dead_; }
-  void SetDead() { is_dead_ = true; }
-  bool ConfirmTrack() { return tracked_times_ > s_tracked_times_threshold_; }
-  static void SetTrackedTimesThreshold(const int &threshold) {
+  double          GetTimestamp();
+  double          GetTrackingTime();
+  bool            IsDead() { return is_dead_; }
+  void            SetDead() { is_dead_ = true; }
+  bool            ConfirmTrack() { return tracked_times_ > s_tracked_times_threshold_; }
+  static void     SetTrackedTimesThreshold(const int& threshold) {
     s_tracked_times_threshold_ = threshold;
   }
-  static void SetChosenFilter(const std::string &chosen_filter) {
+  static void SetChosenFilter(const std::string& chosen_filter) {
     s_chosen_filter_ = chosen_filter;
   }
   static void SetUseFilter(bool use_filter) { s_use_filter_ = use_filter; }
 
  private:
-  double timestamp_ = 0.0;
-  int obs_id_ = 0;
-  int tracked_times_ = 0;
-  double tracking_time_ = 0.0;
-  bool is_dead_ = false;
-  base::ObjectPtr obs_radar_ = nullptr;  // observasion from radar
-  base::ObjectPtr obs_ = nullptr;        // track result after tracking
-  std::shared_ptr<BaseFilter> filter_ = nullptr;
+  double                      timestamp_     = 0.0;
+  int                         obs_id_        = 0;
+  int                         tracked_times_ = 0;
+  double                      tracking_time_ = 0.0;
+  bool                        is_dead_       = false;
+  base::ObjectPtr             obs_radar_     = nullptr;  // observasion from radar
+  base::ObjectPtr             obs_           = nullptr;  // track result after tracking
+  std::shared_ptr<BaseFilter> filter_        = nullptr;
 
   static std::string s_chosen_filter_;
-  static int s_current_idx_;
-  static int s_tracked_times_threshold_;
-  static bool s_use_filter_;
+  static int         s_current_idx_;
+  static int         s_tracked_times_threshold_;
+  static bool        s_use_filter_;
 
   DISALLOW_COPY_AND_ASSIGN(RadarTrack);
 };

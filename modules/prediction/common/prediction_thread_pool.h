@@ -62,14 +62,11 @@ class BaseThreadPool {
     // Post requires that the functions in it are copy-constructible.
     // We used a shared pointer for the packaged_task,
     // Since it's only movable and non-copyable
-    std::shared_ptr<TaskType> task =
-        std::make_shared<TaskType>(std::move(func));
-    std::future<ReturnType> returned_future = task->get_future();
+    std::shared_ptr<TaskType> task            = std::make_shared<TaskType>(std::move(func));
+    std::future<ReturnType>   returned_future = task->get_future();
 
     // Note: variables eg. `task` must be copied here because of the lifetime
-    if (stopped_) {
-      return std::future<ReturnType>();
-    }
+    if (stopped_) { return std::future<ReturnType>(); }
     task_queue_.Enqueue([task]() { (*task)(); });
     return returned_future;
   }
@@ -77,9 +74,9 @@ class BaseThreadPool {
   static std::vector<int> THREAD_POOL_CAPACITY;
 
  private:
-  std::vector<std::thread> workers_;
+  std::vector<std::thread>                                 workers_;
   apollo::cyber::base::BoundedQueue<std::function<void()>> task_queue_;
-  std::atomic_bool stopped_;
+  std::atomic_bool                                         stopped_;
 };
 
 template <int LEVEL>
@@ -91,9 +88,9 @@ class LevelThreadPool : public BaseThreadPool {
   }
 
  private:
-  LevelThreadPool() : BaseThreadPool(THREAD_POOL_CAPACITY[LEVEL], LEVEL + 1) {
-    ADEBUG << "Level = " << LEVEL
-           << "; thread pool capacity = " << THREAD_POOL_CAPACITY[LEVEL];
+  LevelThreadPool()
+      : BaseThreadPool(THREAD_POOL_CAPACITY[LEVEL], LEVEL + 1) {
+    ADEBUG << "Level = " << LEVEL << "; thread pool capacity = " << THREAD_POOL_CAPACITY[LEVEL];
   }
 };
 

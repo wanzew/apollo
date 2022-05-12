@@ -17,6 +17,7 @@
 #include "modules/planning/tasks/deciders/path_reuse_decider/path_reuse_decider.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -33,14 +34,13 @@ class PathReuseDeciderTest : public ::testing::Test {
   virtual void TearDown() {}
 
  protected:
-  TaskConfig config_;
+  TaskConfig                          config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(PathReuseDeciderTest, Init) {
   PathReuseDecider path_reuse_decider(config_, injector_);
-  EXPECT_EQ(path_reuse_decider.Name(),
-            TaskConfig::TaskType_Name(config_.task_type()));
+  EXPECT_EQ(path_reuse_decider.Name(), TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 // TEST_F(PathReuseDeciderTest, GetHistoryStopPositions) {

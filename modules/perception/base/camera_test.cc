@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
-
 #include "modules/perception/base/camera.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -39,11 +39,11 @@ TEST(PinholeCameraModelTest, camera_model_project_test) {
   camera_model.set_width(1080);
   camera_model.set_height(720);
   Eigen::Matrix3f intrinsic_params = Eigen::Matrix3f::Zero();
-  intrinsic_params(0, 0) = 1460;
-  intrinsic_params(0, 2) = 508;
-  intrinsic_params(1, 1) = 1480;
-  intrinsic_params(1, 2) = 364;
-  intrinsic_params(2, 2) = 1;
+  intrinsic_params(0, 0)           = 1460;
+  intrinsic_params(0, 2)           = 508;
+  intrinsic_params(1, 1)           = 1480;
+  intrinsic_params(1, 2)           = 364;
+  intrinsic_params(2, 2)           = 1;
 
   camera_model.set_intrinsic_params(intrinsic_params);
 
@@ -60,9 +60,8 @@ TEST(PinholeCameraModelTest, camera_model_project_test) {
   EXPECT_LT((pt2d - proj2d).norm(), 1.0e-6);
 
   Eigen::Vector3f uproj3d = camera_model.UnProject(pt2d);
-  EXPECT_TRUE(
-      (uproj3d - Eigen::Vector3f(pt3d[0] / pt3d[2], pt3d[1] / pt3d[2], 1.0f))
-          .norm() < 1.0e-6);
+  EXPECT_TRUE((uproj3d - Eigen::Vector3f(pt3d[0] / pt3d[2], pt3d[1] / pt3d[2], 1.0f)).norm() <
+              1.0e-6);
 }
 
 }  //  namespace base

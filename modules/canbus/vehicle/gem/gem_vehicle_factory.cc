@@ -24,8 +24,7 @@
 namespace apollo {
 namespace canbus {
 
-std::unique_ptr<VehicleController>
-GemVehicleFactory::CreateVehicleController() {
+std::unique_ptr<VehicleController> GemVehicleFactory::CreateVehicleController() {
   return std::unique_ptr<VehicleController>(new gem::GemController());
 }
 

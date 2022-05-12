@@ -14,10 +14,10 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
+#include <tinyxml2.h>
+
 #include <string>
 #include <vector>
-
-#include <tinyxml2.h>
 
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
@@ -28,23 +28,18 @@ namespace adapter {
 
 class SignalsXmlParser {
  public:
-  static Status ParseTrafficLights(
-      const tinyxml2::XMLElement& xml_node,
-      std::vector<TrafficLightInternal>* traffic_lights);
-  static Status ParseStopSigns(const tinyxml2::XMLElement& xml_node,
+  static Status ParseTrafficLights(const tinyxml2::XMLElement&        xml_node,
+                                   std::vector<TrafficLightInternal>* traffic_lights);
+  static Status ParseStopSigns(const tinyxml2::XMLElement&    xml_node,
                                std::vector<StopSignInternal>* stop_signs);
-  static Status ParseYieldSigns(const tinyxml2::XMLElement& xml_node,
+  static Status ParseYieldSigns(const tinyxml2::XMLElement&     xml_node,
                                 std::vector<YieldSignInternal>* yield_signs);
 
  private:
-  static Status ToPbSignalType(const std::string& xml_type,
-                               PbSignalType* signal_type);
-  static Status ToPbSubSignalType(const std::string& xml_type,
-                                  PbSubSignalType* sub_signal_type);
-  static Status to_pb_sign_info_type(const std::string& xml_type,
-                                     PbSignInfoType* sign_info_type);
-  static Status ToPbStopSignType(const std::string& xml_type,
-                                 PbStopSignType* stop_type);
+  static Status ToPbSignalType(const std::string& xml_type, PbSignalType* signal_type);
+  static Status ToPbSubSignalType(const std::string& xml_type, PbSubSignalType* sub_signal_type);
+  static Status to_pb_sign_info_type(const std::string& xml_type, PbSignInfoType* sign_info_type);
+  static Status ToPbStopSignType(const std::string& xml_type, PbStopSignType* stop_type);
 };
 
 }  // namespace adapter

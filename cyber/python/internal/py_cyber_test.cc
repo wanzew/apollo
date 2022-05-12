@@ -21,9 +21,10 @@
 
 #include "gtest/gtest.h"
 
+#include "cyber/proto/unit_test.pb.h"
+
 #include "cyber/cyber.h"
 #include "cyber/message/py_message.h"
-#include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cyber {
@@ -35,10 +36,9 @@ TEST(PyCyberTest, init_ok) {
 
 TEST(PyCyberTest, create_reader) {
   EXPECT_TRUE(OK());
-  proto::Chatter chat;
-  PyNode node("listener");
-  std::unique_ptr<PyReader> pr(
-      node.create_reader("channel/chatter", chat.GetTypeName()));
+  proto::Chatter            chat;
+  PyNode                    node("listener");
+  std::unique_ptr<PyReader> pr(node.create_reader("channel/chatter", chat.GetTypeName()));
   EXPECT_EQ("apollo.cyber.proto.Chatter", chat.GetTypeName());
   EXPECT_NE(pr, nullptr);
   pr->register_func([](const char* channel_name) -> int {
@@ -49,10 +49,9 @@ TEST(PyCyberTest, create_reader) {
 
 TEST(PyCyberTest, create_writer) {
   EXPECT_TRUE(OK());
-  auto msgChat = std::make_shared<proto::Chatter>();
-  PyNode node("talker");
-  std::unique_ptr<PyWriter> pw(
-      node.create_writer("channel/chatter", msgChat->GetTypeName(), 10));
+  auto                      msgChat = std::make_shared<proto::Chatter>();
+  PyNode                    node("talker");
+  std::unique_ptr<PyWriter> pw(node.create_writer("channel/chatter", msgChat->GetTypeName(), 10));
   EXPECT_NE(pw, nullptr);
 
   EXPECT_TRUE(OK());

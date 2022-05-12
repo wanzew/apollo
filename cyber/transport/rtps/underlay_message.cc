@@ -30,39 +30,39 @@ namespace transport {
 
 UnderlayMessage::UnderlayMessage() {
   m_timestamp = 0;
-  m_seq = 0;
+  m_seq       = 0;
 }
 
 UnderlayMessage::~UnderlayMessage() {}
 
 UnderlayMessage::UnderlayMessage(const UnderlayMessage& x) {
   m_timestamp = x.m_timestamp;
-  m_seq = x.m_seq;
-  m_data = x.m_data;
-  m_datatype = x.m_datatype;
+  m_seq       = x.m_seq;
+  m_data      = x.m_data;
+  m_datatype  = x.m_datatype;
 }
 
 UnderlayMessage::UnderlayMessage(UnderlayMessage&& x) {
   m_timestamp = x.m_timestamp;
-  m_seq = x.m_seq;
-  m_data = std::move(x.m_data);
-  m_datatype = std::move(x.m_datatype);
+  m_seq       = x.m_seq;
+  m_data      = std::move(x.m_data);
+  m_datatype  = std::move(x.m_datatype);
 }
 
 UnderlayMessage& UnderlayMessage::operator=(const UnderlayMessage& x) {
   m_timestamp = x.m_timestamp;
-  m_seq = x.m_seq;
-  m_data = x.m_data;
-  m_datatype = x.m_datatype;
+  m_seq       = x.m_seq;
+  m_data      = x.m_data;
+  m_datatype  = x.m_datatype;
 
   return *this;
 }
 
 UnderlayMessage& UnderlayMessage::operator=(UnderlayMessage&& x) {
   m_timestamp = x.m_timestamp;
-  m_seq = x.m_seq;
-  m_data = std::move(x.m_data);
-  m_datatype = std::move(x.m_datatype);
+  m_seq       = x.m_seq;
+  m_data      = std::move(x.m_data);
+  m_datatype  = std::move(x.m_datatype);
 
   return *this;
 }
@@ -70,38 +70,30 @@ UnderlayMessage& UnderlayMessage::operator=(UnderlayMessage&& x) {
 size_t UnderlayMessage::getMaxCdrSerializedSize(size_t current_alignment) {
   size_t initial_alignment = current_alignment;
 
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+  current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
 
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+  current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
 
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
+  current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
 
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
+  current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
 
   return current_alignment - initial_alignment;
 }
 
 size_t UnderlayMessage::getCdrSerializedSize(const UnderlayMessage& data,
-                                             size_t current_alignment) {
+                                             size_t                 current_alignment) {
   size_t initial_alignment = current_alignment;
 
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+  current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+
+  current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
 
   current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + data.data().size() + 1;
 
-  current_alignment += 4 +
-                       eprosima::fastcdr::Cdr::alignment(current_alignment, 4) +
-                       data.data().size() + 1;
-
-  current_alignment += 4 +
-                       eprosima::fastcdr::Cdr::alignment(current_alignment, 4) +
-                       data.datatype().size() + 1;
+  current_alignment +=
+      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + data.datatype().size() + 1;
 
   return current_alignment - initial_alignment;
 }
@@ -129,9 +121,7 @@ size_t UnderlayMessage::getKeyMaxCdrSerializedSize(size_t current_alignment) {
 
 bool UnderlayMessage::isKeyDefined() { return false; }
 
-void UnderlayMessage::serializeKey(eprosima::fastcdr::Cdr& scdr) const {
-  (void)scdr;
-}
+void UnderlayMessage::serializeKey(eprosima::fastcdr::Cdr& scdr) const { (void)scdr; }
 
 }  // namespace transport
 }  // namespace cyber

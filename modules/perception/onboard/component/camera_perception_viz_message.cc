@@ -20,17 +20,18 @@ namespace perception {
 namespace onboard {
 
 CameraPerceptionVizMessage::CameraPerceptionVizMessage(
-    const std::string& camera_name, const double msg_timestamp,
-    const Eigen::Matrix4d& pose_camera_to_world,
+    const std::string&                          camera_name,
+    const double                                msg_timestamp,
+    const Eigen::Matrix4d&                      pose_camera_to_world,
     const std::shared_ptr<base::Blob<uint8_t>>& image_blob,
-    const std::vector<base::ObjectPtr>& camera_objects,
-    const std::vector<base::LaneLine>& lane_objects,
-    const apollo::common::ErrorCode& error_code)
-    : camera_name_(camera_name),
-      msg_timestamp_(msg_timestamp),
-      pose_camera_to_world_(pose_camera_to_world),
-      image_blob_(image_blob),
-      error_code_(error_code) {
+    const std::vector<base::ObjectPtr>&         camera_objects,
+    const std::vector<base::LaneLine>&          lane_objects,
+    const apollo::common::ErrorCode&            error_code)
+    : camera_name_(camera_name)
+    , msg_timestamp_(msg_timestamp)
+    , pose_camera_to_world_(pose_camera_to_world)
+    , image_blob_(image_blob)
+    , error_code_(error_code) {
   camera_objects_.clear();
   for (const auto& obj : camera_objects) {
     camera_objects_.push_back(obj);

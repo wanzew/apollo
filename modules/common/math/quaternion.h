@@ -30,9 +30,10 @@
 #include "Eigen/Dense"
 #include "Eigen/Geometry"
 
+#include "modules/common/proto/geometry.pb.h"
+
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/proto/geometry.pb.h"
 
 /**
  * @namespace apollo::common::math
@@ -53,8 +54,8 @@ namespace math {
  *
  * @return Heading encoded by given quaternion
  */
-inline double QuaternionToHeading(const double qw, const double qx,
-                                  const double qy, const double qz) {
+inline double
+QuaternionToHeading(const double qw, const double qx, const double qy, const double qz) {
   EulerAnglesZXYd euler_angles(qw, qx, qy, qz);
   // euler_angles.yaw() is zero when the car is pointing North, but
   // the heading is zero when the car is pointing East.
@@ -70,7 +71,7 @@ inline double QuaternionToHeading(const double qw, const double qx,
  * @return Heading encoded by given quaternion
  */
 template <typename T>
-inline T QuaternionToHeading(const Eigen::Quaternion<T> &q) {
+inline T QuaternionToHeading(const Eigen::Quaternion<T>& q) {
   return static_cast<T>(QuaternionToHeading(q.w(), q.x(), q.y(), q.z()));
 }
 
@@ -100,19 +101,18 @@ inline Eigen::Quaternion<T> HeadingToQuaternion(T heading) {
  *
  * @return Rotated vector
  */
-inline Eigen::Vector3d QuaternionRotate(const Quaternion &orientation,
-                                        const Eigen::Vector3d &original) {
-  Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
-                                       orientation.qy(), orientation.qz());
+inline Eigen::Vector3d QuaternionRotate(const Quaternion&      orientation,
+                                        const Eigen::Vector3d& original) {
+  Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(), orientation.qy(),
+                                       orientation.qz());
   return static_cast<Eigen::Vector3d>(quaternion.toRotationMatrix() * original);
 }
 
-inline Eigen::Vector3d InverseQuaternionRotate(const Quaternion &orientation,
-                                               const Eigen::Vector3d &rotated) {
-  Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
-                                       orientation.qy(), orientation.qz());
-  return static_cast<Eigen::Vector3d>(quaternion.toRotationMatrix().inverse() *
-                                      rotated);
+inline Eigen::Vector3d InverseQuaternionRotate(const Quaternion&      orientation,
+                                               const Eigen::Vector3d& rotated) {
+  Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(), orientation.qy(),
+                                       orientation.qz());
+  return static_cast<Eigen::Vector3d>(quaternion.toRotationMatrix().inverse() * rotated);
 }
 
 }  // namespace math

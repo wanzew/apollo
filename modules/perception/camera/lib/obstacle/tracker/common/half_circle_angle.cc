@@ -21,9 +21,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 void HalfCircleAngle::SetDirection(float theta) {
-  if (theta_ > M_PI) {
-    theta_ = theta;
-  }
+  if (theta_ > M_PI) { theta_ = theta; }
   if (std::abs(theta_ - theta) > M_PI_2) {
     if (theta_ > 0) {
       theta_ -= static_cast<float>(M_PI);
@@ -33,27 +31,21 @@ void HalfCircleAngle::SetDirection(float theta) {
   }
 }
 
-HalfCircleAngle &HalfCircleAngle::operator=(const float &theta) {
+HalfCircleAngle& HalfCircleAngle::operator=(const float& theta) {
   theta_ = theta;
   return *this;
 }
-float HalfCircleAngle::operator+(const float &theta) const {
-  return theta_ + theta;
-}
-float HalfCircleAngle::operator*(const float &scale) const {
-  return theta_ * scale;
-}
-HalfCircleAngle &HalfCircleAngle::operator=(const HalfCircleAngle &theta) {
+float HalfCircleAngle::operator+(const float& theta) const { return theta_ + theta; }
+float HalfCircleAngle::operator*(const float& scale) const { return theta_ * scale; }
+HalfCircleAngle& HalfCircleAngle::operator=(const HalfCircleAngle& theta) {
   this->theta_ = theta.value();
   return *this;
 }
-bool HalfCircleAngle::operator==(const HalfCircleAngle &theta) const {
+bool HalfCircleAngle::operator==(const HalfCircleAngle& theta) const {
   return Equal(theta_, theta.value(), 0.01f);
 }
-bool HalfCircleAngle::operator==(const float &theta) const {
-  return Equal(theta_, theta, 0.01f);
-}
-float HalfCircleAngle::value() const { return theta_; }
+bool HalfCircleAngle::operator==(const float& theta) const { return Equal(theta_, theta, 0.01f); }
+float                 HalfCircleAngle::value() const { return theta_; }
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

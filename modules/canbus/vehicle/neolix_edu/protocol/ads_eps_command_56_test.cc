@@ -28,7 +28,7 @@ class Adsepscommand56Test : public ::testing::Test {
 };
 
 TEST_F(Adsepscommand56Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t         data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Adsepscommand56 accel_cmd;
   EXPECT_EQ(accel_cmd.GetPeriod(), 20 * 1000);
   accel_cmd.UpdateData(data);

@@ -21,7 +21,8 @@
 #include "modules/tools/visualizer/ui_scene_camera_dialog.h"
 
 SceneCameraDialog::SceneCameraDialog(QWidget* parent)
-    : QDialog(parent), ui(new Ui::SceneCameraDialog) {
+    : QDialog(parent)
+    , ui(new Ui::SceneCameraDialog) {
   ui->setupUi(this);
   ui->cameraX->setEnabled(false);
   ui->cameraY->setEnabled(false);
@@ -30,20 +31,13 @@ SceneCameraDialog::SceneCameraDialog(QWidget* parent)
   connect(ui->resetButton, SIGNAL(clicked()), this, SIGNAL(resetcamera()));
   connect(ui->cameraTypeComboBox, SIGNAL(currentIndexChanged(int)), this,
           SLOT(onCameraTypeChanged(int)));
-  connect(ui->cameraX, SIGNAL(valueChanged(double)), this,
-          SIGNAL(xValueChanged(double)));
-  connect(ui->cameraY, SIGNAL(valueChanged(double)), this,
-          SIGNAL(yValueChanged(double)));
-  connect(ui->cameraZ, SIGNAL(valueChanged(double)), this,
-          SIGNAL(zValueChanged(double)));
-  connect(ui->cameraYaw, SIGNAL(valueChanged(double)), this,
-          SIGNAL(yawValueChanged(double)));
-  connect(ui->cameraPitch, SIGNAL(valueChanged(double)), this,
-          SIGNAL(pitchValueChanged(double)));
-  connect(ui->cameraRoll, SIGNAL(valueChanged(double)), this,
-          SIGNAL(rollValueChanged(double)));
-  connect(ui->stepSlider, SIGNAL(valueChanged(int)), this,
-          SLOT(OnStepSlideChanged(int)));
+  connect(ui->cameraX, SIGNAL(valueChanged(double)), this, SIGNAL(xValueChanged(double)));
+  connect(ui->cameraY, SIGNAL(valueChanged(double)), this, SIGNAL(yValueChanged(double)));
+  connect(ui->cameraZ, SIGNAL(valueChanged(double)), this, SIGNAL(zValueChanged(double)));
+  connect(ui->cameraYaw, SIGNAL(valueChanged(double)), this, SIGNAL(yawValueChanged(double)));
+  connect(ui->cameraPitch, SIGNAL(valueChanged(double)), this, SIGNAL(pitchValueChanged(double)));
+  connect(ui->cameraRoll, SIGNAL(valueChanged(double)), this, SIGNAL(rollValueChanged(double)));
+  connect(ui->stepSlider, SIGNAL(valueChanged(int)), this, SLOT(OnStepSlideChanged(int)));
 }
 
 SceneCameraDialog::~SceneCameraDialog() { delete ui; }
@@ -61,8 +55,7 @@ void SceneCameraDialog::updateCameraPos(const QVector3D& pos) {
 }
 
 void SceneCameraDialog::OnStepSlideChanged(int v) {
-  const float step =
-      static_cast<float>(v) / static_cast<float>(ui->stepSlider->maximum());
+  const float step = static_cast<float>(v) / static_cast<float>(ui->stepSlider->maximum());
 
   emit sensitivityChanged(step);
 

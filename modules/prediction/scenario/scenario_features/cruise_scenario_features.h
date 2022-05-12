@@ -39,12 +39,11 @@ class CruiseScenarioFeatures : public ScenarioFeatures {
 
   void InsertLaneOfInterest(const std::string& lane_id);
 
-  void BuildCruiseScenarioFeatures(
-      const EnvironmentFeatures& environment_features);
+  void BuildCruiseScenarioFeatures(const EnvironmentFeatures& environment_features);
 
  private:
-  void SearchForwardAndInsert(const std::string& lane_id,
-                              const double start_lane_s, const double range);
+  void
+  SearchForwardAndInsert(const std::string& lane_id, const double start_lane_s, const double range);
 
   std::unordered_set<std::string> lane_ids_of_interest_;
 };

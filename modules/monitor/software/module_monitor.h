@@ -19,10 +19,11 @@
 #include <string>
 #include <vector>
 
-#include "cyber/service_discovery/specific_manager/node_manager.h"
 #include "modules/dreamview/proto/hmi_mode.pb.h"
-#include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/system_status.pb.h"
+
+#include "cyber/service_discovery/specific_manager/node_manager.h"
+#include "modules/monitor/common/recurrent_runner.h"
 
 namespace apollo {
 namespace monitor {
@@ -33,7 +34,8 @@ class ModuleMonitor : public RecurrentRunner {
   ModuleMonitor();
   void RunOnce(const double current_time) override;
   void UpdateStatus(const apollo::dreamview::ModuleMonitorConfig& config,
-                    const std::string& module_name, ComponentStatus* status);
+                    const std::string&                            module_name,
+                    ComponentStatus*                              status);
 
  private:
   NodeManagerPtr node_manager_ = nullptr;

@@ -29,9 +29,9 @@ class BaseCameraModel {
  public:
   virtual ~BaseCameraModel() = default;
 
-  virtual Eigen::Vector2f Project(const Eigen::Vector3f& point3d) = 0;
+  virtual Eigen::Vector2f Project(const Eigen::Vector3f& point3d)   = 0;
   virtual Eigen::Vector3f UnProject(const Eigen::Vector2f& point2d) = 0;
-  virtual std::string name() const = 0;
+  virtual std::string     name() const                              = 0;
 
   inline void set_width(size_t width) { image_width_ = width; }
   inline void set_height(size_t height) { image_height_ = height; }
@@ -40,7 +40,7 @@ class BaseCameraModel {
   inline size_t get_height() const { return image_height_; }
 
  protected:
-  size_t image_width_ = 0;
+  size_t image_width_  = 0;
   size_t image_height_ = 0;
 };
 
@@ -53,15 +53,11 @@ class PinholeCameraModel : public BaseCameraModel {
 
   Eigen::Vector2f Project(const Eigen::Vector3f& point3d) override;
   Eigen::Vector3f UnProject(const Eigen::Vector2f& point2d) override;
-  std::string name() const override { return "PinholeCameraModel"; }
+  std::string     name() const override { return "PinholeCameraModel"; }
 
-  inline void set_intrinsic_params(const Eigen::Matrix3f& params) {
-    intrinsic_params_ = params;
-  }
+  inline void set_intrinsic_params(const Eigen::Matrix3f& params) { intrinsic_params_ = params; }
 
-  inline Eigen::Matrix3f get_intrinsic_params() const {
-    return intrinsic_params_;
-  }
+  inline Eigen::Matrix3f get_intrinsic_params() const { return intrinsic_params_; }
 
  protected:
   /*     fx  0   cx
@@ -72,9 +68,9 @@ class PinholeCameraModel : public BaseCameraModel {
 };
 
 // TODO(all) remove later
-typedef std::shared_ptr<BaseCameraModel> BaseCameraModelPtr;
-typedef std::shared_ptr<const BaseCameraModel> BaseCameraModelConstPtr;
-typedef std::shared_ptr<PinholeCameraModel> PinholeCameraModelPtr;
+typedef std::shared_ptr<BaseCameraModel>          BaseCameraModelPtr;
+typedef std::shared_ptr<const BaseCameraModel>    BaseCameraModelConstPtr;
+typedef std::shared_ptr<PinholeCameraModel>       PinholeCameraModelPtr;
 typedef std::shared_ptr<const PinholeCameraModel> PinholeCameraModelConstPtr;
 
 }  // namespace base

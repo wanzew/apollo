@@ -32,20 +32,20 @@ struct alignas(16) PatchIndicator {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   PatchIndicator() {
     frame_id = patch_id = -1;
-    sensor_name = "";
+    sensor_name         = "";
   }
 
   PatchIndicator(int frame_id, int patch_id) {
     this->frame_id = frame_id;
     this->patch_id = patch_id;
-    sensor_name = "";
+    sensor_name    = "";
   }
-  PatchIndicator(int frame_id, int patch_id, const std::string &sensor_name) {
-    this->frame_id = frame_id;
-    this->patch_id = patch_id;
+  PatchIndicator(int frame_id, int patch_id, const std::string& sensor_name) {
+    this->frame_id    = frame_id;
+    this->patch_id    = patch_id;
     this->sensor_name = sensor_name;
   }
-  bool operator==(const PatchIndicator &indicator) {
+  bool operator==(const PatchIndicator& indicator) {
     return (frame_id == indicator.frame_id && patch_id == indicator.patch_id);
   }
 
@@ -55,8 +55,8 @@ struct alignas(16) PatchIndicator {
     return str.str();
   }
 
-  int frame_id;
-  int patch_id;
+  int         frame_id;
+  int         patch_id;
   std::string sensor_name;
 };
 
@@ -64,9 +64,7 @@ struct alignas(16) SimilarMap {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool Init(int dim, int gpu_id = 0, int init_size = 128) {
-    if (dim == 0) {
-      return false;
-    }
+    if (dim == 0) { return false; }
 
     inference::CudaUtil::set_device_id(gpu_id);
 
@@ -93,13 +91,13 @@ struct alignas(16) SimilarMap {
     return map_sim[frame1 % dim][frame2 % dim];
   }
 
-  float sim(const PatchIndicator &p1, const PatchIndicator &p2) const {
+  float sim(const PatchIndicator& p1, const PatchIndicator& p2) const {
     auto blob = get(p1.frame_id, p2.frame_id);
     return *(blob->cpu_data() + blob->offset(p1.patch_id, p2.patch_id));
   }
 
   std::vector<std::vector<std::shared_ptr<base::Blob<float>>>> map_sim;
-  int dim;
+  int                                                          dim;
 };
 
 class FrameList {
@@ -108,10 +106,8 @@ class FrameList {
   FrameList() { Init(1); }
 
   bool Init(int cap) {
-    if (cap <= 0) {
-      return false;
-    }
-    capability_ = cap;
+    if (cap <= 0) { return false; }
+    capability_  = cap;
     frame_count_ = 0;
     frames_.resize(capability_);
     return true;
@@ -133,12 +129,12 @@ class FrameList {
     }
   }
 
-  inline void Add(CameraFrame *frame) {
+  inline void Add(CameraFrame* frame) {
     frames_[frame_count_ % capability_] = frame;
     ++frame_count_;
   }
 
-  inline CameraFrame *get_frame(int index) const {
+  inline CameraFrame* get_frame(int index) const {
     assert(index <= frame_count_);
     if (index < 0) {
       return frames_[(index + frame_count_) % capability_];
@@ -147,16 +143,16 @@ class FrameList {
     }
   }
 
-  inline CameraFrame *operator[](int index) const { return get_frame(index); }
+  inline CameraFrame* operator[](int index) const { return get_frame(index); }
 
   inline base::ObjectPtr get_object(PatchIndicator indicator) const {
     return get_frame(indicator.frame_id)->detected_objects[indicator.patch_id];
   }
 
  private:
-  int frame_count_ = 0;
-  int capability_ = 0;
-  std::vector<CameraFrame *> frames_;
+  int                       frame_count_ = 0;
+  int                       capability_  = 0;
+  std::vector<CameraFrame*> frames_;
 };
 
 }  // namespace camera

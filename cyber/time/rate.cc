@@ -59,17 +59,19 @@ namespace apollo {
 namespace cyber {
 
 Rate::Rate(double frequency)
-    : start_(Time::Now()),
-      expected_cycle_time_(1.0 / frequency),
-      actual_cycle_time_(0.0) {}
+    : start_(Time::Now())
+    , expected_cycle_time_(1.0 / frequency)
+    , actual_cycle_time_(0.0) {}
 
 Rate::Rate(uint64_t nanoseconds)
-    : start_(Time::Now()),
-      expected_cycle_time_(static_cast<int64_t>(nanoseconds)),
-      actual_cycle_time_(0.0) {}
+    : start_(Time::Now())
+    , expected_cycle_time_(static_cast<int64_t>(nanoseconds))
+    , actual_cycle_time_(0.0) {}
 
 Rate::Rate(const Duration& d)
-    : start_(Time::Now()), expected_cycle_time_(d), actual_cycle_time_(0.0) {}
+    : start_(Time::Now())
+    , expected_cycle_time_(d)
+    , actual_cycle_time_(0.0) {}
 
 void Rate::Sleep() {
   Time expected_end = start_ + expected_cycle_time_;
@@ -96,9 +98,7 @@ void Rate::Sleep() {
     AWARN << "Detect forward jumps in time";
     // if we've jumped forward in time, or the loop has taken more than a full
     // extra cycle, reset our cycle
-    if (actual_end > expected_end + expected_cycle_time_) {
-      start_ = actual_end;
-    }
+    if (actual_end > expected_end + expected_cycle_time_) { start_ = actual_end; }
     // return false to show that the desired rate was not met
     return;
   }

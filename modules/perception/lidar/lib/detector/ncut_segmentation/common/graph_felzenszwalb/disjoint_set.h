@@ -50,23 +50,23 @@ class Universe {
  public:
   explicit Universe(int elements);
   ~Universe();
-  int find(int x);
+  int  find(int x);
   void join(int x, int y);
-  int size(int x) const { return _elts[x].size; }
-  int num_sets() const { return _num; }
+  int  size(int x) const { return _elts[x].size; }
+  int  num_sets() const { return _num; }
 
  private:
-  uni_elt *_elts;
-  int _num;
+  uni_elt* _elts;
+  int      _num;
 };
 
 Universe::Universe(int elements) {
   _elts = new uni_elt[elements];
-  _num = elements;
+  _num  = elements;
   for (int i = 0; i < elements; i++) {
     _elts[i].rank = 0;
     _elts[i].size = 1;
-    _elts[i].p = i;
+    _elts[i].p    = i;
   }
 }
 
@@ -88,9 +88,7 @@ void Universe::join(int x, int y) {
   } else {
     _elts[x].p = y;
     _elts[y].size += _elts[x].size;
-    if (_elts[x].rank == _elts[y].rank) {
-      _elts[y].rank++;
-    }
+    if (_elts[x].rank == _elts[y].rank) { _elts[y].rank++; }
   }
   _num--;
 }

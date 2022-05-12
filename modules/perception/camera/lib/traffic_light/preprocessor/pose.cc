@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/preprocessor/pose.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-bool CarPose::Init(double ts, const Eigen::Matrix4d &pose) {
+bool CarPose::Init(double ts, const Eigen::Matrix4d& pose) {
   timestamp_ = ts;
-  pose_ = pose;
+  pose_      = pose;
   return true;
 }
 
@@ -37,34 +38,28 @@ const Eigen::Vector3d CarPose::getCarPosition() const {
   return p;
 }
 
-void CarPose::SetCameraPose(const std::string &camera_name,
-                            const Eigen::Matrix4d &c2w_pose) {
+void CarPose::SetCameraPose(const std::string& camera_name, const Eigen::Matrix4d& c2w_pose) {
   c2w_poses_[camera_name] = c2w_pose;
 }
 
-bool CarPose::GetCameraPose(const std::string &camera_name,
-                            Eigen::Matrix4d *c2w_pose) const {
+bool CarPose::GetCameraPose(const std::string& camera_name, Eigen::Matrix4d* c2w_pose) const {
   if (c2w_pose == nullptr) {
     AERROR << "c2w_pose is not available";
     return false;
   }
-  if (c2w_poses_.find(camera_name) == c2w_poses_.end()) {
-    return false;
-  }
+  if (c2w_poses_.find(camera_name) == c2w_poses_.end()) { return false; }
   *c2w_pose = c2w_poses_.at(camera_name);
 
   return true;
 }
 
-std::ostream &operator<<(std::ostream &os, const CarPose &pose) {
+std::ostream& operator<<(std::ostream& os, const CarPose& pose) {
   os << pose.pose_;
   return os;
 }
-void CarPose::ClearCameraPose(const std::string &camera_name) {
+void CarPose::ClearCameraPose(const std::string& camera_name) {
   auto it = c2w_poses_.find(camera_name);
-  if (it != c2w_poses_.end()) {
-    c2w_poses_.erase(it);
-  }
+  if (it != c2w_poses_.end()) { c2w_poses_.erase(it); }
 }
 
 }  // namespace camera

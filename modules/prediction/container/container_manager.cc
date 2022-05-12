@@ -34,16 +34,15 @@ void ContainerManager::Init(const AdapterManagerConfig& config) {
 
 void ContainerManager::RegisterContainers() {
   for (const auto& adapter_config : config_.config()) {
-    if (adapter_config.has_type() &&
-        (adapter_config.mode() == AdapterConfig::RECEIVE_ONLY ||
-         adapter_config.mode() == AdapterConfig::DUPLEX)) {
+    if (adapter_config.has_type() && (adapter_config.mode() == AdapterConfig::RECEIVE_ONLY ||
+                                      adapter_config.mode() == AdapterConfig::DUPLEX)) {
       RegisterContainer(adapter_config.type());
     }
   }
 }
 
-std::unique_ptr<Container> ContainerManager::CreateContainer(
-    const AdapterConfig::MessageType& type) {
+std::unique_ptr<Container>
+ContainerManager::CreateContainer(const AdapterConfig::MessageType& type) {
   std::unique_ptr<Container> container_ptr(nullptr);
   if (type == AdapterConfig::PERCEPTION_OBSTACLES) {
     container_ptr.reset(new ObstaclesContainer());
@@ -57,8 +56,7 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
   return container_ptr;
 }
 
-void ContainerManager::RegisterContainer(
-    const AdapterConfig::MessageType& type) {
+void ContainerManager::RegisterContainer(const AdapterConfig::MessageType& type) {
   containers_[static_cast<int>(type)] = CreateContainer(type);
   AINFO << "Container [" << type << "] is registered.";
 }

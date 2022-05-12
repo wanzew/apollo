@@ -21,8 +21,9 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem.hpp>
 
-#include "cyber/cyber.h"
 #include "cyber/proto/record.pb.h"
+
+#include "cyber/cyber.h"
 #include "cyber/record/record_viewer.h"
 
 namespace apollo {
@@ -36,12 +37,10 @@ ChannelVerify::ChannelVerify(std::shared_ptr<JsonConf> sp_conf)
 void ChannelVerify::Reset() {
   return_state_ = ErrorCode::SUCCESS;
   checked_records_.clear();
-  sp_vec_check_result_ =
-      std::make_shared<std::vector<OneRecordChannelCheckResult>>();
+  sp_vec_check_result_ = std::make_shared<std::vector<OneRecordChannelCheckResult>>();
 }
 
-ErrorCode ChannelVerify::Check(
-    const std::string& record_dir_or_record_full_path) {
+ErrorCode ChannelVerify::Check(const std::string& record_dir_or_record_full_path) {
   std::vector<std::string> records_path;
   records_path = GetRecordsPath(record_dir_or_record_full_path);
   if (records_path.empty()) {
@@ -54,13 +53,11 @@ ErrorCode ChannelVerify::Check(
   return return_state_;
 }
 
-std::shared_ptr<std::vector<OneRecordChannelCheckResult>>
-ChannelVerify::get_check_result() const {
+std::shared_ptr<std::vector<OneRecordChannelCheckResult>> ChannelVerify::get_check_result() const {
   return sp_vec_check_result_;
 }
 
-int ChannelVerify::IncrementalCheck(
-    const std::vector<std::string>& records_path) {
+int ChannelVerify::IncrementalCheck(const std::vector<std::string>& records_path) {
   std::vector<std::string> not_check_records_path;
   AINFO << "all records path:";
   for (size_t i = 0; i < records_path.size(); ++i) {
@@ -73,11 +70,8 @@ int ChannelVerify::IncrementalCheck(
   AINFO << "not_check_records_path:";
   for (size_t i = 0; i < not_check_records_path.size(); ++i) {
     AINFO << "[" << i << "]: " << not_check_records_path[i];
-    OneRecordChannelCheckResult check_result =
-        CheckRecordChannels(not_check_records_path[i]);
-    if (check_result.record_path.empty()) {
-      continue;
-    }
+    OneRecordChannelCheckResult check_result = CheckRecordChannels(not_check_records_path[i]);
+    if (check_result.record_path.empty()) { continue; }
     sp_vec_check_result_->push_back(check_result);
   }
 
@@ -98,16 +92,15 @@ bool ChannelVerify::IsRecordFile(const std::string& record_path) const {
   return true;
 }
 
-std::vector<std::string> ChannelVerify::GetRecordsPath(
-    const std::string& record_dir_or_record_full_path) const {
+std::vector<std::string>
+ChannelVerify::GetRecordsPath(const std::string& record_dir_or_record_full_path) const {
   // record_dir_or_record_full_path is record fullpath or
   // directory which contains some records
   std::vector<std::string> records_path;
   // 1. check record_dir_or_record_full_path is valid or not
   boost::filesystem::path path(record_dir_or_record_full_path);
   if (!boost::filesystem::exists(path)) {
-    AINFO << "record path [" << record_dir_or_record_full_path
-          << "] does not exist";
+    AINFO << "record path [" << record_dir_or_record_full_path << "] does not exist";
     return records_path;
   }
 
@@ -117,9 +110,7 @@ std::vector<std::string> ChannelVerify::GetRecordsPath(
     using dit_t = boost::filesystem::directory_iterator;
     dit_t end;
     for (dit_t it(record_dir_or_record_full_path); it != end; ++it) {
-      if (IsRecordFile(it->path().string())) {
-        records_path.push_back(it->path().string());
-      }
+      if (IsRecordFile(it->path().string())) { records_path.push_back(it->path().string()); }
     }
   }
   return records_path;
@@ -129,14 +120,13 @@ bool ChannelVerify::IsRecordChecked(const std::string& record_path) {
   return !checked_records_.insert(record_path).second;
 }
 
-std::shared_ptr<CyberRecordInfo> ChannelVerify::GetRecordInfo(
-    const std::string& record_path) const {
+std::shared_ptr<CyberRecordInfo>
+ChannelVerify::GetRecordInfo(const std::string& record_path) const {
   if (!IsRecordFile(record_path)) {
-    AINFO << "get_record_info failed.[" << record_path
-          << "] is not record file";
+    AINFO << "get_record_info failed.[" << record_path << "] is not record file";
     return nullptr;
   }
-  std::shared_ptr<CyberRecordInfo> sp_record_info(new CyberRecordInfo);
+  std::shared_ptr<CyberRecordInfo>                     sp_record_info(new CyberRecordInfo);
   std::shared_ptr<apollo::cyber::record::RecordReader> sp_reader =
       std::make_shared<apollo::cyber::record::RecordReader>(record_path);
   if (sp_reader == nullptr || !sp_reader->IsValid()) {
@@ -145,42 +135,37 @@ std::shared_ptr<CyberRecordInfo> ChannelVerify::GetRecordInfo(
   }
   std::shared_ptr<apollo::cyber::record::RecordViewer> sp_viewer(
       new apollo::cyber::record::RecordViewer(sp_reader));
-  sp_record_info->path = record_path;
+  sp_record_info->path       = record_path;
   sp_record_info->start_time = sp_viewer->begin_time();
-  sp_record_info->end_time = sp_viewer->end_time();
+  sp_record_info->end_time   = sp_viewer->end_time();
   sp_record_info->duration =
-      static_cast<double>((sp_viewer->end_time() - sp_viewer->begin_time())) /
-      1e9;
+      static_cast<double>((sp_viewer->end_time() - sp_viewer->begin_time())) / 1e9;
 
   std::set<std::string> channel_list = sp_reader->GetChannelList();
   for (auto it = channel_list.begin(); it != channel_list.end(); ++it) {
     const std::string& channel_name = *it;
     CyberRecordChannel channel;
     channel.channel_name = channel_name;
-    channel.msgnum = sp_reader->GetMessageNumber(channel_name);
-    channel.msg_type = sp_reader->GetMessageType(channel_name);
+    channel.msgnum       = sp_reader->GetMessageNumber(channel_name);
+    channel.msg_type     = sp_reader->GetMessageType(channel_name);
     sp_record_info->channels.push_back(channel);
   }
   return sp_record_info;
 }
 
-OneRecordChannelCheckResult ChannelVerify::CheckRecordChannels(
-    const std::string& record_path) {
-  OneRecordChannelCheckResult check_result;
+OneRecordChannelCheckResult ChannelVerify::CheckRecordChannels(const std::string& record_path) {
+  OneRecordChannelCheckResult      check_result;
   std::shared_ptr<CyberRecordInfo> sp_record_info = GetRecordInfo(record_path);
-  if (sp_record_info == nullptr) {
-    return check_result;
-  }
-  std::vector<CyberRecordChannel>& channels = sp_record_info->channels;
-  std::vector<std::pair<std::string, double>>& topic_list =
-      sp_conf_->topic_list;
-  check_result.record_path = record_path;
-  check_result.start_time = sp_record_info->start_time;
+  if (sp_record_info == nullptr) { return check_result; }
+  std::vector<CyberRecordChannel>&             channels   = sp_record_info->channels;
+  std::vector<std::pair<std::string, double>>& topic_list = sp_conf_->topic_list;
+  check_result.record_path                                = record_path;
+  check_result.start_time                                 = sp_record_info->start_time;
   for (size_t i = 0; i < topic_list.size(); ++i) {
-    std::string& channel_in_list = topic_list[i].first;
-    double channel_expected_rate = topic_list[i].second;
-    bool channel_in_list_found = false;
-    size_t j = 0;
+    std::string& channel_in_list       = topic_list[i].first;
+    double       channel_expected_rate = topic_list[i].second;
+    bool         channel_in_list_found = false;
+    size_t       j                     = 0;
     for (j = 0; j < channels.size(); ++j) {
       std::string& channel_in_record = channels[j].channel_name;
       if (channel_in_record == channel_in_list) {
@@ -192,18 +177,14 @@ OneRecordChannelCheckResult ChannelVerify::CheckRecordChannels(
       AINFO << record_path << " lacks [" << channel_in_list << "]";
       check_result.lack_channels.push_back(channel_in_list);
     } else {  // rate
-      double actual_rate =
-          static_cast<double>((channels[j].msgnum)) / sp_record_info->duration;
+      double actual_rate = static_cast<double>((channels[j].msgnum)) / sp_record_info->duration;
       if (actual_rate < 1e-8) {
         actual_rate = 0.0;
-        AINFO << "msgnum:" << channels[j].msgnum
-              << ",duration:" << sp_record_info->duration;
+        AINFO << "msgnum:" << channels[j].msgnum << ",duration:" << sp_record_info->duration;
       }
       AINFO << record_path << " [" << channel_in_list
-            << "] expected rate: " << channel_expected_rate
-            << ", actual rate: " << actual_rate;
-      if (actual_rate <
-          channel_expected_rate * sp_conf_->topic_rate_tolerance) {
+            << "] expected rate: " << channel_expected_rate << ", actual rate: " << actual_rate;
+      if (actual_rate < channel_expected_rate * sp_conf_->topic_rate_tolerance) {
         check_result.inadequate_rate[channel_in_list] =
             std::make_pair(channel_expected_rate, actual_rate);
       }

@@ -23,31 +23,32 @@ namespace record {
 using apollo::cyber::proto::Channel;
 using apollo::cyber::proto::SectionType;
 
-Spliter::Spliter(const std::string& input_file, const std::string& output_file,
+Spliter::Spliter(const std::string&              input_file,
+                 const std::string&              output_file,
                  const std::vector<std::string>& white_channels,
                  const std::vector<std::string>& black_channels,
-                 uint64_t begin_time, uint64_t end_time)
-    : input_file_(input_file),
-      output_file_(output_file),
-      white_channels_(white_channels),
-      black_channels_(black_channels),
-      begin_time_(begin_time),
-      end_time_(end_time) {}
+                 uint64_t                        begin_time,
+                 uint64_t                        end_time)
+    : input_file_(input_file)
+    , output_file_(output_file)
+    , white_channels_(white_channels)
+    , black_channels_(black_channels)
+    , begin_time_(begin_time)
+    , end_time_(end_time) {}
 
 Spliter::~Spliter() {}
 
 bool Spliter::Proc() {
   // check params
   if (begin_time_ >= end_time_) {
-    AERROR << "begin time larger or equal than end time, begin_time_: "
-           << begin_time_ << "end_time_: " << end_time_;
+    AERROR << "begin time larger or equal than end time, begin_time_: " << begin_time_
+           << "end_time_: " << end_time_;
     return false;
   }
   for (const auto& channel_name : white_channels_) {
-    if (std::find(black_channels_.begin(), black_channels_.end(),
-                  channel_name) != black_channels_.end()) {
-      AERROR << "find channel in both of white list and black list, channel: "
-             << channel_name;
+    if (std::find(black_channels_.begin(), black_channels_.end(), channel_name) !=
+        black_channels_.end()) {
+      AERROR << "find channel in both of white list and black list, channel: " << channel_name;
       return false;
     }
   }
@@ -86,9 +87,7 @@ bool Spliter::Proc() {
       AERROR << "read section failed.";
       return false;
     }
-    if (section.type == SectionType::SECTION_INDEX) {
-      break;
-    }
+    if (section.type == SectionType::SECTION_INDEX) { break; }
     switch (section.type) {
       case SectionType::SECTION_CHANNEL: {
         Channel chan;
@@ -96,11 +95,10 @@ bool Spliter::Proc() {
           AERROR << "read channel section fail.";
           return false;
         }
-        if (white_channels_.empty() ||
-            std::find(white_channels_.begin(), white_channels_.end(),
-                      chan.name()) != white_channels_.end()) {
-          if (std::find(black_channels_.begin(), black_channels_.end(),
-                        chan.name()) == black_channels_.end()) {
+        if (white_channels_.empty() || std::find(white_channels_.begin(), white_channels_.end(),
+                                                 chan.name()) != white_channels_.end()) {
+          if (std::find(black_channels_.begin(), black_channels_.end(), chan.name()) ==
+              black_channels_.end()) {
             writer_.WriteChannel(chan);
           }
         }
@@ -131,17 +129,14 @@ bool Spliter::Proc() {
         for (int idx = 0; idx < cbd.messages_size(); ++idx) {
           if (!white_channels_.empty() &&
               std::find(white_channels_.begin(), white_channels_.end(),
-                        cbd.messages(idx).channel_name()) ==
-                  white_channels_.end()) {
+                        cbd.messages(idx).channel_name()) == white_channels_.end()) {
             continue;
           }
           if (std::find(black_channels_.begin(), black_channels_.end(),
-                        cbd.messages(idx).channel_name()) !=
-              black_channels_.end()) {
+                        cbd.messages(idx).channel_name()) != black_channels_.end()) {
             continue;
           }
-          if (cbd.messages(idx).time() < begin_time_ ||
-              cbd.messages(idx).time() > end_time_) {
+          if (cbd.messages(idx).time() < begin_time_ || cbd.messages(idx).time() > end_time_) {
             continue;
           }
           if (!writer_.WriteMessage(cbd.messages(idx))) {
@@ -152,8 +147,7 @@ bool Spliter::Proc() {
         break;
       }
       default: {
-        AERROR << "this section should not be here, section type: "
-               << section.type;
+        AERROR << "this section should not be here, section type: " << section.type;
         break;
       }
     }  // end for switch

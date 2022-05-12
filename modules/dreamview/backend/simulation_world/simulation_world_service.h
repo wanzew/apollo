@@ -80,14 +80,13 @@ class SimulationWorldService {
    * @param map_service the pointer of MapService.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldService(const MapService *map_service,
-                         bool routing_from_file = false);
+  SimulationWorldService(const MapService* map_service, bool routing_from_file = false);
 
   /**
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const { return world_; }
+  inline const SimulationWorld& world() const { return world_; }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
@@ -104,8 +103,9 @@ class SimulationWorldService {
    * @param sim_world_with_planning_data output of binary format sim_world
    * string with planning_data.
    */
-  void GetWireFormatString(double radius, std::string *sim_world,
-                           std::string *sim_world_with_planning_data);
+  void GetWireFormatString(double       radius,
+                           std::string* sim_world,
+                           std::string* sim_world_with_planning_data);
 
   /**
    * @brief Returns the json representation of the map element Ids and hash
@@ -140,20 +140,17 @@ class SimulationWorldService {
    * @param log_level defined in
    *        modules/common/monitor_log/proto/monitor_log.proto
    */
-  void PublishMonitorMessage(
-      apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
-      const std::string &msg);
+  void PublishMonitorMessage(apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
+                             const std::string&                                    msg);
 
-  void PublishNavigationInfo(
-      const std::shared_ptr<apollo::relative_map::NavigationInfo> &);
-  void PublishRoutingRequest(
-      const std::shared_ptr<apollo::routing::RoutingRequest> &);
+  void PublishNavigationInfo(const std::shared_ptr<apollo::relative_map::NavigationInfo>&);
+  void PublishRoutingRequest(const std::shared_ptr<apollo::routing::RoutingRequest>&);
 
-  void PublishTask(const std::shared_ptr<apollo::task_manager::Task> &);
+  void PublishTask(const std::shared_ptr<apollo::task_manager::Task>&);
 
-  void GetMapElementIds(double radius, MapElementIds *ids) const;
+  void GetMapElementIds(double radius, MapElementIds* ids) const;
 
-  const apollo::hdmap::Map &GetRelativeMap() const;
+  const apollo::hdmap::Map& GetRelativeMap() const;
 
   nlohmann::json GetRoutePathAsJson() const;
 
@@ -168,63 +165,53 @@ class SimulationWorldService {
    * localization, planning, perception, etc.
    */
   template <typename DataType>
-  void UpdateSimulationWorld(const DataType &data);
+  void UpdateSimulationWorld(const DataType& data);
 
   void UpdateMonitorMessages();
 
-  Object &CreateWorldObjectIfAbsent(
-      const apollo::perception::PerceptionObstacle &obstacle);
-  void CreateWorldObjectFromSensorMeasurement(
-      const apollo::perception::SensorMeasurement &sensor,
-      Object *world_object);
-  void SetObstacleInfo(const apollo::perception::PerceptionObstacle &obstacle,
-                       Object *world_object);
-  void SetObstaclePolygon(
-      const apollo::perception::PerceptionObstacle &obstacle,
-      Object *world_object);
-  void SetObstacleSensorMeasurements(
-      const apollo::perception::PerceptionObstacle &obstacle,
-      Object *world_object);
-  void SetObstacleSource(const apollo::perception::PerceptionObstacle &obstacle,
-                         Object *world_object);
-  void UpdatePlanningTrajectory(
-      const apollo::planning::ADCTrajectory &trajectory);
-  void UpdateRSSInfo(const apollo::planning::ADCTrajectory &trajectory);
-  bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
-                    Decision *world_decision);
-  void FindNudgeRegion(const apollo::planning::ObjectDecisionType &decision,
-                       const Object &world_obj, Decision *world_decision);
-  void UpdateDecision(const apollo::planning::DecisionResult &decision_res,
-                      double header_time);
-  void UpdateMainStopDecision(
-      const apollo::planning::MainDecision &main_decision,
-      double update_timestamp_sec, Object *world_main_stop);
+  Object& CreateWorldObjectIfAbsent(const apollo::perception::PerceptionObstacle& obstacle);
+  void CreateWorldObjectFromSensorMeasurement(const apollo::perception::SensorMeasurement& sensor,
+                                              Object* world_object);
+  void SetObstacleInfo(const apollo::perception::PerceptionObstacle& obstacle,
+                       Object*                                       world_object);
+  void SetObstaclePolygon(const apollo::perception::PerceptionObstacle& obstacle,
+                          Object*                                       world_object);
+  void SetObstacleSensorMeasurements(const apollo::perception::PerceptionObstacle& obstacle,
+                                     Object*                                       world_object);
+  void SetObstacleSource(const apollo::perception::PerceptionObstacle& obstacle,
+                         Object*                                       world_object);
+  void UpdatePlanningTrajectory(const apollo::planning::ADCTrajectory& trajectory);
+  void UpdateRSSInfo(const apollo::planning::ADCTrajectory& trajectory);
+  bool LocateMarker(const apollo::planning::ObjectDecisionType& decision, Decision* world_decision);
+  void FindNudgeRegion(const apollo::planning::ObjectDecisionType& decision,
+                       const Object&                               world_obj,
+                       Decision*                                   world_decision);
+  void UpdateDecision(const apollo::planning::DecisionResult& decision_res, double header_time);
+  void UpdateMainStopDecision(const apollo::planning::MainDecision& main_decision,
+                              double                                update_timestamp_sec,
+                              Object*                               world_main_stop);
 
   template <typename MainDecision>
-  void UpdateMainChangeLaneDecision(const MainDecision &decision,
-                                    Object *world_main_decision) {
+  void UpdateMainChangeLaneDecision(const MainDecision& decision, Object* world_main_decision) {
     if (decision.has_change_lane_type() &&
         (decision.change_lane_type() == apollo::routing::ChangeLaneType::LEFT ||
-         decision.change_lane_type() ==
-             apollo::routing::ChangeLaneType::RIGHT)) {
-      auto *change_lane_decision = world_main_decision->add_decision();
+         decision.change_lane_type() == apollo::routing::ChangeLaneType::RIGHT)) {
+      auto* change_lane_decision = world_main_decision->add_decision();
       change_lane_decision->set_change_lane_type(decision.change_lane_type());
 
-      const auto &adc = world_.auto_driving_car();
+      const auto& adc = world_.auto_driving_car();
       change_lane_decision->set_position_x(adc.position_x());
       change_lane_decision->set_position_y(adc.position_y());
       change_lane_decision->set_heading(adc.heading());
     }
   }
 
-  void CreatePredictionTrajectory(
-      const apollo::prediction::PredictionObstacle &obstacle,
-      Object *world_object);
+  void CreatePredictionTrajectory(const apollo::prediction::PredictionObstacle& obstacle,
+                                  Object*                                       world_object);
 
-  void DownsamplePath(const apollo::common::Path &paths,
-                      apollo::common::Path *downsampled_path);
+  void DownsamplePath(const apollo::common::Path& paths, apollo::common::Path* downsampled_path);
 
-  void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
+  void UpdatePlanningData(const apollo::planning_internal::PlanningData& data);
 
   void PopulateMapInfo(double radius);
 
@@ -233,12 +220,10 @@ class SimulationWorldService {
    * SimulationWorld object when triggered by refresh timer.
    */
   template <typename MessageT>
-  void UpdateWithLatestObserved(cyber::Reader<MessageT> *reader,
-                                bool logging = true) {
+  void UpdateWithLatestObserved(cyber::Reader<MessageT>* reader, bool logging = true) {
     if (reader->Empty()) {
       if (logging) {
-        AINFO_EVERY(100) << "Has not received any data from "
-                         << reader->GetChannelName();
+        AINFO_EVERY(100) << "Has not received any data from " << reader->GetChannelName();
       }
       return;
     }
@@ -252,7 +237,7 @@ class SimulationWorldService {
    * file.
    */
   template <typename MessageT>
-  void DumpMessageFromReader(cyber::Reader<MessageT> *reader) {
+  void DumpMessageFromReader(cyber::Reader<MessageT>* reader) {
     if (reader->Empty()) {
       AWARN << "Has not received any data from " << reader->GetChannelName()
             << ". Cannot dump message!";
@@ -262,21 +247,17 @@ class SimulationWorldService {
     apollo::common::util::DumpMessage(reader->GetLatestObserved());
   }
 
-  void ReadRoutingFromFile(const std::string &routing_response_file);
+  void ReadRoutingFromFile(const std::string& routing_response_file);
 
   template <typename MessageT>
-  void UpdateLatency(const std::string &module_name,
-                     cyber::Reader<MessageT> *reader) {
-    if (reader->Empty()) {
-      return;
-    }
+  void UpdateLatency(const std::string& module_name, cyber::Reader<MessageT>* reader) {
+    if (reader->Empty()) { return; }
 
-    const auto header = reader->GetLatestObserved()->header();
+    const auto   header           = reader->GetLatestObserved()->header();
     const double publish_time_sec = header.timestamp_sec();
     const double sensor_time_sec =
-        apollo::cyber::Time(
-            std::max({header.lidar_timestamp(), header.camera_timestamp(),
-                      header.radar_timestamp()}))
+        apollo::cyber::Time(std::max({header.lidar_timestamp(), header.camera_timestamp(),
+                                      header.radar_timestamp()}))
             .ToSecond();
 
     Latency latency;
@@ -302,12 +283,10 @@ class SimulationWorldService {
   void UpdateLatencies();
 
   template <typename Points>
-  void DownsampleSpeedPointsByInterval(const Points &points,
-                                       size_t downsampleInterval,
-                                       Points *downsampled_points) {
-    if (points.empty()) {
-      return;
-    }
+  void DownsampleSpeedPointsByInterval(const Points& points,
+                                       size_t        downsampleInterval,
+                                       Points*       downsampled_points) {
+    if (points.empty()) { return; }
 
     for (int i = 0; i + 1 < points.size(); i += downsampleInterval) {
       *downsampled_points->Add() = points[i];
@@ -325,16 +304,16 @@ class SimulationWorldService {
 
   // Downsampled route paths to be rendered in frontend.
   mutable boost::shared_mutex route_paths_mutex_;
-  std::vector<RoutePath> route_paths_;
+  std::vector<RoutePath>      route_paths_;
 
   // The handle of MapService, not owned by SimulationWorldService.
-  const MapService *map_service_;
+  const MapService* map_service_;
 
   // The map holding obstacle string id to the actual object
   std::unordered_map<std::string, Object> obj_map_;
 
   // A temporary cache for all the monitor messages coming in.
-  std::mutex monitor_msgs_mutex_;
+  std::mutex                                                  monitor_msgs_mutex_;
   std::list<std::shared_ptr<common::monitor::MonitorMessage>> monitor_msgs_;
 
   // The SIMULATOR monitor for publishing messages.
@@ -351,54 +330,40 @@ class SimulationWorldService {
   std::atomic<bool> ready_to_push_;
 
   // Latest rss info
-  double current_real_dist_ = 0.0;
+  double current_real_dist_     = 0.0;
   double current_rss_safe_dist_ = 0.0;
 
   // Gear Location
   apollo::canbus::Chassis_GearPosition gear_location_;
 
   // Readers.
-  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
-  std::shared_ptr<cyber::Reader<apollo::localization::Gps>> gps_reader_;
-  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
-      localization_reader_;
+  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>>                    chassis_reader_;
+  std::shared_ptr<cyber::Reader<apollo::localization::Gps>>                  gps_reader_;
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>> localization_reader_;
   std::shared_ptr<cyber::Reader<apollo::perception::PerceptionObstacles>>
       perception_obstacle_reader_;
   std::shared_ptr<cyber::Reader<apollo::perception::TrafficLightDetection>>
       perception_traffic_light_reader_;
   std::shared_ptr<cyber::Reader<apollo::prediction::PredictionObstacles>>
-      prediction_obstacle_reader_;
-  std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
-      planning_reader_;
-  std::shared_ptr<cyber::Reader<apollo::control::ControlCommand>>
-      control_command_reader_;
-  std::shared_ptr<cyber::Reader<apollo::relative_map::NavigationInfo>>
-      navigation_reader_;
-  std::shared_ptr<cyber::Reader<apollo::relative_map::MapMsg>>
-      relative_map_reader_;
-  std::shared_ptr<cyber::Reader<apollo::audio::AudioEvent>> audio_event_reader_;
-  std::shared_ptr<cyber::Reader<apollo::common::DriveEvent>>
-      drive_event_reader_;
-  std::shared_ptr<cyber::Reader<apollo::common::monitor::MonitorMessage>>
-      monitor_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
-      routing_request_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
-      routing_response_reader_;
-  std::shared_ptr<cyber::Reader<apollo::storytelling::Stories>>
-      storytelling_reader_;
-  std::shared_ptr<cyber::Reader<apollo::audio::AudioDetection>>
-      audio_detection_reader_;
-  std::shared_ptr<cyber::Reader<apollo::task_manager::Task>> task_reader_;
+                                                                          prediction_obstacle_reader_;
+  std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>         planning_reader_;
+  std::shared_ptr<cyber::Reader<apollo::control::ControlCommand>>         control_command_reader_;
+  std::shared_ptr<cyber::Reader<apollo::relative_map::NavigationInfo>>    navigation_reader_;
+  std::shared_ptr<cyber::Reader<apollo::relative_map::MapMsg>>            relative_map_reader_;
+  std::shared_ptr<cyber::Reader<apollo::audio::AudioEvent>>               audio_event_reader_;
+  std::shared_ptr<cyber::Reader<apollo::common::DriveEvent>>              drive_event_reader_;
+  std::shared_ptr<cyber::Reader<apollo::common::monitor::MonitorMessage>> monitor_reader_;
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>         routing_request_reader_;
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>        routing_response_reader_;
+  std::shared_ptr<cyber::Reader<apollo::storytelling::Stories>>           storytelling_reader_;
+  std::shared_ptr<cyber::Reader<apollo::audio::AudioDetection>>           audio_detection_reader_;
+  std::shared_ptr<cyber::Reader<apollo::task_manager::Task>>              task_reader_;
 
   // Writers.
-  std::shared_ptr<cyber::Writer<apollo::relative_map::NavigationInfo>>
-      navigation_writer_;
-  std::shared_ptr<cyber::Writer<apollo::routing::RoutingRequest>>
-      routing_request_writer_;
-  std::shared_ptr<cyber::Writer<apollo::routing::RoutingResponse>>
-      routing_response_writer_;
-  std::shared_ptr<cyber::Writer<apollo::task_manager::Task>> task_writer_;
+  std::shared_ptr<cyber::Writer<apollo::relative_map::NavigationInfo>> navigation_writer_;
+  std::shared_ptr<cyber::Writer<apollo::routing::RoutingRequest>>      routing_request_writer_;
+  std::shared_ptr<cyber::Writer<apollo::routing::RoutingResponse>>     routing_response_writer_;
+  std::shared_ptr<cyber::Writer<apollo::task_manager::Task>>           task_writer_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

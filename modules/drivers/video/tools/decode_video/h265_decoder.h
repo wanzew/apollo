@@ -48,8 +48,8 @@ class H265Decoder {
   bool Init();
 
   // Process frames according to input data, and output converted data
-  DecodingResult Process(const uint8_t* indata, const int32_t insize,
-                         std::vector<uint8_t>* outdata) const;
+  DecodingResult
+  Process(const uint8_t* indata, const int32_t insize, std::vector<uint8_t>* outdata) const;
 
   // Destructor, releasing the resources
   ~H265Decoder() { Release(); }
@@ -62,7 +62,7 @@ class H265Decoder {
 
   AVCodecContext* codec_ctx_h265_ = nullptr;
   AVCodecContext* codec_ctx_jpeg_ = nullptr;
-  AVFrame* yuv_frame_ = nullptr;
+  AVFrame*        yuv_frame_      = nullptr;
 };
 
 }  // namespace video

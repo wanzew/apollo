@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/protocol/brake_status__511.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -26,9 +27,9 @@ class Brakestatus511Test : public ::testing::Test {
 };
 
 TEST_F(Brakestatus511Test, General) {
-  uint8_t data[8] = {0x01, 0x02, 0x01, 0x00, 0x01, 0x01, 0x00, 0x01};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t        data[8] = {0x01, 0x02, 0x01, 0x00, 0x01, 0x01, 0x00, 0x01};
+  int32_t        length  = 8;
+  ChassisDetail  cd;
   Brakestatus511 brake;
   brake.Parse(data, length, &cd);
 

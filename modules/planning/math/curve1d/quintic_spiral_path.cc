@@ -23,9 +23,12 @@
 namespace apollo {
 namespace planning {
 
-QuinticSpiralPath::QuinticSpiralPath(const double x0, const double dx0,
-                                     const double ddx0, const double x1,
-                                     const double dx1, const double ddx1,
+QuinticSpiralPath::QuinticSpiralPath(const double x0,
+                                     const double dx0,
+                                     const double ddx0,
+                                     const double x1,
+                                     const double dx1,
+                                     const double ddx1,
                                      const double p)
     : QuinticPolynomialCurve1d(x0, dx0, ddx0, x1, dx1, ddx1, p) {
   ACHECK(p > 0.0);
@@ -51,8 +54,8 @@ QuinticSpiralPath::QuinticSpiralPath(const double x0, const double dx0,
 
   coef_deriv_[5][5] = 0.5 / p3;
 
-  coef_deriv_[5][6] = 30.0 * x0 / p6 + 12.0 * dx0 / p5 + 1.5 * ddx0 / p4 -
-                      30.0 * x1 / p6 + 12.0 * dx1 / p5 - 1.5 * ddx1 / p4;
+  coef_deriv_[5][6] = 30.0 * x0 / p6 + 12.0 * dx0 / p5 + 1.5 * ddx0 / p4 - 30.0 * x1 / p6 +
+                      12.0 * dx1 / p5 - 1.5 * ddx1 / p4;
 
   // derive b
   // double b = 15.0 * x0 / p4 + 8.0 * dx0 / p3 + 1.5 * ddx0 / p2 - 15.0 * x1 /
@@ -69,8 +72,8 @@ QuinticSpiralPath::QuinticSpiralPath(const double x0, const double dx0,
 
   coef_deriv_[4][5] = -1.0 / p2;
 
-  coef_deriv_[4][6] = -60.0 * x0 / p5 - 24.0 * dx0 / p4 - 3.0 * ddx0 / p3 +
-                      60.0 * x1 / p5 - 21.0 * dx1 / p4 + 2.0 * ddx1 / p3;
+  coef_deriv_[4][6] = -60.0 * x0 / p5 - 24.0 * dx0 / p4 - 3.0 * ddx0 / p3 + 60.0 * x1 / p5 -
+                      21.0 * dx1 / p4 + 2.0 * ddx1 / p3;
 
   // derive c
   // double c = -10.0 * x0 / p3 - 6.0 * dx0 / p2 - 1.5 * ddx0 / p + 10.0 * x1 /
@@ -87,8 +90,8 @@ QuinticSpiralPath::QuinticSpiralPath(const double x0, const double dx0,
 
   coef_deriv_[3][5] = 0.5 / p;
 
-  coef_deriv_[3][6] = 30.0 * x0 / p4 + 12.0 * dx0 / p3 + 1.5 * ddx0 / p2 -
-                      30.0 * x1 / p4 + 8.0 * dx1 / p3 - 0.5 * ddx1 / p2;
+  coef_deriv_[3][6] = 30.0 * x0 / p4 + 12.0 * dx0 / p3 + 1.5 * ddx0 / p2 - 30.0 * x1 / p4 +
+                      8.0 * dx1 / p3 - 0.5 * ddx1 / p2;
 
   // derive d
   // double d = 0.5 * ddx0;
@@ -141,34 +144,29 @@ QuinticSpiralPath::QuinticSpiralPath(const double x0, const double dx0,
 
 QuinticSpiralPath::QuinticSpiralPath(const std::array<double, 3>& start,
                                      const std::array<double, 3>& end,
-                                     const double delta_s)
-    : QuinticSpiralPath(start[0], start[1], start[2], end[0], end[1], end[2],
-                        delta_s) {}
+                                     const double                 delta_s)
+    : QuinticSpiralPath(start[0], start[1], start[2], end[0], end[1], end[2], delta_s) {}
 
-double QuinticSpiralPath::DeriveTheta(const size_t param_index,
-                                      const double r) const {
-  double s = param_ * r;
+double QuinticSpiralPath::DeriveTheta(const size_t param_index, const double r) const {
+  double s  = param_ * r;
   double s2 = s * s;
   double s3 = s2 * s;
   double s4 = s2 * s2;
   double s5 = s3 * s2;
 
-  double derivative =
-      coef_deriv_[5][param_index] * s5 + coef_deriv_[4][param_index] * s4 +
-      coef_deriv_[3][param_index] * s3 + coef_deriv_[2][param_index] * s2 +
-      coef_deriv_[1][param_index] * s + coef_deriv_[0][param_index];
+  double derivative = coef_deriv_[5][param_index] * s5 + coef_deriv_[4][param_index] * s4 +
+                      coef_deriv_[3][param_index] * s3 + coef_deriv_[2][param_index] * s2 +
+                      coef_deriv_[1][param_index] * s + coef_deriv_[0][param_index];
 
   if (param_index == DELTA_S) {
-    derivative += coef_[5] * 5.0 * s4 * r + coef_[4] * 4.0 * s3 * r +
-                  coef_[3] * 3.0 * s2 * r + coef_[2] * 2.0 * s * r +
-                  coef_[1] * r;
+    derivative += coef_[5] * 5.0 * s4 * r + coef_[4] * 4.0 * s3 * r + coef_[3] * 3.0 * s2 * r +
+                  coef_[2] * 2.0 * s * r + coef_[1] * r;
   }
   return derivative;
 }
 
-double QuinticSpiralPath::DeriveKappaDerivative(const size_t param_index,
-                                                const double r) const {
-  double s = param_ * r;
+double QuinticSpiralPath::DeriveKappaDerivative(const size_t param_index, const double r) const {
+  double s  = param_ * r;
   double s2 = s * s;
   double s3 = s2 * s;
   double s4 = s2 * s2;
@@ -176,47 +174,39 @@ double QuinticSpiralPath::DeriveKappaDerivative(const size_t param_index,
   double derivative = 5.0 * coef_deriv_[5][param_index] * s4 +
                       4.0 * coef_deriv_[4][param_index] * s3 +
                       3.0 * coef_deriv_[3][param_index] * s2 +
-                      2.0 * coef_deriv_[2][param_index] * s +
-                      coef_deriv_[1][param_index];
+                      2.0 * coef_deriv_[2][param_index] * s + coef_deriv_[1][param_index];
 
   if (param_index == DELTA_S) {
-    derivative += 5.0 * coef_[5] * 4.0 * s3 * r +
-                  4.0 * coef_[4] * 3.0 * s2 * r + 3.0 * coef_[3] * 2.0 * s * r +
-                  2.0 * coef_[2] * r;
+    derivative += 5.0 * coef_[5] * 4.0 * s3 * r + 4.0 * coef_[4] * 3.0 * s2 * r +
+                  3.0 * coef_[3] * 2.0 * s * r + 2.0 * coef_[2] * r;
   }
   return derivative;
 }
 
-double QuinticSpiralPath::DeriveDKappaDerivative(const size_t param_index,
-                                                 const double r) const {
-  double s = param_ * r;
+double QuinticSpiralPath::DeriveDKappaDerivative(const size_t param_index, const double r) const {
+  double s  = param_ * r;
   double s2 = s * s;
   double s3 = s2 * s;
 
   double derivative = 20.0 * coef_deriv_[5][param_index] * s3 +
                       12.0 * coef_deriv_[4][param_index] * s2 +
-                      6.0 * coef_deriv_[3][param_index] * s +
-                      2.0 * coef_deriv_[2][param_index];
+                      6.0 * coef_deriv_[3][param_index] * s + 2.0 * coef_deriv_[2][param_index];
 
   if (param_index == DELTA_S) {
-    derivative += 20.0 * coef_[5] * 3.0 * s2 * r +
-                  12.0 * coef_[4] * 2.0 * s * r + 6.0 * coef_[3] * r;
+    derivative +=
+        20.0 * coef_[5] * 3.0 * s2 * r + 12.0 * coef_[4] * 2.0 * s * r + 6.0 * coef_[3] * r;
   }
   return derivative;
 }
 
-double QuinticSpiralPath::DeriveD2KappaDerivative(const size_t param_index,
-                                                  const double r) const {
-  double s = param_ * r;
+double QuinticSpiralPath::DeriveD2KappaDerivative(const size_t param_index, const double r) const {
+  double s  = param_ * r;
   double s2 = s * s;
 
   double derivative = 60.0 * coef_deriv_[5][param_index] * s2 +
-                      24.0 * coef_deriv_[4][param_index] * s +
-                      6.0 * coef_deriv_[3][param_index];
+                      24.0 * coef_deriv_[4][param_index] * s + 6.0 * coef_deriv_[3][param_index];
 
-  if (param_index == DELTA_S) {
-    derivative += 60.0 * coef_[5] * 2.0 * s * r + 24.0 * coef_[4] * r;
-  }
+  if (param_index == DELTA_S) { derivative += 60.0 * coef_[5] * 2.0 * s * r + 24.0 * coef_[4] * r; }
   return derivative;
 }
 

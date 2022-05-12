@@ -19,6 +19,7 @@
 #include <iomanip>
 
 #include "Eigen/Dense"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"
 
@@ -31,29 +32,28 @@ const unsigned int LocalizationPoseBuffer::s_buffer_size_ = 20;
 LocalizationPoseBuffer::LocalizationPoseBuffer() {
   lidar_poses_.resize(s_buffer_size_);
   used_buffer_size_ = 0;
-  head_index_ = 0;
-  has_initialized_ = false;
+  head_index_       = 0;
+  has_initialized_  = false;
 }
 
 LocalizationPoseBuffer::~LocalizationPoseBuffer() {}
 
-void LocalizationPoseBuffer::UpdateLidarPose(
-    double timestamp, const Eigen::Affine3d& locator_pose,
-    const Eigen::Affine3d& novatel_pose) {
+void LocalizationPoseBuffer::UpdateLidarPose(double                 timestamp,
+                                             const Eigen::Affine3d& locator_pose,
+                                             const Eigen::Affine3d& novatel_pose) {
   if (!has_initialized_) {
-    lidar_poses_[head_index_].locator_pose = locator_pose;
+    lidar_poses_[head_index_].locator_pose          = locator_pose;
     lidar_poses_[head_index_].locator_pose.linear() = novatel_pose.linear();
-    lidar_poses_[head_index_].novatel_pose = novatel_pose;
-    lidar_poses_[head_index_].timestamp = timestamp;
+    lidar_poses_[head_index_].novatel_pose          = novatel_pose;
+    lidar_poses_[head_index_].timestamp             = timestamp;
     ++used_buffer_size_;
     has_initialized_ = true;
   } else {
     // add 10Hz pose
-    unsigned int empty_position =
-        (head_index_ + used_buffer_size_) % s_buffer_size_;
+    unsigned int empty_position               = (head_index_ + used_buffer_size_) % s_buffer_size_;
     lidar_poses_[empty_position].locator_pose = locator_pose;
     lidar_poses_[empty_position].novatel_pose = novatel_pose;
-    lidar_poses_[empty_position].timestamp = timestamp;
+    lidar_poses_[empty_position].timestamp    = timestamp;
 
     if (used_buffer_size_ == s_buffer_size_) {
       head_index_ = (head_index_ + 1) % s_buffer_size_;
@@ -63,46 +63,43 @@ void LocalizationPoseBuffer::UpdateLidarPose(
   }
 }
 
-Eigen::Affine3d LocalizationPoseBuffer::UpdateOdometryPose(
-    double timestamp, const Eigen::Affine3d& novatel_pose) {
+Eigen::Affine3d LocalizationPoseBuffer::UpdateOdometryPose(double                 timestamp,
+                                                           const Eigen::Affine3d& novatel_pose) {
   Eigen::Affine3d pose = novatel_pose;
   if (used_buffer_size_ > 0) {
     pose.translation()[0] = 0;
     pose.translation()[1] = 0;
     pose.translation()[2] = 0;
     Eigen::Affine3d predict_pose;
-    double weight = 0.0;
+    double          weight = 0.0;
 
     Eigen::Quaterniond novatel_quat(novatel_pose.linear());
     novatel_quat.normalize();
-    common::math::EulerAnglesZXYd novatel_ev(
-        novatel_quat.w(), novatel_quat.x(), novatel_quat.y(), novatel_quat.z());
-    Eigen::Vector3d pose_ev;
+    common::math::EulerAnglesZXYd novatel_ev(novatel_quat.w(), novatel_quat.x(), novatel_quat.y(),
+                                             novatel_quat.z());
+    Eigen::Vector3d               pose_ev;
     pose_ev[0] = 0;
     pose_ev[1] = 0;
     pose_ev[2] = 0;
 
     for (unsigned int c = 0, i = head_index_; c < used_buffer_size_;
-         ++c, i = (i + 1) % s_buffer_size_) {
+         ++c, i                = (i + 1) % s_buffer_size_) {
       predict_pose.translation() = lidar_poses_[i].locator_pose.translation() -
                                    lidar_poses_[i].novatel_pose.translation() +
                                    novatel_pose.translation();
       pose.translation() += predict_pose.translation();
 
-      Eigen::Quaterniond pair_locator_quat(
-          lidar_poses_[i].locator_pose.linear());
+      Eigen::Quaterniond pair_locator_quat(lidar_poses_[i].locator_pose.linear());
       pair_locator_quat.normalize();
-      Eigen::Quaterniond pair_novatel_quat(
-          lidar_poses_[i].novatel_pose.linear());
+      Eigen::Quaterniond pair_novatel_quat(lidar_poses_[i].novatel_pose.linear());
       pair_novatel_quat.normalize();
       Eigen::Quaterniond predict_pose_quat =
           pair_locator_quat * pair_novatel_quat.inverse() * novatel_quat;
       predict_pose_quat.normalized();
 
-      common::math::EulerAnglesZXYd predict_pose_ev(
-          predict_pose_quat.w(), predict_pose_quat.x(), predict_pose_quat.y(),
-          predict_pose_quat.z());
-      double predict_yaw = predict_pose_ev.yaw();
+      common::math::EulerAnglesZXYd predict_pose_ev(predict_pose_quat.w(), predict_pose_quat.x(),
+                                                    predict_pose_quat.y(), predict_pose_quat.z());
+      double                        predict_yaw = predict_pose_ev.yaw();
       if (novatel_ev.yaw() > 0) {
         if (novatel_ev.yaw() - predict_pose_ev.yaw() > M_PI) {
           predict_yaw = predict_pose_ev.yaw() + M_PI * 2.0;
@@ -126,9 +123,8 @@ Eigen::Affine3d LocalizationPoseBuffer::UpdateOdometryPose(
         pose_ev[2] += 2.0 * M_PI;
       }
     }
-    common::math::EulerAnglesZXYd pose_euler(pose_ev[1], pose_ev[0],
-                                             pose_ev[2]);
-    Eigen::Quaterniond tmp_qbn = pose_euler.ToQuaternion();
+    common::math::EulerAnglesZXYd pose_euler(pose_ev[1], pose_ev[0], pose_ev[2]);
+    Eigen::Quaterniond            tmp_qbn = pose_euler.ToQuaternion();
     tmp_qbn.normalize();
     pose.linear() = tmp_qbn.toRotationMatrix();
   }

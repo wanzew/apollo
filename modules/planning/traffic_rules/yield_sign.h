@@ -32,17 +32,14 @@ namespace planning {
 
 class YieldSign : public TrafficRule {
  public:
-  YieldSign(const TrafficRuleConfig& config,
-            const std::shared_ptr<DependencyInjector>& injector);
+  YieldSign(const TrafficRuleConfig& config, const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~YieldSign() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
+  void MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   static constexpr char const* YIELD_SIGN_VO_ID_PREFIX = "YS_";

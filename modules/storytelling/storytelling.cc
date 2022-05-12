@@ -26,13 +26,11 @@ bool Storytelling::Init() {
   story_tellers_.emplace_back(new CloseToJunctionTeller(frame_manager_));
 
   if (!cyber::ComponentBase::GetProtoConfig(&config_)) {
-    AERROR << "Unable to load storytelling conf file: "
-           << cyber::ComponentBase::ConfigFilePath();
+    AERROR << "Unable to load storytelling conf file: " << cyber::ComponentBase::ConfigFilePath();
     return false;
   }
 
-  story_writer_ =
-      node_->CreateWriter<Stories>(config_.topic_config().storytelling_topic());
+  story_writer_ = node_->CreateWriter<Stories>(config_.topic_config().storytelling_topic());
 
   // Init all tellers.
   for (const auto& teller : story_tellers_) {

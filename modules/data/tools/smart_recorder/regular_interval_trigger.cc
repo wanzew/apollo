@@ -21,20 +21,15 @@
 namespace apollo {
 namespace data {
 
-RegularIntervalTrigger::RegularIntervalTrigger() {
-  trigger_name_ = "RegularIntervalTrigger";
-}
+RegularIntervalTrigger::RegularIntervalTrigger() { trigger_name_ = "RegularIntervalTrigger"; }
 
 void RegularIntervalTrigger::Pull(const cyber::record::RecordMessage& msg) {
-  if (!trigger_obj_->enabled()) {
-    return;
-  }
+  if (!trigger_obj_->enabled()) { return; }
   if (current_recording_time_ == 0) {
     current_recording_time_ = msg.time;
     return;
   }
-  if (msg.time - current_recording_time_ >
-      SecondsToNanoSeconds(recording_interval_)) {
+  if (msg.time - current_recording_time_ > SecondsToNanoSeconds(recording_interval_)) {
     current_recording_time_ = msg.time;
     AINFO << "regular interval trigger is pulled: " << msg.time;
     TriggerIt(msg.time);

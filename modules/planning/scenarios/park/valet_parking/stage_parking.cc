@@ -24,8 +24,8 @@ namespace planning {
 namespace scenario {
 namespace valet_parking {
 
-Stage::StageStatus StageParking::Process(
-    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus StageParking::Process(const common::TrajectoryPoint& planning_init_point,
+                                         Frame*                         frame) {
   // Open space planning doesn't use planning_init_point from upstream because
   // of different stitching strategy
   frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);

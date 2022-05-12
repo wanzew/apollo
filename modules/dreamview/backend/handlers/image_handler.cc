@@ -16,11 +16,11 @@
 
 #include "modules/dreamview/backend/handlers/image_handler.h"
 
+#include "opencv2/opencv.hpp"
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
-
-#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace dreamview {
@@ -31,19 +31,16 @@ using apollo::drivers::Image;
 constexpr double ImageHandler::kImageScale;
 
 template <>
-void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
-  if (requests_ == 0) {
-    return;
-  }
+void ImageHandler::OnImage(const std::shared_ptr<Image>& image) {
+  if (requests_ == 0) { return; }
 
-  cv::Mat mat(image->height(), image->width(), CV_8UC3,
-              const_cast<char *>(image->data().data()), image->step());
+  cv::Mat mat(image->height(), image->width(), CV_8UC3, const_cast<char*>(image->data().data()),
+              image->step());
   cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR);
-  cv::resize(
-      mat, mat,
-      cv::Size(static_cast<int>(image->width() * ImageHandler::kImageScale),
-               static_cast<int>(image->height() * ImageHandler::kImageScale)),
-      0, 0, cv::INTER_LINEAR);
+  cv::resize(mat, mat,
+             cv::Size(static_cast<int>(image->width() * ImageHandler::kImageScale),
+                      static_cast<int>(image->height() * ImageHandler::kImageScale)),
+             0, 0, cv::INTER_LINEAR);
 
   std::unique_lock<std::mutex> lock(mutex_);
   cv::imencode(".jpg", mat, send_buffer_, std::vector<int>() /* params */);
@@ -51,31 +48,26 @@ void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
 }
 
 template <>
-void ImageHandler::OnImage(
-    const std::shared_ptr<CompressedImage> &compressed_image) {
-  if (requests_ == 0 ||
-      compressed_image->format() == "h265" /* skip video format */) {
-    return;
-  }
+void ImageHandler::OnImage(const std::shared_ptr<CompressedImage>& compressed_image) {
+  if (requests_ == 0 || compressed_image->format() == "h265" /* skip video format */) { return; }
 
   std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
                                            compressed_image->data().end());
-  cv::Mat mat_image = cv::imdecode(compressed_raw_data, cv::IMREAD_COLOR);
+  cv::Mat              mat_image = cv::imdecode(compressed_raw_data, cv::IMREAD_COLOR);
 
   std::unique_lock<std::mutex> lock(mutex_);
-  cv::imencode(".jpg", mat_image, send_buffer_,
-               std::vector<int>() /* params */);
+  cv::imencode(".jpg", mat_image, send_buffer_, std::vector<int>() /* params */);
   cvar_.notify_all();
 }
 
-void ImageHandler::OnImageFront(const std::shared_ptr<Image> &image) {
+void ImageHandler::OnImageFront(const std::shared_ptr<Image>& image) {
   if (FLAGS_use_navigation_mode) {
     // Navigation mode
     OnImage(image);
   }
 }
 
-void ImageHandler::OnImageShort(const std::shared_ptr<CompressedImage> &image) {
+void ImageHandler::OnImageShort(const std::shared_ptr<CompressedImage>& image) {
   if (!FLAGS_use_navigation_mode) {
     // Regular mode
     OnImage(image);
@@ -83,31 +75,28 @@ void ImageHandler::OnImageShort(const std::shared_ptr<CompressedImage> &image) {
 }
 
 ImageHandler::ImageHandler()
-    : requests_(0), node_(cyber::CreateNode("image_handler")) {
-  node_->CreateReader<Image>(
-      FLAGS_image_front_topic,
-      [this](const std::shared_ptr<Image> &image) { OnImageFront(image); });
+    : requests_(0)
+    , node_(cyber::CreateNode("image_handler")) {
+  node_->CreateReader<Image>(FLAGS_image_front_topic,
+                             [this](const std::shared_ptr<Image>& image) { OnImageFront(image); });
 
   node_->CreateReader<CompressedImage>(
       FLAGS_image_short_topic,
-      [this](const std::shared_ptr<CompressedImage> &image) {
-        OnImageShort(image);
-      });
+      [this](const std::shared_ptr<CompressedImage>& image) { OnImageShort(image); });
 }
 
-bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
+bool ImageHandler::handleGet(CivetServer* server, struct mg_connection* conn) {
   requests_++;
 
-  mg_printf(conn,
-            "HTTP/1.1 200 OK\r\n"
-            "Connection: close\r\n"
-            "Max-Age: 0\r\n"
-            "Expires: 0\r\n"
-            "Cache-Control: no-cache, no-store, must-revalidate, private\r\n"
-            "Pragma: no-cache\r\n"
-            "Content-Type: multipart/x-mixed-replace; "
-            "boundary=--BoundaryString\r\n"
-            "\r\n");
+  mg_printf(conn, "HTTP/1.1 200 OK\r\n"
+                  "Connection: close\r\n"
+                  "Max-Age: 0\r\n"
+                  "Expires: 0\r\n"
+                  "Cache-Control: no-cache, no-store, must-revalidate, private\r\n"
+                  "Pragma: no-cache\r\n"
+                  "Content-Type: multipart/x-mixed-replace; "
+                  "boundary=--BoundaryString\r\n"
+                  "\r\n");
 
   std::vector<uchar> to_send;
   while (true) {

@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+
 #include "modules/map/tools/map_datachecker/server/common.h"
 #include "modules/map/tools/map_datachecker/server/pj_transformer.h"
 #include "modules/map/tools/map_datachecker/server/pose_collection.h"
@@ -32,18 +33,17 @@ class PoseCollectionAgent {
   explicit PoseCollectionAgent(std::shared_ptr<JsonConf> sp_conf);
 
   void OnBestgnssposCallback(
-      const std::shared_ptr<const apollo::drivers::gnss::GnssBestPose>
-          &bestgnsspos);
+      const std::shared_ptr<const apollo::drivers::gnss::GnssBestPose>& bestgnsspos);
   std::shared_ptr<std::vector<FramePose>> GetPoses() const;
 
  private:
   void Reset();
 
  private:
-  std::mutex mutex_;
+  std::mutex                      mutex_;
   std::shared_ptr<PoseCollection> sp_pose_collection_ = nullptr;
-  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
-  std::shared_ptr<PJTransformer> sp_pj_transformer_ = nullptr;
+  std::shared_ptr<JsonConf>       sp_conf_            = nullptr;
+  std::shared_ptr<PJTransformer>  sp_pj_transformer_  = nullptr;
 };
 
 }  // namespace hdmap

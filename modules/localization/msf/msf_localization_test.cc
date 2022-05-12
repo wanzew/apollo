@@ -16,6 +16,7 @@
 #include "modules/localization/msf/msf_localization.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {

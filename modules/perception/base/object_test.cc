@@ -29,8 +29,7 @@ TEST(ObjectTest, object_construct_test) {
   EXPECT_LT(fabs(object.theta), 1.0e-6);
   EXPECT_LT(fabs(object.theta_variance), 1.0e-6);
   EXPECT_EQ(object.type, ObjectType::UNKNOWN);
-  EXPECT_EQ(object.type_probs.size(),
-            static_cast<int>(ObjectType::MAX_OBJECT_TYPE));
+  EXPECT_EQ(object.type_probs.size(), static_cast<int>(ObjectType::MAX_OBJECT_TYPE));
   EXPECT_EQ(object.track_id, -1);
   EXPECT_LT(fabs(object.tracking_time), 1.0e-6);
   EXPECT_LT(fabs(object.latest_tracked_time), 1.0e-6);
@@ -38,46 +37,43 @@ TEST(ObjectTest, object_construct_test) {
 
   std::string str_object = object.ToString();
 
-  Object cp_object(object);
+  Object      cp_object(object);
   std::string str_cp_object = cp_object.ToString();
   EXPECT_EQ(str_object, str_cp_object);
 
   Object assignment_object;
-  assignment_object = object;
+  assignment_object                 = object;
   std::string str_assignment_object = assignment_object.ToString();
   EXPECT_EQ(str_assignment_object, str_object);
 }
 
 TEST(ObjectTest, object_reset_test) {
-  Object object;
+  Object      object;
   std::string str_obj = object.ToString();
 
   object.id = 1;
   object.polygon.resize(2);
-  object.direction = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
-  object.theta = static_cast<float>(M_PI / 2);
+  object.direction      = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
+  object.theta          = static_cast<float>(M_PI / 2);
   object.theta_variance = 0.0f;
-  object.center = Eigen::Vector3d(100, 0.0, 0.0);
-  object.center_uncertainty << 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f,
-      0.01f;
+  object.center         = Eigen::Vector3d(100, 0.0, 0.0);
+  object.center_uncertainty << 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f, 0.01f;
 
-  object.size = Eigen::Vector3f(3.0f, 4.0f, 5.0f);
+  object.size          = Eigen::Vector3f(3.0f, 4.0f, 5.0f);
   object.size_variance = Eigen::Vector3f(0.01f, 0.0f, 0.0f);
-  object.anchor_point = Eigen::Vector3d(100.0, 0.0, 0.0);
-  object.type = ObjectType::BICYCLE;
+  object.anchor_point  = Eigen::Vector3d(100.0, 0.0, 0.0);
+  object.type          = ObjectType::BICYCLE;
   object.type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0.3f);
 
   object.confidence = 0.6f;
 
   object.track_id = 1;
   object.velocity = Eigen::Vector3f(3.0f, 0.0f, 0.0f);
-  object.velocity_uncertainty << 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-      0.0f;
-  object.tracking_time = 0.6;
+  object.velocity_uncertainty << 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f;
+  object.tracking_time       = 0.6;
   object.latest_tracked_time = 12345678986.345;
-  object.acceleration = Eigen::Vector3f(3.0f, 0.0f, 0.0f);
-  object.acceleration_uncertainty << 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-      0.0f, 0.0f;
+  object.acceleration        = Eigen::Vector3f(3.0f, 0.0f, 0.0f);
+  object.acceleration_uncertainty << 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f;
 
   object.Reset();
   std::string reset_obj_str = object.ToString();

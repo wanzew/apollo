@@ -45,15 +45,15 @@ TEST(NodeTest, cases) {
 
   auto writer = node->CreateWriter<Chatter>(attr);
   auto server = node->CreateService<Chatter, Chatter>(
-      "node_test_server", [](const std::shared_ptr<Chatter>& request,
-                             std::shared_ptr<Chatter>& response) {
+      "node_test_server",
+      [](const std::shared_ptr<Chatter>& request, std::shared_ptr<Chatter>& response) {
         AINFO << "server: I am server";
         static uint64_t id = 0;
         ++id;
         response->set_seq(id);
         response->set_timestamp(0);
       });
-  auto client = node->CreateClient<Chatter, Chatter>("node_test_server");
+  auto client      = node->CreateClient<Chatter, Chatter>("node_test_server");
   auto chatter_msg = std::make_shared<Chatter>();
   chatter_msg->set_seq(0);
   chatter_msg->set_timestamp(0);

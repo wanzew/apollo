@@ -24,13 +24,11 @@ namespace lidar {
 class Timer {
  public:
   Timer() { tic(); }
-  void tic() { _start = std::chrono::system_clock::now(); }
+  void   tic() { _start = std::chrono::system_clock::now(); }
   double toc(bool reset = false) {
-    auto time = std::chrono::system_clock::now();
-    std::chrono::duration<double, std::milli> dur = time - _start;
-    if (reset) {
-      tic();
-    }
+    auto                                      time = std::chrono::system_clock::now();
+    std::chrono::duration<double, std::milli> dur  = time - _start;
+    if (reset) { tic(); }
     return dur.count();
   }
 

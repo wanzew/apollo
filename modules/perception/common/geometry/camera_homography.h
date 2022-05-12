@@ -17,6 +17,7 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
+
 #include "modules/perception/base/camera.h"
 
 namespace apollo {
@@ -30,14 +31,14 @@ bool PointCamera1ToCamera2(const Eigen::Vector2d& point,
                            const Eigen::Matrix3d& camera1_intrinsic_inverse,
                            const Eigen::Matrix3d& camera2_intrinsic,
                            const Eigen::Matrix3d& trans_camera1_to_camera2,
-                           Eigen::Vector2d* point_out);
+                           Eigen::Vector2d*       point_out);
 
 // @brief: estimate whether two cameras have field overlap.
 bool IsCamerasFieldOverlap(const base::PinholeCameraModel& from_camera,
                            const base::PinholeCameraModel& to_camera,
-                           const Eigen::Matrix4d& extrinsic,
-                           Eigen::Vector2d* up_left,
-                           Eigen::Vector2d* low_right);
+                           const Eigen::Matrix4d&          extrinsic,
+                           Eigen::Vector2d*                up_left,
+                           Eigen::Vector2d*                low_right);
 
 }  // namespace common
 }  // namespace perception

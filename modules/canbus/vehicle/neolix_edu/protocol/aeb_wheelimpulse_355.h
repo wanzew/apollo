@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Aebwheelimpulse355 : public ::apollo::drivers::canbus::ProtocolData<
-                               ::apollo::canbus::ChassisDetail> {
+class Aebwheelimpulse355
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Aebwheelimpulse355();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': '0x0:Invalid;0x1:Valid', 'offset': 0.0,

@@ -37,8 +37,7 @@ namespace apollo {
 namespace v2x {
 namespace ft {
 
-class V2XFusionComponent
-    : public apollo::cyber::Component<PerceptionObstacles> {
+class V2XFusionComponent : public apollo::cyber::Component<PerceptionObstacles> {
  public:
   ~V2XFusionComponent();
 
@@ -46,22 +45,18 @@ class V2XFusionComponent
 
   bool Init() override;
 
-  bool Proc(const std::shared_ptr<PerceptionObstacles>& perception_obstacles)
-      override;
+  bool Proc(const std::shared_ptr<PerceptionObstacles>& perception_obstacles) override;
 
  private:
-  bool V2XMessageFusionProcess(
-      const std::shared_ptr<PerceptionObstacles>& perception_obstacles);
-  void SerializeMsg(const std::vector<base::Object>& objects,
-                    std::shared_ptr<PerceptionObstacles> obstacles);
+  bool   V2XMessageFusionProcess(const std::shared_ptr<PerceptionObstacles>& perception_obstacles);
+  void   SerializeMsg(const std::vector<base::Object>&     objects,
+                      std::shared_ptr<PerceptionObstacles> obstacles);
   Fusion fusion_;
 
-  std::shared_ptr<apollo::cyber::Reader<LocalizationEstimate>>
-      localization_reader_;
-  std::shared_ptr<apollo::cyber::Reader<V2XObstacles>> v2x_obstacles_reader_;
-  std::shared_ptr<apollo::cyber::Writer<PerceptionObstacles>>
-      perception_fusion_obstacles_writer_;
-  apollo::common::Header header_;
+  std::shared_ptr<apollo::cyber::Reader<LocalizationEstimate>> localization_reader_;
+  std::shared_ptr<apollo::cyber::Reader<V2XObstacles>>         v2x_obstacles_reader_;
+  std::shared_ptr<apollo::cyber::Writer<PerceptionObstacles>>  perception_fusion_obstacles_writer_;
+  apollo::common::Header                                       header_;
 };
 
 CYBER_REGISTER_COMPONENT(V2XFusionComponent)

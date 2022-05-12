@@ -25,10 +25,9 @@
 #include <utility>
 #include <vector>
 
-#include "modules/prediction/container/obstacles/obstacle.h"
-
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 /**
  * @namespace apollo::prediction
@@ -57,8 +56,7 @@ class Evaluator {
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  virtual bool Evaluate(Obstacle* obstacle,
-                        ObstaclesContainer* obstacles_container) = 0;
+  virtual bool Evaluate(Obstacle* obstacle, ObstaclesContainer* obstacles_container) = 0;
 
   /**
    * @brief Evaluate an obstacle
@@ -66,8 +64,8 @@ class Evaluator {
    * @param Obstacles container
    * @param vector of all Obstacles
    */
-  virtual bool Evaluate(Obstacle* obstacle,
-                        ObstaclesContainer* obstacles_container,
+  virtual bool Evaluate(Obstacle*              obstacle,
+                        ObstaclesContainer*    obstacles_container,
                         std::vector<Obstacle*> dynamic_env) {
     return Evaluate(obstacle, obstacles_container);
   }
@@ -79,8 +77,8 @@ class Evaluator {
    * @param Obstacles container
    */
   virtual bool Evaluate(const ADCTrajectoryContainer* adc_trajectory_container,
-                        Obstacle* obstacle,
-                        ObstaclesContainer* obstacles_container) {
+                        Obstacle*                     obstacle,
+                        ObstaclesContainer*           obstacles_container) {
     return Evaluate(obstacle, obstacles_container);
   }
   /**
@@ -91,35 +89,34 @@ class Evaluator {
  protected:
   // Helper function to convert world coordinates to relative coordinates
   // around the obstacle of interest.
-  std::pair<double, double> WorldCoordToObjCoord(
-      std::pair<double, double> input_world_coord,
-      std::pair<double, double> obj_world_coord, double obj_world_angle) {
+  std::pair<double, double> WorldCoordToObjCoord(std::pair<double, double> input_world_coord,
+                                                 std::pair<double, double> obj_world_coord,
+                                                 double                    obj_world_angle) {
     double x_diff = input_world_coord.first - obj_world_coord.first;
     double y_diff = input_world_coord.second - obj_world_coord.second;
-    double rho = std::sqrt(x_diff * x_diff + y_diff * y_diff);
-    double theta = std::atan2(y_diff, x_diff) - obj_world_angle;
+    double rho    = std::sqrt(x_diff * x_diff + y_diff * y_diff);
+    double theta  = std::atan2(y_diff, x_diff) - obj_world_angle;
 
     return std::make_pair(std::cos(theta) * rho, std::sin(theta) * rho);
   }
 
-  std::pair<double, double> WorldCoordToObjCoordNorth(
-      std::pair<double, double> input_world_coord,
-      std::pair<double, double> obj_world_coord, double obj_world_angle) {
+  std::pair<double, double> WorldCoordToObjCoordNorth(std::pair<double, double> input_world_coord,
+                                                      std::pair<double, double> obj_world_coord,
+                                                      double                    obj_world_angle) {
     double x_diff = input_world_coord.first - obj_world_coord.first;
     double y_diff = input_world_coord.second - obj_world_coord.second;
-    double theta = M_PI / 2 - obj_world_angle;
-    double x = std::cos(theta) * x_diff - std::sin(theta) * y_diff;
-    double y = std::sin(theta) * x_diff + std::cos(theta) * y_diff;
+    double theta  = M_PI / 2 - obj_world_angle;
+    double x      = std::cos(theta) * x_diff - std::sin(theta) * y_diff;
+    double y      = std::sin(theta) * x_diff + std::cos(theta) * y_diff;
     return std::make_pair(x, y);
   }
 
-  double WorldAngleToObjAngle(double input_world_angle,
-                              double obj_world_angle) {
+  double WorldAngleToObjAngle(double input_world_angle, double obj_world_angle) {
     return common::math::NormalizeAngle(input_world_angle - obj_world_angle);
   }
 
-  Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
-                                   const int start_index, const int end_index) {
+  Eigen::MatrixXf
+  VectorToMatrixXf(const std::vector<double>& nums, const int start_index, const int end_index) {
     CHECK_LT(start_index, end_index);
     CHECK_GE(start_index, 0);
     CHECK_LE(end_index, static_cast<int>(nums.size()));
@@ -132,9 +129,10 @@ class Evaluator {
   }
 
   Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
-                                   const int start_index, const int end_index,
-                                   const int output_num_row,
-                                   const int output_num_col) {
+                                   const int                  start_index,
+                                   const int                  end_index,
+                                   const int                  output_num_row,
+                                   const int                  output_num_col) {
     CHECK_LT(start_index, end_index);
     CHECK_GE(start_index, 0);
     CHECK_LE(end_index, static_cast<int>(nums.size()));

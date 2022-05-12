@@ -16,8 +16,9 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace drivers {
@@ -28,8 +29,7 @@ using apollo::drivers::conti_radar::OutputType;
 using apollo::drivers::conti_radar::RadarConf;
 using apollo::drivers::conti_radar::RcsThreshold;
 
-class RadarConfig200
-    : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
+class RadarConfig200 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
   RadarConfig200();
@@ -73,7 +73,7 @@ class RadarConfig200
   RadarConfig200* set_store_in_nvm(uint8_t data);
   RadarConfig200* set_rcs_threshold(RcsThreshold rcs_theshold);
   RadarConfig200* set_radar_conf(RadarConf radar_conf);
-  RadarConf radar_conf();
+  RadarConf       radar_conf();
 
   void set_max_distance_valid_p(uint8_t* data, bool valid);
   void set_sensor_id_valid_p(uint8_t* data, bool valid);

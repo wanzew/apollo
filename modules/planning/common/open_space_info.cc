@@ -27,8 +27,7 @@ void CopyTrajectory(const DiscretizedTrajectory trajectory_src,
                     apollo::common::Trajectory* trajectory_tgt_ptr) {
   const size_t horizon = trajectory_src.NumOfPoints();
   for (size_t i = 0; i < horizon; ++i) {
-    *trajectory_tgt_ptr->add_trajectory_point() =
-        trajectory_src.TrajectoryPointAt(i);
+    *trajectory_tgt_ptr->add_trajectory_point() = trajectory_src.TrajectoryPointAt(i);
   }
 }
 
@@ -38,13 +37,12 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
   *ptr_debug = debug_instance_;
 
   // 2, record partitioned trajectories into ptr_debug
-  auto* ptr_partitioned_trajectories = ptr_debug->mutable_planning_data()
-                                           ->mutable_open_space()
-                                           ->mutable_partitioned_trajectories();
+  auto* ptr_partitioned_trajectories =
+      ptr_debug->mutable_planning_data()->mutable_open_space()->mutable_partitioned_trajectories();
 
   for (auto& iter : partitioned_trajectories_) {
-    const auto& picked_trajectory = iter.first;
-    auto* ptr_added_trajectory = ptr_partitioned_trajectories->add_trajectory();
+    const auto& picked_trajectory    = iter.first;
+    auto*       ptr_added_trajectory = ptr_partitioned_trajectories->add_trajectory();
     CopyTrajectory(picked_trajectory, ptr_added_trajectory);
   }
 
@@ -57,9 +55,8 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
   CopyTrajectory(chosen_trajectory, ptr_chosen_trajectory);
 
   // 4, record if the trajectory is fallback trajectory
-  ptr_debug->mutable_planning_data()
-      ->mutable_open_space()
-      ->set_is_fallback_trajectory(fallback_flag_);
+  ptr_debug->mutable_planning_data()->mutable_open_space()->set_is_fallback_trajectory(
+      fallback_flag_);
 
   // 5, record fallback trajectory if needed
   if (fallback_flag_) {

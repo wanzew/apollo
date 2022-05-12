@@ -26,10 +26,10 @@ namespace base {
 
 template <typename T>
 struct alignas(16) Point {
-  T x = 0;
-  T y = 0;
-  T z = 0;
-  T intensity = 0;
+  T         x         = 0;
+  T         y         = 0;
+  T         z         = 0;
+  T         intensity = 0;
   typedef T Type;
 };
 
@@ -56,14 +56,14 @@ struct PointXYZITHBL : public PointXYZITHB<T> {
 using PointF = Point<float>;
 using PointD = Point<double>;
 
-using PointXYZIF = Point<float>;
-using PointXYZID = Point<double>;
-using PointXYZITF = PointXYZIT<float>;
-using PointXYZITD = PointXYZIT<double>;
-using PointXYZITHF = PointXYZITH<float>;
-using PointXYZITHD = PointXYZITH<double>;
-using PointXYZITHBF = PointXYZITHB<float>;
-using PointXYZITHBD = PointXYZITHB<double>;
+using PointXYZIF     = Point<float>;
+using PointXYZID     = Point<double>;
+using PointXYZITF    = PointXYZIT<float>;
+using PointXYZITD    = PointXYZIT<double>;
+using PointXYZITHF   = PointXYZITH<float>;
+using PointXYZITHD   = PointXYZITH<double>;
+using PointXYZITHBF  = PointXYZITHB<float>;
+using PointXYZITHBD  = PointXYZITHB<double>;
 using PointXYZITHBLF = PointXYZITHBL<float>;
 using PointXYZITHBLD = PointXYZITHBL<double>;
 
@@ -74,7 +74,7 @@ struct PointIndices {
 
   std::vector<int> indices;
 
-  typedef std::shared_ptr<PointIndices> Ptr;
+  typedef std::shared_ptr<PointIndices>       Ptr;
   typedef std::shared_ptr<const PointIndices> ConstPtr;
 };
 

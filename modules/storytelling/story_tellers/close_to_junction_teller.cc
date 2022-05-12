@@ -43,8 +43,7 @@ bool GetPNCJunction(const PathPoint& point, std::string* pnc_junction_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<PNCJunctionInfoConstPtr> pnc_junctions;
-  if (HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point, FLAGS_search_radius,
-                                           &pnc_junctions) == 0) {
+  if (HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point, FLAGS_search_radius, &pnc_junctions) == 0) {
     if (pnc_junctions.size() > 0) {
       *pnc_junction_id = pnc_junctions.front()->id().id();
       return true;
@@ -58,8 +57,7 @@ bool GetJunction(const PathPoint& point, std::string* junction_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<JunctionInfoConstPtr> junctions;
-  if (HDMapUtil::BaseMap().GetJunctions(hdmap_point, FLAGS_search_radius,
-                                        &junctions) == 0) {
+  if (HDMapUtil::BaseMap().GetJunctions(hdmap_point, FLAGS_search_radius, &junctions) == 0) {
     if (junctions.size() > 0) {
       *junction_id = junctions.front()->id().id();
       return true;
@@ -73,8 +71,7 @@ bool GetClearArea(const PathPoint& point, std::string* clear_area_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<ClearAreaInfoConstPtr> clear_areas;
-  if (HDMapUtil::BaseMap().GetClearAreas(hdmap_point, FLAGS_search_radius,
-                                         &clear_areas) == 0) {
+  if (HDMapUtil::BaseMap().GetClearAreas(hdmap_point, FLAGS_search_radius, &clear_areas) == 0) {
     if (clear_areas.size() > 0) {
       *clear_area_id = clear_areas.front()->id().id();
       return true;
@@ -88,8 +85,7 @@ bool GetCrosswalk(const PathPoint& point, std::string* crosswalk_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<CrosswalkInfoConstPtr> crosswalks;
-  if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point, FLAGS_search_radius,
-                                         &crosswalks) == 0) {
+  if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point, FLAGS_search_radius, &crosswalks) == 0) {
     if (crosswalks.size() > 0) {
       *crosswalk_id = crosswalks.front()->id().id();
       return true;
@@ -103,8 +99,7 @@ bool GetSignal(const PathPoint& point, std::string* signal_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<SignalInfoConstPtr> signals;
-  if (HDMapUtil::BaseMap().GetSignals(hdmap_point, FLAGS_search_radius,
-                                      &signals) == 0) {
+  if (HDMapUtil::BaseMap().GetSignals(hdmap_point, FLAGS_search_radius, &signals) == 0) {
     if (signals.size() > 0) {
       *signal_id = signals.front()->id().id();
       return true;
@@ -118,8 +113,7 @@ bool GetStopSign(const PathPoint& point, std::string* stop_sign_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<StopSignInfoConstPtr> stop_signs;
-  if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point, FLAGS_search_radius,
-                                        &stop_signs) == 0) {
+  if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point, FLAGS_search_radius, &stop_signs) == 0) {
     if (stop_signs.size() > 0) {
       *stop_sign_id = stop_signs.front()->id().id();
       return true;
@@ -133,8 +127,7 @@ bool GetYieldSign(const PathPoint& point, std::string* yield_sign_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<YieldSignInfoConstPtr> yield_signs;
-  if (HDMapUtil::BaseMap().GetYieldSigns(hdmap_point, FLAGS_search_radius,
-                                         &yield_signs) == 0) {
+  if (HDMapUtil::BaseMap().GetYieldSigns(hdmap_point, FLAGS_search_radius, &yield_signs) == 0) {
     if (yield_signs.size() > 0) {
       *yield_sign_id = yield_signs.front()->id().id();
       return true;
@@ -169,15 +162,13 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
   yield_sign_distance_ = -1;
   for (const auto& point : adc_trajectory.trajectory_point()) {
     const auto& path_point = point.path_point();
-    if (path_point.s() > FLAGS_adc_trajectory_search_distance) {
-      break;
-    }
+    if (path_point.s() > FLAGS_adc_trajectory_search_distance) { break; }
 
     // clear_area
     if (clear_area_id_.empty() || clear_area_distance_ < 0) {
       std::string clear_area_id;
       if (GetClearArea(path_point, &clear_area_id)) {
-        clear_area_id_ = clear_area_id;
+        clear_area_id_       = clear_area_id;
         clear_area_distance_ = path_point.s() - s_start;
       }
     }
@@ -186,7 +177,7 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
     if (crosswalk_id_.empty() || crosswalk_distance_ < 0) {
       std::string crosswalk_id;
       if (GetCrosswalk(path_point, &crosswalk_id)) {
-        crosswalk_id_ = crosswalk_id;
+        crosswalk_id_       = crosswalk_id;
         crosswalk_distance_ = path_point.s() - s_start;
       }
     }
@@ -195,7 +186,7 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
     if (junction_id_.empty() || junction_distance_ < 0) {
       std::string junction_id;
       if (GetJunction(path_point, &junction_id)) {
-        junction_id_ = junction_id;
+        junction_id_       = junction_id;
         junction_distance_ = path_point.s() - s_start;
       }
     }
@@ -204,7 +195,7 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
     if (pnc_junction_id_.empty() || pnc_junction_distance_ < 0) {
       std::string pnc_junction_id;
       if (GetPNCJunction(path_point, &pnc_junction_id)) {
-        pnc_junction_id_ = pnc_junction_id;
+        pnc_junction_id_       = pnc_junction_id;
         pnc_junction_distance_ = path_point.s() - s_start;
       }
     }
@@ -213,7 +204,7 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
     if (signal_id_.empty() || signal_distance_ < 0) {
       std::string signal_id;
       if (GetSignal(path_point, &signal_id)) {
-        signal_id_ = signal_id;
+        signal_id_       = signal_id;
         signal_distance_ = path_point.s() - s_start;
       }
     }
@@ -222,7 +213,7 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
     if (stop_sign_id_.empty() || stop_sign_distance_ < 0) {
       std::string stop_sign_id;
       if (GetStopSign(path_point, &stop_sign_id)) {
-        stop_sign_id_ = stop_sign_id;
+        stop_sign_id_       = stop_sign_id;
         stop_sign_distance_ = path_point.s() - s_start;
       }
     }
@@ -231,7 +222,7 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
     if (yield_sign_id_.empty() || yield_sign_distance_ < 0) {
       std::string yield_sign_id;
       if (GetYieldSign(path_point, &yield_sign_id)) {
-        yield_sign_id_ = yield_sign_id;
+        yield_sign_id_       = yield_sign_id;
         yield_sign_distance_ = path_point.s() - s_start;
       }
     }
@@ -245,9 +236,8 @@ void CloseToJunctionTeller::Init(const StorytellingConfig& storytelling_conf) {
 }
 
 void CloseToJunctionTeller::Update(Stories* stories) {
-  static auto planning_reader =
-      frame_manager_->CreateOrGetReader<ADCTrajectory>(
-          config_.topic_config().planning_trajectory_topic());
+  static auto planning_reader = frame_manager_->CreateOrGetReader<ADCTrajectory>(
+      config_.topic_config().planning_trajectory_topic());
   const auto trajectory = planning_reader->GetLatestObserved();
   if (trajectory == nullptr || trajectory->trajectory_point().empty()) {
     AERROR << "Planning trajectory not ready.";
@@ -258,9 +248,7 @@ void CloseToJunctionTeller::Update(Stories* stories) {
 
   // CloseToClearArea
   if (!clear_area_id_.empty() && clear_area_distance_ >= 0) {
-    if (!stories->has_close_to_clear_area()) {
-      AINFO << "Enter CloseToClearArea story";
-    }
+    if (!stories->has_close_to_clear_area()) { AINFO << "Enter CloseToClearArea story"; }
     auto* story = stories->mutable_close_to_clear_area();
     story->set_id(clear_area_id_);
     story->set_distance(clear_area_distance_);
@@ -271,9 +259,7 @@ void CloseToJunctionTeller::Update(Stories* stories) {
 
   // CloseToCrosswalk
   if (!crosswalk_id_.empty() && crosswalk_distance_ >= 0) {
-    if (!stories->has_close_to_crosswalk()) {
-      AINFO << "Enter CloseToCrosswalk story";
-    }
+    if (!stories->has_close_to_crosswalk()) { AINFO << "Enter CloseToCrosswalk story"; }
     auto* story = stories->mutable_close_to_crosswalk();
     story->set_id(crosswalk_id_);
     story->set_distance(crosswalk_distance_);
@@ -285,9 +271,7 @@ void CloseToJunctionTeller::Update(Stories* stories) {
   // CloseToJunction
   if ((!junction_id_.empty() && junction_distance_ >= 0) ||
       (!pnc_junction_id_.empty() && pnc_junction_distance_ >= 0)) {
-    if (!stories->has_close_to_junction()) {
-      AINFO << "Enter CloseToJunction story";
-    }
+    if (!stories->has_close_to_junction()) { AINFO << "Enter CloseToJunction story"; }
     auto* story = stories->mutable_close_to_junction();
     if (!pnc_junction_id_.empty() && pnc_junction_distance_ >= 0) {
       story->set_id(pnc_junction_id_);
@@ -305,9 +289,7 @@ void CloseToJunctionTeller::Update(Stories* stories) {
 
   // CloseToSignal
   if (!signal_id_.empty() && signal_distance_ >= 0) {
-    if (!stories->has_close_to_signal()) {
-      AINFO << "Enter CloseToSignal story";
-    }
+    if (!stories->has_close_to_signal()) { AINFO << "Enter CloseToSignal story"; }
     auto* story = stories->mutable_close_to_signal();
     story->set_id(signal_id_);
     story->set_distance(signal_distance_);
@@ -318,9 +300,7 @@ void CloseToJunctionTeller::Update(Stories* stories) {
 
   // CloseToStopSign
   if (!stop_sign_id_.empty() && stop_sign_distance_ >= 0) {
-    if (!stories->has_close_to_stop_sign()) {
-      AINFO << "Enter CloseToStopSign story";
-    }
+    if (!stories->has_close_to_stop_sign()) { AINFO << "Enter CloseToStopSign story"; }
     auto* story = stories->mutable_close_to_stop_sign();
     story->set_id(stop_sign_id_);
     story->set_distance(stop_sign_distance_);
@@ -331,9 +311,7 @@ void CloseToJunctionTeller::Update(Stories* stories) {
 
   // CloseToYieldSign
   if (!yield_sign_id_.empty() && yield_sign_distance_ >= 0) {
-    if (!stories->has_close_to_yield_sign()) {
-      AINFO << "Enter CloseToYieldSign story";
-    }
+    if (!stories->has_close_to_yield_sign()) { AINFO << "Enter CloseToYieldSign story"; }
     auto* story = stories->mutable_close_to_yield_sign();
     story->set_id(yield_sign_id_);
     story->set_distance(yield_sign_distance_);

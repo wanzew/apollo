@@ -17,12 +17,13 @@
 
 #include <limits>
 
+#include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -32,26 +33,25 @@ using apollo::cyber::common::GetAbsolutePath;
 
 const float PointCloudPreprocessor::kPointInfThreshold = 1e3;
 
-bool PointCloudPreprocessor::Init(
-    const PointCloudPreprocessorInitOptions& options) {
-  auto config_manager = lib::ConfigManager::Instance();
-  const lib::ModelConfig* model_config = nullptr;
+bool PointCloudPreprocessor::Init(const PointCloudPreprocessorInitOptions& options) {
+  auto                    config_manager = lib::ConfigManager::Instance();
+  const lib::ModelConfig* model_config   = nullptr;
   ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
-  std::string config_file;
-  std::string root_path;
+  std::string       config_file;
+  std::string       root_path;
   ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "pointcloud_preprocessor.conf");
   PointCloudPreprocessorConfig config;
   ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
-  filter_naninf_points_ = config.filter_naninf_points();
+  filter_naninf_points_     = config.filter_naninf_points();
   filter_nearby_box_points_ = config.filter_nearby_box_points();
-  box_forward_x_ = config.box_forward_x();
-  box_backward_x_ = config.box_backward_x();
-  box_forward_y_ = config.box_forward_y();
-  box_backward_y_ = config.box_backward_y();
+  box_forward_x_            = config.box_forward_x();
+  box_backward_x_           = config.box_backward_x();
+  box_forward_y_            = config.box_forward_y();
+  box_backward_y_           = config.box_backward_y();
   /*const auto &vehicle_param =
     common::VehicleConfigHelper::GetConfig().vehicle_param();
   box_forward_x_ = static_cast<float>(vehicle_param.right_edge_to_center());
@@ -59,20 +59,16 @@ bool PointCloudPreprocessor::Init(
   box_forward_y_ = static_cast<float>(vehicle_param.front_edge_to_center());
   box_backward_y_ = static_cast<float>(-vehicle_param.back_edge_to_center());*/
   filter_high_z_points_ = config.filter_high_z_points();
-  z_threshold_ = config.z_threshold();
+  z_threshold_          = config.z_threshold();
   return true;
 }
 
 bool PointCloudPreprocessor::Preprocess(
-    const PointCloudPreprocessorOptions& options,
+    const PointCloudPreprocessorOptions&                      options,
     const std::shared_ptr<apollo::drivers::PointCloud const>& message,
-    LidarFrame* frame) const {
-  if (frame == nullptr) {
-    return false;
-  }
-  if (frame->cloud == nullptr) {
-    frame->cloud = base::PointFCloudPool::Instance().Get();
-  }
+    LidarFrame*                                               frame) const {
+  if (frame == nullptr) { return false; }
+  if (frame->cloud == nullptr) { frame->cloud = base::PointFCloudPool::Instance().Get(); }
   if (frame->world_cloud == nullptr) {
     frame->world_cloud = base::PointDCloudPool::Instance().Get();
   }
@@ -83,30 +79,23 @@ bool PointCloudPreprocessor::Preprocess(
     for (int i = 0; i < message->point_size(); ++i) {
       const apollo::drivers::PointXYZIT& pt = message->point(i);
       if (filter_naninf_points_) {
-        if (std::isnan(pt.x()) || std::isnan(pt.y()) || std::isnan(pt.z())) {
-          continue;
-        }
-        if (fabs(pt.x()) > kPointInfThreshold ||
-            fabs(pt.y()) > kPointInfThreshold ||
+        if (std::isnan(pt.x()) || std::isnan(pt.y()) || std::isnan(pt.z())) { continue; }
+        if (fabs(pt.x()) > kPointInfThreshold || fabs(pt.y()) > kPointInfThreshold ||
             fabs(pt.z()) > kPointInfThreshold) {
           continue;
         }
       }
       Eigen::Vector3d vec3d_lidar(pt.x(), pt.y(), pt.z());
-      Eigen::Vector3d vec3d_novatel =
-          options.sensor2novatel_extrinsics * vec3d_lidar;
+      Eigen::Vector3d vec3d_novatel = options.sensor2novatel_extrinsics * vec3d_lidar;
       if (filter_nearby_box_points_ && vec3d_novatel[0] < box_forward_x_ &&
-          vec3d_novatel[0] > box_backward_x_ &&
-          vec3d_novatel[1] < box_forward_y_ &&
+          vec3d_novatel[0] > box_backward_x_ && vec3d_novatel[1] < box_forward_y_ &&
           vec3d_novatel[1] > box_backward_y_) {
         continue;
       }
-      if (filter_high_z_points_ && pt.z() > z_threshold_) {
-        continue;
-      }
-      point.x = pt.x();
-      point.y = pt.y();
-      point.z = pt.z();
+      if (filter_high_z_points_ && pt.z() > z_threshold_) { continue; }
+      point.x         = pt.x();
+      point.y         = pt.y();
+      point.z         = pt.z();
       point.intensity = static_cast<float>(pt.intensity());
       frame->cloud->push_back(point, static_cast<double>(pt.timestamp()) * 1e-9,
                               std::numeric_limits<float>::max(), i, 0);
@@ -116,17 +105,15 @@ bool PointCloudPreprocessor::Preprocess(
   return true;
 }
 
-bool PointCloudPreprocessor::Preprocess(
-    const PointCloudPreprocessorOptions& options, LidarFrame* frame) const {
-  if (frame == nullptr || frame->cloud == nullptr) {
-    return false;
-  }
+bool PointCloudPreprocessor::Preprocess(const PointCloudPreprocessorOptions& options,
+                                        LidarFrame*                          frame) const {
+  if (frame == nullptr || frame->cloud == nullptr) { return false; }
   if (frame->world_cloud == nullptr) {
     frame->world_cloud = base::PointDCloudPool::Instance().Get();
   }
   if (frame->cloud->size() > 0) {
     size_t size = frame->cloud->size();
-    size_t i = 0;
+    size_t i    = 0;
     while (i < size) {
       auto& pt = frame->cloud->at(i);
       if (filter_naninf_points_) {
@@ -134,19 +121,16 @@ bool PointCloudPreprocessor::Preprocess(
           frame->cloud->SwapPoint(i, size--);
           continue;
         }
-        if (fabs(pt.x) > kPointInfThreshold ||
-            fabs(pt.y) > kPointInfThreshold ||
+        if (fabs(pt.x) > kPointInfThreshold || fabs(pt.y) > kPointInfThreshold ||
             fabs(pt.z) > kPointInfThreshold) {
           frame->cloud->SwapPoint(i, size--);
           continue;
         }
       }
       Eigen::Vector3d vec3d_lidar(pt.x, pt.y, pt.z);
-      Eigen::Vector3d vec3d_novatel =
-          options.sensor2novatel_extrinsics * vec3d_lidar;
+      Eigen::Vector3d vec3d_novatel = options.sensor2novatel_extrinsics * vec3d_lidar;
       if (filter_nearby_box_points_ && vec3d_novatel[0] < box_forward_x_ &&
-          vec3d_novatel[0] > box_backward_x_ &&
-          vec3d_novatel[1] < box_forward_y_ &&
+          vec3d_novatel[0] > box_backward_x_ && vec3d_novatel[1] < box_forward_y_ &&
           vec3d_novatel[1] > box_backward_y_) {
         frame->cloud->SwapPoint(i, size--);
         continue;
@@ -164,26 +148,23 @@ bool PointCloudPreprocessor::Preprocess(
   return true;
 }
 
-bool PointCloudPreprocessor::TransformCloud(
-    const base::PointFCloudPtr& local_cloud, const Eigen::Affine3d& pose,
-    base::PointDCloudPtr world_cloud) const {
-  if (local_cloud == nullptr) {
-    return false;
-  }
+bool PointCloudPreprocessor::TransformCloud(const base::PointFCloudPtr& local_cloud,
+                                            const Eigen::Affine3d&      pose,
+                                            base::PointDCloudPtr        world_cloud) const {
+  if (local_cloud == nullptr) { return false; }
   world_cloud->clear();
   world_cloud->reserve(local_cloud->size());
   for (size_t i = 0; i < local_cloud->size(); ++i) {
-    auto& pt = local_cloud->at(i);
+    auto&           pt = local_cloud->at(i);
     Eigen::Vector3d trans_point(pt.x, pt.y, pt.z);
     trans_point = pose * trans_point;
     base::PointD world_point;
-    world_point.x = trans_point(0);
-    world_point.y = trans_point(1);
-    world_point.z = trans_point(2);
+    world_point.x         = trans_point(0);
+    world_point.y         = trans_point(1);
+    world_point.z         = trans_point(2);
     world_point.intensity = pt.intensity;
     world_cloud->push_back(world_point, local_cloud->points_timestamp(i),
-                           std::numeric_limits<float>::max(),
-                           local_cloud->points_beam_id()[i], 0);
+                           std::numeric_limits<float>::max(), local_cloud->points_beam_id()[i], 0);
   }
   return true;
 }

@@ -21,20 +21,16 @@
 namespace apollo {
 namespace prediction {
 
-void GetRecordFileNames(const boost::filesystem::path& p,
-                        std::vector<std::string>* record_files) {
+void GetRecordFileNames(const boost::filesystem::path& p, std::vector<std::string>* record_files) {
   ACHECK(record_files);
-  if (!boost::filesystem::exists(p)) {
-    return;
-  }
+  if (!boost::filesystem::exists(p)) { return; }
   if (boost::filesystem::is_regular_file(p)) {
     AINFO << "Found record file: " << p.c_str();
     record_files->push_back(p.c_str());
     return;
   }
   if (boost::filesystem::is_directory(p)) {
-    for (auto& entry : boost::make_iterator_range(
-             boost::filesystem::directory_iterator(p), {})) {
+    for (auto& entry : boost::make_iterator_range(boost::filesystem::directory_iterator(p), {})) {
       GetRecordFileNames(entry.path(), record_files);
     }
   }

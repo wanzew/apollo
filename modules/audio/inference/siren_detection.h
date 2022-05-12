@@ -42,7 +42,7 @@ class SirenDetection {
 
  private:
   torch::jit::script::Module torch_model_;
-  torch::Device device_;
+  torch::Device              device_;
 };
 
 }  // namespace audio

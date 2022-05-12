@@ -41,21 +41,21 @@ TEST(UtilTest, CoverTest) {
 }
 TEST(UtilTest, ContainTest) {
   {
-    int a = 10;
+    int              a     = 10;
     std::vector<int> array = {1, 2, 3, 4, 5, 6, 7};
     ASSERT_FALSE(Contain(array, a));
     array.push_back(10);
     ASSERT_TRUE(Contain(array, a));
   }
   {
-    std::string str = "haha";
+    std::string              str   = "haha";
     std::vector<std::string> array = {"a", "b", "c"};
     ASSERT_FALSE(Contain(array, str));
     array.push_back("haha");
     ASSERT_TRUE(Contain(array, str));
   }
   {
-    base::ObjectSubType type = base::ObjectSubType::CAR;
+    base::ObjectSubType              type  = base::ObjectSubType::CAR;
     std::vector<base::ObjectSubType> array = {base::ObjectSubType::VAN,
                                               base::ObjectSubType::PEDESTRIAN};
     ASSERT_FALSE(Contain(array, type));
@@ -66,7 +66,7 @@ TEST(UtilTest, ContainTest) {
 
 TEST(UtilTest, BorderTest) {
   {
-    int width = 400;
+    int width  = 400;
     int height = 300;
 
     int border_size = 50;
@@ -91,17 +91,13 @@ TEST(UtilTest, BorderTest) {
   }
 
   {
-    float width = 1.f;
+    float width  = 1.f;
     float height = 2.f;
 
-    ASSERT_FALSE(
-        OutOfValidRegion(base::RectF(0.f, 0.f, 1.f, 2.f), width, height));
-    ASSERT_TRUE(
-        OutOfValidRegion(base::RectF(0.f, 0.f, 1.f, 2.f), width, height, 0.1f));
-    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.5f, 0.f, 0.5f, 2.f), width,
-                                 height, 0.1f));
-    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.2f, 0.2f, 0.5f, 1.9f), width,
-                                 height, 0.1f));
+    ASSERT_FALSE(OutOfValidRegion(base::RectF(0.f, 0.f, 1.f, 2.f), width, height));
+    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.f, 0.f, 1.f, 2.f), width, height, 0.1f));
+    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.5f, 0.f, 0.5f, 2.f), width, height, 0.1f));
+    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.2f, 0.2f, 0.5f, 1.9f), width, height, 0.1f));
   }
 }
 
@@ -167,13 +163,13 @@ TEST(UtilTest, RefineBoxTest) {
   }
 
   {
-    base::RectI rect(100, 100, -1, -1);
-    base::RectI *result_rect = nullptr;
+    base::RectI  rect(100, 100, -1, -1);
+    base::RectI* result_rect = nullptr;
     RefineBox(rect, 1920, 1080, result_rect);
     EXPECT_EQ(result_rect, nullptr);
 
-    base::BBox2DI box(rect);
-    base::BBox2DI *result_box = nullptr;
+    base::BBox2DI  box(rect);
+    base::BBox2DI* result_box = nullptr;
     RefineBox(box, 1920, 1080, result_box);
     EXPECT_EQ(result_box, nullptr);
   }
@@ -239,13 +235,13 @@ TEST(UtilTest, RefineBoxTest) {
   }
 
   {
-    base::RectF rect(100.f, 100.f, -1.f, -1.f);
-    base::RectF *result_rect = nullptr;
+    base::RectF  rect(100.f, 100.f, -1.f, -1.f);
+    base::RectF* result_rect = nullptr;
     RefineBox(rect, 1920.f, 1080.f, result_rect);
     EXPECT_EQ(result_rect, nullptr);
 
-    base::BBox2DF box(rect);
-    base::BBox2DF *result_box = nullptr;
+    base::BBox2DF  box(rect);
+    base::BBox2DF* result_box = nullptr;
     RefineBox(box, 1920.f, 1080.f, result_box);
     EXPECT_EQ(result_box, nullptr);
   }
@@ -257,8 +253,7 @@ TEST(UtilTest, test_load_anchors) {
     std::vector<float> anchors;
     ASSERT_FALSE(LoadAnchors(anchor_filepath, &anchors));
   }
-  anchor_filepath =
-      "/apollo/modules/perception/testdata/camera/common/data/bad_anchors.txt";
+  anchor_filepath = "/apollo/modules/perception/testdata/camera/common/data/bad_anchors.txt";
   {
     std::vector<float> anchors;
     ASSERT_FALSE(LoadAnchors(anchor_filepath, &anchors));
@@ -271,8 +266,7 @@ TEST(UtilTest, test_load_types) {
     std::vector<base::ObjectSubType> types;
     ASSERT_FALSE(LoadTypes(types_filepath, &types));
   }
-  types_filepath =
-      "/apollo/modules/perception/testdata/camera/common/data/bad_types.txt";
+  types_filepath = "/apollo/modules/perception/testdata/camera/common/data/bad_types.txt";
   {
     std::vector<base::ObjectSubType> types;
     ASSERT_FALSE(LoadTypes(types_filepath, &types));
@@ -280,19 +274,17 @@ TEST(UtilTest, test_load_types) {
 }
 
 TEST(UtilTest, test_resize_cpu) {
-  cv::Mat img = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/common/img/test.jpg");
+  cv::Mat img = cv::imread("/apollo/modules/perception/testdata/"
+                           "camera/common/img/test.jpg");
 
-  DataProvider data_provider;
+  DataProvider              data_provider;
   DataProvider::InitOptions init_options;
   init_options.image_height = img.rows;
-  init_options.image_width = img.cols;
-  init_options.device_id = 0;
+  init_options.image_width  = img.cols;
+  init_options.device_id    = 0;
   data_provider.Init(init_options);
 
-  EXPECT_TRUE(
-      data_provider.FillImageData(img.rows, img.cols, img.data, "bgr8"));
+  EXPECT_TRUE(data_provider.FillImageData(img.rows, img.cols, img.data, "bgr8"));
   std::shared_ptr<base::Blob<uint8_t>> src_blob(new base::Blob<uint8_t>);
 
   DataProvider::ImageOptions image_options;
@@ -300,8 +292,8 @@ TEST(UtilTest, test_resize_cpu) {
   EXPECT_TRUE(data_provider.GetImageBlob(image_options, src_blob.get()));
 
   {
-    std::vector<int> shape = {1, static_cast<int>(img.rows * 0.5),
-                              static_cast<int>(img.cols * 0.5), img.channels()};
+    std::vector<int> shape = {1, static_cast<int>(img.rows * 0.5), static_cast<int>(img.cols * 0.5),
+                              img.channels()};
     std::shared_ptr<base::Blob<float>> dst_blob(new base::Blob<float>(shape));
     EXPECT_TRUE(ResizeCPU(*src_blob, dst_blob, data_provider.src_width(), 0));
     EXPECT_EQ(dst_blob->shape(0), src_blob->shape(0));
@@ -311,8 +303,8 @@ TEST(UtilTest, test_resize_cpu) {
   }
 
   {
-    std::vector<int> shape = {1, static_cast<int>(img.rows * 0.5),
-                              static_cast<int>(img.cols * 0.5), 0};
+    std::vector<int> shape = {1, static_cast<int>(img.rows * 0.5), static_cast<int>(img.cols * 0.5),
+                              0};
     std::shared_ptr<base::Blob<float>> dst_blob(new base::Blob<float>(shape));
     EXPECT_FALSE(ResizeCPU(*src_blob, dst_blob, data_provider.src_width(), 0));
   }
@@ -347,15 +339,15 @@ TEST(UtilTest, FillObjectPolygonFromBBox3DTest) {
   EXPECT_EQ(object, nullptr);
 
   object.reset(new base::Object);
-  object->size(0) = 10;
-  object->size(1) = 10;
-  object->size(2) = 10;
+  object->size(0)      = 10;
+  object->size(1)      = 10;
+  object->size(2)      = 10;
   object->direction(0) = 0.707f;
   object->direction(1) = 0.707f;
   object->direction(2) = 0.0f;
-  object->center(0) = 0;
-  object->center(1) = 0;
-  object->center(2) = 0;
+  object->center(0)    = 0;
+  object->center(1)    = 0;
+  object->center(2)    = 0;
 
   FillObjectPolygonFromBBox3D(object.get());
   EXPECT_EQ(object->polygon.size(), 4);
@@ -371,18 +363,17 @@ TEST(UtilTest, FillObjectPolygonFromBBox3DTest) {
 
 TEST(UtilTest, TestCalculateMeanAndVariance) {
   std::vector<double> data;
-  double mean = 0.0;
-  double var = 0.0;
+  double              mean = 0.0;
+  double              var  = 0.0;
 
-  CalculateMeanAndVariance(data, static_cast<double *>(nullptr), &var);
-  CalculateMeanAndVariance(data, &mean, static_cast<double *>(nullptr));
+  CalculateMeanAndVariance(data, static_cast<double*>(nullptr), &var);
+  CalculateMeanAndVariance(data, &mean, static_cast<double*>(nullptr));
   CalculateMeanAndVariance(data, &mean, &var);
 
-  data = std::vector<double>({-4.771477549277996, -5.993583986626174,
-                              2.021726801725549, -0.13071376170261217,
-                              -0.4202989526699099, 3.3351565902424305,
-                              -2.6686659382771882, 3.391145123909162,
-                              7.645098267749905, -3.0813026156194017});
+  data = std::vector<double>({-4.771477549277996, -5.993583986626174, 2.021726801725549,
+                              -0.13071376170261217, -0.4202989526699099, 3.3351565902424305,
+                              -2.6686659382771882, 3.391145123909162, 7.645098267749905,
+                              -3.0813026156194017});
   CalculateMeanAndVariance(data, &mean, &var);
   EXPECT_NEAR(mean, -0.06729160205462356, 1e-5);
   EXPECT_NEAR(var, 16.061274792441097, 1e-5);

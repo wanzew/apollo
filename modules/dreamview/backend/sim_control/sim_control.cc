@@ -46,76 +46,61 @@ using apollo::routing::RoutingResponse;
 
 namespace {
 
-void TransformToVRF(const Point3D& point_mrf, const Quaternion& orientation,
-                    Point3D* point_vrf) {
+void TransformToVRF(const Point3D& point_mrf, const Quaternion& orientation, Point3D* point_vrf) {
   Eigen::Vector3d v_mrf(point_mrf.x(), point_mrf.y(), point_mrf.z());
-  auto v_vrf = InverseQuaternionRotate(orientation, v_mrf);
+  auto            v_vrf = InverseQuaternionRotate(orientation, v_mrf);
   point_vrf->set_x(v_vrf.x());
   point_vrf->set_y(v_vrf.y());
   point_vrf->set_z(v_vrf.z());
 }
 
 bool IsSameHeader(const Header& lhs, const Header& rhs) {
-  return lhs.sequence_num() == rhs.sequence_num() &&
-         lhs.timestamp_sec() == rhs.timestamp_sec();
+  return lhs.sequence_num() == rhs.sequence_num() && lhs.timestamp_sec() == rhs.timestamp_sec();
 }
 
 }  // namespace
 
 SimControl::SimControl(const MapService* map_service)
-    : map_service_(map_service),
-      node_(cyber::CreateNode("sim_control")),
-      current_trajectory_(std::make_shared<ADCTrajectory>()) {
+    : map_service_(map_service)
+    , node_(cyber::CreateNode("sim_control"))
+    , current_trajectory_(std::make_shared<ADCTrajectory>()) {
   InitTimerAndIO();
 }
 
 void SimControl::InitTimerAndIO() {
-  localization_reader_ =
-      node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
-  planning_reader_ = node_->CreateReader<ADCTrajectory>(
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
+  planning_reader_     = node_->CreateReader<ADCTrajectory>(
       FLAGS_planning_trajectory_topic,
-      [this](const std::shared_ptr<ADCTrajectory>& trajectory) {
-        this->OnPlanning(trajectory);
-      });
+      [this](const std::shared_ptr<ADCTrajectory>& trajectory) { this->OnPlanning(trajectory); });
   routing_response_reader_ = node_->CreateReader<RoutingResponse>(
-      FLAGS_routing_response_topic,
-      [this](const std::shared_ptr<RoutingResponse>& routing) {
+      FLAGS_routing_response_topic, [this](const std::shared_ptr<RoutingResponse>& routing) {
         this->OnRoutingResponse(routing);
       });
   navigation_reader_ = node_->CreateReader<NavigationInfo>(
-      FLAGS_navigation_topic,
-      [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
+      FLAGS_navigation_topic, [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
         this->OnReceiveNavigationInfo(navigation_info);
       });
   prediction_reader_ = node_->CreateReader<PredictionObstacles>(
-      FLAGS_prediction_topic,
-      [this](const std::shared_ptr<PredictionObstacles>& obstacles) {
+      FLAGS_prediction_topic, [this](const std::shared_ptr<PredictionObstacles>& obstacles) {
         this->OnPredictionObstacles(obstacles);
       });
 
-  localization_writer_ =
-      node_->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
-  chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
-  prediction_writer_ =
-      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  localization_writer_ = node_->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
+  chassis_writer_      = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
+  prediction_writer_   = node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
   // Start timer to publish localization and chassis messages.
   sim_control_timer_.reset(new cyber::Timer(
       kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
   sim_prediction_timer_.reset(new cyber::Timer(
-      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
-      false));
+      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); }, false));
 }
 
-void SimControl::Init(double start_velocity,
-                      double start_acceleration) {
-  if (!FLAGS_use_navigation_mode) {
-    InitStartPoint(start_velocity, start_acceleration);
-  }
+void SimControl::Init(double start_velocity, double start_acceleration) {
+  if (!FLAGS_use_navigation_mode) { InitStartPoint(start_velocity, start_acceleration); }
 }
 
-void SimControl::InitStartPoint(double start_velocity,
-                                double start_acceleration) {
+void SimControl::InitStartPoint(double start_velocity, double start_acceleration) {
   TrajectoryPoint point;
   // Use the latest localization position as start point,
   // fall back to a dummy point from map
@@ -131,42 +116,38 @@ void SimControl::InitStartPoint(double start_velocity,
     point.mutable_path_point()->set_y(start_point.y());
     point.mutable_path_point()->set_z(start_point.z());
     double theta = 0.0;
-    double s = 0.0;
-    map_service_->GetPoseWithRegardToLane(start_point.x(), start_point.y(),
-                                          &theta, &s);
+    double s     = 0.0;
+    map_service_->GetPoseWithRegardToLane(start_point.x(), start_point.y(), &theta, &s);
     point.mutable_path_point()->set_theta(theta);
     point.set_v(start_velocity);
     point.set_a(start_acceleration);
   } else {
     start_point_from_localization_ = true;
-    const auto& localization = localization_reader_->GetLatestObserved();
-    const auto& pose = localization->pose();
+    const auto& localization       = localization_reader_->GetLatestObserved();
+    const auto& pose               = localization->pose();
     point.mutable_path_point()->set_x(pose.position().x());
     point.mutable_path_point()->set_y(pose.position().y());
     point.mutable_path_point()->set_z(pose.position().z());
     point.mutable_path_point()->set_theta(pose.heading());
-    point.set_v(
-        std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
+    point.set_v(std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
     // Calculates the dot product of acceleration and velocity. The sign
     // of this projection indicates whether this is acceleration or
     // deceleration.
-    double projection =
-        pose.linear_acceleration().x() * pose.linear_velocity().x() +
-        pose.linear_acceleration().y() * pose.linear_velocity().y();
+    double projection = pose.linear_acceleration().x() * pose.linear_velocity().x() +
+                        pose.linear_acceleration().y() * pose.linear_velocity().y();
 
     // Calculates the magnitude of the acceleration. Negate the value if
     // it is indeed a deceleration.
-    double magnitude = std::hypot(pose.linear_acceleration().x(),
-                                  pose.linear_acceleration().y());
+    double magnitude = std::hypot(pose.linear_acceleration().x(), pose.linear_acceleration().y());
     point.set_a(std::signbit(projection) ? -magnitude : magnitude);
   }
   SetStartPoint(point);
 }
 
 void SimControl::SetStartPoint(const TrajectoryPoint& start_point) {
-  next_point_ = start_point;
+  next_point_       = start_point;
   prev_point_index_ = next_point_index_ = 0;
-  received_planning_ = false;
+  received_planning_                    = false;
 }
 
 void SimControl::Reset() {
@@ -176,7 +157,7 @@ void SimControl::Reset() {
 
 void SimControl::InternalReset() {
   current_routing_header_.Clear();
-  re_routing_triggered_ = false;
+  re_routing_triggered_  = false;
   send_dummy_prediction_ = true;
   ClearPlanning();
 }
@@ -186,24 +167,18 @@ void SimControl::ClearPlanning() {
   received_planning_ = false;
 }
 
-void SimControl::OnReceiveNavigationInfo(
-    const std::shared_ptr<NavigationInfo>& navigation_info) {
+void SimControl::OnReceiveNavigationInfo(const std::shared_ptr<NavigationInfo>& navigation_info) {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (navigation_info->navigation_path_size() > 0) {
     const auto& path = navigation_info->navigation_path(0).path();
-    if (path.path_point_size() > 0) {
-      adc_position_ = path.path_point(0);
-    }
+    if (path.path_point_size() > 0) { adc_position_ = path.path_point(0); }
   }
 }
 
-void SimControl::OnRoutingResponse(
-    const std::shared_ptr<RoutingResponse>& routing) {
+void SimControl::OnRoutingResponse(const std::shared_ptr<RoutingResponse>& routing) {
   std::lock_guard<std::mutex> lock(mutex_);
-  if (!enabled_) {
-    return;
-  }
+  if (!enabled_) { return; }
 
   CHECK_GE(routing->routing_request().waypoint_size(), 2)
       << "routing should have at least two waypoints";
@@ -214,8 +189,7 @@ void SimControl::OnRoutingResponse(
   // If this is from a planning re-routing request, or the start point has
   // been
   // initialized by an actual localization pose, don't reset the start point.
-  re_routing_triggered_ =
-      routing->routing_request().header().module_name() == "planning";
+  re_routing_triggered_ = routing->routing_request().header().module_name() == "planning";
   if (!re_routing_triggered_ && !start_point_from_localization_) {
     ClearPlanning();
     TrajectoryPoint point;
@@ -224,21 +198,17 @@ void SimControl::OnRoutingResponse(
     point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
     point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
     double theta = 0.0;
-    double s = 0.0;
-    map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
-                                          &theta, &s);
+    double s     = 0.0;
+    map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(), &theta, &s);
     point.mutable_path_point()->set_theta(theta);
     SetStartPoint(point);
   }
 }
 
-void SimControl::OnPredictionObstacles(
-    const std::shared_ptr<PredictionObstacles>& obstacles) {
+void SimControl::OnPredictionObstacles(const std::shared_ptr<PredictionObstacles>& obstacles) {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  if (!enabled_) {
-    return;
-  }
+  if (!enabled_) { return; }
 
   send_dummy_prediction_ = obstacles->header().module_name() == "SimPrediction";
 }
@@ -252,8 +222,7 @@ void SimControl::Start() {
     // When localization is already available, we do not need to
     // reset/override the start point.
     localization_reader_->Observe();
-    Init(next_point_.has_v() ? next_point_.v() : 0.0,
-         next_point_.has_a() ? next_point_.a() : 0.0);
+    Init(next_point_.has_v() ? next_point_.v() : 0.0, next_point_.has_a() ? next_point_.a() : 0.0);
 
     InternalReset();
     sim_control_timer_->Start();
@@ -275,18 +244,16 @@ void SimControl::Stop() {
 void SimControl::OnPlanning(const std::shared_ptr<ADCTrajectory>& trajectory) {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  if (!enabled_) {
-    return;
-  }
+  if (!enabled_) { return; }
 
   // Reset current trajectory and the indices upon receiving a new trajectory.
   // The routing SimControl owns must match with the one Planning has.
   if (re_routing_triggered_ ||
       IsSameHeader(trajectory->routing_header(), current_routing_header_)) {
     current_trajectory_ = trajectory;
-    prev_point_index_ = 0;
-    next_point_index_ = 0;
-    received_planning_ = true;
+    prev_point_index_   = 0;
+    next_point_index_   = 0;
+    received_planning_  = true;
   } else {
     ClearPlanning();
   }
@@ -301,7 +268,7 @@ void SimControl::Freeze() {
 void SimControl::RunOnce() {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  TrajectoryPoint trajectory_point;
+  TrajectoryPoint       trajectory_point;
   Chassis::GearPosition gear_position;
   if (!PerfectControlModel(&trajectory_point, &gear_position)) {
     AERROR << "Failed to calculate next point with perfect control model";
@@ -312,18 +279,16 @@ void SimControl::RunOnce() {
   PublishLocalization(trajectory_point);
 }
 
-bool SimControl::PerfectControlModel(TrajectoryPoint* point,
-                                     Chassis::GearPosition* gear_position) {
+bool SimControl::PerfectControlModel(TrajectoryPoint* point, Chassis::GearPosition* gear_position) {
   // Result of the interpolation.
-  auto current_time = Clock::NowInSeconds();
-  const auto& trajectory = current_trajectory_->trajectory_point();
-  *gear_position = current_trajectory_->gear();
+  auto        current_time = Clock::NowInSeconds();
+  const auto& trajectory   = current_trajectory_->trajectory_point();
+  *gear_position           = current_trajectory_->gear();
 
   if (!received_planning_) {
     prev_point_ = next_point_;
   } else {
-    if (current_trajectory_->estop().is_estop() ||
-        next_point_index_ >= trajectory.size()) {
+    if (current_trajectory_->estop().is_estop() || next_point_index_ >= trajectory.size()) {
       // Freeze the car when there's an estop or the current trajectory has
       // been exhausted.
       Freeze();
@@ -335,9 +300,7 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point,
         ++next_point_index_;
       }
 
-      if (next_point_index_ >= trajectory.size()) {
-        next_point_index_ = trajectory.size() - 1;
-      }
+      if (next_point_index_ >= trajectory.size()) { next_point_index_ = trajectory.size() - 1; }
 
       if (next_point_index_ == 0) {
         AERROR << "First trajectory point is a future point!";
@@ -351,20 +314,17 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point,
     }
   }
 
-  if (current_time > next_point_.relative_time() +
-                         current_trajectory_->header().timestamp_sec()) {
+  if (current_time > next_point_.relative_time() + current_trajectory_->header().timestamp_sec()) {
     // Don't try to extrapolate if relative_time passes last point
     *point = next_point_;
   } else {
     *point = InterpolateUsingLinearApproximation(
-        prev_point_, next_point_,
-        current_time - current_trajectory_->header().timestamp_sec());
+        prev_point_, next_point_, current_time - current_trajectory_->header().timestamp_sec());
   }
   return true;
 }
 
-void SimControl::PublishChassis(double cur_speed,
-                                Chassis::GearPosition gear_position) {
+void SimControl::PublishChassis(double cur_speed, Chassis::GearPosition gear_position) {
   auto chassis = std::make_shared<Chassis>();
   FillHeader("SimControl", chassis.get());
 
@@ -388,8 +348,8 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   FillHeader("SimControl", localization.get());
 
   auto* pose = localization->mutable_pose();
-  auto prev = prev_point_.path_point();
-  auto next = next_point_.path_point();
+  auto  prev = prev_point_.path_point();
+  auto  next = next_point_.path_point();
 
   // Set position
   pose->mutable_position()->set_x(point.path_point().x());
@@ -402,8 +362,7 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
     double flu_x = point.path_point().x();
     double flu_y = point.path_point().y();
 
-    Eigen::Vector2d enu_coordinate =
-        common::math::RotateVector2d({flu_x, flu_y}, cur_theta);
+    Eigen::Vector2d enu_coordinate = common::math::RotateVector2d({flu_x, flu_y}, cur_theta);
 
     enu_coordinate.x() += adc_position_.x();
     enu_coordinate.y() += adc_position_.y();
@@ -411,8 +370,7 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
     pose->mutable_position()->set_y(enu_coordinate.y());
   }
 
-  Eigen::Quaternion<double> cur_orientation =
-      HeadingToQuaternion<double>(cur_theta);
+  Eigen::Quaternion<double> cur_orientation = HeadingToQuaternion<double>(cur_theta);
   pose->mutable_orientation()->set_qw(cur_orientation.w());
   pose->mutable_orientation()->set_qx(cur_orientation.x());
   pose->mutable_orientation()->set_qy(cur_orientation.y());
@@ -428,8 +386,7 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   // frame
   pose->mutable_angular_velocity()->set_x(0);
   pose->mutable_angular_velocity()->set_y(0);
-  pose->mutable_angular_velocity()->set_z(point.v() *
-                                          point.path_point().kappa());
+  pose->mutable_angular_velocity()->set_z(point.v() * point.path_point().kappa());
 
   TransformToVRF(pose->angular_velocity(), pose->orientation(),
                  pose->mutable_angular_velocity_vrf());
@@ -455,9 +412,7 @@ void SimControl::PublishDummyPrediction() {
   auto prediction = std::make_shared<PredictionObstacles>();
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (!send_dummy_prediction_) {
-      return;
-    }
+    if (!send_dummy_prediction_) { return; }
     FillHeader("SimPrediction", prediction.get());
   }
   prediction_writer_->Write(prediction);

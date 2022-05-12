@@ -76,33 +76,37 @@ namespace inference {
 template <typename Dtype>
 class ROIPoolingLayer : public Layer<Dtype> {
  public:
-  ROIPoolingLayer(int pooled_h, int pooled_w, bool use_floor,
-                  float spatial_scale, int channels, int max_objs = 1000)
-      : channels_(0),
-        height_(0),
-        width_(0),
-        pooled_height_(pooled_h),
-        pooled_width_(pooled_w),
-        use_floor_(use_floor),
-        float_max_(std::numeric_limits<float>::max()),
-        spatial_scale_(spatial_scale) {
+  ROIPoolingLayer(int   pooled_h,
+                  int   pooled_w,
+                  bool  use_floor,
+                  float spatial_scale,
+                  int   channels,
+                  int   max_objs = 1000)
+      : channels_(0)
+      , height_(0)
+      , width_(0)
+      , pooled_height_(pooled_h)
+      , pooled_width_(pooled_w)
+      , use_floor_(use_floor)
+      , float_max_(std::numeric_limits<float>::max())
+      , spatial_scale_(spatial_scale) {
     max_idx_.Reshape(max_objs, channels, pooled_height_, pooled_width_);
   }
-  void ForwardGPU(const std::vector<std::shared_ptr<base::Blob<Dtype>>> &bottom,
-                  const std::vector<std::shared_ptr<base::Blob<Dtype>>> &top);
-  void ForwardCPU(const std::vector<std::shared_ptr<base::Blob<Dtype>>> &bottom,
-                  const std::vector<std::shared_ptr<base::Blob<Dtype>>> &top);
+  void ForwardGPU(const std::vector<std::shared_ptr<base::Blob<Dtype>>>& bottom,
+                  const std::vector<std::shared_ptr<base::Blob<Dtype>>>& top);
+  void ForwardCPU(const std::vector<std::shared_ptr<base::Blob<Dtype>>>& bottom,
+                  const std::vector<std::shared_ptr<base::Blob<Dtype>>>& top);
 
  private:
   base::Blob<int> max_idx_;
-  int channels_;
-  int height_;
-  int width_;
-  int pooled_height_;
-  int pooled_width_;
-  bool use_floor_;
-  const float float_max_;
-  float spatial_scale_;
+  int             channels_;
+  int             height_;
+  int             width_;
+  int             pooled_height_;
+  int             pooled_width_;
+  bool            use_floor_;
+  const float     float_max_;
+  float           spatial_scale_;
 };
 
 }  // namespace inference

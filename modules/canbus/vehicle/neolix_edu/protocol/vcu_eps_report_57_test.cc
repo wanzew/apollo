@@ -16,9 +16,10 @@
 
 #include "modules/canbus/vehicle/neolix_edu/protocol/vcu_eps_report_57.h"
 
+#include "gtest/gtest.h"
+
 #include "glog/logging.h"
 
-#include "gtest/gtest.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
@@ -31,9 +32,9 @@ class Vcuepsreport57Test : public ::testing::Test {
 };
 
 TEST_F(Vcuepsreport57Test, reset) {
-  uint8_t data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t        data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  int32_t        length  = 8;
+  ChassisDetail  cd;
   Vcuepsreport57 accel_cmd;
   accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b00000000);
@@ -50,8 +51,7 @@ TEST_F(Vcuepsreport57Test, reset) {
   EXPECT_EQ(cd.neolix_edu().vcu_eps_report_57().vcu_eps_report(), false);
   EXPECT_EQ(cd.neolix_edu().vcu_eps_report_57().vcu_real_angle(), 2048);
   EXPECT_EQ(cd.neolix_edu().vcu_eps_report_57().vcu_real_angle_valid(), false);
-  EXPECT_EQ(cd.neolix_edu().vcu_eps_report_57().vcu_target_angle_valid(),
-            false);
+  EXPECT_EQ(cd.neolix_edu().vcu_eps_report_57().vcu_target_angle_valid(), false);
   EXPECT_EQ(cd.neolix_edu().vcu_eps_report_57().vcu_target_angle(), -512);
 }
 

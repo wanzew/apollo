@@ -23,22 +23,19 @@ namespace camera {
 
 class BaseSimilar {
  public:
-  virtual bool Calc(CameraFrame *frame1, CameraFrame *frame2,
-                    base::Blob<float> *sim) = 0;
+  virtual bool Calc(CameraFrame* frame1, CameraFrame* frame2, base::Blob<float>* sim) = 0;
 };
 
 class CosineSimilar : public BaseSimilar {
  public:
   CosineSimilar() = default;
 
-  bool Calc(CameraFrame *frame1, CameraFrame *frame2,
-            base::Blob<float> *sim) override;
+  bool Calc(CameraFrame* frame1, CameraFrame* frame2, base::Blob<float>* sim) override;
 };
 
 class GPUSimilar : public BaseSimilar {
  public:
-  bool Calc(CameraFrame *frame1, CameraFrame *frame2,
-            base::Blob<float> *sim) override;
+  bool Calc(CameraFrame* frame1, CameraFrame* frame2, base::Blob<float>* sim) override;
 };
 }  // namespace camera
 }  // namespace perception

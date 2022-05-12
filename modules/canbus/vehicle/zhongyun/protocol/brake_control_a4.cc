@@ -42,7 +42,7 @@ void Brakecontrola4::UpdateData(uint8_t* data) {
 
 void Brakecontrola4::Reset() {
   // TODO(ChaoM) :  you should check this manually
-  brake_torque_ = 0.0;
+  brake_torque_         = 0.0;
   brake_enable_control_ = Brake_control_a4::BRAKE_ENABLE_CONTROL_BRAKE_MANUAL;
 }
 
@@ -56,8 +56,8 @@ Brakecontrola4* Brakecontrola4::set_brake_torque(double brake_torque) {
 // 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
 void Brakecontrola4::set_p_brake_torque(uint8_t* data, double brake_torque) {
   brake_torque = ProtocolData::BoundedValue(0.0, 100.0, brake_torque);
-  int x = static_cast<int>(brake_torque / 0.050000);
-  uint8_t t = 0;
+  int     x    = static_cast<int>(brake_torque / 0.050000);
+  uint8_t t    = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 1);
@@ -81,8 +81,7 @@ Brakecontrola4* Brakecontrola4::set_brake_enable_control(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 void Brakecontrola4::set_p_brake_enable_control(
-    uint8_t* data,
-    Brake_control_a4::Brake_enable_controlType brake_enable_control) {
+    uint8_t* data, Brake_control_a4::Brake_enable_controlType brake_enable_control) {
   int x = brake_enable_control;
 
   Byte to_set(data + 0);

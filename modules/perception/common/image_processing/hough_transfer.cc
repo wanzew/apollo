@@ -20,17 +20,17 @@ namespace perception {
 namespace common {
 
 HoughTransfer::HoughTransfer()
-    : prepared_(false),
-      d_r_(0.0),
-      d_theta_(0.0),
-      img_w_(0),
-      img_h_(0),
-      r_size_(0),
-      theta_size_(0),
-      vote_reserve_size_(10),
-      vote_map_(),
-      query_map_(),
-      distribute_map_() {}
+    : prepared_(false)
+    , d_r_(0.0)
+    , d_theta_(0.0)
+    , img_w_(0)
+    , img_h_(0)
+    , r_size_(0)
+    , theta_size_(0)
+    , vote_reserve_size_(10)
+    , vote_map_()
+    , query_map_()
+    , distribute_map_() {}
 
 // step1
 // @brief: initiate
@@ -38,12 +38,12 @@ HoughTransfer::HoughTransfer()
 //             d_r, d_theta: discretization step of r and theta
 //                           in polar coordinates
 bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
-  img_w_ = img_w;
-  img_h_ = img_h;
-  d_r_ = d_r;
+  img_w_   = img_w;
+  img_h_   = img_h;
+  d_r_     = d_r;
   d_theta_ = static_cast<float>(M_PI) * d_theta / 180.0f;
-  r_size_ = static_cast<int>(
-      2 * sqrtf(static_cast<float>(img_w_ * img_w_ + img_h_ * img_h_)) / d_r_);
+  r_size_ =
+      static_cast<int>(2 * sqrtf(static_cast<float>(img_w_ * img_w_ + img_h_ * img_h_)) / d_r_);
   theta_size_ = static_cast<int>(M_PI / d_theta_);
 
   ClearWithShrink();
@@ -60,12 +60,8 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
     for (int img_pos = 0; img_pos < img_w_ * img_h_; ++img_pos) {
       int w = img_pos % img_w_;
       int h = img_pos / img_w_;
-      int r =
-          static_cast<int>((cos(cur_theta) * w + sin(cur_theta) * h) / d_r_) +
-          r_size_ / 2;
-      if (0 <= r && r < r_size_) {
-        query_map_[img_pos][theta_idx] = r * theta_size_ + theta_idx;
-      }
+      int r = static_cast<int>((cos(cur_theta) * w + sin(cur_theta) * h) / d_r_) + r_size_ / 2;
+      if (0 <= r && r < r_size_) { query_map_[img_pos][theta_idx] = r * theta_size_ + theta_idx; }
     }
   }
   // init distribute map
@@ -88,11 +84,8 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
 // @params[IN] image: 2D binary image.
 //             with_distribute: flag to control whether to calculate element
 //                              length,vote_num,pts in HoughLine
-bool HoughTransfer::ImageVote(const std::vector<int>& image,
-                              bool with_distribute) {
-  if (image.size() != query_map_.size()) {
-    return false;
-  }
+bool HoughTransfer::ImageVote(const std::vector<int>& image, bool with_distribute) {
+  if (image.size() != query_map_.size()) { return false; }
   ResetMaps(with_distribute);
   for (size_t i = 0; i < image.size(); ++i) {
     if (image[i] > 0) {
@@ -117,9 +110,7 @@ void HoughTransfer::PointVote(int x, int y, bool with_distribute) {
 void HoughTransfer::PointVote(int pos, bool with_distribute) {
   for (int theta_idx = 0; theta_idx < theta_size_; ++theta_idx) {
     ++vote_map_[query_map_[pos][theta_idx]];
-    if (with_distribute) {
-      distribute_map_[query_map_[pos][theta_idx]].push_back(pos);
-    }
+    if (with_distribute) { distribute_map_[query_map_[pos][theta_idx]].push_back(pos); }
   }
 }
 
@@ -130,27 +121,24 @@ void HoughTransfer::PointVote(int pos, bool with_distribute) {
 //             with_distribute: flag to control whether to calculate element
 //                              length,vote_num,pts in HoughLine
 //             lines: save lines detected.
-bool HoughTransfer::GetLines(int min_pt_num, int r_neibor, int theta_neibor,
-                             bool with_distribute,
+bool HoughTransfer::GetLines(int                     min_pt_num,
+                             int                     r_neibor,
+                             int                     theta_neibor,
+                             bool                    with_distribute,
                              std::vector<HoughLine>* lines) const {
-  if (!lines) {
-    return false;
-  }
-  int r_step = 2 * r_neibor + 1;
+  if (!lines) { return false; }
+  int r_step     = 2 * r_neibor + 1;
   int theta_step = 2 * theta_neibor + 1;
 
   // search one vote neighbor for max_vote position in the region
   std::set<int> max_vote_lines;
-  GetMaxVotes(min_pt_num, r_neibor, theta_neibor, r_step, theta_step,
-              &max_vote_lines);
+  GetMaxVotes(min_pt_num, r_neibor, theta_neibor, r_step, theta_step, &max_vote_lines);
 
   // from max vote pos to get line params
   lines->resize(max_vote_lines.size());
   int idx = 0;
   for (auto i = max_vote_lines.begin(); i != max_vote_lines.end(); ++i) {
-    if (!VotePosToHoughLine(*i, with_distribute, &(*lines)[idx++])) {
-      return false;
-    }
+    if (!VotePosToHoughLine(*i, with_distribute, &(*lines)[idx++])) { return false; }
   }
   return true;
 }
@@ -158,17 +146,12 @@ bool HoughTransfer::GetLines(int min_pt_num, int r_neibor, int theta_neibor,
 unsigned int HoughTransfer::MemoryConsume() const {
   unsigned int size = 0;
   if (is_prepared()) {
-    size +=
-        static_cast<unsigned int>(vote_map_.capacity() * sizeof(vote_map_[0]));
-    size += static_cast<unsigned int>(query_map_.capacity() *
-                                      sizeof(query_map_[0]));
-    size += static_cast<unsigned int>(theta_size_ * query_map_.size() *
-                                      sizeof(query_map_[0][0]));
-    size += static_cast<unsigned int>(distribute_map_.capacity() *
-                                      sizeof(distribute_map_[0]));
+    size += static_cast<unsigned int>(vote_map_.capacity() * sizeof(vote_map_[0]));
+    size += static_cast<unsigned int>(query_map_.capacity() * sizeof(query_map_[0]));
+    size += static_cast<unsigned int>(theta_size_ * query_map_.size() * sizeof(query_map_[0][0]));
+    size += static_cast<unsigned int>(distribute_map_.capacity() * sizeof(distribute_map_[0]));
     for (const auto& distribute : distribute_map_) {
-      size += static_cast<unsigned int>(distribute.capacity() *
-                                        sizeof(distribute[0]));
+      size += static_cast<unsigned int>(distribute.capacity() * sizeof(distribute[0]));
     }
   }
   return size;
@@ -203,68 +186,55 @@ void HoughTransfer::ClearWithShrink() {
 }
 
 bool HoughTransfer::CheckPrepared() const {
-  if (static_cast<int>(vote_map_.size()) != r_size_ * theta_size_) {
-    return false;
-  }
-  if (static_cast<int>(query_map_.size()) != img_w_ * img_h_) {
-    return false;
-  }
-  if (static_cast<int>(distribute_map_.size()) != r_size_ * theta_size_) {
-    return false;
-  }
-  if (vote_map_.empty() || query_map_.empty() || distribute_map_.empty()) {
-    return false;
-  }
+  if (static_cast<int>(vote_map_.size()) != r_size_ * theta_size_) { return false; }
+  if (static_cast<int>(query_map_.size()) != img_w_ * img_h_) { return false; }
+  if (static_cast<int>(distribute_map_.size()) != r_size_ * theta_size_) { return false; }
+  if (vote_map_.empty() || query_map_.empty() || distribute_map_.empty()) { return false; }
   return true;
 }
 
-void HoughTransfer::GetMaxVotes(int min_pt_num, int r_neibor, int theta_neibor,
-                                int r_step, int theta_step,
+void HoughTransfer::GetMaxVotes(int            min_pt_num,
+                                int            r_neibor,
+                                int            theta_neibor,
+                                int            r_step,
+                                int            theta_step,
                                 std::set<int>* max_vote_lines) const {
   for (int i = r_neibor; i < r_size_ - r_neibor; i += r_step) {
-    for (int j = theta_neibor; j < theta_size_ - theta_neibor;
-         j += theta_step) {
-      int max_pos = -1;
+    for (int j = theta_neibor; j < theta_size_ - theta_neibor; j += theta_step) {
+      int max_pos  = -1;
       int max_vote = min_pt_num;
       for (int m = -r_neibor; m <= r_neibor; ++m) {
         for (int n = -theta_neibor; n <= theta_neibor; ++n) {
           int neibor_pos = (i + m) * theta_size_ + j + n;
           if (vote_map_[neibor_pos] >= max_vote) {
-            max_pos = neibor_pos;
+            max_pos  = neibor_pos;
             max_vote = vote_map_[neibor_pos];
           }
         }
       }
-      if (max_pos >= 0) {
-        max_vote_lines->insert(max_pos);
-      }
+      if (max_pos >= 0) { max_vote_lines->insert(max_pos); }
     }
   }
 }
 
-bool HoughTransfer::VotePosToHoughLine(int vote_pos, bool with_distribute,
+bool HoughTransfer::VotePosToHoughLine(int        vote_pos,
+                                       bool       with_distribute,
                                        HoughLine* out_line) const {
-  if (!out_line) {
-    return false;
-  }
-  out_line->r = static_cast<float>(vote_pos / theta_size_ - r_size_ / 2) * d_r_;
-  out_line->theta = static_cast<float>(vote_pos % theta_size_) * d_theta_;
+  if (!out_line) { return false; }
+  out_line->r        = static_cast<float>(vote_pos / theta_size_ - r_size_ / 2) * d_r_;
+  out_line->theta    = static_cast<float>(vote_pos % theta_size_) * d_theta_;
   out_line->vote_num = vote_map_[vote_pos];
   if (with_distribute) {
-    if (out_line->vote_num !=
-        static_cast<int>(distribute_map_[vote_pos].size())) {
-      return false;
-    }
-    out_line->pts = distribute_map_[vote_pos];
+    if (out_line->vote_num != static_cast<int>(distribute_map_[vote_pos].size())) { return false; }
+    out_line->pts       = distribute_map_[vote_pos];
     const int start_pos = distribute_map_[vote_pos][0];
-    const int end_pos = distribute_map_[vote_pos][out_line->vote_num - 1];
-    const int start_x = start_pos % img_w_;
-    const int start_y = start_pos / img_w_;
-    const int end_x = end_pos % img_w_;
-    const int end_y = end_pos / img_w_;
-    out_line->length =
-        sqrtf(static_cast<float>((start_x - end_x) * (start_x - end_x) +
-                                 (start_y - end_y) * (start_y - end_y)));
+    const int end_pos   = distribute_map_[vote_pos][out_line->vote_num - 1];
+    const int start_x   = start_pos % img_w_;
+    const int start_y   = start_pos / img_w_;
+    const int end_x     = end_pos % img_w_;
+    const int end_y     = end_pos / img_w_;
+    out_line->length    = sqrtf(static_cast<float>((start_x - end_x) * (start_x - end_x) +
+                                                (start_y - end_y) * (start_y - end_y)));
   }
   return true;
 }

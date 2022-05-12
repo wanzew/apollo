@@ -20,26 +20,26 @@
 
 #pragma once
 
-#include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/common/frame.h"
 #include "modules/planning/proto/decision.pb.h"
+
+#include "modules/common/status/status.h"
+#include "modules/planning/common/frame.h"
 
 namespace apollo {
 namespace planning {
 
 class Smoother {
  public:
-  Smoother() = default;
+  Smoother()          = default;
   virtual ~Smoother() = default;
 
-  apollo::common::Status Smooth(const FrameHistory* frame_history,
-                                const Frame* current_frame,
+  apollo::common::Status Smooth(const FrameHistory*  frame_history,
+                                const Frame*         current_frame,
                                 ADCTrajectory* const current_trajectory_pb);
 
  private:
-  bool IsCloseStop(const common::VehicleState& vehicle_state,
-                   const MainStop& main_stop);
+  bool IsCloseStop(const common::VehicleState& vehicle_state, const MainStop& main_stop);
 };
 
 }  // namespace planning

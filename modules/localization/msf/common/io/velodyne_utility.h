@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "Eigen/Geometry"
+
 #include "modules/common/util/eigen_defs.h"
 
 namespace apollo {
@@ -49,31 +50,35 @@ struct VelodyneFrame {
   Eigen::Affine3d pose;
 };
 
-void LoadPcds(const std::string& file_path, const unsigned int frame_index,
-              const Eigen::Affine3d& pose, VelodyneFrame* velodyne_frame,
-              const bool is_global = false);
-
-void LoadPcds(const std::string& file_path, const unsigned int frame_index,
+void LoadPcds(const std::string&     file_path,
+              const unsigned int     frame_index,
               const Eigen::Affine3d& pose,
+              VelodyneFrame*         velodyne_frame,
+              const bool             is_global = false);
+
+void LoadPcds(const std::string&                  file_path,
+              const unsigned int                  frame_index,
+              const Eigen::Affine3d&              pose,
               ::apollo::common::EigenVector3dVec* pt3ds,
-              std::vector<unsigned char>* intensities, bool is_global = false);
+              std::vector<unsigned char>*         intensities,
+              bool                                is_global = false);
 
 /**@brief Load the PCD poses with their timestamps. */
-void LoadPcdPoses(const std::string& file_path,
+void LoadPcdPoses(const std::string&                  file_path,
                   ::apollo::common::EigenAffine3dVec* poses,
-                  std::vector<double>* timestamps);
+                  std::vector<double>*                timestamps);
 
 /**@brief Load the PCD poses with their timestamps and indices. */
-void LoadPcdPoses(const std::string& file_path,
+void LoadPcdPoses(const std::string&                  file_path,
                   ::apollo::common::EigenAffine3dVec* poses,
-                  std::vector<double>* timestamps,
-                  std::vector<unsigned int>* pcd_indices);
+                  std::vector<double>*                timestamps,
+                  std::vector<unsigned int>*          pcd_indices);
 
 /**@brief Load poses and stds their timestamps. */
-void LoadPosesAndStds(const std::string& file_path,
+void LoadPosesAndStds(const std::string&                  file_path,
                       ::apollo::common::EigenAffine3dVec* poses,
                       ::apollo::common::EigenVector3dVec* stds,
-                      std::vector<double>* timestamps);
+                      std::vector<double>*                timestamps);
 
 // /**@brief Save the PCD poses with their timestamps. */
 // void save_pcd_poses(std::string file_path,

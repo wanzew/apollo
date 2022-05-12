@@ -30,9 +30,8 @@ class SirenDetectionTest : public ::testing::Test {
 };
 
 TEST_F(SirenDetectionTest, is_siren) {
-  std::vector<std::vector<double>> signals(4,
-    (std::vector<double> (72000, 0.01)));
-  bool result = siren_detection_.Evaluate(signals);
+  std::vector<std::vector<double>> signals(4, (std::vector<double>(72000, 0.01)));
+  bool                             result = siren_detection_.Evaluate(signals);
   EXPECT_EQ(result, false);
 }
 

@@ -26,18 +26,18 @@
 #include "cyber/cyber.h"
 #include "modules/v2x/fusion/configs/fusion_tracker_gflags.h"
 
-#define PLUGIN_PARAMS(classname, conf_file, prototype)                       \
-  class classname {                                                          \
-   public:                                                                   \
-    classname() {                                                            \
-      file_path_ = FLAGS_config_path + "/" + conf_file;                      \
-      cyber::common::GetProtoFromFile(file_path_, &params);                  \
-    }                                                                        \
-    ~classname() { cyber::common::SetProtoToASCIIFile(params, file_path_); } \
-    prototype params;                                                        \
-                                                                             \
-   private:                                                                  \
-    std::string file_path_;                                                  \
+#define PLUGIN_PARAMS(classname, conf_file, prototype)                                             \
+  class classname {                                                                                \
+   public:                                                                                         \
+    classname() {                                                                                  \
+      file_path_ = FLAGS_config_path + "/" + conf_file;                                            \
+      cyber::common::GetProtoFromFile(file_path_, &params);                                        \
+    }                                                                                              \
+    ~classname() { cyber::common::SetProtoToASCIIFile(params, file_path_); }                       \
+    prototype params;                                                                              \
+                                                                                                   \
+   private:                                                                                        \
+    std::string file_path_;                                                                        \
   };
 
 namespace apollo {

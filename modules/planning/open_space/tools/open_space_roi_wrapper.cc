@@ -19,6 +19,9 @@
  **/
 
 #include "Eigen/Dense"
+
+#include "modules/planning/proto/planner_open_space_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
@@ -26,7 +29,6 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -45,55 +47,52 @@ class OpenSpaceROITest {
   bool OpenSpaceROI() {
     // left or right of the parking lot is decided when viewing the parking spot
     // open upward
-    Vec2d left_top = target_parking_spot_->polygon().points().at(3);
-    Vec2d left_down = target_parking_spot_->polygon().points().at(0);
-    Vec2d right_top = target_parking_spot_->polygon().points().at(2);
-    Vec2d right_down = target_parking_spot_->polygon().points().at(1);
-    double left_top_s = 0.0;
-    double left_top_l = 0.0;
+    Vec2d  left_top    = target_parking_spot_->polygon().points().at(3);
+    Vec2d  left_down   = target_parking_spot_->polygon().points().at(0);
+    Vec2d  right_top   = target_parking_spot_->polygon().points().at(2);
+    Vec2d  right_down  = target_parking_spot_->polygon().points().at(1);
+    double left_top_s  = 0.0;
+    double left_top_l  = 0.0;
     double right_top_s = 0.0;
     double right_top_l = 0.0;
     if (!(nearby_path_->GetProjection(left_top, &left_top_s, &left_top_l) &&
           nearby_path_->GetProjection(right_top, &right_top_s, &right_top_l))) {
-      AERROR <<  "fail to get parking spot points' projections "
-                 "on reference line";
+      AERROR << "fail to get parking spot points' projections "
+                "on reference line";
       return false;
     }
     // start or end, left or right is decided by the vehicle's heading
     double center_line_s = (left_top_s + right_top_s) / 2;
     double start_s =
-        center_line_s -
-        planner_open_space_config_.roi_config().roi_longitudinal_range_start();
+        center_line_s - planner_open_space_config_.roi_config().roi_longitudinal_range_start();
     double end_s =
-        center_line_s +
-        planner_open_space_config_.roi_config().roi_longitudinal_range_end();
-    hdmap::MapPathPoint end_point = nearby_path_->GetSmoothPoint(end_s);
-    hdmap::MapPathPoint start_point = nearby_path_->GetSmoothPoint(start_s);
-    double start_left_width = nearby_path_->GetRoadLeftWidth(start_s);
-    double start_right_width = nearby_path_->GetRoadRightWidth(start_s);
-    double end_left_width = nearby_path_->GetRoadLeftWidth(end_s);
-    double end_right_width = nearby_path_->GetRoadRightWidth(end_s);
-    double start_right_vec_cos = std::cos(start_point.heading() - M_PI / 2);
-    double start_right_vec_sin = std::sin(start_point.heading() - M_PI / 2);
-    double start_left_vec_cos = std::cos(start_point.heading() + M_PI / 2);
-    double start_left_vec_sin = std::sin(start_point.heading() + M_PI / 2);
-    double end_right_vec_cos = std::cos(end_point.heading() - M_PI / 2);
-    double end_right_vec_sin = std::sin(end_point.heading() - M_PI / 2);
-    double end_left_vec_cos = std::cos(end_point.heading() + M_PI / 2);
-    double end_left_vec_sin = std::sin(end_point.heading() + M_PI / 2);
+        center_line_s + planner_open_space_config_.roi_config().roi_longitudinal_range_end();
+    hdmap::MapPathPoint end_point           = nearby_path_->GetSmoothPoint(end_s);
+    hdmap::MapPathPoint start_point         = nearby_path_->GetSmoothPoint(start_s);
+    double              start_left_width    = nearby_path_->GetRoadLeftWidth(start_s);
+    double              start_right_width   = nearby_path_->GetRoadRightWidth(start_s);
+    double              end_left_width      = nearby_path_->GetRoadLeftWidth(end_s);
+    double              end_right_width     = nearby_path_->GetRoadRightWidth(end_s);
+    double              start_right_vec_cos = std::cos(start_point.heading() - M_PI / 2);
+    double              start_right_vec_sin = std::sin(start_point.heading() - M_PI / 2);
+    double              start_left_vec_cos  = std::cos(start_point.heading() + M_PI / 2);
+    double              start_left_vec_sin  = std::sin(start_point.heading() + M_PI / 2);
+    double              end_right_vec_cos   = std::cos(end_point.heading() - M_PI / 2);
+    double              end_right_vec_sin   = std::sin(end_point.heading() - M_PI / 2);
+    double              end_left_vec_cos    = std::cos(end_point.heading() + M_PI / 2);
+    double              end_left_vec_sin    = std::sin(end_point.heading() + M_PI / 2);
 
-    Vec2d start_right = Vec2d(start_right_width * start_right_vec_cos,
-                              start_right_width * start_right_vec_sin);
+    Vec2d start_right =
+        Vec2d(start_right_width * start_right_vec_cos, start_right_width * start_right_vec_sin);
     start_right = start_right + start_point;
-    Vec2d start_left = Vec2d(start_left_width * start_left_vec_cos,
-                             start_left_width * start_left_vec_sin);
+    Vec2d start_left =
+        Vec2d(start_left_width * start_left_vec_cos, start_left_width * start_left_vec_sin);
     start_left = start_left + start_point;
-    Vec2d end_right = Vec2d(end_right_width * end_right_vec_cos,
-                            end_right_width * end_right_vec_sin);
-    end_right = end_right + end_point;
-    Vec2d end_left = Vec2d(end_left_width * end_left_vec_cos,
-                           end_left_width * end_left_vec_sin);
-    end_left = end_left + end_point;
+    Vec2d end_right =
+        Vec2d(end_right_width * end_right_vec_cos, end_right_width * end_right_vec_sin);
+    end_right      = end_right + end_point;
+    Vec2d end_left = Vec2d(end_left_width * end_left_vec_cos, end_left_width * end_left_vec_sin);
+    end_left       = end_left + end_point;
 
     // rotate the points to have the lane to be horizontal to x axis and scale
     // them base on the origin point
@@ -122,8 +121,8 @@ class OpenSpaceROITest {
 
     // get end_pose of the parking spot
     parking_spot_heading_ = (left_down - left_top).Angle();
-    double end_x = (left_top.x() + right_top.x()) / 2;
-    double end_y = 0.0;
+    double end_x          = (left_top.x() + right_top.x()) / 2;
+    double end_y          = 0.0;
     if (parking_spot_heading_ > kMathEpsilon) {
       if (planner_open_space_config_.roi_config().parking_inwards()) {
         end_y = left_top.y() + (left_down.y() - left_top.y()) / 4;
@@ -142,8 +141,7 @@ class OpenSpaceROITest {
     if (planner_open_space_config_.roi_config().parking_inwards()) {
       open_space_end_pose_.emplace_back(parking_spot_heading_);
     } else {
-      open_space_end_pose_.emplace_back(
-          common::math::NormalizeAngle(parking_spot_heading_ + M_PI));
+      open_space_end_pose_.emplace_back(common::math::NormalizeAngle(parking_spot_heading_ + M_PI));
     }
     open_space_end_pose_.emplace_back(0.0);
 
@@ -219,61 +217,58 @@ class OpenSpaceROITest {
   bool NoRotateOpenSpaceROI() {
     // left or right of the parking lot is decided when viewing the parking spot
     // open upward
-    Vec2d left_top = target_parking_spot_->polygon().points().at(3);
-    Vec2d left_down = target_parking_spot_->polygon().points().at(0);
-    Vec2d right_top = target_parking_spot_->polygon().points().at(2);
-    Vec2d right_down = target_parking_spot_->polygon().points().at(1);
-    double left_top_s = 0.0;
-    double left_top_l = 0.0;
+    Vec2d  left_top    = target_parking_spot_->polygon().points().at(3);
+    Vec2d  left_down   = target_parking_spot_->polygon().points().at(0);
+    Vec2d  right_top   = target_parking_spot_->polygon().points().at(2);
+    Vec2d  right_down  = target_parking_spot_->polygon().points().at(1);
+    double left_top_s  = 0.0;
+    double left_top_l  = 0.0;
     double right_top_s = 0.0;
     double right_top_l = 0.0;
     if (!(nearby_path_->GetProjection(left_top, &left_top_s, &left_top_l) &&
           nearby_path_->GetProjection(right_top, &right_top_s, &right_top_l))) {
-      AERROR <<  "fail to get parking spot points' projections "
-                 "on reference line";
+      AERROR << "fail to get parking spot points' projections "
+                "on reference line";
       return false;
     }
     // start or end, left or right is decided by the vehicle's heading
     double center_line_s = (left_top_s + right_top_s) / 2;
     double start_s =
-        center_line_s -
-        planner_open_space_config_.roi_config().roi_longitudinal_range_start();
+        center_line_s - planner_open_space_config_.roi_config().roi_longitudinal_range_start();
     double end_s =
-        center_line_s +
-        planner_open_space_config_.roi_config().roi_longitudinal_range_end();
-    hdmap::MapPathPoint end_point = nearby_path_->GetSmoothPoint(end_s);
-    hdmap::MapPathPoint start_point = nearby_path_->GetSmoothPoint(start_s);
-    double start_left_width = nearby_path_->GetRoadLeftWidth(start_s);
-    double start_right_width = nearby_path_->GetRoadRightWidth(start_s);
-    double end_left_width = nearby_path_->GetRoadLeftWidth(end_s);
-    double end_right_width = nearby_path_->GetRoadRightWidth(end_s);
+        center_line_s + planner_open_space_config_.roi_config().roi_longitudinal_range_end();
+    hdmap::MapPathPoint end_point         = nearby_path_->GetSmoothPoint(end_s);
+    hdmap::MapPathPoint start_point       = nearby_path_->GetSmoothPoint(start_s);
+    double              start_left_width  = nearby_path_->GetRoadLeftWidth(start_s);
+    double              start_right_width = nearby_path_->GetRoadRightWidth(start_s);
+    double              end_left_width    = nearby_path_->GetRoadLeftWidth(end_s);
+    double              end_right_width   = nearby_path_->GetRoadRightWidth(end_s);
 
     double start_right_vec_cos = std::cos(start_point.heading() - M_PI / 2);
     double start_right_vec_sin = std::sin(start_point.heading() - M_PI / 2);
-    double start_left_vec_cos = std::cos(start_point.heading() + M_PI / 2);
-    double start_left_vec_sin = std::sin(start_point.heading() + M_PI / 2);
-    double end_right_vec_cos = std::cos(end_point.heading() - M_PI / 2);
-    double end_right_vec_sin = std::sin(end_point.heading() - M_PI / 2);
-    double end_left_vec_cos = std::cos(end_point.heading() + M_PI / 2);
-    double end_left_vec_sin = std::sin(end_point.heading() + M_PI / 2);
+    double start_left_vec_cos  = std::cos(start_point.heading() + M_PI / 2);
+    double start_left_vec_sin  = std::sin(start_point.heading() + M_PI / 2);
+    double end_right_vec_cos   = std::cos(end_point.heading() - M_PI / 2);
+    double end_right_vec_sin   = std::sin(end_point.heading() - M_PI / 2);
+    double end_left_vec_cos    = std::cos(end_point.heading() + M_PI / 2);
+    double end_left_vec_sin    = std::sin(end_point.heading() + M_PI / 2);
 
-    Vec2d start_right = Vec2d(start_right_width * start_right_vec_cos,
-                              start_right_width * start_right_vec_sin);
+    Vec2d start_right =
+        Vec2d(start_right_width * start_right_vec_cos, start_right_width * start_right_vec_sin);
     start_right = start_right + start_point;
-    Vec2d start_left = Vec2d(start_left_width * start_left_vec_cos,
-                             start_left_width * start_left_vec_sin);
+    Vec2d start_left =
+        Vec2d(start_left_width * start_left_vec_cos, start_left_width * start_left_vec_sin);
     start_left = start_left + start_point;
-    Vec2d end_right = Vec2d(end_right_width * end_right_vec_cos,
-                            end_right_width * end_right_vec_sin);
-    end_right = end_right + end_point;
-    Vec2d end_left = Vec2d(end_left_width * end_left_vec_cos,
-                           end_left_width * end_left_vec_sin);
-    end_left = end_left + end_point;
+    Vec2d end_right =
+        Vec2d(end_right_width * end_right_vec_cos, end_right_width * end_right_vec_sin);
+    end_right      = end_right + end_point;
+    Vec2d end_left = Vec2d(end_left_width * end_left_vec_cos, end_left_width * end_left_vec_sin);
+    end_left       = end_left + end_point;
 
     // get end_pose of the parking spot
     double heading = (left_down - left_top).Angle();
-    double x = (left_top.x() + right_top.x()) / 2;
-    double y = 0.0;
+    double x       = (left_top.x() + right_top.x()) / 2;
+    double y       = 0.0;
     if (heading > kMathEpsilon) {
       y = left_top.y() + (-left_top.y() + left_down.y()) / 4;
     } else {
@@ -345,17 +340,15 @@ class OpenSpaceROITest {
     return true;
   }
 
-  bool VPresentationObstacle(const std::string& lane_id,
-                             const std::string& parking_id) {
+  bool VPresentationObstacle(const std::string& lane_id, const std::string& parking_id) {
     if (!LoadMap(lane_id, parking_id)) {
       AINFO << "fail at loading map";
       return false;
     }
 
-    ACHECK(cyber::common::GetProtoFromFile(
-        FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
-        << "Failed to load open space config file "
-        << FLAGS_planner_open_space_config_filename;
+    ACHECK(cyber::common::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
+                                           &planner_open_space_config_))
+        << "Failed to load open space config file " << FLAGS_planner_open_space_config_filename;
 
     // load info from pnc map
     if (!OpenSpaceROI()) {
@@ -379,8 +372,7 @@ class OpenSpaceROITest {
     Eigen::MatrixXd parking_boundaries_obstacles_edges_num(4, 1);
     // the order is decided by the ROI()
     parking_boundaries_obstacles_edges_num << 2, 1, 2, 1;
-    obstacles_edges_num_.resize(parking_boundaries_obstacles_edges_num.rows(),
-                                1);
+    obstacles_edges_num_.resize(parking_boundaries_obstacles_edges_num.rows(), 1);
     obstacles_edges_num_ << parking_boundaries_obstacles_edges_num;
     return true;
   }
@@ -390,7 +382,7 @@ class OpenSpaceROITest {
   bool LoadMap(const std::string& lane_id, const std::string& parking_id) {
     std::cout << lane_id << std::endl;
     std::cout << parking_id << std::endl;
-    auto map_ptr = HDMapUtil::BaseMapPtr();
+    auto      map_ptr = HDMapUtil::BaseMapPtr();
     hdmap::Id nearby_lane_id;
     nearby_lane_id.set_id(lane_id);
     hdmap::Id target_lane_id;
@@ -401,23 +393,20 @@ class OpenSpaceROITest {
       return false;
     }
     std::cout << "the lane found is " << nearby_lane->id().id() << std::endl;
-    LaneSegment nearby_lanesegment =
-        LaneSegment(nearby_lane, nearby_lane->accumulate_s().front(),
-                    nearby_lane->accumulate_s().back());
+    LaneSegment nearby_lanesegment = LaneSegment(nearby_lane, nearby_lane->accumulate_s().front(),
+                                                 nearby_lane->accumulate_s().back());
     std::vector<LaneSegment> segments_vector;
     segments_vector.push_back(nearby_lanesegment);
-    nearby_path_ = std::unique_ptr<Path>(new Path(segments_vector));
+    nearby_path_                       = std::unique_ptr<Path>(new Path(segments_vector));
     const auto& parking_space_overlaps = nearby_path_->parking_space_overlaps();
     if (parking_space_overlaps.empty()) {
-      std::cout << "No parking overlaps found on the lane requested"
-                << std::endl;
+      std::cout << "No parking overlaps found on the lane requested" << std::endl;
       return false;
     }
     for (const auto parking_overlap : parking_space_overlaps) {
       if (parking_overlap.object_id != parking_id) {
         target_parking_spot_ = map_ptr->GetParkingSpaceById(target_lane_id);
-        std::cout << "parking_overlap.object_id is " << target_lane_id.id()
-                  << std::endl;
+        std::cout << "parking_overlap.object_id is " << target_lane_id.id() << std::endl;
       }
     }
     if (target_parking_spot_ == nullptr) {
@@ -428,42 +417,47 @@ class OpenSpaceROITest {
     return true;
   }
 
-  std::vector<double>* GetROIXYBoundary() { return &ROI_xy_boundary_; }
-  std::vector<std::vector<Vec2d>>* GetROIParkingBoundary() {
-    return &ROI_parking_boundary_;
-  }
+  std::vector<double>*             GetROIXYBoundary() { return &ROI_xy_boundary_; }
+  std::vector<std::vector<Vec2d>>* GetROIParkingBoundary() { return &ROI_parking_boundary_; }
   std::vector<std::vector<Vec2d>>* GetNoRotateROIParkingBoundary() {
     return &No_rotate_ROI_parking_boundary_;
   }
   std::vector<double>* GetEndPose() { return &open_space_end_pose_; }
-  double GetOriginHeading() { return origin_heading_; }
-  Vec2d GetOriginPose() { return origin_point_; }
-  Polygon2d GetParkingSpotBox() { return parking_spot_box_; }
+  double               GetOriginHeading() { return origin_heading_; }
+  Vec2d                GetOriginPose() { return origin_point_; }
+  Polygon2d            GetParkingSpotBox() { return parking_spot_box_; }
 
  private:
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  ParkingSpaceInfoConstPtr target_parking_spot_ = nullptr;
-  Polygon2d parking_spot_box_;
-  std::unique_ptr<Path> nearby_path_ = nullptr;
-  size_t obstacles_num_ = 0;
-  Eigen::MatrixXd obstacles_edges_num_;
-  std::vector<double> ROI_xy_boundary_;
-  std::vector<std::vector<Vec2d>> ROI_parking_boundary_;
-  std::vector<std::vector<Vec2d>> No_rotate_ROI_parking_boundary_;
-  std::vector<double> open_space_end_pose_;
-  double origin_heading_;
-  Vec2d origin_point_;
-  double parking_spot_heading_;
+  ParkingSpaceInfoConstPtr                 target_parking_spot_ = nullptr;
+  Polygon2d                                parking_spot_box_;
+  std::unique_ptr<Path>                    nearby_path_   = nullptr;
+  size_t                                   obstacles_num_ = 0;
+  Eigen::MatrixXd                          obstacles_edges_num_;
+  std::vector<double>                      ROI_xy_boundary_;
+  std::vector<std::vector<Vec2d>>          ROI_parking_boundary_;
+  std::vector<std::vector<Vec2d>>          No_rotate_ROI_parking_boundary_;
+  std::vector<double>                      open_space_end_pose_;
+  double                                   origin_heading_;
+  Vec2d                                    origin_point_;
+  double                                   parking_spot_heading_;
 };
 
 extern "C" {
 OpenSpaceROITest* CreateROITestPtr() { return new OpenSpaceROITest(); }
 // all data in form of array
-bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
-             double* unrotated_roi_boundary_x, double* unrotated_roi_boundary_y,
-             double* roi_boundary_x, double* roi_boundary_y,
-             double* parking_spot_x, double* parking_spot_y, double* end_pose,
-             double* xy_boundary, double* origin_pose) {
+bool ROITest(OpenSpaceROITest* test_ptr,
+             char*             lane_id,
+             char*             parking_id,
+             double*           unrotated_roi_boundary_x,
+             double*           unrotated_roi_boundary_y,
+             double*           roi_boundary_x,
+             double*           roi_boundary_y,
+             double*           parking_spot_x,
+             double*           parking_spot_y,
+             double*           end_pose,
+             double*           xy_boundary,
+             double*           origin_pose) {
   std::string lane_id_str(lane_id);
   std::string parking_id_str(parking_id);
   if (!test_ptr->VPresentationObstacle(lane_id_str, parking_id_str)) {
@@ -472,13 +466,12 @@ bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
   }
   std::vector<std::vector<Vec2d>>* unrotated_roi_boundary_ =
       test_ptr->GetNoRotateROIParkingBoundary();
-  std::vector<std::vector<Vec2d>>* roi_boundary_ =
-      test_ptr->GetROIParkingBoundary();
-  Polygon2d parking_spot_ = test_ptr->GetParkingSpotBox();
-  std::vector<double>* end_pose_ = test_ptr->GetEndPose();
-  std::vector<double>* xy_boundary_ = test_ptr->GetROIXYBoundary();
-  double origin_heading_ = test_ptr->GetOriginHeading();
-  Vec2d origin_point_ = test_ptr->GetOriginPose();
+  std::vector<std::vector<Vec2d>>* roi_boundary_   = test_ptr->GetROIParkingBoundary();
+  Polygon2d                        parking_spot_   = test_ptr->GetParkingSpotBox();
+  std::vector<double>*             end_pose_       = test_ptr->GetEndPose();
+  std::vector<double>*             xy_boundary_    = test_ptr->GetROIXYBoundary();
+  double                           origin_heading_ = test_ptr->GetOriginHeading();
+  Vec2d                            origin_point_   = test_ptr->GetOriginPose();
 
   // load all into array
   size_t index = 0;
@@ -501,7 +494,7 @@ bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
     }
   }
 
-  index = 0;
+  index                                = 0;
   std::vector<Vec2d> parking_spot_vec_ = parking_spot_.points();
   for (size_t i = 0; i < parking_spot_vec_.size(); i++) {
     parking_spot_x[index] = parking_spot_vec_[i].x();

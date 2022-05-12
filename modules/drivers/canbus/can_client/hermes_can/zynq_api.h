@@ -32,11 +32,11 @@
  * ioctl argument definition for CAN send/recv
  */
 typedef struct ioc_bcan_msg {
-  bcan_msg_t *ioc_msgs;
+  bcan_msg_t*  ioc_msgs;
   unsigned int ioc_msg_num;
   unsigned int ioc_msg_num_done;
-  int ioc_msg_err;
-  int ioc_msg_rx_clear;
+  int          ioc_msg_err;
+  int          ioc_msg_rx_clear;
 } ioc_bcan_msg_t;
 
 /*
@@ -46,7 +46,7 @@ typedef struct ioc_bcan_status_err {
   unsigned int bcan_status;
   unsigned int bcan_err_status;
   unsigned int bcan_err_count;
-  int bcan_ioc_err;
+  int          bcan_ioc_err;
 } ioc_bcan_status_err_t;
 
 /* ioctl command list */
@@ -115,33 +115,24 @@ enum zynq_baudrate_val {
 
 /* GPS update ioctl cmds */
 #define ZYNQ_GPS_VAL_SZ 12
-#define ZYNQ_IOC_GPS_GET _IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GET, unsigned char *)
+#define ZYNQ_IOC_GPS_GET _IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GET, unsigned char*)
 #define ZYNQ_GPS_GPRMC_VAL_SZ 68
-#define ZYNQ_IOC_GPS_GPRMC_GET \
-  _IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GPRMC_GET, unsigned char *)
+#define ZYNQ_IOC_GPS_GPRMC_GET _IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GPRMC_GET, unsigned char*)
 
 /* Trigger ioctl cmds */
-#define ZYNQ_IOC_TRIGGER_DISABLE \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_DISABLE, unsigned long)
-#define ZYNQ_IOC_TRIGGER_ENABLE_GPS \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_ENABLE_GPS, unsigned long)
-#define ZYNQ_IOC_TRIGGER_ENABLE_NOGPS \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_ENABLE_NOGPS, unsigned long)
-#define ZYNQ_IOC_TRIGGER_ENABLE_ONE_GPS \
+#define ZYNQ_IOC_TRIGGER_DISABLE _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_DISABLE, unsigned long)
+#define ZYNQ_IOC_TRIGGER_ENABLE_GPS _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_ENABLE_GPS, unsigned long)
+#define ZYNQ_IOC_TRIGGER_ENABLE_NOGPS _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_ENABLE_NOGPS, unsigned long)
+#define ZYNQ_IOC_TRIGGER_ENABLE_ONE_GPS                                                            \
   _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_ENABLE_ONE_GPS, unsigned long)
-#define ZYNQ_IOC_TRIGGER_ENABLE_ONE_NOGPS \
+#define ZYNQ_IOC_TRIGGER_ENABLE_ONE_NOGPS                                                          \
   _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_ENABLE_ONE_NOGPS, unsigned long)
-#define ZYNQ_IOC_TRIGGER_TIMESTAMP \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_TIMESTAMP, unsigned long)
-#define ZYNQ_IOC_TRIGGER_STATUS _IOR(ZYNQ_IOC_MAGIC, IOC_TRIGGER_STATUS, int *)
-#define ZYNQ_IOC_TRIGGER_STATUS_GPS \
-  _IOR(ZYNQ_IOC_MAGIC, IOC_TRIGGER_STATUS_GPS, int *)
-#define ZYNQ_IOC_TRIGGER_STATUS_PPS \
-  _IOR(ZYNQ_IOC_MAGIC, IOC_TRIGGER_STATUS_PPS, int *)
-#define ZYNQ_IOC_TRIGGER_FPS_SET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_FPS_SET, int *)
-#define ZYNQ_IOC_TRIGGER_FPS_GET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_FPS_GET, int *)
+#define ZYNQ_IOC_TRIGGER_TIMESTAMP _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_TIMESTAMP, unsigned long)
+#define ZYNQ_IOC_TRIGGER_STATUS _IOR(ZYNQ_IOC_MAGIC, IOC_TRIGGER_STATUS, int*)
+#define ZYNQ_IOC_TRIGGER_STATUS_GPS _IOR(ZYNQ_IOC_MAGIC, IOC_TRIGGER_STATUS_GPS, int*)
+#define ZYNQ_IOC_TRIGGER_STATUS_PPS _IOR(ZYNQ_IOC_MAGIC, IOC_TRIGGER_STATUS_PPS, int*)
+#define ZYNQ_IOC_TRIGGER_FPS_SET _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_FPS_SET, int*)
+#define ZYNQ_IOC_TRIGGER_FPS_GET _IOW(ZYNQ_IOC_MAGIC, IOC_TRIGGER_FPS_GET, int*)
 
 /* supported GrassHopper fps */
 #define GH_FPS_30_DEFAULT 0 /* 30Hz */
@@ -172,10 +163,10 @@ enum zynq_baudrate_val {
 #define ZYNQ_FPS_LI_DEFAULT 0xf0ff
 /* Set LI fps only and keep other fps unchanged: 0xf */
 #define ZYNQ_FPS_SET_LI_ONLY(li_fps) (0xf0ff | (li_fps << 8))
-#define ZYNQ_FPS_VALIDATE_FAIL(fps)                               \
-  ((ZYNQ_FPS_GH(fps) > 3 && ZYNQ_FPS_GH(fps) != ZYNQ_FPS_KEEP) || \
-   (ZYNQ_FPS_LI(fps) > 3 && ZYNQ_FPS_LI(fps) != ZYNQ_FPS_KEEP) || \
-   (ZYNQ_FPS_BB(fps) > 2 && ZYNQ_FPS_BB(fps) != ZYNQ_FPS_KEEP) || \
+#define ZYNQ_FPS_VALIDATE_FAIL(fps)                                                                \
+  ((ZYNQ_FPS_GH(fps) > 3 && ZYNQ_FPS_GH(fps) != ZYNQ_FPS_KEEP) ||                                  \
+   (ZYNQ_FPS_LI(fps) > 3 && ZYNQ_FPS_LI(fps) != ZYNQ_FPS_KEEP) ||                                  \
+   (ZYNQ_FPS_BB(fps) > 2 && ZYNQ_FPS_BB(fps) != ZYNQ_FPS_KEEP) ||                                  \
    (ZYNQ_FPS_LD(fps) > 2 && ZYNQ_FPS_LD(fps) != ZYNQ_FPS_KEEP))
 
 /* FW update ioctl cmds */
@@ -186,63 +177,50 @@ typedef struct ioc_zynq_fw_upload {
    * image data size must be multiple of 4 as each polling transfer is in
    * 16-byte, so padding the data if needed.
    */
-  unsigned int *ioc_zynq_fw_data;
-  unsigned int ioc_zynq_fw_num;
-  unsigned int ioc_zynq_fw_done;
-  int ioc_zynq_fw_err;
+  unsigned int* ioc_zynq_fw_data;
+  unsigned int  ioc_zynq_fw_num;
+  unsigned int  ioc_zynq_fw_done;
+  int           ioc_zynq_fw_err;
 } ioc_zynq_fw_upload_t;
 
-#define ZYNQ_IOC_FW_IMAGE_UPLOAD_START \
+#define ZYNQ_IOC_FW_IMAGE_UPLOAD_START                                                             \
   _IOW(ZYNQ_IOC_MAGIC, IOC_FW_IMAGE_UPLOAD_START, unsigned long)
-#define ZYNQ_IOC_FW_IMAGE_UPLOAD \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_FW_IMAGE_UPLOAD, ioc_zynq_fw_upload_t *)
-#define ZYNQ_IOC_FW_PL_UPDATE \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_FW_PL_UPDATE, unsigned long)
-#define ZYNQ_IOC_FW_PS_UPDATE \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_FW_PS_UPDATE, unsigned long)
-#define ZYNQ_IOC_FW_GET_VER _IOW(ZYNQ_IOC_MAGIC, IOC_FW_GET_VER, unsigned int *)
+#define ZYNQ_IOC_FW_IMAGE_UPLOAD _IOW(ZYNQ_IOC_MAGIC, IOC_FW_IMAGE_UPLOAD, ioc_zynq_fw_upload_t*)
+#define ZYNQ_IOC_FW_PL_UPDATE _IOW(ZYNQ_IOC_MAGIC, IOC_FW_PL_UPDATE, unsigned long)
+#define ZYNQ_IOC_FW_PS_UPDATE _IOW(ZYNQ_IOC_MAGIC, IOC_FW_PS_UPDATE, unsigned long)
+#define ZYNQ_IOC_FW_GET_VER _IOW(ZYNQ_IOC_MAGIC, IOC_FW_GET_VER, unsigned int*)
 
 /* CAN channel ioctl cmds */
-#define ZYNQ_IOC_CAN_TX_TIMEOUT_SET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_TX_TIMEOUT_SET, unsigned long)
+#define ZYNQ_IOC_CAN_TX_TIMEOUT_SET _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_TX_TIMEOUT_SET, unsigned long)
 
-#define ZYNQ_IOC_CAN_RX_TIMEOUT_SET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_RX_TIMEOUT_SET, unsigned long)
+#define ZYNQ_IOC_CAN_RX_TIMEOUT_SET _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_RX_TIMEOUT_SET, unsigned long)
 
-#define ZYNQ_IOC_CAN_DEV_START \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_DEV_START, unsigned long)
+#define ZYNQ_IOC_CAN_DEV_START _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_DEV_START, unsigned long)
 
-#define ZYNQ_IOC_CAN_DEV_STOP \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_DEV_STOP, unsigned long)
+#define ZYNQ_IOC_CAN_DEV_STOP _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_DEV_STOP, unsigned long)
 
-#define ZYNQ_IOC_CAN_DEV_RESET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_DEV_RESET, unsigned long)
+#define ZYNQ_IOC_CAN_DEV_RESET _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_DEV_RESET, unsigned long)
 
 #define ZYNQ_IOC_CAN_ID_ADD _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_ID_ADD, unsigned long)
 
 #define ZYNQ_IOC_CAN_ID_DEL _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_ID_DEL, unsigned long)
 
-#define ZYNQ_IOC_CAN_BAUDRATE_SET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_BAUDRATE_SET, unsigned long)
+#define ZYNQ_IOC_CAN_BAUDRATE_SET _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_BAUDRATE_SET, unsigned long)
 
-#define ZYNQ_IOC_CAN_BAUDRATE_GET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_BAUDRATE_GET, unsigned long)
+#define ZYNQ_IOC_CAN_BAUDRATE_GET _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_BAUDRATE_GET, unsigned long)
 
-#define ZYNQ_IOC_CAN_LOOPBACK_SET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_LOOPBACK_SET, unsigned long)
+#define ZYNQ_IOC_CAN_LOOPBACK_SET _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_LOOPBACK_SET, unsigned long)
 
-#define ZYNQ_IOC_CAN_LOOPBACK_UNSET \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_LOOPBACK_UNSET, unsigned long)
+#define ZYNQ_IOC_CAN_LOOPBACK_UNSET _IOW(ZYNQ_IOC_MAGIC, IOC_CAN_LOOPBACK_UNSET, unsigned long)
 
-#define ZYNQ_IOC_CAN_RECV _IOWR(ZYNQ_IOC_MAGIC, IOC_CAN_RECV, ioc_bcan_msg_t *)
+#define ZYNQ_IOC_CAN_RECV _IOWR(ZYNQ_IOC_MAGIC, IOC_CAN_RECV, ioc_bcan_msg_t*)
 
-#define ZYNQ_IOC_CAN_SEND _IOWR(ZYNQ_IOC_MAGIC, IOC_CAN_SEND, ioc_bcan_msg_t *)
+#define ZYNQ_IOC_CAN_SEND _IOWR(ZYNQ_IOC_MAGIC, IOC_CAN_SEND, ioc_bcan_msg_t*)
 
-#define ZYNQ_IOC_CAN_SEND_HIPRI \
-  _IOWR(ZYNQ_IOC_MAGIC, IOC_CAN_SEND_HIPRI, ioc_bcan_msg_t *)
+#define ZYNQ_IOC_CAN_SEND_HIPRI _IOWR(ZYNQ_IOC_MAGIC, IOC_CAN_SEND_HIPRI, ioc_bcan_msg_t*)
 
-#define ZYNQ_IOC_CAN_GET_STATUS_ERR \
-  _IOR(ZYNQ_IOC_MAGIC, IOC_CAN_GET_STATUS_ERR, ioc_bcan_status_err_t *)
+#define ZYNQ_IOC_CAN_GET_STATUS_ERR                                                                \
+  _IOR(ZYNQ_IOC_MAGIC, IOC_CAN_GET_STATUS_ERR, ioc_bcan_status_err_t*)
 
 /* register read/write ioctl cmds */
 typedef struct ioc_zynq_reg_acc {
@@ -261,14 +239,10 @@ typedef struct ioc_zynq_i2c_acc {
   unsigned char i2c_data;
 } ioc_zynq_i2c_acc_t;
 
-#define ZYNQ_IOC_REG_READ \
-  _IOR(ZYNQ_IOC_MAGIC, IOC_REG_READ, ioc_zynq_reg_acc_t *)
-#define ZYNQ_IOC_REG_WRITE \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_REG_WRITE, ioc_zynq_reg_acc_t *)
-#define ZYNQ_IOC_REG_I2C_READ \
-  _IOR(ZYNQ_IOC_MAGIC, IOC_REG_I2C_READ, ioc_zynq_i2c_acc_t *)
-#define ZYNQ_IOC_REG_I2C_WRITE \
-  _IOW(ZYNQ_IOC_MAGIC, IOC_REG_I2C_WRITE, ioc_zynq_i2c_acc_t *)
+#define ZYNQ_IOC_REG_READ _IOR(ZYNQ_IOC_MAGIC, IOC_REG_READ, ioc_zynq_reg_acc_t*)
+#define ZYNQ_IOC_REG_WRITE _IOW(ZYNQ_IOC_MAGIC, IOC_REG_WRITE, ioc_zynq_reg_acc_t*)
+#define ZYNQ_IOC_REG_I2C_READ _IOR(ZYNQ_IOC_MAGIC, IOC_REG_I2C_READ, ioc_zynq_i2c_acc_t*)
+#define ZYNQ_IOC_REG_I2C_WRITE _IOW(ZYNQ_IOC_MAGIC, IOC_REG_I2C_WRITE, ioc_zynq_i2c_acc_t*)
 /* wait for GPS/PPS status change event notification */
-#define ZYNQ_IOC_REG_GPSPPS_EVENT_WAIT \
+#define ZYNQ_IOC_REG_GPSPPS_EVENT_WAIT                                                             \
   _IOW(ZYNQ_IOC_MAGIC, IOC_REG_GPSPPS_EVENT_WAIT, unsigned long)

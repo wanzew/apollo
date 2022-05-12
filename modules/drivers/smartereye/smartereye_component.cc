@@ -16,9 +16,8 @@
 
 #include "modules/drivers/smartereye/smartereye_component.h"
 
-#include "modules/drivers/smartereye/smartereye_handler.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/drivers/smartereye/smartereye_handler.h"
 
 namespace apollo {
 namespace drivers {
@@ -33,8 +32,7 @@ SmartereyeComponent::~SmartereyeComponent() {
 
 bool SmartereyeComponent::Init() {
   camera_config_ = std::make_shared<Config>();
-  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                               camera_config_.get())) {
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_, camera_config_.get())) {
     return false;
   }
   AINFO << "SmartereyeDevice config: " << camera_config_->DebugString();
@@ -43,17 +41,17 @@ bool SmartereyeComponent::Init() {
   camera_device_->init(camera_config_);
 
   device_wait_ = camera_config_->device_wait_ms();
-  spin_rate_ = static_cast<uint32_t>((1.0 / camera_config_->spin_rate()) * 1e6);
+  spin_rate_   = static_cast<uint32_t>((1.0 / camera_config_->spin_rate()) * 1e6);
 
   b_ispolling_ = false;
 
   SetCallback();
 
   writer_ = node_->CreateWriter<Image>(camera_config_->channel_name_image());
-  SmartereyeObstacles_writer_ = node_->CreateWriter<SmartereyeObstacles>(
-      FLAGS_smartereye_obstacles_topic);
-  SmartereyeLanemark_writer_ = node_->CreateWriter<SmartereyeLanemark>(
-      FLAGS_smartereye_lanemark_topic);
+  SmartereyeObstacles_writer_ =
+      node_->CreateWriter<SmartereyeObstacles>(FLAGS_smartereye_obstacles_topic);
+  SmartereyeLanemark_writer_ =
+      node_->CreateWriter<SmartereyeLanemark>(FLAGS_smartereye_lanemark_topic);
 
   async_result_ = cyber::Async(&SmartereyeComponent::run, this);
 
@@ -69,43 +67,36 @@ void SmartereyeComponent::run() {
 }
 
 bool SmartereyeComponent::SetCallback() {
-  CallbackFunc fun =
-      std::bind(&SmartereyeComponent::Callback, this, std::placeholders::_1);
+  CallbackFunc fun = std::bind(&SmartereyeComponent::Callback, this, std::placeholders::_1);
   camera_device_->SetCallback(fun);
 
   return true;
 }
 
-bool SmartereyeComponent::Callback(RawImageFrame *rawFrame) {
-  if (rawFrame->frameId == FrameId::Compound ||
-      rawFrame->frameId == FrameId::LaneExt) {
-    processFrame(rawFrame->frameId,
-                 reinterpret_cast<char *>(rawFrame) + sizeof(RawImageFrame),
-                 reinterpret_cast<char *>(rawFrame) + rawFrame->dataSize +
-                     sizeof(RawImageFrame),
+bool SmartereyeComponent::Callback(RawImageFrame* rawFrame) {
+  if (rawFrame->frameId == FrameId::Compound || rawFrame->frameId == FrameId::LaneExt) {
+    processFrame(rawFrame->frameId, reinterpret_cast<char*>(rawFrame) + sizeof(RawImageFrame),
+                 reinterpret_cast<char*>(rawFrame) + rawFrame->dataSize + sizeof(RawImageFrame),
                  rawFrame->time, rawFrame->width, rawFrame->height);
   } else {
-    processFrame(rawFrame->frameId,
-                 reinterpret_cast<char *>(rawFrame) + sizeof(RawImageFrame),
-                 rawFrame->dataSize, rawFrame->width, rawFrame->height,
-                 rawFrame->format);
+    processFrame(rawFrame->frameId, reinterpret_cast<char*>(rawFrame) + sizeof(RawImageFrame),
+                 rawFrame->dataSize, rawFrame->width, rawFrame->height, rawFrame->format);
   }
 
   return true;
 }
 
-void SmartereyeComponent::processFrame(int frameId, char *image, char *extended,
-                                       int64_t time, int width, int height) {
+void SmartereyeComponent::processFrame(
+    int frameId, char* image, char* extended, int64_t time, int width, int height) {
   switch (frameId) {
     case FrameId::Compound: {
-      FrameDataExtHead *header = reinterpret_cast<FrameDataExtHead *>(extended);
-      int blockNum = (reinterpret_cast<int *>(header->data))[0];
-      OutputObstacles *obsDataPack = reinterpret_cast<OutputObstacles *>(
-          ((reinterpret_cast<int *>(header->data)) + 2));
+      FrameDataExtHead* header   = reinterpret_cast<FrameDataExtHead*>(extended);
+      int               blockNum = (reinterpret_cast<int*>(header->data))[0];
+      OutputObstacles*  obsDataPack =
+          reinterpret_cast<OutputObstacles*>(((reinterpret_cast<int*>(header->data)) + 2));
 
       SmartereyeObstacles pbSmartereyeObstacles;
-      pbSmartereyeObstacles.mutable_header()->set_frame_id(
-          FLAGS_smartereye_obstacles_topic);
+      pbSmartereyeObstacles.mutable_header()->set_frame_id(FLAGS_smartereye_obstacles_topic);
       pbSmartereyeObstacles.set_num_obstacles(blockNum);
 
       OutputObstacle pbOutputObstacle;
@@ -117,8 +108,7 @@ void SmartereyeComponent::processFrame(int frameId, char *image, char *extended,
         pbOutputObstacle.set_statelabel(obsDataPack[j].stateLabel);
         pbOutputObstacle.set_classlabel(obsDataPack[j].classLabel);
         pbOutputObstacle.set_continuouslabel(obsDataPack[j].continuousLabel);
-        pbOutputObstacle.set_fuzzyestimationvalid(
-            obsDataPack[j].fuzzyEstimationValid);
+        pbOutputObstacle.set_fuzzyestimationvalid(obsDataPack[j].fuzzyEstimationValid);
         pbOutputObstacle.set_obstacletype(
             (OutputObstacle_RecognitionType)obsDataPack[j].obstacleType);
         pbOutputObstacle.set_avgdisp(obsDataPack[j].avgDistanceZ);
@@ -138,12 +128,9 @@ void SmartereyeComponent::processFrame(int frameId, char *image, char *extended,
         pbOutputObstacle.set_thirdpointy(obsDataPack[j].thirdPointY);
         pbOutputObstacle.set_fourthpointx(obsDataPack[j].fourthPointX);
         pbOutputObstacle.set_fourthpointy(obsDataPack[j].fourthPointY);
-        pbOutputObstacle.set_fuzzyrelativedistancez(
-            obsDataPack[j].fuzzyRelativeDistanceZ);
-        pbOutputObstacle.set_fuzzyrelativespeedz(
-            obsDataPack[j].fuzzyRelativeSpeedZ);
-        pbOutputObstacle.set_fuzzycollisiontimez(
-            obsDataPack[j].fuzzyCollisionTimeZ);
+        pbOutputObstacle.set_fuzzyrelativedistancez(obsDataPack[j].fuzzyRelativeDistanceZ);
+        pbOutputObstacle.set_fuzzyrelativespeedz(obsDataPack[j].fuzzyRelativeSpeedZ);
+        pbOutputObstacle.set_fuzzycollisiontimez(obsDataPack[j].fuzzyCollisionTimeZ);
         pbOutputObstacle.set_fuzzycollisionx(obsDataPack[j].fuzzyCollisionX);
         pbOutputObstacle.set_fuzzy3dwidth(obsDataPack[j].fuzzy3DWidth);
         pbOutputObstacle.set_fuzzy3dcenterx(obsDataPack[j].fuzzy3DCenterX);
@@ -152,74 +139,56 @@ void SmartereyeComponent::processFrame(int frameId, char *image, char *extended,
         pbOutputObstacle.set_fuzzy3dheight(obsDataPack[j].fuzzy3DHeight);
         pbOutputObstacle.set_fuzzy3dupy(obsDataPack[j].fuzzy3DUpY);
         pbOutputObstacle.set_fuzzy3dlowy(obsDataPack[j].fuzzy3DLowY);
-        pbOutputObstacle.set_fuzzyrelativespeedcenterx(
-            obsDataPack[j].fuzzyRelativeSpeedCenterX);
-        pbOutputObstacle.set_fuzzyrelativespeedleftx(
-            obsDataPack[j].fuzzyRelativeSpeedLeftX);
-        pbOutputObstacle.set_fuzzyrelativespeedrightx(
-            obsDataPack[j].fuzzyRelativeSpeedRightX);
-        (*pbSmartereyeObstacles.mutable_output_obstacles())[j] =
-            pbOutputObstacle;
+        pbOutputObstacle.set_fuzzyrelativespeedcenterx(obsDataPack[j].fuzzyRelativeSpeedCenterX);
+        pbOutputObstacle.set_fuzzyrelativespeedleftx(obsDataPack[j].fuzzyRelativeSpeedLeftX);
+        pbOutputObstacle.set_fuzzyrelativespeedrightx(obsDataPack[j].fuzzyRelativeSpeedRightX);
+        (*pbSmartereyeObstacles.mutable_output_obstacles())[j] = pbOutputObstacle;
       }
       SmartereyeObstacles_writer_->Write(pbSmartereyeObstacles);
 
-      static unsigned char *rgbBuf = new unsigned char[width * height * 3];
-      RoadwayPainter::imageGrayToRGB((unsigned char *)image, rgbBuf, width,
-                                     height);
-      ObstaclePainter::paintObstacle(header->data, rgbBuf, width, height, true,
-                                     false);
+      static unsigned char* rgbBuf = new unsigned char[width * height * 3];
+      RoadwayPainter::imageGrayToRGB((unsigned char*)image, rgbBuf, width, height);
+      ObstaclePainter::paintObstacle(header->data, rgbBuf, width, height, true, false);
 
       Image pb_image;
-      pb_image.mutable_header()->set_frame_id(
-          camera_config_->channel_name_image());
+      pb_image.mutable_header()->set_frame_id(camera_config_->channel_name_image());
       pb_image.set_width(width);
       pb_image.set_height(height);
       pb_image.set_data(rgbBuf, width * height * 3);
       pb_image.set_encoding("rgb8");
       pb_image.set_step(width * 3);
-      pb_image.mutable_header()->set_timestamp_sec(
-          cyber::Time::Now().ToSecond());
+      pb_image.mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
       pb_image.set_measurement_time(time);
 
       writer_->Write(pb_image);
     } break;
     case FrameId::LaneExt: {
-      FrameDataExtHead *header = reinterpret_cast<FrameDataExtHead *>(extended);
-      LdwDataPack *ldwDataPack = reinterpret_cast<LdwDataPack *>(header->data);
-      AINFO << "ldw degree is: "
-            << ldwDataPack->roadway.left_Lane.left_Boundary.degree;
+      FrameDataExtHead* header      = reinterpret_cast<FrameDataExtHead*>(extended);
+      LdwDataPack*      ldwDataPack = reinterpret_cast<LdwDataPack*>(header->data);
+      AINFO << "ldw degree is: " << ldwDataPack->roadway.left_Lane.left_Boundary.degree;
       SmartereyeLanemark pbSmartereyeLanemark;
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_roadway()
-          ->set_width_0(ldwDataPack->roadway.width[0]);
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_roadway()
-          ->set_width_1(ldwDataPack->roadway.width[1]);
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_roadway()
-          ->set_width_2(ldwDataPack->roadway.width[2]);
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_roadway()
-          ->set_is_tracking(ldwDataPack->roadway.isTracking);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_roadway()->set_width_0(
+          ldwDataPack->roadway.width[0]);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_roadway()->set_width_1(
+          ldwDataPack->roadway.width[1]);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_roadway()->set_width_2(
+          ldwDataPack->roadway.width[2]);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_roadway()->set_is_tracking(
+          ldwDataPack->roadway.isTracking);
       pbSmartereyeLanemark.mutable_lane_road_data()->set_softstatus(
           (LdwSoftStatus)ldwDataPack->softStatus);
       pbSmartereyeLanemark.mutable_lane_road_data()->set_steerstatus(
           (LdwSteerStatus)ldwDataPack->steerStatus);
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_lens()
-          ->set_x_image_focal(ldwDataPack->lens.xImageFocal);
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_lens()
-          ->set_y_image_focal(ldwDataPack->lens.yImageFocal);
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_lens()
-          ->set_xratio_focal_pixel(ldwDataPack->lens.xRatioFocalToPixel);
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_lens()
-          ->set_yratio_focal_pixel(ldwDataPack->lens.yRatioFocalToPixel);
-      pbSmartereyeLanemark.mutable_lane_road_data()
-          ->mutable_lens()
-          ->set_mountingheight(ldwDataPack->lens.mountingHeight);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_lens()->set_x_image_focal(
+          ldwDataPack->lens.xImageFocal);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_lens()->set_y_image_focal(
+          ldwDataPack->lens.yImageFocal);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_lens()->set_xratio_focal_pixel(
+          ldwDataPack->lens.xRatioFocalToPixel);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_lens()->set_yratio_focal_pixel(
+          ldwDataPack->lens.yRatioFocalToPixel);
+      pbSmartereyeLanemark.mutable_lane_road_data()->mutable_lens()->set_mountingheight(
+          ldwDataPack->lens.mountingHeight);
       pbSmartereyeLanemark.mutable_lane_road_data()->mutable_lens()->set_mcosrx(
           ldwDataPack->lens.mCosRx);
       pbSmartereyeLanemark.mutable_lane_road_data()->mutable_lens()->set_msinrx(
@@ -230,45 +199,39 @@ void SmartereyeComponent::processFrame(int frameId, char *image, char *extended,
           ldwDataPack->lens.mSinRy);
       SmartereyeLanemark_writer_->Write(pbSmartereyeLanemark);
 
-      static unsigned char *rgbBuf = new unsigned char[width * height * 3];
-      RoadwayPainter::imageGrayToRGB((unsigned char *)image, rgbBuf, width,
-                                     height);
-      bool mIsLaneDetected =
-          RoadwayPainter::paintRoadway(header->data, rgbBuf, width, height);
+      static unsigned char* rgbBuf = new unsigned char[width * height * 3];
+      RoadwayPainter::imageGrayToRGB((unsigned char*)image, rgbBuf, width, height);
+      bool mIsLaneDetected = RoadwayPainter::paintRoadway(header->data, rgbBuf, width, height);
       AINFO << mIsLaneDetected;
 
       Image pb_image;
-      pb_image.mutable_header()->set_frame_id(
-          camera_config_->channel_name_image());
+      pb_image.mutable_header()->set_frame_id(camera_config_->channel_name_image());
       pb_image.set_width(width);
       pb_image.set_height(height);
       pb_image.set_data(rgbBuf, width * height * 3);
       pb_image.set_encoding("rgb8");
       pb_image.set_step(width * 3);
-      pb_image.mutable_header()->set_timestamp_sec(
-          cyber::Time::Now().ToSecond());
+      pb_image.mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
       pb_image.set_measurement_time(time);
 
       writer_->Write(pb_image);
     }
-    default:
-      break;
+    default: break;
   }
 }
 
-void SmartereyeComponent::processFrame(int frameId, char *image,
-                                       uint32_t dataSize, int width, int height,
-                                       int frameFormat) {
+void SmartereyeComponent::processFrame(
+    int frameId, char* image, uint32_t dataSize, int width, int height, int frameFormat) {
   switch (frameId) {
     case FrameId::Lane: {
       AINFO << "case FrameId::Lane:";
-      LdwDataPack *ldwDataPack = reinterpret_cast<LdwDataPack *>(image);
-      int degree = ldwDataPack->roadway.left_Lane.left_Boundary.degree;
+      LdwDataPack* ldwDataPack = reinterpret_cast<LdwDataPack*>(image);
+      int          degree      = ldwDataPack->roadway.left_Lane.left_Boundary.degree;
       AINFO << "ldw degree is: " << degree;
     } break;
     case FrameId::Obstacle: {
       AINFO << "case FrameId::Obstacle:";
-      int blockNum = (reinterpret_cast<int *>(image))[0];
+      int blockNum = (reinterpret_cast<int*>(image))[0];
       AINFO << "blockNum is: " << blockNum;
     } break;
     case FrameId::Disparity: {
@@ -277,8 +240,7 @@ void SmartereyeComponent::processFrame(int frameId, char *image,
     case FrameId::CalibLeftCamera: {
       AINFO << "case FrameId::CalibLeftCamera:";
     } break;
-    default:
-      break;
+    default: break;
   }
 }
 

@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
+
 #include <boost/filesystem.hpp>
 
 #include "gtest/gtest.h"
 
-#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
-#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
-#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_pool.h"
-
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_pool.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
@@ -42,8 +42,9 @@ class PyramidMapTestSuite : public ::testing::Test {
   virtual void TearDown() {}
 };
 
-void CreateTestMapNode(unsigned int m, unsigned int n,
-                       const MapNodeIndex& index,
+void CreateTestMapNode(unsigned int            m,
+                       unsigned int            n,
+                       const MapNodeIndex&     index,
                        const PyramidMapConfig* config) {
   // create map node
   PyramidMapNode* node = new PyramidMapNode();
@@ -51,8 +52,7 @@ void CreateTestMapNode(unsigned int m, unsigned int n,
   node->SetMapNodeIndex(index);
 
   // set map node data
-  double data[] = {node->GetLeftTopCorner()[0] + 0.125,
-                   node->GetLeftTopCorner()[1] + 0.125, 1.0};
+  double data[] = {node->GetLeftTopCorner()[0] + 0.125, node->GetLeftTopCorner()[1] + 0.125, 1.0};
   Eigen::Vector3d vec3d(data);
   EXPECT_TRUE(node->AddValueIfInBound(
       vec3d, static_cast<unsigned char>(m * config->map_node_size_x_ + n), 0));
@@ -68,21 +68,21 @@ TEST_F(PyramidMapTestSuite, pyramid_map_function) {
   // init config
   PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
   config->SetMapNodeSize(2, 2);
-  config->resolution_num_ = 1;
+  config->resolution_num_  = 1;
   config->map_folder_path_ = "test_map";
 
   // create and save nodes
-  unsigned int M = 4;
-  unsigned int N = 4;
+  unsigned int              M = 4;
+  unsigned int              N = 4;
   std::vector<MapNodeIndex> indexes;
   for (unsigned int m = 0; m < M; ++m) {
     for (unsigned int n = 0; n < N; ++n) {
       // create map node index
       MapNodeIndex index;
       index.resolution_id_ = 0;
-      index.zone_id_ = 50;
-      index.m_ = m;
-      index.n_ = n;
+      index.zone_id_       = 50;
+      index.m_             = m;
+      index.n_             = n;
       CreateTestMapNode(m, n, index, config);
       indexes.push_back(index);
     }
@@ -101,14 +101,13 @@ TEST_F(PyramidMapTestSuite, pyramid_map_function) {
   EXPECT_TRUE(pyramid_map.SetMapFolderPath(config->map_folder_path_));
 
   // load map node safe from disk
-  PyramidMapNode* pm_node = dynamic_cast<PyramidMapNode*>(
-      pyramid_map.GetMapNodeSafe(*indexes.begin()));
-  double data[] = {0.125, 0.125, 1.0};
+  PyramidMapNode* pm_node =
+      dynamic_cast<PyramidMapNode*>(pyramid_map.GetMapNodeSafe(*indexes.begin()));
+  double          data[] = {0.125, 0.125, 1.0};
   Eigen::Vector3d loc(data);
   EXPECT_FLOAT_EQ(
       pm_node->GetIntensitySafe(loc),
-      static_cast<float>(indexes.begin()->m_ * config->map_node_size_x_ +
-                         indexes.begin()->n_));
+      static_cast<float>(indexes.begin()->m_ * config->map_node_size_x_ + indexes.begin()->n_));
   EXPECT_TRUE(pyramid_map.IsMapNodeExist(*indexes.begin()));
   EXPECT_FALSE(pyramid_map.IsMapNodeExist(*(indexes.begin() + 1)));
 
@@ -185,21 +184,21 @@ TEST_F(PyramidMapTestSuite, test_init) {
   // init config
   PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
   config->SetMapNodeSize(2, 2);
-  config->resolution_num_ = 1;
+  config->resolution_num_  = 1;
   config->map_folder_path_ = "test_map";
 
   // create and save nodes
-  unsigned int M = 4;
-  unsigned int N = 4;
+  unsigned int              M = 4;
+  unsigned int              N = 4;
   std::vector<MapNodeIndex> indexes;
   for (unsigned int m = 0; m < M; ++m) {
     for (unsigned int n = 0; n < N; ++n) {
       // create map node index
       MapNodeIndex index;
       index.resolution_id_ = 0;
-      index.zone_id_ = 50;
-      index.m_ = m;
-      index.n_ = n;
+      index.zone_id_       = 50;
+      index.m_             = m;
+      index.n_             = n;
       CreateTestMapNode(m, n, index, config);
       indexes.push_back(index);
     }
@@ -218,8 +217,8 @@ TEST_F(PyramidMapTestSuite, test_init) {
   EXPECT_TRUE(pyramid_map.SetMapFolderPath(config->map_folder_path_));
 
   // check fail case
-  double data[] = {0.125 * (config->map_node_size_x_ + 1),
-                   0.125 * (config->map_node_size_x_ + 1), 1.0};
+  double data[] = {0.125 * (config->map_node_size_x_ + 1), 0.125 * (config->map_node_size_x_ + 1),
+                   1.0};
   Eigen::Vector3d loc(data);
   EXPECT_TRUE(pyramid_map.LoadMapArea(loc, 0, 50, 0, 0));
 }

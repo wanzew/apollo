@@ -32,40 +32,35 @@ bool IsCloseEnough(double value_1, double value_2) {
   return std::fabs(value_1 - value_2) < kEpsilon;
 }
 
-const NodeWithRange& GetLargestRange(
-    const std::vector<NodeWithRange>& node_vec) {
+const NodeWithRange& GetLargestRange(const std::vector<NodeWithRange>& node_vec) {
   ACHECK(!node_vec.empty());
-  size_t result_idx = 0;
+  size_t result_idx          = 0;
   double result_range_length = 0.0;
   for (size_t i = 0; i < node_vec.size(); ++i) {
     if (node_vec[i].Length() > result_range_length) {
       result_range_length = node_vec[i].Length();
-      result_idx = i;
+      result_idx          = i;
     }
   }
   return node_vec[result_idx];
 }
 
-bool ResultGenerator::ExtractBasicPassages(
-    const std::vector<NodeWithRange>& nodes,
-    std::vector<PassageInfo>* const passages) {
+bool ResultGenerator::ExtractBasicPassages(const std::vector<NodeWithRange>& nodes,
+                                           std::vector<PassageInfo>* const   passages) {
   ACHECK(!nodes.empty());
   passages->clear();
   std::vector<NodeWithRange> nodes_of_passage;
   nodes_of_passage.push_back(nodes.at(0));
   for (size_t i = 1; i < nodes.size(); ++i) {
-    auto edge =
-        nodes.at(i - 1).GetTopoNode()->GetOutEdgeTo(nodes.at(i).GetTopoNode());
+    auto edge = nodes.at(i - 1).GetTopoNode()->GetOutEdgeTo(nodes.at(i).GetTopoNode());
     if (edge == nullptr) {
-      AERROR << "Get null pointer to edge from " << nodes.at(i - 1).LaneId()
-             << " to " << nodes.at(i).LaneId();
+      AERROR << "Get null pointer to edge from " << nodes.at(i - 1).LaneId() << " to "
+             << nodes.at(i).LaneId();
       return false;
     }
     if (edge->Type() == TET_LEFT || edge->Type() == TET_RIGHT) {
       auto change_lane_type = LEFT;
-      if (edge->Type() == TET_RIGHT) {
-        change_lane_type = RIGHT;
-      }
+      if (edge->Type() == TET_RIGHT) { change_lane_type = RIGHT; }
       passages->emplace_back(nodes_of_passage, change_lane_type);
       nodes_of_passage.clear();
     }
@@ -75,13 +70,12 @@ bool ResultGenerator::ExtractBasicPassages(
   return true;
 }
 
-bool ResultGenerator::IsReachableFromWithChangeLane(
-    const TopoNode* from_node, const PassageInfo& to_nodes,
-    NodeWithRange* reachable_node) {
+bool ResultGenerator::IsReachableFromWithChangeLane(const TopoNode*    from_node,
+                                                    const PassageInfo& to_nodes,
+                                                    NodeWithRange*     reachable_node) {
   for (const auto& to_node : to_nodes.nodes) {
     auto edge = to_node.GetTopoNode()->GetInEdgeFrom(from_node);
-    if (edge != nullptr &&
-        (edge->Type() == TET_LEFT || edge->Type() == TET_RIGHT)) {
+    if (edge != nullptr && (edge->Type() == TET_LEFT || edge->Type() == TET_RIGHT)) {
       *reachable_node = to_node;
       return true;
     }
@@ -89,13 +83,12 @@ bool ResultGenerator::IsReachableFromWithChangeLane(
   return false;
 }
 
-bool ResultGenerator::IsReachableToWithChangeLane(
-    const TopoNode* to_node, const PassageInfo& from_nodes,
-    NodeWithRange* reachable_node) {
+bool ResultGenerator::IsReachableToWithChangeLane(const TopoNode*    to_node,
+                                                  const PassageInfo& from_nodes,
+                                                  NodeWithRange*     reachable_node) {
   for (const auto& from_node : from_nodes.nodes) {
     auto edge = from_node.GetTopoNode()->GetOutEdgeTo(to_node);
-    if (edge != nullptr &&
-        (edge->Type() == TET_LEFT || edge->Type() == TET_RIGHT)) {
+    if (edge != nullptr && (edge->Type() == TET_LEFT || edge->Type() == TET_RIGHT)) {
       *reachable_node = from_node;
       return true;
     }
@@ -104,8 +97,8 @@ bool ResultGenerator::IsReachableToWithChangeLane(
 }
 
 void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
-                                     const PassageInfo& prev_passage,
-                                     PassageInfo* const curr_passage) {
+                                     const PassageInfo&      prev_passage,
+                                     PassageInfo* const      curr_passage) {
   std::unordered_set<const TopoNode*> node_set_of_curr_passage;
   for (const auto& node : curr_passage->nodes) {
     node_set_of_curr_passage.insert(node.GetTopoNode());
@@ -118,8 +111,7 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
         front_node.SetStartS(0.0);
       } else {
         double temp_s = prev_passage.nodes.front().StartS() /
-                        prev_passage.nodes.front().FullLength() *
-                        front_node.FullLength();
+                        prev_passage.nodes.front().FullLength() * front_node.FullLength();
         front_node.SetStartS(temp_s);
       }
     } else {
@@ -130,18 +122,14 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
   bool allowed_to_explore = true;
   while (allowed_to_explore) {
     std::vector<NodeWithRange> pred_set;
-    for (const auto& edge :
-         curr_passage->nodes.front().GetTopoNode()->InFromPreEdge()) {
+    for (const auto& edge : curr_passage->nodes.front().GetTopoNode()->InFromPreEdge()) {
       const auto& pred_node = edge->FromNode();
 
       // if pred node has been inserted
-      if (ContainsKey(node_set_of_curr_passage, pred_node)) {
-        continue;
-      }
+      if (ContainsKey(node_set_of_curr_passage, pred_node)) { continue; }
       // if pred node is reachable from prev passage
       NodeWithRange reachable_node(pred_node, 0, 1);
-      if (IsReachableToWithChangeLane(pred_node, prev_passage,
-                                      &reachable_node)) {
+      if (IsReachableToWithChangeLane(pred_node, prev_passage, &reachable_node)) {
         const auto* pred_range = range_manager.Find(pred_node);
         if (pred_range != nullptr && !pred_range->empty()) {
           double black_s_end = pred_range->back().EndS();
@@ -156,7 +144,7 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
     if (pred_set.empty()) {
       allowed_to_explore = false;
     } else {
-      allowed_to_explore = true;
+      allowed_to_explore         = true;
       const auto& node_to_insert = GetLargestRange(pred_set);
       curr_passage->nodes.insert(curr_passage->nodes.begin(), node_to_insert);
       node_set_of_curr_passage.emplace(node_to_insert.GetTopoNode());
@@ -165,8 +153,8 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
 }
 
 void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
-                                    const PassageInfo& next_passage,
-                                    PassageInfo* const curr_passage) {
+                                    const PassageInfo&      next_passage,
+                                    PassageInfo* const      curr_passage) {
   std::unordered_set<const TopoNode*> node_set_of_curr_passage;
   for (const auto& node : curr_passage->nodes) {
     node_set_of_curr_passage.insert(node.GetTopoNode());
@@ -174,18 +162,16 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
   auto& back_node = curr_passage->nodes.back();
   if (!IsCloseEnough(back_node.EndS(), back_node.FullLength())) {
     if (!range_manager.Find(back_node.GetTopoNode())) {
-      if (IsCloseEnough(next_passage.nodes.back().EndS(),
-                        next_passage.nodes.back().FullLength())) {
+      if (IsCloseEnough(next_passage.nodes.back().EndS(), next_passage.nodes.back().FullLength())) {
         back_node.SetEndS(back_node.FullLength());
       } else {
         double adjusted_end_s = next_passage.nodes.back().EndS() /
-                                next_passage.nodes.back().FullLength() *
-                                back_node.FullLength();
+                                next_passage.nodes.back().FullLength() * back_node.FullLength();
         if (adjusted_end_s > back_node.StartS()) {
           adjusted_end_s = std::min(adjusted_end_s, back_node.FullLength());
           back_node.SetEndS(adjusted_end_s);
-          ADEBUG << "ExtendForward: orig_end_s[" << back_node.EndS()
-                 << "] adjusted_end_s[" << adjusted_end_s << "]";
+          ADEBUG << "ExtendForward: orig_end_s[" << back_node.EndS() << "] adjusted_end_s["
+                 << adjusted_end_s << "]";
         }
       }
     } else {
@@ -196,17 +182,13 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
   bool allowed_to_explore = true;
   while (allowed_to_explore) {
     std::vector<NodeWithRange> succ_set;
-    for (const auto& edge :
-         curr_passage->nodes.back().GetTopoNode()->OutToSucEdge()) {
+    for (const auto& edge : curr_passage->nodes.back().GetTopoNode()->OutToSucEdge()) {
       const auto& succ_node = edge->ToNode();
       // if succ node has been inserted
-      if (ContainsKey(node_set_of_curr_passage, succ_node)) {
-        continue;
-      }
+      if (ContainsKey(node_set_of_curr_passage, succ_node)) { continue; }
       // if next passage is reachable from succ node
       NodeWithRange reachable_node(succ_node, 0, 1.0);
-      if (IsReachableFromWithChangeLane(succ_node, next_passage,
-                                        &reachable_node)) {
+      if (IsReachableFromWithChangeLane(succ_node, next_passage, &reachable_node)) {
         const auto* succ_range = range_manager.Find(succ_node);
         if (succ_range != nullptr && !succ_range->empty()) {
           double black_s_start = succ_range->front().StartS();
@@ -214,13 +196,11 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
             succ_set.emplace_back(succ_node, 0.0, black_s_start);
           }
         } else {
-          if (IsCloseEnough(reachable_node.EndS(),
-                            reachable_node.FullLength())) {
+          if (IsCloseEnough(reachable_node.EndS(), reachable_node.FullLength())) {
             succ_set.emplace_back(succ_node, 0.0, succ_node->Length());
           } else {
-            double push_end_s = reachable_node.EndS() /
-                                reachable_node.FullLength() *
-                                succ_node->Length();
+            double push_end_s =
+                reachable_node.EndS() / reachable_node.FullLength() * succ_node->Length();
             succ_set.emplace_back(succ_node, 0.0, push_end_s);
           }
         }
@@ -229,7 +209,7 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
     if (succ_set.empty()) {
       allowed_to_explore = false;
     } else {
-      allowed_to_explore = true;
+      allowed_to_explore         = true;
       const auto& node_to_insert = GetLargestRange(succ_set);
       curr_passage->nodes.push_back(node_to_insert);
       node_set_of_curr_passage.emplace(node_to_insert.GetTopoNode());
@@ -237,31 +217,26 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
   }
 }
 
-void ResultGenerator::ExtendPassages(const TopoRangeManager& range_manager,
+void ResultGenerator::ExtendPassages(const TopoRangeManager&         range_manager,
                                      std::vector<PassageInfo>* const passages) {
   int passage_num = static_cast<int>(passages->size());
   for (int i = 0; i < passage_num; ++i) {
     if (i < passage_num - 1) {
       ExtendForward(range_manager, passages->at(i + 1), &(passages->at(i)));
     }
-    if (i > 0) {
-      ExtendBackward(range_manager, passages->at(i - 1), &(passages->at(i)));
-    }
+    if (i > 0) { ExtendBackward(range_manager, passages->at(i - 1), &(passages->at(i))); }
   }
   for (int i = passage_num - 1; i >= 0; --i) {
     if (i < passage_num - 1) {
       ExtendForward(range_manager, passages->at(i + 1), &(passages->at(i)));
     }
-    if (i > 0) {
-      ExtendBackward(range_manager, passages->at(i - 1), &(passages->at(i)));
-    }
+    if (i > 0) { ExtendBackward(range_manager, passages->at(i - 1), &(passages->at(i))); }
   }
 }
 
-void LaneNodesToPassageRegion(
-    const std::vector<NodeWithRange>::const_iterator begin,
-    const std::vector<NodeWithRange>::const_iterator end,
-    Passage* const passage) {
+void LaneNodesToPassageRegion(const std::vector<NodeWithRange>::const_iterator begin,
+                              const std::vector<NodeWithRange>::const_iterator end,
+                              Passage* const                                   passage) {
   for (auto it = begin; it != end; ++it) {
     LaneSegment* seg = passage->add_segment();
     seg->set_id(it->LaneId());
@@ -270,43 +245,37 @@ void LaneNodesToPassageRegion(
   }
 }
 
-void LaneNodesToPassageRegion(const std::vector<NodeWithRange>& nodes,
-                              Passage* const passage) {
+void LaneNodesToPassageRegion(const std::vector<NodeWithRange>& nodes, Passage* const passage) {
   return LaneNodesToPassageRegion(nodes.begin(), nodes.end(), passage);
 }
 
 double CalculateDistance(const std::vector<NodeWithRange>& nodes) {
   double distance = nodes.at(0).EndS() - nodes.at(0).StartS();
   for (size_t i = 1; i < nodes.size(); ++i) {
-    auto edge =
-        nodes.at(i - 1).GetTopoNode()->GetOutEdgeTo(nodes.at(i).GetTopoNode());
-    if (edge == nullptr || edge->Type() != TET_FORWARD) {
-      continue;
-    }
+    auto edge = nodes.at(i - 1).GetTopoNode()->GetOutEdgeTo(nodes.at(i).GetTopoNode());
+    if (edge == nullptr || edge->Type() != TET_FORWARD) { continue; }
     distance += nodes.at(i).EndS() - nodes.at(i).StartS();
   }
   return distance;
 }
 
-void PrintDebugInfo(const std::string& road_id,
+void PrintDebugInfo(const std::string&                             road_id,
                     const std::vector<std::vector<NodeWithRange>>& nodes) {
   AINFO << "road id: " << road_id;
   for (size_t j = 0; j < nodes.size(); ++j) {
     AINFO << "\tPassage " << j;
     for (const auto& node : nodes[j]) {
-      AINFO << "\t\t" << node.LaneId() << "   (" << node.StartS() << ", "
-            << node.EndS() << ")";
+      AINFO << "\t\t" << node.LaneId() << "   (" << node.StartS() << ", " << node.EndS() << ")";
     }
   }
 }
 
-bool ResultGenerator::GeneratePassageRegion(
-    const std::string& map_version, const RoutingRequest& request,
-    const std::vector<NodeWithRange>& nodes,
-    const TopoRangeManager& range_manager, RoutingResponse* const result) {
-  if (!GeneratePassageRegion(nodes, range_manager, result)) {
-    return false;
-  }
+bool ResultGenerator::GeneratePassageRegion(const std::string&                map_version,
+                                            const RoutingRequest&             request,
+                                            const std::vector<NodeWithRange>& nodes,
+                                            const TopoRangeManager&           range_manager,
+                                            RoutingResponse* const            result) {
+  if (!GeneratePassageRegion(nodes, range_manager, result)) { return false; }
 
   result->set_map_version(map_version);
   result->mutable_measurement()->set_distance(CalculateDistance(nodes));
@@ -314,13 +283,11 @@ bool ResultGenerator::GeneratePassageRegion(
   return true;
 }
 
-bool ResultGenerator::GeneratePassageRegion(
-    const std::vector<NodeWithRange>& nodes,
-    const TopoRangeManager& range_manager, RoutingResponse* const result) {
+bool ResultGenerator::GeneratePassageRegion(const std::vector<NodeWithRange>& nodes,
+                                            const TopoRangeManager&           range_manager,
+                                            RoutingResponse* const            result) {
   std::vector<PassageInfo> passages;
-  if (!ExtractBasicPassages(nodes, &passages)) {
-    return false;
-  }
+  if (!ExtractBasicPassages(nodes, &passages)) { return false; }
   ExtendPassages(range_manager, &passages);
 
   CreateRoadSegments(passages, result);
@@ -328,30 +295,26 @@ bool ResultGenerator::GeneratePassageRegion(
   return true;
 }
 
-void ResultGenerator::AddRoadSegment(
-    const std::vector<PassageInfo>& passages,
-    const std::pair<std::size_t, std::size_t>& start_index,
-    const std::pair<std::size_t, std::size_t>& end_index,
-    RoutingResponse* result) {
+void ResultGenerator::AddRoadSegment(const std::vector<PassageInfo>&            passages,
+                                     const std::pair<std::size_t, std::size_t>& start_index,
+                                     const std::pair<std::size_t, std::size_t>& end_index,
+                                     RoutingResponse*                           result) {
   auto* road = result->add_road();
 
   road->set_id(passages[start_index.first].nodes[start_index.second].RoadId());
-  for (std::size_t i = start_index.first;
-      i <= end_index.first && i < passages.size(); ++i) {
-    auto* passage = road->add_passage();
+  for (std::size_t i = start_index.first; i <= end_index.first && i < passages.size(); ++i) {
+    auto*        passage = road->add_passage();
     const size_t node_start_index =
-        (i == start_index.first ?
-        std::max((std::size_t)0, start_index.second) : 0);
+        (i == start_index.first ? std::max((std::size_t)0, start_index.second) : 0);
     const auto node_begin_iter = passages[i].nodes.cbegin() + node_start_index;
-    ADEBUG<< "start node: " << node_begin_iter->LaneId() << ": "
-           << node_begin_iter->StartS() << "; " << node_begin_iter->EndS();
+    ADEBUG << "start node: " << node_begin_iter->LaneId() << ": " << node_begin_iter->StartS()
+           << "; " << node_begin_iter->EndS();
     const size_t node_end_index =
-         (i == end_index.first ?
-         std::min(end_index.second, passages[i].nodes.size() - 1) :
-         passages[i].nodes.size() - 1);
+        (i == end_index.first ? std::min(end_index.second, passages[i].nodes.size() - 1) :
+                                passages[i].nodes.size() - 1);
     const auto node_last_iter = passages[i].nodes.cbegin() + node_end_index;
-    ADEBUG << "last node: " << node_last_iter->LaneId() << ": "
-           << node_last_iter->StartS() << "; " << node_last_iter->EndS();
+    ADEBUG << "last node: " << node_last_iter->LaneId() << ": " << node_last_iter->StartS() << "; "
+           << node_last_iter->EndS();
     auto node_end_iter = node_last_iter + 1;
     LaneNodesToPassageRegion(node_begin_iter, node_end_iter, passage);
     if (start_index.first == end_index.first) {
@@ -364,45 +327,40 @@ void ResultGenerator::AddRoadSegment(
   }
 }
 
-void ResultGenerator::CreateRoadSegments(
-    const std::vector<PassageInfo>& passages, RoutingResponse* result) {
+void ResultGenerator::CreateRoadSegments(const std::vector<PassageInfo>& passages,
+                                         RoutingResponse*                result) {
   ACHECK(!passages.empty()) << "passages empty";
-  NodeWithRange fake_node_range(passages.front().nodes.front());
-  bool in_change_lane = false;
+  NodeWithRange                       fake_node_range(passages.front().nodes.front());
+  bool                                in_change_lane = false;
   std::pair<std::size_t, std::size_t> start_index(0, 0);
   for (std::size_t i = 0; i < passages.size(); ++i) {
     const auto& curr_nodes = passages[i].nodes;
     for (std::size_t j = 0; j < curr_nodes.size(); ++j) {
       if ((i + 1 < passages.size() &&
-           IsReachableToWithChangeLane(curr_nodes[j].GetTopoNode(),
-                                       passages[i + 1], &fake_node_range)) ||
-          (i > 0 &&
-           IsReachableFromWithChangeLane(curr_nodes[j].GetTopoNode(),
-                                         passages[i - 1], &fake_node_range))) {
+           IsReachableToWithChangeLane(curr_nodes[j].GetTopoNode(), passages[i + 1],
+                                       &fake_node_range)) ||
+          (i > 0 && IsReachableFromWithChangeLane(curr_nodes[j].GetTopoNode(), passages[i - 1],
+                                                  &fake_node_range))) {
         if (!in_change_lane) {
-          start_index = {i, j};
+          start_index    = {i, j};
           in_change_lane = true;
         }
       } else {
         if (in_change_lane) {
-          ADEBUG << "start_index(" << start_index.first << ", "
-                 << start_index.second
+          ADEBUG << "start_index(" << start_index.first << ", " << start_index.second
                  << ") end_index(" << i << ", " << j - 1 << ")";
           AddRoadSegment(passages, start_index, {i, j - 1}, result);
         }
-        ADEBUG << "start_index(" << i << ", " << j
-               << ") end_index(" << i << ", " << j << ")";
+        ADEBUG << "start_index(" << i << ", " << j << ") end_index(" << i << ", " << j << ")";
         AddRoadSegment(passages, {i, j}, {i, j}, result);
         in_change_lane = false;
       }
     }
   }
   if (in_change_lane) {
-    ADEBUG << "start_index(" << start_index.first << ", " << start_index.second
-           << ") end_index(" << passages.size() - 1 << ", "
-           << passages.back().nodes.size() - 1 << ")";
-    AddRoadSegment(passages, start_index,
-                   {passages.size() - 1, passages.back().nodes.size() - 1},
+    ADEBUG << "start_index(" << start_index.first << ", " << start_index.second << ") end_index("
+           << passages.size() - 1 << ", " << passages.back().nodes.size() - 1 << ")";
+    AddRoadSegment(passages, start_index, {passages.size() - 1, passages.back().nodes.size() - 1},
                    result);
   }
 }

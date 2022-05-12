@@ -31,11 +31,11 @@ class NodeWithRange : public NodeSRange {
   virtual ~NodeWithRange();
   bool operator<(const NodeWithRange& other) const;
 
-  const TopoNode* GetTopoNode() const;
-  bool IsVirtual() const;
+  const TopoNode*    GetTopoNode() const;
+  bool               IsVirtual() const;
   const std::string& RoadId() const;
   const std::string& LaneId() const;
-  double FullLength() const;
+  double             FullLength() const;
 
  private:
   const TopoNode* topo_node_ = nullptr;

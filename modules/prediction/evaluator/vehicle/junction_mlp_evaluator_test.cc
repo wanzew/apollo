@@ -28,9 +28,8 @@ namespace prediction {
 class JunctionMLPEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    const std::string file =
-        "modules/prediction/testdata/"
-        "single_perception_vehicle_injunction.pb.txt";
+    const std::string file = "modules/prediction/testdata/"
+                             "single_perception_vehicle_injunction.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
     FLAGS_enable_all_junction = true;
   }
@@ -40,21 +39,19 @@ class JunctionMLPEvaluatorTest : public KMLMapBasedTest {
 };
 
 TEST_F(JunctionMLPEvaluatorTest, InJunctionCase) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
   JunctionMLPEvaluator junction_mlp_evaluator;
-  ObstaclesContainer container;
+  ObstaclesContainer   container;
   container.GetJunctionAnalyzer()->Init("j2");
   container.Insert(perception_obstacles_);
   container.BuildJunctionFeature();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
   junction_mlp_evaluator.Evaluate(obstacle_ptr, &container);
-  const JunctionFeature& junction_feature =
-      obstacle_ptr->latest_feature().junction_feature();
+  const JunctionFeature& junction_feature = obstacle_ptr->latest_feature().junction_feature();
   EXPECT_EQ(junction_feature.junction_id(), "j2");
   EXPECT_GT(junction_feature.junction_exit_size(), 0);
   for (const auto& junction_exit : junction_feature.junction_exit()) {

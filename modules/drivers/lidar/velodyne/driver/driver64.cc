@@ -26,9 +26,7 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 Velodyne64Driver::~Velodyne64Driver() {
-  if (poll_thread_.joinable()) {
-    poll_thread_.join();
-  }
+  if (poll_thread_.joinable()) { poll_thread_.join(); }
 }
 
 bool Velodyne64Driver::Init() {
@@ -46,7 +44,7 @@ bool Velodyne64Driver::Init() {
     AERROR << "node is NULL";
     return false;
   }
-  writer_ = node_->CreateWriter<VelodyneScan>(config_.scan_channel());
+  writer_      = node_->CreateWriter<VelodyneScan>(config_.scan_channel());
   poll_thread_ = std::thread(&Velodyne64Driver::DevicePoll, this);
   return true;
 }
@@ -57,8 +55,7 @@ bool Velodyne64Driver::Init() {
  */
 bool Velodyne64Driver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   // Allocate a new shared pointer for zero-copy sharing with other nodelets.
-  int poll_result =
-      config_.use_sensor_sync() ? PollStandardSync(scan) : PollStandard(scan);
+  int poll_result = config_.use_sensor_sync() ? PollStandardSync(scan) : PollStandard(scan);
 
   if (poll_result == SOCKET_TIMEOUT || poll_result == RECEIVE_FAIL) {
     return false;  // poll again
@@ -86,13 +83,12 @@ bool Velodyne64Driver::CheckAngle(const VelodynePacket& packet) {
   // check the lidar model
   const unsigned char* raw_ptr = (const unsigned char*)packet.data().c_str();
   for (int i = 0; i < BLOCKS_PER_PACKET; ++i) {
-    uint16_t angle = static_cast<uint16_t>(raw_ptr[i * BLOCK_SIZE + 3] * 256 +
-                                           raw_ptr[i * BLOCK_SIZE + 2]);
+    uint16_t angle =
+        static_cast<uint16_t>(raw_ptr[i * BLOCK_SIZE + 3] * 256 + raw_ptr[i * BLOCK_SIZE + 2]);
     // for the velodyne64 angle resolution is 0.17~0.2 , so take the angle diff
     // at 0.3 degree should be a good choice
     // prefix_angle default = 18000
-    if (angle > config_.prefix_angle() &&
-        std::abs(angle - config_.prefix_angle()) < 30) {
+    if (angle > config_.prefix_angle() && std::abs(angle - config_.prefix_angle()) < 30) {
       return true;
     }
   }
@@ -106,26 +102,21 @@ int Velodyne64Driver::PollStandardSync(std::shared_ptr<VelodyneScan> scan) {
     while (true) {
       // keep reading until full packet received
       VelodynePacket* packet = scan->add_firing_pkts();
-      int rc = input_->get_firing_data_packet(packet);
+      int             rc     = input_->get_firing_data_packet(packet);
 
       if (rc == 0) {
         // check the angle for every packet if a packet has an angle
-        if (CheckAngle(*packet) &&
-            (scan->firing_pkts_size() > 0.5 * config_.npackets())) {
+        if (CheckAngle(*packet) && (scan->firing_pkts_size() > 0.5 * config_.npackets())) {
           return 0;
         } else {
           break;  // got a full packet?
         }
       }
-      if (rc < 0) {
-        return rc;
-      }
+      if (rc < 0) { return rc; }
     }
     // if the only UDP packet lost then recv 1.5*config_.npackets  packets at
     // most
-    if (scan->firing_pkts_size() > 1.5 * config_.npackets()) {
-      return 0;
-    }
+    if (scan->firing_pkts_size() > 1.5 * config_.npackets()) { return 0; }
   }
   return 0;
 }
@@ -134,7 +125,7 @@ void Velodyne64Driver::DevicePoll() {
   while (!apollo::cyber::IsShutdown()) {
     // poll device until end of file
     std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();
-    bool ret = Poll(scan);
+    bool                          ret  = Poll(scan);
     if (ret) {
       apollo::common::util::FillHeader("velodyne", scan.get());
       writer_->Write(scan);

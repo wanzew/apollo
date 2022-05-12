@@ -34,16 +34,18 @@ class FeatureGeneratorTest : public ::testing::Test {
   virtual void SetUp() {}
 
   void MapPointToGrid(const base::PointFCloudPtr& pc_ptr,
-                      std::vector<int>* point2grid, float range, size_t width,
-                      size_t height, float min_height, float max_height) {
+                      std::vector<int>*           point2grid,
+                      float                       range,
+                      size_t                      width,
+                      size_t                      height,
+                      float                       min_height,
+                      float                       max_height) {
     float inv_res_x = 0.5 * static_cast<float>(width) / range;
     float inv_res_y = 0.5 * static_cast<float>(height) / range;
     point2grid->assign(pc_ptr->size(), -1);
     for (size_t i = 0; i < pc_ptr->size(); ++i) {
       const auto& pt = pc_ptr->at(i);
-      if (pt.z <= min_height || pt.z >= max_height) {
-        continue;
-      }
+      if (pt.z <= min_height || pt.z >= max_height) { continue; }
       // the coordinates of x and y are exchanged here
       // (row <-> x, column <-> y)
       int pos_x = F2I(pt.y, range, inv_res_x);  // col
@@ -57,54 +59,43 @@ class FeatureGeneratorTest : public ::testing::Test {
   }
 
   void InitCPUBlobs(bool use_intensity_feature) {
-    base::Blob<float>* out_blob = generator_->out_blob_;
-    float* out_blob_data = nullptr;
-    out_blob_data = out_blob->mutable_cpu_data();
+    base::Blob<float>* out_blob      = generator_->out_blob_;
+    float*             out_blob_data = nullptr;
+    out_blob_data                    = out_blob->mutable_cpu_data();
 
     // set raw feature data
-    int channel_index = 0;
-    generator_->max_height_data_ =
-        out_blob_data + out_blob->offset(0, channel_index++);
-    generator_->mean_height_data_ =
-        out_blob_data + out_blob->offset(0, channel_index++);
-    generator_->count_data_ =
-        out_blob_data + out_blob->offset(0, channel_index++);
-    generator_->direction_data_ =
-        out_blob_data + out_blob->offset(0, channel_index++);
+    int channel_index             = 0;
+    generator_->max_height_data_  = out_blob_data + out_blob->offset(0, channel_index++);
+    generator_->mean_height_data_ = out_blob_data + out_blob->offset(0, channel_index++);
+    generator_->count_data_       = out_blob_data + out_blob->offset(0, channel_index++);
+    generator_->direction_data_   = out_blob_data + out_blob->offset(0, channel_index++);
     if (use_intensity_feature) {
-      generator_->top_intensity_data_ =
-          out_blob_data + out_blob->offset(0, channel_index++);
-      generator_->mean_intensity_data_ =
-          out_blob_data + out_blob->offset(0, channel_index++);
+      generator_->top_intensity_data_  = out_blob_data + out_blob->offset(0, channel_index++);
+      generator_->mean_intensity_data_ = out_blob_data + out_blob->offset(0, channel_index++);
     }
-    generator_->distance_data_ =
-        out_blob_data + out_blob->offset(0, channel_index++);
-    generator_->nonempty_data_ =
-        out_blob_data + out_blob->offset(0, channel_index++);
+    generator_->distance_data_ = out_blob_data + out_blob->offset(0, channel_index++);
+    generator_->nonempty_data_ = out_blob_data + out_blob->offset(0, channel_index++);
     CHECK_EQ(out_blob->offset(0, channel_index), out_blob->count());
 
     // compute direction and distance features
-    int map_size = generator_->height_ * generator_->width_;
+    int                map_size = generator_->height_ * generator_->width_;
     std::vector<float> direction_data(map_size);
     std::vector<float> distance_data(map_size);
     for (int row = 0; row < generator_->height_; ++row) {
       for (int col = 0; col < generator_->width_; ++col) {
         int idx = row * generator_->width_ + col;
         // * row <-> x, column <-> y
-        float center_x = Pixel2Pc(row, generator_->height_, generator_->range_);
-        float center_y = Pixel2Pc(col, generator_->width_, generator_->range_);
-        direction_data[idx] =
-            static_cast<float>(std::atan2(center_y, center_x) / (2.0 * kPI));
-        distance_data[idx] =
-            static_cast<float>(std::hypot(center_x, center_y) / 60.0 - 0.5);
+        float center_x      = Pixel2Pc(row, generator_->height_, generator_->range_);
+        float center_y      = Pixel2Pc(col, generator_->width_, generator_->range_);
+        direction_data[idx] = static_cast<float>(std::atan2(center_y, center_x) / (2.0 * kPI));
+        distance_data[idx]  = static_cast<float>(std::hypot(center_x, center_y) / 60.0 - 0.5);
       }
     }
 
     // memory copy direction and distance features
     memcpy(generator_->direction_data_, direction_data.data(),
            direction_data.size() * sizeof(float));
-    memcpy(generator_->distance_data_, distance_data.data(),
-           distance_data.size() * sizeof(float));
+    memcpy(generator_->distance_data_, distance_data.data(), distance_data.size() * sizeof(float));
   }
 
  protected:
@@ -116,27 +107,24 @@ TEST_F(FeatureGeneratorTest, basic_test) {
   putenv(cyber_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "lidar/lib/segmentation/cnnseg/";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+                    "lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
   base::PointFCloudPtr pc_ptr;
   pc_ptr.reset(new base::PointFCloud);
-  std::string filename =
-      "/apollo/modules/perception/testdata/lidar/lib/segmentation/cnnseg/"
-      "pcd_data/3_car_1_person.pcd";
+  std::string filename = "/apollo/modules/perception/testdata/lidar/lib/segmentation/cnnseg/"
+                         "pcd_data/3_car_1_person.pcd";
   bool ret = LoadPCLPCD(filename, pc_ptr.get());
   ACHECK(ret) << "Failed to load " << filename;
 
   std::vector<int> point2grid;
-  float range = 60.f;
-  size_t width = 640;
-  size_t height = 640;
-  float min_height = -5.f;
-  float max_height = 5.f;
-  MapPointToGrid(pc_ptr, &point2grid, range, width, height, min_height,
-                 max_height);
+  float            range      = 60.f;
+  size_t           width      = 640;
+  size_t           height     = 640;
+  float            min_height = -5.f;
+  float            max_height = 5.f;
+  MapPointToGrid(pc_ptr, &point2grid, range, width, height, min_height, max_height);
 
   FeatureParam param;
   param.set_point_cloud_range(range);
@@ -163,8 +151,7 @@ TEST_F(FeatureGeneratorTest, basic_test) {
       ofs << generator_->top_intensity_data_[i] << std::endl;
     }
     ofs.close();
-    cv::Mat image(param.height(), param.width(), CV_32FC1,
-                  generator_->top_intensity_data_);
+    cv::Mat image(param.height(), param.width(), CV_32FC1, generator_->top_intensity_data_);
     image.convertTo(image, CV_32FC3, 255.0);
     cv::imwrite("cpu_top_intensity_map.jpg", image);
   }
@@ -190,18 +177,17 @@ TEST_F(FeatureGeneratorTest, basic_test) {
     EXPECT_NE(generator_->mean_intensity_data_, nullptr);
     EXPECT_NE(generator_->top_intensity_data_, nullptr);
     // save feature map
-    size_t map_size = param.height() * param.width();
+    size_t             map_size = param.height() * param.width();
     std::vector<float> top_intensity_data(map_size);
-    cudaMemcpy(top_intensity_data.data(), generator_->top_intensity_data_,
-               map_size * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(top_intensity_data.data(), generator_->top_intensity_data_, map_size * sizeof(float),
+               cudaMemcpyDeviceToHost);
     std::ofstream ofs("gpu_top_intensity_map.txt");
     ACHECK(ofs.is_open());
     for (size_t i = 0; i < param.height() * param.width(); ++i) {
       ofs << top_intensity_data[i] << std::endl;
     }
     ofs.close();
-    cv::Mat image(param.height(), param.width(), CV_32FC1,
-                  top_intensity_data.data());
+    cv::Mat image(param.height(), param.width(), CV_32FC1, top_intensity_data.data());
     image.convertTo(image, CV_32FC3, 255.0);
     cv::imwrite("gpu_top_intensity_map.jpg", image);
   }

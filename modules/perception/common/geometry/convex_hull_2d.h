@@ -29,24 +29,22 @@ namespace common {
 template <class CLOUD_IN_TYPE, class CLOUD_OUT_TYPE>
 class ConvexHull2D {
  public:
-  ConvexHull2D() : in_cloud_(nullptr) {
+  ConvexHull2D()
+      : in_cloud_(nullptr) {
     points_.reserve(1000.0);
     polygon_indices_.reserve(1000.0);
   }
   ~ConvexHull2D() { in_cloud_ = nullptr; }
   // main interface to get polygon from input point cloud
-  bool GetConvexHull(const CLOUD_IN_TYPE& in_cloud,
-                     CLOUD_OUT_TYPE* out_polygon) {
+  bool GetConvexHull(const CLOUD_IN_TYPE& in_cloud, CLOUD_OUT_TYPE* out_polygon) {
     SetPoints(in_cloud);
-    if (!GetConvexHullMonotoneChain(out_polygon)) {
-      return MockConvexHull(out_polygon);
-    }
+    if (!GetConvexHullMonotoneChain(out_polygon)) { return MockConvexHull(out_polygon); }
     return true;
   }
   // main interface to get polygon from input point cloud(without ground points)
   bool GetConvexHullWithoutGround(const CLOUD_IN_TYPE& in_cloud,
-                                  const float& distance_above_ground_thres,
-                                  CLOUD_OUT_TYPE* out_polygon) {
+                                  const float&         distance_above_ground_thres,
+                                  CLOUD_OUT_TYPE*      out_polygon) {
     CLOUD_IN_TYPE in_cloud_without_ground;
     in_cloud_without_ground.reserve(in_cloud.size());
     for (std::size_t id = 0; id < in_cloud.size(); ++id) {
@@ -60,17 +58,16 @@ class ConvexHull2D {
       return GetConvexHull(in_cloud, out_polygon);
     } else {
       SetPoints(in_cloud_without_ground);
-      if (!GetConvexHullMonotoneChain(out_polygon)) {
-        return MockConvexHull(out_polygon);
-      }
+      if (!GetConvexHullMonotoneChain(out_polygon)) { return MockConvexHull(out_polygon); }
     }
     return true;
   }
   // main interface to get polygon from input point cloud
   // (without ground points and points above the head of self-driving car)
-  bool GetConvexHullWithoutGroundAndHead(
-      const CLOUD_IN_TYPE& in_cloud, const float& distance_above_ground_thres,
-      const float& distance_beneath_head_thres, CLOUD_OUT_TYPE* out_polygon) {
+  bool GetConvexHullWithoutGroundAndHead(const CLOUD_IN_TYPE& in_cloud,
+                                         const float&         distance_above_ground_thres,
+                                         const float&         distance_beneath_head_thres,
+                                         CLOUD_OUT_TYPE*      out_polygon) {
     CLOUD_IN_TYPE in_cloud_without_ground_and_head;
     in_cloud_without_ground_and_head.reserve(in_cloud.size());
     for (std::size_t id = 0; id < in_cloud.size(); ++id) {
@@ -86,9 +83,7 @@ class ConvexHull2D {
       return GetConvexHull(in_cloud, out_polygon);
     } else {
       SetPoints(in_cloud_without_ground_and_head);
-      if (!GetConvexHullMonotoneChain(out_polygon)) {
-        return MockConvexHull(out_polygon);
-      }
+      if (!GetConvexHullMonotoneChain(out_polygon)) { return MockConvexHull(out_polygon); }
     }
     return true;
   }
@@ -101,8 +96,10 @@ class ConvexHull2D {
   // compute convex hull using Andrew's monotone chain algorithm
   bool GetConvexHullMonotoneChain(CLOUD_OUT_TYPE* out_polygon);
   // given 3 ordered points, return true if in counter clock wise.
-  bool IsCounterClockWise(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2,
-                          const Eigen::Vector2d& p3, const double& eps) {
+  bool IsCounterClockWise(const Eigen::Vector2d& p1,
+                          const Eigen::Vector2d& p2,
+                          const Eigen::Vector2d& p3,
+                          const double&          eps) {
     Eigen::Vector2d p12 = p2 - p1;
     Eigen::Vector2d p13 = p3 - p1;
     return (p12(0) * p13(1) - p12(1) * p13(0) > eps);
@@ -110,13 +107,12 @@ class ConvexHull2D {
 
  private:
   std::vector<Eigen::Vector2d> points_;
-  std::vector<std::size_t> polygon_indices_;
-  const CLOUD_IN_TYPE* in_cloud_;
+  std::vector<std::size_t>     polygon_indices_;
+  const CLOUD_IN_TYPE*         in_cloud_;
 };
 
 template <class CLOUD_IN_TYPE, class CLOUD_OUT_TYPE>
-void ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::SetPoints(
-    const CLOUD_IN_TYPE& in_cloud) {
+void ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::SetPoints(const CLOUD_IN_TYPE& in_cloud) {
   points_.resize(in_cloud.size());
   for (std::size_t i = 0; i < points_.size(); ++i) {
     points_[i] << in_cloud[i].x, in_cloud[i].y;
@@ -125,11 +121,8 @@ void ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::SetPoints(
 }
 
 template <class CLOUD_IN_TYPE, class CLOUD_OUT_TYPE>
-bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::MockConvexHull(
-    CLOUD_OUT_TYPE* out_polygon) {
-  if (in_cloud_->size() == 0) {
-    return false;
-  }
+bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::MockConvexHull(CLOUD_OUT_TYPE* out_polygon) {
+  if (in_cloud_->size() == 0) { return false; }
   out_polygon->resize(4);
   Eigen::Matrix<double, 3, 1> maxv;
   Eigen::Matrix<double, 3, 1> minv;
@@ -174,9 +167,7 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::MockConvexHull(
 template <class CLOUD_IN_TYPE, class CLOUD_OUT_TYPE>
 bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::GetConvexHullMonotoneChain(
     CLOUD_OUT_TYPE* out_polygon) {
-  if (points_.size() < 3) {
-    return false;
-  }
+  if (points_.size() < 3) { return false; }
 
   std::vector<std::size_t> sorted_indices(points_.size());
   std::iota(sorted_indices.begin(), sorted_indices.end(), 0);
@@ -185,28 +176,22 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::GetConvexHullMonotoneChain(
   std::sort(sorted_indices.begin(), sorted_indices.end(),
             [&](const std::size_t& lhs, const std::size_t& rhs) {
               double dx = points_[lhs](0) - points_[rhs](0);
-              if (std::abs(dx) > eps) {
-                return dx < 0.0;
-              }
+              if (std::abs(dx) > eps) { return dx < 0.0; }
               return points_[lhs](1) < points_[rhs](1);
             });
-  int count = 0;
+  int count      = 0;
   int last_count = 1;
   polygon_indices_.clear();
   polygon_indices_.reserve(points_.size());
 
   std::size_t size2 = points_.size() * 2;
   for (std::size_t i = 0; i < size2; ++i) {
-    if (i == points_.size()) {
-      last_count = count;
-    }
-    const std::size_t& idx =
-        sorted_indices[(i < points_.size()) ? i : (size2 - 1 - i)];
-    const auto& point = points_[idx];
+    if (i == points_.size()) { last_count = count; }
+    const std::size_t& idx   = sorted_indices[(i < points_.size()) ? i : (size2 - 1 - i)];
+    const auto&        point = points_[idx];
     while (count > last_count &&
            !IsCounterClockWise(points_[polygon_indices_[count - 2]],
-                               points_[polygon_indices_[count - 1]], point,
-                               eps)) {
+                               points_[polygon_indices_[count - 1]], point, eps)) {
       polygon_indices_.pop_back();
       --count;
     }
@@ -215,9 +200,7 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::GetConvexHullMonotoneChain(
   }
   --count;
   polygon_indices_.pop_back();
-  if (count < 3) {
-    return false;
-  }
+  if (count < 3) { return false; }
   out_polygon->clear();
   out_polygon->resize(polygon_indices_.size());
   float min_z = static_cast<float>(in_cloud_->at(0).z);

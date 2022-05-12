@@ -27,54 +27,102 @@ namespace inference {
 #define NUM_2D_BOX_CORNERS_MACRO 4
 #define NUM_THREADS_MACRO 64
 
-#define CUDA_KERNEL_LOOP(i, n)                                 \
-  for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < (n); \
-       i += blockDim.x * gridDim.x)
+#define CUDA_KERNEL_LOOP(i, n)                                                                     \
+  for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < (n); i += blockDim.x * gridDim.x)
 
 #define DIVUP(m, n) ((m) / (n) + ((m) % (n) > 0))
 
-void bbox_transform_inv_cuda(int block_size, int thread_size, int shared_mem,
-                             cudaStream_t stream, const int nthreads,
-                             const float *boxes, const float *deltas,
-                             const int num_box, const int num_channel,
-                             float *out_boxes);
+void bbox_transform_inv_cuda(int          block_size,
+                             int          thread_size,
+                             int          shared_mem,
+                             cudaStream_t stream,
+                             const int    nthreads,
+                             const float* boxes,
+                             const float* deltas,
+                             const int    num_box,
+                             const int    num_channel,
+                             float*       out_boxes);
 
-void clip_boxes_cuda(int block_size, int thread_size, int shared_mem,
-                     cudaStream_t stream, const int nthreads, float *boxes,
-                     const float height, const float width);
+void clip_boxes_cuda(int          block_size,
+                     int          thread_size,
+                     int          shared_mem,
+                     cudaStream_t stream,
+                     const int    nthreads,
+                     float*       boxes,
+                     const float  height,
+                     const float  width);
 
-void filter_boxes_cuda(
-    int block_size, int thread_size, int shared_mem, cudaStream_t stream,
-    const int nthreads, const float *boxes, const float *scores,
-    const float *all_probs, const int num_box, const int num_channel,
-    const int num_class, const int num_prob, const int filter_channel,
-    const int filter_class, const int min_size_mode, const float min_size_h,
-    const float min_size_w, const float threshold_score, float *filtered_boxes,
-    float *filtered_scores, float *filtered_all_probs, int *filtered_count);
+void filter_boxes_cuda(int          block_size,
+                       int          thread_size,
+                       int          shared_mem,
+                       cudaStream_t stream,
+                       const int    nthreads,
+                       const float* boxes,
+                       const float* scores,
+                       const float* all_probs,
+                       const int    num_box,
+                       const int    num_channel,
+                       const int    num_class,
+                       const int    num_prob,
+                       const int    filter_channel,
+                       const int    filter_class,
+                       const int    min_size_mode,
+                       const float  min_size_h,
+                       const float  min_size_w,
+                       const float  threshold_score,
+                       float*       filtered_boxes,
+                       float*       filtered_scores,
+                       float*       filtered_all_probs,
+                       int*         filtered_count);
 
-void keep_topN_boxes_cuda(int block_size, int thread_size, int shared_mem,
-                          cudaStream_t stream, const int nthreads,
-                          const float *boxes, const float *scores,
-                          const float *all_probs, const int *indexes,
-                          const int *count, const bool keep_score,
-                          const int num_box, const int num_prob, const int topN,
-                          float *out_boxes, float *out_scores,
-                          float *out_all_probs);
+void keep_topN_boxes_cuda(int          block_size,
+                          int          thread_size,
+                          int          shared_mem,
+                          cudaStream_t stream,
+                          const int    nthreads,
+                          const float* boxes,
+                          const float* scores,
+                          const float* all_probs,
+                          const int*   indexes,
+                          const int*   count,
+                          const bool   keep_score,
+                          const int    num_box,
+                          const int    num_prob,
+                          const int    topN,
+                          float*       out_boxes,
+                          float*       out_scores,
+                          float*       out_all_probs);
 
-void repeatedly_add_cuda(int block_size, int thread_size, int shared_mem,
-                         cudaStream_t stream, const int nthreads,
-                         const float *in_data, float *out_data,
-                         const float *add_vec, int add_vec_size);
+void repeatedly_add_cuda(int          block_size,
+                         int          thread_size,
+                         int          shared_mem,
+                         cudaStream_t stream,
+                         const int    nthreads,
+                         const float* in_data,
+                         float*       out_data,
+                         const float* add_vec,
+                         int          add_vec_size);
 
-void repeatedly_mul_cuda(int block_size, int thread_size, int shared_mem,
-                         cudaStream_t stream, const int nthreads,
-                         const float *in_data, float *out_data,
-                         const float *mul_vec, int mul_vec_size);
+void repeatedly_mul_cuda(int          block_size,
+                         int          thread_size,
+                         int          shared_mem,
+                         cudaStream_t stream,
+                         const int    nthreads,
+                         const float* in_data,
+                         float*       out_data,
+                         const float* mul_vec,
+                         int          mul_vec_size);
 
-void slice2d_cuda(int block_size, int thread_size, int shared_mem,
-                  cudaStream_t stream, const int nthreads, const float *in_data,
-                  float *out_data, const int *slice_axises, int slice_axis_num,
-                  int input_axis_size);
+void slice2d_cuda(int          block_size,
+                  int          thread_size,
+                  int          shared_mem,
+                  cudaStream_t stream,
+                  const int    nthreads,
+                  const float* in_data,
+                  float*       out_data,
+                  const int*   slice_axises,
+                  int          slice_axis_num,
+                  int          input_axis_size);
 
 /**
  * @brief GPU Non-Maximum Suppresion for network output
@@ -93,11 +141,20 @@ void slice2d_cuda(int block_size, int thread_size, int shared_mem,
  * @param[in] acc_box_num Accumulated box num
  * @details NMS in GPU and postprocessing for selecting box in CPU
  */
-void NmsForward(bool rpn_proposal_output_score, int host_filter_count,
-                int num_box_corners, float nms_overlap_threshold,
-                int num_candidate, int top_n, int batch_id, int num_prob,
-                float *dev_sorted_box_for_nms, float *scores, float *all_probs,
-                float *out_boxes, int *acc_box_num, cudaStream_t stream);
+void NmsForward(bool         rpn_proposal_output_score,
+                int          host_filter_count,
+                int          num_box_corners,
+                float        nms_overlap_threshold,
+                int          num_candidate,
+                int          top_n,
+                int          batch_id,
+                int          num_prob,
+                float*       dev_sorted_box_for_nms,
+                float*       scores,
+                float*       all_probs,
+                float*       out_boxes,
+                int*         acc_box_num,
+                cudaStream_t stream);
 
 }  // namespace inference
 }  // namespace perception

@@ -45,15 +45,14 @@ void Parkingbrakecmd124::UpdateData(uint8_t* data) {
 
 void Parkingbrakecmd124::Reset() {
   // TODO(QiL) you should check this manually
-  ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
+  ignore_overrides_  = false;
+  enable_            = false;
+  clear_override_    = false;
   parking_brake_cmd_ = false;
-  clear_faults_ = false;
+  clear_faults_      = false;
 }
 
-Parkingbrakecmd124* Parkingbrakecmd124::set_ignore_overrides(
-    bool ignore_overrides) {
+Parkingbrakecmd124* Parkingbrakecmd124::set_ignore_overrides(bool ignore_overrides) {
   ignore_overrides_ = ignore_overrides;
   return this;
 }
@@ -61,8 +60,7 @@ Parkingbrakecmd124* Parkingbrakecmd124::set_ignore_overrides(
 // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-void Parkingbrakecmd124::set_p_ignore_overrides(uint8_t* data,
-                                                bool ignore_overrides) {
+void Parkingbrakecmd124::set_p_ignore_overrides(uint8_t* data, bool ignore_overrides) {
   uint8_t x = ignore_overrides;
 
   Byte to_set(data + 0);
@@ -84,8 +82,7 @@ void Parkingbrakecmd124::set_p_enable(uint8_t* data, bool enable) {
   to_set.set_value(static_cast<uint8_t>(x), 0, 1);
 }
 
-Parkingbrakecmd124* Parkingbrakecmd124::set_clear_override(
-    bool clear_override) {
+Parkingbrakecmd124* Parkingbrakecmd124::set_clear_override(bool clear_override) {
   clear_override_ = clear_override;
   return this;
 }
@@ -93,16 +90,14 @@ Parkingbrakecmd124* Parkingbrakecmd124::set_clear_override(
 // config detail: {'name': 'CLEAR_OVERRIDE', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 2,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-void Parkingbrakecmd124::set_p_clear_override(uint8_t* data,
-                                              bool clear_override) {
+void Parkingbrakecmd124::set_p_clear_override(uint8_t* data, bool clear_override) {
   uint8_t x = clear_override;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 2, 1);
 }
 
-Parkingbrakecmd124* Parkingbrakecmd124::set_parking_brake_cmd(
-    bool parking_brake_cmd) {
+Parkingbrakecmd124* Parkingbrakecmd124::set_parking_brake_cmd(bool parking_brake_cmd) {
   parking_brake_cmd_ = parking_brake_cmd;
   return this;
 }
@@ -110,8 +105,7 @@ Parkingbrakecmd124* Parkingbrakecmd124::set_parking_brake_cmd(
 // config detail: {'name': 'PARKING_BRAKE_CMD', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 8,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-void Parkingbrakecmd124::set_p_parking_brake_cmd(uint8_t* data,
-                                                 bool parking_brake_cmd) {
+void Parkingbrakecmd124::set_p_parking_brake_cmd(uint8_t* data, bool parking_brake_cmd) {
   uint8_t x = parking_brake_cmd;
 
   Byte to_set(data + 1);

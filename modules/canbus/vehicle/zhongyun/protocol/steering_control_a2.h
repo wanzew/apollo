@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class Steeringcontrola2 : public ::apollo::drivers::canbus::ProtocolData<
-                              ::apollo::canbus::ChassisDetail> {
+class Steeringcontrola2
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -61,11 +62,10 @@ class Steeringcontrola2 : public ::apollo::drivers::canbus::ProtocolData<
   // 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit':
   // 0, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
   void set_p_steering_enable_control(
-      uint8_t* data,
-      Steering_control_a2::Steering_enable_controlType steering_enable_control);
+      uint8_t* data, Steering_control_a2::Steering_enable_controlType steering_enable_control);
 
  private:
-  double steering_target_;
+  double                                           steering_target_;
   Steering_control_a2::Steering_enable_controlType steering_enable_control_;
 };
 

@@ -30,27 +30,20 @@ using ::apollo::drivers::canbus::Byte;
 Fail241::Fail241() {}
 const int32_t Fail241::ID = 0x241;
 
-void Fail241::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis) const {
-  chassis->mutable_wey()->mutable_fail_241()->set_engfail(
-      engfail(bytes, length));
-  chassis->mutable_wey()->mutable_fail_241()->set_espfail(
-      espfail(bytes, length));
-  chassis->mutable_wey()->mutable_fail_241()->set_epbfail(
-      epbfail(bytes, length));
-  chassis->mutable_wey()->mutable_fail_241()->set_shiftfail(
-      shiftfail(bytes, length));
-  chassis->mutable_wey()->mutable_fail_241()->set_epsfail(
-      epsfail(bytes, length));
+void Fail241::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
+  chassis->mutable_wey()->mutable_fail_241()->set_engfail(engfail(bytes, length));
+  chassis->mutable_wey()->mutable_fail_241()->set_espfail(espfail(bytes, length));
+  chassis->mutable_wey()->mutable_fail_241()->set_epbfail(epbfail(bytes, length));
+  chassis->mutable_wey()->mutable_fail_241()->set_shiftfail(shiftfail(bytes, length));
+  chassis->mutable_wey()->mutable_fail_241()->set_epsfail(epsfail(bytes, length));
 }
 
 // config detail: {'description': 'Engine Fail status', 'enum': {0:
 // 'ENGFAIL_NO_FAIL', 1: 'ENGFAIL_FAIL'}, 'precision': 1.0, 'len': 1, 'name':
 // 'engfail', 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]',
 // 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Fail_241::EngfailType Fail241::engfail(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes + 0);
+Fail_241::EngfailType Fail241::engfail(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(7, 1);
 
   Fail_241::EngfailType ret = static_cast<Fail_241::EngfailType>(x);
@@ -61,9 +54,8 @@ Fail_241::EngfailType Fail241::engfail(const std::uint8_t* bytes,
 // 1: 'ESPFAIL_FAILURE'}, 'precision': 1.0, 'len': 1, 'name': 'espfail',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 14,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Fail_241::EspfailType Fail241::espfail(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes + 1);
+Fail_241::EspfailType Fail241::espfail(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(6, 1);
 
   Fail_241::EspfailType ret = static_cast<Fail_241::EspfailType>(x);
@@ -75,9 +67,8 @@ Fail_241::EspfailType Fail241::espfail(const std::uint8_t* bytes,
 // 'EPBFAIL_DIAGNOSIS'}, 'precision': 1.0, 'len': 2, 'name': 'epbfail',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 35,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Fail_241::EpbfailType Fail241::epbfail(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes + 4);
+Fail_241::EpbfailType Fail241::epbfail(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(2, 2);
 
   Fail_241::EpbfailType ret = static_cast<Fail_241::EpbfailType>(x);
@@ -92,9 +83,8 @@ Fail_241::EpbfailType Fail241::epbfail(const std::uint8_t* bytes,
 // 'name': 'shiftfail', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|15]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Fail_241::ShiftfailType Fail241::shiftfail(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 3);
+Fail_241::ShiftfailType Fail241::shiftfail(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(4, 4);
 
   Fail_241::ShiftfailType ret = static_cast<Fail_241::ShiftfailType>(x);
@@ -106,9 +96,8 @@ Fail_241::ShiftfailType Fail241::shiftfail(const std::uint8_t* bytes,
 // 'name': 'epsfail', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 21, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Fail_241::EpsfailType Fail241::epsfail(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes + 2);
+Fail_241::EpsfailType Fail241::epsfail(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(5, 1);
 
   Fail_241::EpsfailType ret = static_cast<Fail_241::EpsfailType>(x);

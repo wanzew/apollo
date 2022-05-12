@@ -18,15 +18,17 @@
 
 #include <utility>
 
+#include "nlohmann/json.hpp"
+#include "pcl/filters/voxel_grid.h"
+#include "yaml-cpp/yaml.h"
+
+#include "modules/dreamview/proto/point_cloud.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/proto/point_cloud.pb.h"
-#include "nlohmann/json.hpp"
-#include "pcl/filters/voxel_grid.h"
-#include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace dreamview {
@@ -34,22 +36,22 @@ namespace dreamview {
 using apollo::localization::LocalizationEstimate;
 using Json = nlohmann::json;
 
-float PointCloudUpdater::lidar_height_ = kDefaultLidarHeight;
+float               PointCloudUpdater::lidar_height_ = kDefaultLidarHeight;
 boost::shared_mutex PointCloudUpdater::mutex_;
 
-PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket,
-                                     SimulationWorldUpdater *simworld_updater)
-    : node_(cyber::CreateNode("point_cloud")),
-      websocket_(websocket),
-      point_cloud_str_(""),
-      future_ready_(true),
-      simworld_updater_(simworld_updater) {
+PointCloudUpdater::PointCloudUpdater(WebSocketHandler*       websocket,
+                                     SimulationWorldUpdater* simworld_updater)
+    : node_(cyber::CreateNode("point_cloud"))
+    , websocket_(websocket)
+    , point_cloud_str_("")
+    , future_ready_(true)
+    , simworld_updater_(simworld_updater) {
   RegisterMessageHandlers();
 }
 
 PointCloudUpdater::~PointCloudUpdater() { Stop(); }
 
-void PointCloudUpdater::LoadLidarHeight(const std::string &file_path) {
+void PointCloudUpdater::LoadLidarHeight(const std::string& file_path) {
   if (!cyber::common::PathExists(file_path)) {
     AWARN << "No such file: " << FLAGS_lidar_height_yaml
           << ". Using default lidar height:" << kDefaultLidarHeight;
@@ -66,8 +68,7 @@ void PointCloudUpdater::LoadLidarHeight(const std::string &file_path) {
     return;
   }
 
-  AWARN << "Fail to load the lidar height yaml file: "
-        << FLAGS_lidar_height_yaml
+  AWARN << "Fail to load the lidar height yaml file: " << FLAGS_lidar_height_yaml
         << ". Using default lidar height:" << kDefaultLidarHeight;
   boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
   lidar_height_ = kDefaultLidarHeight;
@@ -75,16 +76,14 @@ void PointCloudUpdater::LoadLidarHeight(const std::string &file_path) {
 
 void PointCloudUpdater::RegisterMessageHandlers() {
   // Send current point_cloud status to the new client.
-  websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection *conn) {
-        Json response;
-        response["type"] = "PointCloudStatus";
-        response["enabled"] = enabled_;
-        websocket_->SendData(conn, response.dump());
-      });
+  websocket_->RegisterConnectionReadyHandler([this](WebSocketHandler::Connection* conn) {
+    Json response;
+    response["type"]    = "PointCloudStatus";
+    response["enabled"] = enabled_;
+    websocket_->SendData(conn, response.dump());
+  });
   websocket_->RegisterMessageHandler(
-      "RequestPointCloud",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "RequestPointCloud", [this](const Json& json, WebSocketHandler::Connection* conn) {
         std::string to_send;
         // If there is no point_cloud data for more than 2 seconds, reset.
         if (point_cloud_str_ != "" &&
@@ -98,65 +97,57 @@ void PointCloudUpdater::RegisterMessageHandlers() {
         }
         websocket_->SendBinaryData(conn, to_send, true);
       });
-  websocket_->RegisterMessageHandler(
-      "TogglePointCloud",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto enable = json.find("enable");
-        if (enable != json.end() && enable->is_boolean()) {
-          if (*enable) {
-            enabled_ = true;
-          } else {
-            enabled_ = false;
-          }
-          if (websocket_) {
-            Json response;
-            response["type"] = "PointCloudStatus";
-            response["enabled"] = enabled_;
-            // Sync the point_cloud status across all the clients.
-            websocket_->BroadcastData(response.dump());
-          }
-        }
-      });
+  websocket_->RegisterMessageHandler("TogglePointCloud",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       auto enable = json.find("enable");
+                                       if (enable != json.end() && enable->is_boolean()) {
+                                         if (*enable) {
+                                           enabled_ = true;
+                                         } else {
+                                           enabled_ = false;
+                                         }
+                                         if (websocket_) {
+                                           Json response;
+                                           response["type"]    = "PointCloudStatus";
+                                           response["enabled"] = enabled_;
+                                           // Sync the point_cloud status across all the clients.
+                                           websocket_->BroadcastData(response.dump());
+                                         }
+                                       }
+                                     });
 }
 
 void PointCloudUpdater::Start() {
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic,
-      [this](const std::shared_ptr<LocalizationEstimate> &msg) {
-        UpdateLocalizationTime(msg);
-      });
+      [this](const std::shared_ptr<LocalizationEstimate>& msg) { UpdateLocalizationTime(msg); });
   point_cloud_reader_ = node_->CreateReader<drivers::PointCloud>(
       FLAGS_pointcloud_topic,
-      [this](const std::shared_ptr<drivers::PointCloud> &msg) {
-        UpdatePointCloud(msg);
-      });
+      [this](const std::shared_ptr<drivers::PointCloud>& msg) { UpdatePointCloud(msg); });
 
   LoadLidarHeight(FLAGS_lidar_height_yaml);
 }
 
 void PointCloudUpdater::Stop() {
-  if (enabled_) {
-    async_future_.wait();
-  }
+  if (enabled_) { async_future_.wait(); }
 }
 
-pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudUpdater::ConvertPCLPointCloud(
-    const std::shared_ptr<drivers::PointCloud> &point_cloud) {
-  pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(
-      new pcl::PointCloud<pcl::PointXYZ>);
-  pcl_ptr->width = point_cloud->width();
-  pcl_ptr->height = point_cloud->height();
+pcl::PointCloud<pcl::PointXYZ>::Ptr
+PointCloudUpdater::ConvertPCLPointCloud(const std::shared_ptr<drivers::PointCloud>& point_cloud) {
+  pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(new pcl::PointCloud<pcl::PointXYZ>);
+  pcl_ptr->width    = point_cloud->width();
+  pcl_ptr->height   = point_cloud->height();
   pcl_ptr->is_dense = false;
 
   if (point_cloud->width() * point_cloud->height() !=
       static_cast<unsigned int>(point_cloud->point_size())) {
-    pcl_ptr->width = 1;
+    pcl_ptr->width  = 1;
     pcl_ptr->height = point_cloud->point_size();
   }
   pcl_ptr->points.resize(point_cloud->point_size());
 
   for (size_t i = 0; i < pcl_ptr->points.size(); ++i) {
-    const auto &point = point_cloud->point(static_cast<int>(i));
+    const auto& point    = point_cloud->point(static_cast<int>(i));
     pcl_ptr->points[i].x = point.x();
     pcl_ptr->points[i].y = point.y();
     pcl_ptr->points[i].z = point.z();
@@ -164,11 +155,8 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudUpdater::ConvertPCLPointCloud(
   return pcl_ptr;
 }
 
-void PointCloudUpdater::UpdatePointCloud(
-    const std::shared_ptr<drivers::PointCloud> &point_cloud) {
-  if (!enabled_) {
-    return;
-  }
+void PointCloudUpdater::UpdatePointCloud(const std::shared_ptr<drivers::PointCloud>& point_cloud) {
+  if (!enabled_) { return; }
   last_point_cloud_time_ = point_cloud->header().timestamp_sec();
   if (simworld_updater_->LastAdcTimestampSec() == 0.0 ||
       simworld_updater_->LastAdcTimestampSec() - last_point_cloud_time_ > 0.1) {
@@ -181,10 +169,9 @@ void PointCloudUpdater::UpdatePointCloud(
     if (future_ready_) {
       future_ready_ = false;
       // transform from drivers::PointCloud to pcl::PointCloud
-      pcl_ptr = ConvertPCLPointCloud(point_cloud);
-      std::future<void> f =
-          cyber::Async(&PointCloudUpdater::FilterPointCloud, this, pcl_ptr);
-      async_future_ = std::move(f);
+      pcl_ptr             = ConvertPCLPointCloud(point_cloud);
+      std::future<void> f = cyber::Async(&PointCloudUpdater::FilterPointCloud, this, pcl_ptr);
+      async_future_       = std::move(f);
     }
   } else {
     pcl_ptr = ConvertPCLPointCloud(point_cloud);
@@ -192,10 +179,8 @@ void PointCloudUpdater::UpdatePointCloud(
   }
 }
 
-void PointCloudUpdater::FilterPointCloud(
-    pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr) {
-  pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_filtered_ptr(
-      new pcl::PointCloud<pcl::PointXYZ>);
+void PointCloudUpdater::FilterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr) {
+  pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_filtered_ptr(new pcl::PointCloud<pcl::PointXYZ>);
 
   /*
       By default, disable voxel filter since it's taking more than 500ms
@@ -220,7 +205,7 @@ void PointCloudUpdater::FilterPointCloud(
   }
   apollo::dreamview::PointCloud point_cloud_pb;
   for (size_t idx = 0; idx < pcl_filtered_ptr->size(); ++idx) {
-    pcl::PointXYZ &pt = pcl_filtered_ptr->points[idx];
+    pcl::PointXYZ& pt = pcl_filtered_ptr->points[idx];
     if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z)) {
       point_cloud_pb.add_num(pt.x);
       point_cloud_pb.add_num(pt.y);
@@ -235,7 +220,7 @@ void PointCloudUpdater::FilterPointCloud(
 }
 
 void PointCloudUpdater::UpdateLocalizationTime(
-    const std::shared_ptr<LocalizationEstimate> &localization) {
+    const std::shared_ptr<LocalizationEstimate>& localization) {
   last_localization_time_ = localization->header().timestamp_sec();
 }
 }  // namespace dreamview

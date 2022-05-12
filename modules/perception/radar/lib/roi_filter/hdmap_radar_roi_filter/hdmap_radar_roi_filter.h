@@ -26,13 +26,13 @@ namespace radar {
 
 class HdmapRadarRoiFilter : public BaseRoiFilter {
  public:
-  HdmapRadarRoiFilter() : BaseRoiFilter() {}
+  HdmapRadarRoiFilter()
+      : BaseRoiFilter() {}
   virtual ~HdmapRadarRoiFilter() {}
 
   bool Init() override { return true; }
 
-  bool RoiFilter(const RoiFilterOptions& options,
-                 base::FramePtr radar_frame) override;
+  bool RoiFilter(const RoiFilterOptions& options, base::FramePtr radar_frame) override;
 
   std::string Name() const override;
 

@@ -75,7 +75,7 @@ class SyncedMemoryTest : public ::testing::Test {};
 
 TEST_F(SyncedMemoryTest, header_test) {
   {
-    bool use_cuda = true;
+    bool  use_cuda = true;
     void* ptr;
     PerceptionMallocHost(&ptr, 100, use_cuda);
     EXPECT_TRUE(ptr);
@@ -83,7 +83,7 @@ TEST_F(SyncedMemoryTest, header_test) {
   }
 
   {
-    bool use_cuda = false;
+    bool  use_cuda = false;
     void* ptr;
     PerceptionMallocHost(&ptr, 100, use_cuda);
     EXPECT_TRUE(ptr);
@@ -130,7 +130,7 @@ TEST_F(SyncedMemoryTest, TestAllocationGPU) {
 
 TEST_F(SyncedMemoryTest, TestCPUWrite) {
   SyncedMemory mem(10, true);
-  void* cpu_data = mem.mutable_cpu_data();
+  void*        cpu_data = mem.mutable_cpu_data();
   EXPECT_EQ(mem.head(), SyncedMemory::HEAD_AT_CPU);
   memset(cpu_data, 1, mem.size());
   for (size_t i = 0; i < mem.size(); ++i) {
@@ -149,7 +149,7 @@ TEST_F(SyncedMemoryTest, TestCPUWrite) {
 
 TEST_F(SyncedMemoryTest, TestGPURead) {
   SyncedMemory mem(10, true);
-  void* cpu_data = mem.mutable_cpu_data();
+  void*        cpu_data = mem.mutable_cpu_data();
   EXPECT_EQ(mem.head(), SyncedMemory::HEAD_AT_CPU);
   memset(cpu_data, 1, mem.size());
   const void* gpu_data = mem.gpu_data();
@@ -179,7 +179,7 @@ TEST_F(SyncedMemoryTest, TestGPURead) {
 
 TEST_F(SyncedMemoryTest, TestGPUWrite) {
   SyncedMemory mem(10, true);
-  void* gpu_data = mem.mutable_gpu_data();
+  void*        gpu_data = mem.mutable_gpu_data();
   EXPECT_EQ(mem.head(), SyncedMemory::HEAD_AT_GPU);
   cudaMemset(gpu_data, 1, mem.size());
   const void* cpu_data = mem.cpu_data();

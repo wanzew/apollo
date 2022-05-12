@@ -21,18 +21,16 @@
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_string(summary_monitor_name, "SummaryMonitor",
-              "Name of the summary monitor.");
+DEFINE_string(summary_monitor_name, "SummaryMonitor", "Name of the summary monitor.");
 
-DEFINE_double(system_status_publish_interval, 1,
-              "SystemStatus publish interval.");
+DEFINE_double(system_status_publish_interval, 1, "SystemStatus publish interval.");
 
 namespace apollo {
 namespace monitor {
 
 void SummaryMonitor::EscalateStatus(const ComponentStatus::Status new_status,
-                                    const std::string& message,
-                                    ComponentStatus* current_status) {
+                                    const std::string&            message,
+                                    ComponentStatus*              current_status) {
   // Overwrite priority: FATAL > ERROR > WARN > OK > UNKNOWN.
   if (new_status > current_status->status()) {
     current_status->set_status(new_status);
@@ -49,11 +47,11 @@ SummaryMonitor::SummaryMonitor()
     : RecurrentRunner(FLAGS_summary_monitor_name, 0) {}
 
 void SummaryMonitor::RunOnce(const double current_time) {
-  auto manager = MonitorManager::Instance();
-  auto* status = manager->GetStatus();
+  auto  manager = MonitorManager::Instance();
+  auto* status  = manager->GetStatus();
   // Escalate the summary status to the most severe one.
   for (auto& component : *status->mutable_components()) {
-    auto* summary = component.second.mutable_summary();
+    auto*       summary        = component.second.mutable_summary();
     const auto& process_status = component.second.process_status();
     EscalateStatus(process_status.status(), process_status.message(), summary);
     const auto& module_status = component.second.module_status();
@@ -61,8 +59,7 @@ void SummaryMonitor::RunOnce(const double current_time) {
     const auto& channel_status = component.second.channel_status();
     EscalateStatus(channel_status.status(), channel_status.message(), summary);
     const auto& resource_status = component.second.resource_status();
-    EscalateStatus(resource_status.status(), resource_status.message(),
-                   summary);
+    EscalateStatus(resource_status.status(), resource_status.message(), summary);
     const auto& other_status = component.second.other_status();
     EscalateStatus(other_status.status(), other_status.message(), summary);
   }
@@ -71,20 +68,19 @@ void SummaryMonitor::RunOnce(const double current_time) {
   // Don't use DebugString() which has known bug on Map field. The string
   // doesn't change though the value has changed.
   static std::hash<std::string> hash_fn;
-  std::string proto_bytes;
+  std::string                   proto_bytes;
   status->SerializeToString(&proto_bytes);
   const size_t new_fp = hash_fn(proto_bytes);
 
   if (system_status_fp_ != new_fp ||
       current_time - last_broadcast_ > FLAGS_system_status_publish_interval) {
-    static auto writer =
-        manager->CreateWriter<SystemStatus>(FLAGS_system_status_topic);
+    static auto writer = manager->CreateWriter<SystemStatus>(FLAGS_system_status_topic);
 
     apollo::common::util::FillHeader("SystemMonitor", status);
     writer->Write(*status);
     status->clear_header();
     system_status_fp_ = new_fp;
-    last_broadcast_ = current_time;
+    last_broadcast_   = current_time;
   }
 }
 

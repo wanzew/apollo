@@ -17,8 +17,9 @@
 
 #include <string>
 
-#include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/system_status.pb.h"
+
+#include "modules/monitor/common/recurrent_runner.h"
 
 namespace apollo {
 namespace monitor {
@@ -33,12 +34,12 @@ class SummaryMonitor : public RecurrentRunner {
   // Escalate the status to a higher priority new status:
   //    FATAL > ERROR > WARN > OK > UNKNOWN.
   static void EscalateStatus(const ComponentStatus::Status new_status,
-                             const std::string& message,
-                             ComponentStatus* current_status);
+                             const std::string&            message,
+                             ComponentStatus*              current_status);
 
  private:
   size_t system_status_fp_ = 0;
-  double last_broadcast_ = 0;
+  double last_broadcast_   = 0;
 };
 
 }  // namespace monitor

@@ -21,7 +21,6 @@
 
 #include "cyber/cyber.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-
 #include "modules/drivers/gnss/stream/raw_stream.h"
 
 namespace apollo {
@@ -39,7 +38,7 @@ class GnssDriverComponent : public Component<> {
   bool Init() override;
 
  private:
-  std::unique_ptr<RawStream> raw_stream_ = nullptr;
+  std::unique_ptr<RawStream>                raw_stream_ = nullptr;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 

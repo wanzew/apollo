@@ -16,8 +16,8 @@
 #pragma once
 
 #include <memory.h>
-#include <cmath>
 
+#include <cmath>
 #include <set>
 #include <string>
 #include <vector>
@@ -27,10 +27,10 @@ namespace perception {
 namespace common {
 
 struct HoughLine {
-  float r = 0.0f;
-  float theta = 0.0f;
-  float length = 0.0f;
-  int vote_num = 0;
+  float            r        = 0.0f;
+  float            theta    = 0.0f;
+  float            length   = 0.0f;
+  int              vote_num = 0;
   std::vector<int> pts;
 };
 
@@ -68,8 +68,11 @@ class HoughTransfer {
   //             with_distribute: flag to control whether to calculate element
   //                              length,vote_num,pts in HoughLine
   //             lines: save lines detected.
-  bool GetLines(int min_pt_num, int r_neibor, int theta_neibor,
-                bool with_distribute, std::vector<HoughLine>* lines) const;
+  bool GetLines(int                     min_pt_num,
+                int                     r_neibor,
+                int                     theta_neibor,
+                bool                    with_distribute,
+                std::vector<HoughLine>* lines) const;
 
   unsigned int MemoryConsume() const;
 
@@ -84,38 +87,39 @@ class HoughTransfer {
 
   inline bool is_prepared() const { return prepared_; }
 
-  inline const std::vector<int>& get_vote_map() const { return vote_map_; }
-  inline const std::vector<std::vector<int>>& get_distribute_map() const {
-    return distribute_map_;
-  }
+  inline const std::vector<int>&              get_vote_map() const { return vote_map_; }
+  inline const std::vector<std::vector<int>>& get_distribute_map() const { return distribute_map_; }
 
   inline float get_d_r() const { return d_r_; }
   inline float get_d_theta() const { return d_theta_; }
-  inline int get_img_w() const { return img_w_; }
-  inline int get_img_h() const { return img_h_; }
-  inline int get_r_size() const { return r_size_; }
-  inline int get_theta_size() const { return theta_size_; }
+  inline int   get_img_w() const { return img_w_; }
+  inline int   get_img_h() const { return img_h_; }
+  inline int   get_r_size() const { return r_size_; }
+  inline int   get_theta_size() const { return theta_size_; }
 
   void ClearWithShrink();
 
  private:
   bool CheckPrepared() const;
 
-  void GetMaxVotes(int min_pt_num, int r_neibor, int theta_neibor, int r_step,
-                   int theta_step, std::set<int>* max_vote_lines) const;
+  void GetMaxVotes(int            min_pt_num,
+                   int            r_neibor,
+                   int            theta_neibor,
+                   int            r_step,
+                   int            theta_step,
+                   std::set<int>* max_vote_lines) const;
 
-  bool VotePosToHoughLine(int vote_pos, bool with_distribute,
-                          HoughLine* out_line) const;
+  bool VotePosToHoughLine(int vote_pos, bool with_distribute, HoughLine* out_line) const;
 
-  bool prepared_;
-  float d_r_;
-  float d_theta_;
-  int img_w_;
-  int img_h_;
-  int r_size_;
-  int theta_size_;
-  int vote_reserve_size_;
-  std::vector<int> vote_map_;
+  bool                          prepared_;
+  float                         d_r_;
+  float                         d_theta_;
+  int                           img_w_;
+  int                           img_h_;
+  int                           r_size_;
+  int                           theta_size_;
+  int                           vote_reserve_size_;
+  std::vector<int>              vote_map_;
   std::vector<std::vector<int>> query_map_;
   std::vector<std::vector<int>> distribute_map_;
 };

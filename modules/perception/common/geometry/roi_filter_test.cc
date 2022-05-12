@@ -26,13 +26,12 @@ namespace perception {
 namespace common {
 
 using apollo::perception::base::HdmapStruct;
-using HdmapStructConstPtr =
-    std::shared_ptr<const apollo::perception::base::HdmapStruct>;
-using HdmapStructPtr = std::shared_ptr<apollo::perception::base::HdmapStruct>;
+using HdmapStructConstPtr = std::shared_ptr<const apollo::perception::base::HdmapStruct>;
+using HdmapStructPtr      = std::shared_ptr<apollo::perception::base::HdmapStruct>;
 using apollo::perception::base::Object;
 using apollo::perception::base::PointD;
 using ObjectConstPtr = std::shared_ptr<const apollo::perception::base::Object>;
-using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+using ObjectPtr      = std::shared_ptr<apollo::perception::base::Object>;
 
 TEST(IsPtInRoiTest, test_roi) {
   HdmapStructPtr hdmap = HdmapStructPtr(new HdmapStruct());
@@ -50,12 +49,12 @@ TEST(IsPtInRoiTest, test_roi) {
   pt.y = 1.0;
   pt.z = 0.0;
   hdmap->junction_polygons[0].push_back(pt);
-  bool flag = false;
-  pt.x = 0.0;
-  pt.y = 0.0;
-  pt.z = 0.0;
+  bool flag                            = false;
+  pt.x                                 = 0.0;
+  pt.y                                 = 0.0;
+  pt.z                                 = 0.0;
   const HdmapStructConstPtr hdmo_const = hdmap;
-  flag = IsPtInRoi(hdmo_const, pt);
+  flag                                 = IsPtInRoi(hdmo_const, pt);
   EXPECT_TRUE(flag);
   pt.x = 10.0;
   pt.y = 10.0;
@@ -80,10 +79,10 @@ TEST(IsObjectInRoiTest, test_roi) {
   pt.y = 1.0;
   pt.z = 0.0;
   hdmap->junction_polygons[0].push_back(pt);
-  bool flag = false;
-  ObjectConstPtr obj = ObjectPtr(new Object());
+  bool                      flag       = false;
+  ObjectConstPtr            obj        = ObjectPtr(new Object());
   const HdmapStructConstPtr hdmo_const = hdmap;
-  flag = IsObjectInRoi(hdmo_const, obj);
+  flag                                 = IsObjectInRoi(hdmo_const, obj);
   EXPECT_TRUE(flag);
 }
 
@@ -103,29 +102,29 @@ TEST(IsObjectBboxInRoiTest, test_roi) {
   pt.y = 1.0;
   pt.z = 0.0;
   hdmap->junction_polygons[0].push_back(pt);
-  bool flag = false;
-  ObjectConstPtr obj = ObjectPtr(new Object());
+  bool                      flag       = false;
+  ObjectConstPtr            obj        = ObjectPtr(new Object());
   const HdmapStructConstPtr hdmo_const = hdmap;
-  flag = IsObjectBboxInRoi(hdmo_const, obj);
+  flag                                 = IsObjectBboxInRoi(hdmo_const, obj);
   EXPECT_TRUE(flag);
 
-  ObjectPtr obj_unconst = ObjectPtr(new Object());
+  ObjectPtr obj_unconst  = ObjectPtr(new Object());
   obj_unconst->center[0] = 10.0;
   obj_unconst->center[1] = 10.0;
   obj_unconst->center[2] = 10.0;
-  flag = IsObjectBboxInRoi(hdmo_const, obj_unconst);
+  flag                   = IsObjectBboxInRoi(hdmo_const, obj_unconst);
   EXPECT_FALSE(flag);
 
   obj_unconst->direction[0] = 0.0;
-  obj_unconst->center[0] = 0.0;
-  obj_unconst->center[1] = 0.0;
-  obj_unconst->center[2] = 0.0;
-  flag = IsObjectBboxInRoi(hdmo_const, obj_unconst);
+  obj_unconst->center[0]    = 0.0;
+  obj_unconst->center[1]    = 0.0;
+  obj_unconst->center[2]    = 0.0;
+  flag                      = IsObjectBboxInRoi(hdmo_const, obj_unconst);
   EXPECT_TRUE(flag);
 }
 
 TEST(ObjectInRoiTest, test_roi) {
-  HdmapStructPtr hdmap = nullptr;
+  HdmapStructPtr         hdmap = nullptr;
   std::vector<ObjectPtr> objects;
   std::vector<ObjectPtr> valid_objects;
 

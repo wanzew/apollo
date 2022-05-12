@@ -25,10 +25,10 @@ namespace benchmark {
 
 class OptionParser {
  public:
-  OptionParser() = default;
+  OptionParser()          = default;
   virtual ~OptionParser() = default;
-  bool parse_from_string(const std::string& input);
-  virtual bool set_options() const { return true; }
+  bool                 parse_from_string(const std::string& input);
+  virtual bool         set_options() const { return true; }
   friend std::ostream& operator<<(std::ostream& out, const OptionParser& rhs);
 
  protected:

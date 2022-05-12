@@ -36,14 +36,15 @@
 
 #pragma once
 
-#include <asm/types.h> /* for videodev2.h */
-#include <malloc.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
+#include <asm/types.h> /* for videodev2.h */
+#include <malloc.h>
+
 #ifndef __aarch64__
-#include <immintrin.h>
-#include <x86intrin.h>
+#  include <immintrin.h>
+#  include <x86intrin.h>
 #endif
 
 extern "C" {
@@ -55,16 +56,16 @@ extern "C" {
 
 #include <libavcodec/version.h>
 #if LIBAVCODEC_VERSION_MAJOR < 55
-#define AV_CODEC_ID_MJPEG CODEC_ID_MJPEG
+#  define AV_CODEC_ID_MJPEG CODEC_ID_MJPEG
 #endif
 
 #include <memory>
 #include <sstream>
 #include <string>
 
-#include "cyber/cyber.h"
-
 #include "modules/drivers/camera/proto/config.pb.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace drivers {
@@ -80,13 +81,13 @@ using apollo::drivers::camera::config::YUYV;
 
 // camera raw image struct
 struct CameraImage {
-  int width;
-  int height;
-  int bytes_per_pixel;
-  int image_size;
-  int is_new;
-  int tv_sec;
-  int tv_usec;
+  int   width;
+  int   height;
+  int   bytes_per_pixel;
+  int   image_size;
+  int   is_new;
+  int   tv_sec;
+  int   tv_usec;
   char* image;
 
   ~CameraImage() {
@@ -100,7 +101,7 @@ struct CameraImage {
 typedef std::shared_ptr<CameraImage> CameraImagePtr;
 
 struct buffer {
-  void* start;
+  void*  start;
   size_t length;
 };
 
@@ -117,7 +118,7 @@ class UsbCam {
   bool wait_for_device(void);
 
  private:
-  int xioctl(int fd, int request, void* arg);
+  int  xioctl(int fd, int request, void* arg);
   bool init_device(void);
   bool uninit_device(void);
 
@@ -128,13 +129,15 @@ class UsbCam {
   void set_v4l_parameter(const std::string& param, int value);
   void set_v4l_parameter(const std::string& param, const std::string& value);
 
-  int init_mjpeg_decoder(int image_width, int image_height);
+  int  init_mjpeg_decoder(int image_width, int image_height);
   void mjpeg2rgb(char* mjepg_buffer, int len, char* rgb_buffer, int pixels);
 
 #ifdef __aarch64__
   int convert_yuv_to_rgb_pixel(int y, int u, int v);
-  int convert_yuv_to_rgb_buffer(unsigned char* yuv, unsigned char* rgb,
-                                unsigned int width, unsigned int height);
+  int convert_yuv_to_rgb_buffer(unsigned char* yuv,
+                                unsigned char* rgb,
+                                unsigned int   width,
+                                unsigned int   height);
 #endif
 
   bool init_read(unsigned int buffer_size);
@@ -151,26 +154,26 @@ class UsbCam {
   void reset_device();
 
   std::shared_ptr<Config> config_;
-  int pixel_format_;
-  int fd_;
-  buffer* buffers_;
-  unsigned int n_buffers_;
-  bool is_capturing_;
-  uint64_t image_seq_;
+  int                     pixel_format_;
+  int                     fd_;
+  buffer*                 buffers_;
+  unsigned int            n_buffers_;
+  bool                    is_capturing_;
+  uint64_t                image_seq_;
 
-  AVFrame* avframe_camera_;
-  AVFrame* avframe_rgb_;
-  AVCodec* avcodec_;
-  AVDictionary* avoptions_;
-  AVCodecContext* avcodec_context_;
-  int avframe_camera_size_;
-  int avframe_rgb_size_;
+  AVFrame*           avframe_camera_;
+  AVFrame*           avframe_rgb_;
+  AVCodec*           avcodec_;
+  AVDictionary*      avoptions_;
+  AVCodecContext*    avcodec_context_;
+  int                avframe_camera_size_;
+  int                avframe_rgb_size_;
   struct SwsContext* video_sws_;
 
-  float frame_warning_interval_ = 0.0;
-  float device_wait_sec_ = 0.0;
-  uint64_t last_nsec_ = 0;
-  float frame_drop_interval_ = 0.0;
+  float    frame_warning_interval_ = 0.0;
+  float    device_wait_sec_        = 0.0;
+  uint64_t last_nsec_              = 0;
+  float    frame_drop_interval_    = 0.0;
 };
 }  // namespace camera
 }  // namespace drivers

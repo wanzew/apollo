@@ -24,31 +24,30 @@ namespace perception {
 namespace fusion {
 
 TEST(SensorDataManagerTest, test) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base";
-  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/"
-      "fusion/base/params";
+  FLAGS_work_root                 = "/apollo/modules/perception/testdata/fusion/base";
+  FLAGS_obs_sensor_meta_path      = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+                                    "fusion/base/params";
 
   SensorDataManager* sensor_data_manager = SensorDataManager::Instance();
-  base::SensorInfo sensor_info_1;
+  base::SensorInfo   sensor_info_1;
   sensor_info_1.name = "velodyne64";
   sensor_info_1.type = base::SensorType::VELODYNE_64;
 
-  double timestamp = 7012;
+  double          timestamp         = 7012;
   Eigen::Affine3d sensor2world_pose = Eigen::Affine3d::Identity();
   base::ObjectPtr base_object_1(new base::Object());
-  base::FramePtr base_frame_1(new base::Frame());
-  base_frame_1->sensor_info = sensor_info_1;
-  base_frame_1->timestamp = timestamp;
+  base::FramePtr  base_frame_1(new base::Frame());
+  base_frame_1->sensor_info       = sensor_info_1;
+  base_frame_1->timestamp         = timestamp;
   base_frame_1->sensor2world_pose = sensor2world_pose;
   base_frame_1->objects.emplace_back(base_object_1);
 
   base::ObjectPtr base_object_2(new base::Object());
-  base::FramePtr base_frame_2(new base::Frame());
-  base_frame_2->sensor_info = sensor_info_1;
-  timestamp = 9012;
-  base_frame_2->timestamp = timestamp;
+  base::FramePtr  base_frame_2(new base::Frame());
+  base_frame_2->sensor_info       = sensor_info_1;
+  timestamp                       = 9012;
+  base_frame_2->timestamp         = timestamp;
   base_frame_2->sensor2world_pose = sensor2world_pose;
   base_frame_2->objects.emplace_back(base_object_2);
 
@@ -62,10 +61,10 @@ TEST(SensorDataManagerTest, test) {
   sensor_info_2.type = base::SensorType::STEREO_CAMERA;
 
   base::ObjectPtr base_object_3(new base::Object());
-  base::FramePtr base_frame_3(new base::Frame());
-  base_frame_3->sensor_info = sensor_info_2;
-  timestamp = 9014;
-  base_frame_3->timestamp = timestamp;
+  base::FramePtr  base_frame_3(new base::Frame());
+  base_frame_3->sensor_info       = sensor_info_2;
+  timestamp                       = 9014;
+  base_frame_3->timestamp         = timestamp;
   base_frame_3->sensor2world_pose = sensor2world_pose;
   base_frame_3->objects.emplace_back(base_object_3);
 
@@ -79,16 +78,13 @@ TEST(SensorDataManagerTest, test) {
   sensor_data_manager->AddSensorMeasurements(error_frame);
   EXPECT_EQ(sensor_data_manager->sensors_.size(), 2);
 
-  double query_timestamp = 9015;
+  double                      query_timestamp = 9015;
   std::vector<SensorFramePtr> frame_vec;
-  sensor_data_manager->GetLatestSensorFrames(query_timestamp, "velodyne64",
-                                             nullptr);
+  sensor_data_manager->GetLatestSensorFrames(query_timestamp, "velodyne64", nullptr);
   EXPECT_EQ(frame_vec.size(), 0);
-  sensor_data_manager->GetLatestSensorFrames(query_timestamp, "ultrasonic",
-                                             &frame_vec);
+  sensor_data_manager->GetLatestSensorFrames(query_timestamp, "ultrasonic", &frame_vec);
   EXPECT_EQ(frame_vec.size(), 0);
-  sensor_data_manager->GetLatestSensorFrames(query_timestamp, "velodyne64",
-                                             &frame_vec);
+  sensor_data_manager->GetLatestSensorFrames(query_timestamp, "velodyne64", &frame_vec);
   EXPECT_EQ(frame_vec.size(), 2);
 
   frame_vec.clear();
@@ -107,17 +103,13 @@ TEST(SensorDataManagerTest, test) {
 
   Eigen::Affine3d pose;
   query_timestamp = 7012;
-  EXPECT_FALSE(
-      sensor_data_manager->GetPose("velodyne64", query_timestamp, nullptr));
-  EXPECT_FALSE(
-      sensor_data_manager->GetPose("ultrasonic", query_timestamp, &pose));
-  EXPECT_TRUE(
-      sensor_data_manager->GetPose("velodyne64", query_timestamp, &pose));
+  EXPECT_FALSE(sensor_data_manager->GetPose("velodyne64", query_timestamp, nullptr));
+  EXPECT_FALSE(sensor_data_manager->GetPose("ultrasonic", query_timestamp, &pose));
+  EXPECT_TRUE(sensor_data_manager->GetPose("velodyne64", query_timestamp, &pose));
   EXPECT_EQ((pose.matrix() - sensor2world_pose.matrix()).trace(), 0.0);
 
   EXPECT_EQ(sensor_data_manager->GetCameraIntrinsic("velodyne64"), nullptr);
-  EXPECT_NE(sensor_data_manager->GetCameraIntrinsic("camera_smartereye"),
-            nullptr);
+  EXPECT_NE(sensor_data_manager->GetCameraIntrinsic("camera_smartereye"), nullptr);
 }
 
 }  // namespace fusion

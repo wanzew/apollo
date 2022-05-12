@@ -14,15 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/data/fusion/all_latest.h"
+
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "cyber/data/data_visitor.h"
-#include "cyber/data/fusion/all_latest.h"
 
 namespace apollo {
 namespace cyber {
@@ -33,14 +35,14 @@ using apollo::cyber::proto::RoleAttributes;
 std::hash<std::string> str_hash;
 
 TEST(AllLatestTest, two_channels) {
-  auto cache0 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  auto cache1 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  ChannelBuffer<RawMessage> buffer0(static_cast<uint64_t>(0), cache0);
-  ChannelBuffer<RawMessage> buffer1(static_cast<uint64_t>(1), cache1);
+  auto                        cache0 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  auto                        cache1 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  ChannelBuffer<RawMessage>   buffer0(static_cast<uint64_t>(0), cache0);
+  ChannelBuffer<RawMessage>   buffer1(static_cast<uint64_t>(1), cache1);
   std::shared_ptr<RawMessage> m;
   std::shared_ptr<RawMessage> m0;
   std::shared_ptr<RawMessage> m1;
-  uint64_t index = 0;
+  uint64_t                    index = 0;
   fusion::AllLatest<RawMessage, RawMessage> fusion(buffer0, buffer1);
 
   // normal fusion
@@ -70,8 +72,7 @@ TEST(AllLatestTest, two_channels) {
 
   // m0 overflow
   for (int i = 0; i < 100; i++) {
-    cache0->Fill(std::make_shared<RawMessage>(std::string("0-") +
-                                              std::to_string(2 + i + 1)));
+    cache0->Fill(std::make_shared<RawMessage>(std::string("0-") + std::to_string(2 + i + 1)));
   }
   // EXPECT_TRUE(fusion.buffer_fusion_->Buffer()->Full());
   EXPECT_TRUE(fusion.Fusion(&index, m0, m1));
@@ -80,19 +81,18 @@ TEST(AllLatestTest, two_channels) {
 }
 
 TEST(AllLatestTest, three_channels) {
-  auto cache0 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  auto cache1 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  auto cache2 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  ChannelBuffer<RawMessage> buffer0(0, cache0);
-  ChannelBuffer<RawMessage> buffer1(1, cache1);
-  ChannelBuffer<RawMessage> buffer2(2, cache2);
+  auto                        cache0 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  auto                        cache1 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  auto                        cache2 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  ChannelBuffer<RawMessage>   buffer0(0, cache0);
+  ChannelBuffer<RawMessage>   buffer1(1, cache1);
+  ChannelBuffer<RawMessage>   buffer2(2, cache2);
   std::shared_ptr<RawMessage> m;
   std::shared_ptr<RawMessage> m0;
   std::shared_ptr<RawMessage> m1;
   std::shared_ptr<RawMessage> m2;
-  uint64_t index = 0;
-  fusion::AllLatest<RawMessage, RawMessage, RawMessage> fusion(buffer0, buffer1,
-                                                               buffer2);
+  uint64_t                    index = 0;
+  fusion::AllLatest<RawMessage, RawMessage, RawMessage> fusion(buffer0, buffer1, buffer2);
 
   // normal fusion
   EXPECT_FALSE(fusion.Fusion(&index, m0, m1, m2));
@@ -111,22 +111,22 @@ TEST(AllLatestTest, three_channels) {
 }
 
 TEST(AllLatestTest, four_channels) {
-  auto cache0 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  auto cache1 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  auto cache2 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  auto cache3 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
-  ChannelBuffer<RawMessage> buffer0(0, cache0);
-  ChannelBuffer<RawMessage> buffer1(1, cache1);
-  ChannelBuffer<RawMessage> buffer2(2, cache2);
-  ChannelBuffer<RawMessage> buffer3(3, cache3);
+  auto                        cache0 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  auto                        cache1 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  auto                        cache2 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  auto                        cache3 = new CacheBuffer<std::shared_ptr<RawMessage>>(10);
+  ChannelBuffer<RawMessage>   buffer0(0, cache0);
+  ChannelBuffer<RawMessage>   buffer1(1, cache1);
+  ChannelBuffer<RawMessage>   buffer2(2, cache2);
+  ChannelBuffer<RawMessage>   buffer3(3, cache3);
   std::shared_ptr<RawMessage> m;
   std::shared_ptr<RawMessage> m0;
   std::shared_ptr<RawMessage> m1;
   std::shared_ptr<RawMessage> m2;
   std::shared_ptr<RawMessage> m3;
-  uint64_t index = 0;
-  fusion::AllLatest<RawMessage, RawMessage, RawMessage, RawMessage> fusion(
-      buffer0, buffer1, buffer2, buffer3);
+  uint64_t                    index = 0;
+  fusion::AllLatest<RawMessage, RawMessage, RawMessage, RawMessage> fusion(buffer0, buffer1,
+                                                                           buffer2, buffer3);
 
   // normal fusion
   EXPECT_FALSE(fusion.Fusion(&index, m0, m1, m2, m3));

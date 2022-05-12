@@ -29,21 +29,23 @@ namespace lidar {
 
 template <typename T>
 bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
-                     Bitmap2D* bitmap, const double extend_dist = 0.0,
-                     const bool no_edge_table = false);
+                     Bitmap2D*                                    bitmap,
+                     const double                                 extend_dist   = 0.0,
+                     const bool                                   no_edge_table = false);
 
 template <typename T>
-bool DrawPolygonsMask(
-    const std::vector<typename PolygonScanCvter<T>::Polygon>& polygons,
-    Bitmap2D* bitmap, const double extend_dist = 0.0,
-    const bool no_edge_table = false);
+bool DrawPolygonsMask(const std::vector<typename PolygonScanCvter<T>::Polygon>& polygons,
+                      Bitmap2D*                                                 bitmap,
+                      const double                                              extend_dist = 0.0,
+                      const bool no_edge_table = false);
 
 template <typename T>
 bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
-                     Bitmap2D* bitmap, const double extend_dist,
-                     const bool no_edge_table) {
-  typedef typename PolygonScanCvter<T>::IntervalIn IntervalIn;
-  typedef typename PolygonScanCvter<T>::IntervalOut IntervalOut;
+                     Bitmap2D*                                    bitmap,
+                     const double                                 extend_dist,
+                     const bool                                   no_edge_table) {
+  typedef typename PolygonScanCvter<T>::IntervalIn     IntervalIn;
+  typedef typename PolygonScanCvter<T>::IntervalOut    IntervalOut;
   typedef typename PolygonScanCvter<T>::DirectionMajor PolyDirMajor;
   if (bitmap->Empty()) {
     AERROR << "bitmap is empty";
@@ -69,21 +71,18 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
   }
   const Eigen::Vector2d& bitmap_min_range = bitmap->min_range();
   const Eigen::Vector2d& bitmap_max_range = bitmap->max_range();
-  const Eigen::Vector2d& cell_size = bitmap->cell_size();
-  const int major_dir = bitmap->dir_major();
-  const int op_major_dir = bitmap->op_dir_major();
+  const Eigen::Vector2d& cell_size        = bitmap->cell_size();
+  const int              major_dir        = bitmap->dir_major();
+  const int              op_major_dir     = bitmap->op_dir_major();
 
   // check major x range
   IntervalIn valid_range;
-  valid_range.first =
-      std::max(poly_min_p[major_dir], bitmap_min_range[major_dir]);
-  valid_range.second =
-      std::min(poly_max_p[major_dir], bitmap_max_range[major_dir]);
+  valid_range.first  = std::max(poly_min_p[major_dir], bitmap_min_range[major_dir]);
+  valid_range.second = std::min(poly_max_p[major_dir], bitmap_max_range[major_dir]);
 
   // for numerical stability
   valid_range.first =
-      (static_cast<int>((valid_range.first - bitmap_min_range[major_dir]) /
-                        cell_size[major_dir]) +
+      (static_cast<int>((valid_range.first - bitmap_min_range[major_dir]) / cell_size[major_dir]) +
        0.5) *
           cell_size[major_dir] +
       bitmap_min_range[major_dir];
@@ -100,8 +99,8 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
   poly_scan_cvter.Init(polygon);
   std::vector<std::vector<IntervalOut>> scans_intervals;
   if (no_edge_table) {
-    size_t scans_size = static_cast<size_t>(
-        (valid_range.second - valid_range.first) / cell_size[major_dir]);
+    size_t scans_size =
+        static_cast<size_t>((valid_range.second - valid_range.first) / cell_size[major_dir]);
     scans_intervals.resize(scans_size);
     for (size_t i = 0; i < scans_size; ++i) {
       double scan_loc = valid_range.first + i * cell_size[major_dir];
@@ -114,8 +113,7 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
   }
   // start to draw
   double x = valid_range.first;
-  for (size_t i = 0; i < scans_intervals.size();
-       x += cell_size[major_dir], ++i) {
+  for (size_t i = 0; i < scans_intervals.size(); x += cell_size[major_dir], ++i) {
     for (auto scan_interval : scans_intervals[i]) {
       if (scan_interval.first > scan_interval.second) {
         AERROR << "The input polygon is illegal(complex polygon)";
@@ -127,13 +125,9 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
       scan_interval.second += extend_dist;
 
       IntervalOut valid_y_range;
-      valid_y_range.first =
-          std::max(bitmap_min_range[op_major_dir], scan_interval.first);
-      valid_y_range.second =
-          std::min(bitmap_max_range[op_major_dir], scan_interval.second);
-      if (valid_y_range.first > valid_y_range.second) {
-        continue;
-      }
+      valid_y_range.first  = std::max(bitmap_min_range[op_major_dir], scan_interval.first);
+      valid_y_range.second = std::min(bitmap_max_range[op_major_dir], scan_interval.second);
+      if (valid_y_range.first > valid_y_range.second) { continue; }
       bitmap->Set(x, valid_y_range.first, valid_y_range.second);
     }
   }
@@ -141,14 +135,13 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
 }
 
 template <typename T>
-bool DrawPolygonsMask(
-    const std::vector<typename PolygonScanCvter<T>::Polygon>& polygons,
-    Bitmap2D* bitmap, const double extend_dist, const bool no_edge_table) {
+bool DrawPolygonsMask(const std::vector<typename PolygonScanCvter<T>::Polygon>& polygons,
+                      Bitmap2D*                                                 bitmap,
+                      const double                                              extend_dist,
+                      const bool                                                no_edge_table) {
   for (const auto& polygon : polygons) {
     bool flag = DrawPolygonMask<T>(polygon, bitmap, extend_dist, no_edge_table);
-    if (!flag) {
-      return false;
-    }
+    if (!flag) { return false; }
   }
   return true;
 }

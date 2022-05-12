@@ -27,8 +27,7 @@ namespace prediction {
 class LaneSequencePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    std::string file =
-        "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+    std::string file = "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     cyber::common::GetProtoFromFile(file, &perception_obstacles_);
   }
 
@@ -37,13 +36,12 @@ class LaneSequencePredictorTest : public KMLMapBasedTest {
 };
 
 TEST_F(LaneSequencePredictorTest, OnLaneCase) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
-  MLPEvaluator mlp_evaluator;
-  ObstaclesContainer container;
+  MLPEvaluator           mlp_evaluator;
+  ObstaclesContainer     container;
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();

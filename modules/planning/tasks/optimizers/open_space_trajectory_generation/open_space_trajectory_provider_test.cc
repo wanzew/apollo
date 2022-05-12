@@ -21,6 +21,7 @@
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -34,7 +35,7 @@ class OpenSpaceTrajectoryProviderTest : public ::testing::Test {
   }
 
  protected:
-  TaskConfig config_;
+  TaskConfig                          config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 

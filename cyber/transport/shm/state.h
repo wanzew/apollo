@@ -34,11 +34,9 @@ class State {
   void DecreaseReferenceCounts() {
     uint32_t current_reference_count = reference_count_.load();
     do {
-      if (current_reference_count == 0) {
-        return;
-      }
-    } while (!reference_count_.compare_exchange_strong(
-        current_reference_count, current_reference_count - 1));
+      if (current_reference_count == 0) { return; }
+    } while (!reference_count_.compare_exchange_strong(current_reference_count,
+                                                       current_reference_count - 1));
   }
 
   void IncreaseReferenceCounts() { reference_count_.fetch_add(1); }
@@ -53,8 +51,8 @@ class State {
   uint32_t reference_counts() { return reference_count_.load(); }
 
  private:
-  std::atomic<bool> need_remap_ = {false};
-  std::atomic<uint32_t> seq_ = {0};
+  std::atomic<bool>     need_remap_      = {false};
+  std::atomic<uint32_t> seq_             = {0};
   std::atomic<uint32_t> reference_count_ = {0};
   std::atomic<uint64_t> ceiling_msg_size_;
 };

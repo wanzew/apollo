@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/wey_vehicle_factory.h"
+
 #include "modules/canbus/vehicle/wey/wey_controller.h"
 #include "modules/canbus/vehicle/wey/wey_message_manager.h"
 #include "modules/common/util/util.h"
@@ -22,8 +23,7 @@
 namespace apollo {
 namespace canbus {
 
-std::unique_ptr<VehicleController>
-WeyVehicleFactory::CreateVehicleController() {
+std::unique_ptr<VehicleController> WeyVehicleFactory::CreateVehicleController() {
   return std::unique_ptr<VehicleController>(new wey::WeyController());
 }
 

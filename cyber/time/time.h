@@ -91,16 +91,16 @@ class Time {
   bool IsZero() const;
 
   Duration operator-(const Time& rhs) const;
-  Time operator+(const Duration& rhs) const;
-  Time operator-(const Duration& rhs) const;
-  Time& operator+=(const Duration& rhs);
-  Time& operator-=(const Duration& rhs);
-  bool operator==(const Time& rhs) const;
-  bool operator!=(const Time& rhs) const;
-  bool operator>(const Time& rhs) const;
-  bool operator<(const Time& rhs) const;
-  bool operator>=(const Time& rhs) const;
-  bool operator<=(const Time& rhs) const;
+  Time     operator+(const Duration& rhs) const;
+  Time     operator-(const Duration& rhs) const;
+  Time&    operator+=(const Duration& rhs);
+  Time&    operator-=(const Duration& rhs);
+  bool     operator==(const Time& rhs) const;
+  bool     operator!=(const Time& rhs) const;
+  bool     operator>(const Time& rhs) const;
+  bool     operator<(const Time& rhs) const;
+  bool     operator>=(const Time& rhs) const;
+  bool     operator<=(const Time& rhs) const;
 
  private:
   uint64_t nanoseconds_ = 0;

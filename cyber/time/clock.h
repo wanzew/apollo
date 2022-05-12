@@ -38,9 +38,8 @@ using ::apollo::cyber::proto::ClockMode;
  */
 class Clock {
  public:
-  static constexpr int64_t PRECISION =
-      std::chrono::system_clock::duration::period::den /
-      std::chrono::system_clock::duration::period::num;
+  static constexpr int64_t PRECISION = std::chrono::system_clock::duration::period::den /
+                                       std::chrono::system_clock::duration::period::num;
 
   /// PRECISION >= 1000000 means the precision is at least 1us.
   static_assert(PRECISION >= 1000000,
@@ -81,13 +80,11 @@ class Clock {
    * @brief This is for mock clock mode only. It will set the timestamp
    * for the mock clock with UNIX timestamp in seconds.
    */
-  static void SetNowInSeconds(const double seconds) {
-    Clock::SetNow(Time(seconds));
-  }
+  static void SetNowInSeconds(const double seconds) { Clock::SetNow(Time(seconds)); }
 
  private:
-  ClockMode mode_;
-  Time mock_now_;
+  ClockMode                           mode_;
+  Time                                mock_now_;
   ::apollo::cyber::base::AtomicRWLock rwlock_;
 
   DECLARE_SINGLETON(Clock)

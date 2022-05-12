@@ -35,9 +35,9 @@ class Polynomial {
 
  private:
   std::map<uint32_t, double> coeff_;
-  std::vector<uint32_t> index_gap_;
+  std::vector<uint32_t>      index_gap_;
   std::map<uint32_t, double> power_cache_;
-  bool initialized_ = false;
+  bool                       initialized_ = false;
 };
 
 std::ostream& operator<<(std::ostream& o, const Polynomial& p);

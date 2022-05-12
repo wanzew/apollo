@@ -25,22 +25,21 @@ namespace apollo {
 namespace v2x {
 namespace ft {
 
-bool LoadData(const std::string& file, std::vector<base::Object>* objects,
-              const std::string& frame_id) {
+bool LoadData(const std::string&         file,
+              std::vector<base::Object>* objects,
+              const std::string&         frame_id) {
   std::fstream fin;
   fin.open(file.c_str(), std::ios::in);
-  if (!fin) {
-    return false;
-  }
+  if (!fin) { return false; }
   std::string line;
   while (getline(fin, line)) {
     std::istringstream iss(line);
-    float sub_type_probs, x, y, z, xx, xy, xz, yx, yy, yz, zx, zy, zz;
-    Eigen::Vector3d pos;
-    Eigen::Matrix3d var;
-    int type, sub_type;
-    iss >> type >> sub_type >> sub_type_probs >> x >> y >> z >> xx >> xy >>
-        xz >> yx >> yy >> yz >> zx >> zy >> zz;
+    float              sub_type_probs, x, y, z, xx, xy, xz, yx, yy, yz, zx, zy, zz;
+    Eigen::Vector3d    pos;
+    Eigen::Matrix3d    var;
+    int                type, sub_type;
+    iss >> type >> sub_type >> sub_type_probs >> x >> y >> z >> xx >> xy >> xz >> yx >> yy >> yz >>
+        zx >> zy >> zz;
     pos << x, y, z;
     var << xx, xy, xz, yx, yy, yz, zx, zy, zz;
     base::Object obj;
@@ -64,11 +63,10 @@ bool LoadData(const std::string& file, std::vector<base::Object>* objects,
         obj.sub_type = base::ObjectSubType::BUS;
         obj.size.Set(bus_size, id_var);
         break;
-      default:
-        break;
+      default: break;
     }
     obj.sensor_type = base::SensorType::MONOCULAR_CAMERA;
-    obj.frame_id = frame_id;
+    obj.frame_id    = frame_id;
     obj.position.Set(pos, var);
     obj.theta.Set(0, 1);
     obj.type_probs.push_back(0.9f);

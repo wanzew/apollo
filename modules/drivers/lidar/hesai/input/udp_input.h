@@ -18,6 +18,7 @@
 #define LIDAR_HESAI_SRC_INPUT_H_
 
 #include <cstdint>
+
 #include "modules/drivers/lidar/hesai/common/type_defs.h"
 
 namespace apollo {
@@ -28,12 +29,12 @@ class Input {
  public:
   Input(uint16_t port, uint16_t gpsPort);
   ~Input();
-  int GetPacket(HesaiPacket *pkt);
+  int GetPacket(HesaiPacket* pkt);
 
  private:
   int socketForLidar = -1;
-  int socketForGPS = -1;
-  int socketNumber = -1;
+  int socketForGPS   = -1;
+  int socketNumber   = -1;
 };
 
 }  // namespace hesai

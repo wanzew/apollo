@@ -38,12 +38,12 @@ using base::PointD;
 using base::PointF;
 
 MaskPillarsDetection::MaskPillarsDetection()
-    : x_min_(Params::kMinXRange),
-      x_max_(Params::kMaxXRange),
-      y_min_(Params::kMinYRange),
-      y_max_(Params::kMaxYRange),
-      z_min_(Params::kMinZRange),
-      z_max_(Params::kMaxZRange) {
+    : x_min_(Params::kMinXRange)
+    , x_max_(Params::kMaxXRange)
+    , y_min_(Params::kMinYRange)
+    , y_max_(Params::kMaxYRange)
+    , z_min_(Params::kMinZRange)
+    , z_max_(Params::kMaxZRange) {
   if (FLAGS_enable_ground_removal) {
     z_min_ = std::max(z_min_, static_cast<float>(FLAGS_ground_removal_height));
   }
@@ -52,18 +52,14 @@ MaskPillarsDetection::MaskPillarsDetection()
 // TODO(chenjiahao):
 //  specify score threshold and nms over lap threshold for each class.
 bool MaskPillarsDetection::Init(const LidarDetectorInitOptions& options) {
-  point_pillars_ptr_.reset(
-      new PointPillars(FLAGS_reproduce_result_mode, FLAGS_score_threshold,
-                       FLAGS_nms_overlap_threshold, FLAGS_mask_pfe_torch_file,
-                       FLAGS_mask_scattered_torch_file,
-                       FLAGS_mask_backbone_torch_file,
-                       FLAGS_mask_fpn_torch_file,
-                       FLAGS_mask_bbox_head_torch_file));
+  point_pillars_ptr_.reset(new PointPillars(
+      FLAGS_reproduce_result_mode, FLAGS_score_threshold, FLAGS_nms_overlap_threshold,
+      FLAGS_mask_pfe_torch_file, FLAGS_mask_scattered_torch_file, FLAGS_mask_backbone_torch_file,
+      FLAGS_mask_fpn_torch_file, FLAGS_mask_bbox_head_torch_file));
   return true;
 }
 
-bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
-                                   LidarFrame* frame) {
+bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options, LidarFrame* frame) {
   // check input
   if (frame == nullptr) {
     AERROR << "Input null frame ptr.";
@@ -79,9 +75,9 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
   }
 
   // record input cloud and lidar frame
-  original_cloud_ = frame->cloud;
+  original_cloud_       = frame->cloud;
   original_world_cloud_ = frame->world_cloud;
-  lidar_frame_ref_ = frame;
+  lidar_frame_ref_      = frame;
 
   // check output
   frame->segmented_objects.clear();
@@ -94,8 +90,7 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
   Timer timer;
 
   int num_points;
-  cur_cloud_ptr_ = std::shared_ptr<base::PointFCloud>(
-      new base::PointFCloud(*original_cloud_));
+  cur_cloud_ptr_ = std::shared_ptr<base::PointFCloud>(new base::PointFCloud(*original_cloud_));
 
   // down sample the point cloud through filtering beams
   if (FLAGS_enable_downsample_beams) {
@@ -112,14 +107,11 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
 
   // down sample the point cloud through filtering voxel grid
   if (FLAGS_enable_downsample_pointcloud) {
-    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_ptr(
-        new pcl::PointCloud<pcl::PointXYZI>());
-    pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud_ptr(
-        new pcl::PointCloud<pcl::PointXYZI>());
+    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_ptr(new pcl::PointCloud<pcl::PointXYZI>());
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud_ptr(new pcl::PointCloud<pcl::PointXYZI>());
     TransformToPCLXYZI(*cur_cloud_ptr_, pcl_cloud_ptr);
-    DownSampleCloudByVoxelGrid(
-        pcl_cloud_ptr, filtered_cloud_ptr, FLAGS_downsample_voxel_size_x,
-        FLAGS_downsample_voxel_size_y, FLAGS_downsample_voxel_size_z);
+    DownSampleCloudByVoxelGrid(pcl_cloud_ptr, filtered_cloud_ptr, FLAGS_downsample_voxel_size_x,
+                               FLAGS_downsample_voxel_size_y, FLAGS_downsample_voxel_size_z);
 
     // transform pcl point cloud to apollo point cloud
     base::PointFCloudPtr downsample_voxel_cloud_ptr(new base::PointFCloud());
@@ -132,8 +124,7 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
   AINFO << "num points before fusing: " << num_points;
 
   // fuse clouds of preceding frames with current cloud
-  cur_cloud_ptr_->mutable_points_timestamp()->assign(cur_cloud_ptr_->size(),
-                                                     0.0);
+  cur_cloud_ptr_->mutable_points_timestamp()->assign(cur_cloud_ptr_->size(), 0.0);
   if (FLAGS_enable_fuse_frames && FLAGS_num_fuse_frames > 1) {
     // before fusing
     while (!prev_world_clouds_.empty() &&
@@ -142,16 +133,15 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
       prev_world_clouds_.pop_front();
     }
     // transform current cloud to world coordinate and save to a new ptr
-    base::PointDCloudPtr cur_world_cloud_ptr =
-        std::make_shared<base::PointDCloud>();
+    base::PointDCloudPtr cur_world_cloud_ptr = std::make_shared<base::PointDCloud>();
     for (size_t i = 0; i < cur_cloud_ptr_->size(); ++i) {
-      auto& pt = cur_cloud_ptr_->at(i);
+      auto&           pt = cur_cloud_ptr_->at(i);
       Eigen::Vector3d trans_point(pt.x, pt.y, pt.z);
       trans_point = lidar_frame_ref_->lidar2world_pose * trans_point;
       PointD world_point;
-      world_point.x = trans_point(0);
-      world_point.y = trans_point(1);
-      world_point.z = trans_point(2);
+      world_point.x         = trans_point(0);
+      world_point.y         = trans_point(1);
+      world_point.z         = trans_point(2);
       world_point.intensity = pt.intensity;
       cur_world_cloud_ptr->push_back(world_point);
     }
@@ -164,8 +154,7 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
     FuseCloud(cur_cloud_ptr_, prev_world_clouds_);
 
     // after fusing
-    while (static_cast<int>(prev_world_clouds_.size()) >=
-           FLAGS_num_fuse_frames - 1) {
+    while (static_cast<int>(prev_world_clouds_.size()) >= FLAGS_num_fuse_frames - 1) {
       prev_world_clouds_.pop_front();
     }
     prev_world_clouds_.emplace_back(cur_world_cloud_ptr);
@@ -175,10 +164,9 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
 
   // shuffle points and cut off
   if (FLAGS_enable_shuffle_points) {
-    num_points = std::min(num_points, FLAGS_max_num_points);
-    std::vector<int> point_indices = GenerateIndices(0, num_points, true);
-    base::PointFCloudPtr shuffle_cloud_ptr(
-        new base::PointFCloud(*cur_cloud_ptr_, point_indices));
+    num_points                         = std::min(num_points, FLAGS_max_num_points);
+    std::vector<int>     point_indices = GenerateIndices(0, num_points, true);
+    base::PointFCloudPtr shuffle_cloud_ptr(new base::PointFCloud(*cur_cloud_ptr_, point_indices));
     cur_cloud_ptr_ = shuffle_cloud_ptr;
   }
   shuffle_time_ = timer.toc(true);
@@ -190,14 +178,12 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
 
   // inference
   std::vector<float> out_detections;
-  std::vector<int> out_labels;
-  point_pillars_ptr_->DoInference(points_array, num_points, &out_detections,
-                                  &out_labels);
+  std::vector<int>   out_labels;
+  point_pillars_ptr_->DoInference(points_array, num_points, &out_detections, &out_labels);
   inference_time_ = timer.toc(true);
 
   // transfer output bounding boxes to objects
-  GetObjects(&frame->segmented_objects, frame->lidar2world_pose,
-             &out_detections, &out_labels);
+  GetObjects(&frame->segmented_objects, frame->lidar2world_pose, &out_detections, &out_labels);
   collect_time_ = timer.toc(true);
 
   AINFO << "PointPillars: "
@@ -214,43 +200,40 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
 }
 
 void MaskPillarsDetection::CloudToArray(const base::PointFCloudPtr& pc_ptr,
-                                         float* out_points_array,
-                                         const float normalizing_factor) {
+                                        float*                      out_points_array,
+                                        const float                 normalizing_factor) {
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
-    const auto& point = pc_ptr->at(i);
-    float x = point.x;
-    float y = point.y;
-    float z = point.z;
-    float intensity = point.intensity;
-    if (z < z_min_ || z > z_max_ || y < y_min_ || y > y_max_ || x < x_min_ ||
-        x > x_max_) {
+    const auto& point     = pc_ptr->at(i);
+    float       x         = point.x;
+    float       y         = point.y;
+    float       z         = point.z;
+    float       intensity = point.intensity;
+    if (z < z_min_ || z > z_max_ || y < y_min_ || y > y_max_ || x < x_min_ || x > x_max_) {
       continue;
     }
     out_points_array[i * FLAGS_num_point_feature + 0] = x;
     out_points_array[i * FLAGS_num_point_feature + 1] = y;
     out_points_array[i * FLAGS_num_point_feature + 2] = z;
-    out_points_array[i * FLAGS_num_point_feature + 3] =
-        intensity / normalizing_factor;
+    out_points_array[i * FLAGS_num_point_feature + 3] = intensity / normalizing_factor;
     // delta of timestamp between prev and cur frames
     out_points_array[i * FLAGS_num_point_feature + 4] =
         static_cast<float>(pc_ptr->points_timestamp(i));
   }
 }
 
-void MaskPillarsDetection::FuseCloud(
-    const base::PointFCloudPtr& out_cloud_ptr,
-    const std::deque<base::PointDCloudPtr>& fuse_clouds) {
+void MaskPillarsDetection::FuseCloud(const base::PointFCloudPtr&             out_cloud_ptr,
+                                     const std::deque<base::PointDCloudPtr>& fuse_clouds) {
   for (auto iter = fuse_clouds.rbegin(); iter != fuse_clouds.rend(); ++iter) {
     double delta_t = lidar_frame_ref_->timestamp - (*iter)->get_timestamp();
     // transform prev world point cloud to current sensor's coordinates
     for (size_t i = 0; i < (*iter)->size(); ++i) {
-      auto& point = (*iter)->at(i);
+      auto&           point = (*iter)->at(i);
       Eigen::Vector3d trans_point(point.x, point.y, point.z);
       trans_point = lidar_frame_ref_->lidar2world_pose.inverse() * trans_point;
       base::PointF pt;
-      pt.x = static_cast<float>(trans_point(0));
-      pt.y = static_cast<float>(trans_point(1));
-      pt.z = static_cast<float>(trans_point(2));
+      pt.x         = static_cast<float>(trans_point(0));
+      pt.y         = static_cast<float>(trans_point(1));
+      pt.z         = static_cast<float>(trans_point(2));
       pt.intensity = static_cast<float>(point.intensity);
       // delta of time between current and prev frame
       out_cloud_ptr->push_back(pt, delta_t);
@@ -258,9 +241,7 @@ void MaskPillarsDetection::FuseCloud(
   }
 }
 
-std::vector<int> MaskPillarsDetection::GenerateIndices(int start_index,
-                                                        int size,
-                                                        bool shuffle) {
+std::vector<int> MaskPillarsDetection::GenerateIndices(int start_index, int size, bool shuffle) {
   // create a range number array
   std::vector<int> indices(size);
   std::iota(indices.begin(), indices.end(), start_index);
@@ -268,15 +249,15 @@ std::vector<int> MaskPillarsDetection::GenerateIndices(int start_index,
   // shuffle the index array
   if (shuffle) {
     unsigned seed = 0;
-    std::shuffle(indices.begin(), indices.end(),
-                 std::default_random_engine(seed));
+    std::shuffle(indices.begin(), indices.end(), std::default_random_engine(seed));
   }
   return indices;
 }
 
-void MaskPillarsDetection::GetObjects(
-    std::vector<std::shared_ptr<Object>>* objects, const Eigen::Affine3d& pose,
-    std::vector<float>* detections, std::vector<int>* labels) {
+void MaskPillarsDetection::GetObjects(std::vector<std::shared_ptr<Object>>* objects,
+                                      const Eigen::Affine3d&                pose,
+                                      std::vector<float>*                   detections,
+                                      std::vector<int>*                     labels) {
   int num_objects = detections->size() / FLAGS_num_output_box_feature;
 
   objects->clear();
@@ -284,38 +265,37 @@ void MaskPillarsDetection::GetObjects(
 
   for (int i = 0; i < num_objects; ++i) {
     auto& object = objects->at(i);
-    object->id = i;
+    object->id   = i;
 
     // read params of bounding box
-    float x = detections->at(i * FLAGS_num_output_box_feature + 0);
-    float y = detections->at(i * FLAGS_num_output_box_feature + 1);
-    float z = detections->at(i * FLAGS_num_output_box_feature + 2);
-    float dx = detections->at(i * FLAGS_num_output_box_feature + 4);
-    float dy = detections->at(i * FLAGS_num_output_box_feature + 3);
-    float dz = detections->at(i * FLAGS_num_output_box_feature + 5);
+    float x   = detections->at(i * FLAGS_num_output_box_feature + 0);
+    float y   = detections->at(i * FLAGS_num_output_box_feature + 1);
+    float z   = detections->at(i * FLAGS_num_output_box_feature + 2);
+    float dx  = detections->at(i * FLAGS_num_output_box_feature + 4);
+    float dy  = detections->at(i * FLAGS_num_output_box_feature + 3);
+    float dz  = detections->at(i * FLAGS_num_output_box_feature + 5);
     float yaw = detections->at(i * FLAGS_num_output_box_feature + 6);
     yaw += M_PI / 2;
     yaw = std::atan2(sinf(yaw), cosf(yaw));
     yaw = -yaw;
 
     // directions
-    object->theta = yaw;
-    object->direction[0] = cosf(yaw);
-    object->direction[1] = sinf(yaw);
-    object->direction[2] = 0;
+    object->theta                                 = yaw;
+    object->direction[0]                          = cosf(yaw);
+    object->direction[1]                          = sinf(yaw);
+    object->direction[2]                          = 0;
     object->lidar_supplement.is_orientation_ready = true;
 
     // compute vertexes of bounding box and transform to world coordinate
     object->lidar_supplement.num_points_in_roi = 8;
-    object->lidar_supplement.on_use = true;
-    object->lidar_supplement.is_background = false;
-    float roll = 0, pitch = 0;
-    Eigen::Quaternionf quater =
-        Eigen::AngleAxisf(roll, Eigen::Vector3f::UnitX()) *
-        Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitY()) *
-        Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
+    object->lidar_supplement.on_use            = true;
+    object->lidar_supplement.is_background     = false;
+    float              roll = 0, pitch = 0;
+    Eigen::Quaternionf quater = Eigen::AngleAxisf(roll, Eigen::Vector3f::UnitX()) *
+                                Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitY()) *
+                                Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
     Eigen::Translation3f translation(x, y, z);
-    Eigen::Affine3f affine3f = translation * quater.toRotationMatrix();
+    Eigen::Affine3f      affine3f = translation * quater.toRotationMatrix();
     for (float vx : std::vector<float>{dx / 2, -dx / 2}) {
       for (float vy : std::vector<float>{dy / 2, -dy / 2}) {
         for (float vz : std::vector<float>{0, dz}) {
@@ -339,13 +319,12 @@ void MaskPillarsDetection::GetObjects(
     }
 
     // classification
-    object->lidar_supplement.raw_probs.push_back(std::vector<float>(
-        static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
+    object->lidar_supplement.raw_probs.push_back(
+        std::vector<float>(static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
     object->lidar_supplement.raw_classification_methods.push_back(Name());
     object->sub_type = GetObjectSubType(labels->at(i));
-    object->type = base::kSubType2TypeMap.at(object->sub_type);
-    object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] =
-        1.0f;
+    object->type     = base::kSubType2TypeMap.at(object->sub_type);
+    object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] = 1.0f;
     // copy to type
     object->type_probs.assign(object->lidar_supplement.raw_probs.back().begin(),
                               object->lidar_supplement.raw_probs.back().end());
@@ -356,14 +335,11 @@ void MaskPillarsDetection::GetObjects(
 // TODO(chenjiahao): move types into an array in the same order as offline
 base::ObjectSubType MaskPillarsDetection::GetObjectSubType(const int label) {
   switch (label) {
-    case 0:
-      return base::ObjectSubType::CAR;
-    case 1:
-      return base::ObjectSubType::PEDESTRIAN;
+    case 0: return base::ObjectSubType::CAR;
+    case 1: return base::ObjectSubType::PEDESTRIAN;
     case 2:  // construction vehicle
       return base::ObjectSubType::CYCLIST;
-    default:
-      return base::ObjectSubType::UNKNOWN;
+    default: return base::ObjectSubType::UNKNOWN;
   }
 }
 

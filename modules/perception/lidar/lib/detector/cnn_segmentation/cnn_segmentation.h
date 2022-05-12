@@ -28,11 +28,11 @@
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/lib/thread/thread_worker.h"
-#include "modules/perception/lidar/lib/interface/base_ground_detector.h"
-#include "modules/perception/lidar/lib/interface/base_roi_filter.h"
-#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/feature_generator.h"
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/spp_engine/spp_engine.h"
+#include "modules/perception/lidar/lib/interface/base_ground_detector.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -40,31 +40,30 @@ namespace lidar {
 
 class CNNSegmentation : public BaseLidarDetector {
  public:
-  CNNSegmentation() = default;
+  CNNSegmentation()          = default;
   virtual ~CNNSegmentation() = default;
 
-  bool Init(const LidarDetectorInitOptions& options =
-                LidarDetectorInitOptions()) override;
+  bool Init(const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) override;
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "CNNSegmentation"; }
 
  private:
-  bool GetConfigs(std::string* param_file, std::string* proto_file,
-                  std::string* weight_file, std::string* engine_file);
+  bool GetConfigs(std::string* param_file,
+                  std::string* proto_file,
+                  std::string* weight_file,
+                  std::string* engine_file);
 
   bool InitClusterAndBackgroundSegmentation();
 
-  void GetObjectsFromSppEngine(
-      std::vector<std::shared_ptr<base::Object>>* objects);
+  void GetObjectsFromSppEngine(std::vector<std::shared_ptr<base::Object>>* objects);
 
-  void MapPointToGrid(
-      const std::shared_ptr<base::AttributePointCloud<base::PointF>>& pc_ptr);
+  void MapPointToGrid(const std::shared_ptr<base::AttributePointCloud<base::PointF>>& pc_ptr);
 
-  CNNSegParam cnnseg_param_;
+  CNNSegParam                           cnnseg_param_;
   std::shared_ptr<inference::Inference> inference_;
-  std::shared_ptr<FeatureGenerator> feature_generator_;
+  std::shared_ptr<FeatureGenerator>     feature_generator_;
 
   // output blobs
   std::shared_ptr<base::Blob<float>> instance_pt_blob_;
@@ -77,9 +76,9 @@ class CNNSegmentation : public BaseLidarDetector {
   std::shared_ptr<base::Blob<float>> feature_blob_;
 
   // feature parameters
-  float range_ = 0.f;
-  int width_ = 0;
-  int height_ = 0;
+  float range_      = 0.f;
+  int   width_      = 0;
+  int   height_     = 0;
   float min_height_ = 0.f;
   float max_height_ = 0.f;
 
@@ -95,26 +94,25 @@ class CNNSegmentation : public BaseLidarDetector {
   lib::ThreadWorker worker_;
 
   // spp engine
-  SppEngine spp_engine_;
+  SppEngine       spp_engine_;
   SppEngineConfig spp_engine_config_;
 
   // reference pointer of lidar frame
-  LidarFrame* lidar_frame_ref_ = nullptr;
+  LidarFrame*                                              lidar_frame_ref_ = nullptr;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;
-  std::shared_ptr<base::AttributePointCloud<base::PointD>>
-      original_world_cloud_;
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> original_world_cloud_;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> roi_cloud_;
   std::shared_ptr<base::AttributePointCloud<base::PointD>> roi_world_cloud_;
-  int gpu_id_ = -1;
+  int                                                      gpu_id_ = -1;
 
   // time statistics
-  double mapping_time_ = 0.0;
-  double feature_time_ = 0.0;
-  double infer_time_ = 0.0;
-  double join_time_ = 0.0;
-  double fg_seg_time_ = 0.0;
-  double collect_time_ = 0.0;
-  double roi_filter_time_ = 0.0;
+  double mapping_time_         = 0.0;
+  double feature_time_         = 0.0;
+  double infer_time_           = 0.0;
+  double join_time_            = 0.0;
+  double fg_seg_time_          = 0.0;
+  double collect_time_         = 0.0;
+  double roi_filter_time_      = 0.0;
   double ground_detector_time_ = 0.0;
 
   // sensor_name

@@ -31,16 +31,16 @@ class RadarObstaclePerception : public BaseRadarObstaclePerception {
 
   bool Init(const std::string& pipeline_name) override;
 
-  bool Perceive(const drivers::ContiRadar& corrected_obstacles,
+  bool Perceive(const drivers::ContiRadar&    corrected_obstacles,
                 const RadarPerceptionOptions& options,
                 std::vector<base::ObjectPtr>* objects) override;
 
   std::string Name() const override;
 
  private:
-  std::shared_ptr<BaseDetector> detector_;
+  std::shared_ptr<BaseDetector>  detector_;
   std::shared_ptr<BaseRoiFilter> roi_filter_;
-  std::shared_ptr<BaseTracker> tracker_;
+  std::shared_ptr<BaseTracker>   tracker_;
 };
 
 }  // namespace radar

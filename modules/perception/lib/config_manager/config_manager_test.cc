@@ -25,7 +25,8 @@ namespace lib {
 
 class ConfigManagerTest : public testing::Test {
  protected:
-  ConfigManagerTest() : config_manager_(NULL) {}
+  ConfigManagerTest()
+      : config_manager_(NULL) {}
   virtual ~ConfigManagerTest() {}
   virtual void SetUp() {
     char cyber_path[80] = "CYBER_PATH=";
@@ -33,7 +34,7 @@ class ConfigManagerTest : public testing::Test {
     char module_path[80] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_config_manager_path = "/apollo/modules/perception/testdata/lib/conf";
-    config_manager_ = ConfigManager::Instance();
+    config_manager_           = ConfigManager::Instance();
     ASSERT_TRUE(config_manager_ != nullptr);
   }
 
@@ -55,7 +56,7 @@ TEST_F(ConfigManagerTest, TestInit) {
 }
 
 TEST_F(ConfigManagerTest, TestGetModelConfig) {
-  std::string model_name = "FrameClassifier";
+  std::string        model_name   = "FrameClassifier";
   const ModelConfig* model_config = nullptr;
 
   EXPECT_TRUE(config_manager_->GetModelConfig(model_name, &model_config));
@@ -69,12 +70,11 @@ TEST_F(ConfigManagerTest, TestGetModelConfig) {
 }
 
 TEST_F(ConfigManagerTest, TestModelConfig) {
-  std::string model_name = "FrameClassifier";
+  std::string        model_name   = "FrameClassifier";
   const ModelConfig* model_config = nullptr;
   ASSERT_TRUE(config_manager_->Init());
   ASSERT_EQ(config_manager_->NumModels(), 2u);
-  ASSERT_FALSE(
-      config_manager_->GetModelConfig("FrameClassifier1", &model_config));
+  ASSERT_FALSE(config_manager_->GetModelConfig("FrameClassifier1", &model_config));
   ASSERT_TRUE(config_manager_->GetModelConfig(model_name, &model_config));
   ASSERT_EQ(model_config->name(), model_name);
 

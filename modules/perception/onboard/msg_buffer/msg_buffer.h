@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <boost/circular_buffer.hpp>
+
 #include "gflags/gflags.h"
 
 #include "cyber/cyber.h"
@@ -36,11 +37,12 @@ DECLARE_double(obs_buffer_match_precision);
 template <class T>
 class MsgBuffer {
  public:
-  typedef std::shared_ptr<T const> ConstPtr;
+  typedef std::shared_ptr<T const>    ConstPtr;
   typedef std::pair<double, ConstPtr> ObjectPair;
 
  public:
-  MsgBuffer() : buffer_queue_(FLAGS_obs_msg_buffer_size) {}
+  MsgBuffer()
+      : buffer_queue_(FLAGS_obs_msg_buffer_size) {}
   ~MsgBuffer() = default;
 
   MsgBuffer(const MsgBuffer&) = delete;
@@ -53,19 +55,18 @@ class MsgBuffer {
   // get latest message
   int LookupLatest(ConstPtr* msg);
   // get messages in (timestamp-period, timestamp+period)
-  int LookupPeriod(double timestamp, double period,
-                   std::vector<ObjectPair>* msgs);
+  int LookupPeriod(double timestamp, double period, std::vector<ObjectPair>* msgs);
 
  private:
   void MsgCallback(const ConstPtr& msg);
 
  private:
-  std::string node_name_;
-  std::unique_ptr<cyber::Node> node_;
+  std::string                       node_name_;
+  std::unique_ptr<cyber::Node>      node_;
   std::shared_ptr<cyber::Reader<T>> msg_subscriber_;
-  std::mutex buffer_mutex_;
+  std::mutex                        buffer_mutex_;
 
-  bool init_ = false;
+  bool                               init_ = false;
   boost::circular_buffer<ObjectPair> buffer_queue_;
 };
 
@@ -91,7 +92,7 @@ void MsgBuffer<T>::Init(const std::string& channel, const std::string& name) {
 template <class T>
 void MsgBuffer<T>::MsgCallback(const ConstPtr& msg) {
   std::lock_guard<std::mutex> lock(buffer_mutex_);
-  double timestamp = msg->measurement_time();
+  double                      timestamp = msg->measurement_time();
   buffer_queue_.push_back(std::make_pair(timestamp, msg));
 }
 
@@ -106,29 +107,23 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
     AERROR << "msg buffer is empty.";
     return false;
   }
-  if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
-      timestamp) {
-    AERROR << "Your timestamp (" << timestamp
-           << ") is earlier than the oldest timestamp ("
+  if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision > timestamp) {
+    AERROR << "Your timestamp (" << timestamp << ") is earlier than the oldest timestamp ("
            << buffer_queue_.front().first << ").";
     return false;
   }
-  if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
-      timestamp) {
-    AERROR << "Your timestamp (" << timestamp
-           << ") is newer than the latest timestamp ("
+  if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision < timestamp) {
+    AERROR << "Your timestamp (" << timestamp << ") is newer than the latest timestamp ("
            << buffer_queue_.back().first << ").";
     return false;
   }
 
   // loop to find nearest
   double distance = std::numeric_limits<double>::max();
-  int idx = static_cast<int>(buffer_queue_.size()) - 1;
+  int    idx      = static_cast<int>(buffer_queue_.size()) - 1;
   for (; idx >= 0; --idx) {
     double temp_distance = fabs(timestamp - buffer_queue_[idx].first);
-    if (temp_distance >= distance) {
-      break;
-    }
+    if (temp_distance >= distance) { break; }
     distance = temp_distance;
   }
   *msg = buffer_queue_[idx + 1].second;
@@ -152,7 +147,8 @@ int MsgBuffer<T>::LookupLatest(ConstPtr* msg) {
 }
 
 template <class T>
-int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
+int MsgBuffer<T>::LookupPeriod(const double             timestamp,
+                               const double             period,
                                std::vector<ObjectPair>* msgs) {
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
@@ -163,14 +159,12 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
     AERROR << "Message buffer is empty.";
     return false;
   }
-  if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
-      timestamp) {
+  if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision > timestamp) {
     AERROR << "Your timestamp (" << timestamp << ") is earlier than the oldest "
            << "timestamp (" << buffer_queue_.front().first << ").";
     return false;
   }
-  if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
-      timestamp) {
+  if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision < timestamp) {
     AERROR << "Your timestamp (" << timestamp << ") is newer than the latest "
            << "timestamp (" << buffer_queue_.back().first << ").";
     return false;
@@ -179,12 +173,8 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
   const double lower_timestamp = timestamp - period;
   const double upper_timestamp = timestamp + period;
   for (const auto& obj_pair : buffer_queue_) {
-    if (obj_pair.first < lower_timestamp) {
-      continue;
-    }
-    if (obj_pair.first > upper_timestamp) {
-      break;
-    }
+    if (obj_pair.first < lower_timestamp) { continue; }
+    if (obj_pair.first > upper_timestamp) { break; }
     msgs->push_back(obj_pair);
   }
 

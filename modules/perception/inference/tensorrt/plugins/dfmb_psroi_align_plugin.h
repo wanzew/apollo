@@ -30,23 +30,23 @@ namespace inference {
 // input2 dims: [N, C2, H2, W2]
 class DFMBPSROIAlignPlugin : public nvinfer1::IPlugin {
  public:
-  DFMBPSROIAlignPlugin(
-      const DFMBPSROIAlignParameter &dfmb_psroi_align_parameter,
-      nvinfer1::Dims *in_dims, int nbInputs) {
-    heat_map_a_ = dfmb_psroi_align_parameter.heat_map_a();
-    output_channel_ = dfmb_psroi_align_parameter.output_dim();
-    group_height_ = dfmb_psroi_align_parameter.group_height();
-    group_width_ = dfmb_psroi_align_parameter.group_width();
-    pooled_height_ = dfmb_psroi_align_parameter.pooled_height();
-    pooled_width_ = dfmb_psroi_align_parameter.pooled_width();
-    pad_ratio_ = dfmb_psroi_align_parameter.pad_ratio();
+  DFMBPSROIAlignPlugin(const DFMBPSROIAlignParameter& dfmb_psroi_align_parameter,
+                       nvinfer1::Dims*                in_dims,
+                       int                            nbInputs) {
+    heat_map_a_      = dfmb_psroi_align_parameter.heat_map_a();
+    output_channel_  = dfmb_psroi_align_parameter.output_dim();
+    group_height_    = dfmb_psroi_align_parameter.group_height();
+    group_width_     = dfmb_psroi_align_parameter.group_width();
+    pooled_height_   = dfmb_psroi_align_parameter.pooled_height();
+    pooled_width_    = dfmb_psroi_align_parameter.pooled_width();
+    pad_ratio_       = dfmb_psroi_align_parameter.pad_ratio();
     sample_per_part_ = dfmb_psroi_align_parameter.sample_per_part();
 
-    trans_std_ = dfmb_psroi_align_parameter.trans_std();
+    trans_std_   = dfmb_psroi_align_parameter.trans_std();
     part_height_ = dfmb_psroi_align_parameter.part_height();
-    part_width_ = dfmb_psroi_align_parameter.part_width();
-    heat_map_b_ = dfmb_psroi_align_parameter.heat_map_b();
-    no_trans_ = (nbInputs < 3);
+    part_width_  = dfmb_psroi_align_parameter.part_width();
+    heat_map_b_  = dfmb_psroi_align_parameter.heat_map_b();
+    no_trans_    = (nbInputs < 3);
     num_classes_ = no_trans_ ? 1 : in_dims[2].d[1];
 
     CHECK_GT(heat_map_a_, 0);
@@ -61,13 +61,11 @@ class DFMBPSROIAlignPlugin : public nvinfer1::IPlugin {
     CHECK_GE(part_height_, 0);
     CHECK_GE(part_width_, 0);
 
-    channels_ = in_dims[0].d[0];
-    height_ = in_dims[0].d[1];
-    width_ = in_dims[0].d[2];
-    output_dims_ = nvinfer1::Dims4(in_dims[1].d[0], output_channel_,
-                                   pooled_height_, pooled_width_);
-    output_size_ =
-        in_dims[1].d[0] * output_channel_ * pooled_height_ * pooled_width_;
+    channels_    = in_dims[0].d[0];
+    height_      = in_dims[0].d[1];
+    width_       = in_dims[0].d[2];
+    output_dims_ = nvinfer1::Dims4(in_dims[1].d[0], output_channel_, pooled_height_, pooled_width_);
+    output_size_ = in_dims[1].d[0] * output_channel_ * pooled_height_ * pooled_width_;
 
     CHECK_EQ(channels_, output_channel_ * group_height_ * group_width_);
     CHECK_EQ(in_dims[1].d[1], 5);
@@ -82,50 +80,55 @@ class DFMBPSROIAlignPlugin : public nvinfer1::IPlugin {
 
   virtual ~DFMBPSROIAlignPlugin() {}
 
-  virtual int initialize() { return 0; }
+  virtual int  initialize() { return 0; }
   virtual void terminate() {}
-  int getNbOutputs() const override { return 1; }
+  int          getNbOutputs() const override { return 1; }
 
-  nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
-                                     int nbInputDims) override {
+  nvinfer1::Dims
+  getOutputDimensions(int index, const nvinfer1::Dims* inputs, int nbInputDims) override {
     // TODO(chenjiahao): complete input dims assertion
     return output_dims_;
   }
 
-  void configure(const nvinfer1::Dims *inputDims, int nbInputs,
-                 const nvinfer1::Dims *outputDims, int nbOutputs,
-                 int maxBatchSize) override {}
+  void configure(const nvinfer1::Dims* inputDims,
+                 int                   nbInputs,
+                 const nvinfer1::Dims* outputDims,
+                 int                   nbOutputs,
+                 int                   maxBatchSize) override {}
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
 
-  virtual int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream);
+  virtual int enqueue(int                batchSize,
+                      const void* const* inputs,
+                      void**             outputs,
+                      void*              workspace,
+                      cudaStream_t       stream);
 
   size_t getSerializationSize() override { return 0; }
 
-  void serialize(void *buffer) override {
-    char *d = reinterpret_cast<char *>(buffer), *a = d;
+  void serialize(void* buffer) override {
+    char * d = reinterpret_cast<char*>(buffer), *a = d;
     size_t size = getSerializationSize();
     CHECK_EQ(d, a + size);
   }
 
  private:
   const int thread_size_ = 512;
-  float heat_map_a_;
-  float heat_map_b_;
-  float pad_ratio_;
+  float     heat_map_a_;
+  float     heat_map_b_;
+  float     pad_ratio_;
 
-  int output_channel_;
-  bool no_trans_;
+  int   output_channel_;
+  bool  no_trans_;
   float trans_std_;
-  int sample_per_part_;
-  int group_height_;
-  int group_width_;
-  int pooled_height_;
-  int pooled_width_;
-  int part_height_;
-  int part_width_;
-  int num_classes_;
+  int   sample_per_part_;
+  int   group_height_;
+  int   group_width_;
+  int   pooled_height_;
+  int   pooled_width_;
+  int   part_height_;
+  int   part_width_;
+  int   num_classes_;
 
   int channels_;
   int height_;

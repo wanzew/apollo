@@ -15,15 +15,16 @@
  *****************************************************************************/
 #include "modules/canbus/vehicle/lexus/lexus_controller.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
-#include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
@@ -48,13 +49,13 @@ class LexusControllerTest : public ::testing::Test {
   }
 
  protected:
-  LexusController controller_;
-  ControlCommand control_cmd_;
-  VehicleSignal vehicle_signal_;
+  LexusController                            controller_;
+  ControlCommand                             control_cmd_;
+  VehicleSignal                              vehicle_signal_;
   CanSender<::apollo::canbus::ChassisDetail> sender_;
-  LexusMessageManager msg_manager_;
-  CanbusConf canbus_conf_;
-  VehicleParameter params_;
+  LexusMessageManager                        msg_manager_;
+  CanbusConf                                 canbus_conf_;
+  VehicleParameter                           params_;
 };
 
 TEST_F(LexusControllerTest, Init) {
@@ -86,16 +87,12 @@ TEST_F(LexusControllerTest, Status) {
 TEST_F(LexusControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
-            ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL), ErrorCode::OK);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::AUTO_STEER_ONLY),
-            ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::AUTO_STEER_ONLY), ErrorCode::OK);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::AUTO_SPEED_ONLY),
-            ErrorCode::OK);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_AUTO_DRIVE),
-            ErrorCode::CANBUS_ERROR);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::AUTO_SPEED_ONLY), ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_AUTO_DRIVE), ErrorCode::CANBUS_ERROR);
 }
 
 }  // namespace lexus

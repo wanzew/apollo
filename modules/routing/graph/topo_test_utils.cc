@@ -31,7 +31,7 @@ void AddCurve(Curve* curve) {
   curve_segment->set_heading(0.0);
   curve_segment->set_length(TEST_LANE_LENGTH);
   auto* lane_segment = curve_segment->mutable_line_segment();
-  auto* point1 = lane_segment->add_point();
+  auto* point1       = lane_segment->add_point();
   point1->set_x(TEST_START_S);
   point1->set_y(0.0);
   auto* point21 = lane_segment->add_point();
@@ -50,7 +50,8 @@ void AddCurve(Curve* curve) {
 
 }  // namespace
 
-void GetNodeDetailForTest(Node* const node, const std::string& lane_id,
+void GetNodeDetailForTest(Node* const        node,
+                          const std::string& lane_id,
                           const std::string& road_id) {
   node->set_lane_id(lane_id);
   node->set_length(TEST_LANE_LENGTH);
@@ -65,8 +66,7 @@ void GetNodeDetailForTest(Node* const node, const std::string& lane_id,
   right_out->mutable_end()->set_s(TEST_END_S);
 }
 
-void GetNodeForTest(Node* const node, const std::string& lane_id,
-                    const std::string& road_id) {
+void GetNodeForTest(Node* const node, const std::string& lane_id, const std::string& road_id) {
   node->set_lane_id(lane_id);
   node->set_length(TEST_LANE_LENGTH);
   node->set_road_id(road_id);
@@ -79,8 +79,9 @@ void GetNodeForTest(Node* const node, const std::string& lane_id,
   right_out->mutable_end()->set_s(TEST_END_S);
 }
 
-void GetEdgeForTest(Edge* const edge, const std::string& lane_id_1,
-                    const std::string& lane_id_2,
+void GetEdgeForTest(Edge* const                edge,
+                    const std::string&         lane_id_1,
+                    const std::string&         lane_id_2,
                     const Edge::DirectionType& type) {
   edge->set_from_lane_id(lane_id_1);
   edge->set_to_lane_id(lane_id_2);

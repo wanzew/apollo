@@ -36,19 +36,17 @@ class Motioncontrollimits1_12_test : public ::testing::Test {
 };
 
 TEST_F(Motioncontrollimits1_12_test, General) {
-  uint8_t data[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const double adc_cmd_throttlecommandlimit = 64.00;
-  const double adc_cmd_steeringrate = 3071.15;
-  const double adc_cmd_steerwheelanglelimit = 640.0;
+  uint8_t       data[8]                         = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
+  const double  adc_cmd_throttlecommandlimit    = 64.00;
+  const double  adc_cmd_steeringrate            = 3071.15;
+  const double  adc_cmd_steerwheelanglelimit    = 640.0;
   const uint8_t equivalent_throttlecommandlimit = 0x80;
-  const uint8_t equivalent_steeringrate1 = 0xef;
-  const uint8_t equivalent_steeringrate2 = 0xef;
+  const uint8_t equivalent_steeringrate1        = 0xef;
+  const uint8_t equivalent_steeringrate2        = 0xef;
   const uint8_t equivalent_steerwheelanglelimit = 0x80;
-  controllimits_.set_p_adc_cmd_throttlecommandlimit(
-      data, adc_cmd_throttlecommandlimit);
+  controllimits_.set_p_adc_cmd_throttlecommandlimit(data, adc_cmd_throttlecommandlimit);
   controllimits_.set_p_adc_cmd_steeringrate(data, adc_cmd_steeringrate);
-  controllimits_.set_p_adc_cmd_steerwheelanglelimit(
-      data, adc_cmd_steerwheelanglelimit);
+  controllimits_.set_p_adc_cmd_steerwheelanglelimit(data, adc_cmd_steerwheelanglelimit);
   EXPECT_EQ(data[3], equivalent_throttlecommandlimit);
   EXPECT_EQ(data[0], equivalent_steeringrate1);
   EXPECT_EQ(data[1], equivalent_steeringrate2);

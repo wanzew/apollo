@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/dummy/dummy_roi_filter.h"
+
 #include <numeric>
 
 namespace apollo {
@@ -23,17 +24,11 @@ namespace lidar {
 
 bool DummyROIFilter::Init(const ROIFilterInitOptions& options) { return true; }
 
-bool DummyROIFilter::Filter(const ROIFilterOptions& options,
-                            LidarFrame* frame) {
-  if (!frame) {
-    return false;
-  }
-  if (!frame->cloud) {
-    return false;
-  }
+bool DummyROIFilter::Filter(const ROIFilterOptions& options, LidarFrame* frame) {
+  if (!frame) { return false; }
+  if (!frame->cloud) { return false; }
   frame->roi_indices.indices.resize(frame->cloud->size());
-  std::iota(frame->roi_indices.indices.begin(),
-            frame->roi_indices.indices.end(), 0);
+  std::iota(frame->roi_indices.indices.begin(), frame->roi_indices.indices.end(), 0);
   return true;
 }
 

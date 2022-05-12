@@ -42,13 +42,13 @@ class ReadableInfo {
   bool SerializeTo(std::string* dst) const;
 
   uint64_t host_id() const { return host_id_; }
-  void set_host_id(uint64_t host_id) { host_id_ = host_id; }
+  void     set_host_id(uint64_t host_id) { host_id_ = host_id; }
 
   uint32_t block_index() const { return block_index_; }
-  void set_block_index(uint32_t block_index) { block_index_ = block_index; }
+  void     set_block_index(uint32_t block_index) { block_index_ = block_index; }
 
   uint64_t channel_id() const { return channel_id_; }
-  void set_channel_id(uint64_t channel_id) { channel_id_ = channel_id; }
+  void     set_channel_id(uint64_t channel_id) { channel_id_ = channel_id; }
 
   static const size_t kSize;
 

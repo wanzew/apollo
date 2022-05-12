@@ -31,11 +31,11 @@ bool NodeSRange::IsEnoughForChangeLane(double length) {
   return (length > FLAGS_min_length_for_lane_change);
 }
 
-NodeSRange::NodeSRange(double s1, double s2) : start_s_(s1), end_s_(s2) {}
+NodeSRange::NodeSRange(double s1, double s2)
+    : start_s_(s1)
+    , end_s_(s2) {}
 
-bool NodeSRange::operator<(const NodeSRange& other) const {
-  return StartS() < other.StartS();
-}
+bool NodeSRange::operator<(const NodeSRange& other) const { return StartS() < other.StartS(); }
 
 bool NodeSRange::IsValid() const { return start_s_ <= end_s_; }
 
@@ -54,12 +54,8 @@ void NodeSRange::SetStartS(double start_s) { start_s_ = start_s; }
 void NodeSRange::SetEndS(double end_s) { end_s_ = end_s; }
 
 bool NodeSRange::MergeRangeOverlap(const NodeSRange& other) {
-  if (!IsValid() || !other.IsValid()) {
-    return false;
-  }
-  if (other.StartS() > EndS() || other.EndS() < StartS()) {
-    return false;
-  }
+  if (!IsValid() || !other.IsValid()) { return false; }
+  if (other.StartS() > EndS() || other.EndS() < StartS()) { return false; }
   SetEndS(std::max(EndS(), other.EndS()));
   SetStartS(std::min(StartS(), other.StartS()));
   return true;

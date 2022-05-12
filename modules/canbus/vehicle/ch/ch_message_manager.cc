@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
+
 #include "modules/canbus/vehicle/ch/protocol/brake_command_111.h"
 #include "modules/canbus/vehicle/ch/protocol/brake_status__511.h"
 #include "modules/canbus/vehicle/ch/protocol/control_command_115.h"

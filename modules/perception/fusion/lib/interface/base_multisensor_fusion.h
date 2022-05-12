@@ -35,13 +35,12 @@ struct ObstacleMultiSensorFusionParam {
 
 class BaseMultiSensorFusion {
  public:
-  BaseMultiSensorFusion() = default;
+  BaseMultiSensorFusion()          = default;
   virtual ~BaseMultiSensorFusion() = default;
 
   virtual bool Init(const ObstacleMultiSensorFusionParam& param) = 0;
 
-  virtual bool Process(const base::FrameConstPtr& frame,
-               std::vector<base::ObjectPtr>* objects) = 0;
+  virtual bool Process(const base::FrameConstPtr& frame, std::vector<base::ObjectPtr>* objects) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -50,7 +49,7 @@ class BaseMultiSensorFusion {
 };  // Class BaseMultiSensorFusion
 
 PERCEPTION_REGISTER_REGISTERER(BaseMultiSensorFusion);
-#define PERCEPTION_REGISTER_MULTISENSORFUSION(name) \
+#define PERCEPTION_REGISTER_MULTISENSORFUSION(name)                                                \
   PERCEPTION_REGISTER_CLASS(BaseMultiSensorFusion, name)
 
 }  // namespace fusion

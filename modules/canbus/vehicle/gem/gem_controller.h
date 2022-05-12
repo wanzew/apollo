@@ -19,14 +19,13 @@
 #include <memory>
 #include <thread>
 
-#include "cyber/common/macros.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
+#include "cyber/common/macros.h"
 #include "modules/canbus/vehicle/gem/protocol/accel_cmd_67.h"
 #include "modules/canbus/vehicle/gem/protocol/brake_cmd_6b.h"
 #include "modules/canbus/vehicle/gem/protocol/global_cmd_69.h"
@@ -45,11 +44,10 @@ class GemController final : public VehicleController {
 
   virtual ~GemController();
 
-  ::apollo::common::ErrorCode Init(
-      const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
-      override;
+  ::apollo::common::ErrorCode
+  Init(const VehicleParameter&                                params,
+       CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+       MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) override;
 
   bool Start() override;
 
@@ -70,7 +68,7 @@ class GemController final : public VehicleController {
 
  private:
   // main logical function for operation the car enter or exit the auto driving
-  void Emergency() override;
+  void                        Emergency() override;
   ::apollo::common::ErrorCode EnableAutoMode() override;
   ::apollo::common::ErrorCode DisableAutoMode() override;
   ::apollo::common::ErrorCode EnableSteeringOnlyMode() override;
@@ -105,38 +103,37 @@ class GemController final : public VehicleController {
   void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
   void SetBeam(const ::apollo::control::ControlCommand& command) override;
   void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetTurningSignal(const ::apollo::control::ControlCommand& command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
 
  private:
-  void SecurityDogThreadFunc();
-  virtual bool CheckResponse(const int32_t flags, bool need_wait);
-  void set_chassis_error_mask(const int32_t mask);
-  int32_t chassis_error_mask();
+  void               SecurityDogThreadFunc();
+  virtual bool       CheckResponse(const int32_t flags, bool need_wait);
+  void               set_chassis_error_mask(const int32_t mask);
+  int32_t            chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
-  void set_chassis_error_code(const Chassis::ErrorCode& error_code);
+  void               set_chassis_error_code(const Chassis::ErrorCode& error_code);
 
  private:
   // control protocol
-  Accelcmd67* accel_cmd_67_ = nullptr;
-  Brakecmd6b* brake_cmd_6b_ = nullptr;
-  Shiftcmd65* shift_cmd_65_ = nullptr;
+  Accelcmd67*    accel_cmd_67_    = nullptr;
+  Brakecmd6b*    brake_cmd_6b_    = nullptr;
+  Shiftcmd65*    shift_cmd_65_    = nullptr;
   Steeringcmd6d* steering_cmd_6d_ = nullptr;
-  Turncmd63* turn_cmd_63_ = nullptr;
-  Globalcmd69* global_cmd_69_ = nullptr;
+  Turncmd63*     turn_cmd_63_     = nullptr;
+  Globalcmd69*   global_cmd_69_   = nullptr;
 
-  Chassis chassis_;
+  Chassis                      chassis_;
   std::unique_ptr<std::thread> thread_;
-  bool is_chassis_error_ = false;
+  bool                         is_chassis_error_ = false;
 
-  std::mutex chassis_error_code_mutex_;
+  std::mutex         chassis_error_code_mutex_;
   Chassis::ErrorCode chassis_error_code_ = Chassis::NO_ERROR;
 
   std::mutex chassis_mask_mutex_;
-  int32_t chassis_error_mask_ = 0;
+  int32_t    chassis_error_mask_ = 0;
 };
 
 }  // namespace gem

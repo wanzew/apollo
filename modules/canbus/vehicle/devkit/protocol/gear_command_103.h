@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Gearcommand103 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Gearcommand103
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -41,15 +42,13 @@ class Gearcommand103 : public ::apollo::drivers::canbus::ProtocolData<
   // 4: 'GEAR_TARGET_DRIVE'}, 'precision': 1.0, 'len': 3, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 10, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Gearcommand103* set_gear_target(
-      Gear_command_103::Gear_targetType gear_target);
+  Gearcommand103* set_gear_target(Gear_command_103::Gear_targetType gear_target);
 
   // config detail: {'name': 'Gear_EN_CTRL', 'enum': {0: 'GEAR_EN_CTRL_DISABLE',
   // 1: 'GEAR_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 1, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Gearcommand103* set_gear_en_ctrl(
-      Gear_command_103::Gear_en_ctrlType gear_en_ctrl);
+  Gearcommand103* set_gear_en_ctrl(Gear_command_103::Gear_en_ctrlType gear_en_ctrl);
 
   // config detail: {'name': 'CheckSum_103', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
@@ -62,15 +61,13 @@ class Gearcommand103 : public ::apollo::drivers::canbus::ProtocolData<
   // 4: 'GEAR_TARGET_DRIVE'}, 'precision': 1.0, 'len': 3, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 10, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  void set_p_gear_target(uint8_t* data,
-                         Gear_command_103::Gear_targetType gear_target);
+  void set_p_gear_target(uint8_t* data, Gear_command_103::Gear_targetType gear_target);
 
   // config detail: {'name': 'Gear_EN_CTRL', 'enum': {0: 'GEAR_EN_CTRL_DISABLE',
   // 1: 'GEAR_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 1, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  void set_p_gear_en_ctrl(uint8_t* data,
-                          Gear_command_103::Gear_en_ctrlType gear_en_ctrl);
+  void set_p_gear_en_ctrl(uint8_t* data, Gear_command_103::Gear_en_ctrlType gear_en_ctrl);
 
   // config detail: {'name': 'CheckSum_103', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
@@ -78,9 +75,9 @@ class Gearcommand103 : public ::apollo::drivers::canbus::ProtocolData<
   void set_p_checksum_103(uint8_t* data, int checksum_103);
 
  private:
-  Gear_command_103::Gear_targetType gear_target_;
+  Gear_command_103::Gear_targetType  gear_target_;
   Gear_command_103::Gear_en_ctrlType gear_en_ctrl_;
-  int checksum_103_;
+  int                                checksum_103_;
 };
 
 }  // namespace devkit

@@ -22,10 +22,11 @@ namespace benchmark {
 
 bool DetectionEvaluation::init(const std::string& clouds,
                                const std::string& results,
-                               const std::string& groundtruths, bool is_folder,
-                               unsigned int loader_thread_num,
-                               unsigned int eval_thread_num,
-                               unsigned int eval_parrallel_num,
+                               const std::string& groundtruths,
+                               bool               is_folder,
+                               unsigned int       loader_thread_num,
+                               unsigned int       eval_thread_num,
+                               unsigned int       eval_parrallel_num,
                                const std::string& reserve) {
   std::vector<std::string> strs;
   strs.push_back(clouds);
@@ -64,9 +65,9 @@ bool DetectionEvaluation::init(const std::string& clouds,
 void DetectionEvaluation::run_evaluation() {
   // sequential loading and accumulate
   while (true) {
-    bool has_more_data = true;
+    bool                                          has_more_data = true;
     std::vector<std::shared_ptr<FrameStatistics>> frames;
-    std::vector<std::future<void>> status;
+    std::vector<std::future<void>>                status;
     unsigned int start_id = static_cast<unsigned int>(_frame_metrics.size());
     for (unsigned int i = 0; i < _eval_parrallel_num; ++i) {
       std::shared_ptr<FrameStatistics> frame_ptr;
@@ -74,8 +75,7 @@ void DetectionEvaluation::run_evaluation() {
         has_more_data = false;
         break;
       } else {
-        std::cout << "No. " << _frame_metrics.size() << ":  "
-                  << frame_ptr->get_name() << std::endl;
+        std::cout << "No. " << _frame_metrics.size() << ":  " << frame_ptr->get_name() << std::endl;
         frames.push_back(frame_ptr);
         _frame_metrics.push_back(FrameMetrics());
         std::future<void> f = _thread_pool->push([frame_ptr](int id) {
@@ -93,18 +93,14 @@ void DetectionEvaluation::run_evaluation() {
           &_frame_metrics[start_id + i].detection_recall_2017);
       frames[i]->get_meta_statistics().get_2017_detection_visible_recall(
           &_frame_metrics[start_id + i].detection_visible_recall_2017);
-      frames[i]->get_meta_statistics().get_2017_aad(
-          &_frame_metrics[start_id + i].aad_2017);
-      _frame_metrics[start_id + i].frame_name = frames[i]->get_name();
-      _frame_metrics[start_id + i].jaccard_index_percentile =
-          frames[i]->jaccard_index_percentile();
+      frames[i]->get_meta_statistics().get_2017_aad(&_frame_metrics[start_id + i].aad_2017);
+      _frame_metrics[start_id + i].frame_name               = frames[i]->get_name();
+      _frame_metrics[start_id + i].jaccard_index_percentile = frames[i]->jaccard_index_percentile();
 
       _self_stat.add_objects(frames[i]->get_objects(), start_id + i);
     }
 
-    if (!has_more_data) {
-      break;
-    }
+    if (!has_more_data) { break; }
   }
 
   // globally evaluation
@@ -113,50 +109,45 @@ void DetectionEvaluation::run_evaluation() {
   _meta_stat.get_2017_detection_visible_recall(&_detection_visible_recall_2017);
   _meta_stat.get_2016_detection_precision_and_recall(&_detection_precision_2016,
                                                      &_detection_recall_2016);
-  _meta_stat.get_2017_detection_ap_aos(&_detection_ap, &_detection_aos,
-                                       &_detection_curve_samples);
+  _meta_stat.get_2017_detection_ap_aos(&_detection_ap, &_detection_aos, &_detection_curve_samples);
   _meta_stat.get_2017_detection_ap_per_type(&_detection_ap_per_type,
                                             &_detection_curve_samples_per_type);
   _meta_stat.get_2017_classification_accuracy(&_classification_accuracy_2017);
   _meta_stat.get_2016_classification_accuracy(&_classification_accuracy_2016);
   _meta_stat.get_classification_confusion_matrix(
-      &_classification_confusion_matrix_gt_major,
-      &_classification_confusion_matrix_det_major,
+      &_classification_confusion_matrix_gt_major, &_classification_confusion_matrix_det_major,
       &_classification_confusion_matrix_det_major_with_fp);
 
   _meta_stat.get_2017_aad(&_aad_2017);
   std::sort(_frame_metrics.begin(), _frame_metrics.end());
   // self-evaluation metrics
-  _self_stat.get_classification_type_change_rates(
-      &_classification_change_rate_per_class, &_classification_change_rate);
+  _self_stat.get_classification_type_change_rates(&_classification_change_rate_per_class,
+                                                  &_classification_change_rate);
 }
 
 std::ostream& operator<<(std::ostream& out, const DetectionEvaluation& rhs) {
   auto pad_str = [](std::string* str, size_t num, char c = ' ') {
-    if (num > str->size()) {
-      str->insert(str->size(), num - str->size(), c);
-    }
+    if (num > str->size()) { str->insert(str->size(), num - str->size(), c); }
   };
   static const size_t padding_length = 12;
-  const std::string section_split_str(80, '=');
-  std::string str_buf;
-  std::string range_string = "";
+  const std::string   section_split_str(80, '=');
+  std::string         str_buf;
+  std::string         range_string = "";
   for (unsigned int i = 0; i < MetaStatistics::get_range_dim(); ++i) {
     str_buf = MetaStatistics::get_range(i);
     pad_str(&str_buf, padding_length);
     range_string += str_buf;
   }
   std::string full_range_string =
-      range_string + " " +
-      MetaStatistics::get_range(MetaStatistics::get_range_dim());
+      range_string + " " + MetaStatistics::get_range(MetaStatistics::get_range_dim());
 
   out << std::fixed << std::setprecision(4);
   out << section_split_str << std::endl;
   out << "Recall    (" << range_string << ")  ";
   out << "Precision (" << range_string << ")  "
       << "Visible recall(" << range_string << ")  "
-      << "Jaccard index percentile "
-      << FrameStatistics::get_jaccard_index_percentile() << std::endl;
+      << "Jaccard index percentile " << FrameStatistics::get_jaccard_index_percentile()
+      << std::endl;
   for (auto& frame : rhs._frame_metrics) {
     out << "          ";
     for (unsigned int i = 0; i < MetaStatistics::get_range_dim(); ++i) {
@@ -219,10 +210,8 @@ std::ostream& operator<<(std::ostream& out, const DetectionEvaluation& rhs) {
   out << section_split_str << std::endl;
   out << "2017 Classification KPI:  " << full_range_string << std::endl;
   for (unsigned int i = 0; i < rhs._classification_accuracy_2017.size(); ++i) {
-    out << std::left << std::setw(10) << translate_type_index_to_string(i)
-        << " accuracy    :  ";
-    for (std::size_t j = 0; j < rhs._classification_accuracy_2017[0].size();
-         ++j) {
+    out << std::left << std::setw(10) << translate_type_index_to_string(i) << " accuracy    :  ";
+    for (std::size_t j = 0; j < rhs._classification_accuracy_2017[0].size(); ++j) {
       str_buf = std::to_string(rhs._classification_accuracy_2017[i][j]);
       pad_str(&str_buf, padding_length);
       out << str_buf;
@@ -231,27 +220,19 @@ std::ostream& operator<<(std::ostream& out, const DetectionEvaluation& rhs) {
   }
   out << std::endl;
 
-  out << "Classification confusion matrix (Row: groundtruth, Col: estimated)"
-      << std::endl;
-  for (unsigned int i = 0;
-       i < rhs._classification_confusion_matrix_gt_major.size(); ++i) {
-    out << std::left << std::setw(10) << translate_type_index_to_string(i)
-        << " ";
-    for (std::size_t j = 0;
-         j < rhs._classification_confusion_matrix_gt_major[0].size(); ++j) {
+  out << "Classification confusion matrix (Row: groundtruth, Col: estimated)" << std::endl;
+  for (unsigned int i = 0; i < rhs._classification_confusion_matrix_gt_major.size(); ++i) {
+    out << std::left << std::setw(10) << translate_type_index_to_string(i) << " ";
+    for (std::size_t j = 0; j < rhs._classification_confusion_matrix_gt_major[0].size(); ++j) {
       out << rhs._classification_confusion_matrix_gt_major[i][j] << " ";
     }
     out << std::endl;
   }
   out << std::endl;
-  out << "Classification confusion matrix (Row: estimated, Col: groundtruth)"
-      << std::endl;
-  for (unsigned int i = 0;
-       i < rhs._classification_confusion_matrix_det_major.size(); ++i) {
-    out << std::left << std::setw(10) << translate_type_index_to_string(i)
-        << " ";
-    for (std::size_t j = 0;
-         j < rhs._classification_confusion_matrix_det_major[0].size(); ++j) {
+  out << "Classification confusion matrix (Row: estimated, Col: groundtruth)" << std::endl;
+  for (unsigned int i = 0; i < rhs._classification_confusion_matrix_det_major.size(); ++i) {
+    out << std::left << std::setw(10) << translate_type_index_to_string(i) << " ";
+    for (std::size_t j = 0; j < rhs._classification_confusion_matrix_det_major[0].size(); ++j) {
       out << rhs._classification_confusion_matrix_det_major[i][j] << " ";
     }
     out << std::endl;
@@ -260,25 +241,19 @@ std::ostream& operator<<(std::ostream& out, const DetectionEvaluation& rhs) {
   out << "Classification confusion matrix with fp (Row: estimated, Col: "
          "groundtruth)"
       << std::endl;
-  for (unsigned int i = 0;
-       i < rhs._classification_confusion_matrix_det_major_with_fp.size(); ++i) {
-    out << std::left << std::setw(10) << translate_type_index_to_string(i)
-        << " ";
-    for (std::size_t j = 0;
-         j < rhs._classification_confusion_matrix_det_major_with_fp[0].size();
+  for (unsigned int i = 0; i < rhs._classification_confusion_matrix_det_major_with_fp.size(); ++i) {
+    out << std::left << std::setw(10) << translate_type_index_to_string(i) << " ";
+    for (std::size_t j = 0; j < rhs._classification_confusion_matrix_det_major_with_fp[0].size();
          ++j) {
-      out << rhs._classification_confusion_matrix_det_major_with_fp[i][j]
-          << " ";
+      out << rhs._classification_confusion_matrix_det_major_with_fp[i][j] << " ";
     }
     out << std::endl;
   }
   out << section_split_str << std::endl;
   out << "2016 Classification KPI:  " << range_string << std::endl;
   for (unsigned int i = 0; i < rhs._classification_accuracy_2016.size(); ++i) {
-    out << std::left << std::setw(10) << translate_type_index_to_string(i)
-        << " accuracy    :  ";
-    for (std::size_t j = 0; j < rhs._classification_accuracy_2016[i].size();
-         ++j) {
+    out << std::left << std::setw(10) << translate_type_index_to_string(i) << " accuracy    :  ";
+    for (std::size_t j = 0; j < rhs._classification_accuracy_2016[i].size(); ++j) {
       str_buf = std::to_string(rhs._classification_accuracy_2016[i][j]);
       pad_str(&str_buf, padding_length);
       out << str_buf;
@@ -286,14 +261,11 @@ std::ostream& operator<<(std::ostream& out, const DetectionEvaluation& rhs) {
     out << std::endl;
   }
   out << section_split_str << std::endl;
-  out << "Classification change rate: " << std::setw(10)
-      << rhs._classification_change_rate << std::endl;
-  for (unsigned int i = 0; i < rhs._classification_change_rate_per_class.size();
-       ++i) {
-    out << std::left << std::setw(10) << translate_type_index_to_string(i)
-        << " ";
-    for (std::size_t j = 0;
-         j < rhs._classification_change_rate_per_class[i].size(); ++j) {
+  out << "Classification change rate: " << std::setw(10) << rhs._classification_change_rate
+      << std::endl;
+  for (unsigned int i = 0; i < rhs._classification_change_rate_per_class.size(); ++i) {
+    out << std::left << std::setw(10) << translate_type_index_to_string(i) << " ";
+    for (std::size_t j = 0; j < rhs._classification_change_rate_per_class[i].size(); ++j) {
       out << rhs._classification_change_rate_per_class[i][j] << " ";
     }
     out << std::endl;
@@ -301,13 +273,11 @@ std::ostream& operator<<(std::ostream& out, const DetectionEvaluation& rhs) {
   // print ap for each type
   out << section_split_str << std::endl;
   for (unsigned int i = 0; i < MetaStatistics::get_type_dim(); ++i) {
-    out << MetaStatistics::get_type(i) << " ap "
-        << rhs._detection_ap_per_type[i] << std::endl;
-    out << "SPR-Curve samples <precision recall confidence similarity>"
-        << std::endl;
+    out << MetaStatistics::get_type(i) << " ap " << rhs._detection_ap_per_type[i] << std::endl;
+    out << "SPR-Curve samples <precision recall confidence similarity>" << std::endl;
     for (auto& tuple : rhs._detection_curve_samples_per_type[i]) {
-      out << "sprc_sample:         " << tuple.precision << "  " << tuple.recall
-          << "  " << tuple.confidence << "  " << tuple.similarity << std::endl;
+      out << "sprc_sample:         " << tuple.precision << "  " << tuple.recall << "  "
+          << tuple.confidence << "  " << tuple.similarity << std::endl;
     }
     out << "---------------------------------------------------" << std::endl;
   }
@@ -325,11 +295,10 @@ std::ostream& operator<<(std::ostream& out, const DetectionEvaluation& rhs) {
   out << section_split_str << std::endl;
   out << "aos " << rhs._detection_aos << std::endl;
   out << "ap " << rhs._detection_ap << std::endl << std::endl;
-  out << "SPR-Curve samples <precision recall confidence similarity>"
-      << std::endl;
+  out << "SPR-Curve samples <precision recall confidence similarity>" << std::endl;
   for (auto& tuple : rhs._detection_curve_samples) {
-    out << "sprc_sample:         " << tuple.precision << "  " << tuple.recall
-        << "  " << tuple.confidence << "  " << tuple.similarity << std::endl;
+    out << "sprc_sample:         " << tuple.precision << "  " << tuple.recall << "  "
+        << tuple.confidence << "  " << tuple.similarity << std::endl;
   }
 
   return out;

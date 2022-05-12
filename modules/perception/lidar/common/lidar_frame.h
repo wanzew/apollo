@@ -61,14 +61,10 @@ struct LidarFrame {
   std::string reserve;
 
   void Reset() {
-    if (cloud) {
-      cloud->clear();
-    }
-    if (world_cloud) {
-      world_cloud->clear();
-    }
-    timestamp = 0.0;
-    lidar2world_pose = Eigen::Affine3d::Identity();
+    if (cloud) { cloud->clear(); }
+    if (world_cloud) { world_cloud->clear(); }
+    timestamp          = 0.0;
+    lidar2world_pose   = Eigen::Affine3d::Identity();
     novatel2world_pose = Eigen::Affine3d::Identity();
     if (hdmap_struct) {
       hdmap_struct->road_boundary.clear();
@@ -83,11 +79,9 @@ struct LidarFrame {
     secondary_indices.indices.clear();
   }
 
-  void FilterPointCloud(base::PointCloud<base::PointF> *filtered_cloud,
-                        const std::vector<uint32_t> &indices) {
-    if (cloud && filtered_cloud) {
-      filtered_cloud->CopyPointCloudExclude(*cloud, indices);
-    }
+  void FilterPointCloud(base::PointCloud<base::PointF>* filtered_cloud,
+                        const std::vector<uint32_t>&    indices) {
+    if (cloud && filtered_cloud) { filtered_cloud->CopyPointCloudExclude(*cloud, indices); }
   }
 };  // struct LidarFrame
 

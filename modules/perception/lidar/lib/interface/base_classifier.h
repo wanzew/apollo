@@ -35,14 +35,12 @@ class BaseClassifier {
 
   virtual ~BaseClassifier() = default;
 
-  virtual bool Init(
-      const ClassifierInitOptions& options = ClassifierInitOptions()) = 0;
+  virtual bool Init(const ClassifierInitOptions& options = ClassifierInitOptions()) = 0;
 
   // @brief: classify object list, and fill type in object.
   // @param [in]: options
   // @param [in/out]: object list
-  virtual bool Classify(const ClassifierOptions& options,
-                        LidarFrame* frame) = 0;
+  virtual bool Classify(const ClassifierOptions& options, LidarFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -51,8 +49,7 @@ class BaseClassifier {
 };  // class BaseClassifier
 
 PERCEPTION_REGISTER_REGISTERER(BaseClassifier);
-#define PERCEPTION_REGISTER_CLASSIFIER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseClassifier, name)
+#define PERCEPTION_REGISTER_CLASSIFIER(name) PERCEPTION_REGISTER_CLASS(BaseClassifier, name)
 
 }  // namespace lidar
 }  // namespace perception

@@ -16,9 +16,10 @@
 
 #include "modules/canbus/vehicle/neolix_edu/protocol/vcu_brake_report_47.h"
 
+#include "gtest/gtest.h"
+
 #include "glog/logging.h"
 
-#include "gtest/gtest.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
@@ -31,9 +32,9 @@ class Vcubrakereport47Test : public ::testing::Test {
 };
 
 TEST_F(Vcubrakereport47Test, reset) {
-  uint8_t data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t          data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  int32_t          length  = 8;
+  ChassisDetail    cd;
   Vcubrakereport47 accel_cmd;
   accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b00000000);
@@ -47,14 +48,11 @@ TEST_F(Vcubrakereport47Test, reset) {
 
   EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().brake_enable_resp(), false);
   EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().control_mode_resp(), 0);
-  EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vcu_real_brake_valid(),
-            false);
+  EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vcu_real_brake_valid(), false);
   EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vcu_real_brake(), 0);
   EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vcu_real_parking_status(), 0);
-  EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vcu_real_parking_valid(),
-            false);
-  EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().rampauxiliaryindication(),
-            false);
+  EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vcu_real_parking_valid(), false);
+  EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().rampauxiliaryindication(), false);
   EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vehicleslope(), 0);
 }
 

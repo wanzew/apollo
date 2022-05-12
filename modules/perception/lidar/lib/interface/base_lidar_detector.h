@@ -37,16 +37,14 @@ class BaseLidarDetector {
 
   virtual ~BaseLidarDetector() = default;
 
-  virtual bool Init(
-      const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) = 0;
+  virtual bool Init(const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) = 0;
 
   // @brief: process point cloud and get objects.
   // @param [in]: options
   // @param [in/out]: frame
   // objects should be filled, required,
   // label field of point cloud can be filled, optional,
-  virtual bool Detect(const LidarDetectorOptions& options,
-                       LidarFrame* frame) = 0;
+  virtual bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -55,8 +53,7 @@ class BaseLidarDetector {
 };  // class BaseLidarDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseLidarDetector);
-#define PERCEPTION_REGISTER_LIDARDETECTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseLidarDetector, name)
+#define PERCEPTION_REGISTER_LIDARDETECTOR(name) PERCEPTION_REGISTER_CLASS(BaseLidarDetector, name)
 
 }  // namespace lidar
 }  // namespace perception

@@ -16,10 +16,9 @@
 
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
-DEFINE_string(
-    relative_map_config_filename,
-    "/apollo/modules/map/relative_map/conf/relative_map_config.pb.txt",
-    "Relative map configuration file");
+DEFINE_string(relative_map_config_filename,
+              "/apollo/modules/map/relative_map/conf/relative_map_config.pb.txt",
+              "Relative map configuration file");
 
 DEFINE_string(navigator_config_filename,
               "/apollo/modules/map/relative_map/conf/navigator_config.pb.txt",
@@ -27,8 +26,10 @@ DEFINE_string(navigator_config_filename,
 
 DEFINE_int32(relative_map_loop_rate, 10, "Loop rate for relative_map node");
 
-DEFINE_bool(enable_cyclic_rerouting, false,
+DEFINE_bool(enable_cyclic_rerouting,
+            false,
             "Enable auto rerouting in a in a cyclic/circular navigaton line.");
 
-DEFINE_bool(relative_map_generate_left_boundray, true,
+DEFINE_bool(relative_map_generate_left_boundray,
+            true,
             "Generate left boundary for detected lanes.");

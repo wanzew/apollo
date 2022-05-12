@@ -28,10 +28,9 @@ TEST(ConditionNotifierTest, constructor) {
 }
 
 TEST(ConditionNotifierTest, notify_listen) {
-  auto notifier = ConditionNotifier::Instance();
+  auto         notifier = ConditionNotifier::Instance();
   ReadableInfo readable_info;
-  while (notifier->Listen(100, &readable_info)) {
-  }
+  while (notifier->Listen(100, &readable_info)) {}
   EXPECT_FALSE(notifier->Listen(100, &readable_info));
   EXPECT_TRUE(notifier->Notify(readable_info));
   EXPECT_TRUE(notifier->Listen(100, &readable_info));

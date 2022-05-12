@@ -16,8 +16,9 @@
 
 #include "modules/planning/common/path/discretized_path.h"
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 #include "modules/common/util/point_factory.h"
 
 namespace apollo {
@@ -31,10 +32,10 @@ TEST(DiscretizedPathTest, basic_test) {
   const double s2 = s1 + std::sqrt(1.0 + 1.0);
   const double s3 = s2 + std::sqrt(1.0 + 1.0);
   const double s4 = s3 + std::sqrt(1.0 + 1.0);
-  PathPoint p1 = PointFactory::ToPathPoint(0.0, 0.0, 0.0, s1);
-  PathPoint p2 = PointFactory::ToPathPoint(1.0, 1.0, 0.0, s2);
-  PathPoint p3 = PointFactory::ToPathPoint(2.0, 2.0, 0.0, s3);
-  PathPoint p4 = PointFactory::ToPathPoint(3.0, 3.0, 0.0, s4);
+  PathPoint    p1 = PointFactory::ToPathPoint(0.0, 0.0, 0.0, s1);
+  PathPoint    p2 = PointFactory::ToPathPoint(1.0, 1.0, 0.0, s2);
+  PathPoint    p3 = PointFactory::ToPathPoint(2.0, 2.0, 0.0, s3);
+  PathPoint    p4 = PointFactory::ToPathPoint(3.0, 3.0, 0.0, s4);
 
   std::vector<PathPoint> path_points{p1, p2, p3, p4};
 
@@ -72,10 +73,10 @@ TEST(DiscretizedPathTest, reverse_case) {
   const double s2 = s1 - std::sqrt(1.0 + 1.0);
   const double s3 = s2 - std::sqrt(1.0 + 1.0);
   const double s4 = s3 - std::sqrt(1.0 + 1.0);
-  PathPoint p1 = PointFactory::ToPathPoint(0.0, 0.0, 0.0, s1);
-  PathPoint p2 = PointFactory::ToPathPoint(1.0, 1.0, 0.0, s2);
-  PathPoint p3 = PointFactory::ToPathPoint(2.0, 2.0, 0.0, s3);
-  PathPoint p4 = PointFactory::ToPathPoint(3.0, 3.0, 0.0, s4);
+  PathPoint    p1 = PointFactory::ToPathPoint(0.0, 0.0, 0.0, s1);
+  PathPoint    p2 = PointFactory::ToPathPoint(1.0, 1.0, 0.0, s2);
+  PathPoint    p3 = PointFactory::ToPathPoint(2.0, 2.0, 0.0, s3);
+  PathPoint    p4 = PointFactory::ToPathPoint(3.0, 3.0, 0.0, s4);
 
   std::vector<PathPoint> path_points{p1, p2, p3, p4};
 

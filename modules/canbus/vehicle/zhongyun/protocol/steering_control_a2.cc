@@ -42,13 +42,11 @@ void Steeringcontrola2::UpdateData(uint8_t* data) {
 
 void Steeringcontrola2::Reset() {
   // TODO(ChaoM) :  you should check this manually
-  steering_target_ = 0.0;
-  steering_enable_control_ =
-      Steering_control_a2::STEERING_ENABLE_CONTROL_STEERING_MANUALCONTROL;
+  steering_target_         = 0.0;
+  steering_enable_control_ = Steering_control_a2::STEERING_ENABLE_CONTROL_STEERING_MANUALCONTROL;
 }
 
-Steeringcontrola2* Steeringcontrola2::set_steering_target(
-    double steering_target) {
+Steeringcontrola2* Steeringcontrola2::set_steering_target(double steering_target) {
   steering_target_ = steering_target;
   return this;
 }
@@ -56,11 +54,10 @@ Steeringcontrola2* Steeringcontrola2::set_steering_target(
 // config detail: {'name': 'Steering_target', 'offset': -1638.35, 'precision':
 // 0.05, 'len': 16, 'is_signed_var': False, 'physical_range': '[-32|32]', 'bit':
 // 8, 'type': 'double', 'order': 'intel', 'physical_unit': 'deg'}
-void Steeringcontrola2::set_p_steering_target(uint8_t* data,
-                                              double steering_target) {
+void Steeringcontrola2::set_p_steering_target(uint8_t* data, double steering_target) {
   steering_target = ProtocolData::BoundedValue(-32.0, 32.0, steering_target);
-  int x = static_cast<int>((steering_target - -1638.350000) / 0.050000);
-  uint8_t t = 0;
+  int     x       = static_cast<int>((steering_target - -1638.350000) / 0.050000);
+  uint8_t t       = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 1);
@@ -84,8 +81,7 @@ Steeringcontrola2* Steeringcontrola2::set_steering_enable_control(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 void Steeringcontrola2::set_p_steering_enable_control(
-    uint8_t* data,
-    Steering_control_a2::Steering_enable_controlType steering_enable_control) {
+    uint8_t* data, Steering_control_a2::Steering_enable_controlType steering_enable_control) {
   int x = steering_enable_control;
 
   Byte to_set(data + 0);

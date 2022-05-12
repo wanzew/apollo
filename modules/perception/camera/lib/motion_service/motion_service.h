@@ -23,20 +23,21 @@
 
 #include "Eigen/Core"
 
-#include "cyber/component/component.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/onboard/proto/motion_service.pb.h"
+#include "modules/perception/proto/motion_service.pb.h"
+
+#include "cyber/component/component.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/motion/plane_motion.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/onboard/proto/motion_service.pb.h"
-#include "modules/perception/proto/motion_service.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-typedef std::shared_ptr<apollo::drivers::Image> ImageMsgType;
+typedef std::shared_ptr<apollo::drivers::Image>             ImageMsgType;
 typedef std::shared_ptr<localization::LocalizationEstimate> LocalizationMsgType;
 
 class MotionService : public apollo::cyber::Component<> {
@@ -44,36 +45,34 @@ class MotionService : public apollo::cyber::Component<> {
   MotionService() = default;
   virtual ~MotionService() { delete vehicle_planemotion_; }
 
-  bool Init() override;
-  bool GetMotionInformation(double timestamp, base::VehicleStatus *vs);
+  bool               Init() override;
+  bool               GetMotionInformation(double timestamp, base::VehicleStatus* vs);
   base::MotionBuffer GetMotionBuffer();
-  double GetLatestTimestamp();
+  double             GetLatestTimestamp();
 
  private:
-  void OnLocalization(const LocalizationMsgType &localization);
-  void OnReceiveImage(const ImageMsgType &message,
-                      const std::string &camera_name);
+  void OnLocalization(const LocalizationMsgType& localization);
+  void OnReceiveImage(const ImageMsgType& message, const std::string& camera_name);
   void PublishEvent(const double timestamp);
-  void ConvertVehicleMotionToMsgOut(
-      base::VehicleStatus vs, apollo::perception::VehicleStatus *v_status_msg);
+  void ConvertVehicleMotionToMsgOut(base::VehicleStatus                vs,
+                                    apollo::perception::VehicleStatus* v_status_msg);
 
-  PlaneMotion *vehicle_planemotion_ = nullptr;
-  std::string device_id_;
-  double pre_azimuth = 0;  // a invalid value
-  double pre_timestamp_ = 0;
-  double pre_camera_timestamp_ = 0;
-  double camera_timestamp_ = 0;
-  bool start_flag_ = false;
-  const int motion_buffer_size_ = 100;
-  double timestamp_offset_ = 0.0;
+  PlaneMotion* vehicle_planemotion_ = nullptr;
+  std::string  device_id_;
+  double       pre_azimuth           = 0;  // a invalid value
+  double       pre_timestamp_        = 0;
+  double       pre_camera_timestamp_ = 0;
+  double       camera_timestamp_     = 0;
+  bool         start_flag_           = false;
+  const int    motion_buffer_size_   = 100;
+  double       timestamp_offset_     = 0.0;
 
   std::vector<std::string> camera_names_;  // camera sensor names
   std::vector<std::string> input_camera_channel_names_;
-  std::mutex mutex_;
+  std::mutex               mutex_;
   //   std::mutex image_mutex_;
-  std::mutex motion_mutex_;
-  std::shared_ptr<apollo::cyber::Writer<apollo::perception::Motion_Service>>
-      writer_;
+  std::mutex                                                                 motion_mutex_;
+  std::shared_ptr<apollo::cyber::Writer<apollo::perception::Motion_Service>> writer_;
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
 

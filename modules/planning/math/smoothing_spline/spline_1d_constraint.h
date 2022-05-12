@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "Eigen/Core"
+
 #include "modules/planning/math/smoothing_spline/affine_constraint.h"
 #include "modules/planning/math/smoothing_spline/spline_1d.h"
 
@@ -75,16 +76,12 @@ class Spline1dConstraint {
   bool AddPointSecondDerivativeConstraint(const double x, const double ddfx);
   bool AddPointThirdDerivativeConstraint(const double x, const double dddfx);
 
-  bool AddPointConstraintInRange(const double x, const double fx,
-                                 const double range);
-  bool AddPointDerivativeConstraintInRange(const double x, const double dfx,
-                                           const double range);
-  bool AddPointSecondDerivativeConstraintInRange(const double x,
-                                                 const double ddfx,
-                                                 const double range);
-  bool AddPointThirdDerivativeConstraintInRange(const double x,
-                                                const double dddfx,
-                                                const double range);
+  bool AddPointConstraintInRange(const double x, const double fx, const double range);
+  bool AddPointDerivativeConstraintInRange(const double x, const double dfx, const double range);
+  bool
+  AddPointSecondDerivativeConstraintInRange(const double x, const double ddfx, const double range);
+  bool
+  AddPointThirdDerivativeConstraintInRange(const double x, const double dddfx, const double range);
   // guarantee up to values are joint
   bool AddSmoothConstraint();
 
@@ -122,20 +119,21 @@ class Spline1dConstraint {
                          std::vector<double>* const filtered_lower_bound,
                          std::vector<double>* const filtered_upper_bound_x,
                          std::vector<double>* const filtered_upper_bound);
-  void GeneratePowerX(const double x, const uint32_t order,
-                      std::vector<double>* const power_x) const;
+  void
+  GeneratePowerX(const double x, const uint32_t order, std::vector<double>* const power_x) const;
 
-  using AddConstraintInRangeFunc =
-      std::function<bool(const std::vector<double>&, const std::vector<double>&,
-                         const std::vector<double>&)>;
-  bool AddConstraintInRange(AddConstraintInRangeFunc func, const double x,
-                            const double val, const double range);
+  using AddConstraintInRangeFunc = std::function<bool(
+      const std::vector<double>&, const std::vector<double>&, const std::vector<double>&)>;
+  bool AddConstraintInRange(AddConstraintInRangeFunc func,
+                            const double             x,
+                            const double             val,
+                            const double             range);
 
  private:
-  AffineConstraint inequality_constraint_;
-  AffineConstraint equality_constraint_;
+  AffineConstraint    inequality_constraint_;
+  AffineConstraint    equality_constraint_;
   std::vector<double> x_knots_;
-  uint32_t spline_order_;
+  uint32_t            spline_order_;
 };
 
 }  // namespace planning

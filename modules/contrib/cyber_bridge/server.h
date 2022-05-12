@@ -9,6 +9,7 @@
 #include <unordered_set>
 
 #include "boost/asio.hpp"
+
 #include "modules/contrib/cyber_bridge/clients.h"
 
 class Node;
@@ -21,7 +22,7 @@ class Server : public std::enable_shared_from_this<Server> {
   void run();
 
  private:
-  Node& node;
+  Node&   node;
   Clients clients;
 
   boost::asio::io_service io;
@@ -29,7 +30,7 @@ class Server : public std::enable_shared_from_this<Server> {
 
   boost::asio::ip::tcp::endpoint endpoint;
   boost::asio::ip::tcp::acceptor acceptor;
-  boost::asio::ip::tcp::socket socket;
+  boost::asio::ip::tcp::socket   socket;
 
   void stop(const boost::system::error_code& error, int signal_number);
 

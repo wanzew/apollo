@@ -17,6 +17,7 @@
 #include "modules/perception/lib/thread/thread_worker.h"
 
 #include <thread>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -24,7 +25,7 @@ namespace perception {
 namespace lib {
 
 TEST(ThreadWorkerTest, ThreadWorkerTest1) {
-  int count = 0;
+  int          count = 0;
   ThreadWorker worker;
   worker.Bind([&]() {
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -41,7 +42,7 @@ TEST(ThreadWorkerTest, ThreadWorkerTest1) {
 }
 
 TEST(ThreadWorkerTest, ThreadWorkerTest2) {
-  int count = 0;
+  int          count = 0;
   ThreadWorker worker;
   worker.Bind([&]() {
     ++count;

@@ -28,7 +28,8 @@ namespace fusion {
 
 class BaseShapeFusion {
  public:
-  explicit BaseShapeFusion(TrackPtr track) : track_ref_(track) {}
+  explicit BaseShapeFusion(TrackPtr track)
+      : track_ref_(track) {}
   virtual ~BaseShapeFusion() {}
   BaseShapeFusion(const BaseShapeFusion&) = delete;
   BaseShapeFusion& operator=(const BaseShapeFusion&) = delete;
@@ -39,11 +40,11 @@ class BaseShapeFusion {
   // @param [in]: measurement
   // @param [in]: target_timestamp
   virtual void UpdateWithMeasurement(const SensorObjectPtr measurement,
-                                     double target_timestamp) = 0;
+                                     double                target_timestamp) = 0;
 
   virtual void UpdateWithoutMeasurement(const std::string& sensor_id,
-                                        double measurement_timestamp,
-                                        double target_timestamp) = 0;
+                                        double             measurement_timestamp,
+                                        double             target_timestamp) = 0;
 
   virtual std::string Name() const = 0;
 

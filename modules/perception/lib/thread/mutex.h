@@ -33,8 +33,8 @@ class Mutex {
 
   inline bool TryLock() { return pthread_mutex_trylock(&mu_) == 0; }
 
-  Mutex(const Mutex &) = delete;
-  Mutex &operator=(const Mutex &) = delete;
+  Mutex(const Mutex&) = delete;
+  Mutex& operator=(const Mutex&) = delete;
 
  private:
   friend class CondVar;
@@ -43,14 +43,17 @@ class Mutex {
 
 class MutexLock {
  public:
-  explicit MutexLock(Mutex *mu) : mu_(mu) { mu_->Lock(); }
+  explicit MutexLock(Mutex* mu)
+      : mu_(mu) {
+    mu_->Lock();
+  }
   ~MutexLock() { mu_->Unlock(); }
 
-  MutexLock(const MutexLock &) = delete;
-  MutexLock &operator=(const MutexLock &) = delete;
+  MutexLock(const MutexLock&) = delete;
+  MutexLock& operator=(const MutexLock&) = delete;
 
  private:
-  Mutex *const mu_;
+  Mutex* const mu_;
 };
 
 // Wrapper for pthread_cond_t
@@ -59,14 +62,14 @@ class CondVar {
   CondVar() { pthread_cond_init(&cv_, nullptr); }
   ~CondVar() { pthread_cond_destroy(&cv_); }
 
-  void Wait(Mutex *mu) { pthread_cond_wait(&cv_, &mu->mu_); }
+  void Wait(Mutex* mu) { pthread_cond_wait(&cv_, &mu->mu_); }
 
   void Signal() { pthread_cond_signal(&cv_); }
 
   void Signalall() { pthread_cond_broadcast(&cv_); }
 
-  CondVar(const CondVar &) = delete;
-  CondVar &operator=(const CondVar &) = delete;
+  CondVar(const CondVar&) = delete;
+  CondVar& operator=(const CondVar&) = delete;
 
  private:
   pthread_cond_t cv_;
@@ -74,15 +77,14 @@ class CondVar {
 
 class BlockingCounter {
  public:
-  explicit BlockingCounter(size_t cnt) : counter_(cnt) {}
+  explicit BlockingCounter(size_t cnt)
+      : counter_(cnt) {}
 
   bool Decrement() {
     MutexLock lock(&mutex_);
     --counter_;
 
-    if (counter_ == 0u) {
-      cond_.Signalall();
-    }
+    if (counter_ == 0u) { cond_.Signalall(); }
 
     return counter_ == 0u;
   }
@@ -100,13 +102,13 @@ class BlockingCounter {
     }
   }
 
-  BlockingCounter(const BlockingCounter &) = delete;
-  BlockingCounter &operator=(const BlockingCounter &) = delete;
+  BlockingCounter(const BlockingCounter&) = delete;
+  BlockingCounter& operator=(const BlockingCounter&) = delete;
 
  private:
-  Mutex mutex_;
+  Mutex   mutex_;
   CondVar cond_;
-  size_t counter_;
+  size_t  counter_;
 };
 
 class RwMutex {
@@ -119,8 +121,8 @@ class RwMutex {
 
   inline void Unlock() { pthread_rwlock_unlock(&mu_); }
 
-  RwMutex(const RwMutex &) = delete;
-  RwMutex &operator=(const RwMutex &) = delete;
+  RwMutex(const RwMutex&) = delete;
+  RwMutex& operator=(const RwMutex&) = delete;
 
  private:
   pthread_rwlock_t mu_;
@@ -128,26 +130,32 @@ class RwMutex {
 
 class ReaderMutexLock {
  public:
-  explicit ReaderMutexLock(RwMutex *mu) : mu_(mu) { mu_->ReaderLock(); }
+  explicit ReaderMutexLock(RwMutex* mu)
+      : mu_(mu) {
+    mu_->ReaderLock();
+  }
   ~ReaderMutexLock() { mu_->Unlock(); }
 
-  ReaderMutexLock(const ReaderMutexLock &) = delete;
-  ReaderMutexLock &operator=(const ReaderMutexLock &) = delete;
+  ReaderMutexLock(const ReaderMutexLock&) = delete;
+  ReaderMutexLock& operator=(const ReaderMutexLock&) = delete;
 
  private:
-  RwMutex *mu_ = nullptr;
+  RwMutex* mu_ = nullptr;
 };
 
 class WriterMutexLock {
  public:
-  explicit WriterMutexLock(RwMutex *mu) : mu_(mu) { mu_->WriterLock(); }
+  explicit WriterMutexLock(RwMutex* mu)
+      : mu_(mu) {
+    mu_->WriterLock();
+  }
   ~WriterMutexLock() { mu_->Unlock(); }
 
-  WriterMutexLock(const WriterMutexLock &) = delete;
-  WriterMutexLock &operator=(const WriterMutexLock &) = delete;
+  WriterMutexLock(const WriterMutexLock&) = delete;
+  WriterMutexLock& operator=(const WriterMutexLock&) = delete;
 
  private:
-  RwMutex *mu_ = nullptr;
+  RwMutex* mu_ = nullptr;
 };
 
 }  // namespace lib

@@ -16,9 +16,10 @@
 
 #include "modules/planning/scenarios/emergency/emergency_stop/stage_approach.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
@@ -33,15 +34,14 @@ class StageApproachTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StageApproachTest, Init) {
   EmergencyStopStageApproach emergency_stop_stage_approach(config_, injector_);
-  EXPECT_EQ(
-      emergency_stop_stage_approach.Name(),
-      ScenarioConfig::StageType_Name(ScenarioConfig::EMERGENCY_STOP_APPROACH));
+  EXPECT_EQ(emergency_stop_stage_approach.Name(),
+            ScenarioConfig::StageType_Name(ScenarioConfig::EMERGENCY_STOP_APPROACH));
 }
 
 }  // namespace emergency_stop

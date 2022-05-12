@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Throttlecommand100 : public ::apollo::drivers::canbus::ProtocolData<
-                               ::apollo::canbus::ChassisDetail> {
+class Throttlecommand100
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -57,8 +58,8 @@ class Throttlecommand100 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Throttlecommand100* set_throttle_en_ctrl(
-      Throttle_command_100::Throttle_en_ctrlType throttle_en_ctrl);
+  Throttlecommand100*
+  set_throttle_en_ctrl(Throttle_command_100::Throttle_en_ctrlType throttle_en_ctrl);
 
  private:
   // config detail: {'name': 'Throttle_Acc', 'offset': 0.0, 'precision': 0.01,
@@ -82,14 +83,13 @@ class Throttlecommand100 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_throttle_en_ctrl(
-      uint8_t* data,
-      Throttle_command_100::Throttle_en_ctrlType throttle_en_ctrl);
+  void set_p_throttle_en_ctrl(uint8_t*                                   data,
+                              Throttle_command_100::Throttle_en_ctrlType throttle_en_ctrl);
 
  private:
-  double throttle_acc_;
-  int checksum_100_;
-  double throttle_pedal_target_;
+  double                                     throttle_acc_;
+  int                                        checksum_100_;
+  double                                     throttle_pedal_target_;
   Throttle_command_100::Throttle_en_ctrlType throttle_en_ctrl_;
 };
 

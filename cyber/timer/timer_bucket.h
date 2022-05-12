@@ -33,11 +33,11 @@ class TimerBucket {
     task_list_.push_back(task);
   }
 
-  std::mutex& mutex() { return mutex_; }
+  std::mutex&                          mutex() { return mutex_; }
   std::list<std::weak_ptr<TimerTask>>& task_list() { return task_list_; }
 
  private:
-  std::mutex mutex_;
+  std::mutex                          mutex_;
   std::list<std::weak_ptr<TimerTask>> task_list_;
 };
 

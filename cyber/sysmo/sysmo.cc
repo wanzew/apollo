@@ -34,14 +34,10 @@ void SysMo::Start() {
 }
 
 void SysMo::Shutdown() {
-  if (!start_ || shut_down_.exchange(true)) {
-    return;
-  }
+  if (!start_ || shut_down_.exchange(true)) { return; }
 
   cv_.notify_all();
-  if (sysmo_.joinable()) {
-    sysmo_.join();
-  }
+  if (sysmo_.joinable()) { sysmo_.join(); }
 }
 
 void SysMo::Checker() {

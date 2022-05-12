@@ -16,9 +16,10 @@
 
 #include "modules/canbus/vehicle/neolix_edu/protocol/aeb_diagresp_718.h"
 
+#include "gtest/gtest.h"
+
 #include "glog/logging.h"
 
-#include "gtest/gtest.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
@@ -31,9 +32,9 @@ class Aebdiagresp718Test : public ::testing::Test {
 };
 
 TEST_F(Aebdiagresp718Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t        data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  int32_t        length  = 8;
+  ChassisDetail  cd;
   Aebdiagresp718 accel_cmd;
   accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b01100111);

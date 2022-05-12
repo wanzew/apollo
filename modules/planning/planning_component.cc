@@ -48,11 +48,9 @@ bool PlanningComponent::Init() {
   }
 
   ACHECK(ComponentBase::GetProtoConfig(&config_))
-      << "failed to load planning config file "
-      << ComponentBase::ConfigFilePath();
+      << "failed to load planning config file " << ComponentBase::ConfigFilePath();
 
-  if (FLAGS_planning_offline_learning ||
-      config_.learning_mode() != PlanningConfig::NO_LEARNING) {
+  if (FLAGS_planning_offline_learning || config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     if (!message_process_.Init(config_, injector_)) {
       AERROR << "failed to init MessageProcess";
       return false;
@@ -61,14 +59,14 @@ bool PlanningComponent::Init() {
 
   planning_base_->Init(config_);
 
-  routing_reader_ = node_->CreateReader<RoutingResponse>(
-      config_.topic_config().routing_response_topic(),
-      [this](const std::shared_ptr<RoutingResponse>& routing) {
-        AINFO << "Received routing data: run routing callback."
-              << routing->header().DebugString();
-        std::lock_guard<std::mutex> lock(mutex_);
-        routing_.CopyFrom(*routing);
-      });
+  routing_reader_ =
+      node_->CreateReader<RoutingResponse>(config_.topic_config().routing_response_topic(),
+                                           [this](const std::shared_ptr<RoutingResponse>& routing) {
+                                             AINFO << "Received routing data: run routing callback."
+                                                   << routing->header().DebugString();
+                                             std::lock_guard<std::mutex> lock(mutex_);
+                                             routing_.CopyFrom(*routing);
+                                           });
 
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
       config_.topic_config().traffic_light_detection_topic(),
@@ -78,13 +76,13 @@ bool PlanningComponent::Init() {
         traffic_light_.CopyFrom(*traffic_light);
       });
 
-  pad_msg_reader_ = node_->CreateReader<PadMessage>(
-      config_.topic_config().planning_pad_topic(),
-      [this](const std::shared_ptr<PadMessage>& pad_msg) {
-        ADEBUG << "Received pad data: run pad callback.";
-        std::lock_guard<std::mutex> lock(mutex_);
-        pad_msg_.CopyFrom(*pad_msg);
-      });
+  pad_msg_reader_ =
+      node_->CreateReader<PadMessage>(config_.topic_config().planning_pad_topic(),
+                                      [this](const std::shared_ptr<PadMessage>& pad_msg) {
+                                        ADEBUG << "Received pad data: run pad callback.";
+                                        std::lock_guard<std::mutex> lock(mutex_);
+                                        pad_msg_.CopyFrom(*pad_msg);
+                                      });
 
   story_telling_reader_ = node_->CreateReader<Stories>(
       config_.topic_config().story_telling_topic(),
@@ -103,11 +101,11 @@ bool PlanningComponent::Init() {
           relative_map_.CopyFrom(*map_message);
         });
   }
-  planning_writer_ = node_->CreateWriter<ADCTrajectory>(
-      config_.topic_config().planning_trajectory_topic());
+  planning_writer_ =
+      node_->CreateWriter<ADCTrajectory>(config_.topic_config().planning_trajectory_topic());
 
-  rerouting_writer_ = node_->CreateWriter<RoutingRequest>(
-      config_.topic_config().routing_request_topic());
+  rerouting_writer_ =
+      node_->CreateWriter<RoutingRequest>(config_.topic_config().routing_request_topic());
 
   planning_learning_data_writer_ = node_->CreateWriter<PlanningLearningData>(
       config_.topic_config().planning_learning_data_topic());
@@ -116,33 +114,28 @@ bool PlanningComponent::Init() {
 }
 
 bool PlanningComponent::Proc(
-    const std::shared_ptr<prediction::PredictionObstacles>&
-        prediction_obstacles,
-    const std::shared_ptr<canbus::Chassis>& chassis,
-    const std::shared_ptr<localization::LocalizationEstimate>&
-        localization_estimate) {
+    const std::shared_ptr<prediction::PredictionObstacles>&    prediction_obstacles,
+    const std::shared_ptr<canbus::Chassis>&                    chassis,
+    const std::shared_ptr<localization::LocalizationEstimate>& localization_estimate) {
   ACHECK(prediction_obstacles != nullptr);
 
   // check and process possible rerouting request
   CheckRerouting();
 
   // process fused input data
-  local_view_.prediction_obstacles = prediction_obstacles;
-  local_view_.chassis = chassis;
+  local_view_.prediction_obstacles  = prediction_obstacles;
+  local_view_.chassis               = chassis;
   local_view_.localization_estimate = localization_estimate;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (!local_view_.routing ||
-        hdmap::PncMap::IsNewRouting(*local_view_.routing, routing_)) {
-      local_view_.routing =
-          std::make_shared<routing::RoutingResponse>(routing_);
+    if (!local_view_.routing || hdmap::PncMap::IsNewRouting(*local_view_.routing, routing_)) {
+      local_view_.routing = std::make_shared<routing::RoutingResponse>(routing_);
     }
   }
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    local_view_.traffic_light =
-        std::make_shared<TrafficLightDetection>(traffic_light_);
-    local_view_.relative_map = std::make_shared<MapMsg>(relative_map_);
+    local_view_.traffic_light = std::make_shared<TrafficLightDetection>(traffic_light_);
+    local_view_.relative_map  = std::make_shared<MapMsg>(relative_map_);
   }
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -171,11 +164,10 @@ bool PlanningComponent::Proc(
   // publish learning data frame for RL test
   if (config_.learning_mode() == PlanningConfig::RL_TEST) {
     PlanningLearningData planning_learning_data;
-    LearningDataFrame* learning_data_frame =
+    LearningDataFrame*   learning_data_frame =
         injector_->learning_based_data()->GetLatestLearningDataFrame();
     if (learning_data_frame) {
-      planning_learning_data.mutable_learning_data_frame()
-                            ->CopyFrom(*learning_data_frame);
+      planning_learning_data.mutable_learning_data_frame()->CopyFrom(*learning_data_frame);
       common::util::FillHeader(node_->Name(), &planning_learning_data);
       planning_learning_data_writer_->Write(planning_learning_data);
     } else {
@@ -190,8 +182,8 @@ bool PlanningComponent::Proc(
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
   // modify trajectory relative time due to the timestamp change in header
-  auto start_time = adc_trajectory_pb.header().timestamp_sec();
-  const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
+  auto         start_time = adc_trajectory_pb.header().timestamp_sec();
+  const double dt         = start_time - adc_trajectory_pb.header().timestamp_sec();
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
   }
@@ -205,12 +197,8 @@ bool PlanningComponent::Proc(
 }
 
 void PlanningComponent::CheckRerouting() {
-  auto* rerouting = injector_->planning_context()
-                        ->mutable_planning_status()
-                        ->mutable_rerouting();
-  if (!rerouting->need_rerouting()) {
-    return;
-  }
+  auto* rerouting = injector_->planning_context()->mutable_planning_status()->mutable_rerouting();
+  if (!rerouting->need_rerouting()) { return; }
   common::util::FillHeader(node_->Name(), rerouting->mutable_routing_request());
   rerouting->set_need_rerouting(false);
   rerouting_writer_->Write(rerouting->routing_request());
@@ -218,9 +206,7 @@ void PlanningComponent::CheckRerouting() {
 
 bool PlanningComponent::CheckInput() {
   ADCTrajectory trajectory_pb;
-  auto* not_ready = trajectory_pb.mutable_decision()
-                        ->mutable_main_decision()
-                        ->mutable_not_ready();
+  auto* not_ready = trajectory_pb.mutable_decision()->mutable_main_decision()->mutable_not_ready();
 
   if (local_view_.localization_estimate == nullptr) {
     not_ready->set_reason("localization not ready");
@@ -237,9 +223,7 @@ bool PlanningComponent::CheckInput() {
       not_ready->set_reason("relative map not ready");
     }
   } else {
-    if (!local_view_.routing->has_header()) {
-      not_ready->set_reason("routing not ready");
-    }
+    if (!local_view_.routing->has_header()) { not_ready->set_reason("routing not ready"); }
   }
 
   if (not_ready->has_reason()) {

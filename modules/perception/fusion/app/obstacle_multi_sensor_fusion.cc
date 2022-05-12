@@ -19,14 +19,12 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-bool ObstacleMultiSensorFusion::Init(
-    const ObstacleMultiSensorFusionParam& param) {
+bool ObstacleMultiSensorFusion::Init(const ObstacleMultiSensorFusionParam& param) {
   if (fusion_ != nullptr) {
     AINFO << "Already inited";
     return true;
   }
-  BaseFusionSystem* fusion =
-          BaseFusionSystemRegisterer::GetInstanceByName(param.fusion_method);
+  BaseFusionSystem* fusion = BaseFusionSystemRegisterer::GetInstanceByName(param.fusion_method);
   fusion_.reset(fusion);
 
   FusionInitOptions init_options;
@@ -38,7 +36,7 @@ bool ObstacleMultiSensorFusion::Init(
   return true;
 }
 
-bool ObstacleMultiSensorFusion::Process(const base::FrameConstPtr& frame,
+bool ObstacleMultiSensorFusion::Process(const base::FrameConstPtr&    frame,
                                         std::vector<base::ObjectPtr>* objects) {
   FusionOptions options;
   return fusion_->Fuse(options, frame, objects);

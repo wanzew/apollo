@@ -26,11 +26,11 @@ class VideoImagesDialog : public QDialog {
   Q_OBJECT
 
  public:
-  explicit VideoImagesDialog(QWidget *parent = nullptr);
+  explicit VideoImagesDialog(QWidget* parent = nullptr);
   ~VideoImagesDialog();
 
   int count(void) const;
 
  private:
-  Ui::VideoImagesDialog *ui;
+  Ui::VideoImagesDialog* ui;
 };

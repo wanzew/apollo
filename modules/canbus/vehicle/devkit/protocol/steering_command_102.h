@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
-                               ::apollo::canbus::ChassisDetail> {
+class Steeringcommand102
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -40,8 +41,7 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
   // 'STEER_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
   // 'Steer_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  Steeringcommand102* set_steer_en_ctrl(
-      Steering_command_102::Steer_en_ctrlType steer_en_ctrl);
+  Steeringcommand102* set_steer_en_ctrl(Steering_command_102::Steer_en_ctrlType steer_en_ctrl);
 
   // config detail: {'bit': 31, 'is_signed_var': False, 'len': 16, 'name':
   // 'Steer_ANGLE_Target', 'offset': -500.0, 'order': 'motorola',
@@ -64,8 +64,7 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
   // 'STEER_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
   // 'Steer_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  void set_p_steer_en_ctrl(
-      uint8_t* data, Steering_command_102::Steer_en_ctrlType steer_en_ctrl);
+  void set_p_steer_en_ctrl(uint8_t* data, Steering_command_102::Steer_en_ctrlType steer_en_ctrl);
 
   // config detail: {'bit': 31, 'is_signed_var': False, 'len': 16, 'name':
   // 'Steer_ANGLE_Target', 'offset': -500.0, 'order': 'motorola',
@@ -85,9 +84,9 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   Steering_command_102::Steer_en_ctrlType steer_en_ctrl_;
-  int steer_angle_target_;
-  int steer_angle_spd_;
-  int checksum_102_;
+  int                                     steer_angle_target_;
+  int                                     steer_angle_spd_;
+  int                                     checksum_102_;
 };
 
 }  // namespace devkit

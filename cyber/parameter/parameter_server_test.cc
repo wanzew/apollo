@@ -43,13 +43,11 @@ class ParameterServerTest : public ::testing::Test {
   virtual void TearDown() { ps_.reset(); }
 
  protected:
-  std::shared_ptr<Node> node_;
+  std::shared_ptr<Node>            node_;
   std::unique_ptr<ParameterServer> ps_;
 };
 
-TEST_F(ParameterServerTest, set_parameter) {
-  ps_->SetParameter(Parameter("int", 1));
-}
+TEST_F(ParameterServerTest, set_parameter) { ps_->SetParameter(Parameter("int", 1)); }
 
 TEST_F(ParameterServerTest, get_parameter) {
   ps_->SetParameter(Parameter("int", 1));

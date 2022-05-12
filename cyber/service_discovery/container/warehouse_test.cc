@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "gtest/gtest.h"
+
 #include "cyber/service_discovery/container/multi_value_warehouse.h"
 #include "cyber/service_discovery/container/single_value_warehouse.h"
-
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {
@@ -27,7 +27,8 @@ using proto::RoleAttributes;
 
 class WarehouseTest : public ::testing::Test {
  protected:
-  WarehouseTest() : key_num_(256) {}
+  WarehouseTest()
+      : key_num_(256) {}
 
   virtual ~WarehouseTest() {}
 
@@ -41,9 +42,9 @@ class WarehouseTest : public ::testing::Test {
     multi_.Clear();
   }
 
-  int key_num_;
+  int                  key_num_;
   SingleValueWarehouse single_;
-  MultiValueWarehouse multi_;
+  MultiValueWarehouse  multi_;
 
  private:
   void FillSingle() {

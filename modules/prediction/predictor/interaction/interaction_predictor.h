@@ -47,40 +47,40 @@ class InteractionPredictor : public SequencePredictor {
    * @return If predicted successfully
    */
   bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
-               Obstacle* obstacle,
-               ObstaclesContainer* obstacles_container) override;
+               Obstacle*                     obstacle,
+               ObstaclesContainer*           obstacles_container) override;
 
  private:
   void Clear();
 
-  void BuildADCTrajectory(
-      const ADCTrajectoryContainer* adc_trajectory_container,
-      const double time_resolution);
+  void BuildADCTrajectory(const ADCTrajectoryContainer* adc_trajectory_container,
+                          const double                  time_resolution);
 
-  bool DrawTrajectory(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double lon_acceleration, const double total_time,
-      const double period,
-      std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
+  bool DrawTrajectory(const Obstacle&                               obstacle,
+                      const LaneSequence&                           lane_sequence,
+                      const double                                  lon_acceleration,
+                      const double                                  total_time,
+                      const double                                  period,
+                      std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
 
-  double ComputeTrajectoryCost(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double acceleration,
-      const ADCTrajectoryContainer* adc_trajectory_container);
+  double ComputeTrajectoryCost(const Obstacle&               obstacle,
+                               const LaneSequence&           lane_sequence,
+                               const double                  acceleration,
+                               const ADCTrajectoryContainer* adc_trajectory_container);
 
   double LongitudinalAccelerationCost(const double acceleration);
 
   double CentripetalAccelerationCost(const LaneSequence& lane_sequence,
-                                     const double speed,
-                                     const double acceleration);
+                                     const double        speed,
+                                     const double        acceleration);
 
   double CollisionWithEgoVehicleCost(const LaneSequence& lane_sequence,
-                                     const double speed,
-                                     const double acceleration);
+                                     const double        speed,
+                                     const double        acceleration);
 
-  bool LowerRightOfWayThanEgo(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const ADCTrajectoryContainer* adc_trajectory_container);
+  bool LowerRightOfWayThanEgo(const Obstacle&               obstacle,
+                              const LaneSequence&           lane_sequence,
+                              const ADCTrajectoryContainer* adc_trajectory_container);
 
   double ComputeLikelihood(const double cost);
 

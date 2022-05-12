@@ -35,10 +35,11 @@ class QosProfileConf {
   QosProfileConf();
   virtual ~QosProfileConf();
 
-  static QosProfile CreateQosProfile(const QosHistoryPolicy& history,
-                                     uint32_t depth, uint32_t mps,
+  static QosProfile CreateQosProfile(const QosHistoryPolicy&     history,
+                                     uint32_t                    depth,
+                                     uint32_t                    mps,
                                      const QosReliabilityPolicy& reliability,
-                                     const QosDurabilityPolicy& durability);
+                                     const QosDurabilityPolicy&  durability);
 
   static const uint32_t QOS_HISTORY_DEPTH_SYSTEM_DEFAULT;
   static const uint32_t QOS_MPS_SYSTEM_DEFAULT;

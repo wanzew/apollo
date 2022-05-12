@@ -26,7 +26,9 @@
 #include <vector>
 
 #include "Eigen/Dense"
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/dependency_injector.h"
@@ -41,7 +43,7 @@ namespace apollo {
 namespace planning {
 class OpenSpaceFallbackDecider : public Decider {
  public:
-  OpenSpaceFallbackDecider(const TaskConfig& config,
+  OpenSpaceFallbackDecider(const TaskConfig&                          config,
                            const std::shared_ptr<DependencyInjector>& injector);
 
  private:
@@ -49,18 +51,17 @@ class OpenSpaceFallbackDecider : public Decider {
 
   // bool IsCollisionFreeTrajectory(const ADCTrajectory& trajectory_pb);
 
-  void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles,
-                                 std::vector<std::vector<common::math::Box2d>>&
-                                     predicted_bounding_rectangles);
+  void BuildPredictedEnvironment(
+      const std::vector<const Obstacle*>&            obstacles,
+      std::vector<std::vector<common::math::Box2d>>& predicted_bounding_rectangles);
 
   bool IsCollisionFreeTrajectory(
-      const TrajGearPair& trajectory_pb,
-      const std::vector<std::vector<common::math::Box2d>>&
-          predicted_bounding_rectangles,
-      size_t* current_idx, size_t* first_collision_idx);
+      const TrajGearPair&                                  trajectory_pb,
+      const std::vector<std::vector<common::math::Box2d>>& predicted_bounding_rectangles,
+      size_t*                                              current_idx,
+      size_t*                                              first_collision_idx);
 
-  bool QuardraticFormulaLowerSolution(const double a, const double b,
-                                      const double c, double* sol);
+  bool QuardraticFormulaLowerSolution(const double a, const double b, const double c, double* sol);
 };
 
 }  // namespace planning

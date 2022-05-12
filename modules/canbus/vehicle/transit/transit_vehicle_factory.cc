@@ -24,8 +24,7 @@
 namespace apollo {
 namespace canbus {
 
-std::unique_ptr<VehicleController>
-TransitVehicleFactory::CreateVehicleController() {
+std::unique_ptr<VehicleController> TransitVehicleFactory::CreateVehicleController() {
   return std::unique_ptr<VehicleController>(new transit::TransitController());
 }
 

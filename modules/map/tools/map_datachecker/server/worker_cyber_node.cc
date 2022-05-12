@@ -27,8 +27,8 @@ constexpr double kDEGRESS_TO_RADIANS = M_PI / 180.0;
 namespace apollo {
 namespace hdmap {
 
-MapDataCheckerCyberNode::MapDataCheckerCyberNode(
-    std::shared_ptr<MapDataCheckerAgent> agent, bool *init_success) {
+MapDataCheckerCyberNode::MapDataCheckerCyberNode(std::shared_ptr<MapDataCheckerAgent> agent,
+                                                 bool* init_success) {
   if (!agent) {
     AFATAL << "MapDataCheckerAgent pointer is nullptr";
     *init_success = false;
@@ -36,7 +36,7 @@ MapDataCheckerCyberNode::MapDataCheckerCyberNode(
   }
 
   agent_ = agent->GetWorkerAgent();
-  node_ = apollo::cyber::CreateNode(std::string("cybernode_map_datachecker"));
+  node_  = apollo::cyber::CreateNode(std::string("cybernode_map_datachecker"));
   if (!node_) {
     AFATAL << "Create cybertron node failed.";
     *init_success = false;
@@ -53,8 +53,7 @@ MapDataCheckerCyberNode::MapDataCheckerCyberNode(
 int MapDataCheckerCyberNode::CreateChannelSubscriber() {
   AINFO << "create bestgnsspos reader, topic: " << FLAGS_topic_bestgnsspos;
   bestgnsspos_reader_ = node_->CreateReader<GnssBestPose_t>(
-      FLAGS_topic_bestgnsspos,
-      [this](const std::shared_ptr<const GnssBestPose_t> &msg) {
+      FLAGS_topic_bestgnsspos, [this](const std::shared_ptr<const GnssBestPose_t>& msg) {
         agent_->GetSpPoseCollectionAgent()->OnBestgnssposCallback(msg);
       });
   if (!bestgnsspos_reader_) {

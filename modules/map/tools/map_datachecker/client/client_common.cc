@@ -27,8 +27,8 @@ namespace apollo {
 namespace hdmap {
 
 std::vector<std::string> GetFileLines(const std::string& path) {
-  std::ifstream file_handler(path);
-  std::string line;
+  std::ifstream            file_handler(path);
+  std::string              line;
   std::vector<std::string> lines;
   while (std::getline(file_handler, line)) {
     lines.emplace_back(line);

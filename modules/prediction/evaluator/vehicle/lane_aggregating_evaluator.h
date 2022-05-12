@@ -54,8 +54,7 @@ class LaneAggregatingEvaluator : public Evaluator {
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
-                ObstaclesContainer* obstacles_container) override;
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Get the name of evaluator.
@@ -68,30 +67,25 @@ class LaneAggregatingEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        A vector of doubles to be filled up with extracted features
    */
-  bool ExtractObstacleFeatures(const Obstacle* obstacle_ptr,
-                               std::vector<double>* feature_values);
+  bool ExtractObstacleFeatures(const Obstacle* obstacle_ptr, std::vector<double>* feature_values);
 
   /**
    * @brief Set lane feature vector
    * @param Obstacle pointer
    *        A vector of doubles to be filled up with extracted features
    */
-  bool ExtractStaticEnvFeatures(
-      const Obstacle* obstacle_ptr, const LaneGraph* lane_graph_ptr,
-      std::vector<std::vector<double>>* feature_values,
-      std::vector<int>* lane_sequence_idx_to_remove);
+  bool ExtractStaticEnvFeatures(const Obstacle*                   obstacle_ptr,
+                                const LaneGraph*                  lane_graph_ptr,
+                                std::vector<std::vector<double>>* feature_values,
+                                std::vector<int>*                 lane_sequence_idx_to_remove);
 
-  torch::Tensor AggregateLaneEncodings(
-      const std::vector<torch::Tensor>& lane_encoding_list);
+  torch::Tensor AggregateLaneEncodings(const std::vector<torch::Tensor>& lane_encoding_list);
 
-  torch::Tensor LaneEncodingMaxPooling(
-      const std::vector<torch::Tensor>& lane_encoding_list);
+  torch::Tensor LaneEncodingMaxPooling(const std::vector<torch::Tensor>& lane_encoding_list);
 
-  torch::Tensor LaneEncodingAvgPooling(
-      const std::vector<torch::Tensor>& lane_encoding_list);
+  torch::Tensor LaneEncodingAvgPooling(const std::vector<torch::Tensor>& lane_encoding_list);
 
-  std::vector<double> StableSoftmax(
-      const std::vector<double>& prediction_scores);
+  std::vector<double> StableSoftmax(const std::vector<double>& prediction_scores);
 
   void LoadModel();
 
@@ -99,16 +93,16 @@ class LaneAggregatingEvaluator : public Evaluator {
   torch::jit::script::Module torch_obstacle_encoding_;
   torch::jit::script::Module torch_lane_encoding_;
   torch::jit::script::Module torch_prediction_layer_;
-  torch::Device device_;
+  torch::Device              device_;
 
-  static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;
-  static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
-  static const size_t LANE_POINTS_SIZE = 100;          // 50m
-  static const size_t BACKWARD_LANE_POINTS_SIZE = 50;  // 25m
+  static const size_t OBSTACLE_FEATURE_SIZE     = 20 * 9;
+  static const size_t SINGLE_LANE_FEATURE_SIZE  = 4;
+  static const size_t LANE_POINTS_SIZE          = 100;  // 50m
+  static const size_t BACKWARD_LANE_POINTS_SIZE = 50;   // 25m
 
-  static const size_t OBSTACLE_ENCODING_SIZE = 128;
+  static const size_t OBSTACLE_ENCODING_SIZE    = 128;
   static const size_t SINGLE_LANE_ENCODING_SIZE = 128;
-  static const size_t AGGREGATED_ENCODING_SIZE = 256;
+  static const size_t AGGREGATED_ENCODING_SIZE  = 256;
 };
 
 }  // namespace prediction

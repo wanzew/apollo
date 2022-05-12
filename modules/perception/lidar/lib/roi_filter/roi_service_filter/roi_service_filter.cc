@@ -24,8 +24,8 @@ namespace perception {
 namespace lidar {
 
 bool ROIServiceFilter::Init(const ROIFilterInitOptions& options) {
-  roi_service_ = std::dynamic_pointer_cast<ROIService>(
-      SceneManager::Instance().Service("ROIService"));
+  roi_service_ =
+      std::dynamic_pointer_cast<ROIService>(SceneManager::Instance().Service("ROIService"));
   if (roi_service_ == nullptr) {
     AERROR << "ROi service is nullptr, Init scene manager first !";
     return false;
@@ -33,8 +33,7 @@ bool ROIServiceFilter::Init(const ROIFilterInitOptions& options) {
   return true;
 }
 
-bool ROIServiceFilter::Filter(const ROIFilterOptions& options,
-                              LidarFrame* frame) {
+bool ROIServiceFilter::Filter(const ROIFilterOptions& options, LidarFrame* frame) {
   if (frame == nullptr || frame->world_cloud == nullptr) {
     AERROR << "Frame is nullptr.";
     return false;
@@ -48,12 +47,11 @@ bool ROIServiceFilter::Filter(const ROIFilterOptions& options,
   frame->roi_indices.indices.clear();
   frame->roi_indices.indices.reserve(frame->world_cloud->size());
   for (size_t i = 0; i < frame->world_cloud->size(); ++i) {
-    auto& pt = frame->world_cloud->at(i);
+    auto&           pt = frame->world_cloud->at(i);
     Eigen::Vector3d world_point(pt.x, pt.y, pt.z);
     if (roi_service_->QueryIsPointInROI(world_point, roi_service_content_)) {
       frame->roi_indices.indices.push_back(static_cast<int>(i));
-      frame->cloud->mutable_points_label()->at(i) =
-          static_cast<uint8_t>(LidarPointLabel::ROI);
+      frame->cloud->mutable_points_label()->at(i) = static_cast<uint8_t>(LidarPointLabel::ROI);
     }
   }
   return true;

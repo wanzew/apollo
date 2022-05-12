@@ -38,15 +38,14 @@ class ThreadPool {
   explicit ThreadPool(std::size_t thread_num, std::size_t max_task_num = 1000);
 
   template <typename F, typename... Args>
-  auto Enqueue(F&& f, Args&&... args)
-      -> std::future<typename std::result_of<F(Args...)>::type>;
+  auto Enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
 
   ~ThreadPool();
 
  private:
-  std::vector<std::thread> workers_;
+  std::vector<std::thread>            workers_;
   BoundedQueue<std::function<void()>> task_queue_;
-  std::atomic_bool stop_;
+  std::atomic_bool                    stop_;
 };
 
 inline ThreadPool::ThreadPool(std::size_t threads, std::size_t max_task_num)
@@ -59,9 +58,7 @@ inline ThreadPool::ThreadPool(std::size_t threads, std::size_t max_task_num)
     workers_.emplace_back([this] {
       while (!stop_) {
         std::function<void()> task;
-        if (task_queue_.WaitDequeue(&task)) {
-          task();
-        }
+        if (task_queue_.WaitDequeue(&task)) { task(); }
       }
     });
   }
@@ -79,18 +76,14 @@ auto ThreadPool::Enqueue(F&& f, Args&&... args)
   std::future<return_type> res = task->get_future();
 
   // don't allow enqueueing after stopping the pool
-  if (stop_) {
-    return std::future<return_type>();
-  }
+  if (stop_) { return std::future<return_type>(); }
   task_queue_.Enqueue([task]() { (*task)(); });
   return res;
 };
 
 // the destructor joins all threads
 inline ThreadPool::~ThreadPool() {
-  if (stop_.exchange(true)) {
-    return;
-  }
+  if (stop_.exchange(true)) { return; }
   task_queue_.BreakAllWait();
   for (std::thread& worker : workers_) {
     worker.join();

@@ -22,14 +22,12 @@ namespace v2x {
 namespace ft {
 
 TEST(KMkernal, get_km_result) {
-  KMkernal km_matcher;
+  KMkernal        km_matcher;
   Eigen::MatrixXf association_mat(5, 4);
-  association_mat << 50, 34, 0, 0, 10, 0, 17, 0, 0, 31, 18, 10, 0, 0, 8, 17, 0,
-      0, 0, 2;
+  association_mat << 50, 34, 0, 0, 10, 0, 17, 0, 0, 31, 18, 10, 0, 0, 8, 17, 0, 0, 0, 2;
   std::vector<std::pair<int, int>> match_cps;
   EXPECT_FALSE(km_matcher.GetKMResult(association_mat, &match_cps));
-  EXPECT_TRUE(
-      km_matcher.GetKMResult(association_mat.transpose(), &match_cps, true));
+  EXPECT_TRUE(km_matcher.GetKMResult(association_mat.transpose(), &match_cps, true));
 }
 
 }  // namespace ft

@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_bcm_304.h"
+
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -28,8 +30,7 @@ using ::apollo::drivers::canbus::Byte;
 Scubcm304::Scubcm304() {}
 const int32_t Scubcm304::ID = 0x304;
 
-void Scubcm304::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
+void Scubcm304::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_vehreversest(
       bcm_vehreversest(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_rightturnlampst(
@@ -38,16 +39,12 @@ void Scubcm304::Parse(const std::uint8_t* bytes, int32_t length,
       bcm_rearfoglampst(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_parkinglampst(
       bcm_parkinglampst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_lowbeamst(
-      bcm_lowbeamst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_lowbeamst(bcm_lowbeamst(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_leftturnlampst(
       bcm_leftturnlampst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_keyst(
-      bcm_keyst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_hornst(
-      bcm_hornst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_highbeamst(
-      bcm_highbeamst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_keyst(bcm_keyst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_hornst(bcm_hornst(bytes, length));
+  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_highbeamst(bcm_highbeamst(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_hazardlampst(
       bcm_hazardlampst(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_frontfoglampst(
@@ -61,13 +58,12 @@ void Scubcm304::Parse(const std::uint8_t* bytes, int32_t length,
 // 'len': 1, 'name': 'bcm_vehreversest', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 11, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcm_304::Bcm_vehreversestType Scubcm304::bcm_vehreversest(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_bcm_304::Bcm_vehreversestType Scubcm304::bcm_vehreversest(const std::uint8_t* bytes,
+                                                              int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(3, 1);
 
-  Scu_bcm_304::Bcm_vehreversestType ret =
-      static_cast<Scu_bcm_304::Bcm_vehreversestType>(x);
+  Scu_bcm_304::Bcm_vehreversestType ret = static_cast<Scu_bcm_304::Bcm_vehreversestType>(x);
   return ret;
 }
 
@@ -76,13 +72,12 @@ Scu_bcm_304::Bcm_vehreversestType Scubcm304::bcm_vehreversest(
 // 'precision': 1.0, 'len': 1, 'name': 'bcm_rightturnlampst', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 4, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcm_304::Bcm_rightturnlampstType Scubcm304::bcm_rightturnlampst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcm_304::Bcm_rightturnlampstType Scubcm304::bcm_rightturnlampst(const std::uint8_t* bytes,
+                                                                    int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(4, 1);
 
-  Scu_bcm_304::Bcm_rightturnlampstType ret =
-      static_cast<Scu_bcm_304::Bcm_rightturnlampstType>(x);
+  Scu_bcm_304::Bcm_rightturnlampstType ret = static_cast<Scu_bcm_304::Bcm_rightturnlampstType>(x);
   return ret;
 }
 
@@ -91,13 +86,12 @@ Scu_bcm_304::Bcm_rightturnlampstType Scubcm304::bcm_rightturnlampst(
 // 'precision': 1.0, 'len': 1, 'name': 'bcm_rearfoglampst', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcm_304::Bcm_rearfoglampstType Scubcm304::bcm_rearfoglampst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcm_304::Bcm_rearfoglampstType Scubcm304::bcm_rearfoglampst(const std::uint8_t* bytes,
+                                                                int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
-  Scu_bcm_304::Bcm_rearfoglampstType ret =
-      static_cast<Scu_bcm_304::Bcm_rearfoglampstType>(x);
+  Scu_bcm_304::Bcm_rearfoglampstType ret = static_cast<Scu_bcm_304::Bcm_rearfoglampstType>(x);
   return ret;
 }
 
@@ -106,13 +100,12 @@ Scu_bcm_304::Bcm_rearfoglampstType Scubcm304::bcm_rearfoglampst(
 // 'precision': 1.0, 'len': 1, 'name': 'bcm_parkinglampst', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 12, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Scu_bcm_304::Bcm_parkinglampstType Scubcm304::bcm_parkinglampst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_bcm_304::Bcm_parkinglampstType Scubcm304::bcm_parkinglampst(const std::uint8_t* bytes,
+                                                                int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(4, 1);
 
-  Scu_bcm_304::Bcm_parkinglampstType ret =
-      static_cast<Scu_bcm_304::Bcm_parkinglampstType>(x);
+  Scu_bcm_304::Bcm_parkinglampstType ret = static_cast<Scu_bcm_304::Bcm_parkinglampstType>(x);
   return ret;
 }
 
@@ -121,13 +114,12 @@ Scu_bcm_304::Bcm_parkinglampstType Scubcm304::bcm_parkinglampst(
 // 'len': 1, 'name': 'bcm_lowbeamst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 2, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcm_304::Bcm_lowbeamstType Scubcm304::bcm_lowbeamst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcm_304::Bcm_lowbeamstType Scubcm304::bcm_lowbeamst(const std::uint8_t* bytes,
+                                                        int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(2, 1);
 
-  Scu_bcm_304::Bcm_lowbeamstType ret =
-      static_cast<Scu_bcm_304::Bcm_lowbeamstType>(x);
+  Scu_bcm_304::Bcm_lowbeamstType ret = static_cast<Scu_bcm_304::Bcm_lowbeamstType>(x);
   return ret;
 }
 
@@ -136,13 +128,12 @@ Scu_bcm_304::Bcm_lowbeamstType Scubcm304::bcm_lowbeamst(
 // 'precision': 1.0, 'len': 1, 'name': 'bcm_leftturnlampst', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 5, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcm_304::Bcm_leftturnlampstType Scubcm304::bcm_leftturnlampst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcm_304::Bcm_leftturnlampstType Scubcm304::bcm_leftturnlampst(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(5, 1);
 
-  Scu_bcm_304::Bcm_leftturnlampstType ret =
-      static_cast<Scu_bcm_304::Bcm_leftturnlampstType>(x);
+  Scu_bcm_304::Bcm_leftturnlampstType ret = static_cast<Scu_bcm_304::Bcm_leftturnlampstType>(x);
   return ret;
 }
 
@@ -151,9 +142,8 @@ Scu_bcm_304::Bcm_leftturnlampstType Scubcm304::bcm_leftturnlampst(
 // 'len': 2, 'name': 'bcm_keyst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|3]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcm_304::Bcm_keystType Scubcm304::bcm_keyst(const std::uint8_t* bytes,
-                                                int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcm_304::Bcm_keystType Scubcm304::bcm_keyst(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(6, 2);
 
   Scu_bcm_304::Bcm_keystType ret = static_cast<Scu_bcm_304::Bcm_keystType>(x);
@@ -165,9 +155,8 @@ Scu_bcm_304::Bcm_keystType Scubcm304::bcm_keyst(const std::uint8_t* bytes,
 // 'name': 'bcm_hornst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 15, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcm_304::Bcm_hornstType Scubcm304::bcm_hornst(const std::uint8_t* bytes,
-                                                  int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_bcm_304::Bcm_hornstType Scubcm304::bcm_hornst(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(7, 1);
 
   Scu_bcm_304::Bcm_hornstType ret = static_cast<Scu_bcm_304::Bcm_hornstType>(x);
@@ -179,13 +168,12 @@ Scu_bcm_304::Bcm_hornstType Scubcm304::bcm_hornst(const std::uint8_t* bytes,
 // 'len': 1, 'name': 'bcm_highbeamst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 3, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcm_304::Bcm_highbeamstType Scubcm304::bcm_highbeamst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcm_304::Bcm_highbeamstType Scubcm304::bcm_highbeamst(const std::uint8_t* bytes,
+                                                          int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(3, 1);
 
-  Scu_bcm_304::Bcm_highbeamstType ret =
-      static_cast<Scu_bcm_304::Bcm_highbeamstType>(x);
+  Scu_bcm_304::Bcm_highbeamstType ret = static_cast<Scu_bcm_304::Bcm_highbeamstType>(x);
   return ret;
 }
 
@@ -194,13 +182,12 @@ Scu_bcm_304::Bcm_highbeamstType Scubcm304::bcm_highbeamst(
 // 'len': 1, 'name': 'bcm_hazardlampst', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 13, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Scu_bcm_304::Bcm_hazardlampstType Scubcm304::bcm_hazardlampst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_bcm_304::Bcm_hazardlampstType Scubcm304::bcm_hazardlampst(const std::uint8_t* bytes,
+                                                              int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(5, 1);
 
-  Scu_bcm_304::Bcm_hazardlampstType ret =
-      static_cast<Scu_bcm_304::Bcm_hazardlampstType>(x);
+  Scu_bcm_304::Bcm_hazardlampstType ret = static_cast<Scu_bcm_304::Bcm_hazardlampstType>(x);
   return ret;
 }
 
@@ -209,13 +196,12 @@ Scu_bcm_304::Bcm_hazardlampstType Scubcm304::bcm_hazardlampst(
 // 'precision': 1.0, 'len': 1, 'name': 'bcm_frontfoglampst', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcm_304::Bcm_frontfoglampstType Scubcm304::bcm_frontfoglampst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Scu_bcm_304::Bcm_frontfoglampstType Scubcm304::bcm_frontfoglampst(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_bcm_304::Bcm_frontfoglampstType ret =
-      static_cast<Scu_bcm_304::Bcm_frontfoglampstType>(x);
+  Scu_bcm_304::Bcm_frontfoglampstType ret = static_cast<Scu_bcm_304::Bcm_frontfoglampstType>(x);
   return ret;
 }
 
@@ -224,9 +210,9 @@ Scu_bcm_304::Bcm_frontfoglampstType Scubcm304::bcm_frontfoglampst(
 // 'precision': 1.0, 'len': 1, 'name': 'bcm_brakelightswitchst',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 14,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcm_304::Bcm_brakelightswitchstType Scubcm304::bcm_brakelightswitchst(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_bcm_304::Bcm_brakelightswitchstType Scubcm304::bcm_brakelightswitchst(const std::uint8_t* bytes,
+                                                                          int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(6, 1);
 
   Scu_bcm_304::Bcm_brakelightswitchstType ret =

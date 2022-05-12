@@ -44,8 +44,8 @@ TEST(PollerTest, operation) {
   ASSERT_EQ(fcntl(pipe_fd[1], F_SETFL, O_NONBLOCK), 0);
 
   // invalid input, callback is nullptr
-  request.fd = pipe_fd[0];
-  request.events = EPOLLIN | EPOLLET;
+  request.fd         = pipe_fd[0];
+  request.events     = EPOLLIN | EPOLLET;
   request.timeout_ms = 0;
   EXPECT_FALSE(poller->Register(request));
 
@@ -57,7 +57,7 @@ TEST(PollerTest, operation) {
   EXPECT_EQ(response.events, 0);
 
   // timeout_ms is 50
-  response.events = 123;
+  response.events    = 123;
   request.timeout_ms = 50;
   EXPECT_TRUE(poller->Register(request));
   std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -66,14 +66,14 @@ TEST(PollerTest, operation) {
   EXPECT_EQ(response.events, 0);
 
   // timeout_ms is 200
-  response.events = 123;
+  response.events    = 123;
   request.timeout_ms = 200;
   EXPECT_TRUE(poller->Register(request));
   std::this_thread::sleep_for(std::chrono::milliseconds(20));
   EXPECT_EQ(response.events, 123);
-  char msg = 'C';
-  ssize_t res = 0;
-  int try_num = 3;
+  char    msg     = 'C';
+  ssize_t res     = 0;
+  int     try_num = 3;
   do {
     --try_num;
     res = write(pipe_fd[1], &msg, 1);
@@ -89,10 +89,10 @@ TEST(PollerTest, operation) {
   EXPECT_FALSE(poller->Unregister(request));
 
   poller->Shutdown();
-  request.fd = pipe_fd[0];
-  request.events = EPOLLIN | EPOLLET;
+  request.fd         = pipe_fd[0];
+  request.events     = EPOLLIN | EPOLLET;
   request.timeout_ms = 0;
-  request.callback = [](const PollResponse&) {};
+  request.callback   = [](const PollResponse&) {};
   // poller has been shutdown
   EXPECT_FALSE(poller->Register(request));
   EXPECT_FALSE(poller->Unregister(request));

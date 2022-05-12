@@ -22,91 +22,88 @@ namespace apollo {
 namespace planning {
 
 DistanceApproachIPOPTFixedTsInterface::DistanceApproachIPOPTFixedTsInterface(
-    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
-    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
-    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
-    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
-    const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
-    const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+    const size_t                  horizon,
+    const double                  ts,
+    const Eigen::MatrixXd&        ego,
+    const Eigen::MatrixXd&        xWS,
+    const Eigen::MatrixXd&        uWS,
+    const Eigen::MatrixXd&        l_warm_up,
+    const Eigen::MatrixXd&        n_warm_up,
+    const Eigen::MatrixXd&        x0,
+    const Eigen::MatrixXd&        xf,
+    const Eigen::MatrixXd&        last_time_u,
+    const std::vector<double>&    XYbounds,
+    const Eigen::MatrixXi&        obstacles_edges_num,
+    const size_t                  obstacles_num,
+    const Eigen::MatrixXd&        obstacles_A,
+    const Eigen::MatrixXd&        obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
-    : ts_(ts),
-      ego_(ego),
-      xWS_(xWS),
-      uWS_(uWS),
-      l_warm_up_(l_warm_up),
-      n_warm_up_(n_warm_up),
-      x0_(x0),
-      xf_(xf),
-      last_time_u_(last_time_u),
-      XYbounds_(XYbounds),
-      obstacles_edges_num_(obstacles_edges_num),
-      obstacles_A_(obstacles_A),
-      obstacles_b_(obstacles_b) {
+    : ts_(ts)
+    , ego_(ego)
+    , xWS_(xWS)
+    , uWS_(uWS)
+    , l_warm_up_(l_warm_up)
+    , n_warm_up_(n_warm_up)
+    , x0_(x0)
+    , xf_(xf)
+    , last_time_u_(last_time_u)
+    , XYbounds_(XYbounds)
+    , obstacles_edges_num_(obstacles_edges_num)
+    , obstacles_A_(obstacles_A)
+    , obstacles_b_(obstacles_b) {
   ACHECK(horizon < std::numeric_limits<int>::max())
       << "Invalid cast on horizon in open space planner";
   horizon_ = static_cast<int>(horizon);
   ACHECK(obstacles_num < std::numeric_limits<int>::max())
       << "Invalid cast on obstacles_num in open space planner";
 
-  obstacles_num_ = static_cast<int>(obstacles_num);
-  w_ev_ = ego_(1, 0) + ego_(3, 0);
-  l_ev_ = ego_(0, 0) + ego_(2, 0);
-  g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
-  offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
+  obstacles_num_       = static_cast<int>(obstacles_num);
+  w_ev_                = ego_(1, 0) + ego_(3, 0);
+  l_ev_                = ego_(0, 0) + ego_(2, 0);
+  g_                   = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
+  offset_              = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
   obstacles_edges_sum_ = obstacles_edges_num_.sum();
-  state_result_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
-  dual_l_result_ = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
-  dual_n_result_ = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
-  control_result_ = Eigen::MatrixXd::Zero(2, horizon_ + 1);
-  time_result_ = Eigen::MatrixXd::Zero(1, horizon_ + 1);
-  state_start_index_ = 0;
+  state_result_        = Eigen::MatrixXd::Zero(4, horizon_ + 1);
+  dual_l_result_       = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
+  dual_n_result_       = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
+  control_result_      = Eigen::MatrixXd::Zero(2, horizon_ + 1);
+  time_result_         = Eigen::MatrixXd::Zero(1, horizon_ + 1);
+  state_start_index_   = 0;
   control_start_index_ = 4 * (horizon_ + 1);
-  time_start_index_ = control_start_index_ + 2 * horizon_;
-  l_start_index_ = time_start_index_;
-  n_start_index_ = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
+  time_start_index_    = control_start_index_ + 2 * horizon_;
+  l_start_index_       = time_start_index_;
+  n_start_index_       = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
 
   planner_open_space_config_ = planner_open_space_config;
-  distance_approach_config_ =
-      planner_open_space_config_.distance_approach_config();
-  weight_state_x_ = distance_approach_config_.weight_x();
-  weight_state_y_ = distance_approach_config_.weight_y();
-  weight_state_phi_ = distance_approach_config_.weight_phi();
-  weight_state_v_ = distance_approach_config_.weight_v();
-  weight_input_steer_ = distance_approach_config_.weight_steer();
-  weight_input_a_ = distance_approach_config_.weight_a();
-  weight_rate_steer_ = distance_approach_config_.weight_steer_rate();
-  weight_rate_a_ = distance_approach_config_.weight_a_rate();
-  weight_stitching_steer_ = distance_approach_config_.weight_steer_stitching();
-  weight_stitching_a_ = distance_approach_config_.weight_a_stitching();
-  weight_first_order_time_ =
-      distance_approach_config_.weight_first_order_time();
-  weight_second_order_time_ =
-      distance_approach_config_.weight_second_order_time();
-  min_safety_distance_ = distance_approach_config_.min_safety_distance();
-  max_steer_angle_ =
-      vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
-  max_speed_forward_ = distance_approach_config_.max_speed_forward();
-  max_speed_reverse_ = distance_approach_config_.max_speed_reverse();
-  max_acceleration_forward_ =
-      distance_approach_config_.max_acceleration_forward();
-  max_acceleration_reverse_ =
-      distance_approach_config_.max_acceleration_reverse();
-  min_time_sample_scaling_ =
-      distance_approach_config_.min_time_sample_scaling();
-  max_time_sample_scaling_ =
-      distance_approach_config_.max_time_sample_scaling();
-  max_steer_rate_ =
-      vehicle_param_.max_steer_angle_rate() / vehicle_param_.steer_ratio();
-  use_fix_time_ = distance_approach_config_.use_fix_time();
-  wheelbase_ = vehicle_param_.wheel_base();
-  enable_constraint_check_ =
-      distance_approach_config_.enable_constraint_check();
+  distance_approach_config_  = planner_open_space_config_.distance_approach_config();
+  weight_state_x_            = distance_approach_config_.weight_x();
+  weight_state_y_            = distance_approach_config_.weight_y();
+  weight_state_phi_          = distance_approach_config_.weight_phi();
+  weight_state_v_            = distance_approach_config_.weight_v();
+  weight_input_steer_        = distance_approach_config_.weight_steer();
+  weight_input_a_            = distance_approach_config_.weight_a();
+  weight_rate_steer_         = distance_approach_config_.weight_steer_rate();
+  weight_rate_a_             = distance_approach_config_.weight_a_rate();
+  weight_stitching_steer_    = distance_approach_config_.weight_steer_stitching();
+  weight_stitching_a_        = distance_approach_config_.weight_a_stitching();
+  weight_first_order_time_   = distance_approach_config_.weight_first_order_time();
+  weight_second_order_time_  = distance_approach_config_.weight_second_order_time();
+  min_safety_distance_       = distance_approach_config_.min_safety_distance();
+  max_steer_angle_           = vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
+  max_speed_forward_         = distance_approach_config_.max_speed_forward();
+  max_speed_reverse_         = distance_approach_config_.max_speed_reverse();
+  max_acceleration_forward_  = distance_approach_config_.max_acceleration_forward();
+  max_acceleration_reverse_  = distance_approach_config_.max_acceleration_reverse();
+  min_time_sample_scaling_   = distance_approach_config_.min_time_sample_scaling();
+  max_time_sample_scaling_   = distance_approach_config_.max_time_sample_scaling();
+  max_steer_rate_            = vehicle_param_.max_steer_angle_rate() / vehicle_param_.steer_ratio();
+  use_fix_time_              = distance_approach_config_.use_fix_time();
+  wheelbase_                 = vehicle_param_.wheel_base();
+  enable_constraint_check_   = distance_approach_config_.enable_constraint_check();
 }
 
 bool DistanceApproachIPOPTFixedTsInterface::get_nlp_info(
-    int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
-    IndexStyleEnum& index_style) {
+    int& n, int& m, int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) {
   ADEBUG << "get_nlp_info";
   // n1 : states variables, 4 * (N+1)
   int n1 = 4 * (horizon_ + 1);
@@ -131,7 +128,7 @@ bool DistanceApproachIPOPTFixedTsInterface::get_nlp_info(
   int m4 = 4 * obstacles_num_ * (horizon_ + 1);
   ADEBUG << "m4: " << m4;
 
-  num_of_variables_ = n1 + n2 + lambda_horizon_ + miu_horizon_;
+  num_of_variables_   = n1 + n2 + lambda_horizon_ + miu_horizon_;
   num_of_constraints_ = m1 + m2 + m4 + (num_of_variables_ - (horizon_ + 1) + 2);
 
   // number of variables
@@ -147,13 +144,10 @@ bool DistanceApproachIPOPTFixedTsInterface::get_nlp_info(
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
-                                                            double* x_u, int m,
-                                                            double* g_l,
-                                                            double* g_u) {
+bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(
+    int n, double* x_l, double* x_u, int m, double* g_l, double* g_u) {
   ADEBUG << "get_bounds_info";
-  ACHECK(XYbounds_.size() == 4)
-      << "XYbounds_ size is not 4, but" << XYbounds_.size();
+  ACHECK(XYbounds_.size() == 4) << "XYbounds_ size is not 4, but" << XYbounds_.size();
 
   // Variables: includes state, u, sample time and lagrange multipliers
   // 1. state variables, 4 * [0, horizon]
@@ -206,8 +200,7 @@ bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
 
     variable_index += 2;
   }
-  ADEBUG << "variable_index after adding control variables : "
-         << variable_index;
+  ADEBUG << "variable_index after adding control variables : " << variable_index;
 
   // 4. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
   // horizon_]
@@ -253,8 +246,7 @@ bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
     ++constraint_index;
   }
 
-  ADEBUG << "constraint_index after adding steering rate constraints: "
-         << constraint_index;
+  ADEBUG << "constraint_index after adding steering rate constraints: " << constraint_index;
 
   // 4. Three obstacles related equal constraints, one equality constraints,
   // [0, horizon_] * [0, obstacles_num_-1] * 4
@@ -276,13 +268,12 @@ bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
       constraint_index += 4;
     }
   }
-  ADEBUG << "constraints_index after adding obstacles related constraints: "
-         << constraint_index;
+  ADEBUG << "constraints_index after adding obstacles related constraints: " << constraint_index;
 
   // 5. load variable bounds as constraints
   // start configuration
-  g_l[constraint_index] = x0_(0, 0);
-  g_u[constraint_index] = x0_(0, 0);
+  g_l[constraint_index]     = x0_(0, 0);
+  g_u[constraint_index]     = x0_(0, 0);
   g_l[constraint_index + 1] = x0_(1, 0);
   g_u[constraint_index + 1] = x0_(1, 0);
   g_l[constraint_index + 2] = x0_(2, 0);
@@ -292,8 +283,8 @@ bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
   constraint_index += 4;
 
   for (int i = 1; i < horizon_; ++i) {
-    g_l[constraint_index] = XYbounds_[0];
-    g_u[constraint_index] = XYbounds_[1];
+    g_l[constraint_index]     = XYbounds_[0];
+    g_u[constraint_index]     = XYbounds_[1];
     g_l[constraint_index + 1] = XYbounds_[2];
     g_u[constraint_index + 1] = XYbounds_[3];
     g_l[constraint_index + 2] = -max_speed_reverse_;
@@ -302,8 +293,8 @@ bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
   }
 
   // end configuration
-  g_l[constraint_index] = xf_(0, 0);
-  g_u[constraint_index] = xf_(0, 0);
+  g_l[constraint_index]     = xf_(0, 0);
+  g_u[constraint_index]     = xf_(0, 0);
   g_l[constraint_index + 1] = xf_(1, 0);
   g_u[constraint_index + 1] = xf_(1, 0);
   g_l[constraint_index + 2] = xf_(2, 0);
@@ -313,8 +304,8 @@ bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
   constraint_index += 4;
 
   for (int i = 0; i < horizon_; ++i) {
-    g_l[constraint_index] = -max_steer_angle_;
-    g_u[constraint_index] = max_steer_angle_;
+    g_l[constraint_index]     = -max_steer_angle_;
+    g_u[constraint_index]     = max_steer_angle_;
     g_l[constraint_index + 1] = -max_acceleration_reverse_;
     g_u[constraint_index + 1] = max_acceleration_forward_;
     constraint_index += 2;
@@ -332,15 +323,20 @@ bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
     constraint_index++;
   }
 
-  ADEBUG << "constraint_index after adding obstacles constraints: "
-         << constraint_index;
+  ADEBUG << "constraint_index after adding obstacles constraints: " << constraint_index;
   ADEBUG << "get_bounds_info_ out";
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::get_starting_point(
-    int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
-    bool init_lambda, double* lambda) {
+bool DistanceApproachIPOPTFixedTsInterface::get_starting_point(int     n,
+                                                               bool    init_x,
+                                                               double* x,
+                                                               bool    init_z,
+                                                               double* z_L,
+                                                               double* z_U,
+                                                               int     m,
+                                                               bool    init_lambda,
+                                                               double* lambda) {
   ADEBUG << "get_starting_point";
   ACHECK(init_x) << "Warm start init_x setting failed";
 
@@ -357,8 +353,8 @@ bool DistanceApproachIPOPTFixedTsInterface::get_starting_point(
 
   // 2. control variable initialization, 2 * horizon_
   for (int i = 0; i < horizon_; ++i) {
-    int index = i * 2;
-    x[control_start_index_ + index] = uWS_(0, i);
+    int index                           = i * 2;
+    x[control_start_index_ + index]     = uWS_(0, i);
     x[control_start_index_ + index + 1] = uWS_(1, i);
   }
 
@@ -379,7 +375,7 @@ bool DistanceApproachIPOPTFixedTsInterface::get_starting_point(
   }
 
   if (enable_constraint_check_) {
-    int kM = m;
+    int    kM = m;
     double g[kM];
     ADEBUG << "initial points constraint checking";
     eval_constraints(n, x, m, g);
@@ -390,35 +386,31 @@ bool DistanceApproachIPOPTFixedTsInterface::get_starting_point(
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_f(int n, const double* x,
-                                                   bool new_x,
-                                                   double& obj_value) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_f(int           n,
+                                                   const double* x,
+                                                   bool          new_x,
+                                                   double&       obj_value) {
   eval_obj(n, x, &obj_value);
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_grad_f(int n, const double* x,
-                                                        bool new_x,
-                                                        double* grad_f) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_grad_f(int           n,
+                                                        const double* x,
+                                                        bool          new_x,
+                                                        double*       grad_f) {
   gradient(tag_f, n, x, grad_f);
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_g(int n, const double* x,
-                                                   bool new_x, int m,
-                                                   double* g) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_g(
+    int n, const double* x, bool new_x, int m, double* g) {
   eval_constraints(n, x, m, g);
-  if (enable_constraint_check_) {
-    check_g(n, x, m, g);
-  }
+  if (enable_constraint_check_) { check_g(n, x, m, g); }
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g(int n, const double* x,
-                                                       bool new_x, int m,
-                                                       int nele_jac, int* iRow,
-                                                       int* jCol,
-                                                       double* values) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g(
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow, int* jCol, double* values) {
   if (values == nullptr) {
     // return the structure of the jacobian
     for (int idx = 0; idx < nnz_jac; idx++) {
@@ -427,8 +419,7 @@ bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g(int n, const double* x,
     }
   } else {
     // return the values of the jacobian of the constraints
-    sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
-               options_g);
+    sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval, options_g);
     for (int idx = 0; idx < nnz_jac; idx++) {
       values[idx] = jacval[idx];
     }
@@ -438,16 +429,22 @@ bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g(int n, const double* x,
 }
 
 bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g_ser(
-    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow,
-    int* jCol, double* values) {
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow, int* jCol, double* values) {
   AERROR << "NOT VALID NOW";
   return false;
 }  // NOLINT
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_h(
-    int n, const double* x, bool new_x, double obj_factor, int m,
-    const double* lambda, bool new_lambda, int nele_hess, int* iRow, int* jCol,
-    double* values) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_h(int           n,
+                                                   const double* x,
+                                                   bool          new_x,
+                                                   double        obj_factor,
+                                                   int           m,
+                                                   const double* lambda,
+                                                   bool          new_lambda,
+                                                   int           nele_hess,
+                                                   int*          iRow,
+                                                   int*          jCol,
+                                                   double*       values) {
   if (values == nullptr) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
@@ -467,8 +464,7 @@ bool DistanceApproachIPOPTFixedTsInterface::eval_h(
     }
 
     set_param_vec(tag_L, m + 1, obj_lam);
-    sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
-                &hessval, options_L);
+    sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L, &hessval, options_L);
 
     for (int idx = 0; idx < nnz_L; idx++) {
       values[idx] = hessval[idx];
@@ -479,11 +475,18 @@ bool DistanceApproachIPOPTFixedTsInterface::eval_h(
 }
 
 void DistanceApproachIPOPTFixedTsInterface::finalize_solution(
-    Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
-    const double* z_U, int m, const double* g, const double* lambda,
-    double obj_value, const Ipopt::IpoptData* ip_data,
+    Ipopt::SolverReturn               status,
+    int                               n,
+    const double*                     x,
+    const double*                     z_L,
+    const double*                     z_U,
+    int                               m,
+    const double*                     g,
+    const double*                     lambda,
+    double                            obj_value,
+    const Ipopt::IpoptData*           ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  int state_index = state_start_index_;
+  int state_index   = state_start_index_;
   int control_index = control_start_index_;
   // int time_index = time_start_index_;
   int dual_l_index = l_start_index_;
@@ -500,13 +503,13 @@ void DistanceApproachIPOPTFixedTsInterface::finalize_solution(
   // 4. dual_l obstacles_edges_sum_ * [0, horizon]
   // 5. dual_n obstacles_num * [0, horizon]
   for (int i = 0; i < horizon_; ++i) {
-    state_result_(0, i) = x[state_index];
-    state_result_(1, i) = x[state_index + 1];
-    state_result_(2, i) = x[state_index + 2];
-    state_result_(3, i) = x[state_index + 3];
+    state_result_(0, i)   = x[state_index];
+    state_result_(1, i)   = x[state_index + 1];
+    state_result_(2, i)   = x[state_index + 2];
+    state_result_(3, i)   = x[state_index + 3];
     control_result_(0, i) = x[control_index];
     control_result_(1, i) = x[control_index + 1];
-    time_result_(0, i) = ts_;
+    time_result_(0, i)    = ts_;
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
       dual_l_result_(j, i) = x[dual_l_index + j];
     }
@@ -528,7 +531,7 @@ void DistanceApproachIPOPTFixedTsInterface::finalize_solution(
   state_result_(1, horizon_) = xf_(1, 0);
   state_result_(2, horizon_) = xf_(2, 0);
   state_result_(3, horizon_) = xf_(3, 0);
-  time_result_(0, horizon_) = ts_;
+  time_result_(0, horizon_)  = ts_;
   // time_result_ = ts_ * time_result_;
   for (int j = 0; j < obstacles_edges_sum_; ++j) {
     dual_l_result_(j, horizon_) = x[dual_l_index + j];
@@ -547,26 +550,25 @@ void DistanceApproachIPOPTFixedTsInterface::finalize_solution(
 }
 
 void DistanceApproachIPOPTFixedTsInterface::get_optimization_results(
-    Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
-    Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
+    Eigen::MatrixXd* state_result,
+    Eigen::MatrixXd* control_result,
+    Eigen::MatrixXd* time_result,
+    Eigen::MatrixXd* dual_l_result,
     Eigen::MatrixXd* dual_n_result) const {
   ADEBUG << "get_optimization_results";
-  *state_result = state_result_;
+  *state_result   = state_result_;
   *control_result = control_result_;
-  *time_result = time_result_;
-  *dual_l_result = dual_l_result_;
-  *dual_n_result = dual_n_result_;
+  *time_result    = time_result_;
+  *dual_l_result  = dual_l_result_;
+  *dual_n_result  = dual_n_result_;
 
-  if (!distance_approach_config_.enable_initial_final_check()) {
-    return;
-  }
+  if (!distance_approach_config_.enable_initial_final_check()) { return; }
   CHECK_EQ(state_result_.cols(), xWS_.cols());
   CHECK_EQ(state_result_.rows(), xWS_.rows());
   double state_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4; ++j) {
-      state_diff_max =
-          std::max(std::abs(xWS_(j, i) - state_result_(j, i)), state_diff_max);
+      state_diff_max = std::max(std::abs(xWS_(j, i) - state_result_(j, i)), state_diff_max);
     }
   }
 
@@ -574,10 +576,8 @@ void DistanceApproachIPOPTFixedTsInterface::get_optimization_results(
   CHECK_EQ(control_result_.rows(), uWS_.rows());
   double control_diff_max = 0.0;
   for (int i = 0; i < horizon_; ++i) {
-    control_diff_max = std::max(std::abs(uWS_(0, i) - control_result_(0, i)),
-                                control_diff_max);
-    control_diff_max = std::max(std::abs(uWS_(1, i) - control_result_(1, i)),
-                                control_diff_max);
+    control_diff_max = std::max(std::abs(uWS_(0, i) - control_result_(0, i)), control_diff_max);
+    control_diff_max = std::max(std::abs(uWS_(1, i) - control_result_(1, i)), control_diff_max);
   }
 
   // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
@@ -586,8 +586,7 @@ void DistanceApproachIPOPTFixedTsInterface::get_optimization_results(
   double l_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      l_diff_max = std::max(std::abs(l_warm_up_(j, i) - dual_l_result_(j, i)),
-                            l_diff_max);
+      l_diff_max = std::max(std::abs(l_warm_up_(j, i) - dual_l_result_(j, i)), l_diff_max);
     }
   }
 
@@ -597,8 +596,7 @@ void DistanceApproachIPOPTFixedTsInterface::get_optimization_results(
   double n_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      n_diff_max = std::max(std::abs(n_warm_up_(j, i) - dual_n_result_(j, i)),
-                            n_diff_max);
+      n_diff_max = std::max(std::abs(n_warm_up_(j, i) - dual_n_result_(j, i)), n_diff_max);
     }
   }
 
@@ -610,8 +608,7 @@ void DistanceApproachIPOPTFixedTsInterface::get_optimization_results(
 
 //***************    start ADOL-C part ***********************************
 template <class T>
-void DistanceApproachIPOPTFixedTsInterface::eval_obj(int n, const T* x,
-                                                     T* obj_value) {
+void DistanceApproachIPOPTFixedTsInterface::eval_obj(int n, const T* x, T* obj_value) {
   // Objective is :
   // min control inputs
   // min input rate
@@ -631,11 +628,9 @@ void DistanceApproachIPOPTFixedTsInterface::eval_obj(int n, const T* x,
     T x1_diff = x[state_index] - xWS_(0, i);
     T x2_diff = x[state_index + 1] - xWS_(1, i);
     T x3_diff = x[state_index + 2] - xWS_(2, i);
-    T x4_abs = x[state_index + 3];
-    *obj_value += weight_state_x_ * x1_diff * x1_diff +
-                  weight_state_y_ * x2_diff * x2_diff +
-                  weight_state_phi_ * x3_diff * x3_diff +
-                  weight_state_v_ * x4_abs * x4_abs;
+    T x4_abs  = x[state_index + 3];
+    *obj_value += weight_state_x_ * x1_diff * x1_diff + weight_state_y_ * x2_diff * x2_diff +
+                  weight_state_phi_ * x3_diff * x3_diff + weight_state_v_ * x4_abs * x4_abs;
     state_index += 4;
   }
 
@@ -647,27 +642,25 @@ void DistanceApproachIPOPTFixedTsInterface::eval_obj(int n, const T* x,
   }
 
   // 3. objective to minimize input change rate for first horizon
-  control_index = control_start_index_;
+  control_index          = control_start_index_;
   T last_time_steer_rate = (x[control_index] - last_time_u_(0, 0)) / ts_;
-  T last_time_a_rate = (x[control_index + 1] - last_time_u_(1, 0)) / ts_;
+  T last_time_a_rate     = (x[control_index + 1] - last_time_u_(1, 0)) / ts_;
 
-  *obj_value +=
-      weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
-      weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
+  *obj_value += weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+                weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
 
   // 4. objective to minimize input change rates, [0- horizon_ -2]
   for (int i = 0; i < horizon_ - 1; ++i) {
     T steering_rate = (x[control_index + 2] - x[control_index]) / ts_;
-    T a_rate = (x[control_index + 3] - x[control_index + 1]) / ts_;
-    *obj_value += weight_rate_steer_ * steering_rate * steering_rate +
-                  weight_rate_a_ * a_rate * a_rate;
+    T a_rate        = (x[control_index + 3] - x[control_index + 1]) / ts_;
+    *obj_value +=
+        weight_rate_steer_ * steering_rate * steering_rate + weight_rate_a_ * a_rate * a_rate;
     control_index += 2;
   }
 }
 
 template <class T>
-void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
-                                                             int m, T* g) {
+void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x, int m, T* g) {
   // state start index
   int state_index = state_start_index_;
 
@@ -694,8 +687,7 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
     */
 
     g[constraint_index] =
-        x[state_index + 4] -
-        (x[state_index] + ts_ * x[state_index + 3] * cos(x[state_index + 2]));
+        x[state_index + 4] - (x[state_index] + ts_ * x[state_index + 3] * cos(x[state_index + 2]));
 
     // x2
     /*
@@ -709,8 +701,8 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
     */
 
     g[constraint_index + 1] =
-        x[state_index + 5] - (x[state_index + 1] + ts_ * x[state_index + 3] *
-                                                       sin(x[state_index + 2]));
+        x[state_index + 5] -
+        (x[state_index + 1] + ts_ * x[state_index + 3] * sin(x[state_index + 2]));
 
     // x3
     /*
@@ -727,8 +719,7 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
 
     g[constraint_index + 2] =
         x[state_index + 6] -
-        (x[state_index + 2] +
-         ts_ * x[state_index + 3] * tan(x[control_index]) / wheelbase_);
+        (x[state_index + 2] + ts_ * x[state_index + 3] * tan(x[control_index]) / wheelbase_);
 
     // x4
     /*
@@ -772,11 +763,9 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
   for (int i = 0; i < horizon_ + 1; ++i) {
     int edges_counter = 0;
     for (int j = 0; j < obstacles_num_; ++j) {
-      int current_edges_num = obstacles_edges_num_(j, 0);
-      Eigen::MatrixXd Aj =
-          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-      Eigen::MatrixXd bj =
-          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+      int             current_edges_num = obstacles_edges_num_(j, 0);
+      Eigen::MatrixXd Aj = obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+      Eigen::MatrixXd bj = obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
       // norm(A* lambda) <= 1
       T tmp1 = 0.0;
@@ -789,12 +778,10 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
       g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2;
 
       // G' * mu + R' * lambda == 0
-      g[constraint_index + 1] = x[n_index] - x[n_index + 2] +
-                                cos(x[state_index + 2]) * tmp1 +
+      g[constraint_index + 1] = x[n_index] - x[n_index + 2] + cos(x[state_index + 2]) * tmp1 +
                                 sin(x[state_index + 2]) * tmp2;
 
-      g[constraint_index + 2] = x[n_index + 1] - x[n_index + 3] -
-                                sin(x[state_index + 2]) * tmp1 +
+      g[constraint_index + 2] = x[n_index + 1] - x[n_index + 3] - sin(x[state_index + 2]) * tmp1 +
                                 cos(x[state_index + 2]) * tmp2;
 
       //  -g'*mu + (A*t - b)*lambda > 0
@@ -808,10 +795,9 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
         tmp4 += bj(k, 0) * x[l_index + k];
       }
 
-      g[constraint_index + 3] =
-          tmp3 + (x[state_index] + cos(x[state_index + 2]) * offset_) * tmp1 +
-          (x[state_index + 1] + sin(x[state_index + 2]) * offset_) * tmp2 -
-          tmp4;
+      g[constraint_index + 3] = tmp3 + (x[state_index] + cos(x[state_index + 2]) * offset_) * tmp1 +
+                                (x[state_index + 1] + sin(x[state_index + 2]) * offset_) * tmp2 -
+                                tmp4;
 
       // Update index
       edges_counter += current_edges_num;
@@ -826,14 +812,14 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
          << constraint_index;
 
   // 5. load variable bounds as constraints
-  state_index = state_start_index_;
+  state_index   = state_start_index_;
   control_index = control_start_index_;
   // time_index = time_start_index_;
   l_index = l_start_index_;
   n_index = n_start_index_;
 
   // start configuration
-  g[constraint_index] = x[state_index];
+  g[constraint_index]     = x[state_index];
   g[constraint_index + 1] = x[state_index + 1];
   g[constraint_index + 2] = x[state_index + 2];
   g[constraint_index + 3] = x[state_index + 3];
@@ -842,7 +828,7 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
 
   // constraints on x,y,v
   for (int i = 1; i < horizon_; ++i) {
-    g[constraint_index] = x[state_index];
+    g[constraint_index]     = x[state_index];
     g[constraint_index + 1] = x[state_index + 1];
     g[constraint_index + 2] = x[state_index + 3];
     constraint_index += 3;
@@ -850,7 +836,7 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
   }
 
   // end configuration
-  g[constraint_index] = x[state_index];
+  g[constraint_index]     = x[state_index];
   g[constraint_index + 1] = x[state_index + 1];
   g[constraint_index + 2] = x[state_index + 2];
   g[constraint_index + 3] = x[state_index + 3];
@@ -858,7 +844,7 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
   state_index += 4;
 
   for (int i = 0; i < horizon_; ++i) {
-    g[constraint_index] = x[control_index];
+    g[constraint_index]     = x[control_index];
     g[constraint_index + 1] = x[control_index + 1];
     constraint_index += 2;
     control_index += 2;
@@ -877,10 +863,12 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
   }
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::check_g(int n, const double* x,
-                                                    int m, const double* g) {
-  int kN = n;
-  int kM = m;
+bool DistanceApproachIPOPTFixedTsInterface::check_g(int           n,
+                                                    const double* x,
+                                                    int           m,
+                                                    const double* g) {
+  int    kN = n;
+  int    kM = m;
   double x_u_tmp[kN];
   double x_l_tmp[kN];
   double g_u_tmp[kM];
@@ -893,8 +881,8 @@ bool DistanceApproachIPOPTFixedTsInterface::check_g(int n, const double* x,
     x_u_tmp[idx] = x_u_tmp[idx] + delta_v;
     x_l_tmp[idx] = x_l_tmp[idx] - delta_v;
     if (x[idx] > x_u_tmp[idx] || x[idx] < x_l_tmp[idx]) {
-      AINFO << "x idx unfeasible: " << idx << ", x: " << x[idx]
-            << ", lower: " << x_l_tmp[idx] << ", upper: " << x_u_tmp[idx];
+      AINFO << "x idx unfeasible: " << idx << ", x: " << x[idx] << ", lower: " << x_l_tmp[idx]
+            << ", upper: " << x_u_tmp[idx];
     }
   }
 
@@ -956,21 +944,22 @@ bool DistanceApproachIPOPTFixedTsInterface::check_g(int n, const double* x,
   return true;
 }
 
-void DistanceApproachIPOPTFixedTsInterface::generate_tapes(int n, int m,
+void DistanceApproachIPOPTFixedTsInterface::generate_tapes(int  n,
+                                                           int  m,
                                                            int* nnz_jac_g,
                                                            int* nnz_h_lag) {
-  std::vector<double> xp(n);
-  std::vector<double> lamp(m);
-  std::vector<double> zl(m);
-  std::vector<double> zu(m);
+  std::vector<double>  xp(n);
+  std::vector<double>  lamp(m);
+  std::vector<double>  zl(m);
+  std::vector<double>  zu(m);
   std::vector<adouble> xa(n);
   std::vector<adouble> g(m);
-  std::vector<double> lam(m);
+  std::vector<double>  lam(m);
 
-  double sig;
+  double  sig;
   adouble obj_value;
-  double dummy = 0.0;
-  obj_lam = new double[m + 1];
+  double  dummy = 0.0;
+  obj_lam       = new double[m + 1];
   get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
 
   trace_on(tag_f);
@@ -1009,25 +998,23 @@ void DistanceApproachIPOPTFixedTsInterface::generate_tapes(int n, int m,
 
   trace_off();
 
-  rind_g = nullptr;
-  cind_g = nullptr;
-  rind_L = nullptr;
-  cind_L = nullptr;
-  jacval = nullptr;
+  rind_g  = nullptr;
+  cind_g  = nullptr;
+  rind_L  = nullptr;
+  cind_L  = nullptr;
+  jacval  = nullptr;
   hessval = nullptr;
 
   options_g[0] = 0; /* sparsity pattern by index domains (default) */
   options_g[1] = 0; /*                         safe mode (default) */
   options_g[2] = 0;
   options_g[3] = 0; /*                column compression (default) */
-  sparse_jac(tag_g, m, n, 0, &xp[0], &nnz_jac, &rind_g, &cind_g, &jacval,
-             options_g);
+  sparse_jac(tag_g, m, n, 0, &xp[0], &nnz_jac, &rind_g, &cind_g, &jacval, options_g);
   *nnz_jac_g = nnz_jac;
 
   options_L[0] = 0;
   options_L[1] = 1;
-  sparse_hess(tag_L, n, 0, &xp[0], &nnz_L, &rind_L, &cind_L, &hessval,
-              options_L);
+  sparse_hess(tag_L, n, 0, &xp[0], &nnz_L, &rind_L, &cind_L, &hessval, options_L);
   *nnz_h_lag = nnz_L;
 }
 //***************    end   ADOL-C part ***********************************

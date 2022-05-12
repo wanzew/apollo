@@ -34,9 +34,7 @@ double BoundedScalePositiveProbability(double p, double max_p, double min_p) {
 // @return scaled prob
 // @NOTE: original method name is scale_positive_probability
 double ScalePositiveProbability(double p, double max_p, double th_p) {
-  if (p <= th_p) {
-    return p;
-  }
+  if (p <= th_p) { return p; }
   p = (p - th_p) * (max_p - th_p) / (1 - th_p) + th_p;
   return p;
 }
@@ -67,8 +65,8 @@ double FuseTwoProbabilities(double prob1, double prob2) {
 // @return fsued probability of input multiple probabilities
 // @NOTE: original method name is fused_multiple_probabilities
 double FuseMultipleProbabilities(const std::vector<double>& probs) {
-  std::vector<double> log_odd_probs = probs;
-  auto prob_to_log_odd = [](double p) {
+  std::vector<double> log_odd_probs   = probs;
+  auto                prob_to_log_odd = [](double p) {
     p = std::max(std::min(p, 1 - 1e-6), 1e-6);
     return std::log(p / (1 - p));
   };
@@ -79,8 +77,7 @@ double FuseMultipleProbabilities(const std::vector<double>& probs) {
   for (auto& log_odd_prob : log_odd_probs) {
     log_odd_prob = prob_to_log_odd(log_odd_prob);
   }
-  double log_odd_probs_sum =
-      std::accumulate(log_odd_probs.begin(), log_odd_probs.end(), 0.0);
+  double log_odd_probs_sum = std::accumulate(log_odd_probs.begin(), log_odd_probs.end(), 0.0);
   return log_odd_to_prob(log_odd_probs_sum);
 }
 

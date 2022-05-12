@@ -21,11 +21,12 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/proto/pad_msg.pb.h"
+
 #include "modules/common/util/future.h"
 #include "modules/planning/planner/navi_planner_dispatcher.h"
 #include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
-#include "modules/planning/proto/pad_msg.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -63,18 +64,16 @@ class NaviPlanning : public PlanningBase {
    * @brief main logic of the planning module, runs periodically triggered by
    * timer.
    */
-  void RunOnce(const LocalView& local_view,
-               ADCTrajectory* const trajectory_pb) override;
+  void RunOnce(const LocalView& local_view, ADCTrajectory* const trajectory_pb) override;
 
-  apollo::common::Status Plan(
-      const double current_time_stamp,
-      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* const trajectory) override;
+  apollo::common::Status Plan(const double                                current_time_stamp,
+                              const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+                              ADCTrajectory* const                        trajectory) override;
 
  private:
-  common::Status InitFrame(const uint32_t sequence_num,
+  common::Status InitFrame(const uint32_t                 sequence_num,
                            const common::TrajectoryPoint& planning_start_point,
-                           const common::VehicleState& vehicle_state);
+                           const common::VehicleState&    vehicle_state);
 
   bool CheckPlanningConfig(const PlanningConfig& config);
 
@@ -94,8 +93,7 @@ class NaviPlanning : public PlanningBase {
    * @lane_info_group output left neighbors info which sorted from near to
    *far
    */
-  void GetLeftNeighborLanesInfo(
-      std::vector<std::pair<std::string, double>>* const lane_info_group);
+  void GetLeftNeighborLanesInfo(std::vector<std::pair<std::string, double>>* const lane_info_group);
 
   /**
    * @brief get the right neighbors lane of the lane which the vehicle is
@@ -103,17 +101,17 @@ class NaviPlanning : public PlanningBase {
    * @lane_info_group output right neighbors info which sorted from near to
    *far
    */
-  void GetRightNeighborLanesInfo(
-      std::vector<std::pair<std::string, double>>* const lane_info_group);
+  void
+  GetRightNeighborLanesInfo(std::vector<std::pair<std::string, double>>* const lane_info_group);
 
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
 
   class VehicleConfig {
    public:
-    double x_ = 0.0;
-    double y_ = 0.0;
-    double theta_ = 0.0;
-    bool is_valid_ = false;
+    double x_        = 0.0;
+    double y_        = 0.0;
+    double theta_    = 0.0;
+    bool   is_valid_ = false;
   };
   VehicleConfig last_vehicle_config_;
 

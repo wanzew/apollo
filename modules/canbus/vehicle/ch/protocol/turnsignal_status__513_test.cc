@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/protocol/turnsignal_status__513.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -26,9 +27,9 @@ class Turnsignalstatus513Test : public ::testing::Test {
 };
 
 TEST_F(Turnsignalstatus513Test, General) {
-  uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t             data[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
+  int32_t             length  = 8;
+  ChassisDetail       cd;
   Turnsignalstatus513 turnsignalstatus;
   turnsignalstatus.Parse(data, length, &cd);
 

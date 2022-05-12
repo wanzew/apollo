@@ -36,18 +36,20 @@ namespace apollo {
 namespace drivers {
 namespace robosense {
 struct alignas(16) LidarPacketMsg {
-  double timestamp = 0.0;
-  std::string frame_id = "";
+  double                               timestamp = 0.0;
+  std::string                          frame_id  = "";
   std::array<uint8_t, PKT_DATA_LENGTH> packet{};  ///< lidar single packet
 };
 
 class RobosenseDriver : public lidar::LidarDriver {
  public:
-  RobosenseDriver(const std::shared_ptr<cyber::Node> &node,
-                  const ::apollo::drivers::lidar::config &config)
-      : node_(node), conf_(config.robosense()) {}
-  RobosenseDriver(const std::shared_ptr<cyber::Node> &node, const Config &conf)
-      : node_(node), conf_(conf) {}
+  RobosenseDriver(const std::shared_ptr<cyber::Node>&     node,
+                  const ::apollo::drivers::lidar::config& config)
+      : node_(node)
+      , conf_(config.robosense()) {}
+  RobosenseDriver(const std::shared_ptr<cyber::Node>& node, const Config& conf)
+      : node_(node)
+      , conf_(conf) {}
   ~RobosenseDriver() { stop(); }
   bool Init() override;
 
@@ -57,10 +59,10 @@ class RobosenseDriver : public lidar::LidarDriver {
   void processDifopPackets();
 
  private:
-  std::shared_ptr<cyber::Node> node_ = nullptr;
-  Config conf_;
-  std::shared_ptr<cyber::Writer<RobosenseScan>> scan_writer_ = nullptr;
-  std::shared_ptr<cyber::Writer<PointCloud>> pointcloud_writer_ = nullptr;
+  std::shared_ptr<cyber::Node>                  node_ = nullptr;
+  Config                                        conf_;
+  std::shared_ptr<cyber::Writer<RobosenseScan>> scan_writer_       = nullptr;
+  std::shared_ptr<cyber::Writer<PointCloud>>    pointcloud_writer_ = nullptr;
 
  private:
   void prepareLidarScanMsg(std::shared_ptr<RobosenseScan> msg);
@@ -75,16 +77,16 @@ class RobosenseDriver : public lidar::LidarDriver {
   }
 
  private:
-  Queue<LidarPacketMsg> msop_pkt_queue_;
-  Queue<LidarPacketMsg> difop_pkt_queue_;
-  bool thread_flag_;
-  std::shared_ptr<std::thread> lidar_thread_ptr_;
+  Queue<LidarPacketMsg>                    msop_pkt_queue_;
+  Queue<LidarPacketMsg>                    difop_pkt_queue_;
+  bool                                     thread_flag_;
+  std::shared_ptr<std::thread>             lidar_thread_ptr_;
   std::shared_ptr<DecoderBase<PointXYZIT>> lidar_decoder_ptr_;
-  std::shared_ptr<Input> lidar_input_ptr_;
-  uint32_t scan_seq_;
-  uint32_t points_seq_;
-  std::shared_ptr<PointCloud> point_cloud_ptr_;
-  std::shared_ptr<RobosenseScan> scan_ptr_;
+  std::shared_ptr<Input>                   lidar_input_ptr_;
+  uint32_t                                 scan_seq_;
+  uint32_t                                 points_seq_;
+  std::shared_ptr<PointCloud>              point_cloud_ptr_;
+  std::shared_ptr<RobosenseScan>           scan_ptr_;
 };
 }  // namespace robosense
 }  // namespace drivers

@@ -23,17 +23,18 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-void CropBox::getCropBox(const int width, const int height,
-                         const base::TrafficLightPtr &light,
-                         base::RectI *crop_box) {
+void CropBox::getCropBox(const int                    width,
+                         const int                    height,
+                         const base::TrafficLightPtr& light,
+                         base::RectI*                 crop_box) {
   int rows = height;
   int cols = width;
 
   if (OutOfValidRegion(light->region.projection_roi, width, height) ||
       light->region.projection_roi.Area() <= 0) {
-    crop_box->x = 0;
-    crop_box->y = 0;
-    crop_box->width = 0;
+    crop_box->x      = 0;
+    crop_box->y      = 0;
+    crop_box->width  = 0;
     crop_box->height = 0;
     return;
   }
@@ -46,10 +47,9 @@ void CropBox::getCropBox(const int width, const int height,
   // scale
   int center_x = (xr + xl) / 2;
   int center_y = (yb + yt) / 2;
-  int resize =
-      static_cast<int>(crop_scale_ * static_cast<float>(std::max(
-                                         light->region.projection_roi.width,
-                                         light->region.projection_roi.height)));
+  int resize   = static_cast<int>(crop_scale_ *
+                                static_cast<float>(std::max(light->region.projection_roi.width,
+                                                            light->region.projection_roi.height)));
 
   resize = std::max(resize, min_crop_size_);
   resize = std::min(resize, width);
@@ -72,32 +72,31 @@ void CropBox::getCropBox(const int width, const int height,
     yb = rows - 1;
   }
 
-  crop_box->x = xl;
-  crop_box->y = yt;
-  crop_box->width = xr - xl + 1;
+  crop_box->x      = xl;
+  crop_box->y      = yt;
+  crop_box->width  = xr - xl + 1;
   crop_box->height = yb - yt + 1;
 }
 void CropBox::Init(float crop_scale, int min_crop_size) {
-  crop_scale_ = crop_scale;
+  crop_scale_    = crop_scale;
   min_crop_size_ = min_crop_size;
 }
-CropBox::CropBox(float crop_scale, int min_crop_size) {
-  Init(crop_scale, min_crop_size);
-}
-void CropBoxWholeImage::getCropBox(const int width, const int height,
-                                   const base::TrafficLightPtr &light,
-                                   base::RectI *crop_box) {
+CropBox::CropBox(float crop_scale, int min_crop_size) { Init(crop_scale, min_crop_size); }
+void CropBoxWholeImage::getCropBox(const int                    width,
+                                   const int                    height,
+                                   const base::TrafficLightPtr& light,
+                                   base::RectI*                 crop_box) {
   if (!OutOfValidRegion(light->region.projection_roi, width, height) &&
       light->region.projection_roi.Area() > 0) {
     crop_box->x = crop_box->y = 0;
-    crop_box->width = width;
-    crop_box->height = height;
+    crop_box->width           = width;
+    crop_box->height          = height;
     return;
   }
 
-  crop_box->x = 0;
-  crop_box->y = 0;
-  crop_box->width = 0;
+  crop_box->x      = 0;
+  crop_box->y      = 0;
+  crop_box->width  = 0;
   crop_box->height = 0;
 }
 

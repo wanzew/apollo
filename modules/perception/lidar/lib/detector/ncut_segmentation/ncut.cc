@@ -16,6 +16,8 @@
 
 #include "modules/perception/lidar/lib/detector/ncut_segmentation/ncut.h"
 
+#include <omp.h>
+
 #include <algorithm>
 #include <ctime>
 #include <functional>
@@ -26,8 +28,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -48,7 +48,7 @@ using Eigen::MatrixXf;
 NCut::NCut() {}
 NCut::~NCut() { ADEBUG << "NCut destructor done"; }
 
-bool NCut::Init(const NCutParam &param) {
+bool NCut::Init(const NCutParam& param) {
   if (!Configure(param)) {
     AERROR << "failed to load ncut config.";
     return false;
@@ -62,22 +62,21 @@ bool NCut::Init(const NCutParam &param) {
   return true;
 }
 
-bool NCut::Configure(const NCutParam &ncut_param_) {
-  _grid_radius = ncut_param_.grid_radius();
-  _connect_radius = ncut_param_.connect_radius();
-  _super_pixel_cell_size = ncut_param_.super_pixel_cell_size();
-  _num_cuts = ncut_param_.num_cuts();
-  _ncuts_stop_threshold = ncut_param_.ncuts_stop_threshold();
-  _ncuts_enable_classifier_threshold =
-      ncut_param_.ncuts_enable_classifier_threshold();
-  _sigma_space = ncut_param_.sigma_space();
-  _sigma_feature = ncut_param_.sigma_feature();
-  _skeleton_cell_size = ncut_param_.skeleton_cell_size();
-  _patch_size = ncut_param_.patch_size();
-  _overlap_factor = ncut_param_.overlap_factor();
-  _felzenszwalb_sigma = ncut_param_.felzenszwalb_sigma();
-  _felzenszwalb_k = ncut_param_.felzenszwalb_k();
-  _felzenszwalb_min_size = ncut_param_.felzenszwalb_min_size();
+bool NCut::Configure(const NCutParam& ncut_param_) {
+  _grid_radius                       = ncut_param_.grid_radius();
+  _connect_radius                    = ncut_param_.connect_radius();
+  _super_pixel_cell_size             = ncut_param_.super_pixel_cell_size();
+  _num_cuts                          = ncut_param_.num_cuts();
+  _ncuts_stop_threshold              = ncut_param_.ncuts_stop_threshold();
+  _ncuts_enable_classifier_threshold = ncut_param_.ncuts_enable_classifier_threshold();
+  _sigma_space                       = ncut_param_.sigma_space();
+  _sigma_feature                     = ncut_param_.sigma_feature();
+  _skeleton_cell_size                = ncut_param_.skeleton_cell_size();
+  _patch_size                        = ncut_param_.patch_size();
+  _overlap_factor                    = ncut_param_.overlap_factor();
+  _felzenszwalb_sigma                = ncut_param_.felzenszwalb_sigma();
+  _felzenszwalb_k                    = ncut_param_.felzenszwalb_k();
+  _felzenszwalb_min_size             = ncut_param_.felzenszwalb_min_size();
 
   AINFO << "NCut Parameters" << ncut_param_.DebugString();
   return true;
@@ -101,8 +100,7 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
     pids[i] = static_cast<int>(i);
   }
   _cloud_obstacles = base::PointFCloudPtr(new base::PointFCloud(*cloud, pids));
-  AINFO << "cloud obstacle size in ncut segment is "
-        << _cloud_obstacles->size();
+  AINFO << "cloud obstacle size in ncut segment is " << _cloud_obstacles->size();
 #ifdef DEBUG_NCUT
   ADEBUG << "segment enter ... input cloud size " << cloud->size();
 // visualize_points(pids);
@@ -110,8 +108,7 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
   // .1 super pixels
   // super_pixels_felzenszwalb(cloud, _grid_radius, _super_pixel_cell_size,
   // _cluster_points);
-  SuperPixelsFloodFill(cloud, _grid_radius, _super_pixel_cell_size,
-                       &_cluster_points);
+  SuperPixelsFloodFill(cloud, _grid_radius, _super_pixel_cell_size, &_cluster_points);
 #ifdef DEBUG_NCUT
   // visualize_segments_from_points(_cluster_points);
   ADEBUG << "super pixels " << _cluster_points.size();
@@ -127,9 +124,8 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
 #endif
   // .3 grach cut
   std::vector<std::vector<int>> segment_clusters;
-  std::vector<std::string> segment_labels;
-  NormalizedCut(_ncuts_stop_threshold, true, &segment_clusters,
-                &segment_labels);
+  std::vector<std::string>      segment_labels;
+  NormalizedCut(_ncuts_stop_threshold, true, &segment_clusters, &segment_labels);
 #ifdef DEBUG_NCUT
   AINFO << "normalized_cut done, #segments " << segment_clusters.size()
         << ", time: " << omp_get_wtime() - start_t;
@@ -149,10 +145,11 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
   }
 }
 
-void NCut::SuperPixelsFloodFill(base::PointFCloudConstPtr cloud, float radius,
-                                float cell_size,
-                                std::vector<std::vector<int>> *super_pixels) {
-  FloodFill ff_grid(radius, cell_size);
+void NCut::SuperPixelsFloodFill(base::PointFCloudConstPtr      cloud,
+                                float                          radius,
+                                float                          cell_size,
+                                std::vector<std::vector<int>>* super_pixels) {
+  FloodFill        ff_grid(radius, cell_size);
   std::vector<int> num_cells_per_components;
   ff_grid.GetSegments(cloud, super_pixels, &num_cells_per_components);
 }
@@ -168,32 +165,30 @@ void NCut::PrecomputeAllSkeletonAndBbox() {
   _ff_feature_grid.SetCellSize(_skeleton_cell_size);
   _ff_feature_grid.BuildGrid(_cloud_obstacles);
   std::vector<gridIndex> dummy_indices;
-  BuildAverageHeightMap(_cloud_obstacles, _ff_feature_grid, &_cv_feature_map,
-                        &dummy_indices);
+  BuildAverageHeightMap(_cloud_obstacles, _ff_feature_grid, &_cv_feature_map, &dummy_indices);
 
   // build_maximum_height_map(_cloud_obstacles, _ff_feature_grid,
   // _cv_feature_map, dummy_indices);
   for (int i = 0; i < num_clusters; ++i) {
-    SampleByGrid(_cluster_points[i], &_cluster_skeleton_points[i],
-                 &_cluster_skeleton_features[i]);
+    SampleByGrid(_cluster_points[i], &_cluster_skeleton_points[i], &_cluster_skeleton_features[i]);
     _cluster_bounding_box[i] = ComputeClusterBoundingBox(_cluster_points[i]);
   }
   // cluster label
   for (size_t i = 0; i < _cluster_points.size(); ++i) {
-    base::PointFCloudPtr pc = base::PointFCloudPtr(
-        new base::PointFCloud(*_cloud_obstacles, _cluster_points[i]));
+    base::PointFCloudPtr pc =
+        base::PointFCloudPtr(new base::PointFCloud(*_cloud_obstacles, _cluster_points[i]));
     _cluster_labels[i] = GetPcLabel(pc);
   }
 }
 
-void NCut::BuildAverageHeightMap(
-    base::PointFCloudConstPtr cloud, const FloodFill &ff_map,
-    cv::Mat *cv_height_map_in, std::vector<gridIndex> *point_pixel_indices_in) {
-  cv::Mat &cv_height_map = *cv_height_map_in;
-  std::vector<gridIndex> &point_pixel_indices = *point_pixel_indices_in;
-  const int num_points = static_cast<int>(cloud->size());
-  cv::Mat cv_img =
-      cv::Mat::zeros(ff_map.GetNumRows(), ff_map.GetNumCols(), CV_32F);
+void NCut::BuildAverageHeightMap(base::PointFCloudConstPtr cloud,
+                                 const FloodFill&          ff_map,
+                                 cv::Mat*                  cv_height_map_in,
+                                 std::vector<gridIndex>*   point_pixel_indices_in) {
+  cv::Mat&                cv_height_map       = *cv_height_map_in;
+  std::vector<gridIndex>& point_pixel_indices = *point_pixel_indices_in;
+  const int               num_points          = static_cast<int>(cloud->size());
+  cv::Mat                 cv_img = cv::Mat::zeros(ff_map.GetNumRows(), ff_map.GetNumCols(), CV_32F);
   std::vector<std::vector<int>> counts;
   counts.resize(cv_img.rows);
   for (size_t i = 0; i < counts.size(); ++i) {
@@ -201,9 +196,9 @@ void NCut::BuildAverageHeightMap(
   }
   point_pixel_indices.resize(num_points);
   for (int i = 0; i < num_points; ++i) {
-    int irow = -1;
-    int jcol = -1;
-    base::PointF pt = (*cloud)[i];
+    int          irow = -1;
+    int          jcol = -1;
+    base::PointF pt   = (*cloud)[i];
     if (ff_map.Pos2d(pt.x, pt.y, &irow, &jcol)) {
       cv_img.at<float>(irow, jcol) += pt.z;
       counts[irow][jcol] += 1;
@@ -216,28 +211,25 @@ void NCut::BuildAverageHeightMap(
   }
   for (int i = 0; i < cv_img.rows; ++i) {
     for (int j = 0; j < cv_img.cols; ++j) {
-      if (counts[i][j] > 0) {
-        cv_img.at<float>(i, j) /= static_cast<float>(counts[i][j]);
-      }
+      if (counts[i][j] > 0) { cv_img.at<float>(i, j) /= static_cast<float>(counts[i][j]); }
     }
   }
   cv::Mat cv_height_map_copy;
   cv::GaussianBlur(cv_img, cv_height_map_copy, cv::Size(3, 3), 0, 0);
-  cv::normalize(cv_height_map_copy, cv_height_map, 0, 255, cv::NORM_MINMAX,
-                CV_8UC1);
+  cv::normalize(cv_height_map_copy, cv_height_map, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 }
 
-void NCut::SampleByGrid(const std::vector<int> &point_gids,
-                        MatrixXf *skeleton_coords_in,
-                        MatrixXf *skeleton_feature_in) {
-  MatrixXf &skeleton_coords = *skeleton_coords_in;
-  MatrixXf &skeleton_feature = *skeleton_feature_in;
-  FloodFill sampler(_grid_radius, _skeleton_cell_size);
-  base::PointFCloudPtr pc = base::PointFCloudPtr(
-      new base::PointFCloud(*_cloud_obstacles, point_gids));
+void NCut::SampleByGrid(const std::vector<int>& point_gids,
+                        MatrixXf*               skeleton_coords_in,
+                        MatrixXf*               skeleton_feature_in) {
+  MatrixXf&            skeleton_coords  = *skeleton_coords_in;
+  MatrixXf&            skeleton_feature = *skeleton_feature_in;
+  FloodFill            sampler(_grid_radius, _skeleton_cell_size);
+  base::PointFCloudPtr pc =
+      base::PointFCloudPtr(new base::PointFCloud(*_cloud_obstacles, point_gids));
   sampler.BuildGrid(pc);
   std::unordered_map<int, std::pair<base::PointF, float>> centroids;
-  const std::vector<int> &point_idx = sampler.GetPointIdxInGrid();
+  const std::vector<int>&                                 point_idx = sampler.GetPointIdxInGrid();
   std::unordered_map<int, std::pair<base::PointF, float>>::iterator it;
   for (size_t i = 0; i < point_idx.size(); ++i) {
     it = centroids.find(point_idx[i]);
@@ -262,21 +254,19 @@ void NCut::SampleByGrid(const std::vector<int> &point_gids,
   GetPatchFeature(skeleton_coords, &skeleton_feature);
 }
 
-void NCut::GetPatchFeature(const MatrixXf &points, MatrixXf *features_in) {
-  MatrixXf &features = *features_in;
+void NCut::GetPatchFeature(const MatrixXf& points, MatrixXf* features_in) {
+  MatrixXf& features   = *features_in;
   const int num_points = static_cast<int>(points.rows());
-  const int dim = _patch_size * _patch_size;
+  const int dim        = _patch_size * _patch_size;
   features.resize(num_points, dim);
   for (int i = 0; i < num_points; ++i) {
     // .1 patch
     int irow = 0;
     int jcol = 0;
-    _ff_feature_grid.Pos2d(points.coeffRef(i, 0), points.coeffRef(i, 1), &irow,
-                           &jcol);
-    cv::Mat patch;
+    _ff_feature_grid.Pos2d(points.coeffRef(i, 0), points.coeffRef(i, 1), &irow, &jcol);
+    cv::Mat     patch;
     cv::Point2f pt(static_cast<float>(irow), static_cast<float>(jcol));
-    cv::getRectSubPix(_cv_feature_map, cv::Size(_patch_size, _patch_size), pt,
-                      patch);
+    cv::getRectSubPix(_cv_feature_map, cv::Size(_patch_size, _patch_size), pt, patch);
     // .2 maybe later i will add other features based on patch
     // .3 add to features
     assert(dim == patch.rows * patch.cols);
@@ -284,16 +274,15 @@ void NCut::GetPatchFeature(const MatrixXf &points, MatrixXf *features_in) {
     for (int r = 0; r < patch.rows; ++r) {
       for (int c = 0; c < patch.cols; ++c) {
         float val = patch.at<float>(r, c);
-        features.coeffRef(i, p++) = static_cast<float>(
-            (std::isnan(val) || std::isinf(val)) ? 1.e-50 : val);
+        features.coeffRef(i, p++) =
+            static_cast<float>((std::isnan(val) || std::isinf(val)) ? 1.e-50 : val);
         // features.coeffRef(i, p++) = patch.at<float>(r, c);
       }
     }
   }
 }
 
-NCut::NcutBoundingBox NCut::ComputeClusterBoundingBox(
-    const std::vector<int> &point_gids) {
+NCut::NcutBoundingBox NCut::ComputeClusterBoundingBox(const std::vector<int>& point_gids) {
   // ! Note: do not perform rotation, so just some intuitive guess
   float x_max = -std::numeric_limits<float>::max();
   float y_max = -std::numeric_limits<float>::max();
@@ -303,12 +292,12 @@ NCut::NcutBoundingBox NCut::ComputeClusterBoundingBox(
   float z_min = std::numeric_limits<float>::max();
   for (size_t j = 0; j < point_gids.size(); ++j) {
     int pid = point_gids[j];
-    x_min = std::min(x_min, (*_cloud_obstacles)[pid].x);
-    x_max = std::max(x_max, (*_cloud_obstacles)[pid].x);
-    y_min = std::min(y_min, (*_cloud_obstacles)[pid].y);
-    y_max = std::max(y_max, (*_cloud_obstacles)[pid].y);
-    z_min = std::min(z_min, (*_cloud_obstacles)[pid].z);
-    z_max = std::max(z_max, (*_cloud_obstacles)[pid].z);
+    x_min   = std::min(x_min, (*_cloud_obstacles)[pid].x);
+    x_max   = std::max(x_max, (*_cloud_obstacles)[pid].x);
+    y_min   = std::min(y_min, (*_cloud_obstacles)[pid].y);
+    y_max   = std::max(y_max, (*_cloud_obstacles)[pid].y);
+    z_min   = std::min(z_min, (*_cloud_obstacles)[pid].z);
+    z_max   = std::max(z_max, (*_cloud_obstacles)[pid].z);
   }
   NcutBoundingBox box;
   std::get<0>(box) = x_min;
@@ -320,10 +309,8 @@ NCut::NcutBoundingBox NCut::ComputeClusterBoundingBox(
   return box;
 }
 
-std::string NCut::GetPcLabel(const base::PointFCloudPtr &cloud) {
-  if (cloud->size() < OBSTACLE_MINIMUM_NUM_POINTS) {
-    return "unknown";
-  }
+std::string NCut::GetPcLabel(const base::PointFCloudPtr& cloud) {
+  if (cloud->size() < OBSTACLE_MINIMUM_NUM_POINTS) { return "unknown"; }
   base::PointFCloudPtr rot_cloud(new base::PointFCloud);
   base::OrientCloud(*cloud, rot_cloud.get(), true);
   std::string label;
@@ -331,21 +318,18 @@ std::string NCut::GetPcLabel(const base::PointFCloudPtr &cloud) {
   // &label);
   label = _classifier->GetLabel(rot_cloud);
   // ./obstacle_detection/classifier/frame_classifier_pipeline.cpp line 466
-  if (label == "background") {
-    label = "unknown";
-  }
+  if (label == "background") { label = "unknown"; }
   return label;
 }
 
-void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
-                         std::vector<std::vector<int>> *segment_clusters_in,
-                         std::vector<std::string> *segment_labels_in) {
-  std::vector<std::vector<int>> &segment_clusters = *segment_clusters_in;
-  std::vector<std::string> &segment_labels = *segment_labels_in;
-  const int num_clusters = static_cast<int>(_cluster_points.size());
-  if (num_clusters < 1) {
-    return;
-  }
+void NCut::NormalizedCut(float                          ncuts_threshold,
+                         bool                           use_classifier,
+                         std::vector<std::vector<int>>* segment_clusters_in,
+                         std::vector<std::string>*      segment_labels_in) {
+  std::vector<std::vector<int>>& segment_clusters = *segment_clusters_in;
+  std::vector<std::string>&      segment_labels   = *segment_labels_in;
+  const int                      num_clusters     = static_cast<int>(_cluster_points.size());
+  if (num_clusters < 1) { return; }
   if (num_clusters == 1) {
     std::vector<int> tmp(1, 0);
     segment_clusters.push_back(tmp);
@@ -359,11 +343,11 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
 #endif
   MatrixXf weights;
   ComputeSkeletonWeights(&weights);
-  std::vector<int> *curr = new std::vector<int>(num_clusters);
+  std::vector<int>* curr = new std::vector<int>(num_clusters);
   for (int i = 0; i < num_clusters; ++i) {
     (*curr)[i] = i;
   }
-  std::stack<std::vector<int> *> job_stack;
+  std::stack<std::vector<int>*> job_stack;
   job_stack.push(curr);
   while (!job_stack.empty()) {
     curr = job_stack.top();
@@ -387,20 +371,20 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
       std::cout << " as a segment (" << seg_label << ")" << std::endl;
 #endif
     } else {
-      std::vector<int> *seg1 = new std::vector<int>();
-      std::vector<int> *seg2 = new std::vector<int>();
-      MatrixXf my_weights(curr->size(), curr->size());
+      std::vector<int>* seg1 = new std::vector<int>();
+      std::vector<int>* seg2 = new std::vector<int>();
+      MatrixXf          my_weights(curr->size(), curr->size());
       for (size_t i = 0; i < curr->size(); ++i) {
         const int ci = curr->at(i);
         for (size_t j = 0; j < curr->size(); ++j) {
-          const int cj = curr->at(j);
+          const int cj              = curr->at(j);
           my_weights.coeffRef(i, j) = weights.coeffRef(ci, cj);
         }
       }
       double cost = GetMinNcuts(my_weights, curr, seg1, seg2);
 #ifdef DEBUG_NCUT
-      AINFO << "N cut cost is " << cost << ", seg1 size " << seg1->size()
-            << ", seg2 size " << seg2->size();
+      AINFO << "N cut cost is " << cost << ", seg1 size " << seg1->size() << ", seg2 size "
+            << seg2->size();
       if (curr->size() < 50) {
         std::cout << "seg1: ";
         for (size_t i = 0; i < seg1->size(); ++i) {
@@ -421,8 +405,8 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
           const int cid = (*curr)[i];
           if (_cluster_labels[cid] != "unknown") {
 #ifdef DEBUG_NCUT
-            std::cout << "cluster: " << cid << " as a segment (hit, "
-                      << _cluster_labels[cid] << ")" << std::endl;
+            std::cout << "cluster: " << cid << " as a segment (hit, " << _cluster_labels[cid] << ")"
+                      << std::endl;
 #endif
             std::vector<int> tmp(1, cid);
             segment_clusters.push_back(tmp);
@@ -464,43 +448,43 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
     }
     std::cout << ": " << segment_labels[i] << std::endl;
   }
-  LOG_DEBUG << "normalized_cut: " << segment_clusters.size()
-            << " segments from " << _cluster_points.size() << " clusters";
+  LOG_DEBUG << "normalized_cut: " << segment_clusters.size() << " segments from "
+            << _cluster_points.size() << " clusters";
 // visualize_segments_from_cluster(segment_clusters);
 #endif
 }
 
-void NCut::ComputeSkeletonWeights(Eigen::MatrixXf *weights_in) {
-  Eigen::MatrixXf &weights = *weights_in;
-  const int num_clusters = static_cast<int>(_cluster_points.size());
-  const double hs2 = _sigma_space * _sigma_space;
-  const double hf2 = _sigma_feature * _sigma_feature;
-  const double radius2 = _connect_radius * _connect_radius;
+void NCut::ComputeSkeletonWeights(Eigen::MatrixXf* weights_in) {
+  Eigen::MatrixXf& weights      = *weights_in;
+  const int        num_clusters = static_cast<int>(_cluster_points.size());
+  const double     hs2          = _sigma_space * _sigma_space;
+  const double     hf2          = _sigma_feature * _sigma_feature;
+  const double     radius2      = _connect_radius * _connect_radius;
   weights.resize(num_clusters, num_clusters);
   for (int i = 0; i < num_clusters; ++i) {
     weights.coeffRef(i, i) = 1.f;
     for (int j = i + 1; j < num_clusters; ++j) {
-      float dist_point = std::numeric_limits<float>::max();
+      float dist_point   = std::numeric_limits<float>::max();
       float dist_feature = std::numeric_limits<float>::max();
-      ComputeSquaredSkeletonDistance(
-          _cluster_skeleton_points[i], _cluster_skeleton_features[i],
-          _cluster_skeleton_points[j], _cluster_skeleton_features[j],
-          &dist_point, &dist_feature);
+      ComputeSquaredSkeletonDistance(_cluster_skeleton_points[i], _cluster_skeleton_features[i],
+                                     _cluster_skeleton_points[j], _cluster_skeleton_features[j],
+                                     &dist_point, &dist_feature);
       if (dist_point > radius2) {
         weights.coeffRef(i, j) = 0.f;
         weights.coeffRef(j, i) = 0.f;
       } else {
-        weights.coeffRef(i, j) = static_cast<float>(exp(-dist_point / hs2) *
-                                                    exp(-dist_feature / hf2));
+        weights.coeffRef(i, j) =
+            static_cast<float>(exp(-dist_point / hs2) * exp(-dist_feature / hf2));
         weights.coeffRef(j, i) = weights.coeffRef(i, j);
       }
     }
   }
 }
 
-float NCut::GetMinNcuts(const Eigen::MatrixXf &in_weights,
-                        const std::vector<int> *in_clusters,
-                        std::vector<int> *seg1, std::vector<int> *seg2) {
+float NCut::GetMinNcuts(const Eigen::MatrixXf&  in_weights,
+                        const std::vector<int>* in_clusters,
+                        std::vector<int>*       seg1,
+                        std::vector<int>*       seg2) {
   // .0 initialization
   const int num_clusters = static_cast<int>(in_weights.rows());
   seg1->resize(num_clusters);
@@ -517,18 +501,17 @@ float NCut::GetMinNcuts(const Eigen::MatrixXf &in_weights,
   // .2 search for best split
   const float minval = eigenvectors.col(1).minCoeff();
   const float maxval = eigenvectors.col(1).maxCoeff();
-  const float increment = static_cast<float>(
-      (maxval - minval) / (static_cast<float>(_num_cuts) + 1.0f));
-  int num_seg1 = 0;
-  int num_seg2 = 0;
+  const float increment =
+      static_cast<float>((maxval - minval) / (static_cast<float>(_num_cuts) + 1.0f));
+  int   num_seg1  = 0;
+  int   num_seg2  = 0;
   float opt_split = 0.0;
-  float opt_cost = std::numeric_limits<float>::max();
+  float opt_cost  = std::numeric_limits<float>::max();
   for (int i = 0; i < _num_cuts; ++i) {
     num_seg1 = 0;
     num_seg2 = 0;
     // .2.1 split
-    float split =
-        static_cast<float>(minval + static_cast<float>(i + 1) * increment);
+    float split = static_cast<float>(minval + static_cast<float>(i + 1) * increment);
     for (int j = 0; j < num_clusters; ++j) {
       if (eigenvectors.coeffRef(j, 1) > split) {
         (*seg1)[num_seg1++] = j;
@@ -539,7 +522,7 @@ float NCut::GetMinNcuts(const Eigen::MatrixXf &in_weights,
     // .2.2 compute best normalized_cuts cost
     double assoc1 = 0.0;
     double assoc2 = 0.0;
-    double cut = 0.0;
+    double cut    = 0.0;
     for (int j = 0; j < num_seg1; ++j) {
       assoc1 += in_weights.row(seg1->at(j)).sum();
     }
@@ -553,13 +536,12 @@ float NCut::GetMinNcuts(const Eigen::MatrixXf &in_weights,
     }
     float cost = static_cast<float>(cut / assoc1 + cut / assoc2);
 #ifdef DEBUG_NCUT
-    LOG_DEBUG << "seg1: " << num_seg1 << ", seg2: " << num_seg2 << ", split "
-              << split << ", cut " << cut << ", assoc1 " << assoc1
-              << ", assoc2 " << assoc2 << ", cost " << cost;
+    LOG_DEBUG << "seg1: " << num_seg1 << ", seg2: " << num_seg2 << ", split " << split << ", cut "
+              << cut << ", assoc1 " << assoc1 << ", assoc2 " << assoc2 << ", cost " << cost;
 #endif
     // .2.3 find best cost
     if (cost < opt_cost) {
-      opt_cost = cost;
+      opt_cost  = cost;
       opt_split = split;
     }
   }
@@ -578,12 +560,12 @@ float NCut::GetMinNcuts(const Eigen::MatrixXf &in_weights,
   return opt_cost;
 }
 
-void NCut::LaplacianDecomposition(const Eigen::MatrixXf &weights,
-                                  Eigen::MatrixXf *eigenvectors_in) {
+void NCut::LaplacianDecomposition(const Eigen::MatrixXf& weights,
+                                  Eigen::MatrixXf*       eigenvectors_in) {
 #ifdef DEBUG_NCUT
 // std::cout << "laplacian 0:\n " << weights << std::endl << std::endl;
 #endif
-  Eigen::MatrixXf &eigenvectors = *eigenvectors_in;
+  Eigen::MatrixXf& eigenvectors = *eigenvectors_in;
   // .1 degree matrix: D = sum(W, 2)
   Eigen::VectorXf diag(weights.rows());
   for (int i = 0; i < weights.rows(); ++i) {
@@ -606,8 +588,7 @@ void NCut::LaplacianDecomposition(const Eigen::MatrixXf &weights,
   // .3 D^(-1/2)
   Eigen::VectorXf diag_halfinv(weights.rows());
   for (int i = 0; i < weights.rows(); ++i) {
-    diag_halfinv.coeffRef(i) =
-        static_cast<float>(1.0 / std::sqrt(diag.coeffRef(i)));
+    diag_halfinv.coeffRef(i) = static_cast<float>(1.0 / std::sqrt(diag.coeffRef(i)));
   }
   // .4 normalized laplacian D^(-1/2) * L * D^(-1/2)
   for (int i = 0; i < laplacian.rows(); ++i) {
@@ -639,76 +620,66 @@ void NCut::LaplacianDecomposition(const Eigen::MatrixXf &weights,
   // .7 get sorted eigen vectors
   eigenvectors.resize(weights.rows(), weights.cols());
   for (int i = 0; i < eigenvectors.cols(); ++i) {
-    eigenvectors.col(i) =
-        eig_solver.eigenvectors().col(eigval[i].second).real();
+    eigenvectors.col(i) = eig_solver.eigenvectors().col(eigval[i].second).real();
   }
   for (int i = 0; i < eigenvectors.rows(); ++i) {
     eigenvectors.row(i) *= diag_halfinv.coeffRef(i);
   }
 }
 
-bool NCut::ComputeSquaredSkeletonDistance(const Eigen::MatrixXf &in1_points,
-                                          const Eigen::MatrixXf &in1_features,
-                                          const Eigen::MatrixXf &in2_points,
-                                          const Eigen::MatrixXf &in2_features,
-                                          float *dist_point,
-                                          float *dist_feature) {
-  if (!((in1_points.rows() == in1_features.rows()) &&
-        (in2_points.rows() == in2_features.rows()))) {
+bool NCut::ComputeSquaredSkeletonDistance(const Eigen::MatrixXf& in1_points,
+                                          const Eigen::MatrixXf& in1_features,
+                                          const Eigen::MatrixXf& in2_points,
+                                          const Eigen::MatrixXf& in2_features,
+                                          float*                 dist_point,
+                                          float*                 dist_feature) {
+  if (!((in1_points.rows() == in1_features.rows()) && (in2_points.rows() == in2_features.rows()))) {
     return false;
   }
-  const int num1 = static_cast<int>(in1_points.rows());
-  const int num2 = static_cast<int>(in2_points.rows());
-  const int dim = static_cast<int>(in1_features.cols());
-  int min_index1 = -1;
-  int min_index2 = -1;
-  float min_dist = std::numeric_limits<float>::max();
+  const int num1       = static_cast<int>(in1_points.rows());
+  const int num2       = static_cast<int>(in2_points.rows());
+  const int dim        = static_cast<int>(in1_features.cols());
+  int       min_index1 = -1;
+  int       min_index2 = -1;
+  float     min_dist   = std::numeric_limits<float>::max();
   for (int i = 0; i < num1; ++i) {
     for (int j = 0; j < num2; ++j) {
-      const float diff_x =
-          in1_points.coeffRef(i, 0) - in2_points.coeffRef(j, 0);
-      const float diff_y =
-          in1_points.coeffRef(i, 1) - in2_points.coeffRef(j, 1);
-      const float diff_z =
-          in1_points.coeffRef(i, 2) - in2_points.coeffRef(j, 2);
-      float dist = diff_x * diff_x + diff_y * diff_y + diff_z * diff_z;
+      const float diff_x = in1_points.coeffRef(i, 0) - in2_points.coeffRef(j, 0);
+      const float diff_y = in1_points.coeffRef(i, 1) - in2_points.coeffRef(j, 1);
+      const float diff_z = in1_points.coeffRef(i, 2) - in2_points.coeffRef(j, 2);
+      float       dist   = diff_x * diff_x + diff_y * diff_y + diff_z * diff_z;
       if (dist < min_dist) {
-        min_dist = dist;
+        min_dist   = dist;
         min_index1 = i;
         min_index2 = j;
       }
     }
   }
-  *dist_point = min_dist;
+  *dist_point   = min_dist;
   *dist_feature = 0.f;
   for (int i = 0; i < dim; ++i) {
-    float diff = in1_features.coeffRef(min_index1, i) -
-                 in2_features.coeffRef(min_index2, i);
+    float diff = in1_features.coeffRef(min_index1, i) - in2_features.coeffRef(min_index2, i);
     *dist_feature += diff * diff;
   }
   return true;
 }
 
-bool NCut::IsMovableObstacle(const std::vector<int> &cluster_ids,
-                             std::string *label) {
+bool NCut::IsMovableObstacle(const std::vector<int>& cluster_ids, std::string* label) {
   NcutBoundingBox box;
   GetComponentBoundingBox(cluster_ids, &box);
   float dummy_length = GetBboxLength(box);
-  float dummy_width = GetBboxWidth(box);
-  float length = std::max(dummy_length, dummy_width);
-  float width = std::min(dummy_length, dummy_width);
-  if (IsPotentialPedestrianSize(length, width) ||
-      IsPotentialBicyclistSize(length, width) ||
+  float dummy_width  = GetBboxWidth(box);
+  float length       = std::max(dummy_length, dummy_width);
+  float width        = std::min(dummy_length, dummy_width);
+  if (IsPotentialPedestrianSize(length, width) || IsPotentialBicyclistSize(length, width) ||
       IsPotentialCarSize(length, width)) {
     *label = GetClustersLabel(cluster_ids);
-    if (*label != "unknown" || *label != "background") {
-      return true;
-    }
+    if (*label != "unknown" || *label != "background") { return true; }
   }
   return false;
 }
 
-std::string NCut::GetClustersLabel(const std::vector<int> &cluster_ids) {
+std::string NCut::GetClustersLabel(const std::vector<int>& cluster_ids) {
   std::vector<int> point_ids;
   GetClustersPids(cluster_ids, &point_ids);
   base::PointFCloudPtr cloud =
@@ -716,39 +687,34 @@ std::string NCut::GetClustersLabel(const std::vector<int> &cluster_ids) {
   return GetPcLabel(cloud);
 }
 
-void NCut::GetClustersPids(const std::vector<int> &cids,
-                           std::vector<int> *pids_in) {
-  std::vector<int> &pids = *pids_in;
-  int num_points = 0;
+void NCut::GetClustersPids(const std::vector<int>& cids, std::vector<int>* pids_in) {
+  std::vector<int>& pids       = *pids_in;
+  int               num_points = 0;
   for (size_t i = 0; i < cids.size(); ++i) {
     num_points += static_cast<int>(_cluster_points[cids[i]].size());
   }
   pids.resize(num_points, -1);
   int offset = 0;
   for (size_t i = 0; i < cids.size(); ++i) {
-    const std::vector<int> &curr_pids = _cluster_points[cids[i]];
-    memcpy(pids.data() + offset, curr_pids.data(),
-           sizeof(int) * curr_pids.size());
+    const std::vector<int>& curr_pids = _cluster_points[cids[i]];
+    memcpy(pids.data() + offset, curr_pids.data(), sizeof(int) * curr_pids.size());
     offset += static_cast<int>(curr_pids.size());
   }
 }
 
-int NCut::GetComponentBoundingBox(const std::vector<int> &cluster_ids,
-                                  NcutBoundingBox *box_in) {
-  NcutBoundingBox &box = *box_in;
-  if (cluster_ids.empty()) {
-    return 0;
-  }
-  int cid = cluster_ids[0];
-  float x_min = std::get<0>(_cluster_bounding_box[cid]);
-  float x_max = std::get<1>(_cluster_bounding_box[cid]);
-  float y_min = std::get<2>(_cluster_bounding_box[cid]);
-  float y_max = std::get<3>(_cluster_bounding_box[cid]);
-  float z_min = std::get<4>(_cluster_bounding_box[cid]);
-  float z_max = std::get<5>(_cluster_bounding_box[cid]);
-  int num_points = static_cast<int>(_cluster_points[cid].size());
+int NCut::GetComponentBoundingBox(const std::vector<int>& cluster_ids, NcutBoundingBox* box_in) {
+  NcutBoundingBox& box = *box_in;
+  if (cluster_ids.empty()) { return 0; }
+  int   cid        = cluster_ids[0];
+  float x_min      = std::get<0>(_cluster_bounding_box[cid]);
+  float x_max      = std::get<1>(_cluster_bounding_box[cid]);
+  float y_min      = std::get<2>(_cluster_bounding_box[cid]);
+  float y_max      = std::get<3>(_cluster_bounding_box[cid]);
+  float z_min      = std::get<4>(_cluster_bounding_box[cid]);
+  float z_max      = std::get<5>(_cluster_bounding_box[cid]);
+  int   num_points = static_cast<int>(_cluster_points[cid].size());
   for (size_t i = 1; i < cluster_ids.size(); ++i) {
-    cid = cluster_ids[i];
+    cid   = cluster_ids[i];
     x_min = std::min(x_min, std::get<0>(_cluster_bounding_box[cid]));
     x_max = std::max(x_max, std::get<1>(_cluster_bounding_box[cid]));
     y_min = std::min(y_min, std::get<2>(_cluster_bounding_box[cid]));
@@ -766,48 +732,43 @@ int NCut::GetComponentBoundingBox(const std::vector<int> &cluster_ids,
   return num_points;
 }
 
-std::string NCut::GetPcRoughLabel(const base::PointFCloudPtr &cloud,
-                                  bool only_check_pedestrian) {
-  if (cloud->size() < OBSTACLE_MINIMUM_NUM_POINTS) {
-    return "unknown";
-  }
+std::string NCut::GetPcRoughLabel(const base::PointFCloudPtr& cloud, bool only_check_pedestrian) {
+  if (cloud->size() < OBSTACLE_MINIMUM_NUM_POINTS) { return "unknown"; }
   float x_max = -std::numeric_limits<float>::max();
   float y_max = -std::numeric_limits<float>::max();
   float x_min = std::numeric_limits<float>::max();
   float y_min = std::numeric_limits<float>::max();
   for (size_t i = 0; i < cloud->size(); ++i) {
     base::PointF pt = (*cloud)[i];
-    x_min = std::min(x_min, pt.x);
-    x_max = std::max(x_max, pt.x);
-    y_min = std::min(y_min, pt.y);
-    y_max = std::max(y_max, pt.y);
+    x_min           = std::min(x_min, pt.x);
+    x_max           = std::max(x_max, pt.x);
+    y_min           = std::min(y_min, pt.y);
+    y_max           = std::max(y_max, pt.y);
   }
-  float dummy_length = x_max - x_min;
-  float dummy_width = y_max - y_min;
-  float length = std::max(dummy_length, dummy_width);
-  float width = std::min(dummy_length, dummy_width);
-  std::string label = "unknown";
-  bool is_candidate = false;
+  float       dummy_length = x_max - x_min;
+  float       dummy_width  = y_max - y_min;
+  float       length       = std::max(dummy_length, dummy_width);
+  float       width        = std::min(dummy_length, dummy_width);
+  std::string label        = "unknown";
+  bool        is_candidate = false;
   if (only_check_pedestrian) {
-    if (IsPotentialPedestrianSize(length, width) ||
-        IsPotentialBicyclistSize(length, width)) {
+    if (IsPotentialPedestrianSize(length, width) || IsPotentialBicyclistSize(length, width)) {
       is_candidate = true;
     }
   } else {
-    if (IsPotentialPedestrianSize(length, width) ||
-        IsPotentialBicyclistSize(length, width) ||
+    if (IsPotentialPedestrianSize(length, width) || IsPotentialBicyclistSize(length, width) ||
         IsPotentialCarSize(length, width)) {
       is_candidate = true;
     }
   }
-  if (is_candidate) {
-    label = GetPcLabel(cloud);
-  }
+  if (is_candidate) { label = GetPcLabel(cloud); }
   return label;
 }
 
-void NCut::GetSegmentRoughSize(const base::PointFCloudPtr &cloud, float *length,
-                               float *width, float *height) {
+void NCut::GetSegmentRoughSize(const base::PointFCloudPtr& cloud,
+                               float*                      length,
+                               float*                      width,
+                               float*                      height) {
   float x_max = -std::numeric_limits<float>::max();
   float y_max = -std::numeric_limits<float>::max();
   float z_max = -std::numeric_limits<float>::max();
@@ -816,15 +777,15 @@ void NCut::GetSegmentRoughSize(const base::PointFCloudPtr &cloud, float *length,
   float z_min = std::numeric_limits<float>::max();
   for (size_t i = 0; i < cloud->size(); ++i) {
     base::PointF pt = (*cloud)[i];
-    x_min = std::min(x_min, pt.x);
-    x_max = std::max(x_max, pt.x);
-    y_min = std::min(y_min, pt.y);
-    y_max = std::max(y_max, pt.y);
-    z_min = std::min(z_min, pt.z);
-    z_max = std::max(z_max, pt.z);
+    x_min           = std::min(x_min, pt.x);
+    x_max           = std::max(x_max, pt.x);
+    y_min           = std::min(y_min, pt.y);
+    y_max           = std::max(y_max, pt.y);
+    z_min           = std::min(z_min, pt.z);
+    z_max           = std::max(z_max, pt.z);
   }
   *length = (x_max - x_min);
-  *width = (y_max - y_min);
+  *width  = (y_max - y_min);
   *height = (z_max - z_min);
 }
 

@@ -15,11 +15,13 @@
  *****************************************************************************/
 
 #include <unistd.h>
+
 #include <atomic>
 #include <string>
 
-#include "gflags/gflags.h"
 #include "gtest/gtest.h"
+
+#include "gflags/gflags.h"
 
 #include "cyber/record/file/record_file_base.h"
 #include "cyber/record/file/record_file_reader.h"
@@ -37,10 +39,10 @@ using apollo::cyber::proto::Header;
 using apollo::cyber::proto::SectionType;
 using apollo::cyber::proto::SingleMessage;
 
-constexpr char kChan1[] = "/test1";
-constexpr char kChan2[] = "/test2";
-constexpr char kMsgType[] = "apollo.cyber.proto.Test";
-constexpr char kStr10B[] = "1234567890";
+constexpr char kChan1[]     = "/test1";
+constexpr char kChan2[]     = "/test2";
+constexpr char kMsgType[]   = "apollo.cyber.proto.Test";
+constexpr char kStr10B[]    = "1234567890";
 constexpr char kTestFile1[] = "record_file_test_1.record";
 constexpr char kTestFile2[] = "record_file_test_2.record";
 
@@ -291,7 +293,7 @@ TEST(RecordFileTest, TestIndex) {
          pos = reader.CurrentPosition()) {
       // Find index at position
       if (section.type != SectionType::SECTION_INDEX) {
-        bool found = false;
+        bool               found = false;
         proto::SingleIndex match;
         for (const auto& row : index.indexes()) {
           if (row.position() == pos) {

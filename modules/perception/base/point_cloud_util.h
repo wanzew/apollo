@@ -45,11 +45,12 @@ struct BoundingCube {
 
 bool DownSamplePointCloudBeams(base::PointFCloudPtr cloud_ptr,
                                base::PointFCloudPtr out_cloud_ptr,
-                               int downsample_factor);
+                               int                  downsample_factor);
 
-bool GetPointCloudMinareaBbox(const base::PointFCloud& pc, BoundingCube* box,
-                              const int& min_num_points = 5,
-                              const bool& verbose = false);
+bool GetPointCloudMinareaBbox(const base::PointFCloud& pc,
+                              BoundingCube*            box,
+                              const int&               min_num_points = 5,
+                              const bool&              verbose        = false);
 
 void CloudDemean(base::PointFCloudPtr cloud);
 

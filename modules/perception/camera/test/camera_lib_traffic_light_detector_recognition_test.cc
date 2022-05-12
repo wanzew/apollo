@@ -21,41 +21,36 @@ namespace perception {
 namespace camera {
 
 TEST(RecognizeTest, yellow) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/yellow.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image = cv::imread("/apollo/modules/perception/testdata/"
+                                    "camera/lib/traffic_light/detector/recognition/img/yellow.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
 
@@ -63,9 +58,9 @@ TEST(RecognizeTest, yellow) {
   lights.emplace_back(new base::TrafficLight);
 
   base::RectI region(918, 241, 18, 54);
-  lights[0]->region.is_detected = true;
+  lights[0]->region.is_detected     = true;
   lights[0]->region.detect_class_id = base::TLDetectionClass::TL_VERTICAL_CLASS;
-  lights[0]->region.detection_roi = region;
+  lights[0]->region.detection_roi   = region;
 
   frame.traffic_lights = lights;
 
@@ -77,41 +72,36 @@ TEST(RecognizeTest, yellow) {
 }
 
 TEST(RecognizeTest, red) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/red.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image = cv::imread("/apollo/modules/perception/testdata/"
+                                    "camera/lib/traffic_light/detector/recognition/img/red.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
 
@@ -119,9 +109,9 @@ TEST(RecognizeTest, red) {
   lights.emplace_back(new base::TrafficLight);
 
   base::RectI region(1043, 601, 21, 54);
-  lights[0]->region.is_detected = true;
+  lights[0]->region.is_detected     = true;
   lights[0]->region.detect_class_id = base::TLDetectionClass::TL_VERTICAL_CLASS;
-  lights[0]->region.detection_roi = region;
+  lights[0]->region.detection_roi   = region;
 
   frame.traffic_lights = lights;
 
@@ -133,49 +123,44 @@ TEST(RecognizeTest, red) {
 }
 
 TEST(RecognizeTest, green) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/green.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image = cv::imread("/apollo/modules/perception/testdata/"
+                                    "camera/lib/traffic_light/detector/recognition/img/green.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
   std::vector<base::TrafficLightPtr> lights;
   lights.emplace_back(new base::TrafficLight);
   base::RectI region(538, 332, 52, 135);
-  lights[0]->region.is_detected = true;
+  lights[0]->region.is_detected     = true;
   lights[0]->region.detect_class_id = base::TLDetectionClass::TL_VERTICAL_CLASS;
-  lights[0]->region.detection_roi = region;
+  lights[0]->region.detection_roi   = region;
 
   frame.traffic_lights = lights;
 
@@ -185,41 +170,36 @@ TEST(RecognizeTest, green) {
 }
 
 TEST(RecognizeTest, black) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/black.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image = cv::imread("/apollo/modules/perception/testdata/"
+                                    "camera/lib/traffic_light/detector/recognition/img/black.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
 
@@ -227,9 +207,9 @@ TEST(RecognizeTest, black) {
   lights.emplace_back(new base::TrafficLight);
 
   base::RectI region(1209, 201, 25, 64);
-  lights[0]->region.is_detected = true;
+  lights[0]->region.is_detected     = true;
   lights[0]->region.detect_class_id = base::TLDetectionClass::TL_VERTICAL_CLASS;
-  lights[0]->region.detection_roi = region;
+  lights[0]->region.detection_roi   = region;
 
   frame.traffic_lights = lights;
 
@@ -241,41 +221,36 @@ TEST(RecognizeTest, black) {
 }
 
 TEST(RecognizeTest, no_detection) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/black.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image = cv::imread("/apollo/modules/perception/testdata/"
+                                    "camera/lib/traffic_light/detector/recognition/img/black.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
 
@@ -283,7 +258,7 @@ TEST(RecognizeTest, no_detection) {
   lights.emplace_back(new base::TrafficLight);
 
   lights[0]->region.is_detected = false;
-  frame.traffic_lights = lights;
+  frame.traffic_lights          = lights;
 
 #if USE_GPU == 1
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
@@ -293,41 +268,36 @@ TEST(RecognizeTest, no_detection) {
 }
 
 TEST(RecognizeTest, unknown_class) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/yellow.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image = cv::imread("/apollo/modules/perception/testdata/"
+                                    "camera/lib/traffic_light/detector/recognition/img/yellow.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
 
@@ -335,9 +305,9 @@ TEST(RecognizeTest, unknown_class) {
   lights.emplace_back(new base::TrafficLight);
 
   base::RectI region(918, 241, 18, 54);
-  lights[0]->region.is_detected = true;
+  lights[0]->region.is_detected     = true;
   lights[0]->region.detect_class_id = base::TLDetectionClass::TL_UNKNOWN_CLASS;
-  lights[0]->region.detection_roi = region;
+  lights[0]->region.detection_roi   = region;
 
   frame.traffic_lights = lights;
 
@@ -347,41 +317,36 @@ TEST(RecognizeTest, unknown_class) {
 }
 
 TEST(RecognizeTest, quadrate) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/green.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image = cv::imread("/apollo/modules/perception/testdata/"
+                                    "camera/lib/traffic_light/detector/recognition/img/green.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
 
@@ -389,9 +354,9 @@ TEST(RecognizeTest, quadrate) {
   lights.emplace_back(new base::TrafficLight);
 
   base::RectI region(544, 425, 40, 44);
-  lights[0]->region.is_detected = true;
+  lights[0]->region.is_detected     = true;
   lights[0]->region.detect_class_id = base::TLDetectionClass::TL_QUADRATE_CLASS;
-  lights[0]->region.detection_roi = region;
+  lights[0]->region.detection_roi   = region;
 
   frame.traffic_lights = lights;
 
@@ -403,57 +368,51 @@ TEST(RecognizeTest, quadrate) {
 }
 
 TEST(RecognizeTest, horizontal) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/horizontal.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image =
+      cv::imread("/apollo/modules/perception/testdata/"
+                 "camera/lib/traffic_light/detector/recognition/img/horizontal.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
 
   std::vector<base::TrafficLightPtr> lights;
   lights.emplace_back(new base::TrafficLight);
   base::RectI region(1354, 635, 71, 24);
-  lights[0]->region.is_detected = true;
-  lights[0]->region.detect_class_id =
-      base::TLDetectionClass::TL_HORIZONTAL_CLASS;
-  lights[0]->region.detection_roi = region;
+  lights[0]->region.is_detected     = true;
+  lights[0]->region.detect_class_id = base::TLDetectionClass::TL_HORIZONTAL_CLASS;
+  lights[0]->region.detection_roi   = region;
 
   lights.emplace_back(new base::TrafficLight);
-  lights[1]->region.is_detected = false;
-  lights[1]->region.detect_class_id =
-      base::TLDetectionClass::TL_HORIZONTAL_CLASS;
-  lights[1]->region.detection_roi = region;
+  lights[1]->region.is_detected     = false;
+  lights[1]->region.detect_class_id = base::TLDetectionClass::TL_HORIZONTAL_CLASS;
+  lights[1]->region.detection_roi   = region;
 
   frame.traffic_lights = lights;
 
@@ -465,41 +424,37 @@ TEST(RecognizeTest, horizontal) {
 }
 
 TEST(RecognizeTest, no_light) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   TrafficLightDetectorInitOptions init_options;
-  TrafficLightDetectorOptions recognition_options;
-  CameraFrame frame;
-  cv::Mat origin_image = cv::imread(
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/img/horizontal.jpg");
+  TrafficLightDetectorOptions     recognition_options;
+  CameraFrame                     frame;
+  cv::Mat                         origin_image =
+      cv::imread("/apollo/modules/perception/testdata/"
+                 "camera/lib/traffic_light/detector/recognition/img/horizontal.jpg");
   ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
   img_gpu_data.reset(new base::SyncedMemory(size, true));
 
-  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data,
-         size * sizeof(uint8_t));
+  memcpy(img_gpu_data->mutable_cpu_data(), origin_image.data, size * sizeof(uint8_t));
 
   DataProvider data_provider;
   frame.data_provider = &data_provider;
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.image_height = origin_image.rows;
-  dp_init_options.image_width = origin_image.cols;
+  dp_init_options.image_height    = origin_image.rows;
+  dp_init_options.image_width     = origin_image.cols;
   dp_init_options.do_undistortion = false;
-  dp_init_options.sensor_name = "onsemi_narrow";
-  dp_init_options.device_id = 0;
+  dp_init_options.sensor_name     = "onsemi_narrow";
+  dp_init_options.device_id       = 0;
   frame.data_provider->Init(dp_init_options);
-  frame.data_provider->FillImageData(
-      origin_image.rows, origin_image.cols,
-      (const uint8_t *)(img_gpu_data->mutable_gpu_data()), "bgr8");
+  frame.data_provider->FillImageData(origin_image.rows, origin_image.cols,
+                                     (const uint8_t*)(img_gpu_data->mutable_gpu_data()), "bgr8");
 
   init_options.conf_file = "config.pt";
-  init_options.root_dir =
-      "/apollo/modules/perception/testdata/"
-      "camera/lib/traffic_light/detector/recognition/data/";
+  init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                          "camera/lib/traffic_light/detector/recognition/data/";
   init_options.gpu_id = 0;
   EXPECT_TRUE(recognition->Init(init_options));
 
@@ -514,38 +469,33 @@ TEST(RecognizeTest, no_light) {
 }
 
 TEST(RecognizeTest, bad_config) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   {
     TrafficLightDetectorInitOptions init_options;
-    DataProvider::InitOptions dp_init_options;
+    DataProvider::InitOptions       dp_init_options;
     init_options.conf_file = "bad_config.pt";
-    init_options.root_dir =
-        "/apollo/modules/perception/testdata/"
-        "camera/lib/traffic_light/detector/recognition/data/";
+    init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                            "camera/lib/traffic_light/detector/recognition/data/";
     init_options.gpu_id = 0;
     recognition->Init(init_options);
     init_options.conf_file = "non_exist_config.pt";
-    init_options.root_dir =
-        "/apollo/modules/perception/testdata/"
-        "camera/lib/traffic_light/detector/recognition/data/";
+    init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                            "camera/lib/traffic_light/detector/recognition/data/";
     init_options.gpu_id = 0;
     EXPECT_FALSE(recognition->Init(init_options));
   }
 }
 
 TEST(RecognizeTest, rgb_config) {
-  std::shared_ptr<TrafficLightRecognition> recognition(
-      new TrafficLightRecognition);
+  std::shared_ptr<TrafficLightRecognition> recognition(new TrafficLightRecognition);
 
   {
     TrafficLightDetectorInitOptions init_options;
-    DataProvider::InitOptions dp_init_options;
+    DataProvider::InitOptions       dp_init_options;
     init_options.conf_file = "rgb_config.pt";
-    init_options.root_dir =
-        "/apollo/modules/perception/testdata/"
-        "camera/lib/traffic_light/detector/recognition/data/";
+    init_options.root_dir  = "/apollo/modules/perception/testdata/"
+                            "camera/lib/traffic_light/detector/recognition/data/";
     init_options.gpu_id = 0;
     EXPECT_TRUE(recognition->Init(init_options));
   }

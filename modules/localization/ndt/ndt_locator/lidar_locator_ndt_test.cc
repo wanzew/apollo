@@ -20,7 +20,9 @@
 #include <sstream>
 
 #include <boost/filesystem.hpp>
+
 #include "gtest/gtest.h"
+
 #include "pcl/io/pcd_io.h"
 
 #include "cyber/common/log.h"
@@ -32,11 +34,9 @@ namespace localization {
 namespace ndt {
 
 TEST(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
-  const std::string map_folder =
-      "/apollo/modules/localization/ndt/test_data/ndt_map";
-  const std::string poses_file =
-      "/apollo/modules/localization/ndt/test_data/pcds/poses.txt";
-  LidarLocatorNdt locator;
+  const std::string map_folder = "/apollo/modules/localization/ndt/test_data/ndt_map";
+  const std::string poses_file = "/apollo/modules/localization/ndt/test_data/pcds/poses.txt";
+  LidarLocatorNdt   locator;
 
   // Locator settings.
   locator.SetMapFolderPath(map_folder);
@@ -47,7 +47,7 @@ TEST(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
 
   // Load poses.
   std::vector<Eigen::Affine3d, Eigen::aligned_allocator<Eigen::Affine3d>> poses;
-  std::vector<double> timestamps;
+  std::vector<double>                                                     timestamps;
   msf::velodyne::LoadPcdPoses(poses_file, &poses, &timestamps);
   Eigen::Affine3d location = Eigen::Affine3d::Identity();
 
@@ -55,20 +55,19 @@ TEST(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
   for (; frame_idx < poses.size(); ++frame_idx) {
     // Config.
     const unsigned int resolution_id = 0;
-    const int zone_id = 10;
+    const int          zone_id       = 10;
     if (!locator.IsInitialized()) {
       locator.Init(poses[frame_idx], resolution_id, zone_id);
       continue;
     }
 
     ::apollo::common::EigenVector3dVec pt3ds;
-    std::vector<unsigned char> intensities;
-    std::stringstream ss;
+    std::vector<unsigned char>         intensities;
+    std::stringstream                  ss;
     ss << frame_idx + 1;
     std::string pcd_file_path =
         "/apollo/modules/localization/ndt/test_data/pcds/" + ss.str() + ".pcd";
-    msf::velodyne::LoadPcds(pcd_file_path, frame_idx, poses[frame_idx], &pt3ds,
-                            &intensities);
+    msf::velodyne::LoadPcds(pcd_file_path, frame_idx, poses[frame_idx], &pt3ds, &intensities);
     LidarFrame lidar_frame;
     lidar_frame.measurement_time = timestamps[frame_idx];
     lidar_frame.pt_xs.reserve(pt3ds.size());

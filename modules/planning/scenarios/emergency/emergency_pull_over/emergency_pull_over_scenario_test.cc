@@ -20,9 +20,10 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -39,15 +40,14 @@ class EmergencyPullOverScenarioTest : public ::testing::Test {
 };
 
 TEST_F(EmergencyPullOverScenarioTest, Init) {
-  FLAGS_scenario_emergency_pull_over_config_file =
-      "/apollo/modules/planning/conf/scenario"
-      "/emergency_pull_over_config.pb.txt";
+  FLAGS_scenario_emergency_pull_over_config_file = "/apollo/modules/planning/conf/scenario"
+                                                   "/emergency_pull_over_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_emergency_pull_over_config_file, &config));
   ScenarioContext context;
-  auto injector = std::make_shared<DependencyInjector>();
+  auto            injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new EmergencyPullOverScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::EMERGENCY_PULL_OVER);
 }

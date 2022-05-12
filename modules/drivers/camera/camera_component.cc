@@ -22,8 +22,7 @@ namespace camera {
 
 bool CameraComponent::Init() {
   camera_config_ = std::make_shared<Config>();
-  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                               camera_config_.get())) {
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_, camera_config_.get())) {
     return false;
   }
   AINFO << "UsbCam config: " << camera_config_->DebugString();
@@ -32,12 +31,12 @@ bool CameraComponent::Init() {
   camera_device_->init(camera_config_);
   raw_image_.reset(new CameraImage);
 
-  raw_image_->width = camera_config_->width();
-  raw_image_->height = camera_config_->height();
+  raw_image_->width           = camera_config_->width();
+  raw_image_->height          = camera_config_->height();
   raw_image_->bytes_per_pixel = camera_config_->bytes_per_pixel();
 
   device_wait_ = camera_config_->device_wait_ms();
-  spin_rate_ = static_cast<uint32_t>((1.0 / camera_config_->spin_rate()) * 1e6);
+  spin_rate_   = static_cast<uint32_t>((1.0 / camera_config_->spin_rate()) * 1e6);
 
   if (camera_config_->output_type() == YUYV) {
     raw_image_->image_size = raw_image_->width * raw_image_->height * 2;
@@ -45,14 +44,12 @@ bool CameraComponent::Init() {
     raw_image_->image_size = raw_image_->width * raw_image_->height * 3;
   }
   if (raw_image_->image_size > MAX_IMAGE_SIZE) {
-    AERROR << "image size is too big ,must less than " << MAX_IMAGE_SIZE
-           << " bytes.";
+    AERROR << "image size is too big ,must less than " << MAX_IMAGE_SIZE << " bytes.";
     return false;
   }
   raw_image_->is_new = 0;
   // free memory in this struct desturctor
-  raw_image_->image =
-      reinterpret_cast<char*>(calloc(raw_image_->image_size, sizeof(char)));
+  raw_image_->image = reinterpret_cast<char*>(calloc(raw_image_->image_size, sizeof(char)));
   if (raw_image_->image == nullptr) {
     AERROR << "system calloc memory error, size:" << raw_image_->image_size;
     return false;
@@ -76,7 +73,7 @@ bool CameraComponent::Init() {
     pb_image_buffer_.push_back(pb_image);
   }
 
-  writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
+  writer_       = node_->CreateWriter<Image>(camera_config_->channel_name());
   async_result_ = cyber::Async(&CameraComponent::run, this);
   return true;
 }
@@ -96,12 +93,9 @@ void CameraComponent::run() {
     }
 
     cyber::Time image_time(raw_image_->tv_sec, 1000 * raw_image_->tv_usec);
-    if (index_ >= buffer_size_) {
-      index_ = 0;
-    }
+    if (index_ >= buffer_size_) { index_ = 0; }
     auto pb_image = pb_image_buffer_.at(index_++);
-    pb_image->mutable_header()->set_timestamp_sec(
-        cyber::Time::Now().ToSecond());
+    pb_image->mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
     pb_image->set_measurement_time(image_time.ToSecond());
     pb_image->set_data(raw_image_->image, raw_image_->image_size);
     writer_->Write(pb_image);

@@ -22,10 +22,11 @@
 
 #include <string>
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -36,14 +37,13 @@ class NaviTask {
   virtual ~NaviTask() = default;
   virtual const std::string& Name() const;
 
-  virtual apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info);
+  virtual apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info);
 
   virtual bool Init(const PlanningConfig& config);
 
  protected:
-  bool is_init_ = false;
-  Frame* frame_ = nullptr;
+  bool               is_init_             = false;
+  Frame*             frame_               = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;
 
  private:

@@ -22,7 +22,7 @@ namespace perception {
 namespace camera {
 
 TEST(HistogramEstimatorTest, histogram_estimator_test) {
-  HistogramEstimator estimator;
+  HistogramEstimator       estimator;
   HistogramEstimatorParams params1;
   HistogramEstimatorParams params2;
   params1 = params2;

@@ -45,60 +45,51 @@ bool LatLonControllerSubmodule::Init() {
   // lateral controller initialization
   ACHECK(cyber::common::GetProtoFromFile(FLAGS_lateral_controller_conf_file,
                                          &lateral_controller_conf_))
-      << "Unable to load lateral controller conf file: "
-      << FLAGS_lateral_controller_conf_file;
+      << "Unable to load lateral controller conf file: " << FLAGS_lateral_controller_conf_file;
 
   if (!lateral_controller_.Init(injector_, &lateral_controller_conf_).ok()) {
-    monitor_logger_buffer_.ERROR(
-        "Control init lateral controller failed! Stopping...");
+    monitor_logger_buffer_.ERROR("Control init lateral controller failed! Stopping...");
     return false;
   }
   // longitudinal controller
-  ACHECK(cyber::common::GetProtoFromFile(
-      FLAGS_longitudinal_controller_conf_file, &longitudinal_controller_conf_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_longitudinal_controller_conf_file,
+                                         &longitudinal_controller_conf_))
       << "Unable to load longitudinal controller conf file: " +
              FLAGS_longitudinal_controller_conf_file;
 
-  if (!longitudinal_controller_.Init(injector_, &longitudinal_controller_conf_)
-           .ok()) {
-    monitor_logger_buffer_.ERROR(
-        "Control init longitudinal controller failed! Stopping...");
+  if (!longitudinal_controller_.Init(injector_, &longitudinal_controller_conf_).ok()) {
+    monitor_logger_buffer_.ERROR("Control init longitudinal controller failed! Stopping...");
     return false;
   }
 
-  control_core_writer_ =
-      node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
+  control_core_writer_ = node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
 
   ACHECK(control_core_writer_ != nullptr);
 
   return true;
 }
 
-bool LatLonControllerSubmodule::Proc(
-    const std::shared_ptr<Preprocessor>& preprocessor_status) {
-  const auto start_time = Clock::Now();
+bool LatLonControllerSubmodule::Proc(const std::shared_ptr<Preprocessor>& preprocessor_status) {
+  const auto     start_time = Clock::Now();
   ControlCommand control_core_command;
 
   // recording pad msg
   if (preprocessor_status->received_pad_msg()) {
-    control_core_command.mutable_pad_msg()->CopyFrom(
-        preprocessor_status->local_view().pad_msg());
+    control_core_command.mutable_pad_msg()->CopyFrom(preprocessor_status->local_view().pad_msg());
   }
   ADEBUG << "Lat+Lon controller submodule started ....";
 
   // skip produce control command when estop for lat+lon controller
   StatusPb pre_status = preprocessor_status->header().status();
   if (pre_status.error_code() != ErrorCode::OK) {
-    control_core_command.mutable_header()->mutable_status()->CopyFrom(
-        pre_status);
+    control_core_command.mutable_header()->mutable_status()->CopyFrom(pre_status);
     AERROR << "Error in preprocessor submodule.";
     return false;
   }
 
-  Status status = ProduceControlCoreCommand(preprocessor_status->local_view(),
-                                            &control_core_command);
-  AERROR_IF(!status.ok()) << "Failed to produce control command:"
-                          << status.error_message();
+  Status status =
+      ProduceControlCoreCommand(preprocessor_status->local_view(), &control_core_command);
+  AERROR_IF(!status.ok()) << "Failed to produce control command:" << status.error_message();
 
   control_core_command.mutable_header()->set_lidar_timestamp(
       preprocessor_status->header().lidar_timestamp());
@@ -110,22 +101,19 @@ bool LatLonControllerSubmodule::Proc(
 
   const auto end_time = Clock::Now();
 
-  static apollo::common::LatencyRecorder latency_recorder(
-      FLAGS_control_core_command_topic);
-  latency_recorder.AppendLatencyRecord(
-      control_core_command.header().lidar_timestamp(), start_time, end_time);
+  static apollo::common::LatencyRecorder latency_recorder(FLAGS_control_core_command_topic);
+  latency_recorder.AppendLatencyRecord(control_core_command.header().lidar_timestamp(), start_time,
+                                       end_time);
 
-  control_core_command.mutable_header()->mutable_status()->set_error_code(
-      status.code());
-  control_core_command.mutable_header()->mutable_status()->set_msg(
-      status.error_message());
+  control_core_command.mutable_header()->mutable_status()->set_error_code(status.code());
+  control_core_command.mutable_header()->mutable_status()->set_msg(status.error_message());
 
   control_core_writer_->Write(control_core_command);
   return status.ok();
 }
 
-Status LatLonControllerSubmodule::ProduceControlCoreCommand(
-    const LocalView& local_view, ControlCommand* control_core_command) {
+Status LatLonControllerSubmodule::ProduceControlCoreCommand(const LocalView& local_view,
+                                                            ControlCommand*  control_core_command) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (local_view.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
     lateral_controller_.Reset();
@@ -134,18 +122,16 @@ Status LatLonControllerSubmodule::ProduceControlCoreCommand(
   }
 
   // fill out control command sequentially
-  Status lateral_status = lateral_controller_.ComputeControlCommand(
-      &local_view.localization(), &local_view.chassis(),
-      &local_view.trajectory(), control_core_command);
+  Status lateral_status =
+      lateral_controller_.ComputeControlCommand(&local_view.localization(), &local_view.chassis(),
+                                                &local_view.trajectory(), control_core_command);
 
   // return error if lateral status has error
-  if (!lateral_status.ok()) {
-    return lateral_status;
-  }
+  if (!lateral_status.ok()) { return lateral_status; }
 
   Status longitudinal_status = longitudinal_controller_.ComputeControlCommand(
-      &local_view.localization(), &local_view.chassis(),
-      &local_view.trajectory(), control_core_command);
+      &local_view.localization(), &local_view.chassis(), &local_view.trajectory(),
+      control_core_command);
   return longitudinal_status;
 }
 

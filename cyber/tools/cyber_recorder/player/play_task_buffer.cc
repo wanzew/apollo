@@ -37,27 +37,21 @@ bool PlayTaskBuffer::Empty() const {
 }
 
 void PlayTaskBuffer::Push(const TaskPtr& task) {
-  if (task == nullptr) {
-    return;
-  }
+  if (task == nullptr) { return; }
   std::lock_guard<std::mutex> lck(mutex_);
   tasks_.insert(std::make_pair(task->msg_play_time_ns(), task));
 }
 
 PlayTaskBuffer::TaskPtr PlayTaskBuffer::Front() {
   std::lock_guard<std::mutex> lck(mutex_);
-  if (tasks_.empty()) {
-    return nullptr;
-  }
+  if (tasks_.empty()) { return nullptr; }
   auto res = tasks_.begin()->second;
   return res;
 }
 
 void PlayTaskBuffer::PopFront() {
   std::lock_guard<std::mutex> lck(mutex_);
-  if (!tasks_.empty()) {
-    tasks_.erase(tasks_.begin());
-  }
+  if (!tasks_.empty()) { tasks_.erase(tasks_.begin()); }
 }
 
 }  // namespace record

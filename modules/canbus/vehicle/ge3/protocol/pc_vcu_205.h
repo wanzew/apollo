@@ -17,14 +17,14 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ge3 {
 
-class Pcvcu205 : public ::apollo::drivers::canbus::ProtocolData<
-                     ::apollo::canbus::ChassisDetail> {
+class Pcvcu205 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -47,8 +47,7 @@ class Pcvcu205 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'name': 'PC_AccPedEnable', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 6, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Pcvcu205* set_pc_accpedenable(
-      Pc_vcu_205::Pc_accpedenableType pc_accpedenable);
+  Pcvcu205* set_pc_accpedenable(Pc_vcu_205::Pc_accpedenableType pc_accpedenable);
 
   // config detail: {'description': 'Torque request', 'offset': -3000.0,
   // 'precision': 1.5, 'len': 12, 'name': 'PC_TorqReq', 'is_signed_var': False,
@@ -90,8 +89,7 @@ class Pcvcu205 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'name': 'PC_AccPedEnable', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 6, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  void set_p_pc_accpedenable(uint8_t* data,
-                             Pc_vcu_205::Pc_accpedenableType pc_accpedenable);
+  void set_p_pc_accpedenable(uint8_t* data, Pc_vcu_205::Pc_accpedenableType pc_accpedenable);
 
   // config detail: {'description': 'Torque request', 'offset': -3000.0,
   // 'precision': 1.5, 'len': 12, 'name': 'PC_TorqReq', 'is_signed_var': False,
@@ -104,8 +102,7 @@ class Pcvcu205 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 1, 'name': 'PC_TorqEnable', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 5, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_pc_torqenable(uint8_t* data,
-                           Pc_vcu_205::Pc_torqenableType pc_torqenable);
+  void set_p_pc_torqenable(uint8_t* data, Pc_vcu_205::Pc_torqenableType pc_torqenable);
 
   // config detail: {'description': 'Gear request', 'enum': {0:
   // 'PC_GEARREQ_INVALID', 1: 'PC_GEARREQ_DRIVE', 2: 'PC_GEARREQ_NEUTRAL', 3:
@@ -120,16 +117,15 @@ class Pcvcu205 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 1, 'name': 'PC_GearEnable', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_pc_gearenable(uint8_t* data,
-                           Pc_vcu_205::Pc_gearenableType pc_gearenable);
+  void set_p_pc_gearenable(uint8_t* data, Pc_vcu_205::Pc_gearenableType pc_gearenable);
 
  private:
-  double pc_accpedreq_;
+  double                          pc_accpedreq_;
   Pc_vcu_205::Pc_accpedenableType pc_accpedenable_;
-  double pc_torqreq_;
-  Pc_vcu_205::Pc_torqenableType pc_torqenable_;
-  Pc_vcu_205::Pc_gearreqType pc_gearreq_;
-  Pc_vcu_205::Pc_gearenableType pc_gearenable_;
+  double                          pc_torqreq_;
+  Pc_vcu_205::Pc_torqenableType   pc_torqenable_;
+  Pc_vcu_205::Pc_gearreqType      pc_gearreq_;
+  Pc_vcu_205::Pc_gearenableType   pc_gearenable_;
 };
 
 }  // namespace ge3

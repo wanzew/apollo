@@ -35,24 +35,21 @@ struct StopSignUnprotectedContext;
 
 class StopSignUnprotectedStageIntersectionCruise : public Stage {
  public:
-  StopSignUnprotectedStageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  StopSignUnprotectedStageIntersectionCruise(const ScenarioConfig::StageConfig&         config,
+                                             const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+                             Frame*                         frame) override;
 
-  StopSignUnprotectedContext* GetContext() {
-    return GetContextAs<StopSignUnprotectedContext>();
-  }
+  StopSignUnprotectedContext* GetContext() { return GetContextAs<StopSignUnprotectedContext>(); }
 
   Stage::StageStatus FinishStage();
 
  private:
   ScenarioStopSignUnprotectedConfig scenario_config_;
-  StageIntersectionCruiseImpl stage_impl_;
+  StageIntersectionCruiseImpl       stage_impl_;
 };
 
 }  // namespace stop_sign

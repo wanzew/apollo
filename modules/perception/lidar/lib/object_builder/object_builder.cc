@@ -26,24 +26,19 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-static const float kEpsilon = 1e-6f;
+static const float kEpsilon        = 1e-6f;
 static const float kEpsilonForSize = 1e-2f;
 static const float kEpsilonForLine = 1e-3f;
 using apollo::perception::base::PointD;
 using apollo::perception::base::PointF;
-using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
-using PointFCloud = apollo::perception::base::PointCloud<PointF>;
+using ObjectPtr    = std::shared_ptr<apollo::perception::base::Object>;
+using PointFCloud  = apollo::perception::base::PointCloud<PointF>;
 using PolygonDType = apollo::perception::base::PointCloud<PointD>;
 
-bool ObjectBuilder::Init(const ObjectBuilderInitOptions& options) {
-  return true;
-}
+bool ObjectBuilder::Init(const ObjectBuilderInitOptions& options) { return true; }
 
-bool ObjectBuilder::Build(const ObjectBuilderOptions& options,
-                          LidarFrame* frame) {
-  if (frame == nullptr) {
-    return false;
-  }
+bool ObjectBuilder::Build(const ObjectBuilderOptions& options, LidarFrame* frame) {
+  if (frame == nullptr) { return false; }
   std::vector<ObjectPtr>* objects = &(frame->segmented_objects);
   for (size_t i = 0; i < objects->size(); ++i) {
     if (objects->at(i)) {
@@ -59,7 +54,7 @@ bool ObjectBuilder::Build(const ObjectBuilderOptions& options,
 void ObjectBuilder::ComputePolygon2D(ObjectPtr object) {
   Eigen::Vector3f min_pt;
   Eigen::Vector3f max_pt;
-  PointFCloud& cloud = object->lidar_supplement.cloud;
+  PointFCloud&    cloud = object->lidar_supplement.cloud;
   GetMinMax3D(cloud, &min_pt, &max_pt);
   if (cloud.size() < 4u) {
     SetDefaultValue(min_pt, max_pt, object);
@@ -72,47 +67,39 @@ void ObjectBuilder::ComputePolygon2D(ObjectPtr object) {
 
 void ObjectBuilder::ComputeOtherObjectInformation(ObjectPtr object) {
   object->anchor_point = object->center;
-  double timestamp = 0.0;
-  size_t num_point = object->lidar_supplement.cloud.size();
+  double timestamp     = 0.0;
+  size_t num_point     = object->lidar_supplement.cloud.size();
   for (size_t i = 0; i < num_point; ++i) {
     timestamp += object->lidar_supplement.cloud.points_timestamp(i);
   }
-  if (num_point > 0) {
-    timestamp /= static_cast<double>(num_point);
-  }
+  if (num_point > 0) { timestamp /= static_cast<double>(num_point); }
   object->latest_tracked_time = timestamp;
 }
 
 void ObjectBuilder::ComputePolygonSizeCenter(ObjectPtr object) {
-  if (object->lidar_supplement.cloud.size() < 4u) {
-    return;
-  }
+  if (object->lidar_supplement.cloud.size() < 4u) { return; }
   Eigen::Vector3f dir = object->direction;
-  common::CalculateBBoxSizeCenter2DXY(object->lidar_supplement.cloud, dir,
-                                      &(object->size), &(object->center));
+  common::CalculateBBoxSizeCenter2DXY(object->lidar_supplement.cloud, dir, &(object->size),
+                                      &(object->center));
   if (object->lidar_supplement.is_background) {
-    float length = object->size(0);
-    float width = object->size(1);
-    Eigen::Matrix<float, 3, 1> ortho_dir(-object->direction(1),
-                                         object->direction(0), 0.0);
+    float                      length = object->size(0);
+    float                      width  = object->size(1);
+    Eigen::Matrix<float, 3, 1> ortho_dir(-object->direction(1), object->direction(0), 0.0);
     if (length < width) {
       object->direction = ortho_dir;
-      object->size(0) = width;
-      object->size(1) = length;
+      object->size(0)   = width;
+      object->size(1)   = length;
     }
   }
   for (size_t i = 0; i < 3; ++i) {
-    if (object->size(i) < kEpsilonForSize) {
-      object->size(i) = kEpsilonForSize;
-    }
+    if (object->size(i) < kEpsilonForSize) { object->size(i) = kEpsilonForSize; }
   }
-  object->theta =
-      static_cast<float>(atan2(object->direction(1), object->direction(0)));
+  object->theta = static_cast<float>(atan2(object->direction(1), object->direction(0)));
 }
 
 void ObjectBuilder::SetDefaultValue(const Eigen::Vector3f& min_pt_in,
                                     const Eigen::Vector3f& max_pt_in,
-                                    ObjectPtr object) {
+                                    ObjectPtr              object) {
   Eigen::Vector3f min_pt = min_pt_in;
   Eigen::Vector3f max_pt = max_pt_in;
   // handle degeneration case
@@ -122,20 +109,18 @@ void ObjectBuilder::SetDefaultValue(const Eigen::Vector3f& min_pt_in,
       min_pt[i] = min_pt[i] - kEpsilonForSize / 2;
     }
   }
-  Eigen::Vector3f center((min_pt[0] + max_pt[0]) / 2,
-                         (min_pt[1] + max_pt[1]) / 2,
+  Eigen::Vector3f center((min_pt[0] + max_pt[0]) / 2, (min_pt[1] + max_pt[1]) / 2,
                          (min_pt[2] + max_pt[2]) / 2);
-  object->center = Eigen::Vector3d(static_cast<double>(center(0)),
-                                   static_cast<double>(center(1)),
+  object->center = Eigen::Vector3d(static_cast<double>(center(0)), static_cast<double>(center(1)),
                                    static_cast<double>(center(2)));
-  float length = max_pt[0] - min_pt[0];
-  float width = max_pt[1] - min_pt[1];
-  float height = max_pt[2] - min_pt[2];
+  float length   = max_pt[0] - min_pt[0];
+  float width    = max_pt[1] - min_pt[1];
+  float height   = max_pt[2] - min_pt[2];
   if (length < width) {
-    object->size = Eigen::Vector3f(width, length, height);
+    object->size      = Eigen::Vector3f(width, length, height);
     object->direction = Eigen::Vector3f(0.0, 1.0, 0.0);
   } else {
-    object->size = Eigen::Vector3f(length, width, height);
+    object->size      = Eigen::Vector3f(length, width, height);
     object->direction = Eigen::Vector3f(1.0, 0.0, 0.0);
   }
   // polygon
@@ -161,17 +146,15 @@ void ObjectBuilder::SetDefaultValue(const Eigen::Vector3f& min_pt_in,
 
 bool ObjectBuilder::LinePerturbation(PointFCloud* cloud) {
   if (cloud->size() >= 3) {
-    int start_point = 0;
-    int end_point = 1;
-    float diff_x = cloud->at(start_point).x - cloud->at(end_point).x;
-    float diff_y = cloud->at(start_point).y - cloud->at(end_point).y;
-    size_t idx = 0;
+    int    start_point = 0;
+    int    end_point   = 1;
+    float  diff_x      = cloud->at(start_point).x - cloud->at(end_point).x;
+    float  diff_y      = cloud->at(start_point).y - cloud->at(end_point).y;
+    size_t idx         = 0;
     for (idx = 2; idx < cloud->size(); ++idx) {
       float tdiff_x = cloud->at(idx).x - cloud->at(start_point).x;
       float tdiff_y = cloud->at(idx).y - cloud->at(start_point).y;
-      if (fabs(diff_x * tdiff_y - tdiff_x * diff_y) > kEpsilonForLine) {
-        return false;
-      }
+      if (fabs(diff_x * tdiff_y - tdiff_x * diff_y) > kEpsilonForLine) { return false; }
     }
     cloud->at(0).x += kEpsilonForLine;
     cloud->at(1).y += kEpsilonForLine;
@@ -181,17 +164,12 @@ bool ObjectBuilder::LinePerturbation(PointFCloud* cloud) {
 }
 
 void ObjectBuilder::GetMinMax3D(const PointFCloud& cloud,
-                                Eigen::Vector3f* min_pt,
-                                Eigen::Vector3f* max_pt) {
-  (*min_pt)[0] = (*min_pt)[1] = (*min_pt)[2] =
-      std::numeric_limits<float>::max();
-  (*max_pt)[0] = (*max_pt)[1] = (*max_pt)[2] =
-      -std::numeric_limits<float>::max();
+                                Eigen::Vector3f*   min_pt,
+                                Eigen::Vector3f*   max_pt) {
+  (*min_pt)[0] = (*min_pt)[1] = (*min_pt)[2] = std::numeric_limits<float>::max();
+  (*max_pt)[0] = (*max_pt)[1] = (*max_pt)[2] = -std::numeric_limits<float>::max();
   for (size_t i = 0; i < cloud.size(); ++i) {
-    if (std::isnan(cloud[i].x) || std::isnan(cloud[i].y) ||
-        std::isnan(cloud[i].z)) {
-      continue;
-    }
+    if (std::isnan(cloud[i].x) || std::isnan(cloud[i].y) || std::isnan(cloud[i].z)) { continue; }
     (*min_pt)[0] = std::min((*min_pt)[0], cloud[i].x);
     (*max_pt)[0] = std::max((*max_pt)[0], cloud[i].x);
     (*min_pt)[1] = std::min((*min_pt)[1], cloud[i].y);

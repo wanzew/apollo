@@ -32,8 +32,7 @@ class JunctionScenarioFeatures : public ScenarioFeatures {
 
   virtual ~JunctionScenarioFeatures();
 
-  void BuildJunctionScenarioFeatures(
-      const EnvironmentFeatures& environment_features);
+  void BuildJunctionScenarioFeatures(const EnvironmentFeatures& environment_features);
 };
 
 }  // namespace prediction

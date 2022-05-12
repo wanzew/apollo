@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
-
 #include "modules/perception/radar/lib/dummy/dummy_algorithms.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -26,8 +26,8 @@ using drivers::ContiRadar;
 class DummyAlgorithmsTest : public testing::Test {
  protected:
   DummyPreprocessor preprocessor;
-  DummyDetector detector;
-  DummyRoiFilter roi_filter;
+  DummyDetector     detector;
+  DummyRoiFilter    roi_filter;
 };
 
 ContiRadar MockContiObs() {
@@ -70,10 +70,10 @@ ContiRadar MockContiObs() {
 }
 
 TEST_F(DummyAlgorithmsTest, dummy_test) {
-  ContiRadar raw_obs = MockContiObs();
-  ContiRadar corrected_obs;
+  ContiRadar          raw_obs = MockContiObs();
+  ContiRadar          corrected_obs;
   PreprocessorOptions preprocessor_options;
-  bool init_result = preprocessor.Init();
+  bool                init_result = preprocessor.Init();
   EXPECT_TRUE(init_result);
   EXPECT_EQ(preprocessor.Name(), "DummyPreprocessor");
   preprocessor.Preprocess(raw_obs, preprocessor_options, &corrected_obs);
@@ -97,8 +97,7 @@ TEST_F(DummyAlgorithmsTest, dummy_test) {
   init_result = roi_filter.Init();
   EXPECT_TRUE(init_result);
   EXPECT_EQ(roi_filter.Name(), "DummyRoiFilter");
-  bool roi_filter_result =
-      roi_filter.RoiFilter(roi_filter_options, detected_frame);
+  bool roi_filter_result = roi_filter.RoiFilter(roi_filter_options, detected_frame);
   EXPECT_TRUE(roi_filter_result);
   EXPECT_EQ(detected_frame->objects.size(), 6);
 }

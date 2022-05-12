@@ -19,11 +19,11 @@
 
 #ifdef LOCAL_REPO
 // local repo header path
-#include "modules/perception/common/noncopyable.h"
-#include "modules/perception/lib/common/twod_threed_util.h"
+#  include "modules/perception/common/noncopyable.h"
+#  include "modules/perception/lib/common/twod_threed_util.h"
 #else
 // perception-camera header path
-#include "modules/perception/camera/common/twod_threed_util.h"
+#  include "modules/perception/camera/common/twod_threed_util.h"
 #endif
 
 namespace apollo {
@@ -32,24 +32,24 @@ namespace camera {
 
 struct ObjPostProcessorOptions {
   // ground + line segments
-  float plane[4] = {0};
-  std::vector<LineSegment2D<float>> line_segs = {};
-  bool check_lowerbound = true;
+  float                             plane[4]         = {0};
+  std::vector<LineSegment2D<float>> line_segs        = {};
+  bool                              check_lowerbound = true;
 
   // disparity
-  float *disp_map = nullptr;
-  float baseline = 0.0f;
+  float* disp_map = nullptr;
+  float  baseline = 0.0f;
 
-  float hwl[3] = {0};
+  float hwl[3]  = {0};
   float bbox[4] = {0};
-  float ry = 0.0f;
+  float ry      = 0.0f;
 };
 
 // hyper parameters
 struct ObjPostProcessorParams {
   ObjPostProcessorParams() { set_default(); }
-  void set_default();
-  int max_nr_iter;
+  void  set_default();
+  int   max_nr_iter;
   float sampling_ratio_low;
   float weight_iou;
   float learning_r;
@@ -64,49 +64,61 @@ class ObjPostProcessor {
   ObjPostProcessor() {}
   ~ObjPostProcessor() {}
 
-  void Init(const float *k_mat, int width, int height) {
+  void Init(const float* k_mat, int width, int height) {
     memcpy(k_mat_, k_mat, sizeof(float) * 9);
-    width_ = width;
+    width_  = width;
     height_ = height;
   }
 
-  bool PostProcessObjWithGround(const ObjPostProcessorOptions &options,
-                                float center[3], float hwl[3], float *ry);
+  bool PostProcessObjWithGround(const ObjPostProcessorOptions& options,
+                                float                          center[3],
+                                float                          hwl[3],
+                                float*                         ry);
 
-  bool PostProcessObjWithDispmap(const ObjPostProcessorOptions &options,
-                                 float center[3], float hwl[3], float *ry);
+  bool PostProcessObjWithDispmap(const ObjPostProcessorOptions& options,
+                                 float                          center[3],
+                                 float                          hwl[3],
+                                 float*                         ry);
 
  private:
-  float GetProjectionScore(float ry, const float *bbox, const float *hwl,
-                           const float *center,
-                           const bool &check_truncation = true) const {
+  float GetProjectionScore(float        ry,
+                           const float* bbox,
+                           const float* hwl,
+                           const float* center,
+                           const bool&  check_truncation = true) const {
     float rot[9] = {0};
     GenRotMatrix(ry, rot);
-    float *bbox_null_1 = nullptr;
-    float *bbox_null_2 = nullptr;
-    return GetScoreViaRotDimensionCenter(&k_mat_[0], width_, height_, bbox, rot,
-                                         hwl, center, check_truncation,
-                                         bbox_null_1, bbox_null_2);
+    float* bbox_null_1 = nullptr;
+    float* bbox_null_2 = nullptr;
+    return GetScoreViaRotDimensionCenter(&k_mat_[0], width_, height_, bbox, rot, hwl, center,
+                                         check_truncation, bbox_null_1, bbox_null_2);
   }
 
   // refinement using ground-3d bbox consistency
-  bool AdjustCenterWithGround(const float *bbox, const float *hwl, float ry,
-                              const float *plane, float *center) const;
+  bool AdjustCenterWithGround(
+      const float* bbox, const float* hwl, float ry, const float* plane, float* center) const;
 
   // adjustment using on-ground line segments
-  bool PostRefineCenterWithGroundBoundary(
-      const float *bbox, const float *hwl, float ry, const float *plane,
-      const std::vector<LineSegment2D<float>> &line_seg_limits, float *center,
-      bool check_lowerbound) const;
+  bool PostRefineCenterWithGroundBoundary(const float*                             bbox,
+                                          const float*                             hwl,
+                                          float                                    ry,
+                                          const float*                             plane,
+                                          const std::vector<LineSegment2D<float>>& line_seg_limits,
+                                          float*                                   center,
+                                          bool check_lowerbound) const;
 
-  int GetDepthXPair(const float *bbox, const float *hwl, const float *center,
-                    float ry, float *depth_pts, int *x_pts,
-                    float *pts_c = nullptr) const;
+  int GetDepthXPair(const float* bbox,
+                    const float* hwl,
+                    const float* center,
+                    float        ry,
+                    float*       depth_pts,
+                    int*         x_pts,
+                    float*       pts_c = nullptr) const;
 
  private:
-  float k_mat_[9] = {0};
-  int width_ = 0;
-  int height_ = 0;
+  float                  k_mat_[9] = {0};
+  int                    width_    = 0;
+  int                    height_   = 0;
   ObjPostProcessorParams params_;
   // DISALLOW_COPY_AND_ASSIGN(ObjPostProcessor);
 };

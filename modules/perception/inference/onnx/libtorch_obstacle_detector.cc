@@ -26,18 +26,17 @@ namespace inference {
 
 using apollo::perception::base::Blob;
 
-ObstacleDetector::ObstacleDetector(const std::string &net_file,
-                                   const std::string &model_file,
-                                   const std::vector<std::string> &outputs):
-                                   net_file_(net_file),
-                                   model_file_(model_file),
-                                   output_names_(outputs) {}
+ObstacleDetector::ObstacleDetector(const std::string&              net_file,
+                                   const std::string&              model_file,
+                                   const std::vector<std::string>& outputs)
+    : net_file_(net_file)
+    , model_file_(model_file)
+    , output_names_(outputs) {}
 
-bool ObstacleDetector::Init(const std::map<std::string,
-                            std::vector<int>> &shapes) {
+bool ObstacleDetector::Init(const std::map<std::string, std::vector<int>>& shapes) {
   if (gpu_id_ >= 0) {
     device_type_ = torch::kCUDA;
-    device_id_ = gpu_id_;
+    device_id_   = gpu_id_;
   } else {
     device_type_ = torch::kCPU;
   }
@@ -66,64 +65,56 @@ bool ObstacleDetector::Init(const std::map<std::string,
   net_.eval();
 
   // run a fake inference at init time as first inference is relative slow
-  int height_ = blobs_[input_names_[0]]->shape(1);
-  int width_ = blobs_[input_names_[0]]->shape(2);
-  torch::Tensor input_feature_tensor = torch::zeros({1, 3, height_, width_});
+  int                  height_              = blobs_[input_names_[0]]->shape(1);
+  int                  width_               = blobs_[input_names_[0]]->shape(2);
+  torch::Tensor        input_feature_tensor = torch::zeros({1, 3, height_, width_});
   std::array<float, 2> down_ratio{8.0f, 8.0f};
-  torch::Tensor tensor_downratio = torch::from_blob(down_ratio.data(), {1, 2});
+  torch::Tensor        tensor_downratio = torch::from_blob(down_ratio.data(), {1, 2});
   std::array<float, 9> K{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-  torch::Tensor tensor_K = torch::from_blob(K.data(), {1, 3, 3});
+  torch::Tensor        tensor_K = torch::from_blob(K.data(), {1, 3, 3});
 
   std::vector<torch::jit::IValue> torch_inputs;
   // torch_inputs.push_back(std::make_tuple(input_feature_tensor.to(device),
   //                       tensor_downratio.to(device)));
   torch_inputs.push_back(input_feature_tensor.to(device));
-  torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
-                                         tensor_downratio.to(device)));
-  auto torch_output_tensor =
-      net_.forward(torch_inputs).toTuple()->elements();
-  if (torch_output_tensor[0].toTensor().requires_grad()) {
-    AWARN << "Require grad";
-  }
+  torch_inputs.push_back(std::make_tuple(tensor_K.to(device), tensor_downratio.to(device)));
+  auto torch_output_tensor = net_.forward(torch_inputs).toTuple()->elements();
+  if (torch_output_tensor[0].toTensor().requires_grad()) { AWARN << "Require grad"; }
 
   c10::cuda::CUDACachingAllocator::emptyCache();
   return true;
 }
 
-ObstacleDetector::ObstacleDetector(const std::string &net_file,
-                   const std::string &model_file,
-                   const std::vector<std::string> &outputs,
-                   const std::vector<std::string> &inputs):
-                   net_file_(net_file), model_file_(model_file),
-                   output_names_(outputs), input_names_(inputs) {}
+ObstacleDetector::ObstacleDetector(const std::string&              net_file,
+                                   const std::string&              model_file,
+                                   const std::vector<std::string>& outputs,
+                                   const std::vector<std::string>& inputs)
+    : net_file_(net_file)
+    , model_file_(model_file)
+    , output_names_(outputs)
+    , input_names_(inputs) {}
 
-std::shared_ptr<Blob<float>> ObstacleDetector::get_blob(
-    const std::string &name) {
+std::shared_ptr<Blob<float>> ObstacleDetector::get_blob(const std::string& name) {
   auto iter = blobs_.find(name);
-  if (iter == blobs_.end()) {
-    return nullptr;
-  }
+  if (iter == blobs_.end()) { return nullptr; }
   return iter->second;
 }
 
 void ObstacleDetector::Infer() {
   torch::Device device(device_type_, device_id_);
-  auto blob = blobs_[input_names_[0]];
-  auto input_K = blobs_[input_names_[1]];
-  auto input_ratio = blobs_[input_names_[2]];
+  auto          blob        = blobs_[input_names_[0]];
+  auto          input_K     = blobs_[input_names_[1]];
+  auto          input_ratio = blobs_[input_names_[2]];
 
   torch::Tensor tensor_image = torch::from_blob(
-                              blob->data()->mutable_gpu_data(),
-                              {blob->shape(0), blob->shape(1), blob->shape(2),
-                              blob->shape(3)}, torch::kFloat32);
-  torch::Tensor tensor_K = torch::from_blob(
-                    input_K->data()->mutable_cpu_data(),
-                    {input_K->shape(0), input_K->shape(1), input_K->shape(2)},
-                    torch::kFloat32);
-  torch::Tensor tensor_ratio = torch::from_blob(
-                    input_ratio->data()->mutable_cpu_data(),
-                    {input_ratio->shape(0), input_ratio->shape(1)},
-                    torch::kFloat32);
+      blob->data()->mutable_gpu_data(),
+      {blob->shape(0), blob->shape(1), blob->shape(2), blob->shape(3)}, torch::kFloat32);
+  torch::Tensor tensor_K =
+      torch::from_blob(input_K->data()->mutable_cpu_data(),
+                       {input_K->shape(0), input_K->shape(1), input_K->shape(2)}, torch::kFloat32);
+  torch::Tensor tensor_ratio =
+      torch::from_blob(input_ratio->data()->mutable_cpu_data(),
+                       {input_ratio->shape(0), input_ratio->shape(1)}, torch::kFloat32);
 
   std::vector<torch::jit::IValue> torch_inputs;
   tensor_image = tensor_image.to(device);
@@ -135,17 +126,16 @@ void ObstacleDetector::Infer() {
   tensor_image[0][2] = tensor_image[0][2].div_(57.375);
 
   torch_inputs.push_back(tensor_image);
-  torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
-                                         tensor_ratio.to(device)));
+  torch_inputs.push_back(std::make_tuple(tensor_K.to(device), tensor_ratio.to(device)));
 
   AINFO << "Start to do inference";
   auto outputs = net_.forward(torch_inputs).toTuple()->elements();
   AINFO << "Finished inference";
 
   for (u_int i = 0; i < output_names_.size(); i++) {
-    torch::Tensor output_tensor = outputs[i].toTensor();
-    std::vector<int64_t> output_size_ = output_tensor.sizes().vec();
-    std::vector<int> output_size(begin(output_size_), end(output_size_));
+    torch::Tensor        output_tensor = outputs[i].toTensor();
+    std::vector<int64_t> output_size_  = output_tensor.sizes().vec();
+    std::vector<int>     output_size(begin(output_size_), end(output_size_));
     blobs_[output_names_[i]]->Reshape(output_size);
     blobs_[output_names_[i]]->set_gpu_data(output_tensor.data_ptr<float>());
   }

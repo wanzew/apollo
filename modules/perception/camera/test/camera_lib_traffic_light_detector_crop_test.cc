@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/camera/lib/traffic_light/detector/detection/cropbox.h"
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
+#include "modules/perception/camera/lib/traffic_light/detector/detection/cropbox.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
 TEST(CropBoxTest, wholebox) {
-  int img_width = 1920;
+  int img_width  = 1920;
   int img_height = 1080;
   {
-    base::RectI gt_box(0, 0, 1920, 1080);
+    base::RectI              gt_box(0, 0, 1920, 1080);
     std::shared_ptr<IGetBox> crop;
     crop.reset(new CropBoxWholeImage());
     base::TrafficLightPtr light;
-    base::RectI project_roi(1, 2, 3, 4);
+    base::RectI           project_roi(1, 2, 3, 4);
     light.reset(new base::TrafficLight);
     light->region.projection_roi = project_roi;
     base::RectI cbox;
@@ -39,11 +39,11 @@ TEST(CropBoxTest, wholebox) {
   }
 
   {
-    base::RectI gt_box(0, 0, 0, 0);
+    base::RectI              gt_box(0, 0, 0, 0);
     std::shared_ptr<IGetBox> crop;
     crop.reset(new CropBoxWholeImage());
     base::TrafficLightPtr light;
-    base::RectI project_roi(1, -2, 3, 4);
+    base::RectI           project_roi(1, -2, 3, 4);
     light.reset(new base::TrafficLight);
     light->region.projection_roi = project_roi;
     base::RectI cbox;
@@ -52,11 +52,11 @@ TEST(CropBoxTest, wholebox) {
   }
 
   {
-    base::RectI gt_box(0, 0, 0, 0);
+    base::RectI              gt_box(0, 0, 0, 0);
     std::shared_ptr<IGetBox> crop;
     crop.reset(new CropBoxWholeImage());
     base::TrafficLightPtr light;
-    base::RectI project_roi(1, -2, 0, 4);
+    base::RectI           project_roi(1, -2, 0, 4);
     light.reset(new base::TrafficLight);
     light->region.projection_roi = project_roi;
     base::RectI cbox;
@@ -65,11 +65,11 @@ TEST(CropBoxTest, wholebox) {
   }
 
   {
-    base::RectI gt_box(0, 0, 0, 0);
+    base::RectI              gt_box(0, 0, 0, 0);
     std::shared_ptr<IGetBox> crop;
     crop.reset(new CropBoxWholeImage());
     base::TrafficLightPtr light;
-    base::RectI project_roi(1, 1, 0, 0);
+    base::RectI           project_roi(1, 1, 0, 0);
     light.reset(new base::TrafficLight);
     light->region.projection_roi = project_roi;
     base::RectI cbox;
@@ -79,8 +79,8 @@ TEST(CropBoxTest, wholebox) {
 }
 
 TEST(CropBoxTest, crop_roi) {
-  int img_width = 1920;
-  int img_height = 1080;
+  int                      img_width  = 1920;
+  int                      img_height = 1080;
   std::shared_ptr<IGetBox> crop;
   crop.reset(new CropBox(2.5, 210));
   base::TrafficLightPtr light;

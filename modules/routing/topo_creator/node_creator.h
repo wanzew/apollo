@@ -26,8 +26,10 @@ namespace apollo {
 namespace routing {
 namespace node_creator {
 
-void GetPbNode(const hdmap::Lane& lane, const std::string& road_id,
-               const RoutingConfig& routingconfig, Node* const node);
+void GetPbNode(const hdmap::Lane&   lane,
+               const std::string&   road_id,
+               const RoutingConfig& routingconfig,
+               Node* const          node);
 
 }  // namespace node_creator
 }  // namespace routing

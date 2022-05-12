@@ -27,8 +27,8 @@ class DigitalFilterCoefficientsTest : public ::testing::Test {
 };
 
 TEST_F(DigitalFilterCoefficientsTest, LpfCoefficients) {
-  double ts = 0.01;
-  double cutoff_freq = 20;
+  double              ts          = 0.01;
+  double              cutoff_freq = 20;
   std::vector<double> den;
   std::vector<double> num;
   LpfCoefficients(ts, cutoff_freq, &den, &num);
@@ -42,9 +42,9 @@ TEST_F(DigitalFilterCoefficientsTest, LpfCoefficients) {
 }
 
 TEST_F(DigitalFilterCoefficientsTest, LpFirstOrderCoefficients) {
-  double ts = 0.01;
-  double settling_time = 0.005;
-  double dead_time = 0.04;
+  double              ts            = 0.01;
+  double              settling_time = 0.005;
+  double              dead_time     = 0.04;
   std::vector<double> den;
   std::vector<double> num;
   LpFirstOrderCoefficients(ts, settling_time, dead_time, &den, &num);

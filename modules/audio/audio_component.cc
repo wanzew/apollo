@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "modules/audio/audio_component.h"
+
 #include "modules/audio/proto/audio_conf.pb.h"
 #include "modules/common/proto/geometry.pb.h"
+
 #include "modules/common/util/message_util.h"
 
 namespace apollo {
@@ -36,15 +38,13 @@ std::string AudioComponent::Name() const {
 bool AudioComponent::Init() {
   AudioConf audio_conf;
   if (!ComponentBase::GetProtoConfig(&audio_conf)) {
-    AERROR << "Unable to load audio conf file: "
-           << ComponentBase::ConfigFilePath();
+    AERROR << "Unable to load audio conf file: " << ComponentBase::ConfigFilePath();
     return false;
   }
-  localization_reader_ =
-      node_->CreateReader<localization::LocalizationEstimate>(
-          audio_conf.topic_conf().localization_topic_name(), nullptr);
-  audio_writer_ = node_->CreateWriter<AudioDetection>(
-      audio_conf.topic_conf().audio_detection_topic_name());
+  localization_reader_ = node_->CreateReader<localization::LocalizationEstimate>(
+      audio_conf.topic_conf().localization_topic_name(), nullptr);
+  audio_writer_ =
+      node_->CreateWriter<AudioDetection>(audio_conf.topic_conf().audio_detection_topic_name());
   respeaker_extrinsics_file_ = audio_conf.respeaker_extrinsics_path();
   return true;
 }
@@ -52,9 +52,9 @@ bool AudioComponent::Init() {
 bool AudioComponent::Proc(const std::shared_ptr<AudioData>& audio_data) {
   // TODO(all) remove GetSignals() multiple calls
   AudioDetection audio_detection;
-  MessageProcess::OnMicrophone(*audio_data, respeaker_extrinsics_file_,
-      &audio_info_, &direction_detection_, &moving_detection_,
-      &siren_detection_, &audio_detection);
+  MessageProcess::OnMicrophone(*audio_data, respeaker_extrinsics_file_, &audio_info_,
+                               &direction_detection_, &moving_detection_, &siren_detection_,
+                               &audio_detection);
 
   FillHeader(node_->Name(), &audio_detection);
   audio_writer_->Write(audio_detection);

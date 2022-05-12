@@ -20,19 +20,19 @@ namespace perception {
 namespace base {
 
 struct CarLight {
-  float brake_visible = 0.0f;
-  float brake_switch_on = 0.0f;
-  float left_turn_visible = 0.0f;
-  float left_turn_switch_on = 0.0f;
-  float right_turn_visible = 0.0f;
+  float brake_visible        = 0.0f;
+  float brake_switch_on      = 0.0f;
+  float left_turn_visible    = 0.0f;
+  float left_turn_switch_on  = 0.0f;
+  float right_turn_visible   = 0.0f;
   float right_turn_switch_on = 0.0f;
 
   void Reset() {
-    brake_visible = 0;
-    brake_switch_on = 0;
-    left_turn_visible = 0;
-    left_turn_switch_on = 0;
-    right_turn_visible = 0;
+    brake_visible        = 0;
+    brake_switch_on      = 0;
+    left_turn_visible    = 0;
+    left_turn_switch_on  = 0;
+    right_turn_visible   = 0;
     right_turn_switch_on = 0;
   }
 };

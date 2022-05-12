@@ -24,7 +24,7 @@ namespace network {
 
 TEST(LayerTest, dense_test) {
   LayerParameter layer_pb;
-  Dense dense;
+  Dense          dense;
 
   EXPECT_FALSE(dense.Load(layer_pb));
   EXPECT_EQ(dense.Name(), "layer");
@@ -55,7 +55,7 @@ TEST(LayerTest, dense_test) {
 
 TEST(LayerTest, activation_test) {
   LayerParameter layer_pb;
-  Activation act;
+  Activation     act;
 
   layer_pb.set_name("layer1");
   layer_pb.set_order_number(1);
@@ -73,7 +73,7 @@ TEST(LayerTest, activation_test) {
 }
 
 TEST(LayerTest, bn_test) {
-  LayerParameter layer_pb;
+  LayerParameter     layer_pb;
   BatchNormalization bn;
 
   layer_pb.mutable_batch_normalization()->set_epsilon(1e-8);
@@ -104,7 +104,7 @@ TEST(LayerTest, bn_test) {
 
 TEST(LayerTest, lstm_test) {
   LayerParameter layer_pb;
-  LSTM lstm;
+  LSTM           lstm;
 
   layer_pb.mutable_lstm()->set_units(1);
   layer_pb.mutable_lstm()->set_return_sequences(true);
@@ -165,7 +165,7 @@ TEST(LayerTest, lstm_test) {
 
 TEST(LayerTest, flatten_test) {
   LayerParameter layer_pb;
-  Flatten flat;
+  Flatten        flat;
 
   layer_pb.set_name("layer1");
   layer_pb.set_order_number(1);
@@ -186,7 +186,7 @@ TEST(LayerTest, flatten_test) {
 
 TEST(LayerTest, input_test) {
   LayerParameter layer_pb;
-  Input input;
+  Input          input;
 
   EXPECT_FALSE(input.Load(layer_pb));
   layer_pb.mutable_input()->add_input_shape(2);
@@ -195,7 +195,7 @@ TEST(LayerTest, input_test) {
 
 TEST(LayerTest, concat_test) {
   LayerParameter layer_pb;
-  Concatenate concat;
+  Concatenate    concat;
 
   layer_pb.mutable_concatenate()->set_axis(0);
   EXPECT_TRUE(concat.Load(layer_pb));

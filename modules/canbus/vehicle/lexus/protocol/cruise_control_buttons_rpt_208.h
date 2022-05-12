@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,13 +25,11 @@ namespace canbus {
 namespace lexus {
 
 class Cruisecontrolbuttonsrpt208
-    : public ::apollo::drivers::canbus::ProtocolData<
-          ::apollo::canbus::ChassisDetail> {
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Cruisecontrolbuttonsrpt208();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'OUTPUT_VALUE', 'enum': {0:
@@ -42,8 +41,8 @@ class Cruisecontrolbuttonsrpt208
   // 'OUTPUT_VALUE_CRUISE_CONTROL_ON_OFF'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 31, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Cruise_control_buttons_rpt_208::Output_valueType output_value(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Cruise_control_buttons_rpt_208::Output_valueType output_value(const std::uint8_t* bytes,
+                                                                const int32_t       length) const;
 
   // config detail: {'name': 'MANUAL_INPUT', 'enum': {0:
   // 'MANUAL_INPUT_CRUISE_CONTROL_NONE', 1: 'MANUAL_INPUT_CRUISE_CONTROL_CNCL',
@@ -54,8 +53,8 @@ class Cruisecontrolbuttonsrpt208
   // 'MANUAL_INPUT_CRUISE_CONTROL_ON_OFF'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Cruise_control_buttons_rpt_208::Manual_inputType manual_input(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Cruise_control_buttons_rpt_208::Manual_inputType manual_input(const std::uint8_t* bytes,
+                                                                const int32_t       length) const;
 
   // config detail: {'name': 'COMMANDED_VALUE', 'enum': {0:
   // 'COMMANDED_VALUE_CRUISE_CONTROL_NONE', 1:
@@ -67,8 +66,8 @@ class Cruisecontrolbuttonsrpt208
   // 'COMMANDED_VALUE_CRUISE_CONTROL_ON_OFF'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 23, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Cruise_control_buttons_rpt_208::Commanded_valueType commanded_value(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Cruise_control_buttons_rpt_208::Commanded_valueType commanded_value(const std::uint8_t* bytes,
+                                                                      const int32_t length) const;
 
   // config detail: {'name': 'VEHICLE_FAULT', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 6,
@@ -89,15 +88,13 @@ class Cruisecontrolbuttonsrpt208
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool output_reported_fault(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool output_reported_fault(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'INPUT_OUTPUT_FAULT', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 3, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool input_output_fault(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  bool input_output_fault(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'ENABLED', 'offset': 0.0, 'precision': 1.0, 'len':
   // 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0, 'type':
@@ -108,8 +105,7 @@ class Cruisecontrolbuttonsrpt208
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 2, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool command_output_fault(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool command_output_fault(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace lexus

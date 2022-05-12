@@ -28,12 +28,14 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "localization_msf/sins_struct.h"
-#include "modules/common/status/status.h"
+
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/heading.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+
+#include "modules/common/status/status.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::localization::msf
@@ -46,7 +48,7 @@ namespace msf {
 enum class GnssMode { NOVATEL = 0, SELF };
 
 struct VehicleGnssAntExtrinsic {
-  int ant_num;
+  int        ant_num;
   TransformD transform_1;
   TransformD transform_2;
 
@@ -69,20 +71,17 @@ class MeasureRepublishProcess {
   common::Status Init(const LocalizationIntegParam& params);
 
   // GNSS message process
-  bool NovatelBestgnssposProcess(const GnssBestPose& bestgnsspos_msg,
-                                 MeasureData* measure);
-  void GnssLocalProcess(const MeasureData& gnss_local_msg,
-                        MeasureData* measure);
+  bool NovatelBestgnssposProcess(const GnssBestPose& bestgnsspos_msg, MeasureData* measure);
+  void GnssLocalProcess(const MeasureData& gnss_local_msg, MeasureData* measure);
 
   // integrated message process
   void IntegPvaProcess(const InsPva& inspva_msg);
 
   // lidar message process
-  bool LidarLocalProcess(const LocalizationEstimate& lidar_local_msg,
-                         MeasureData* measure);
+  bool LidarLocalProcess(const LocalizationEstimate& lidar_local_msg, MeasureData* measure);
 
-  bool GnssHeadingProcess(const drivers::gnss::Heading& heading_msg,
-                          MeasureData* measure, int* status);
+  bool
+  GnssHeadingProcess(const drivers::gnss::Heading& heading_msg, MeasureData* measure, int* status);
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -90,40 +89,37 @@ class MeasureRepublishProcess {
   bool IsSinsAlign();
   bool CheckBestgnssposeStatus(const GnssBestPose& bestgnsspos_msg);
   bool CheckBestgnssPoseXYStd(const GnssBestPose& bestgnsspos_msg);
-  void TransferXYZFromBestgnsspose(const GnssBestPose& bestgnsspos_msg,
-                                   MeasureData* measure);
+  void TransferXYZFromBestgnsspose(const GnssBestPose& bestgnsspos_msg, MeasureData* measure);
   void TransferFirstMeasureFromBestgnsspose(const GnssBestPose& bestgnsspos_msg,
-                                            MeasureData* measure);
-  bool CalculateVelFromBestgnsspose(const GnssBestPose& bestgnsspos_msg,
-                                    MeasureData* measure);
+                                            MeasureData*        measure);
+  bool CalculateVelFromBestgnsspose(const GnssBestPose& bestgnsspos_msg, MeasureData* measure);
 
-  bool LoadImuGnssAntennaExtrinsic(std::string file_path,
-                                   VehicleGnssAntExtrinsic* extrinsic) const;
+  bool LoadImuGnssAntennaExtrinsic(std::string file_path, VehicleGnssAntExtrinsic* extrinsic) const;
 
  private:
   MeasureData pre_bestgnsspose_;
-  bool pre_bestgnsspose_valid_;
-  bool send_init_bestgnsspose_;
+  bool        pre_bestgnsspose_valid_;
+  bool        send_init_bestgnsspose_;
 
   std::list<InsPva> integ_pva_list_;
-  size_t pva_buffer_size_;
-  std::mutex integ_pva_mutex_;
+  size_t            pva_buffer_size_;
+  std::mutex        integ_pva_mutex_;
 
-  int local_utm_zone_id_;
+  int  local_utm_zone_id_;
   bool is_trans_gpstime_to_utctime_;
 
-  double map_height_time_;
+  double     map_height_time_;
   std::mutex height_mutex_;
 
-  bool is_using_novatel_heading_;
-  double novatel_heading_time_;
+  bool       is_using_novatel_heading_;
+  double     novatel_heading_time_;
   std::mutex novatel_heading_mutex_;
 
   GnssMode gnss_mode_;
 
-  static constexpr double GNSS_XY_STD_THRESHOLD = 5.0;
+  static constexpr double GNSS_XY_STD_THRESHOLD      = 5.0;
   static constexpr double BESTPOSE_TIME_MAX_INTERVAL = 1.05;
-  static constexpr int BESTPOSE_GOOD_COUNT = 10;
+  static constexpr int    BESTPOSE_GOOD_COUNT        = 10;
   VehicleGnssAntExtrinsic imu_gnssant_extrinsic_;
 };
 

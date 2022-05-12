@@ -79,13 +79,12 @@ bool Dense::Load(const DenseParameter& dense_pb) {
   return true;
 }
 
-void Dense::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                Eigen::MatrixXf* output) {
+void Dense::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
   Eigen::MatrixXf prod = static_cast<Eigen::MatrixXf>(inputs[0] * weights_);
   if (use_bias_) {
     Eigen::MatrixXf sum = prod.rowwise() + bias_.transpose();
-    prod = sum;
+    prod                = sum;
   }
   *output = prod.unaryExpr(kactivation_);
   CHECK_EQ(output->cols(), units_);
@@ -126,14 +125,12 @@ bool Conv1d::Load(const Conv1dParameter& conv1d_pb) {
   return true;
 }
 
-void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                 Eigen::MatrixXf* output) {
+void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
   CHECK_GT(kernel_.size(), 0U);
   CHECK_EQ(kernel_[0].rows(), inputs[0].rows());
-  int kernel_size = static_cast<int>(kernel_[0].cols());
-  int output_num_col =
-      static_cast<int>((inputs[0].cols() - kernel_size) / stride_) + 1;
+  int kernel_size    = static_cast<int>(kernel_[0].cols());
+  int output_num_col = static_cast<int>((inputs[0].cols() - kernel_size) / stride_) + 1;
   int output_num_row = static_cast<int>(kernel_.size());
   output->resize(output_num_row, output_num_col);
   for (int i = 0; i < output_num_row; ++i) {
@@ -141,8 +138,7 @@ void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
       float output_i_j_unbiased = 0.0f;
       for (int p = 0; p < inputs[0].rows(); ++p) {
         for (int q = j * stride_; q < j * stride_ + kernel_size; ++q) {
-          output_i_j_unbiased +=
-              inputs[0](p, q) * kernel_[i](p, q - j * stride_);
+          output_i_j_unbiased += inputs[0](p, q) * kernel_[i](p, q - j * stride_);
         }
       }
 
@@ -173,11 +169,9 @@ bool MaxPool1d::Load(const MaxPool1dParameter& maxpool1d_pb) {
   return true;
 }
 
-void MaxPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                    Eigen::MatrixXf* output) {
+void MaxPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
-  int output_num_col =
-      static_cast<int>((inputs[0].cols() - kernel_size_) / stride_) + 1;
+  int output_num_col = static_cast<int>((inputs[0].cols() - kernel_size_) / stride_) + 1;
   int output_num_row = static_cast<int>(inputs[0].rows());
   output->resize(output_num_row, output_num_col);
   int input_index = 0;
@@ -216,11 +210,9 @@ bool AvgPool1d::Load(const AvgPool1dParameter& avgpool1d_pb) {
   return true;
 }
 
-void AvgPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                    Eigen::MatrixXf* output) {
+void AvgPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
-  int output_num_col =
-      static_cast<int>((inputs[0].cols() - kernel_size_) / stride_) + 1;
+  int output_num_col = static_cast<int>((inputs[0].cols() - kernel_size_) / stride_) + 1;
   int output_num_row = static_cast<int>(inputs[0].rows());
   output->resize(output_num_row, output_num_col);
   int input_index = 0;
@@ -246,7 +238,7 @@ bool Activation::Load(const LayerParameter& layer_pb) {
     kactivation_ = serialize_to_function("linear");
   } else {
     ActivationParameter activation_pb = layer_pb.activation();
-    kactivation_ = serialize_to_function(activation_pb.activation());
+    kactivation_                      = serialize_to_function(activation_pb.activation());
   }
   return true;
 }
@@ -260,8 +252,7 @@ bool Activation::Load(const ActivationParameter& activation_pb) {
   return true;
 }
 
-void Activation::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                     Eigen::MatrixXf* output) {
+void Activation::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
   *output = inputs[0].unaryExpr(kactivation_);
 }
@@ -273,11 +264,11 @@ bool BatchNormalization::Load(const LayerParameter& layer_pb) {
   }
 
   auto bn_pb = layer_pb.batch_normalization();
-  epsilon_ = static_cast<float>(bn_pb.epsilon());
-  axis_ = bn_pb.axis();
-  center_ = bn_pb.center();
-  scale_ = bn_pb.scale();
-  momentum_ = bn_pb.momentum();
+  epsilon_   = static_cast<float>(bn_pb.epsilon());
+  axis_      = bn_pb.axis();
+  center_    = bn_pb.center();
+  scale_     = bn_pb.scale();
+  momentum_  = bn_pb.momentum();
   if (!bn_pb.has_mu() || !LoadTensor(bn_pb.mu(), &mu_)) {
     AERROR << "Fail to Load mu!";
     return false;
@@ -301,18 +292,12 @@ bool BatchNormalization::Load(const LayerParameter& layer_pb) {
   return true;
 }
 
-void BatchNormalization::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                             Eigen::MatrixXf* output) {
+void BatchNormalization::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
   Eigen::MatrixXf temp = (inputs[0].rowwise() - mu_.transpose());
-  Eigen::MatrixXf norm =
-      temp.array().rowwise() / (sigma_.array().sqrt() + epsilon_).transpose();
-  if (scale_) {
-    norm = norm.array().rowwise() * gamma_.transpose().array();
-  }
-  if (center_) {
-    norm = norm.rowwise() + beta_.transpose();
-  }
+  Eigen::MatrixXf norm = temp.array().rowwise() / (sigma_.array().sqrt() + epsilon_).transpose();
+  if (scale_) { norm = norm.array().rowwise() * gamma_.transpose().array(); }
+  if (center_) { norm = norm.rowwise() + beta_.transpose(); }
   *output = norm;
 }
 
@@ -350,8 +335,7 @@ bool LSTM::Load(const LayerParameter& layer_pb) {
     ADEBUG << "Set recurrent_activation function as hard_tanh.";
     krecurrent_activation_ = serialize_to_function("hard_tanh");
   } else {
-    krecurrent_activation_ =
-        serialize_to_function(lstm_pb.recurrent_activation());
+    krecurrent_activation_ = serialize_to_function(lstm_pb.recurrent_activation());
   }
   if (!lstm_pb.has_use_bias()) {
     ADEBUG << "Set use_bias as true.";
@@ -365,23 +349,19 @@ bool LSTM::Load(const LayerParameter& layer_pb) {
   } else {
     unit_forget_bias_ = lstm_pb.unit_forget_bias();
   }
-  if (!lstm_pb.has_weights_input() ||
-      !LoadTensor(lstm_pb.weights_input(), &wi_)) {
+  if (!lstm_pb.has_weights_input() || !LoadTensor(lstm_pb.weights_input(), &wi_)) {
     AERROR << "Fail to Load input weights!";
     return false;
   }
-  if (!lstm_pb.has_weights_forget() ||
-      !LoadTensor(lstm_pb.weights_forget(), &wf_)) {
+  if (!lstm_pb.has_weights_forget() || !LoadTensor(lstm_pb.weights_forget(), &wf_)) {
     AERROR << "Fail to Load forget weights!";
     return false;
   }
-  if (!lstm_pb.has_weights_cell() ||
-      !LoadTensor(lstm_pb.weights_cell(), &wc_)) {
+  if (!lstm_pb.has_weights_cell() || !LoadTensor(lstm_pb.weights_cell(), &wc_)) {
     AERROR << "Fail to Load cell weights!";
     return false;
   }
-  if (!lstm_pb.has_weights_output() ||
-      !LoadTensor(lstm_pb.weights_output(), &wo_)) {
+  if (!lstm_pb.has_weights_output() || !LoadTensor(lstm_pb.weights_output(), &wo_)) {
     AERROR << "Fail to Load output weights!";
     return false;
   }
@@ -425,8 +405,10 @@ bool LSTM::Load(const LayerParameter& layer_pb) {
   return true;
 }
 
-void LSTM::Step(const Eigen::MatrixXf& input, Eigen::MatrixXf* output,
-                Eigen::MatrixXf* ht_1, Eigen::MatrixXf* ct_1) {
+void LSTM::Step(const Eigen::MatrixXf& input,
+                Eigen::MatrixXf*       output,
+                Eigen::MatrixXf*       ht_1,
+                Eigen::MatrixXf*       ct_1) {
   Eigen::MatrixXf x_i = input * wi_ + bi_.transpose();
   Eigen::MatrixXf x_f = input * wf_ + bf_.transpose();
   Eigen::MatrixXf x_c = input * wc_ + bc_.transpose();
@@ -434,19 +416,17 @@ void LSTM::Step(const Eigen::MatrixXf& input, Eigen::MatrixXf* output,
 
   Eigen::MatrixXf i = (x_i + (*ht_1) * r_wi_).unaryExpr(krecurrent_activation_);
   Eigen::MatrixXf f = (x_f + (*ht_1) * r_wf_).unaryExpr(krecurrent_activation_);
-  Eigen::MatrixXf c =
-      f.array() * ct_1->array() +
-      i.array() * ((x_c + (*ht_1) * r_wc_).unaryExpr(kactivation_)).array();
+  Eigen::MatrixXf c = f.array() * ct_1->array() +
+                      i.array() * ((x_c + (*ht_1) * r_wc_).unaryExpr(kactivation_)).array();
   Eigen::MatrixXf o = (x_o + (*ht_1) * r_wo_).unaryExpr(krecurrent_activation_);
   Eigen::MatrixXf h = o.array() * (c.unaryExpr(kactivation_)).array();
 
-  *ht_1 = h;
-  *ct_1 = c;
+  *ht_1   = h;
+  *ct_1   = c;
   *output = h;
 }
 
-void LSTM::Run(const std::vector<Eigen::MatrixXf>& inputs,
-               Eigen::MatrixXf* output) {
+void LSTM::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
   Eigen::MatrixXf sequences(inputs[0].rows(), units_);
   Eigen::MatrixXf temp;
@@ -492,11 +472,9 @@ bool Flatten::Load(const LayerParameter& layer_pb) {
   return true;
 }
 
-void Flatten::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                  Eigen::MatrixXf* output) {
+void Flatten::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> inp(
-      inputs[0]);
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> inp(inputs[0]);
   inp.resize(1, inp.size());
   *output = inp;
 }
@@ -531,8 +509,7 @@ bool Input::Load(const LayerParameter& layer_pb) {
   return true;
 }
 
-void Input::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                Eigen::MatrixXf* output) {
+void Input::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1U);
   CHECK_EQ(inputs[0].cols(), input_shape_.back());
   *output = inputs[0];
@@ -552,8 +529,7 @@ bool Concatenate::Load(const LayerParameter& layer_pb) {
   return true;
 }
 
-void Concatenate::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                      Eigen::MatrixXf* output) {
+void Concatenate::Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 2U);
   CHECK_EQ(inputs[0].rows(), inputs[1].rows());
   output->resize(inputs[0].rows(), inputs[0].cols() + inputs[1].cols());

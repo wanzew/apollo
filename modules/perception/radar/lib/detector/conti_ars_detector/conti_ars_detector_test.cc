@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/radar/lib/detector/conti_ars_detector/conti_ars_detector.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -49,12 +50,12 @@ TEST(ContiArsDetector, detect) {
   pose << 0, -1, 0, 4, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1;
   Eigen::Matrix4d radar2novatel_trans;
   radar2novatel_trans << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
-  options.radar2world_pose = &pose;
+  options.radar2world_pose    = &pose;
   options.radar2novatel_trans = &radar2novatel_trans;
-  options.car_linear_speed = Eigen::Vector3f(3, 1, 0);
-  options.car_angular_speed = Eigen::Vector3f(0, 0, 0);
+  options.car_linear_speed    = Eigen::Vector3f(3, 1, 0);
+  options.car_angular_speed   = Eigen::Vector3f(0, 0, 0);
 
-  auto radar_frame = std::shared_ptr<base::Frame>(new base::Frame);
+  auto             radar_frame = std::shared_ptr<base::Frame>(new base::Frame);
   ContiArsDetector detector;
   detector.Init();
   detector.Detect(corrected_obstacles, options, radar_frame);
@@ -78,7 +79,7 @@ TEST(ContiArsDetector, detect) {
   dist_uncertain << 0.01f, 0.0f, 0.0f, 0.0f, 0.04f, 0.0f, 0.0f, 0.0f, 0.0f;
   vel_uncertain << 0.01f, 0.0f, 0.0f, 0.0f, 0.04f, 0.0f, 0.0f, 0.0f, 0.0f;
   float dist_diff = (dist_uncertain - radar_object->center_uncertainty).norm();
-  float vel_diff = (vel_uncertain - radar_object->velocity_uncertainty).norm();
+  float vel_diff  = (vel_uncertain - radar_object->velocity_uncertainty).norm();
   EXPECT_LT(dist_diff, 1.0e-6);
   EXPECT_LT(vel_diff, 1.0e-6);
 
@@ -119,8 +120,7 @@ TEST(ContiArsDetector, detect) {
   EXPECT_EQ(radar_object->type, base::ObjectType::UNKNOWN);
 
   base::FramePtr radar_frame7(new base::Frame);
-  corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(
-      CONTI_TYPE_UNKNOWN);
+  corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(CONTI_TYPE_UNKNOWN);
   detector.Detect(corrected_obstacles, options, radar_frame7);
   radar_object = radar_frame7->objects.front();
   EXPECT_EQ(radar_object->type, base::ObjectType::UNKNOWN);
@@ -157,8 +157,7 @@ TEST(ContiArsDetector, detect) {
   EXPECT_EQ(radar_object->motion_state, base::MotionState::MOVING);
 
   base::FramePtr radar_frame13(new base::Frame);
-  corrected_obstacles.mutable_contiobs(0)->set_dynprop(
-      CONTI_STATIONARY_CANDIDATE);
+  corrected_obstacles.mutable_contiobs(0)->set_dynprop(CONTI_STATIONARY_CANDIDATE);
   detector.Detect(corrected_obstacles, options, radar_frame13);
   radar_object = radar_frame13->objects.front();
   EXPECT_EQ(radar_object->motion_state, base::MotionState::STATIONARY);
@@ -170,8 +169,7 @@ TEST(ContiArsDetector, detect) {
   EXPECT_EQ(radar_object->motion_state, base::MotionState::UNKNOWN);
 
   auto radar_frame15 = std::shared_ptr<base::Frame>(new base::Frame);
-  corrected_obstacles.mutable_contiobs(0)->set_dynprop(
-      CONTI_CROSSING_STATIONARY);
+  corrected_obstacles.mutable_contiobs(0)->set_dynprop(CONTI_CROSSING_STATIONARY);
   detector.Detect(corrected_obstacles, options, radar_frame15);
   radar_object = radar_frame15->objects.front();
   EXPECT_EQ(radar_object->motion_state, base::MotionState::STATIONARY);

@@ -28,7 +28,8 @@ namespace fusion {
 
 class BaseExistenceFusion {
  public:
-  explicit BaseExistenceFusion(TrackPtr track) : track_ref_(track) {}
+  explicit BaseExistenceFusion(TrackPtr track)
+      : track_ref_(track) {}
   virtual ~BaseExistenceFusion() {}
   BaseExistenceFusion(const BaseExistenceFusion&) = delete;
   BaseExistenceFusion& operator=(const BaseExistenceFusion&) = delete;
@@ -40,13 +41,13 @@ class BaseExistenceFusion {
   // @param [in]: target_timestamp
   // @param [in/out]: track
   virtual void UpdateWithMeasurement(const SensorObjectPtr measurement,
-                                     double target_timestamp,
-                                     double match_dist) = 0;
+                                     double                target_timestamp,
+                                     double                match_dist) = 0;
 
   virtual void UpdateWithoutMeasurement(const std::string& sensor_id,
-                                        double measurement_timestamp,
-                                        double target_timestamp,
-                                        double min_match_dist) = 0;
+                                        double             measurement_timestamp,
+                                        double             target_timestamp,
+                                        double             min_match_dist) = 0;
 
   virtual std::string Name() const = 0;
 

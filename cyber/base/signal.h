@@ -36,9 +36,9 @@ class Connection;
 template <typename... Args>
 class Signal {
  public:
-  using Callback = std::function<void(Args...)>;
-  using SlotPtr = std::shared_ptr<Slot<Args...>>;
-  using SlotList = std::list<SlotPtr>;
+  using Callback       = std::function<void(Args...)>;
+  using SlotPtr        = std::shared_ptr<Slot<Args...>>;
+  using SlotList       = std::list<SlotPtr>;
   using ConnectionType = Connection<Args...>;
 
   Signal() {}
@@ -84,9 +84,7 @@ class Signal {
       }
     }
 
-    if (find) {
-      ClearDisconnectedSlots();
-    }
+    if (find) { ClearDisconnectedSlots(); }
     return find;
   }
 
@@ -104,61 +102,57 @@ class Signal {
 
   void ClearDisconnectedSlots() {
     std::lock_guard<std::mutex> lock(mutex_);
-    slots_.erase(
-        std::remove_if(slots_.begin(), slots_.end(),
-                       [](const SlotPtr& slot) { return !slot->connected(); }),
-        slots_.end());
+    slots_.erase(std::remove_if(slots_.begin(), slots_.end(),
+                                [](const SlotPtr& slot) { return !slot->connected(); }),
+                 slots_.end());
   }
 
-  SlotList slots_;
+  SlotList   slots_;
   std::mutex mutex_;
 };
 
 template <typename... Args>
 class Connection {
  public:
-  using SlotPtr = std::shared_ptr<Slot<Args...>>;
+  using SlotPtr   = std::shared_ptr<Slot<Args...>>;
   using SignalPtr = Signal<Args...>*;
 
-  Connection() : slot_(nullptr), signal_(nullptr) {}
+  Connection()
+      : slot_(nullptr)
+      , signal_(nullptr) {}
   Connection(const SlotPtr& slot, const SignalPtr& signal)
-      : slot_(slot), signal_(signal) {}
+      : slot_(slot)
+      , signal_(signal) {}
   virtual ~Connection() {
-    slot_ = nullptr;
+    slot_   = nullptr;
     signal_ = nullptr;
   }
 
   Connection& operator=(const Connection& another) {
     if (this != &another) {
-      this->slot_ = another.slot_;
+      this->slot_   = another.slot_;
       this->signal_ = another.signal_;
     }
     return *this;
   }
 
   bool HasSlot(const SlotPtr& slot) const {
-    if (slot != nullptr && slot_ != nullptr) {
-      return slot_.get() == slot.get();
-    }
+    if (slot != nullptr && slot_ != nullptr) { return slot_.get() == slot.get(); }
     return false;
   }
 
   bool IsConnected() const {
-    if (slot_) {
-      return slot_->connected();
-    }
+    if (slot_) { return slot_->connected(); }
     return false;
   }
 
   bool Disconnect() {
-    if (signal_ && slot_) {
-      return signal_->Disconnect(*this);
-    }
+    if (signal_ && slot_) { return signal_->Disconnect(*this); }
     return false;
   }
 
  private:
-  SlotPtr slot_;
+  SlotPtr   slot_;
   SignalPtr signal_;
 };
 
@@ -167,15 +161,15 @@ class Slot {
  public:
   using Callback = std::function<void(Args...)>;
   Slot(const Slot& another)
-      : cb_(another.cb_), connected_(another.connected_) {}
+      : cb_(another.cb_)
+      , connected_(another.connected_) {}
   explicit Slot(const Callback& cb, bool connected = true)
-      : cb_(cb), connected_(connected) {}
+      : cb_(cb)
+      , connected_(connected) {}
   virtual ~Slot() {}
 
   void operator()(Args... args) {
-    if (connected_ && cb_) {
-      cb_(args...);
-    }
+    if (connected_ && cb_) { cb_(args...); }
   }
 
   void Disconnect() { connected_ = false; }
@@ -183,7 +177,7 @@ class Slot {
 
  private:
   Callback cb_;
-  bool connected_ = true;
+  bool     connected_ = true;
 };
 
 }  // namespace base

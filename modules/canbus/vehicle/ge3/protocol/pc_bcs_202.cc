@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_bcs_202.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -41,7 +42,7 @@ void Pcbcs202::UpdateData(uint8_t* data) {
 
 void Pcbcs202::Reset() {
   // you should check this manually
-  pc_brkpedreq_ = 0.0;
+  pc_brkpedreq_    = 0.0;
   pc_brkpedenable_ = Pc_bcs_202::PC_BRKPEDENABLE_DISABLE;
 }
 
@@ -56,8 +57,8 @@ Pcbcs202* Pcbcs202::set_pc_brkpedreq(double pc_brkpedreq) {
 // 'physical_unit': '%'}
 void Pcbcs202::set_p_pc_brkpedreq(uint8_t* data, double pc_brkpedreq) {
   pc_brkpedreq = ProtocolData::BoundedValue(0.0, 100.0, pc_brkpedreq);
-  int x = static_cast<int>(pc_brkpedreq / 0.100000);
-  uint8_t t = 0;
+  int     x    = static_cast<int>(pc_brkpedreq / 0.100000);
+  uint8_t t    = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 1);
@@ -69,8 +70,7 @@ void Pcbcs202::set_p_pc_brkpedreq(uint8_t* data, double pc_brkpedreq) {
   to_set1.set_value(t, 0, 2);
 }
 
-Pcbcs202* Pcbcs202::set_pc_brkpedenable(
-    Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable) {
+Pcbcs202* Pcbcs202::set_pc_brkpedenable(Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable) {
   pc_brkpedenable_ = pc_brkpedenable;
   return this;
 }
@@ -80,8 +80,8 @@ Pcbcs202* Pcbcs202::set_pc_brkpedenable(
 // 'len': 1, 'name': 'PC_BrkPedEnable', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcbcs202::set_p_pc_brkpedenable(
-    uint8_t* data, Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable) {
+void Pcbcs202::set_p_pc_brkpedenable(uint8_t*                        data,
+                                     Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable) {
   int x = pc_brkpedenable;
 
   Byte to_set(data + 0);

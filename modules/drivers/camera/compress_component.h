@@ -18,10 +18,11 @@
 
 #include <memory>
 
-#include "cyber/base/concurrent_object_pool.h"
-#include "cyber/cyber.h"
 #include "modules/drivers/camera/proto/config.pb.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
+
+#include "cyber/base/concurrent_object_pool.h"
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace drivers {
@@ -40,8 +41,8 @@ class CompressComponent : public Component<Image> {
 
  private:
   std::shared_ptr<CCObjectPool<CompressedImage>> image_pool_;
-  std::shared_ptr<Writer<CompressedImage>> writer_ = nullptr;
-  Config config_;
+  std::shared_ptr<Writer<CompressedImage>>       writer_ = nullptr;
+  Config                                         config_;
 };
 
 CYBER_REGISTER_COMPONENT(CompressComponent)

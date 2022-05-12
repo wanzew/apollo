@@ -24,11 +24,9 @@
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
-ABSL_FLAG(std::string, module_monitor_name, "ModuleMonitor",
-          "Name of the modules monitor.");
+ABSL_FLAG(std::string, module_monitor_name, "ModuleMonitor", "Name of the modules monitor.");
 
-ABSL_FLAG(double, module_monitor_interval, 1.5,
-          "Process status checking interval in seconds.");
+ABSL_FLAG(double, module_monitor_interval, 1.5, "Process status checking interval in seconds.");
 
 namespace apollo {
 namespace monitor {
@@ -36,31 +34,29 @@ namespace monitor {
 ModuleMonitor::ModuleMonitor()
     : RecurrentRunner(absl::GetFlag(FLAGS_module_monitor_name),
                       absl::GetFlag(FLAGS_module_monitor_interval)) {
-  node_manager_ =
-      cyber::service_discovery::TopologyManager::Instance()->node_manager();
+  node_manager_ = cyber::service_discovery::TopologyManager::Instance()->node_manager();
 }
 
 void ModuleMonitor::RunOnce(const double current_time) {
-  auto manager = MonitorManager::Instance();
-  const auto& mode = manager->GetHMIMode();
+  auto        manager = MonitorManager::Instance();
+  const auto& mode    = manager->GetHMIMode();
 
   // Check monitored components.
   auto* components = manager->GetStatus()->mutable_components();
   for (const auto& iter : mode.monitored_components()) {
-    const std::string& name = iter.first;
-    const auto& monitored_component = iter.second;
-    if (monitored_component.has_module() &&
-        apollo::common::util::ContainsKey(*components, name)) {
+    const std::string& name                = iter.first;
+    const auto&        monitored_component = iter.second;
+    if (monitored_component.has_module() && apollo::common::util::ContainsKey(*components, name)) {
       const auto& config = monitored_component.module();
-      auto* status = components->at(name).mutable_module_status();
+      auto*       status = components->at(name).mutable_module_status();
       UpdateStatus(config, name, status);
     }
   }
 }
 
-void ModuleMonitor::UpdateStatus(
-    const apollo::dreamview::ModuleMonitorConfig& config,
-    const std::string& module_name, ComponentStatus* status) {
+void ModuleMonitor::UpdateStatus(const apollo::dreamview::ModuleMonitorConfig& config,
+                                 const std::string&                            module_name,
+                                 ComponentStatus*                              status) {
   status->clear_status();
 
   bool all_nodes_matched = true;

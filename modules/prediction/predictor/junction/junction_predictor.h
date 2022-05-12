@@ -50,14 +50,16 @@ class JunctionPredictor : public Predictor {
    * @return If predicted successfully
    */
   bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
-               Obstacle* obstacle,
-               ObstaclesContainer* obstacles_container) override;
+               Obstacle*                     obstacle,
+               ObstaclesContainer*           obstacles_container) override;
 
  private:
-  void DrawJunctionTrajectoryPoints(
-      const Feature& feature, const JunctionExit& junction_exit,
-      const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
+  void
+  DrawJunctionTrajectoryPoints(const Feature&                                feature,
+                               const JunctionExit&                           junction_exit,
+                               const double                                  total_time,
+                               const double                                  period,
+                               std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
 
   std::vector<JunctionExit> MostLikelyJunctions(const Feature& feature);
 
@@ -72,7 +74,7 @@ class JunctionPredictor : public Predictor {
 
   double CostFunction(const std::array<double, 4>& x_coeffs,
                       const std::array<double, 4>& y_coeffs,
-                      const double time_to_exit);
+                      const double                 time_to_exit);
 
   std::vector<double> GenerateCandidateTimes();
 };

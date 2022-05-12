@@ -46,20 +46,18 @@ class SensorDataManager {
   bool IsCamera(const base::FrameConstPtr& frame_ptr);
 
   // Getter
-  void GetLatestSensorFrames(double timestamp, const std::string& sensor_id,
+  void GetLatestSensorFrames(double                       timestamp,
+                             const std::string&           sensor_id,
                              std::vector<SensorFramePtr>* frames) const;
 
-  void GetLatestFrames(double timestamp,
-                       std::vector<SensorFramePtr>* frames) const;
+  void GetLatestFrames(double timestamp, std::vector<SensorFramePtr>* frames) const;
 
-  bool GetPose(const std::string& sensor_id, double timestamp,
-               Eigen::Affine3d* pose) const;
+  bool GetPose(const std::string& sensor_id, double timestamp, Eigen::Affine3d* pose) const;
 
-  base::BaseCameraModelPtr GetCameraIntrinsic(
-      const std::string& sensor_id) const;
+  base::BaseCameraModelPtr GetCameraIntrinsic(const std::string& sensor_id) const;
 
  private:
-  bool inited_ = false;
+  bool                                       inited_ = false;
   std::unordered_map<std::string, SensorPtr> sensors_;
 
   const common::SensorManager* sensor_manager_ = nullptr;

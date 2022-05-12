@@ -18,6 +18,8 @@
  * @file
  */
 
+#include "modules/third_party_perception/tools/conversion_radar.h"
+
 #include <cmath>
 #include <iostream>
 #include <map>
@@ -25,10 +27,8 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
-
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"
-#include "modules/third_party_perception/tools/conversion_radar.h"
 
 /**
  * @namespace apollo::third_party_perception::conversion_radar
@@ -45,19 +45,19 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using Point = apollo::common::Point3D;
 
-RadarObstacles ContiToRadarObstacles(
-    const apollo::drivers::ContiRadar& conti_radar,
-    const apollo::localization::LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles, const Chassis& chassis) {
+RadarObstacles ContiToRadarObstacles(const apollo::drivers::ContiRadar&                conti_radar,
+                                     const apollo::localization::LocalizationEstimate& localization,
+                                     const RadarObstacles& last_radar_obstacles,
+                                     const Chassis&        chassis) {
   RadarObstacles obstacles;
 
-  const double last_timestamp = last_radar_obstacles.header().timestamp_sec();
+  const double last_timestamp    = last_radar_obstacles.header().timestamp_sec();
   const double current_timestamp = conti_radar.header().timestamp_sec();
 
-  const auto adc_pos = localization.pose().position();
-  const auto adc_vel = localization.pose().linear_velocity();
-  const auto adc_quaternion = localization.pose().orientation();
-  const double adc_theta = GetAngleFromQuaternion(adc_quaternion);
+  const auto   adc_pos        = localization.pose().position();
+  const auto   adc_vel        = localization.pose().linear_velocity();
+  const auto   adc_quaternion = localization.pose().orientation();
+  const double adc_theta      = GetAngleFromQuaternion(adc_quaternion);
 
   for (int index = 0; index < conti_radar.contiobs_size(); ++index) {
     const auto& contiobs = conti_radar.contiobs(index);
@@ -88,7 +88,7 @@ RadarObstacles ContiToRadarObstacles(
     rob.mutable_relative_velocity()->set_y(contiobs.lateral_vel());
 
     const auto iter = last_radar_obstacles.radar_obstacle().find(index);
-    Point absolute_vel;
+    Point      absolute_vel;
     if (iter == last_radar_obstacles.radar_obstacle().end()) {
       rob.set_count(0);
       rob.set_movable(false);
@@ -99,18 +99,15 @@ RadarObstacles ContiToRadarObstacles(
     } else if (!FLAGS_use_navigation_mode) {
       rob.set_count(iter->second.count() + 1);
       rob.set_movable(iter->second.movable());
-      absolute_vel.set_x(
-          (absolute_pos.x() - iter->second.absolute_position().x()) /
-          (current_timestamp - last_timestamp));
-      absolute_vel.set_y(
-          (absolute_pos.y() - iter->second.absolute_position().y()) /
-          (current_timestamp - last_timestamp));
+      absolute_vel.set_x((absolute_pos.x() - iter->second.absolute_position().x()) /
+                         (current_timestamp - last_timestamp));
+      absolute_vel.set_y((absolute_pos.y() - iter->second.absolute_position().y()) /
+                         (current_timestamp - last_timestamp));
       absolute_vel.set_z(0.0);
-      double v_heading = std::atan2(absolute_vel.y(), absolute_vel.x());
+      double v_heading    = std::atan2(absolute_vel.y(), absolute_vel.x());
       double heading_diff = HeadingDifference(v_heading, rob.theta());
       if (heading_diff < FLAGS_movable_heading_threshold &&
-          Speed(absolute_vel) * std::cos(heading_diff) >
-              FLAGS_movable_speed_threshold) {
+          Speed(absolute_vel) * std::cos(heading_diff) > FLAGS_movable_speed_threshold) {
         rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
       } else {
         rob.set_moving_frames_count(0);
@@ -128,8 +125,7 @@ RadarObstacles ContiToRadarObstacles(
         rob.set_theta(contiobs.oritation_angle() / 180 * M_PI);
       } else {
         // in FLU
-        rob.set_theta(std::atan2(rob.relative_position().x(),
-                                 rob.relative_position().y()));
+        rob.set_theta(std::atan2(rob.relative_position().x(), rob.relative_position().y()));
       }
     }
 
@@ -145,30 +141,27 @@ RadarObstacles ContiToRadarObstacles(
   return obstacles;
 }
 
-RadarObstacles DelphiToRadarObstacles(
-    const DelphiESR& delphi_esr, const LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles) {
+RadarObstacles DelphiToRadarObstacles(const DelphiESR&            delphi_esr,
+                                      const LocalizationEstimate& localization,
+                                      const RadarObstacles&       last_radar_obstacles) {
   RadarObstacles obstacles;
 
-  const double last_timestamp = last_radar_obstacles.header().timestamp_sec();
+  const double last_timestamp    = last_radar_obstacles.header().timestamp_sec();
   const double current_timestamp = delphi_esr.header().timestamp_sec();
 
   // assign motion power from 540
-  std::vector<apollo::drivers::Esr_trackmotionpower_540::Motionpower>
-      motionpowers(64);
-  for (const auto& esr_trackmotionpower_540 :
-       delphi_esr.esr_trackmotionpower_540()) {
+  std::vector<apollo::drivers::Esr_trackmotionpower_540::Motionpower> motionpowers(64);
+  for (const auto& esr_trackmotionpower_540 : delphi_esr.esr_trackmotionpower_540()) {
     if (!esr_trackmotionpower_540.has_can_tx_track_can_id_group()) {
       AERROR << "ESR track motion power 540 does not have "
                 "can_tx_track_can_id_group()";
       continue;
     }
-    const int can_tx_track_can_id_group =
-        esr_trackmotionpower_540.can_tx_track_can_id_group();
+    const int can_tx_track_can_id_group = esr_trackmotionpower_540.can_tx_track_can_id_group();
     const int can_tx_track_motion_power_size =
         esr_trackmotionpower_540.can_tx_track_motion_power_size();
-    for (int index = 0; index < (can_tx_track_can_id_group < 9 ? 7 : 1) &&
-                        index < can_tx_track_motion_power_size;
+    for (int index = 0;
+         index < (can_tx_track_can_id_group < 9 ? 7 : 1) && index < can_tx_track_motion_power_size;
          ++index) {
       std::size_t motion_powers_index = can_tx_track_can_id_group * 7 + index;
       if (motion_powers_index < motionpowers.size()) {
@@ -178,13 +171,13 @@ RadarObstacles DelphiToRadarObstacles(
     }
   }
 
-  const auto adc_pos = localization.pose().position();
-  const auto adc_vel = localization.pose().linear_velocity();
-  const auto adc_quaternion = localization.pose().orientation();
-  const double adc_theta = GetAngleFromQuaternion(adc_quaternion);
+  const auto   adc_pos        = localization.pose().position();
+  const auto   adc_vel        = localization.pose().linear_velocity();
+  const auto   adc_quaternion = localization.pose().orientation();
+  const double adc_theta      = GetAngleFromQuaternion(adc_quaternion);
 
-  for (int index = 0; index < delphi_esr.esr_track01_500_size() &&
-                      index < static_cast<int>(motionpowers.size());
+  for (int index = 0;
+       index < delphi_esr.esr_track01_500_size() && index < static_cast<int>(motionpowers.size());
        ++index) {
     const auto& data_500 = delphi_esr.esr_track01_500(index);
 
@@ -197,19 +190,17 @@ RadarObstacles DelphiToRadarObstacles(
     RadarObstacle rob;
 
     rob.set_id(index);
-    rob.set_rcs(static_cast<double>(motionpowers[index].can_tx_track_power()) -
-                10.0);
+    rob.set_rcs(static_cast<double>(motionpowers[index].can_tx_track_power()) - 10.0);
     rob.set_length(GetDefaultObjectLength(4));
     rob.set_width(GetDefaultObjectWidth(4));
     rob.set_height(3.0);
 
     const double range = data_500.can_tx_track_range();
     const double angle = data_500.can_tx_track_angle() * M_PI / 180.0;
-    Point relative_pos_sl;
+    Point        relative_pos_sl;
     relative_pos_sl.set_x(range * std::cos(angle) +
                           FLAGS_radar_pos_adjust +  // offset: imu <-> mobileye
-                          rob.length() /
-                              2.0);  // make x the middle point of the vehicle
+                          rob.length() / 2.0);      // make x the middle point of the vehicle
     relative_pos_sl.set_y(range * std::sin(angle));
     rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
 
@@ -223,7 +214,7 @@ RadarObstacles DelphiToRadarObstacles(
     double theta = GetNearestLaneHeading(rob.absolute_position());
     rob.set_theta(theta);
 
-    const double range_vel = data_500.can_tx_track_range_rate();
+    const double range_vel   = data_500.can_tx_track_range_rate();
     const double lateral_vel = data_500.can_tx_track_lat_rate();
     rob.mutable_relative_velocity()->set_x(range_vel * std::cos(angle) -
                                            lateral_vel * std::sin(angle));
@@ -231,7 +222,7 @@ RadarObstacles DelphiToRadarObstacles(
                                            lateral_vel * std::cos(angle));
 
     const auto iter = last_radar_obstacles.radar_obstacle().find(index);
-    Point absolute_vel;
+    Point      absolute_vel;
     if (iter == last_radar_obstacles.radar_obstacle().end()) {
       rob.set_count(0);
       rob.set_movable(false);
@@ -242,18 +233,15 @@ RadarObstacles DelphiToRadarObstacles(
     } else {
       rob.set_count(iter->second.count() + 1);
       rob.set_movable(iter->second.movable());
-      absolute_vel.set_x(
-          (absolute_pos.x() - iter->second.absolute_position().x()) /
-          (current_timestamp - last_timestamp));
-      absolute_vel.set_y(
-          (absolute_pos.y() - iter->second.absolute_position().y()) /
-          (current_timestamp - last_timestamp));
+      absolute_vel.set_x((absolute_pos.x() - iter->second.absolute_position().x()) /
+                         (current_timestamp - last_timestamp));
+      absolute_vel.set_y((absolute_pos.y() - iter->second.absolute_position().y()) /
+                         (current_timestamp - last_timestamp));
       absolute_vel.set_z(0.0);
-      double v_heading = std::atan2(absolute_vel.y(), absolute_vel.x());
+      double v_heading    = std::atan2(absolute_vel.y(), absolute_vel.x());
       double heading_diff = HeadingDifference(v_heading, rob.theta());
       if (heading_diff < FLAGS_movable_heading_threshold &&
-          Speed(absolute_vel) * std::cos(heading_diff) >
-              FLAGS_movable_speed_threshold) {
+          Speed(absolute_vel) * std::cos(heading_diff) > FLAGS_movable_speed_threshold) {
         rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
       } else {
         rob.set_moving_frames_count(0);
@@ -272,12 +260,11 @@ RadarObstacles DelphiToRadarObstacles(
   return obstacles;
 }
 
-PerceptionObstacles RadarObstaclesToPerceptionObstacles(
-    const RadarObstacles& radar_obstacles) {
+PerceptionObstacles RadarObstaclesToPerceptionObstacles(const RadarObstacles& radar_obstacles) {
   PerceptionObstacles obstacles;
 
   for (const auto& iter : radar_obstacles.radar_obstacle()) {
-    auto* pob = obstacles.add_perception_obstacle();
+    auto*       pob            = obstacles.add_perception_obstacle();
     const auto& radar_obstacle = iter.second;
 
     pob->set_id(radar_obstacle.id() + FLAGS_radar_id_offset);
@@ -298,9 +285,8 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     pob->set_theta(radar_obstacle.theta());
 
     // create polygon
-    FillPerceptionPolygon(pob, pob->position().x(), pob->position().y(),
-                          pob->position().z(), pob->length(), pob->width(),
-                          pob->height(), pob->theta());
+    FillPerceptionPolygon(pob, pob->position().x(), pob->position().y(), pob->position().z(),
+                          pob->length(), pob->width(), pob->height(), pob->theta());
     pob->set_confidence(0.01);
   }
 

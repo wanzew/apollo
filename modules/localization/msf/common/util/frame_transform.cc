@@ -24,24 +24,17 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-bool FrameTransform::LatlonToUtmXY(double lon_rad, double lat_rad,
-                                   UTMCoor *utm_xy) {
+bool FrameTransform::LatlonToUtmXY(double lon_rad, double lat_rad, UTMCoor* utm_xy) {
   projPJ pj_latlon;
   projPJ pj_utm;
-  int zone = 0;
-  zone = static_cast<int>((lon_rad * RAD_TO_DEG + 180) / 6) + 1;
-  std::string latlon_src =
-      "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-  std::string utm_dst =
-      absl::StrCat("+proj=utm +zone=", zone, " +ellps=GRS80 +units=m +no_defs");
-  if (!(pj_latlon = pj_init_plus(latlon_src.c_str()))) {
-    return false;
-  }
-  if (!(pj_utm = pj_init_plus(utm_dst.c_str()))) {
-    return false;
-  }
+  int    zone            = 0;
+  zone                   = static_cast<int>((lon_rad * RAD_TO_DEG + 180) / 6) + 1;
+  std::string latlon_src = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+  std::string utm_dst = absl::StrCat("+proj=utm +zone=", zone, " +ellps=GRS80 +units=m +no_defs");
+  if (!(pj_latlon = pj_init_plus(latlon_src.c_str()))) { return false; }
+  if (!(pj_utm = pj_init_plus(utm_dst.c_str()))) { return false; }
   double longitude = lon_rad;
-  double latitude = lat_rad;
+  double latitude  = lat_rad;
   pj_transform(pj_latlon, pj_utm, 1, 1, &longitude, &latitude, nullptr);
   utm_xy->x = longitude;
   utm_xy->y = latitude;
@@ -49,20 +42,14 @@ bool FrameTransform::LatlonToUtmXY(double lon_rad, double lat_rad,
   pj_free(pj_utm);
   return true;
 }
-bool FrameTransform::UtmXYToLatlon(double x, double y, int zone, bool southhemi,
-                                   WGS84Corr *latlon) {
-  projPJ pj_latlon;
-  projPJ pj_utm;
-  std::string latlon_src =
-      "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-  std::string utm_dst =
-      absl::StrCat("+proj=utm +zone=", zone, " +ellps=GRS80 +units=m +no_defs");
-  if (!(pj_latlon = pj_init_plus(latlon_src.c_str()))) {
-    return false;
-  }
-  if (!(pj_utm = pj_init_plus(utm_dst.c_str()))) {
-    return false;
-  }
+bool FrameTransform::UtmXYToLatlon(
+    double x, double y, int zone, bool southhemi, WGS84Corr* latlon) {
+  projPJ      pj_latlon;
+  projPJ      pj_utm;
+  std::string latlon_src = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+  std::string utm_dst = absl::StrCat("+proj=utm +zone=", zone, " +ellps=GRS80 +units=m +no_defs");
+  if (!(pj_latlon = pj_init_plus(latlon_src.c_str()))) { return false; }
+  if (!(pj_utm = pj_init_plus(utm_dst.c_str()))) { return false; }
   pj_transform(pj_utm, pj_latlon, 1, 1, &x, &y, nullptr);
   latlon->log = x;
   latlon->lat = y;
@@ -71,17 +58,13 @@ bool FrameTransform::UtmXYToLatlon(double x, double y, int zone, bool southhemi,
   return true;
 }
 
-bool FrameTransform::XYZToBlh(const Vector3d &xyz, Vector3d *blh) {
-  projPJ pj_xyz;
-  projPJ pj_blh;
+bool FrameTransform::XYZToBlh(const Vector3d& xyz, Vector3d* blh) {
+  projPJ      pj_xyz;
+  projPJ      pj_blh;
   std::string xyz_src = "+proj=geocent +datum=WGS84";
   std::string blh_dst = "+proj=latlong +datum=WGS84";
-  if (!(pj_xyz = pj_init_plus(xyz_src.c_str()))) {
-    return false;
-  }
-  if (!(pj_blh = pj_init_plus(blh_dst.c_str()))) {
-    return false;
-  }
+  if (!(pj_xyz = pj_init_plus(xyz_src.c_str()))) { return false; }
+  if (!(pj_blh = pj_init_plus(blh_dst.c_str()))) { return false; }
   double x = xyz[0];
   double y = xyz[1];
   double z = xyz[2];
@@ -93,21 +76,17 @@ bool FrameTransform::XYZToBlh(const Vector3d &xyz, Vector3d *blh) {
   pj_free(pj_blh);
   return true;
 }
-bool FrameTransform::BlhToXYZ(const Vector3d &blh, Vector3d *xyz) {
-  projPJ pj_xyz;
-  projPJ pj_blh;
+bool FrameTransform::BlhToXYZ(const Vector3d& blh, Vector3d* xyz) {
+  projPJ      pj_xyz;
+  projPJ      pj_blh;
   std::string blh_src = "+proj=latlong +datum=WGS84";
   std::string xyz_dst = "+proj=geocent +datum=WGS84";
 
-  if (!(pj_blh = pj_init_plus(blh_src.c_str()))) {
-    return false;
-  }
-  if (!(pj_xyz = pj_init_plus(xyz_dst.c_str()))) {
-    return false;
-  }
+  if (!(pj_blh = pj_init_plus(blh_src.c_str()))) { return false; }
+  if (!(pj_xyz = pj_init_plus(xyz_dst.c_str()))) { return false; }
   double longitude = blh[0];
-  double latitude = blh[1];
-  double height = blh[2];
+  double latitude  = blh[1];
+  double height    = blh[2];
   pj_transform(pj_blh, pj_xyz, 1, 1, &longitude, &latitude, &height);
   (*xyz)[0] = longitude;
   (*xyz)[1] = latitude;

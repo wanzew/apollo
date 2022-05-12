@@ -52,12 +52,12 @@ TEST(LidarCloudMaskTest, lidar_cloud_mask_test) {
     source_cloud[i].x = static_cast<float>(i);
   }
 
-  std::vector<int> indices = {1, 2, 3};
+  std::vector<int> indices            = {1, 2, 3};
   std::vector<int> indices_of_indices = {1};
 
   base::PointIndices p_indices;
   base::PointIndices p_indices_of_indices;
-  p_indices.indices = indices;
+  p_indices.indices            = indices;
   p_indices_of_indices.indices = indices_of_indices;
 
   mask.Set(source_cloud.size(), 0);

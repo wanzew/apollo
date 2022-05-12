@@ -43,13 +43,13 @@ class GlobalData {
 
   int ProcessId() const;
 
-  void SetProcessGroup(const std::string& process_group);
+  void               SetProcessGroup(const std::string& process_group);
   const std::string& ProcessGroup() const;
 
   void SetComponentNums(const int component_nums);
-  int ComponentNums() const;
+  int  ComponentNums() const;
 
-  void SetSchedName(const std::string& sched_name);
+  void               SetSchedName(const std::string& sched_name);
   const std::string& SchedName() const;
 
   const std::string& HostIp() const;
@@ -64,20 +64,18 @@ class GlobalData {
   bool IsRealityMode() const;
   bool IsMockTimeMode() const;
 
-  static uint64_t GenerateHashId(const std::string& name) {
-    return common::Hash(name);
-  }
+  static uint64_t GenerateHashId(const std::string& name) { return common::Hash(name); }
 
-  static uint64_t RegisterNode(const std::string& node_name);
+  static uint64_t    RegisterNode(const std::string& node_name);
   static std::string GetNodeById(uint64_t id);
 
-  static uint64_t RegisterChannel(const std::string& channel);
+  static uint64_t    RegisterChannel(const std::string& channel);
   static std::string GetChannelById(uint64_t id);
 
-  static uint64_t RegisterService(const std::string& service);
+  static uint64_t    RegisterService(const std::string& service);
   static std::string GetServiceById(uint64_t id);
 
-  static uint64_t RegisterTaskName(const std::string& task_name);
+  static uint64_t    RegisterTaskName(const std::string& task_name);
   static std::string GetTaskNameById(uint64_t id);
 
  private:
@@ -92,7 +90,7 @@ class GlobalData {
   std::string host_name_;
 
   // process info
-  int process_id_;
+  int         process_id_;
   std::string process_group_;
 
   int component_nums_ = 0;
@@ -101,7 +99,7 @@ class GlobalData {
   std::string sched_name_ = "CYBER_DEFAULT";
 
   // run mode
-  RunMode run_mode_;
+  RunMode   run_mode_;
   ClockMode clock_mode_;
 
   static AtomicHashMap<uint64_t, std::string, 512> node_id_map_;

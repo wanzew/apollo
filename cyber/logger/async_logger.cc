@@ -28,10 +28,10 @@ namespace apollo {
 namespace cyber {
 namespace logger {
 
-static const std::unordered_map<char, int> log_level_map = {
-    {'F', 3}, {'E', 2}, {'W', 1}, {'I', 0}};
+static const std::unordered_map<char, int> log_level_map = {{'F', 3}, {'E', 2}, {'W', 1}, {'I', 0}};
 
-AsyncLogger::AsyncLogger(google::base::Logger* wrapped) : wrapped_(wrapped) {
+AsyncLogger::AsyncLogger(google::base::Logger* wrapped)
+    : wrapped_(wrapped) {
   active_buf_.reset(new std::deque<Msg>());
   flushing_buf_.reset(new std::deque<Msg>());
 }
@@ -47,9 +47,7 @@ void AsyncLogger::Start() {
 
 void AsyncLogger::Stop() {
   state_.store(STOPPED, std::memory_order_release);
-  if (log_thread_.joinable()) {
-    log_thread_.join();
-  }
+  if (log_thread_.joinable()) { log_thread_.join(); }
 
   FlushBuffer(active_buf_);
   ACHECK(active_buf_->empty());
@@ -57,8 +55,7 @@ void AsyncLogger::Stop() {
   // std::cout << "Async Logger Stop!" << std::endl;
 }
 
-void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
-                        int message_len) {
+void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message, int message_len) {
   if (cyber_unlikely(state_.load(std::memory_order_acquire) != RUNNING)) {
     // std::cout << "Async Logger not running!" << std::endl;
     return;
@@ -68,14 +65,11 @@ void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
     while (flag_.test_and_set(std::memory_order_acquire)) {
       cpu_relax();
     }
-    active_buf_->emplace_back(timestamp, std::move(msg_str),
-                              log_level_map.at(message[0]));
+    active_buf_->emplace_back(timestamp, std::move(msg_str), log_level_map.at(message[0]));
     flag_.clear(std::memory_order_release);
   }
 
-  if (force_flush && timestamp == 0 && message && message_len == 0) {
-    Stop();
-  }
+  if (force_flush && timestamp == 0 && message && message_len == 0) { Stop(); }
 }
 
 void AsyncLogger::Flush() {
@@ -94,9 +88,7 @@ void AsyncLogger::RunThread() {
     active_buf_.swap(flushing_buf_);
     flag_.clear(std::memory_order_release);
     FlushBuffer(flushing_buf_);
-    if (active_buf_->size() < 800) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
+    if (active_buf_->size() < 800) { std::this_thread::sleep_for(std::chrono::milliseconds(1)); }
   }
 }
 
@@ -108,11 +100,8 @@ void AsyncLogger::FlushBuffer(const std::unique_ptr<std::deque<Msg>>& buffer) {
 
     if (module_logger_map_.find(module_name) == module_logger_map_.end()) {
       std::string file_name = module_name + ".log.INFO.";
-      if (!FLAGS_log_dir.empty()) {
-        file_name = FLAGS_log_dir + "/" + file_name;
-      }
-      module_logger_map_[module_name].reset(
-          new LogFileObject(google::INFO, file_name.c_str()));
+      if (!FLAGS_log_dir.empty()) { file_name = FLAGS_log_dir + "/" + file_name; }
+      module_logger_map_[module_name].reset(new LogFileObject(google::INFO, file_name.c_str()));
       module_logger_map_[module_name]->SetSymlinkBasename(module_name.c_str());
     }
     const bool force_flush = msg.level > 0;

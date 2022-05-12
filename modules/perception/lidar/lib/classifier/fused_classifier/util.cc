@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -26,8 +27,7 @@ using apollo::perception::base::ObjectType;
 
 void FromStdToVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
   (*dst_prob)(0) = src_prob[0];
-  for (size_t i = 3; i < static_cast<size_t>(ObjectType::MAX_OBJECT_TYPE);
-       ++i) {
+  for (size_t i = 3; i < static_cast<size_t>(ObjectType::MAX_OBJECT_TYPE); ++i) {
     (*dst_prob)(i - 2) = static_cast<double>(src_prob[i]);
   }
 }
@@ -35,8 +35,7 @@ void FromStdToVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
 void FromEigenToVector(const Vectord& src_prob, std::vector<float>* dst_prob) {
   dst_prob->assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
   dst_prob->at(0) = static_cast<float>(src_prob(0));
-  for (size_t i = 3; i < static_cast<size_t>(ObjectType::MAX_OBJECT_TYPE);
-       ++i) {
+  for (size_t i = 3; i < static_cast<size_t>(ObjectType::MAX_OBJECT_TYPE); ++i) {
     dst_prob->at(i) = static_cast<float>(src_prob(i - 2));
   }
 }
@@ -62,7 +61,7 @@ void ToExpStable(Vectord* prob) {
 
 void Normalize(Vectord* prob) {
   double sum = prob->sum();
-  sum = sum < 1e-9 ? 1e-9 : sum;
+  sum        = sum < 1e-9 ? 1e-9 : sum;
   *prob /= sum;
 }
 
@@ -90,9 +89,7 @@ bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix) {
 }
 
 bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
-  if (matrix == nullptr) {
-    return false;
-  }
+  if (matrix == nullptr) { return false; }
   std::ifstream fin(filename);
   if (!fin.is_open()) {
     AERROR << "Fail to open file: " << filename;
@@ -103,11 +100,9 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
   return true;
 }
 
-bool LoadMultipleMatricesFile(const std::string& filename,
+bool LoadMultipleMatricesFile(const std::string&              filename,
                               EigenMap<std::string, Matrixd>* matrices) {
-  if (matrices == nullptr) {
-    return false;
-  }
+  if (matrices == nullptr) { return false; }
   std::ifstream fin(filename);
   if (!fin.is_open()) {
     AERROR << "Fail to open file: " << filename;

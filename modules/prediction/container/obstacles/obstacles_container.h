@@ -25,12 +25,13 @@
 #include <string>
 #include <vector>
 
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/common/util/lru_cache.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/submodules/submodule_output.h"
 
 namespace apollo {
@@ -64,9 +65,8 @@ class ObstaclesContainer : public Container {
    * @param Perception obstacle
    *        Timestamp
    */
-  void InsertPerceptionObstacle(
-      const perception::PerceptionObstacle& perception_obstacle,
-      const double timestamp);
+  void InsertPerceptionObstacle(const perception::PerceptionObstacle& perception_obstacle,
+                                const double                          timestamp);
 
   /**
    * @brief Insert a feature proto message into the container
@@ -100,8 +100,7 @@ class ObstaclesContainer : public Container {
 
   size_t NumOfObstacles() { return ptr_obstacles_.size(); }
 
-  const apollo::perception::PerceptionObstacle& GetPerceptionObstacle(
-      const int id);
+  const apollo::perception::PerceptionObstacle& GetPerceptionObstacle(const int id);
 
   /**
    * @brief Get movable obstacle IDs in the current frame
@@ -134,8 +133,8 @@ class ObstaclesContainer : public Container {
 
   double timestamp() const;
 
-  SubmoduleOutput GetSubmoduleOutput(
-      const size_t history_size, const apollo::cyber::Time& frame_start_time);
+  SubmoduleOutput GetSubmoduleOutput(const size_t               history_size,
+                                     const apollo::cyber::Time& frame_start_time);
 
   /**
    * @brief Get current scenario
@@ -159,14 +158,14 @@ class ObstaclesContainer : public Container {
   bool IsMovable(const perception::PerceptionObstacle& perception_obstacle);
 
  private:
-  double timestamp_ = -1.0;
+  double                                                 timestamp_ = -1.0;
   common::util::LRUCache<int, std::unique_ptr<Obstacle>> ptr_obstacles_;
-  std::vector<int> curr_frame_movable_obstacle_ids_;
-  std::vector<int> curr_frame_unmovable_obstacle_ids_;
-  std::vector<int> curr_frame_considered_obstacle_ids_;
-  Scenario curr_scenario_;
-  std::unique_ptr<ObstacleClusters> clusters_;
-  JunctionAnalyzer junction_analyzer_;
+  std::vector<int>                                       curr_frame_movable_obstacle_ids_;
+  std::vector<int>                                       curr_frame_unmovable_obstacle_ids_;
+  std::vector<int>                                       curr_frame_considered_obstacle_ids_;
+  Scenario                                               curr_scenario_;
+  std::unique_ptr<ObstacleClusters>                      clusters_;
+  JunctionAnalyzer                                       junction_analyzer_;
 };
 
 }  // namespace prediction

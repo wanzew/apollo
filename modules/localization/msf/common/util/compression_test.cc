@@ -23,7 +23,7 @@ namespace localization {
 namespace msf {
 
 TEST(CompressionTestSuite, ZlibStrategyTest) {
-  ZlibStrategy zlib;
+  ZlibStrategy               zlib;
   std::vector<unsigned char> buf_uncompressed;
   std::vector<unsigned char> buf_compressed;
   for (int i = 0; i < 255; i++) {

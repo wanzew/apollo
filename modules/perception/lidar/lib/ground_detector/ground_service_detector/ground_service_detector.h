@@ -28,20 +28,19 @@ namespace lidar {
 
 class GroundServiceDetector : public BaseGroundDetector {
  public:
-  GroundServiceDetector() = default;
+  GroundServiceDetector()  = default;
   ~GroundServiceDetector() = default;
 
-  bool Init(const GroundDetectorInitOptions& options =
-                GroundDetectorInitOptions()) override;
+  bool Init(const GroundDetectorInitOptions& options = GroundDetectorInitOptions()) override;
 
   bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "GroundServiceDetector"; }
 
  private:
-  GroundServicePtr ground_service_ = nullptr;
+  GroundServicePtr     ground_service_ = nullptr;
   GroundServiceContent ground_service_content_;
-  double ground_threshold_ = 0.25;
+  double               ground_threshold_ = 0.25;
 };
 
 }  // namespace lidar

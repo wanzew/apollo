@@ -43,23 +43,22 @@ void Adslighthorncommand310::UpdateData(uint8_t* data) {
   ++auto_drivercmd_alivecounter_;
   auto_drivercmd_alivecounter_ = (auto_drivercmd_alivecounter_) % 16;
   set_p_auto_drivercmd_alivecounter(data, auto_drivercmd_alivecounter_);
-  auto_drivercmd_checksum_ =
-      data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
+  auto_drivercmd_checksum_ = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
   set_p_auto_drivercmd_checksum(data, auto_drivercmd_checksum_);
 }
 
 void Adslighthorncommand310::Reset() {
   // TODO(All) :  you should check this manually
-  turn_right_light_command_ = false;
-  turn_left_light_command_ = false;
-  horn_command_ = false;
-  beam_command_ = 0;
+  turn_right_light_command_    = false;
+  turn_left_light_command_     = false;
+  horn_command_                = false;
+  beam_command_                = 0;
   auto_drivercmd_alivecounter_ = 0;
-  auto_drivercmd_checksum_ = 0;
+  auto_drivercmd_checksum_     = 0;
 }
 
-Adslighthorncommand310* Adslighthorncommand310::set_turn_right_light_command(
-    bool turn_right_light_command) {
+Adslighthorncommand310*
+Adslighthorncommand310::set_turn_right_light_command(bool turn_right_light_command) {
   turn_right_light_command_ = turn_right_light_command;
   return this;
 }
@@ -68,16 +67,16 @@ Adslighthorncommand310* Adslighthorncommand310::set_turn_right_light_command(
 // 'precision': 1.0, 'len': 1, 'name': 'Turn_Right_Light_Command',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 8, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': 'bit'}
-void Adslighthorncommand310::set_p_turn_right_light_command(
-    uint8_t* data, bool turn_right_light_command) {
+void Adslighthorncommand310::set_p_turn_right_light_command(uint8_t* data,
+                                                            bool     turn_right_light_command) {
   int x = turn_right_light_command;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 0, 1);
 }
 
-Adslighthorncommand310* Adslighthorncommand310::set_turn_left_light_command(
-    bool turn_left_light_command) {
+Adslighthorncommand310*
+Adslighthorncommand310::set_turn_left_light_command(bool turn_left_light_command) {
   turn_left_light_command_ = turn_left_light_command;
   return this;
 }
@@ -86,16 +85,15 @@ Adslighthorncommand310* Adslighthorncommand310::set_turn_left_light_command(
 // 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name': 'Turn_Left_Light_Command',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 9, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': 'bit'}
-void Adslighthorncommand310::set_p_turn_left_light_command(
-    uint8_t* data, bool turn_left_light_command) {
+void Adslighthorncommand310::set_p_turn_left_light_command(uint8_t* data,
+                                                           bool     turn_left_light_command) {
   int x = turn_left_light_command;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 1, 1);
 }
 
-Adslighthorncommand310* Adslighthorncommand310::set_horn_command(
-    bool horn_command) {
+Adslighthorncommand310* Adslighthorncommand310::set_horn_command(bool horn_command) {
   horn_command_ = horn_command;
   return this;
 }
@@ -103,16 +101,14 @@ Adslighthorncommand310* Adslighthorncommand310::set_horn_command(
 // config detail: {'name': 'Horn_Command', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 10,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': 'bit'}
-void Adslighthorncommand310::set_p_horn_command(uint8_t* data,
-                                                bool horn_command) {
+void Adslighthorncommand310::set_p_horn_command(uint8_t* data, bool horn_command) {
   int x = horn_command;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 2, 1);
 }
 
-Adslighthorncommand310* Adslighthorncommand310::set_beam_command(
-    int beam_command) {
+Adslighthorncommand310* Adslighthorncommand310::set_beam_command(int beam_command) {
   beam_command_ = beam_command;
   return this;
 }
@@ -121,17 +117,16 @@ Adslighthorncommand310* Adslighthorncommand310::set_beam_command(
 // 0.0, 'precision': 1.0, 'len': 2, 'name': 'Beam_Command', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 13, 'type': 'int', 'order':
 // 'motorola', 'physical_unit': 'bit'}
-void Adslighthorncommand310::set_p_beam_command(uint8_t* data,
-                                                int beam_command) {
+void Adslighthorncommand310::set_p_beam_command(uint8_t* data, int beam_command) {
   beam_command = ProtocolData::BoundedValue(0, 1, beam_command);
-  int x = beam_command;
+  int x        = beam_command;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 4, 2);
 }
 
-Adslighthorncommand310* Adslighthorncommand310::set_auto_drivercmd_alivecounter(
-    int auto_drivercmd_alivecounter) {
+Adslighthorncommand310*
+Adslighthorncommand310::set_auto_drivercmd_alivecounter(int auto_drivercmd_alivecounter) {
   auto_drivercmd_alivecounter_ = auto_drivercmd_alivecounter;
   return this;
 }
@@ -139,18 +134,17 @@ Adslighthorncommand310* Adslighthorncommand310::set_auto_drivercmd_alivecounter(
 // config detail: {'name': 'AUTO_DriverCmd_AliveCounter', 'offset': 0.0,
 // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adslighthorncommand310::set_p_auto_drivercmd_alivecounter(
-    uint8_t* data, int auto_drivercmd_alivecounter) {
-  auto_drivercmd_alivecounter =
-      ProtocolData::BoundedValue(0, 15, auto_drivercmd_alivecounter);
-  int x = auto_drivercmd_alivecounter;
+void Adslighthorncommand310::set_p_auto_drivercmd_alivecounter(uint8_t* data,
+                                                               int auto_drivercmd_alivecounter) {
+  auto_drivercmd_alivecounter = ProtocolData::BoundedValue(0, 15, auto_drivercmd_alivecounter);
+  int x                       = auto_drivercmd_alivecounter;
 
   Byte to_set(data + 6);
   to_set.set_value(x, 0, 4);
 }
 
-Adslighthorncommand310* Adslighthorncommand310::set_auto_drivercmd_checksum(
-    int auto_drivercmd_checksum) {
+Adslighthorncommand310*
+Adslighthorncommand310::set_auto_drivercmd_checksum(int auto_drivercmd_checksum) {
   auto_drivercmd_checksum_ = auto_drivercmd_checksum;
   return this;
 }
@@ -158,11 +152,10 @@ Adslighthorncommand310* Adslighthorncommand310::set_auto_drivercmd_checksum(
 // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adslighthorncommand310::set_p_auto_drivercmd_checksum(
-    uint8_t* data, int auto_drivercmd_checksum) {
-  auto_drivercmd_checksum =
-      ProtocolData::BoundedValue(0, 255, auto_drivercmd_checksum);
-  int x = auto_drivercmd_checksum;
+void Adslighthorncommand310::set_p_auto_drivercmd_checksum(uint8_t* data,
+                                                           int      auto_drivercmd_checksum) {
+  auto_drivercmd_checksum = ProtocolData::BoundedValue(0, 255, auto_drivercmd_checksum);
+  int x                   = auto_drivercmd_checksum;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);

@@ -20,11 +20,12 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_approach.h"
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -41,91 +42,71 @@ using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 using apollo::perception::TrafficLight;
 
-Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus
+TrafficLightUnprotectedLeftTurnStageApproach::Process(const TrajectoryPoint& planning_init_point,
+                                                      Frame*                 frame) {
   ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  if (!config_.enabled()) {
-    return FinishStage(frame);
-  }
+  if (!config_.enabled()) { return FinishStage(frame); }
 
   // set cruise_speed to slow down
   frame->mutable_reference_line_info()->front().SetCruiseSpeed(
       scenario_config_.approach_cruise_speed());
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "TrafficLightUnprotectedLeftTurnStageApproach planning error";
-  }
+  if (!plan_ok) { AERROR << "TrafficLightUnprotectedLeftTurnStageApproach planning error"; }
 
-  if (GetContext()->current_traffic_light_overlap_ids.empty()) {
-    return FinishScenario();
-  }
+  if (GetContext()->current_traffic_light_overlap_ids.empty()) { return FinishScenario(); }
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
-  PathOverlap* traffic_light = nullptr;
-  bool traffic_light_all_done = true;
-  for (const auto& traffic_light_overlap_id :
-       GetContext()->current_traffic_light_overlap_ids) {
+  PathOverlap* traffic_light          = nullptr;
+  bool         traffic_light_all_done = true;
+  for (const auto& traffic_light_overlap_id : GetContext()->current_traffic_light_overlap_ids) {
     // get overlap along reference line
-    PathOverlap* current_traffic_light_overlap =
-        scenario::util::GetOverlapOnReferenceLine(reference_line_info,
-                                                  traffic_light_overlap_id,
-                                                  ReferenceLineInfo::SIGNAL);
-    if (!current_traffic_light_overlap) {
-      continue;
-    }
+    PathOverlap* current_traffic_light_overlap = scenario::util::GetOverlapOnReferenceLine(
+        reference_line_info, traffic_light_overlap_id, ReferenceLineInfo::SIGNAL);
+    if (!current_traffic_light_overlap) { continue; }
 
     traffic_light = current_traffic_light_overlap;
 
     // set right_of_way_status
-    reference_line_info.SetJunctionRightOfWay(
-        current_traffic_light_overlap->start_s, false);
+    reference_line_info.SetJunctionRightOfWay(current_traffic_light_overlap->start_s, false);
 
     const double distance_adc_to_stop_line =
         current_traffic_light_overlap->start_s - adc_front_edge_s;
     auto signal_color = frame->GetSignal(traffic_light_overlap_id).color();
-    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
-           << "] start_s[" << current_traffic_light_overlap->start_s
-           << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
-           << "] color[" << signal_color << "]";
+    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id << "] start_s["
+           << current_traffic_light_overlap->start_s << "] distance_adc_to_stop_line["
+           << distance_adc_to_stop_line << "] color[" << signal_color << "]";
 
-    if (distance_adc_to_stop_line < 0)
-        return FinishStage(frame);
+    if (distance_adc_to_stop_line < 0) return FinishStage(frame);
     // check on traffic light color and distance to stop line
     if (signal_color != TrafficLight::GREEN ||
-        distance_adc_to_stop_line >=
-            scenario_config_.max_valid_stop_distance()) {
+        distance_adc_to_stop_line >= scenario_config_.max_valid_stop_distance()) {
       traffic_light_all_done = false;
       break;
     }
   }
 
-  if (traffic_light == nullptr) {
-    return FinishScenario();
-  }
+  if (traffic_light == nullptr) { return FinishScenario(); }
 
-  if (traffic_light_all_done) {
-    return FinishStage(frame);
-  }
+  if (traffic_light_all_done) { return FinishStage(frame); }
 
   return Stage::RUNNING;
 }
 
-Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
-    Frame* frame) {
+Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(Frame* frame) {
   // check speed at stop_stage
   const double adc_speed = injector_->vehicle_state()->linear_velocity();
   if (adc_speed > scenario_config_.max_adc_speed_before_creep()) {
     // skip creep
-    next_stage_ = ScenarioConfig ::
-        TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE;
+    next_stage_ = ScenarioConfig ::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE;
   } else {
     // creep
     // update PlanningContext
@@ -134,8 +115,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
         ->mutable_traffic_light()
         ->mutable_done_traffic_light_overlap_id()
         ->Clear();
-    for (const auto& traffic_light_overlap_id :
-         GetContext()->current_traffic_light_overlap_ids) {
+    for (const auto& traffic_light_overlap_id : GetContext()->current_traffic_light_overlap_ids) {
       injector_->planning_context()
           ->mutable_planning_status()
           ->mutable_traffic_light()
@@ -143,7 +123,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
     }
 
     GetContext()->creep_start_time = Clock::NowInSeconds();
-    next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP;
+    next_stage_                    = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP;
   }
 
   // reset cruise_speed

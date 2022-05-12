@@ -28,7 +28,7 @@ namespace transport {
 template <typename M>
 class RtpsReceiver : public Receiver<M> {
  public:
-  RtpsReceiver(const RoleAttributes& attr,
+  RtpsReceiver(const RoleAttributes&                        attr,
                const typename Receiver<M>::MessageListener& msg_listener);
   virtual ~RtpsReceiver();
 
@@ -43,9 +43,8 @@ class RtpsReceiver : public Receiver<M> {
 };
 
 template <typename M>
-RtpsReceiver<M>::RtpsReceiver(
-    const RoleAttributes& attr,
-    const typename Receiver<M>::MessageListener& msg_listener)
+RtpsReceiver<M>::RtpsReceiver(const RoleAttributes&                        attr,
+                              const typename Receiver<M>::MessageListener& msg_listener)
     : Receiver<M>(attr, msg_listener) {
   dispatcher_ = RtpsDispatcher::Instance();
 }
@@ -57,30 +56,24 @@ RtpsReceiver<M>::~RtpsReceiver() {
 
 template <typename M>
 void RtpsReceiver<M>::Enable() {
-  if (this->enabled_) {
-    return;
-  }
-  dispatcher_->AddListener<M>(
-      this->attr_, std::bind(&RtpsReceiver<M>::OnNewMessage, this,
-                             std::placeholders::_1, std::placeholders::_2));
+  if (this->enabled_) { return; }
+  dispatcher_->AddListener<M>(this->attr_, std::bind(&RtpsReceiver<M>::OnNewMessage, this,
+                                                     std::placeholders::_1, std::placeholders::_2));
   this->enabled_ = true;
 }
 
 template <typename M>
 void RtpsReceiver<M>::Disable() {
-  if (!this->enabled_) {
-    return;
-  }
+  if (!this->enabled_) { return; }
   dispatcher_->RemoveListener<M>(this->attr_);
   this->enabled_ = false;
 }
 
 template <typename M>
 void RtpsReceiver<M>::Enable(const RoleAttributes& opposite_attr) {
-  dispatcher_->AddListener<M>(
-      this->attr_, opposite_attr,
-      std::bind(&RtpsReceiver<M>::OnNewMessage, this, std::placeholders::_1,
-                std::placeholders::_2));
+  dispatcher_->AddListener<M>(this->attr_, opposite_attr,
+                              std::bind(&RtpsReceiver<M>::OnNewMessage, this, std::placeholders::_1,
+                                        std::placeholders::_2));
 }
 
 template <typename M>

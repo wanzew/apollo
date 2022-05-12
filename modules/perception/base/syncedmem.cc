@@ -67,47 +67,43 @@ namespace perception {
 namespace base {
 
 SyncedMemory::SyncedMemory(bool use_cuda)
-    : cpu_ptr_(NULL),
-      gpu_ptr_(NULL),
-      size_(0),
-      head_(UNINITIALIZED),
-      own_cpu_data_(false),
-      cpu_malloc_use_cuda_(use_cuda),
-      own_gpu_data_(false),
-      device_(-1) {
+    : cpu_ptr_(NULL)
+    , gpu_ptr_(NULL)
+    , size_(0)
+    , head_(UNINITIALIZED)
+    , own_cpu_data_(false)
+    , cpu_malloc_use_cuda_(use_cuda)
+    , own_gpu_data_(false)
+    , device_(-1) {
 #if USE_GPU == 1
-#ifdef PERCEPTION_DEBUG
+#  ifdef PERCEPTION_DEBUG
   BASE_CUDA_CHECK(cudaGetDevice(&device_));
-#endif
+#  endif
 #endif
 }
 
 SyncedMemory::SyncedMemory(size_t size, bool use_cuda)
-    : cpu_ptr_(NULL),
-      gpu_ptr_(NULL),
-      size_(size),
-      head_(UNINITIALIZED),
-      own_cpu_data_(false),
-      cpu_malloc_use_cuda_(use_cuda),
-      own_gpu_data_(false),
-      device_(-1) {
+    : cpu_ptr_(NULL)
+    , gpu_ptr_(NULL)
+    , size_(size)
+    , head_(UNINITIALIZED)
+    , own_cpu_data_(false)
+    , cpu_malloc_use_cuda_(use_cuda)
+    , own_gpu_data_(false)
+    , device_(-1) {
 #if USE_GPU == 1
-#ifdef PERCEPTION_DEBUG
+#  ifdef PERCEPTION_DEBUG
   BASE_CUDA_CHECK(cudaGetDevice(&device_));
-#endif
+#  endif
 #endif
 }
 
 SyncedMemory::~SyncedMemory() {
   check_device();
-  if (cpu_ptr_ && own_cpu_data_) {
-    PerceptionFreeHost(cpu_ptr_, cpu_malloc_use_cuda_);
-  }
+  if (cpu_ptr_ && own_cpu_data_) { PerceptionFreeHost(cpu_ptr_, cpu_malloc_use_cuda_); }
 
 #if USE_GPU == 1
-  if (gpu_ptr_ && own_gpu_data_) {
-    BASE_CUDA_CHECK(cudaFree(gpu_ptr_));
-  }
+  if (gpu_ptr_ && own_gpu_data_) { BASE_CUDA_CHECK(cudaFree(gpu_ptr_)); }
 #endif  // USE_GPU
 }
 
@@ -121,7 +117,7 @@ inline void SyncedMemory::to_cpu() {
         return;
       }
       memset(cpu_ptr_, 0, size_);
-      head_ = HEAD_AT_CPU;
+      head_         = HEAD_AT_CPU;
       own_cpu_data_ = true;
       break;
     case HEAD_AT_GPU:
@@ -137,8 +133,7 @@ inline void SyncedMemory::to_cpu() {
 #endif
       break;
     case HEAD_AT_CPU:
-    case SYNCED:
-      break;
+    case SYNCED: break;
   }
 }
 
@@ -149,7 +144,7 @@ inline void SyncedMemory::to_gpu() {
     case UNINITIALIZED:
       BASE_CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
       BASE_CUDA_CHECK(cudaMemset(gpu_ptr_, 0, size_));
-      head_ = HEAD_AT_GPU;
+      head_         = HEAD_AT_GPU;
       own_gpu_data_ = true;
       break;
     case HEAD_AT_CPU:
@@ -161,8 +156,7 @@ inline void SyncedMemory::to_gpu() {
       head_ = SYNCED;
       break;
     case HEAD_AT_GPU:
-    case SYNCED:
-      break;
+    case SYNCED: break;
   }
 #else
   NO_GPU;
@@ -178,11 +172,9 @@ const void* SyncedMemory::cpu_data() {
 void SyncedMemory::set_cpu_data(void* data) {
   check_device();
   ACHECK(data);
-  if (own_cpu_data_) {
-    PerceptionFreeHost(cpu_ptr_, cpu_malloc_use_cuda_);
-  }
-  cpu_ptr_ = data;
-  head_ = HEAD_AT_CPU;
+  if (own_cpu_data_) { PerceptionFreeHost(cpu_ptr_, cpu_malloc_use_cuda_); }
+  cpu_ptr_      = data;
+  head_         = HEAD_AT_CPU;
   own_cpu_data_ = false;
 }
 
@@ -201,11 +193,9 @@ void SyncedMemory::set_gpu_data(void* data) {
   check_device();
 #if USE_GPU == 1
   ACHECK(data);
-  if (own_gpu_data_) {
-    BASE_CUDA_CHECK(cudaFree(gpu_ptr_));
-  }
-  gpu_ptr_ = data;
-  head_ = HEAD_AT_GPU;
+  if (own_gpu_data_) { BASE_CUDA_CHECK(cudaFree(gpu_ptr_)); }
+  gpu_ptr_      = data;
+  head_         = HEAD_AT_GPU;
   own_gpu_data_ = false;
 #else
   NO_GPU;
@@ -248,7 +238,7 @@ void SyncedMemory::async_gpu_push(const cudaStream_t& stream) {
 
 void SyncedMemory::check_device() {
 #if USE_GPU == 1
-#ifdef PERCEPTION_DEBUG
+#  ifdef PERCEPTION_DEBUG
   int device;
   cudaGetDevice(&device);
   CHECK_EQ(device, device_);
@@ -257,7 +247,7 @@ void SyncedMemory::check_device() {
     BASE_CUDA_CHECK(cudaPointerGetAttributes(&attributes, gpu_ptr_));
     CHECK_EQ(attributes.device, device_);
   }
-#endif
+#  endif
 #endif
 }
 

@@ -16,8 +16,9 @@
 
 #include "modules/perception/radar/lib/tracker/common/radar_track_manager.h"
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 #include "modules/perception/radar/lib/tracker/filter/adaptive_kalman_filter.h"
 
 namespace apollo {
@@ -29,7 +30,7 @@ TEST(RadarTrackManagerTest, radar_track_manager_test) {
   object->track_id = 100;
   object->center << 10.0, 20.0, 0.0;
   object->velocity << 3.0, 4.0, 0.0;
-  double timestamp = 123456789.0;
+  double        timestamp = 123456789.0;
   RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
   RadarTrackPtr radar_track2(new RadarTrack(object, timestamp));
 

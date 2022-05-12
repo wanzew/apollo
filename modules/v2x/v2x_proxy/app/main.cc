@@ -20,7 +20,7 @@
  */
 #include "modules/v2x/v2x_proxy/app/v2x_proxy.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   ::apollo::cyber::Init(argv[0]);
   ::apollo::v2x::V2xProxy v2x_proxy;

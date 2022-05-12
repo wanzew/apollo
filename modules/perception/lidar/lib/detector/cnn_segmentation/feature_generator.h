@@ -35,10 +35,10 @@ class FeatureGenerator {
   FeatureGenerator() {
 #if USE_GPU == 1
     pc_gpu_size_ = kMaxPointCloudGPUSize;
-    BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&pc_gpu_),
-                               pc_gpu_size_ * sizeof(base::PointF)));
-    BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&point2grid_gpu_),
-                               pc_gpu_size_ * sizeof(int)));
+    BASE_CUDA_CHECK(
+        cudaMalloc(reinterpret_cast<void**>(&pc_gpu_), pc_gpu_size_ * sizeof(base::PointF)));
+    BASE_CUDA_CHECK(
+        cudaMalloc(reinterpret_cast<void**>(&point2grid_gpu_), pc_gpu_size_ * sizeof(int)));
 #endif
   }
 
@@ -50,8 +50,7 @@ class FeatureGenerator {
 
   bool Init(const FeatureParam& feature_param, base::Blob<float>* out_blob);
 
-  void Generate(const base::PointFCloudPtr& pc_ptr,
-                const std::vector<int>& point2grid) {
+  void Generate(const base::PointFCloudPtr& pc_ptr, const std::vector<int>& point2grid) {
 #if USE_GPU == 1
     GenerateGPU(pc_ptr, point2grid);
 #else
@@ -63,17 +62,13 @@ class FeatureGenerator {
 
  private:
 #if USE_GPU == 1
-  void GenerateGPU(const base::PointFCloudPtr& pc_ptr,
-                   const std::vector<int>& point2grid);
+  void GenerateGPU(const base::PointFCloudPtr& pc_ptr, const std::vector<int>& point2grid);
   void ReleaseGPUMemory();
 #endif
-  void GenerateCPU(const base::PointFCloudPtr& pc_ptr,
-                   const std::vector<int>& point2grid);
+  void GenerateCPU(const base::PointFCloudPtr& pc_ptr, const std::vector<int>& point2grid);
 
   float LogCount(int count) {
-    if (count < static_cast<int>(log_table_.size())) {
-      return log_table_[count];
-    }
+    if (count < static_cast<int>(log_table_.size())) { return log_table_[count]; }
     return logf(static_cast<float>(1 + count));
   }
 
@@ -81,26 +76,26 @@ class FeatureGenerator {
   std::vector<float> log_table_;
   // log table for GPU, with base::Blob type
   std::shared_ptr<base::Blob<float>> log_blob_;
-  const int kMaxLogNum = 256;
+  const int                          kMaxLogNum = 256;
 
   // feature param
-  int width_ = 0;
-  int height_ = 0;
-  float range_ = 0.0f;
-  float min_height_ = 0.0f;
-  float max_height_ = 0.0f;
-  bool use_intensity_feature_ = false;
-  bool use_constant_feature_ = false;
+  int   width_                 = 0;
+  int   height_                = 0;
+  float range_                 = 0.0f;
+  float min_height_            = 0.0f;
+  float max_height_            = 0.0f;
+  bool  use_intensity_feature_ = false;
+  bool  use_constant_feature_  = false;
 
   // raw feature data
-  float* max_height_data_ = nullptr;
-  float* mean_height_data_ = nullptr;
-  float* count_data_ = nullptr;
-  float* direction_data_ = nullptr;
-  float* top_intensity_data_ = nullptr;
+  float* max_height_data_     = nullptr;
+  float* mean_height_data_    = nullptr;
+  float* count_data_          = nullptr;
+  float* direction_data_      = nullptr;
+  float* top_intensity_data_  = nullptr;
   float* mean_intensity_data_ = nullptr;
-  float* distance_data_ = nullptr;
-  float* nonempty_data_ = nullptr;
+  float* distance_data_       = nullptr;
+  float* nonempty_data_       = nullptr;
 
   // 1-d index in feature map of each point
   std::vector<int> map_idx_;
@@ -109,11 +104,11 @@ class FeatureGenerator {
   base::Blob<float>* out_blob_ = nullptr;
 
   // param for managing gpu memory, only for cuda code
-  base::PointF* pc_gpu_ = nullptr;
-  int* point2grid_gpu_ = nullptr;
-  int pc_gpu_size_ = 0;
-  const int kMaxPointCloudGPUSize = 120000;
-  const int kGPUThreadSize = 512;
+  base::PointF* pc_gpu_               = nullptr;
+  int*          point2grid_gpu_       = nullptr;
+  int           pc_gpu_size_          = 0;
+  const int     kMaxPointCloudGPUSize = 120000;
+  const int     kGPUThreadSize        = 512;
 
   // for TEST only
   FRIEND_TEST(FeatureGeneratorTest, basic_test);

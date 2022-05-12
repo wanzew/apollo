@@ -20,9 +20,9 @@
 namespace {
 std::string func_name_simplified(const std::string& str) {
   constexpr char kLeftBracket = '(';
-  constexpr char kSpace = ' ';
+  constexpr char kSpace       = ' ';
 
-  auto end = str.find(kLeftBracket);
+  auto end   = str.find(kLeftBracket);
   auto begin = str.rfind(kSpace, end);
 
   if (begin == std::string::npos) {
@@ -41,19 +41,16 @@ namespace apollo {
 namespace common {
 namespace util {
 
-std::string function_signature(const std::string& func_name,
-                               const std::string& indicator) {
+std::string function_signature(const std::string& func_name, const std::string& indicator) {
   auto simplified_name = func_name_simplified(func_name);
-  if (indicator.empty()) {
-    return simplified_name;
-  }
+  if (indicator.empty()) { return simplified_name; }
   return absl::StrCat(indicator, "_", simplified_name);
 }
 
 void Timer::Start() { start_time_ = Time::Now(); }
 
 int64_t Timer::End(const std::string& msg) {
-  end_time_ = Time::Now();
+  end_time_            = Time::Now();
   int64_t elapsed_time = (end_time_ - start_time_).ToNanosecond() / 1e6;
   ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
 

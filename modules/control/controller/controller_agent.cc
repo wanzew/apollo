@@ -32,57 +32,52 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::cyber::Clock;
 
-void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
+void ControllerAgent::RegisterControllers(const ControlConf* control_conf) {
   AINFO << "Only support MPC controller or Lat + Lon controllers as of now";
   for (auto active_controller : control_conf->active_controllers()) {
     switch (active_controller) {
       case ControlConf::MPC_CONTROLLER:
-        controller_factory_.Register(
-            ControlConf::MPC_CONTROLLER,
-            []() -> Controller * { return new MPCController(); });
+        controller_factory_.Register(ControlConf::MPC_CONTROLLER,
+                                     []() -> Controller* { return new MPCController(); });
         break;
       case ControlConf::LAT_CONTROLLER:
-        controller_factory_.Register(
-            ControlConf::LAT_CONTROLLER,
-            []() -> Controller * { return new LatController(); });
+        controller_factory_.Register(ControlConf::LAT_CONTROLLER,
+                                     []() -> Controller* { return new LatController(); });
         break;
       case ControlConf::LON_CONTROLLER:
-        controller_factory_.Register(
-            ControlConf::LON_CONTROLLER,
-            []() -> Controller * { return new LonController(); });
+        controller_factory_.Register(ControlConf::LON_CONTROLLER,
+                                     []() -> Controller* { return new LonController(); });
         break;
-      default:
-        AERROR << "Unknown active controller type:" << active_controller;
+      default: AERROR << "Unknown active controller type:" << active_controller;
     }
   }
 }
 
-Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
+Status ControllerAgent::InitializeConf(const ControlConf* control_conf) {
   if (!control_conf) {
     AERROR << "control_conf is null";
     return Status(ErrorCode::CONTROL_INIT_ERROR, "Failed to load config");
   }
   control_conf_ = control_conf;
   for (auto controller_type : control_conf_->active_controllers()) {
-    auto controller = controller_factory_.CreateObject(
-        static_cast<ControlConf::ControllerType>(controller_type));
+    auto controller =
+        controller_factory_.CreateObject(static_cast<ControlConf::ControllerType>(controller_type));
     if (controller) {
       controller_list_.emplace_back(std::move(controller));
     } else {
       AERROR << "Controller: " << controller_type << "is not supported";
-      return Status(ErrorCode::CONTROL_INIT_ERROR,
-                    "Invalid controller type:" + controller_type);
+      return Status(ErrorCode::CONTROL_INIT_ERROR, "Invalid controller type:" + controller_type);
     }
   }
   return Status::OK();
 }
 
 Status ControllerAgent::Init(std::shared_ptr<DependencyInjector> injector,
-                             const ControlConf *control_conf) {
+                             const ControlConf*                  control_conf) {
   injector_ = injector;
   RegisterControllers(control_conf);
   ACHECK(InitializeConf(control_conf).ok()) << "Failed to initialize config.";
-  for (auto &controller : controller_list_) {
+  for (auto& controller : controller_list_) {
     if (controller == nullptr) {
       return Status(ErrorCode::CONTROL_INIT_ERROR, "Controller is null.");
     }
@@ -96,26 +91,27 @@ Status ControllerAgent::Init(std::shared_ptr<DependencyInjector> injector,
   return Status::OK();
 }
 
-Status ControllerAgent::ComputeControlCommand(
-    const localization::LocalizationEstimate *localization,
-    const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-    control::ControlCommand *cmd) {
-  for (auto &controller : controller_list_) {
+Status
+ControllerAgent::ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                                       const canbus::Chassis*                    chassis,
+                                       const planning::ADCTrajectory*            trajectory,
+                                       control::ControlCommand*                  cmd) {
+  for (auto& controller : controller_list_) {
     ADEBUG << "controller:" << controller->Name() << " processing ...";
     double start_timestamp = Clock::NowInSeconds();
     controller->ComputeControlCommand(localization, chassis, trajectory, cmd);
-    double end_timestamp = Clock::NowInSeconds();
-    const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+    double       end_timestamp = Clock::NowInSeconds();
+    const double time_diff_ms  = (end_timestamp - start_timestamp) * 1000;
 
-    ADEBUG << "controller: " << controller->Name()
-           << " calculation time is: " << time_diff_ms << " ms.";
+    ADEBUG << "controller: " << controller->Name() << " calculation time is: " << time_diff_ms
+           << " ms.";
     cmd->mutable_latency_stats()->add_controller_time_ms(time_diff_ms);
   }
   return Status::OK();
 }
 
 Status ControllerAgent::Reset() {
-  for (auto &controller : controller_list_) {
+  for (auto& controller : controller_list_) {
     ADEBUG << "controller:" << controller->Name() << " reset...";
     controller->Reset();
   }

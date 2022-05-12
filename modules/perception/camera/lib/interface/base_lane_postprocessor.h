@@ -18,9 +18,8 @@
 #include <string>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -39,18 +38,16 @@ class BaseLanePostprocessor {
 
   virtual ~BaseLanePostprocessor() = default;
 
-  virtual bool Init(const LanePostprocessorInitOptions& options =
-                        LanePostprocessorInitOptions()) = 0;
+  virtual bool
+  Init(const LanePostprocessorInitOptions& options = LanePostprocessorInitOptions()) = 0;
 
   // @brief: refine 3D location of detected lanes.
   // @param [in]: options
   // @param [in/out]: frame
   // 3D information of lane should be filled, required.
-  virtual bool Process2D(const LanePostprocessorOptions& options,
-                         CameraFrame* frame) = 0;
+  virtual bool Process2D(const LanePostprocessorOptions& options, CameraFrame* frame) = 0;
 
-  virtual bool Process3D(const LanePostprocessorOptions& options,
-                         CameraFrame* frame) = 0;
+  virtual bool Process3D(const LanePostprocessorOptions& options, CameraFrame* frame) = 0;
 
   virtual void SetIm2CarHomography(Eigen::Matrix3d homography_im2car) {
     // do nothing
@@ -63,8 +60,7 @@ class BaseLanePostprocessor {
 };  // class BaseLanePostprocessor
 
 PERCEPTION_REGISTER_REGISTERER(BaseLanePostprocessor);
-#define REGISTER_LANE_POSTPROCESSOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseLanePostprocessor, name)
+#define REGISTER_LANE_POSTPROCESSOR(name) PERCEPTION_REGISTER_CLASS(BaseLanePostprocessor, name)
 
 }  // namespace camera
 }  // namespace perception

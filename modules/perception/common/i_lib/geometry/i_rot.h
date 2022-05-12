@@ -19,25 +19,20 @@ inline void i_force_rot_2x2(T R[4]) {
 /*This routine orthogonalizes a 3x3 near Rotation matrix R in place, i.e., force
  * it to be orthogonal.*/
 template <typename T>
-inline void i_rot_orthogonalize(
-    T R[9], int nr_svd_iter = I_DEFAULT_MAX_SVD_ITERATIONS) {
+inline void i_rot_orthogonalize(T R[9], int nr_svd_iter = I_DEFAULT_MAX_SVD_ITERATIONS) {
   /*obtain SVD*/
   T Ut[9], w[3], Vt[9];
   i_svd_3x3(R, Ut, w, Vt, true, nr_svd_iter);
-  if (i_determinant_3x3(Ut) < (T)0.0) {
-    i_neg9(Ut);
-  }
-  if (i_determinant_3x3(Vt) < (T)0.0) {
-    i_neg9(Vt);
-  }
+  if (i_determinant_3x3(Ut) < (T)0.0) { i_neg9(Ut); }
+  if (i_determinant_3x3(Vt) < (T)0.0) { i_neg9(Vt); }
   i_mult_AtB_3x3_3x3(Ut, Vt, R);
 }
 
 /*Rodrigues' solver for computing the matrix exponential of a 3x3 skew-symmetric
  * matrix*/
 template <typename T>
-inline void i_rot_rodrigues_3x3_solver(T sinc, T mcos, T a0_sqr, T a1_sqr,
-                                       T a2_sqr, const T a[3], T R[9]) {
+inline void
+i_rot_rodrigues_3x3_solver(T sinc, T mcos, T a0_sqr, T a1_sqr, T a2_sqr, const T a[3], T R[9]) {
   T tmp1, tmp2;
   R[0] = (T)1.0 - (a1_sqr + a2_sqr) * mcos;
   R[4] = (T)1.0 - (a0_sqr + a2_sqr) * mcos;
@@ -57,10 +52,16 @@ inline void i_rot_rodrigues_3x3_solver(T sinc, T mcos, T a0_sqr, T a1_sqr,
 }
 
 template <typename T>
-inline void i_rot_rodrigues_3x3_solver(T sinc, T mcos, T a0_sqr, T a1_sqr,
-                                       T a2_sqr, const T s_da[3],
-                                       const T c_da[3], const T a[3], T R[9],
-                                       T D[9][3]) {
+inline void i_rot_rodrigues_3x3_solver(T       sinc,
+                                       T       mcos,
+                                       T       a0_sqr,
+                                       T       a1_sqr,
+                                       T       a2_sqr,
+                                       const T s_da[3],
+                                       const T c_da[3],
+                                       const T a[3],
+                                       T       R[9],
+                                       T       D[9][3]) {
   T tmp1, tmp2, e_x[9], e_x2[9];
   T mcos_x_a0 = mcos * a[0];
   T mcos_x_a1 = mcos * a[1];
@@ -94,70 +95,46 @@ inline void i_rot_rodrigues_3x3_solver(T sinc, T mcos, T a0_sqr, T a1_sqr,
   // i=0
   D[0][0] = (T)(/*e_x[0] * s_da[0]*/ /*+ sinc*e_x_da[0][0] +*/ e_x2[0] *
                 c_da[0] /*+ mcos * e_x2_da[0][0]*/);
-  D[0][1] =
-      (T)(/*e_x[0] * s_da[1]*/ /*+ sinc*e_x_da[0][1] +*/ e_x2[0] * c_da[1] +
-          mtwo_mcos_x_a1);
-  D[0][2] =
-      (T)(/*e_x[0] * s_da[2]*/ /*+ sinc*e_x_da[0][2] +*/ e_x2[0] * c_da[2] +
-          mtwo_mcos_x_a2);
+  D[0][1] = (T)(/*e_x[0] * s_da[1]*/ /*+ sinc*e_x_da[0][1] +*/ e_x2[0] * c_da[1] + mtwo_mcos_x_a1);
+  D[0][2] = (T)(/*e_x[0] * s_da[2]*/ /*+ sinc*e_x_da[0][2] +*/ e_x2[0] * c_da[2] + mtwo_mcos_x_a2);
   // i=1
-  D[1][0] = (T)(e_x[1] * s_da[0] /*+ sinc*e_x_da[1][0]*/ + e_x2[1] * c_da[0] +
-                mcos_x_a1);
-  D[1][1] = (T)(e_x[1] * s_da[1] /*+ sinc*e_x_da[1][1]*/ + e_x2[1] * c_da[1] +
-                mcos_x_a0);
-  D[1][2] = (T)(e_x[1] * s_da[2] - sinc /**e_x_da[1][2]*/ +
-                e_x2[1] * c_da[2] /*+ mcos * e_x2_da[1][2]*/);
+  D[1][0] = (T)(e_x[1] * s_da[0] /*+ sinc*e_x_da[1][0]*/ + e_x2[1] * c_da[0] + mcos_x_a1);
+  D[1][1] = (T)(e_x[1] * s_da[1] /*+ sinc*e_x_da[1][1]*/ + e_x2[1] * c_da[1] + mcos_x_a0);
+  D[1][2] =
+      (T)(e_x[1] * s_da[2] - sinc /**e_x_da[1][2]*/ + e_x2[1] * c_da[2] /*+ mcos * e_x2_da[1][2]*/);
   // i=2
-  D[2][0] = (T)(e_x[2] * s_da[0] /*+ sinc*e_x_da[2][0]*/ + e_x2[2] * c_da[0] +
-                mcos_x_a2);
-  D[2][1] = (T)(e_x[2] * s_da[1] + sinc /**e_x_da[2][1]*/ +
-                e_x2[2] * c_da[1] /*+ mcos * e_x2_da[2][1]*/);
-  D[2][2] = (T)(e_x[2] * s_da[2] /*+ sinc*e_x_da[2][2]*/ + e_x2[2] * c_da[2] +
-                mcos_x_a0);
+  D[2][0] = (T)(e_x[2] * s_da[0] /*+ sinc*e_x_da[2][0]*/ + e_x2[2] * c_da[0] + mcos_x_a2);
+  D[2][1] =
+      (T)(e_x[2] * s_da[1] + sinc /**e_x_da[2][1]*/ + e_x2[2] * c_da[1] /*+ mcos * e_x2_da[2][1]*/);
+  D[2][2] = (T)(e_x[2] * s_da[2] /*+ sinc*e_x_da[2][2]*/ + e_x2[2] * c_da[2] + mcos_x_a0);
   // i=3
-  D[3][0] = (T)(e_x[3] * s_da[0] /*+ sinc*e_x_da[3][0]*/ + e_x2[3] * c_da[0] +
-                mcos_x_a1);
-  D[3][1] = (T)(e_x[3] * s_da[1] /*+ sinc*e_x_da[3][1]*/ + e_x2[3] * c_da[1] +
-                mcos_x_a0);
-  D[3][2] = (T)(e_x[3] * s_da[2] + sinc /**e_x_da[3][2]*/ +
-                e_x2[3] * c_da[2] /*+ mcos * e_x2_da[3][2]*/);
+  D[3][0] = (T)(e_x[3] * s_da[0] /*+ sinc*e_x_da[3][0]*/ + e_x2[3] * c_da[0] + mcos_x_a1);
+  D[3][1] = (T)(e_x[3] * s_da[1] /*+ sinc*e_x_da[3][1]*/ + e_x2[3] * c_da[1] + mcos_x_a0);
+  D[3][2] =
+      (T)(e_x[3] * s_da[2] + sinc /**e_x_da[3][2]*/ + e_x2[3] * c_da[2] /*+ mcos * e_x2_da[3][2]*/);
   // i=4
-  D[4][0] =
-      (T)(/*e_x[4] * s_da[0]*/ /*+ sinc*e_x_da[4][0] +*/ e_x2[4] * c_da[0] +
-          mtwo_mcos_x_a0);
+  D[4][0] = (T)(/*e_x[4] * s_da[0]*/ /*+ sinc*e_x_da[4][0] +*/ e_x2[4] * c_da[0] + mtwo_mcos_x_a0);
   D[4][1] = (T)(/*e_x[4] * s_da[1]*/ /*+ sinc*e_x_da[4][1] +*/ e_x2[4] *
                 c_da[1] /*+ mcos * e_x2_da[4][1]*/);
-  D[4][2] =
-      (T)(/*e_x[4] * s_da[2]*/ /*+ sinc*e_x_da[4][2] +*/ e_x2[4] * c_da[2] +
-          mtwo_mcos_x_a2);
+  D[4][2] = (T)(/*e_x[4] * s_da[2]*/ /*+ sinc*e_x_da[4][2] +*/ e_x2[4] * c_da[2] + mtwo_mcos_x_a2);
   // i=5
-  D[5][0] = (T)(e_x[5] * s_da[0] - sinc /**e_x_da[5][0]*/ +
-                e_x2[5] * c_da[0] /*+ mcos * e_x2_da[5][0]*/);
-  D[5][1] = (T)(e_x[5] * s_da[1] /*+ sinc*e_x_da[5][1]*/ + e_x2[5] * c_da[1] +
-                mcos_x_a2);
-  D[5][2] = (T)(e_x[5] * s_da[2] /*+ sinc*e_x_da[5][2]*/ + e_x2[5] * c_da[2] +
-                mcos_x_a1);
+  D[5][0] =
+      (T)(e_x[5] * s_da[0] - sinc /**e_x_da[5][0]*/ + e_x2[5] * c_da[0] /*+ mcos * e_x2_da[5][0]*/);
+  D[5][1] = (T)(e_x[5] * s_da[1] /*+ sinc*e_x_da[5][1]*/ + e_x2[5] * c_da[1] + mcos_x_a2);
+  D[5][2] = (T)(e_x[5] * s_da[2] /*+ sinc*e_x_da[5][2]*/ + e_x2[5] * c_da[2] + mcos_x_a1);
   // i=6
-  D[6][0] = (T)(e_x[6] * s_da[0] /*+ sinc*e_x_da[6][0]*/ + e_x2[6] * c_da[0] +
-                mcos_x_a2);
-  D[6][1] = (T)(e_x[6] * s_da[1] - sinc /**e_x_da[6][1]*/ +
-                e_x2[6] * c_da[1] /*+ mcos * e_x2_da[6][1]*/);
-  D[6][2] = (T)(e_x[6] * s_da[2] /*+ sinc*e_x_da[6][2]*/ + e_x2[6] * c_da[2] +
-                mcos_x_a0);
+  D[6][0] = (T)(e_x[6] * s_da[0] /*+ sinc*e_x_da[6][0]*/ + e_x2[6] * c_da[0] + mcos_x_a2);
+  D[6][1] =
+      (T)(e_x[6] * s_da[1] - sinc /**e_x_da[6][1]*/ + e_x2[6] * c_da[1] /*+ mcos * e_x2_da[6][1]*/);
+  D[6][2] = (T)(e_x[6] * s_da[2] /*+ sinc*e_x_da[6][2]*/ + e_x2[6] * c_da[2] + mcos_x_a0);
   // i=7
-  D[7][0] = (T)(e_x[7] * s_da[0] + sinc /**e_x_da[7][0]*/ +
-                e_x2[7] * c_da[0] /*+ mcos * e_x2_da[7][0]*/);
-  D[7][1] = (T)(e_x[7] * s_da[1] /*+ sinc*e_x_da[7][1]*/ + e_x2[7] * c_da[1] +
-                mcos_x_a2);
-  D[7][2] = (T)(e_x[7] * s_da[2] /*+ sinc*e_x_da[7][2]*/ + e_x2[7] * c_da[2] +
-                mcos_x_a1);
+  D[7][0] =
+      (T)(e_x[7] * s_da[0] + sinc /**e_x_da[7][0]*/ + e_x2[7] * c_da[0] /*+ mcos * e_x2_da[7][0]*/);
+  D[7][1] = (T)(e_x[7] * s_da[1] /*+ sinc*e_x_da[7][1]*/ + e_x2[7] * c_da[1] + mcos_x_a2);
+  D[7][2] = (T)(e_x[7] * s_da[2] /*+ sinc*e_x_da[7][2]*/ + e_x2[7] * c_da[2] + mcos_x_a1);
   // i=8
-  D[8][0] =
-      (T)(/*e_x[8] * s_da[0]*/ /*+ sinc*e_x_da[8][0] +*/ e_x2[8] * c_da[0] +
-          mtwo_mcos_x_a0);
-  D[8][1] =
-      (T)(/*e_x[8] * s_da[1]*/ /*+ sinc*e_x_da[8][1] +*/ e_x2[8] * c_da[1] +
-          mtwo_mcos_x_a1);
+  D[8][0] = (T)(/*e_x[8] * s_da[0]*/ /*+ sinc*e_x_da[8][0] +*/ e_x2[8] * c_da[0] + mtwo_mcos_x_a0);
+  D[8][1] = (T)(/*e_x[8] * s_da[1]*/ /*+ sinc*e_x_da[8][1] +*/ e_x2[8] * c_da[1] + mtwo_mcos_x_a1);
   D[8][2] = (T)(/*e_x[8] * s_da[2]*/ /*+ sinc*e_x_da[8][2] +*/ e_x2[8] *
                 c_da[2] /*+ mcos * e_x2_da[8][2]*/);
 }
@@ -173,7 +150,7 @@ inline void i_rot_rodrigues_3x3(const T a[3], T R[9]) {
   T a1_sqr = i_sqr(x[1]);
   T a2_sqr = i_sqr(x[2]);
   T theta2 = a0_sqr + a1_sqr + a2_sqr;
-  T theta = i_sqrt(theta2);
+  T theta  = i_sqrt(theta2);
 
   if (theta < Constant<T>::MIN_ABS_SAFE_DIVIDEND()) {
     /*theta is too small; use a third-order Taylor approximation for sin(theta)
@@ -189,7 +166,7 @@ inline void i_rot_rodrigues_3x3(const T a[3], T R[9]) {
     a1_sqr = i_sqr(x[1]);
     a2_sqr = i_sqr(x[2]);
     theta2 = a0_sqr + a1_sqr + a2_sqr;
-    theta = i_sqrt(theta2);
+    theta  = i_sqrt(theta2);
     if (theta < Constant<T>::MIN_ABS_SAFE_DIVIDEND()) {
       /*theta is too small; use a third-order Taylor approximation for
        * sin(theta) and cos(theta)*/
@@ -212,8 +189,7 @@ argument is the output (a 3x3 rotation matrix), The 3rd argument is the
 derivative (a 9x3 matrix)*/
 template <typename T>
 inline void i_rot_rodrigues_3x3(const T a[3], T R[9], T D[9][3]) {
-  T sinc, mcos, x[3], s_da[3],
-      c_da[3]; /*derivatives of sinc and mcos wrt to a, respectively*/
+  T sinc, mcos, x[3], s_da[3], c_da[3]; /*derivatives of sinc and mcos wrt to a, respectively*/
   i_copy3(a, x);
 
   T a0_sqr = i_sqr(x[0]);
@@ -221,7 +197,7 @@ inline void i_rot_rodrigues_3x3(const T a[3], T R[9], T D[9][3]) {
   T a2_sqr = i_sqr(x[2]);
 
   T theta2 = a0_sqr + a1_sqr + a2_sqr;
-  T theta = i_sqrt(theta2);
+  T theta  = i_sqrt(theta2);
 
   if (theta < Constant<T>::MIN_ABS_SAFE_DIVIDEND()) {
     /*theta is too small; use a third-order Taylor approximation for sin(theta)
@@ -240,7 +216,7 @@ inline void i_rot_rodrigues_3x3(const T a[3], T R[9], T D[9][3]) {
     a1_sqr = i_sqr(x[1]);
     a2_sqr = i_sqr(x[2]);
     theta2 = a0_sqr + a1_sqr + a2_sqr;
-    theta = i_sqrt(theta2);
+    theta  = i_sqrt(theta2);
     if (theta < Constant<T>::MIN_ABS_SAFE_DIVIDEND()) {
       /*theta is too small; use a third-order Taylor approximation for
        * sin(theta) and cos(theta)*/
@@ -252,8 +228,8 @@ inline void i_rot_rodrigues_3x3(const T a[3], T R[9], T D[9][3]) {
     } else {
       T sin_theta = i_sin(theta);
       T cos_theta = i_cos(theta);
-      sinc = i_div(sin_theta, theta);
-      mcos = i_div((T)1.0 - cos_theta, theta2);
+      sinc        = i_div(sin_theta, theta);
+      mcos        = i_div((T)1.0 - cos_theta, theta2);
       /*derivatives*/
       T s_dtheta = (cos_theta - sin_theta / theta) / theta2;
       T c_dtheta = (sinc - (T)(2.0) * mcos) / theta2;
@@ -263,16 +239,15 @@ inline void i_rot_rodrigues_3x3(const T a[3], T R[9], T D[9][3]) {
   } else {
     T sin_theta = i_sin(theta);
     T cos_theta = i_cos(theta);
-    sinc = i_div(sin_theta, theta);
-    mcos = i_div((T)1.0 - cos_theta, theta2);
+    sinc        = i_div(sin_theta, theta);
+    mcos        = i_div((T)1.0 - cos_theta, theta2);
     /*derivatives*/
     T s_dtheta = (cos_theta - sin_theta / theta) / theta2;
     T c_dtheta = (sinc - (T)(2.0) * mcos) / theta2;
     i_scale3(x, s_da, s_dtheta);
     i_scale3(x, c_da, c_dtheta);
   }
-  i_rot_rodrigues_3x3_solver(sinc, mcos, a0_sqr, a1_sqr, a2_sqr, s_da, c_da, x,
-                             R, D);
+  i_rot_rodrigues_3x3_solver(sinc, mcos, a0_sqr, a1_sqr, a2_sqr, s_da, c_da, x, R, D);
 }
 
 /*Rodrigues' formula for computing the matrix exponential of a 3x3
@@ -288,7 +263,7 @@ inline void i_rot_rodrigues_3x3_slow(const T a[3], T R[9], T D[9][3]) {
   T a2_sqr = i_sqr(a[2]);
 
   T theta2 = a0_sqr + a1_sqr + a2_sqr;
-  T theta = i_sqrt(theta2);
+  T theta  = i_sqrt(theta2);
   T s_da[3], c_da[3]; /*derivatives of sinc and mcos wrt to a, respectively*/
 
   if (theta < Constant<T>::MIN_ABS_SAFE_DIVIDEND()) {
@@ -305,8 +280,8 @@ inline void i_rot_rodrigues_3x3_slow(const T a[3], T R[9], T D[9][3]) {
   } else {
     T sin_theta = i_sin(theta);
     T cos_theta = i_cos(theta);
-    sinc = i_div(sin_theta, theta);
-    mcos = i_div((T)1.0 - cos_theta, theta2);
+    sinc        = i_div(sin_theta, theta);
+    mcos        = i_div((T)1.0 - cos_theta, theta2);
     /*derivatives*/
     T s_dtheta = (cos_theta - sin_theta / theta) / theta2;
     T c_dtheta = (sinc - (T)(2.0) * mcos) / theta2;
@@ -336,10 +311,9 @@ inline void i_rot_rodrigues_3x3_slow(const T a[3], T R[9], T D[9][3]) {
   T e_x[9];
   i_axiator(a, e_x);
 
-  static const T e_x_da[9][3] = {
-      {(T)0, (T)0, (T)0},  {(T)0, (T)0, -(T)1}, {(T)0, (T)1, (T)0},
-      {(T)0, (T)0, (T)1},  {(T)0, (T)0, (T)0},  {-(T)1, (T)0, (T)0},
-      {(T)0, -(T)1, (T)0}, {(T)1, (T)0, (T)0},  {(T)0, (T)0, (T)0}};
+  static const T e_x_da[9][3] = {{(T)0, (T)0, (T)0},  {(T)0, (T)0, -(T)1}, {(T)0, (T)1, (T)0},
+                                 {(T)0, (T)0, (T)1},  {(T)0, (T)0, (T)0},  {-(T)1, (T)0, (T)0},
+                                 {(T)0, -(T)1, (T)0}, {(T)1, (T)0, (T)0},  {(T)0, (T)0, (T)0}};
 
   T e_x2[9];
   i_sqr_skew_symmetric_3x3(a, e_x2);
@@ -365,68 +339,41 @@ inline void i_rot_rodrigues_3x3_slow(const T a[3], T R[9], T D[9][3]) {
   }*/
 
   // i=0
-  D[0][0] = (T)(e_x[0] * s_da[0] + sinc * e_x_da[0][0] + e_x2[0] * c_da[0] +
-                mcos * e_x2_da[0][0]);
-  D[0][1] = (T)(e_x[0] * s_da[1] + sinc * e_x_da[0][1] + e_x2[0] * c_da[1] +
-                mcos * e_x2_da[0][1]);
-  D[0][2] = (T)(e_x[0] * s_da[2] + sinc * e_x_da[0][2] + e_x2[0] * c_da[2] +
-                mcos * e_x2_da[0][2]);
+  D[0][0] = (T)(e_x[0] * s_da[0] + sinc * e_x_da[0][0] + e_x2[0] * c_da[0] + mcos * e_x2_da[0][0]);
+  D[0][1] = (T)(e_x[0] * s_da[1] + sinc * e_x_da[0][1] + e_x2[0] * c_da[1] + mcos * e_x2_da[0][1]);
+  D[0][2] = (T)(e_x[0] * s_da[2] + sinc * e_x_da[0][2] + e_x2[0] * c_da[2] + mcos * e_x2_da[0][2]);
   // i=1
-  D[1][0] = (T)(e_x[1] * s_da[0] + sinc * e_x_da[1][0] + e_x2[1] * c_da[0] +
-                mcos * e_x2_da[1][0]);
-  D[1][1] = (T)(e_x[1] * s_da[1] + sinc * e_x_da[1][1] + e_x2[1] * c_da[1] +
-                mcos * e_x2_da[1][1]);
-  D[1][2] = (T)(e_x[1] * s_da[2] + sinc * e_x_da[1][2] + e_x2[1] * c_da[2] +
-                mcos * e_x2_da[1][2]);
+  D[1][0] = (T)(e_x[1] * s_da[0] + sinc * e_x_da[1][0] + e_x2[1] * c_da[0] + mcos * e_x2_da[1][0]);
+  D[1][1] = (T)(e_x[1] * s_da[1] + sinc * e_x_da[1][1] + e_x2[1] * c_da[1] + mcos * e_x2_da[1][1]);
+  D[1][2] = (T)(e_x[1] * s_da[2] + sinc * e_x_da[1][2] + e_x2[1] * c_da[2] + mcos * e_x2_da[1][2]);
   // i=2
-  D[2][0] = (T)(e_x[2] * s_da[0] + sinc * e_x_da[2][0] + e_x2[2] * c_da[0] +
-                mcos * e_x2_da[2][0]);
-  D[2][1] = (T)(e_x[2] * s_da[1] + sinc * e_x_da[2][1] + e_x2[2] * c_da[1] +
-                mcos * e_x2_da[2][1]);
-  D[2][2] = (T)(e_x[2] * s_da[2] + sinc * e_x_da[2][2] + e_x2[2] * c_da[2] +
-                mcos * e_x2_da[2][2]);
+  D[2][0] = (T)(e_x[2] * s_da[0] + sinc * e_x_da[2][0] + e_x2[2] * c_da[0] + mcos * e_x2_da[2][0]);
+  D[2][1] = (T)(e_x[2] * s_da[1] + sinc * e_x_da[2][1] + e_x2[2] * c_da[1] + mcos * e_x2_da[2][1]);
+  D[2][2] = (T)(e_x[2] * s_da[2] + sinc * e_x_da[2][2] + e_x2[2] * c_da[2] + mcos * e_x2_da[2][2]);
   // i=3
-  D[3][0] = (T)(e_x[3] * s_da[0] + sinc * e_x_da[3][0] + e_x2[3] * c_da[0] +
-                mcos * e_x2_da[3][0]);
-  D[3][1] = (T)(e_x[3] * s_da[1] + sinc * e_x_da[3][1] + e_x2[3] * c_da[1] +
-                mcos * e_x2_da[3][1]);
-  D[3][2] = (T)(e_x[3] * s_da[2] + sinc * e_x_da[3][2] + e_x2[3] * c_da[2] +
-                mcos * e_x2_da[3][2]);
+  D[3][0] = (T)(e_x[3] * s_da[0] + sinc * e_x_da[3][0] + e_x2[3] * c_da[0] + mcos * e_x2_da[3][0]);
+  D[3][1] = (T)(e_x[3] * s_da[1] + sinc * e_x_da[3][1] + e_x2[3] * c_da[1] + mcos * e_x2_da[3][1]);
+  D[3][2] = (T)(e_x[3] * s_da[2] + sinc * e_x_da[3][2] + e_x2[3] * c_da[2] + mcos * e_x2_da[3][2]);
   // i=4
-  D[4][0] = (T)(e_x[4] * s_da[0] + sinc * e_x_da[4][0] + e_x2[4] * c_da[0] +
-                mcos * e_x2_da[4][0]);
-  D[4][1] = (T)(e_x[4] * s_da[1] + sinc * e_x_da[4][1] + e_x2[4] * c_da[1] +
-                mcos * e_x2_da[4][1]);
-  D[4][2] = (T)(e_x[4] * s_da[2] + sinc * e_x_da[4][2] + e_x2[4] * c_da[2] +
-                mcos * e_x2_da[4][2]);
+  D[4][0] = (T)(e_x[4] * s_da[0] + sinc * e_x_da[4][0] + e_x2[4] * c_da[0] + mcos * e_x2_da[4][0]);
+  D[4][1] = (T)(e_x[4] * s_da[1] + sinc * e_x_da[4][1] + e_x2[4] * c_da[1] + mcos * e_x2_da[4][1]);
+  D[4][2] = (T)(e_x[4] * s_da[2] + sinc * e_x_da[4][2] + e_x2[4] * c_da[2] + mcos * e_x2_da[4][2]);
   // i=5
-  D[5][0] = (T)(e_x[5] * s_da[0] + sinc * e_x_da[5][0] + e_x2[5] * c_da[0] +
-                mcos * e_x2_da[5][0]);
-  D[5][1] = (T)(e_x[5] * s_da[1] + sinc * e_x_da[5][1] + e_x2[5] * c_da[1] +
-                mcos * e_x2_da[5][1]);
-  D[5][2] = (T)(e_x[5] * s_da[2] + sinc * e_x_da[5][2] + e_x2[5] * c_da[2] +
-                mcos * e_x2_da[5][2]);
+  D[5][0] = (T)(e_x[5] * s_da[0] + sinc * e_x_da[5][0] + e_x2[5] * c_da[0] + mcos * e_x2_da[5][0]);
+  D[5][1] = (T)(e_x[5] * s_da[1] + sinc * e_x_da[5][1] + e_x2[5] * c_da[1] + mcos * e_x2_da[5][1]);
+  D[5][2] = (T)(e_x[5] * s_da[2] + sinc * e_x_da[5][2] + e_x2[5] * c_da[2] + mcos * e_x2_da[5][2]);
   // i=6
-  D[6][0] = (T)(e_x[6] * s_da[0] + sinc * e_x_da[6][0] + e_x2[6] * c_da[0] +
-                mcos * e_x2_da[6][0]);
-  D[6][1] = (T)(e_x[6] * s_da[1] + sinc * e_x_da[6][1] + e_x2[6] * c_da[1] +
-                mcos * e_x2_da[6][1]);
-  D[6][2] = (T)(e_x[6] * s_da[2] + sinc * e_x_da[6][2] + e_x2[6] * c_da[2] +
-                mcos * e_x2_da[6][2]);
+  D[6][0] = (T)(e_x[6] * s_da[0] + sinc * e_x_da[6][0] + e_x2[6] * c_da[0] + mcos * e_x2_da[6][0]);
+  D[6][1] = (T)(e_x[6] * s_da[1] + sinc * e_x_da[6][1] + e_x2[6] * c_da[1] + mcos * e_x2_da[6][1]);
+  D[6][2] = (T)(e_x[6] * s_da[2] + sinc * e_x_da[6][2] + e_x2[6] * c_da[2] + mcos * e_x2_da[6][2]);
   // i=7
-  D[7][0] = (T)(e_x[7] * s_da[0] + sinc * e_x_da[7][0] + e_x2[7] * c_da[0] +
-                mcos * e_x2_da[7][0]);
-  D[7][1] = (T)(e_x[7] * s_da[1] + sinc * e_x_da[7][1] + e_x2[7] * c_da[1] +
-                mcos * e_x2_da[7][1]);
-  D[7][2] = (T)(e_x[7] * s_da[2] + sinc * e_x_da[7][2] + e_x2[7] * c_da[2] +
-                mcos * e_x2_da[7][2]);
+  D[7][0] = (T)(e_x[7] * s_da[0] + sinc * e_x_da[7][0] + e_x2[7] * c_da[0] + mcos * e_x2_da[7][0]);
+  D[7][1] = (T)(e_x[7] * s_da[1] + sinc * e_x_da[7][1] + e_x2[7] * c_da[1] + mcos * e_x2_da[7][1]);
+  D[7][2] = (T)(e_x[7] * s_da[2] + sinc * e_x_da[7][2] + e_x2[7] * c_da[2] + mcos * e_x2_da[7][2]);
   // i=8
-  D[8][0] = (T)(e_x[8] * s_da[0] + sinc * e_x_da[8][0] + e_x2[8] * c_da[0] +
-                mcos * e_x2_da[8][0]);
-  D[8][1] = (T)(e_x[8] * s_da[1] + sinc * e_x_da[8][1] + e_x2[8] * c_da[1] +
-                mcos * e_x2_da[8][1]);
-  D[8][2] = (T)(e_x[8] * s_da[2] + sinc * e_x_da[8][2] + e_x2[8] * c_da[2] +
-                mcos * e_x2_da[8][2]);
+  D[8][0] = (T)(e_x[8] * s_da[0] + sinc * e_x_da[8][0] + e_x2[8] * c_da[0] + mcos * e_x2_da[8][0]);
+  D[8][1] = (T)(e_x[8] * s_da[1] + sinc * e_x_da[8][1] + e_x2[8] * c_da[1] + mcos * e_x2_da[8][1]);
+  D[8][2] = (T)(e_x[8] * s_da[2] + sinc * e_x_da[8][2] + e_x2[8] * c_da[2] + mcos * e_x2_da[8][2]);
 }
 
 /*The inverse Rodrigues' formula for computing the logarithm of a 3x3 rotation
@@ -434,28 +381,26 @@ inline void i_rot_rodrigues_3x3_slow(const T a[3], T R[9], T D[9][3]) {
   argument is the output (a 3-vector rotation vector)*/
 template <typename T>
 inline void i_rot_invert_rodrigues_3x3(const T R[9],
-                                       T v[3] /*unnormalized rotation vector*/,
-                                       T &theta /*rotation angle in radians*/) {
-  T r[3];
-  T Q[9], Ac[9], h[3], htA[3], ss[3];
-  int iv[3];
-  const T *R_ref[3];
-  T *Q_ref[3], *Ac_ref[3];
+                                       T       v[3] /*unnormalized rotation vector*/,
+                                       T&      theta /*rotation angle in radians*/) {
+  T        r[3];
+  T        Q[9], Ac[9], h[3], htA[3], ss[3];
+  int      iv[3];
+  const T* R_ref[3];
+  T *      Q_ref[3], *Ac_ref[3];
   i_make_const_reference_3x3(R, R_ref);
   i_make_reference_3x3(Q, Q_ref);
   i_make_reference_3x3(Ac, Ac_ref);
   /*compute the eigenvector of R corresponding to the eigenvalue 1, every
    * rotation matrix must have this eigenvalue*/
-  i_eigenvector_from_eigenvalue(R_ref, (T)(1.0), Q_ref, h, htA, ss, Ac_ref, 3,
-                                iv);
+  i_eigenvector_from_eigenvalue(R_ref, (T)(1.0), Q_ref, h, htA, ss, Ac_ref, 3, iv);
   i_copy3(Q + 6, v); /*eigen vector of R, unit rotation axis*/
   r[0] = R[7] - R[5];
   r[1] = R[2] - R[6];
   r[2] = R[3] - R[1];
-  T c = (i_trace_3x3(R) - (T)1.0) *
-        (T)0.5; /*the trace of R is 1 + 2\cos(\theta), equivalent to the sum of
-                   its eigenvalues*/
-  T s = i_dot3(r, v) * (T)0.5;
+  T c = (i_trace_3x3(R) - (T)1.0) * (T)0.5; /*the trace of R is 1 + 2\cos(\theta), equivalent to the
+                                               sum of its eigenvalues*/
+  T s   = i_dot3(r, v) * (T)0.5;
   theta = i_atan2(s, c);
   i_scale3(v, theta);
 }
@@ -469,17 +414,13 @@ inline bool i_rot_3x3(const T a[3], const T b[3], T R[9]) {
   T v[3], s, theta;  // vx[9], vx2[9];
   i_eye_3x3(R);
   /*corner case 1: a == b*/
-  if (i_equal3(a, b)) {
-    return true;
-  }
+  if (i_equal3(a, b)) { return true; }
   i_cross(a, b, v);
 
   /*L2 norm of v:*/
   s = i_l2_norm3(v); /*sine of angle*/
 
-  if (s < Constant<T>::MIN_ABS_SAFE_DIVIDEND()) {
-    return false; /*parallel vectors*/
-  }
+  if (s < Constant<T>::MIN_ABS_SAFE_DIVIDEND()) { return false; /*parallel vectors*/ }
 
   /*normalize v:*/
   i_scale3(v, i_rec(s));
@@ -518,18 +459,16 @@ inline bool i_rot_3x3(const T a[3], const T b[3], T R[9]) {
 /*Generate a random 3x3 rotation matrix R, if force_proper is set to 1, then R
  * is forced to be a proper rotation matrix with det(R) = 1*/
 template <typename T>
-inline void i_rand_rot_3x3(T R[9], int &seed, int force_proper = 1) {
-  T Q[9], A[9], h[3], htA[3], ss[3];
-  T *R_ref[3], *Q_ref[3], *A_ref[3];
+inline void i_rand_rot_3x3(T R[9], int& seed, int force_proper = 1) {
+  T   Q[9], A[9], h[3], htA[3], ss[3];
+  T * R_ref[3], *Q_ref[3], *A_ref[3];
   int iv[3];
   i_make_reference_3x3(R, R_ref);
   i_make_reference_3x3(Q, Q_ref);
   i_make_reference_3x3(A, A_ref);
   i_rand_orthogonal<T>(Q_ref, A_ref, R_ref, h, htA, ss, 3, 3, iv, seed);
   if (force_proper) {
-    if (i_determinant_3x3(R) < (T)0.0) {
-      i_neg9(R);
-    }
+    if (i_determinant_3x3(R) < (T)0.0) { i_neg9(R); }
   }
 }
 

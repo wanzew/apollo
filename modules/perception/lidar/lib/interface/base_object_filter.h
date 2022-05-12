@@ -37,15 +37,13 @@ class BaseObjectFilter {
 
   virtual ~BaseObjectFilter() = default;
 
-  virtual bool Init(
-      const ObjectFilterInitOptions& options = ObjectFilterInitOptions()) = 0;
+  virtual bool Init(const ObjectFilterInitOptions& options = ObjectFilterInitOptions()) = 0;
 
   // @brief: filter objects
   // @param [in]: options
   // @param [in/out]: frame
   // segmented_objects should be valid, and will be filtered,
-  virtual bool Filter(const ObjectFilterOptions& options,
-                      LidarFrame* frame) = 0;
+  virtual bool Filter(const ObjectFilterOptions& options, LidarFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -54,8 +52,7 @@ class BaseObjectFilter {
 };  // class BaseObjectFilter
 
 PERCEPTION_REGISTER_REGISTERER(BaseObjectFilter);
-#define PERCEPTION_REGISTER_OBJECTFILTER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseObjectFilter, name)
+#define PERCEPTION_REGISTER_OBJECTFILTER(name) PERCEPTION_REGISTER_CLASS(BaseObjectFilter, name)
 
 }  // namespace lidar
 }  // namespace perception

@@ -40,35 +40,31 @@ void Dreamview::TerminateProfilingMode() {
 Status Dreamview::Init() {
   VehicleConfigHelper::Init();
 
-  if (FLAGS_dreamview_profiling_mode &&
-      FLAGS_dreamview_profiling_duration > 0.0) {
+  if (FLAGS_dreamview_profiling_mode && FLAGS_dreamview_profiling_duration > 0.0) {
     exit_timer_.reset(new cyber::Timer(
-        FLAGS_dreamview_profiling_duration,
-        [this]() { this->TerminateProfilingMode(); }, false));
+        FLAGS_dreamview_profiling_duration, [this]() { this->TerminateProfilingMode(); }, false));
 
     exit_timer_->Start();
     AWARN << "============================================================";
-    AWARN << "| Dreamview running in profiling mode, exit in "
-          << FLAGS_dreamview_profiling_duration << " seconds |";
+    AWARN << "| Dreamview running in profiling mode, exit in " << FLAGS_dreamview_profiling_duration
+          << " seconds |";
     AWARN << "============================================================";
   }
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
-  std::vector<std::string> options = {
-      "document_root",         FLAGS_static_file_dir,
-      "listening_ports",       FLAGS_server_ports,
-      "websocket_timeout_ms",  FLAGS_websocket_timeout_ms,
-      "request_timeout_ms",    FLAGS_request_timeout_ms,
-      "enable_keep_alive",     "yes",
-      "tcp_nodelay",           "1",
-      "keep_alive_timeout_ms", "500"};
+  std::vector<std::string> options = {"document_root",         FLAGS_static_file_dir,
+                                      "listening_ports",       FLAGS_server_ports,
+                                      "websocket_timeout_ms",  FLAGS_websocket_timeout_ms,
+                                      "request_timeout_ms",    FLAGS_request_timeout_ms,
+                                      "enable_keep_alive",     "yes",
+                                      "tcp_nodelay",           "1",
+                                      "keep_alive_timeout_ms", "500"};
   if (PathExists(FLAGS_ssl_certificate)) {
     options.push_back("ssl_certificate");
     options.push_back(FLAGS_ssl_certificate);
   } else if (FLAGS_ssl_certificate.size() > 0) {
-    AERROR << "Certificate file " << FLAGS_ssl_certificate
-           << " does not exist!";
+    AERROR << "Certificate file " << FLAGS_ssl_certificate << " does not exist!";
   }
   server_.reset(new CivetServer(options));
 
@@ -80,13 +76,11 @@ Status Dreamview::Init() {
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
   sim_control_.reset(new SimControl(map_service_.get()));
-  perception_camera_updater_.reset(
-      new PerceptionCameraUpdater(camera_ws_.get()));
+  perception_camera_updater_.reset(new PerceptionCameraUpdater(camera_ws_.get()));
 
   sim_world_updater_.reset(new SimulationWorldUpdater(
-      websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),
-      map_service_.get(), perception_camera_updater_.get(),
-      FLAGS_routing_from_file));
+      websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(), map_service_.get(),
+      perception_camera_updater_.get(), FLAGS_routing_from_file));
   point_cloud_updater_.reset(
       new PointCloudUpdater(point_cloud_ws_.get(), sim_world_updater_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get()));

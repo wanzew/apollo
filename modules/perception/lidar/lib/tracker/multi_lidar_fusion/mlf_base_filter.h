@@ -32,27 +32,26 @@ struct MlfFilterOptions {};
 
 class MlfBaseFilter {
  public:
-  MlfBaseFilter() = default;
+  MlfBaseFilter()          = default;
   virtual ~MlfBaseFilter() = default;
 
-  virtual bool Init(
-      const MlfFilterInitOptions& options = MlfFilterInitOptions()) = 0;
+  virtual bool Init(const MlfFilterInitOptions& options = MlfFilterInitOptions()) = 0;
 
   // @brief: interface for updating filter with object
   // @params [in]: options for updating
   // @params [in]: track data, not include new object
   // @params [in/out]: new object for updating
-  virtual void UpdateWithObject(const MlfFilterOptions& options,
+  virtual void UpdateWithObject(const MlfFilterOptions&     options,
                                 const MlfTrackDataConstPtr& track_data,
-                                TrackedObjectPtr new_object) = 0;
+                                TrackedObjectPtr            new_object) = 0;
 
   // @brief: interface for updating filter without object
   // @params [in]: options for updating
   // @params [in]: current timestamp
   // @params [in/out]: track data to be updated
   virtual void UpdateWithoutObject(const MlfFilterOptions& options,
-                                   double timestamp,
-                                   MlfTrackDataPtr track_data) = 0;
+                                   double                  timestamp,
+                                   MlfTrackDataPtr         track_data) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -61,8 +60,7 @@ class MlfBaseFilter {
 };  // class MlfBaseFilter
 
 PERCEPTION_REGISTER_REGISTERER(MlfBaseFilter);
-#define PERCEPTION_REGISTER_MLFFILTER(name) \
-  PERCEPTION_REGISTER_CLASS(MlfBaseFilter, name)
+#define PERCEPTION_REGISTER_MLFFILTER(name) PERCEPTION_REGISTER_CLASS(MlfBaseFilter, name)
 
 }  // namespace lidar
 }  // namespace perception

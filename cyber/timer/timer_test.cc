@@ -35,7 +35,7 @@ using cyber::Timer;
 using cyber::TimerOption;
 
 TEST(TimerTest, one_shot) {
-  int count = 0;
+  int   count = 0;
   Timer timer(
       100, [&count] { count = 100; }, true);
   timer.Start();
@@ -49,15 +49,15 @@ TEST(TimerTest, one_shot) {
 }
 
 TEST(TimerTest, cycle) {
-  using TimerPtr = std::shared_ptr<Timer>;
-  int count = 0;
-  TimerPtr timers[1000];
+  using TimerPtr    = std::shared_ptr<Timer>;
+  int         count = 0;
+  TimerPtr    timers[1000];
   TimerOption opt;
-  opt.oneshot = false;
+  opt.oneshot  = false;
   opt.callback = [=] { AINFO << count; };
   for (int i = 0; i < 1000; i++) {
     opt.period = i + 1;
-    timers[i] = std::make_shared<Timer>();
+    timers[i]  = std::make_shared<Timer>();
     timers[i]->SetTimerOption(opt);
     timers[i]->Start();
   }
@@ -69,7 +69,7 @@ TEST(TimerTest, cycle) {
 }
 
 TEST(TimerTest, start_stop) {
-  int count = 0;
+  int   count = 0;
   Timer timer(
       2, [count] { AINFO << count; }, false);
   for (int i = 0; i < 100; i++) {

@@ -23,11 +23,11 @@
 #include "cyber/time/time.h"
 
 #if defined(__GNUC__) || defined(__GNUG__)
-#define AFUNC __PRETTY_FUNCTION__
+#  define AFUNC __PRETTY_FUNCTION__
 #elif defined(__clang__)
-#define AFUNC __PRETTY_FUNCTION__
+#  define AFUNC __PRETTY_FUNCTION__
 #else
-#define AFUNC __func__
+#  define AFUNC __func__
 #endif
 
 // How to Use:
@@ -64,8 +64,7 @@ namespace apollo {
 namespace common {
 namespace util {
 
-std::string function_signature(const std::string& func_name,
-                               const std::string& indicator = "");
+std::string function_signature(const std::string& func_name, const std::string& indicator = "");
 
 class Timer {
  public:
@@ -89,12 +88,15 @@ class Timer {
 
 class TimerWrapper {
  public:
-  explicit TimerWrapper(const std::string& msg) : msg_(msg) { timer_.Start(); }
+  explicit TimerWrapper(const std::string& msg)
+      : msg_(msg) {
+    timer_.Start();
+  }
 
   ~TimerWrapper() { timer_.End(msg_); }
 
  private:
-  Timer timer_;
+  Timer       timer_;
   std::string msg_;
 
   DISALLOW_COPY_AND_ASSIGN(TimerWrapper);
@@ -105,29 +107,29 @@ class TimerWrapper {
 }  // namespace apollo
 
 #if defined(ENABLE_PERF)
-#define PERF_FUNCTION()                               \
-  apollo::common::util::TimerWrapper _timer_wrapper_( \
-      apollo::common::util::function_signature(AFUNC))
-#define PERF_FUNCTION_WITH_NAME(func_name) \
-  apollo::common::util::TimerWrapper _timer_wrapper_(func_name)
-#define PERF_FUNCTION_WITH_INDICATOR(indicator)       \
-  apollo::common::util::TimerWrapper _timer_wrapper_( \
-      apollo::common::util::function_signature(AFUNC, indicator))
-#define PERF_BLOCK_START()             \
-  apollo::common::util::Timer _timer_; \
-  _timer_.Start()
-#define PERF_BLOCK_END(msg) _timer_.End(msg)
-#define PERF_BLOCK_END_WITH_INDICATOR(indicator, msg) \
-  _timer_.End(absl::StrCat(indicator, "_", msg))
+#  define PERF_FUNCTION()                                                                          \
+    apollo::common::util::TimerWrapper _timer_wrapper_(                                            \
+        apollo::common::util::function_signature(AFUNC))
+#  define PERF_FUNCTION_WITH_NAME(func_name)                                                       \
+    apollo::common::util::TimerWrapper _timer_wrapper_(func_name)
+#  define PERF_FUNCTION_WITH_INDICATOR(indicator)                                                  \
+    apollo::common::util::TimerWrapper _timer_wrapper_(                                            \
+        apollo::common::util::function_signature(AFUNC, indicator))
+#  define PERF_BLOCK_START()                                                                       \
+    apollo::common::util::Timer _timer_;                                                           \
+    _timer_.Start()
+#  define PERF_BLOCK_END(msg) _timer_.End(msg)
+#  define PERF_BLOCK_END_WITH_INDICATOR(indicator, msg)                                            \
+    _timer_.End(absl::StrCat(indicator, "_", msg))
 #else
-#define PERF_FUNCTION()
-#define PERF_FUNCTION_WITH_NAME(func_name) UNUSED(func_name);
-#define PERF_FUNCTION_WITH_INDICATOR(indicator) UNUSED(indicator);
-#define PERF_BLOCK_START()
-#define PERF_BLOCK_END(msg) UNUSED(msg);
-#define PERF_BLOCK_END_WITH_INDICATOR(indicator, msg) \
-  {                                                   \
-    UNUSED(indicator);                                \
-    UNUSED(msg);                                      \
-  }
+#  define PERF_FUNCTION()
+#  define PERF_FUNCTION_WITH_NAME(func_name) UNUSED(func_name);
+#  define PERF_FUNCTION_WITH_INDICATOR(indicator) UNUSED(indicator);
+#  define PERF_BLOCK_START()
+#  define PERF_BLOCK_END(msg) UNUSED(msg);
+#  define PERF_BLOCK_END_WITH_INDICATOR(indicator, msg)                                            \
+    {                                                                                              \
+      UNUSED(indicator);                                                                           \
+      UNUSED(msg);                                                                                 \
+    }
 #endif  // ENABLE_PERF

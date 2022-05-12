@@ -83,9 +83,7 @@ template <typename T>
 T GpsToUnixSeconds(T gps_seconds) {
   for (size_t i = 0; i < ArraySize(LEAP_SECONDS); ++i) {
     T result = gps_seconds + (UNIX_GPS_DIFF - LEAP_SECONDS[i][1]);
-    if (result >= LEAP_SECONDS[i][0]) {
-      return result;
-    }
+    if (result >= LEAP_SECONDS[i][0]) { return result; }
   }
   return static_cast<T>(0);
 }

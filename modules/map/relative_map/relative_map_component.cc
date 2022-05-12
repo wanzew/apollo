@@ -28,15 +28,12 @@ using apollo::perception::PerceptionObstacles;
 bool RelativeMapComponent::Init() {
   vehicle_state_provider_ = std::make_shared<common::VehicleStateProvider>();
   InitReaders();
-  return relative_map_.Init(vehicle_state_provider_.get()).ok() &&
-         relative_map_.Start().ok();
+  return relative_map_.Init(vehicle_state_provider_.get()).ok() && relative_map_.Start().ok();
 }
 
 bool RelativeMapComponent::Proc() {
   auto map_msg = std::make_shared<MapMsg>();
-  if (!relative_map_.Process(map_msg.get())) {
-    return false;
-  }
+  if (!relative_map_.Process(map_msg.get())) { return false; }
   common::util::FillHeader(node_->Name(), map_msg.get());
   relative_map_writer_->Write(map_msg);
   return true;
@@ -57,15 +54,13 @@ bool RelativeMapComponent::InitReaders() {
       });
 
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      FLAGS_localization_topic,
-      [this](const std::shared_ptr<LocalizationEstimate>& localization) {
+      FLAGS_localization_topic, [this](const std::shared_ptr<LocalizationEstimate>& localization) {
         ADEBUG << "Received chassis data: run chassis callback.";
         relative_map_.OnLocalization(*localization.get());
       });
 
   navigation_reader_ = node_->CreateReader<NavigationInfo>(
-      FLAGS_navigation_topic,
-      [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
+      FLAGS_navigation_topic, [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
         ADEBUG << "Received chassis data: run chassis callback.";
         relative_map_.OnNavigationInfo(*navigation_info.get());
       });

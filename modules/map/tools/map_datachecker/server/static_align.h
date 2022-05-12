@@ -30,15 +30,21 @@ enum class StaticAlignDetectMethod {
 };
 
 typedef struct Point3d {
-  Point3d() : x(0.0), y(0.0), z(0.0) {}
+  Point3d()
+      : x(0.0)
+      , y(0.0)
+      , z(0.0) {}
   double x, y, z;
 } Point3d;
 
 typedef struct Centroid3D {
-  Centroid3D() : count(0), start_time(0.0), end_time(0.0) {}
+  Centroid3D()
+      : count(0)
+      , start_time(0.0)
+      , end_time(0.0) {}
   Point3d center;
-  int count;
-  double start_time, end_time;
+  int     count;
+  double  start_time, end_time;
 } Centroid3D;
 
 class StaticAlign : public Alignment {
@@ -47,18 +53,18 @@ class StaticAlign : public Alignment {
   ErrorCode Process(const std::vector<FramePose>& poses);
 
  private:
-  void Reset();
+  void   Reset();
   double GetStaticAlignProgress(const std::vector<FramePose>& poses);
   double StaticAlignRansac(const std::vector<FramePose>& poses);
   double StaticAlignDynamicCentroid(const std::vector<FramePose>& poses);
   double GetCentroidTimeDuring();
-  void UpdateDynamicCentroid(const FramePose& pose);
-  bool IsStaticPose(const FramePose& pose);
-  void UpdateGoodPoseInfo(const FramePose& pose);
+  void   UpdateDynamicCentroid(const FramePose& pose);
+  bool   IsStaticPose(const FramePose& pose);
+  void   UpdateGoodPoseInfo(const FramePose& pose);
 
  private:
   StaticAlignDetectMethod static_align_detect_method_;
-  Centroid3D dynamic_centroid_;
+  Centroid3D              dynamic_centroid_;
 };
 
 }  // namespace hdmap

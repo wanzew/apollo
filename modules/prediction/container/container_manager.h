@@ -24,10 +24,11 @@
 #include <memory>
 #include <unordered_map>
 
-#include "cyber/common/macros.h"
 #include "gtest/gtest.h"
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
+#include "cyber/common/macros.h"
 #include "modules/prediction/container/container.h"
 
 /**
@@ -48,7 +49,7 @@ class ContainerManager {
    * @brief Container manager initialization
    * @param Adapter config
    */
-  void Init(const common::adapter::AdapterManagerConfig &config);
+  void Init(const common::adapter::AdapterManagerConfig& config);
 
   /**
    * @brief Get mutable container
@@ -56,10 +57,10 @@ class ContainerManager {
    * @return Pointer to the container given the name
    */
   template <typename T>
-  T *GetContainer(const common::adapter::AdapterConfig::MessageType &type) {
+  T* GetContainer(const common::adapter::AdapterConfig::MessageType& type) {
     auto key_type = static_cast<int>(type);
     if (containers_.find(key_type) != containers_.end()) {
-      return static_cast<T *>(containers_[key_type].get());
+      return static_cast<T*>(containers_[key_type].get());
     }
     return nullptr;
   }
@@ -69,8 +70,8 @@ class ContainerManager {
    * @param Container type
    * @return Container pointer
    */
-  std::unique_ptr<Container> CreateContainer(
-      const common::adapter::AdapterConfig::MessageType &type);
+  std::unique_ptr<Container>
+  CreateContainer(const common::adapter::AdapterConfig::MessageType& type);
 
   FRIEND_TEST(FeatureExtractorTest, junction);
   FRIEND_TEST(ScenarioManagerTest, run);
@@ -80,8 +81,7 @@ class ContainerManager {
    * @brief Register a container
    * @param Container type
    */
-  void RegisterContainer(
-      const common::adapter::AdapterConfig::MessageType &type);
+  void RegisterContainer(const common::adapter::AdapterConfig::MessageType& type);
 
   /**
    * @brief Register all containers

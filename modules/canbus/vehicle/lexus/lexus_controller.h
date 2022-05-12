@@ -21,8 +21,6 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
@@ -42,6 +40,7 @@
 #include "modules/canbus/vehicle/lexus/protocol/steering_cmd_12c.h"
 #include "modules/canbus/vehicle/lexus/protocol/turn_cmd_130.h"
 #include "modules/canbus/vehicle/lexus/protocol/wiper_cmd_134.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {
 namespace canbus {
@@ -51,11 +50,10 @@ class LexusController final : public VehicleController {
  public:
   virtual ~LexusController();
 
-  ::apollo::common::ErrorCode Init(
-      const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
-      override;
+  ::apollo::common::ErrorCode
+  Init(const VehicleParameter&                                params,
+       CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+       MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) override;
 
   bool Start() override;
 
@@ -76,7 +74,7 @@ class LexusController final : public VehicleController {
 
  private:
   // main logical function for operation the car enter or exit the auto driving
-  void Emergency() override;
+  void                        Emergency() override;
   ::apollo::common::ErrorCode EnableAutoMode() override;
   ::apollo::common::ErrorCode DisableAutoMode() override;
   ::apollo::common::ErrorCode EnableSteeringOnlyMode() override;
@@ -111,44 +109,43 @@ class LexusController final : public VehicleController {
   void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
   void SetBeam(const ::apollo::control::ControlCommand& command) override;
   void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetTurningSignal(const ::apollo::control::ControlCommand& command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
 
  private:
-  void SecurityDogThreadFunc();
-  virtual bool CheckResponse(const int32_t flags, bool need_wait);
-  void set_chassis_error_mask(const int32_t mask);
-  int32_t chassis_error_mask();
+  void               SecurityDogThreadFunc();
+  virtual bool       CheckResponse(const int32_t flags, bool need_wait);
+  void               set_chassis_error_mask(const int32_t mask);
+  int32_t            chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
-  void set_chassis_error_code(const Chassis::ErrorCode& error_code);
+  void               set_chassis_error_code(const Chassis::ErrorCode& error_code);
 
  private:
   // control protocol
-  Accelcmd100* accel_cmd_100_ = nullptr;
-  Brakecmd104* brake_cmd_104_ = nullptr;
+  Accelcmd100*                accel_cmd_100_                  = nullptr;
+  Brakecmd104*                brake_cmd_104_                  = nullptr;
   Cruisecontrolbuttonscmd108* cruise_control_buttons_cmd_108_ = nullptr;
-  Dashcontrolsrightrpt210* dash_controls_right_rpt_210_ = nullptr;
-  Hazardlightscmd114* hazard_lights_cmd_114_ = nullptr;
-  Headlightcmd118* headlight_cmd_118_ = nullptr;
-  Horncmd11c* horn_cmd_11c_ = nullptr;
-  Parkingbrakecmd124* parking_brake_cmd_124_ = nullptr;
-  Shiftcmd128* shift_cmd_128_ = nullptr;
-  Steeringcmd12c* steering_cmd_12c_ = nullptr;
-  Turncmd130* turn_cmd_130_ = nullptr;
-  Wipercmd134* wiper_cmd_134_ = nullptr;
+  Dashcontrolsrightrpt210*    dash_controls_right_rpt_210_    = nullptr;
+  Hazardlightscmd114*         hazard_lights_cmd_114_          = nullptr;
+  Headlightcmd118*            headlight_cmd_118_              = nullptr;
+  Horncmd11c*                 horn_cmd_11c_                   = nullptr;
+  Parkingbrakecmd124*         parking_brake_cmd_124_          = nullptr;
+  Shiftcmd128*                shift_cmd_128_                  = nullptr;
+  Steeringcmd12c*             steering_cmd_12c_               = nullptr;
+  Turncmd130*                 turn_cmd_130_                   = nullptr;
+  Wipercmd134*                wiper_cmd_134_                  = nullptr;
 
-  Chassis chassis_;
+  Chassis                      chassis_;
   std::unique_ptr<std::thread> thread_;
-  bool is_chassis_error_ = false;
+  bool                         is_chassis_error_ = false;
 
-  std::mutex chassis_error_code_mutex_;
+  std::mutex         chassis_error_code_mutex_;
   Chassis::ErrorCode chassis_error_code_ = Chassis::NO_ERROR;
 
   std::mutex chassis_mask_mutex_;
-  int32_t chassis_error_mask_ = 0;
+  int32_t    chassis_error_mask_ = 0;
 };
 
 }  // namespace lexus

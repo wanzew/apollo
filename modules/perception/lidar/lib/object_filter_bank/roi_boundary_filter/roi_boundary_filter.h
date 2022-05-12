@@ -18,8 +18,9 @@
 #include <string>
 #include <vector>
 
-#include "Eigen/Dense"
 #include "gtest/gtest_prod.h"
+
+#include "Eigen/Dense"
 
 #include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point.h"
@@ -36,8 +37,7 @@ class ROIBoundaryFilter : public BaseObjectFilter {
 
   virtual ~ROIBoundaryFilter() = default;
 
-  bool Init(const ObjectFilterInitOptions& options =
-                ObjectFilterInitOptions()) override;
+  bool Init(const ObjectFilterInitOptions& options = ObjectFilterInitOptions()) override;
 
   // @brief: filter objects
   // @param [in]: options
@@ -49,35 +49,33 @@ class ROIBoundaryFilter : public BaseObjectFilter {
 
  private:
   // @brief: given input objects, build polygon in world frame
-  void BuildWorldPolygons(const ObjectFilterOptions& options,
-                          const LidarFrame& frame);
+  void BuildWorldPolygons(const ObjectFilterOptions& options, const LidarFrame& frame);
   // @brief: fill is_in_roi in lidar object supplement
   void FillObjectRoiFlag(const ObjectFilterOptions& options, LidarFrame* frame);
   // @brief: filter outside objects based on distance to boundary
   void FilterObjectsOutsideBoundary(const ObjectFilterOptions& options,
-                                    LidarFrame* frame,
-                                    std::vector<bool>* objects_valid_flag);
+                                    LidarFrame*                frame,
+                                    std::vector<bool>*         objects_valid_flag);
   // @brief: filter inside objects based on distance to boundary
   void FilterObjectsInsideBoundary(const ObjectFilterOptions& options,
-                                   LidarFrame* frame,
-                                   std::vector<bool>* objects_valid_flag);
+                                   LidarFrame*                frame,
+                                   std::vector<bool>*         objects_valid_flag);
   // @brief: filter objects based on position and confidence
   void FilterObjectsByConfidence(const ObjectFilterOptions& options,
-                                 LidarFrame* frame,
-                                 std::vector<bool>* objects_valid_flag);
+                                 LidarFrame*                frame,
+                                 std::vector<bool>*         objects_valid_flag);
 
  private:
   FRIEND_TEST(ROIBoundaryFilterTest, roi_boundary_filter_test);
 
-  apollo::common::EigenVector<apollo::perception::base::PointDCloud>
-      polygons_in_world_;
-  std::vector<bool> objects_cross_roi_;
-  std::vector<bool> objects_valid_flag_;
+  apollo::common::EigenVector<apollo::perception::base::PointDCloud> polygons_in_world_;
+  std::vector<bool>                                                  objects_cross_roi_;
+  std::vector<bool>                                                  objects_valid_flag_;
   // params
   double distance_to_boundary_threshold_ = 1.0;
-  double inside_threshold_ = 1.0;
-  float confidence_threshold_ = 0.5f;
-  float cross_roi_threshold_ = 0.6f;
+  double inside_threshold_               = 1.0;
+  float  confidence_threshold_           = 0.5f;
+  float  cross_roi_threshold_            = 0.6f;
 };  // class ROIBoundaryFilter
 
 }  // namespace lidar

@@ -16,9 +16,9 @@
 
 #include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/spatio_temporal_ground_detector.h"
 
-#include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
+#include "gflags/gflags.h"
 #include "pcl/io/pcd_io.h"
 
 namespace apollo {
@@ -33,7 +33,7 @@ DECLARE_string(config_manager_path);
 namespace lidar {
 
 bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
-  int ret = 0;
+  int                             ret = 0;
   pcl::PointCloud<pcl::PointXYZI> org_cloud;
   if ((ret = pcl::io::loadPCDFile(file_path, org_cloud)) < 0) {
     AERROR << "Failed to load pcd file: " << file_path << " " << ret;
@@ -48,10 +48,10 @@ bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
       continue;
     }
     base::PointF& pt = cloud_out->at(pid++);
-    pt.x = org_cloud.at(i).x;
-    pt.y = org_cloud.at(i).y;
-    pt.z = org_cloud.at(i).z;
-    pt.intensity = org_cloud.at(i).intensity;
+    pt.x             = org_cloud.at(i).x;
+    pt.y             = org_cloud.at(i).y;
+    pt.z             = org_cloud.at(i).z;
+    pt.intensity     = org_cloud.at(i).intensity;
   }
   cloud_out->resize(pid);
 

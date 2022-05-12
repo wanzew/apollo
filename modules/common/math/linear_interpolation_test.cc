@@ -15,8 +15,9 @@
  *****************************************************************************/
 #include "modules/common/math/linear_interpolation.h"
 
-#include "Eigen/Dense"
 #include "gtest/gtest.h"
+
+#include "Eigen/Dense"
 
 namespace apollo {
 namespace common {

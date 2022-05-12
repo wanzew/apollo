@@ -32,7 +32,7 @@ struct alignas(16) Landmark {
   std::vector<float> type_probs;
 
   // @brief existence confidence, required
-  float confidence = 1.0f;
+  float   confidence = 1.0f;
   BBox2DF box;
 };
 

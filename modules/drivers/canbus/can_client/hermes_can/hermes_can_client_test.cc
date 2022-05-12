@@ -46,14 +46,13 @@ TEST(HermesCanClient, send) {
 
   // CanFrame can_frame[1];
   std::vector<CanFrame> frames;
-  int32_t num = 0;
+  int32_t               num = 0;
 
   // CanFrame frame;
   // frame.id = 0x60;
   // frame.len = 8;
   // frame.data[0] = 0;
-  EXPECT_EQ(hermes_can.get()->Send(frames, &num),
-            ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
+  EXPECT_EQ(hermes_can.get()->Send(frames, &num), ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
 
   // frames.push_back(frame);
   // num = 1;

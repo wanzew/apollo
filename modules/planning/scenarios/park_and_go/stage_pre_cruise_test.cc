@@ -20,11 +20,13 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_pre_cruise.h"
 
+#include "gtest/gtest.h"
+
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -39,15 +41,14 @@ class ParkAndGoStagePreCruiseTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(ParkAndGoStagePreCruiseTest, Init) {
   ParkAndGoStagePreCruise park_and_go_stage_pre_cruise(config_, injector_);
-  EXPECT_EQ(
-      park_and_go_stage_pre_cruise.Name(),
-      ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_PRE_CRUISE));
+  EXPECT_EQ(park_and_go_stage_pre_cruise.Name(),
+            ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_PRE_CRUISE));
 }
 
 }  // namespace park_and_go

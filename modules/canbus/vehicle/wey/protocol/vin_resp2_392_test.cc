@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/protocol/vin_resp2_392.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,10 +28,10 @@ class Vinresp2392Test : public ::testing::Test {
 };
 
 TEST_F(Vinresp2392Test, reset) {
-  Vinresp2392 vin2;
-  int32_t length = 8;
+  Vinresp2392   vin2;
+  int32_t       length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
+  uint8_t       bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
   vin2.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin15(), 136);

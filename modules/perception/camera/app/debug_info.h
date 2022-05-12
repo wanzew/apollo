@@ -26,22 +26,23 @@
 namespace apollo {
 namespace perception {
 namespace camera {
-void WriteCamera2World(std::ofstream &fout, int frame_num,
-                       const Eigen::Affine3d &pose);
-void WriteTracking(std::ofstream &fout, int frame_num,
-                   const std::vector<base::ObjectPtr> &tracked_object);
-int WriteDetections(const bool enable, const std::string &out_path,
-                    const std::vector<base::ObjectPtr> &objects);
-int WriteDetections(const bool enable, const std::string &out_path,
-                    CameraFrame *frame);
-int WriteLanelines(const bool enable, const std::string &save_path,
-                   const std::vector<base::LaneLine> &lane_objects);
+void WriteCamera2World(std::ofstream& fout, int frame_num, const Eigen::Affine3d& pose);
+void WriteTracking(std::ofstream&                      fout,
+                   int                                 frame_num,
+                   const std::vector<base::ObjectPtr>& tracked_object);
+int  WriteDetections(const bool                          enable,
+                     const std::string&                  out_path,
+                     const std::vector<base::ObjectPtr>& objects);
+int  WriteDetections(const bool enable, const std::string& out_path, CameraFrame* frame);
+int  WriteLanelines(const bool                         enable,
+                    const std::string&                 save_path,
+                    const std::vector<base::LaneLine>& lane_objects);
 
-int WriteCalibrationOutput(bool enable, const std::string &out_path,
-                           const CameraFrame *frame);
-void WriteFusionTracking(std::ofstream &fout, int frame_num,
-                         const std::string &camera_name,
-                         const std::vector<base::ObjectPtr> &tracked_object);
+int  WriteCalibrationOutput(bool enable, const std::string& out_path, const CameraFrame* frame);
+void WriteFusionTracking(std::ofstream&                      fout,
+                         int                                 frame_num,
+                         const std::string&                  camera_name,
+                         const std::vector<base::ObjectPtr>& tracked_object);
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

@@ -46,14 +46,14 @@ namespace lidar {
 class PreprocessPointsCuda {
  private:
   // initializer list
-  const int num_threads_;
-  const int max_num_pillars_;
-  const int max_num_points_per_pillar_;
-  const int num_point_feature_;
-  const int num_inds_for_scan_;
-  const int grid_x_size_;
-  const int grid_y_size_;
-  const int grid_z_size_;
+  const int   num_threads_;
+  const int   max_num_pillars_;
+  const int   max_num_points_per_pillar_;
+  const int   num_point_feature_;
+  const int   num_inds_for_scan_;
+  const int   grid_x_size_;
+  const int   grid_y_size_;
+  const int   grid_z_size_;
   const float pillar_x_size_;
   const float pillar_y_size_;
   const float pillar_z_size_;
@@ -63,7 +63,7 @@ class PreprocessPointsCuda {
   // end initializer list
 
   float* dev_pillar_point_feature_in_coors_;
-  int* dev_pillar_count_histo_;
+  int*   dev_pillar_count_histo_;
 
   int* dev_counter_;
   int* dev_pillar_count_;
@@ -87,13 +87,19 @@ class PreprocessPointsCuda {
    * @param[in] min_z_range Minimum z value for point cloud
    * @details Captital variables never change after the compile
    */
-  PreprocessPointsCuda(const int num_threads, const int max_num_pillars,
-                       const int max_points_per_pillar,
-                       const int num_point_feature, const int num_inds_for_scan,
-                       const int grid_x_size, const int grid_y_size,
-                       const int grid_z_size, const float pillar_x_size,
-                       const float pillar_y_size, const float pillar_z_size,
-                       const float min_x_range, const float min_y_range,
+  PreprocessPointsCuda(const int   num_threads,
+                       const int   max_num_pillars,
+                       const int   max_points_per_pillar,
+                       const int   num_point_feature,
+                       const int   num_inds_for_scan,
+                       const int   grid_x_size,
+                       const int   grid_y_size,
+                       const int   grid_z_size,
+                       const float pillar_x_size,
+                       const float pillar_y_size,
+                       const float pillar_z_size,
+                       const float min_x_range,
+                       const float min_y_range,
                        const float min_z_range);
   ~PreprocessPointsCuda();
 
@@ -114,13 +120,15 @@ class PreprocessPointsCuda {
    *   The number of valid pillars for an input point cloud
    * @details Convert point cloud to pillar representation
    */
-  void DoPreprocessPointsCuda(const float* dev_points, const int in_num_points,
-                              int* dev_x_coors, int* dev_y_coors,
-                              float* dev_num_points_per_pillar,
-                              float* dev_pillar_point_feature,
-                              float* dev_pillar_coors,
-                              int* dev_sparse_pillar_map,
-                              int* host_pillar_count);
+  void DoPreprocessPointsCuda(const float* dev_points,
+                              const int    in_num_points,
+                              int*         dev_x_coors,
+                              int*         dev_y_coors,
+                              float*       dev_num_points_per_pillar,
+                              float*       dev_pillar_point_feature,
+                              float*       dev_pillar_coors,
+                              int*         dev_sparse_pillar_map,
+                              int*         host_pillar_count);
 };
 
 }  // namespace lidar

@@ -25,35 +25,30 @@ namespace drivers {
 namespace lidar {
 
 LidarDriverFactory::LidarDriverFactory() {}
-LidarDriverFactory::LidarDriverFactory(
-    const apollo::drivers::lidar::config& config) {}
+LidarDriverFactory::LidarDriverFactory(const apollo::drivers::lidar::config& config) {}
 void LidarDriverFactory::RegisterLidarClients() {
   Register(LidarParameter::HESAI,
            [](const std::shared_ptr<::apollo::cyber::Node>& node,
-              const apollo::drivers::lidar::config& config) -> LidarDriver* {
+              const apollo::drivers::lidar::config&         config) -> LidarDriver* {
              return new hesai::HesaiDriver(node, config);
            });
   Register(LidarParameter::ROBOSENSE,
            [](const std::shared_ptr<::apollo::cyber::Node>& node,
-              const apollo::drivers::lidar::config& config) -> LidarDriver* {
+              const apollo::drivers::lidar::config&         config) -> LidarDriver* {
              return new robosense::RobosenseDriver(node, config);
            });
 
   Register(LidarParameter::VELODYNE,
            [](const std::shared_ptr<::apollo::cyber::Node>& node,
-              const apollo::drivers::lidar::config& config) -> LidarDriver* {
-             return velodyne::VelodyneDriverFactory::CreateDriver(
-                 node, config.velodyne());
+              const apollo::drivers::lidar::config&         config) -> LidarDriver* {
+             return velodyne::VelodyneDriverFactory::CreateDriver(node, config.velodyne());
            });
 }
-std::unique_ptr<LidarDriver> LidarDriverFactory::CreateLidarDriver(
-    const std::shared_ptr<::apollo::cyber::Node>& node,
-    const apollo::drivers::lidar::config& parameter) {
+std::unique_ptr<LidarDriver>
+LidarDriverFactory::CreateLidarDriver(const std::shared_ptr<::apollo::cyber::Node>& node,
+                                      const apollo::drivers::lidar::config&         parameter) {
   auto factory = CreateObject(parameter.brand(), node, parameter);
-  if (!factory) {
-    AERROR << "Failed to create lidar with parameter: "
-           << parameter.DebugString();
-  }
+  if (!factory) { AERROR << "Failed to create lidar with parameter: " << parameter.DebugString(); }
   return factory;
 }
 

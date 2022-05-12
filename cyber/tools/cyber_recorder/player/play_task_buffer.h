@@ -38,14 +38,14 @@ class PlayTaskBuffer {
   virtual ~PlayTaskBuffer();
 
   size_t Size() const;
-  bool Empty() const;
+  bool   Empty() const;
 
-  void Push(const TaskPtr& task);
+  void    Push(const TaskPtr& task);
   TaskPtr Front();
-  void PopFront();
+  void    PopFront();
 
  private:
-  TaskMap tasks_;
+  TaskMap            tasks_;
   mutable std::mutex mutex_;
 };
 

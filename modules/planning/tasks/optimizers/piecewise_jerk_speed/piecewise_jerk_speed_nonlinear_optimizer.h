@@ -36,12 +36,11 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
   virtual ~PiecewiseJerkSpeedNonlinearOptimizer() = default;
 
  private:
-  common::Status Process(const PathData& path_data,
+  common::Status Process(const PathData&                path_data,
                          const common::TrajectoryPoint& init_point,
-                         SpeedData* const speed_data) override;
+                         SpeedData* const               speed_data) override;
 
-  common::Status SetUpStatesAndBounds(const PathData& path_data,
-                                      const SpeedData& speed_data);
+  common::Status SetUpStatesAndBounds(const PathData& path_data, const SpeedData& speed_data);
 
   bool CheckSpeedLimitFeasibility();
 
@@ -49,7 +48,7 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
 
   common::Status SmoothPathCurvature(const PathData& path_data);
 
-  common::Status OptimizeByQP(SpeedData* const speed_data,
+  common::Status OptimizeByQP(SpeedData* const     speed_data,
                               std::vector<double>* distance,
                               std::vector<double>* velocity,
                               std::vector<double>* acceleration);
@@ -59,20 +58,20 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
                                std::vector<double>* acceleration);
 
   // st problem dimensions
-  double delta_t_ = 0.0;
+  double delta_t_      = 0.0;
   double total_length_ = 0.0;
-  double total_time_ = 0.0;
-  int num_of_knots_ = 0;
+  double total_time_   = 0.0;
+  int    num_of_knots_ = 0;
 
   // st initial values
-  double s_init_ = 0.0;
-  double s_dot_init_ = 0.0;
+  double s_init_      = 0.0;
+  double s_dot_init_  = 0.0;
   double s_ddot_init_ = 0.0;
 
   // st states dynamically feasibility bounds
-  double s_dot_max_ = 0.0;
-  double s_ddot_min_ = 0.0;
-  double s_ddot_max_ = 0.0;
+  double s_dot_max_   = 0.0;
+  double s_ddot_min_  = 0.0;
+  double s_ddot_max_  = 0.0;
   double s_dddot_min_ = 0.0;
   double s_dddot_max_ = 0.0;
 
@@ -81,7 +80,7 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
   std::vector<std::pair<double, double>> s_soft_bounds_;
 
   // speed limits
-  SpeedLimit speed_limit_;
+  SpeedLimit                speed_limit_;
   PiecewiseJerkTrajectory1d smoothed_speed_limit_;
 
   // smoothed path curvature profile as a function of traversal distance

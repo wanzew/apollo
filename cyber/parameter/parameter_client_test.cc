@@ -51,7 +51,7 @@ class ParameterClientTest : public ::testing::Test {
   }
 
  protected:
-  std::shared_ptr<Node> node_;
+  std::shared_ptr<Node>            node_;
   std::unique_ptr<ParameterServer> ps_;
   std::unique_ptr<ParameterClient> pc_;
 };

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/zhongyun/protocol/vehicle_state_feedback_c1.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -28,13 +29,13 @@ class Vehiclestatefeedbackc1Test : public ::testing::Test {
 
 TEST_F(Vehiclestatefeedbackc1Test, reset) {
   Vehiclestatefeedbackc1 feedback_;
-  int32_t length = 8;
-  ChassisDetail cd;
-  uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x03, 0x12, 0x13, 0x01};
+  int32_t                length = 8;
+  ChassisDetail          cd;
+  uint8_t                bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x03, 0x12, 0x13, 0x01};
 
   feedback_.Parse(bytes, length, &cd);
 
-  auto &feedbackinfo = cd.zhongyun().vehicle_state_feedback_c1();
+  auto& feedbackinfo = cd.zhongyun().vehicle_state_feedback_c1();
   EXPECT_DOUBLE_EQ(feedbackinfo.parking_actual(), 1);
   EXPECT_DOUBLE_EQ(feedbackinfo.brake_torque_feedback(), 244.1);
   EXPECT_DOUBLE_EQ(feedbackinfo.gear_state_actual(), 3);

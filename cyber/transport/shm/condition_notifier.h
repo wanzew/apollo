@@ -18,6 +18,7 @@
 #define CYBER_TRANSPORT_SHM_CONDITION_NOTIFIER_H_
 
 #include <sys/types.h>
+
 #include <atomic>
 #include <cstdint>
 
@@ -33,8 +34,8 @@ const uint32_t kBufLength = 4096;
 class ConditionNotifier : public NotifierBase {
   struct Indicator {
     std::atomic<uint64_t> next_seq = {0};
-    ReadableInfo infos[kBufLength];
-    uint64_t seqs[kBufLength] = {0};
+    ReadableInfo          infos[kBufLength];
+    uint64_t              seqs[kBufLength] = {0};
   };
 
  public:
@@ -53,11 +54,11 @@ class ConditionNotifier : public NotifierBase {
   bool Remove();
   void Reset();
 
-  key_t key_ = 0;
-  void* managed_shm_ = nullptr;
-  size_t shm_size_ = 0;
-  Indicator* indicator_ = nullptr;
-  uint64_t next_seq_ = 0;
+  key_t             key_         = 0;
+  void*             managed_shm_ = nullptr;
+  size_t            shm_size_    = 0;
+  Indicator*        indicator_   = nullptr;
+  uint64_t          next_seq_    = 0;
   std::atomic<bool> is_shutdown_ = {false};
 
   DECLARE_SINGLETON(ConditionNotifier)

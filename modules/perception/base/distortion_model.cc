@@ -21,11 +21,9 @@ namespace apollo {
 namespace perception {
 namespace base {
 
-Eigen::Vector2f BrownCameraDistortionModel::Project(
-    const Eigen::Vector3f& point3d) {
+Eigen::Vector2f BrownCameraDistortionModel::Project(const Eigen::Vector3f& point3d) {
   if (std::isless(point3d[2], 0.f)) {
-    AERROR << "The input point (" << point3d
-           << ") should be in front of the camera";
+    AERROR << "The input point (" << point3d << ") should be in front of the camera";
   }
   // radial distortion coefficients
   const float k1 = distort_params_[0];
@@ -37,20 +35,18 @@ Eigen::Vector2f BrownCameraDistortionModel::Project(
 
   Eigen::Vector2f pt2d_img;
   // normalized
-  const Eigen::Vector2f pt_normalized(point3d[0] / point3d[2],
-                                      point3d[1] / point3d[2]);
-  const float x_n = pt_normalized[0];
-  const float y_n = pt_normalized[1];
-  const float x_mul_x = x_n * x_n;
-  const float y_mul_y = y_n * y_n;
-  const float x_mul_y = x_n * y_n;
-  const float r_squared = x_mul_x + y_mul_y;
-  const float r_to_the_4th = r_squared * r_squared;
-  const float r_to_the_6th = r_squared * r_to_the_4th;
+  const Eigen::Vector2f pt_normalized(point3d[0] / point3d[2], point3d[1] / point3d[2]);
+  const float           x_n          = pt_normalized[0];
+  const float           y_n          = pt_normalized[1];
+  const float           x_mul_x      = x_n * x_n;
+  const float           y_mul_y      = y_n * y_n;
+  const float           x_mul_y      = x_n * y_n;
+  const float           r_squared    = x_mul_x + y_mul_y;
+  const float           r_to_the_4th = r_squared * r_squared;
+  const float           r_to_the_6th = r_squared * r_to_the_4th;
 
   // radial distortion
-  pt2d_img = pt_normalized *
-             (1 + k1 * r_squared + k2 * r_to_the_4th + k3 * r_to_the_6th);
+  pt2d_img = pt_normalized * (1 + k1 * r_squared + k2 * r_to_the_4th + k3 * r_to_the_6th);
 
   // tangential distortion
   pt2d_img[0] += 2 * p1 * x_mul_y + p2 * (r_squared + 2 * x_mul_x);
@@ -61,14 +57,13 @@ Eigen::Vector2f BrownCameraDistortionModel::Project(
   const float fy = intrinsic_params_(1, 1);
   const float cx = intrinsic_params_(0, 2);
   const float cy = intrinsic_params_(1, 2);
-  pt2d_img[0] = fx * pt2d_img[0] + cx;
-  pt2d_img[1] = fy * pt2d_img[1] + cy;
+  pt2d_img[0]    = fx * pt2d_img[0] + cx;
+  pt2d_img[1]    = fy * pt2d_img[1] + cy;
 
   return pt2d_img;
 }
 
-std::shared_ptr<BaseCameraModel>
-BrownCameraDistortionModel::get_camera_model() {
+std::shared_ptr<BaseCameraModel> BrownCameraDistortionModel::get_camera_model() {
   std::shared_ptr<PinholeCameraModel> camera_model(new PinholeCameraModel());
   camera_model->set_width(width_);
   camera_model->set_height(height_);
@@ -77,14 +72,13 @@ BrownCameraDistortionModel::get_camera_model() {
   return std::dynamic_pointer_cast<BaseCameraModel>(camera_model);
 }
 
-bool BrownCameraDistortionModel::set_params(size_t width, size_t height,
+bool BrownCameraDistortionModel::set_params(size_t                 width,
+                                            size_t                 height,
                                             const Eigen::VectorXf& params) {
-  if (params.size() != 14) {
-    return false;
-  }
+  if (params.size() != 14) { return false; }
 
-  width_ = width;
-  height_ = height;
+  width_                  = width;
+  height_                 = height;
   intrinsic_params_(0, 0) = params(0);
   intrinsic_params_(0, 1) = params(1);
   intrinsic_params_(0, 2) = params(2);

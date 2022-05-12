@@ -27,11 +27,11 @@ namespace perception {
 namespace camera {
 
 struct CalibrationServiceInitOptions : public BaseInitOptions {
-  int image_width = 0;
-  int image_height = 0;
-  double timestamp = 0;
-  std::string calibrator_working_sensor_name = "";
-  std::string calibrator_method = "";
+  int                                    image_width                    = 0;
+  int                                    image_height                   = 0;
+  double                                 timestamp                      = 0;
+  std::string                            calibrator_working_sensor_name = "";
+  std::string                            calibrator_method              = "";
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
 };
 
@@ -43,37 +43,28 @@ class BaseCalibrationService {
 
   virtual ~BaseCalibrationService() = default;
 
-  virtual bool Init(const CalibrationServiceInitOptions &options =
-                        CalibrationServiceInitOptions()) = 0;
+  virtual bool
+  Init(const CalibrationServiceInitOptions& options = CalibrationServiceInitOptions()) = 0;
 
   virtual bool BuildIndex() = 0;
 
   // @brief query camera to world pose with refinement if any
-  virtual bool QueryCameraToWorldPose(Eigen::Matrix4d *pose) const {
-    return false;
-  }
+  virtual bool QueryCameraToWorldPose(Eigen::Matrix4d* pose) const { return false; }
 
   // @brief query depth on ground plane given pixel coordinate
-  virtual bool QueryDepthOnGroundPlane(int x, int y, double *depth) const {
-    return false;
-  }
+  virtual bool QueryDepthOnGroundPlane(int x, int y, double* depth) const { return false; }
 
   // @brief query 3d point on ground plane given pixel coordinate
-  virtual bool QueryPoint3dOnGroundPlane(int x, int y,
-                                         Eigen::Vector3d *point3d) const {
+  virtual bool QueryPoint3dOnGroundPlane(int x, int y, Eigen::Vector3d* point3d) const {
     return false;
   }
 
   // @brief query ground plane in camera frame, parameterized as
   // [n^T, d] with n^T*x+d=0
-  virtual bool QueryGroundPlaneInCameraFrame(
-      Eigen::Vector4d *plane_param) const {
-    return false;
-  }
+  virtual bool QueryGroundPlaneInCameraFrame(Eigen::Vector4d* plane_param) const { return false; }
 
   // @brief query camera to ground height and pitch angle
-  virtual bool QueryCameraToGroundHeightAndPitchAngle(float *height,
-                                                      float *pitch) const {
+  virtual bool QueryCameraToGroundHeightAndPitchAngle(float* height, float* pitch) const {
     return false;
   }
 
@@ -82,27 +73,26 @@ class BaseCalibrationService {
   virtual float QueryPitchAngle() const { return 0.f; }
 
   // @brief using calibrator to update pitch angle
-  virtual void Update(CameraFrame *frame) {
+  virtual void Update(CameraFrame* frame) {
     // do nothing
   }
 
   // @brief set camera height, pitch and project matrix
-  virtual void SetCameraHeightAndPitch(
-      const std::map<std::string, float> &name_camera_ground_height_map,
-      const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
-      const float &pitch_angle_master_sensor) {
+  virtual void
+  SetCameraHeightAndPitch(const std::map<std::string, float>& name_camera_ground_height_map,
+                          const std::map<std::string, float>& name_camera_pitch_angle_diff_map,
+                          const float&                        pitch_angle_master_sensor) {
     // do nothing
   }
 
   virtual std::string Name() const = 0;
 
-  BaseCalibrationService(const BaseCalibrationService &) = delete;
-  BaseCalibrationService &operator=(const BaseCalibrationService &) = delete;
+  BaseCalibrationService(const BaseCalibrationService&) = delete;
+  BaseCalibrationService& operator=(const BaseCalibrationService&) = delete;
 };  // class BaseCalibrationService
 
 PERCEPTION_REGISTER_REGISTERER(BaseCalibrationService);
-#define REGISTER_CALIBRATION_SERVICE(name) \
-  PERCEPTION_REGISTER_CLASS(BaseCalibrationService, name)
+#define REGISTER_CALIBRATION_SERVICE(name) PERCEPTION_REGISTER_CLASS(BaseCalibrationService, name)
 
 }  // namespace camera
 }  // namespace perception

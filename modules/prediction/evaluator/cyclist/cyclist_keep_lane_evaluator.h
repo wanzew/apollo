@@ -23,9 +23,8 @@
 
 #include <string>
 
-#include "modules/prediction/evaluator/evaluator.h"
-
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/evaluator.h"
 
 /**
  * @namespace apollo::prediction
@@ -50,8 +49,7 @@ class CyclistKeepLaneEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
-                ObstaclesContainer* obstacles_container) override;
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Get the name of evaluator.
@@ -59,8 +57,7 @@ class CyclistKeepLaneEvaluator : public Evaluator {
   std::string GetName() override { return "CYCLIST_KEEP_LANE_EVALUATOR"; }
 
  private:
-  double ComputeProbability(const std::string& curr_lane_id,
-                            const LaneSequence& lane_sequence);
+  double ComputeProbability(const std::string& curr_lane_id, const LaneSequence& lane_sequence);
 };
 
 }  // namespace prediction

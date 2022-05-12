@@ -20,7 +20,9 @@
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
@@ -33,25 +35,20 @@ using apollo::common::math::Vec2d;
 
 class Node3dTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    node_ = std::unique_ptr<Node3d>(new Node3d(0.0, 0.0, 0.0));
-  }
+  virtual void SetUp() { node_ = std::unique_ptr<Node3d>(new Node3d(0.0, 0.0, 0.0)); }
 
  protected:
   std::unique_ptr<Node3d> node_;
-  common::VehicleParam vehicle_param_ =
-      common::VehicleConfigHelper::GetConfig().vehicle_param();
+  common::VehicleParam    vehicle_param_ = common::VehicleConfigHelper::GetConfig().vehicle_param();
 };
 
 TEST_F(Node3dTest, GetBoundingBox) {
-  Box2d test_box = Node3d::GetBoundingBox(vehicle_param_, 0.0, 0.0, 0.0);
+  Box2d  test_box   = Node3d::GetBoundingBox(vehicle_param_, 0.0, 0.0, 0.0);
   double ego_length = vehicle_param_.length();
-  double ego_width = vehicle_param_.width();
-  Box2d gold_box({0.0, 0.0}, 0.0, ego_length, ego_width);
-  double shift_distance =
-      ego_length / 2.0 - vehicle_param_.back_edge_to_center();
-  Vec2d shift_vec{shift_distance * std::cos(0.0),
-                  shift_distance * std::sin(0.0)};
+  double ego_width  = vehicle_param_.width();
+  Box2d  gold_box({0.0, 0.0}, 0.0, ego_length, ego_width);
+  double shift_distance = ego_length / 2.0 - vehicle_param_.back_edge_to_center();
+  Vec2d  shift_vec{shift_distance * std::cos(0.0), shift_distance * std::sin(0.0)};
   gold_box.Shift(shift_vec);
   ASSERT_EQ(test_box.heading(), gold_box.heading());
   ASSERT_EQ(test_box.center_x(), gold_box.center_x());

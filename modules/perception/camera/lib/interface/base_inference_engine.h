@@ -18,9 +18,8 @@
 #include <string>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -36,14 +35,12 @@ class BaseInferenceEngine {
 
   virtual ~BaseInferenceEngine() = default;
 
-  virtual bool Init(const InferenceEngineInitOptions& options =
-                        InferenceEngineInitOptions()) = 0;
+  virtual bool Init(const InferenceEngineInitOptions& options = InferenceEngineInitOptions()) = 0;
 
   // @brief: do network inference.
   // @param [in]: options
   // output blobs should be filled, required,
-  virtual bool Infer(const InferenceEngineOptions& options,
-                     CameraFrame* frame) = 0;
+  virtual bool Infer(const InferenceEngineOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -52,8 +49,7 @@ class BaseInferenceEngine {
 };  // class BaseInferenceEngine
 
 PERCEPTION_REGISTER_REGISTERER(BaseInferenceEngine);
-#define REGISTER_INFERENCE_ENGINE(name) \
-  PERCEPTION_REGISTER_CLASS(BaseInferenceEngine, name)
+#define REGISTER_INFERENCE_ENGINE(name) PERCEPTION_REGISTER_CLASS(BaseInferenceEngine, name)
 
 }  // namespace camera
 }  // namespace perception

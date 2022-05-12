@@ -29,20 +29,21 @@ namespace planning {
 
 using apollo::common::Status;
 
-Task::Task(const TaskConfig& config) : config_(config) {
+Task::Task(const TaskConfig& config)
+    : config_(config) {
   name_ = TaskConfig::TaskType_Name(config_.task_type());
 }
 
-Task::Task(const TaskConfig& config,
-           const std::shared_ptr<DependencyInjector>& injector)
-    : config_(config), injector_(injector) {
+Task::Task(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector)
+    : config_(config)
+    , injector_(injector) {
   name_ = TaskConfig::TaskType_Name(config_.task_type());
 }
 
 const std::string& Task::Name() const { return name_; }
 
 Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
+  frame_               = frame;
   reference_line_info_ = reference_line_info;
   return Status::OK();
 }

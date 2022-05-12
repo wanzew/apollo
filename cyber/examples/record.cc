@@ -33,11 +33,11 @@ const char CHANNEL_NAME_1[] = "/test/channel1";
 const char CHANNEL_NAME_2[] = "/test/channel2";
 const char MESSAGE_TYPE_1[] = "apollo.cyber.proto.Test";
 const char MESSAGE_TYPE_2[] = "apollo.cyber.proto.Channel";
-const char PROTO_DESC[] = "1234567890";
-const char STR_10B[] = "1234567890";
-const char TEST_FILE[] = "test.record";
+const char PROTO_DESC[]     = "1234567890";
+const char STR_10B[]        = "1234567890";
+const char TEST_FILE[]      = "test.record";
 
-void test_write(const std::string &writefile) {
+void test_write(const std::string& writefile) {
   RecordWriter writer;
   writer.SetSizeOfFileSegmentation(0);
   writer.SetIntervalOfFileSegmentation(0);
@@ -50,21 +50,20 @@ void test_write(const std::string &writefile) {
   writer.Close();
 }
 
-void test_read(const std::string &readfile) {
-  RecordReader reader(readfile);
+void test_read(const std::string& readfile) {
+  RecordReader  reader(readfile);
   RecordMessage message;
-  uint64_t msg_count = reader.GetMessageNumber(CHANNEL_NAME_1);
+  uint64_t      msg_count = reader.GetMessageNumber(CHANNEL_NAME_1);
   AINFO << "MSGTYPE: " << reader.GetMessageType(CHANNEL_NAME_1);
   AINFO << "MSGDESC: " << reader.GetProtoDesc(CHANNEL_NAME_1);
 
   // read all message
-  uint64_t i = 0;
+  uint64_t i     = 0;
   uint64_t valid = 0;
   for (i = 0; i < msg_count; ++i) {
     if (reader.ReadMessage(&message)) {
       AINFO << "msg[" << i << "]-> "
-            << "channel name: " << message.channel_name
-            << "; content: " << message.content
+            << "channel name: " << message.channel_name << "; content: " << message.content
             << "; msg time: " << message.time;
       valid++;
     } else {
@@ -75,7 +74,7 @@ void test_read(const std::string &readfile) {
   AINFO << "MSG validmsg:totalcount: " << valid << ":" << msg_count;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   apollo::cyber::Init(argv[0]);
   test_write(TEST_FILE);
   sleep(1);

@@ -31,8 +31,7 @@
 #include "modules/monitor/software/recorder_monitor.h"
 #include "modules/monitor/software/summary_monitor.h"
 
-DEFINE_bool(enable_functional_safety, true,
-            "Whether to enable functional safety check.");
+DEFINE_bool(enable_functional_safety, true, "Whether to enable functional safety check.");
 
 namespace apollo {
 namespace monitor {
@@ -67,18 +66,14 @@ bool Monitor::Init() {
   // overall status.
   runners_.emplace_back(new SummaryMonitor());
   // Check functional safety according to the summary.
-  if (FLAGS_enable_functional_safety) {
-    runners_.emplace_back(new FunctionalSafetyMonitor());
-  }
+  if (FLAGS_enable_functional_safety) { runners_.emplace_back(new FunctionalSafetyMonitor()); }
 
   return true;
 }
 
 bool Monitor::Proc() {
   const double current_time = apollo::cyber::Clock::NowInSeconds();
-  if (!MonitorManager::Instance()->StartFrame(current_time)) {
-    return false;
-  }
+  if (!MonitorManager::Instance()->StartFrame(current_time)) { return false; }
   for (auto& runner : runners_) {
     runner->Tick(current_time);
   }

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/protocol/throttle_command_110.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -41,9 +42,8 @@ void Throttlecommand110::UpdateData(uint8_t* data) {
 
 void Throttlecommand110::Reset() {
   // you should check this manually
-  throttle_pedal_en_ctrl_ =
-      Throttle_command_110::THROTTLE_PEDAL_EN_CTRL_DISABLE;
-  throttle_pedal_cmd_ = 0;
+  throttle_pedal_en_ctrl_ = Throttle_command_110::THROTTLE_PEDAL_EN_CTRL_DISABLE;
+  throttle_pedal_cmd_     = 0;
 }
 
 Throttlecommand110* Throttlecommand110::set_throttle_pedal_en_ctrl(
@@ -58,16 +58,14 @@ Throttlecommand110* Throttlecommand110::set_throttle_pedal_en_ctrl(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 void Throttlecommand110::set_p_throttle_pedal_en_ctrl(
-    uint8_t* data,
-    Throttle_command_110::Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl) {
+    uint8_t* data, Throttle_command_110::Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl) {
   int x = throttle_pedal_en_ctrl;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
-Throttlecommand110* Throttlecommand110::set_throttle_pedal_cmd(
-    int throttle_pedal_cmd) {
+Throttlecommand110* Throttlecommand110::set_throttle_pedal_cmd(int throttle_pedal_cmd) {
   throttle_pedal_cmd_ = throttle_pedal_cmd;
   return this;
 }
@@ -76,10 +74,9 @@ Throttlecommand110* Throttlecommand110::set_throttle_pedal_cmd(
 // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'THROTTLE_PEDAL_CMD',
 // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type': 'int',
 // 'order': 'intel', 'physical_unit': '%'}
-void Throttlecommand110::set_p_throttle_pedal_cmd(uint8_t* data,
-                                                  int throttle_pedal_cmd) {
+void Throttlecommand110::set_p_throttle_pedal_cmd(uint8_t* data, int throttle_pedal_cmd) {
   throttle_pedal_cmd = ProtocolData::BoundedValue(0, 100, throttle_pedal_cmd);
-  int x = throttle_pedal_cmd;
+  int x              = throttle_pedal_cmd;
 
   Byte to_set(data + 1);
   to_set.set_value(static_cast<uint8_t>(x), 0, 8);

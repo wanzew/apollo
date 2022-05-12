@@ -39,20 +39,19 @@ class BaseObjectPool {
   // @brief pure virtual function to get batch of smart pointers
   // @params[IN] num: batch number
   // @params[OUT] data: vector container to store the pointers
-  virtual void BatchGet(size_t num,
-                        std::vector<std::shared_ptr<ObjectType>>* data) = 0;
+  virtual void BatchGet(size_t num, std::vector<std::shared_ptr<ObjectType>>* data) = 0;
   // @brief pure virtual function to get batch of smart pointers
   // @params[IN] num: batch number
   // @params[IN] is_front: indicating insert to front or back of the list
   // @params[OUT] data: list container to store the pointers
-  virtual void BatchGet(size_t num, bool is_front,
-                        std::list<std::shared_ptr<ObjectType>>* data) = 0;
+  virtual void
+  BatchGet(size_t num, bool is_front, std::list<std::shared_ptr<ObjectType>>* data) = 0;
   // @brief pure virtual function to get batch of smart pointers
   // @params[IN] num: batch number
   // @params[IN] is_front: indicating insert to front or back of the deque
   // @params[OUT] data: deque container to store the pointers
-  virtual void BatchGet(size_t num, bool is_front,
-                        std::deque<std::shared_ptr<ObjectType>>* data) = 0;
+  virtual void
+  BatchGet(size_t num, bool is_front, std::deque<std::shared_ptr<ObjectType>>* data) = 0;
   // @brief virtual function to set capacity
   virtual void set_capacity(size_t capacity) {}
   // @brief capacity getter
@@ -63,7 +62,7 @@ class BaseObjectPool {
  protected:
   BaseObjectPool(const BaseObjectPool& rhs) = delete;
   BaseObjectPool& operator=(const BaseObjectPool& rhs) = delete;
-  size_t capacity_ = 0;
+  size_t          capacity_                            = 0;
 };  // class BaseObjectPool
 
 // @brief dummy object pool implementation, not managing memory
@@ -76,14 +75,11 @@ class DummyObjectPool : public BaseObjectPool<ObjectType> {
     return pool;
   }
   // @brief overrided function to get object smart pointer
-  std::shared_ptr<ObjectType> Get() override {
-    return std::shared_ptr<ObjectType>(new ObjectType);
-  }
+  std::shared_ptr<ObjectType> Get() override { return std::shared_ptr<ObjectType>(new ObjectType); }
   // @brief overrided function to get batch of smart pointers
   // @params[IN] num: batch number
   // @params[OUT] data: vector container to store the pointers
-  void BatchGet(size_t num,
-                std::vector<std::shared_ptr<ObjectType>>* data) override {
+  void BatchGet(size_t num, std::vector<std::shared_ptr<ObjectType>>* data) override {
     for (size_t i = 0; i < num; ++i) {
       data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
     }
@@ -92,24 +88,20 @@ class DummyObjectPool : public BaseObjectPool<ObjectType> {
   // @params[IN] num: batch number
   // @params[IN] is_front: indicating insert to front or back of the list
   // @params[OUT] data: list container to store the pointers
-  void BatchGet(size_t num, bool is_front,
-                std::list<std::shared_ptr<ObjectType>>* data) override {
+  void BatchGet(size_t num, bool is_front, std::list<std::shared_ptr<ObjectType>>* data) override {
     for (size_t i = 0; i < num; ++i) {
-      is_front
-          ? data->emplace_front(std::shared_ptr<ObjectType>(new ObjectType))
-          : data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
+      is_front ? data->emplace_front(std::shared_ptr<ObjectType>(new ObjectType)) :
+                 data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
     }
   }
   // @brief overrided function to get batch of smart pointers
   // @params[IN] num: batch number
   // @params[IN] is_front: indicating insert to front or back of the deque
   // @params[OUT] data: deque container to store the pointers
-  void BatchGet(size_t num, bool is_front,
-                std::deque<std::shared_ptr<ObjectType>>* data) override {
+  void BatchGet(size_t num, bool is_front, std::deque<std::shared_ptr<ObjectType>>* data) override {
     for (size_t i = 0; i < num; ++i) {
-      is_front
-          ? data->emplace_front(std::shared_ptr<ObjectType>(new ObjectType))
-          : data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
+      is_front ? data->emplace_front(std::shared_ptr<ObjectType>(new ObjectType)) :
+                 data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
     }
   }
 

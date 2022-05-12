@@ -16,8 +16,9 @@
 
 #pragma once
 
-#include <QtWidgets/QOpenGLWidget>
 #include <memory>
+
+#include <QtWidgets/QOpenGLWidget>
 
 #include "modules/tools/visualizer/free_camera.h"
 #include "modules/tools/visualizer/plane.h"
@@ -37,10 +38,10 @@ class VideoImgViewer : public QOpenGLWidget, protected QOpenGLFunctions {
 
  private:
   bool is_init_;
-  int mvp_id_;
+  int  mvp_id_;
 
-  Plane plane_;
-  FreeCamera ortho_camera_;
+  Plane                    plane_;
+  FreeCamera               ortho_camera_;
   std::shared_ptr<Texture> default_image_;
 
   std::shared_ptr<QOpenGLShaderProgram> video_image_shader_prog_;

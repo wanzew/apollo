@@ -23,9 +23,9 @@
 namespace apollo {
 namespace planning {
 
-std::unique_ptr<Planner> NaviPlannerDispatcher::DispatchPlanner(
-    const PlanningConfig& planning_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
+std::unique_ptr<Planner>
+NaviPlannerDispatcher::DispatchPlanner(const PlanningConfig&                      planning_config,
+                                       const std::shared_ptr<DependencyInjector>& injector) {
   auto planner_type = PlannerType::NAVI;
   if (planning_config.has_navigation_planning_config()) {
     planner_type = planning_config.navigation_planning_config().planner_type(0);

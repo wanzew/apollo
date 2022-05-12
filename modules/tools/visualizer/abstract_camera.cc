@@ -15,14 +15,15 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/abstract_camera.h"
+
 #include <cmath>
 
 const QVector3D AbstractCamera::UP{0.0f, 1.0f, 0.0f};
 
 QMatrix4x4 AbstractCamera::YawPitchRoll(float yaw, float pitch, float roll) {
-  yaw = Radians(yaw);
+  yaw   = Radians(yaw);
   pitch = Radians(pitch);
-  roll = Radians(roll);
+  roll  = Radians(roll);
 
   register float tmpCy = std::cos(yaw);
   register float tmpSy = std::sin(yaw);
@@ -52,16 +53,16 @@ QMatrix4x4 AbstractCamera::YawPitchRoll(float yaw, float pitch, float roll) {
 }
 
 AbstractCamera::AbstractCamera()
-    : camera_mode_(CameraMode::PerspectiveMode),
-      fov_(45.0f),
-      near_plane_width_(1.0f),
-      near_plane_height_(1.0f),
-      near_plane_(0.1f),
-      far_plane_(1000.0f),
-      position_(0.0f, 0.0f, 0.0f),
-      attitude_(),
-      look_(0.0f, 0.0f, 1.0f),
-      up_(UP),
-      right_(1.0f, 0.0f, 0.0f),
-      projection_mat_(),
-      model_view_mat_() {}
+    : camera_mode_(CameraMode::PerspectiveMode)
+    , fov_(45.0f)
+    , near_plane_width_(1.0f)
+    , near_plane_height_(1.0f)
+    , near_plane_(0.1f)
+    , far_plane_(1000.0f)
+    , position_(0.0f, 0.0f, 0.0f)
+    , attitude_()
+    , look_(0.0f, 0.0f, 1.0f)
+    , up_(UP)
+    , right_(1.0f, 0.0f, 0.0f)
+    , projection_mat_()
+    , model_view_mat_() {}

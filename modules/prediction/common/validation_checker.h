@@ -35,24 +35,23 @@ class ValidationChecker {
    * @param current speed of obstacle
    * @return probability
    */
-  static double ProbabilityByCentripetalAcceleration(
-      const LaneSequence& lane_sequence, const double speed);
+  static double ProbabilityByCentripetalAcceleration(const LaneSequence& lane_sequence,
+                                                     const double        speed);
 
   /**
    * @brief Check the validity of trajectory's centripetal acceleration
    * @param The discretized trajectory
    * @return The validity of trajectory's centripetal acceleration
    */
-  static bool ValidCentripetalAcceleration(
-      const std::vector<common::TrajectoryPoint>& discretized_trajectory);
+  static bool
+  ValidCentripetalAcceleration(const std::vector<common::TrajectoryPoint>& discretized_trajectory);
 
   /**
    * @brief Check if a trajectory point is valid
    * @param A trajectory point
    * @return True if the trajectory point is valid
    */
-  static bool ValidTrajectoryPoint(
-      const common::TrajectoryPoint& trajectory_point);
+  static bool ValidTrajectoryPoint(const common::TrajectoryPoint& trajectory_point);
 
  private:
   ValidationChecker() = delete;

@@ -28,7 +28,7 @@ class SceneCameraDialog : public QDialog {
   Q_OBJECT
 
  public:
-  explicit SceneCameraDialog(QWidget *parent = nullptr);
+  explicit SceneCameraDialog(QWidget* parent = nullptr);
   ~SceneCameraDialog();
 
  signals:
@@ -45,13 +45,13 @@ class SceneCameraDialog : public QDialog {
   void rollValueChanged(double);
 
  public slots:  // NOLINT
-  void updateCameraAttitude(const QVector3D &);
-  void updateCameraPos(const QVector3D &);
+  void updateCameraAttitude(const QVector3D&);
+  void updateCameraPos(const QVector3D&);
 
  private slots:  // NOLINT
   void OnStepSlideChanged(int v);
   void onCameraTypeChanged(int);
 
  private:
-  Ui::SceneCameraDialog *ui;
+  Ui::SceneCameraDialog* ui;
 };

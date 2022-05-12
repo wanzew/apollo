@@ -13,33 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/fusion/base/sensor_object.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
-#include "modules/perception/fusion/base/sensor_object.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
 
 TEST(SensorObjectTest, test) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base";
-  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/"
-      "fusion/base/params";
+  FLAGS_work_root                 = "/apollo/modules/perception/testdata/fusion/base";
+  FLAGS_obs_sensor_meta_path      = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+                                    "fusion/base/params";
   base::SensorInfo sensor_info;
   sensor_info.name = "test";
   sensor_info.type = base::SensorType::VELODYNE_64;
   SensorPtr sensor_ptr(new Sensor(sensor_info));
 
-  double timestamp = 7012;
+  double          timestamp         = 7012;
   Eigen::Affine3d sensor2world_pose = Eigen::Affine3d::Identity();
   base::ObjectPtr base_object(new base::Object());
-  base::FramePtr base_frame(new base::Frame());
-  base_frame->timestamp = timestamp;
+  base::FramePtr  base_frame(new base::Frame());
+  base_frame->timestamp         = timestamp;
   base_frame->sensor2world_pose = sensor2world_pose;
   base_frame->objects.emplace_back(base_object);
   base_frame->sensor_info = sensor_info;

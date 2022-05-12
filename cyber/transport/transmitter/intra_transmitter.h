@@ -42,15 +42,15 @@ class IntraTransmitter : public Transmitter<M> {
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
 
  private:
-  uint64_t channel_id_;
+  uint64_t           channel_id_;
   IntraDispatcherPtr dispatcher_;
 };
 
 template <typename M>
 IntraTransmitter<M>::IntraTransmitter(const RoleAttributes& attr)
-    : Transmitter<M>(attr),
-      channel_id_(attr.channel_id()),
-      dispatcher_(nullptr) {}
+    : Transmitter<M>(attr)
+    , channel_id_(attr.channel_id())
+    , dispatcher_(nullptr) {}
 
 template <typename M>
 IntraTransmitter<M>::~IntraTransmitter() {
@@ -60,7 +60,7 @@ IntraTransmitter<M>::~IntraTransmitter() {
 template <typename M>
 void IntraTransmitter<M>::Enable() {
   if (!this->enabled_) {
-    dispatcher_ = IntraDispatcher::Instance();
+    dispatcher_    = IntraDispatcher::Instance();
     this->enabled_ = true;
   }
 }
@@ -68,14 +68,13 @@ void IntraTransmitter<M>::Enable() {
 template <typename M>
 void IntraTransmitter<M>::Disable() {
   if (this->enabled_) {
-    dispatcher_ = nullptr;
+    dispatcher_    = nullptr;
     this->enabled_ = false;
   }
 }
 
 template <typename M>
-bool IntraTransmitter<M>::Transmit(const MessagePtr& msg,
-                                   const MessageInfo& msg_info) {
+bool IntraTransmitter<M>::Transmit(const MessagePtr& msg, const MessageInfo& msg_info) {
   if (!this->enabled_) {
     ADEBUG << "not enable.";
     return false;

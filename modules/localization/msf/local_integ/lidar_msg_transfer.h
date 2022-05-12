@@ -22,6 +22,7 @@
 #pragma once
 
 #include "modules/drivers/proto/pointcloud.pb.h"
+
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 
 /**
@@ -36,7 +37,7 @@ class LidarMsgTransfer {
  public:
   LidarMsgTransfer() = default;
 
-  void Transfer(const drivers::PointCloud &message, LidarFrame *lidar_frame);
+  void Transfer(const drivers::PointCloud& message, LidarFrame* lidar_frame);
 
  protected:
   double max_height_ = 100.0;

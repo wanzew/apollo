@@ -16,9 +16,10 @@
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 
-#include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 
 using ::testing::ElementsAre;
 
@@ -27,27 +28,24 @@ namespace dreamview {
 
 class MockClient {
  public:
-  MockClient(const char *host, int port) {
-    conn = mg_connect_websocket_client(host, port, 0, error_buffer, 100,
-                                       "/websocket", "", &MockClient::OnMessage,
-                                       nullptr, nullptr);
+  MockClient(const char* host, int port) {
+    conn = mg_connect_websocket_client(host, port, 0, error_buffer, 100, "/websocket", "",
+                                       &MockClient::OnMessage, nullptr, nullptr);
     CHECK_NOTNULL(conn);
   }
 
-  const std::vector<std::string> &GetReceivedMessages() {
-    return received_messages_;
-  }
+  const std::vector<std::string>& GetReceivedMessages() { return received_messages_; }
 
  private:
-  static int OnMessage(struct mg_connection *conn, int bits, char *data,
-                       size_t data_len, void *cbdata) {
+  static int
+  OnMessage(struct mg_connection* conn, int bits, char* data, size_t data_len, void* cbdata) {
     AINFO << "Get " << *data;
     received_messages_.emplace_back(data);
     return 1;
   }
 
-  mg_connection *conn;
-  char error_buffer[100];
+  mg_connection*                  conn;
+  char                            error_buffer[100];
   static std::vector<std::string> received_messages_;
 };
 std::vector<std::string> MockClient::received_messages_;
@@ -86,20 +84,18 @@ TEST(WebSocketTest, handleData) {
   // in almost all cases this should be fine for a small integration test.
   CivetServer server({"listening_ports", "32695"});
   server.addWebSocketHandler("/websocket", handler);
-  handler.RegisterMessageHandler("test",
-                                 [this](const WebSocketHandler::Json &json,
-                                        WebSocketHandler::Connection *conn) {
-                                   AINFO << "Received test request.";
-                                 });
+  handler.RegisterMessageHandler(
+      "test", [this](const WebSocketHandler::Json& json, WebSocketHandler::Connection* conn) {
+        AINFO << "Received test request.";
+      });
 
   // Wait for a small amount of time to make sure that the server is up.
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
-  mg_connection *conn = nullptr;
-  std::string data = "{\"type\":\"test\"}";
-  char *data_char = const_cast<char *>(data.c_str());
-  EXPECT_TRUE(
-      handler.handleData(&server, conn, 0x81, data_char, data.length()));
+  mg_connection* conn      = nullptr;
+  std::string    data      = "{\"type\":\"test\"}";
+  char*          data_char = const_cast<char*>(data.c_str());
+  EXPECT_TRUE(handler.handleData(&server, conn, 0x81, data_char, data.length()));
 }
 
 }  // namespace dreamview

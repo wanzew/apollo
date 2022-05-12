@@ -14,25 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/common/similar.h"
+
 #include "modules/perception/base/blob.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-bool CosineSimilar::Calc(CameraFrame *frame1, CameraFrame *frame2,
-                         base::Blob<float> *sim) {
+bool CosineSimilar::Calc(CameraFrame* frame1, CameraFrame* frame2, base::Blob<float>* sim) {
   auto n = frame1->detected_objects.size();
   auto m = frame2->detected_objects.size();
-  if ((n && m) == 0) {
-    return false;
-  }
+  if ((n && m) == 0) { return false; }
   sim->Reshape({static_cast<int>(n), static_cast<int>(m)});
-  float *sim_data = sim->mutable_cpu_data();
-  auto dim =
-      frame1->detected_objects[0]->camera_supplement.object_feature.size();
-  for (auto &object1 : frame1->detected_objects) {
-    for (auto &object2 : frame2->detected_objects) {
+  float* sim_data = sim->mutable_cpu_data();
+  auto   dim      = frame1->detected_objects[0]->camera_supplement.object_feature.size();
+  for (auto& object1 : frame1->detected_objects) {
+    for (auto& object2 : frame2->detected_objects) {
       float s = 0.0f;
       for (size_t k = 0; k < dim; ++k) {
         s += object1->camera_supplement.object_feature[k] *

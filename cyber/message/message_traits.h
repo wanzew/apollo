@@ -44,9 +44,8 @@ DEFINE_TYPE_TRAIT(HasParseFromArray, ParseFromArray)
 template <typename T>
 class HasSerializer {
  public:
-  static constexpr bool value =
-      HasSerializeToString<T>::value && HasParseFromString<T>::value &&
-      HasSerializeToArray<T>::value && HasParseFromArray<T>::value;
+  static constexpr bool value = HasSerializeToString<T>::value && HasParseFromString<T>::value &&
+                                HasSerializeToArray<T>::value && HasParseFromArray<T>::value;
 };
 
 // avoid potential ODR violation
@@ -54,80 +53,71 @@ template <typename T>
 constexpr bool HasSerializer<T>::value;
 
 template <typename T,
-          typename std::enable_if<HasType<T>::value &&
-                                      std::is_member_function_pointer<
-                                          decltype(&T::TypeName)>::value,
-                                  bool>::type = 0>
+          typename std::enable_if<
+              HasType<T>::value && std::is_member_function_pointer<decltype(&T::TypeName)>::value,
+              bool>::type = 0>
 std::string MessageType(const T& message) {
   return message.TypeName();
 }
 
 template <typename T,
-          typename std::enable_if<HasType<T>::value &&
-                                      !std::is_member_function_pointer<
-                                          decltype(&T::TypeName)>::value,
-                                  bool>::type = 0>
+          typename std::enable_if<
+              HasType<T>::value && !std::is_member_function_pointer<decltype(&T::TypeName)>::value,
+              bool>::type = 0>
 std::string MessageType(const T& message) {
   return T::TypeName();
 }
 
 template <typename T,
-          typename std::enable_if<
-              !HasType<T>::value &&
-                  !std::is_base_of<google::protobuf::Message, T>::value,
-              bool>::type = 0>
+          typename std::enable_if<!HasType<T>::value &&
+                                      !std::is_base_of<google::protobuf::Message, T>::value,
+                                  bool>::type = 0>
 std::string MessageType(const T& message) {
   return typeid(T).name();
 }
 
 template <typename T,
-          typename std::enable_if<HasType<T>::value &&
-                                      !std::is_member_function_pointer<
-                                          decltype(&T::TypeName)>::value,
-                                  bool>::type = 0>
+          typename std::enable_if<
+              HasType<T>::value && !std::is_member_function_pointer<decltype(&T::TypeName)>::value,
+              bool>::type = 0>
 std::string MessageType() {
   return T::TypeName();
 }
 
 template <typename T,
-          typename std::enable_if<
-              !HasType<T>::value &&
-                  !std::is_base_of<google::protobuf::Message, T>::value,
-              bool>::type = 0>
+          typename std::enable_if<!HasType<T>::value &&
+                                      !std::is_base_of<google::protobuf::Message, T>::value,
+                                  bool>::type = 0>
 std::string MessageType() {
   return typeid(T).name();
 }
 
-template <
-    typename T,
-    typename std::enable_if<
-        HasType<T>::value &&
-            std::is_member_function_pointer<decltype(&T::TypeName)>::value &&
-            !std::is_base_of<google::protobuf::Message, T>::value,
-        bool>::type = 0>
+template <typename T,
+          typename std::enable_if<
+              HasType<T>::value && std::is_member_function_pointer<decltype(&T::TypeName)>::value &&
+                  !std::is_base_of<google::protobuf::Message, T>::value,
+              bool>::type = 0>
 std::string MessageType() {
   return typeid(T).name();
 }
 
 template <typename T>
-typename std::enable_if<HasSetType<T>::value, void>::type SetTypeName(
-    const std::string& type_name, T* message) {
+typename std::enable_if<HasSetType<T>::value, void>::type SetTypeName(const std::string& type_name,
+                                                                      T*                 message) {
   message->SetTypeName(type_name);
 }
 
 template <typename T>
-typename std::enable_if<!HasSetType<T>::value, void>::type SetTypeName(
-    const std::string& type_name, T* message) {}
+typename std::enable_if<!HasSetType<T>::value, void>::type SetTypeName(const std::string& type_name,
+                                                                       T* message) {}
 
 template <typename T>
-typename std::enable_if<HasByteSize<T>::value, int>::type ByteSize(
-    const T& message) {
+typename std::enable_if<HasByteSize<T>::value, int>::type ByteSize(const T& message) {
   return static_cast<int>(message.ByteSizeLong());
 }
 
 template <typename T>
-typename std::enable_if<!HasByteSize<T>::value, int>::type ByteSize(
-    const T& message) {
+typename std::enable_if<!HasByteSize<T>::value, int>::type ByteSize(const T& message) {
   (void)message;
   return -1;
 }
@@ -135,15 +125,13 @@ typename std::enable_if<!HasByteSize<T>::value, int>::type ByteSize(
 template <typename T>
 int FullByteSize(const T& message) {
   int content_size = ByteSize(message);
-  if (content_size < 0) {
-    return content_size;
-  }
+  if (content_size < 0) { return content_size; }
   return content_size + static_cast<int>(sizeof(MessageHeader));
 }
 
 template <typename T>
-typename std::enable_if<HasParseFromArray<T>::value, bool>::type ParseFromArray(
-    const void* data, int size, T* message) {
+typename std::enable_if<HasParseFromArray<T>::value, bool>::type
+ParseFromArray(const void* data, int size, T* message) {
   return message->ParseFromArray(data, size);
 }
 
@@ -166,8 +154,8 @@ ParseFromString(const std::string& str, T* message) {
 }
 
 template <typename T>
-typename std::enable_if<HasParseFromArray<T>::value, bool>::type ParseFromHC(
-    const void* data, int size, T* message) {
+typename std::enable_if<HasParseFromArray<T>::value, bool>::type
+ParseFromHC(const void* data, int size, T* message) {
   const auto header_size = sizeof(MessageHeader);
   RETURN_VAL_IF(size < (int)header_size, false);
   const MessageHeader* header = static_cast<const MessageHeader*>(data);
@@ -179,8 +167,8 @@ typename std::enable_if<HasParseFromArray<T>::value, bool>::type ParseFromHC(
 }
 
 template <typename T>
-typename std::enable_if<!HasParseFromArray<T>::value, bool>::type ParseFromHC(
-    const void* data, int size, T* message) {
+typename std::enable_if<!HasParseFromArray<T>::value, bool>::type
+ParseFromHC(const void* data, int size, T* message) {
   return false;
 }
 
@@ -212,16 +200,12 @@ template <typename T>
 typename std::enable_if<HasSerializeToArray<T>::value, bool>::type
 SerializeToHC(const T& message, void* data, int size) {
   int msg_size = ByteSize(message);
-  if (msg_size < 0) {
-    return false;
-  }
+  if (msg_size < 0) { return false; }
   const std::string& type_name = MessageType(message);
-  MessageHeader header;
+  MessageHeader      header;
   header.set_msg_type(type_name.data(), type_name.size());
   header.set_content_size(msg_size);
-  if (sizeof(header) > static_cast<size_t>(size)) {
-    return false;
-  }
+  if (sizeof(header) > static_cast<size_t>(size)) { return false; }
   char* ptr = reinterpret_cast<char*>(data);
   memcpy(ptr, static_cast<const void*>(&header), sizeof(header));
   ptr += sizeof(header);
@@ -235,59 +219,53 @@ SerializeToHC(const T& message, void* data, int size) {
   return false;
 }
 
-template <typename T, typename std::enable_if<HasGetDescriptorString<T>::value,
-                                              bool>::type = 0>
+template <typename T, typename std::enable_if<HasGetDescriptorString<T>::value, bool>::type = 0>
 void GetDescriptorString(const std::string& type, std::string* desc_str) {
   T::GetDescriptorString(type, desc_str);
 }
 
 template <typename T,
-          typename std::enable_if<
-              !HasGetDescriptorString<T>::value &&
-                  !std::is_base_of<google::protobuf::Message, T>::value,
-              bool>::type = 0>
+          typename std::enable_if<!HasGetDescriptorString<T>::value &&
+                                      !std::is_base_of<google::protobuf::Message, T>::value,
+                                  bool>::type = 0>
 void GetDescriptorString(const std::string& type, std::string* desc_str) {}
 
 template <typename MessageT,
-          typename std::enable_if<
-              !std::is_base_of<google::protobuf::Message, MessageT>::value,
-              int>::type = 0>
+          typename std::enable_if<!std::is_base_of<google::protobuf::Message, MessageT>::value,
+                                  int>::type = 0>
 void GetDescriptorString(const MessageT& message, std::string* desc_str) {}
 
-template <
-    typename T, typename Descriptor,
-    typename std::enable_if<HasFullName<Descriptor>::value, bool>::type = 0>
+template <typename T,
+          typename Descriptor,
+          typename std::enable_if<HasFullName<Descriptor>::value, bool>::type = 0>
 std::string GetFullName() {
   return T::descriptor()->full_name();
 }
 
-template <
-    typename T, typename Descriptor,
-    typename std::enable_if<!HasFullName<Descriptor>::value, bool>::type = 0>
+template <typename T,
+          typename Descriptor,
+          typename std::enable_if<!HasFullName<Descriptor>::value, bool>::type = 0>
 std::string GetFullName() {
   return typeid(T).name();
 }
 
 template <typename T,
-          typename std::enable_if<
-              HasDescriptor<T>::value &&
-                  !std::is_base_of<google::protobuf::Message, T>::value,
-              bool>::type = 0>
+          typename std::enable_if<HasDescriptor<T>::value &&
+                                      !std::is_base_of<google::protobuf::Message, T>::value,
+                                  bool>::type = 0>
 std::string GetMessageName() {
   return GetFullName<T, decltype(*T::descriptor())>();
 }
 
 template <typename T,
-          typename std::enable_if<
-              HasDescriptor<T>::value &&
-                  std::is_base_of<google::protobuf::Message, T>::value,
-              bool>::type = 0>
+          typename std::enable_if<HasDescriptor<T>::value &&
+                                      std::is_base_of<google::protobuf::Message, T>::value,
+                                  bool>::type = 0>
 std::string GetMessageName() {
   return T::descriptor()->full_name();
 }
 
-template <typename T,
-          typename std::enable_if<!HasDescriptor<T>::value, bool>::type = 0>
+template <typename T, typename std::enable_if<!HasDescriptor<T>::value, bool>::type = 0>
 std::string GetMessageName() {
   return typeid(T).name();
 }

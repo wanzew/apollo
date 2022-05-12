@@ -22,9 +22,10 @@
 
 #include <vector>
 
-#include "cyber/common/macros.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+
+#include "cyber/common/macros.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -39,7 +40,7 @@ class EgoInfo {
   ~EgoInfo() = default;
 
   bool Update(const common::TrajectoryPoint& start_point,
-              const common::VehicleState& vehicle_state);
+              const common::VehicleState&    vehicle_state);
 
   void Clear();
 
@@ -51,8 +52,7 @@ class EgoInfo {
 
   common::math::Box2d ego_box() const { return ego_box_; }
 
-  void CalculateFrontObstacleClearDistance(
-      const std::vector<const Obstacle*>& obstacles);
+  void CalculateFrontObstacleClearDistance(const std::vector<const Obstacle*>& obstacles);
 
  private:
   FRIEND_TEST(EgoInfoTest, EgoInfoSimpleTest);
@@ -62,11 +62,10 @@ class EgoInfo {
   }
 
   void set_start_point(const common::TrajectoryPoint& start_point) {
-    start_point_ = start_point;
+    start_point_      = start_point;
     const auto& param = ego_vehicle_config_.vehicle_param();
     start_point_.set_a(
-        std::fmax(std::fmin(start_point_.a(), param.max_acceleration()),
-                  param.max_deceleration()));
+        std::fmax(std::fmin(start_point_.a(), param.max_acceleration()), param.max_deceleration()));
   }
 
   void CalculateEgoBox(const common::VehicleState& vehicle_state);

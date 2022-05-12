@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/tool/benchmark/lidar/base/point_cloud_frame.h"
+
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/util/io_util.h"
 
 namespace apollo {
@@ -24,9 +26,7 @@ namespace benchmark {
 
 std::string PointCloudFrame::_s_cloud_type = "xyzit";  // NOLINT
 
-void PointCloudFrame::set_cloud_type(const std::string& type) {
-  _s_cloud_type = type;
-}
+void PointCloudFrame::set_cloud_type(const std::string& type) { _s_cloud_type = type; }
 
 bool PointCloudFrame::load(const std::vector<std::string>& filenames) {
   if (filenames.empty()) {

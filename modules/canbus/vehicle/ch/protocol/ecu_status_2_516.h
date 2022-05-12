@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Ecustatus2516 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+class Ecustatus2516
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Ecustatus2516();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'bit': 0, 'description': 'Percentage of battery remaining
@@ -60,8 +60,7 @@ class Ecustatus2516 : public ::apollo::drivers::canbus::ProtocolData<
   // status)', 'is_signed_var': True, 'len': 16, 'name': 'BATTERY_TEMPERATURE',
   // 'offset': 0.0, 'order': 'intel', 'physical_range': '[-40|110]',
   // 'physical_unit': '℃', 'precision': 1.0, 'type': 'int'}
-  int battery_temperature(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  int battery_temperature(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ch

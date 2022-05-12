@@ -30,16 +30,14 @@ class MovingDetectionTest : public ::testing::Test {
 };
 
 TEST_F(MovingDetectionTest, fft1d) {
-  std::vector<double> signal{1.0, 2.0, 3.0, 4.0, -1.0, -2.0};
-  std::vector<std::complex<double>> fft_result =
-      moving_detection_.fft1d(signal);
+  std::vector<double>               signal{1.0, 2.0, 3.0, 4.0, -1.0, -2.0};
+  std::vector<std::complex<double>> fft_result = moving_detection_.fft1d(signal);
 }
 
 TEST_F(MovingDetectionTest, moving) {
-  std::vector<std::vector<double>> signals{
-    {1.0, 2.0, 3.0, 4.0, -1.0, -2.0},
-    {-1.0, -2.0, 3.0, 4.0, 1.0, -2.0}};
-  MovingResult result = moving_detection_.Detect(signals);
+  std::vector<std::vector<double>> signals{{1.0, 2.0, 3.0, 4.0, -1.0, -2.0},
+                                           {-1.0, -2.0, 3.0, 4.0, 1.0, -2.0}};
+  MovingResult                     result = moving_detection_.Detect(signals);
   EXPECT_EQ(result, UNKNOWN);
 }
 

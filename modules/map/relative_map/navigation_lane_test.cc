@@ -21,14 +21,17 @@
 
 #include "modules/map/relative_map/navigation_lane.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
+
+#include "nlohmann/json.hpp"
+
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/map/relative_map/proto/relative_map_config.pb.h"
-#include "nlohmann/json.hpp"
+
+#include "cyber/common/file.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/relative_map/common/relative_map_gflags.h"
 
 namespace apollo {
 namespace relative_map {
@@ -40,8 +43,7 @@ using apollo::relative_map::NavigationPath;
 using nlohmann::json;
 
 namespace {
-bool GetNavigationPathFromFile(const std::string& filename,
-                               NavigationPath* navigation_path) {
+bool GetNavigationPathFromFile(const std::string& filename, NavigationPath* navigation_path) {
   CHECK_NOTNULL(navigation_path);
 
   std::ifstream ifs(filename, std::ios::in);
@@ -52,8 +54,8 @@ bool GetNavigationPathFromFile(const std::string& filename,
   std::string line_str;
   while (std::getline(ifs, line_str)) {
     try {
-      auto json_obj = json::parse(line_str);
-      auto* point = navigation_path->mutable_path()->add_path_point();
+      auto  json_obj = json::parse(line_str);
+      auto* point    = navigation_path->mutable_path()->add_path_point();
       point->set_x(json_obj["x"]);
       point->set_y(json_obj["y"]);
       point->set_s(json_obj["s"]);
@@ -69,17 +71,14 @@ bool GetNavigationPathFromFile(const std::string& filename,
   return true;
 }
 
-bool GenerateNavigationInfo(
-    const std::vector<std::string>& navigation_line_filenames,
-    NavigationInfo* navigation_info) {
+bool GenerateNavigationInfo(const std::vector<std::string>& navigation_line_filenames,
+                            NavigationInfo*                 navigation_info) {
   CHECK_NOTNULL(navigation_info);
 
   int i = 0;
   for (const std::string& filename : navigation_line_filenames) {
     auto* navigation_path = navigation_info->add_navigation_path();
-    if (!GetNavigationPathFromFile(filename, navigation_path)) {
-      continue;
-    }
+    if (!GetNavigationPathFromFile(filename, navigation_path)) { continue; }
     navigation_path->set_path_priority(i);
     navigation_path->mutable_path()->set_name("Navigation path " + i);
     ++i;
@@ -93,8 +92,7 @@ class NavigationLaneTest : public testing::Test {
   virtual void SetUp() {
     vehicle_state_provider_ = std::make_shared<VehicleStateProvider>();
     RelativeMapConfig config;
-    EXPECT_TRUE(cyber::common::GetProtoFromFile(
-        FLAGS_relative_map_config_filename, &config));
+    EXPECT_TRUE(cyber::common::GetProtoFromFile(FLAGS_relative_map_config_filename, &config));
 
     navigation_lane_.SetConfig(config.navigation_lane());
     navigation_lane_.SetVehicleStateProvider(vehicle_state_provider_.get());
@@ -105,28 +103,26 @@ class NavigationLaneTest : public testing::Test {
     data_file_dir_ = "modules/map/relative_map/testdata/multi_lane_map/";
 
     localization::LocalizationEstimate localization;
-    canbus::Chassis chassis;
-    EXPECT_TRUE(cyber::common::GetProtoFromFile(
-        data_file_dir_ + "localization_info.pb.txt", &localization));
-    EXPECT_TRUE(cyber::common::GetProtoFromFile(
-        data_file_dir_ + "chassis_info.pb.txt", &chassis));
+    canbus::Chassis                    chassis;
+    EXPECT_TRUE(cyber::common::GetProtoFromFile(data_file_dir_ + "localization_info.pb.txt",
+                                                &localization));
+    EXPECT_TRUE(cyber::common::GetProtoFromFile(data_file_dir_ + "chassis_info.pb.txt", &chassis));
 
     vehicle_state_provider_->Update(localization, chassis);
   }
 
  protected:
-  NavigationLane navigation_lane_;
-  NavigationInfo navigation_info_;
-  MapGenerationParam map_param_;
-  std::vector<std::string> navigation_line_filenames_;
-  std::string data_file_dir_;
+  NavigationLane                        navigation_lane_;
+  NavigationInfo                        navigation_info_;
+  MapGenerationParam                    map_param_;
+  std::vector<std::string>              navigation_line_filenames_;
+  std::string                           data_file_dir_;
   std::shared_ptr<VehicleStateProvider> vehicle_state_provider_ = nullptr;
 };
 
 TEST_F(NavigationLaneTest, GenerateOneLaneMap) {
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
-  EXPECT_TRUE(
-      GenerateNavigationInfo(navigation_line_filenames_, &navigation_info_));
+  EXPECT_TRUE(GenerateNavigationInfo(navigation_line_filenames_, &navigation_info_));
   navigation_lane_.UpdateNavigationInfo(navigation_info_);
   EXPECT_TRUE(navigation_lane_.GeneratePath());
   EXPECT_GT(navigation_lane_.Path().path().path_point_size(), 0);
@@ -147,8 +143,7 @@ TEST_F(NavigationLaneTest, GenerateOneLaneMap) {
 TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "right.smoothed");
-  EXPECT_TRUE(
-      GenerateNavigationInfo(navigation_line_filenames_, &navigation_info_));
+  EXPECT_TRUE(GenerateNavigationInfo(navigation_line_filenames_, &navigation_info_));
   navigation_lane_.UpdateNavigationInfo(navigation_info_);
   EXPECT_TRUE(navigation_lane_.GeneratePath());
   EXPECT_GT(navigation_lane_.Path().path().path_point_size(), 0);
@@ -157,8 +152,8 @@ TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
   EXPECT_EQ(2, map_msg.hdmap().lane_size());
 
-  for (auto iter = map_msg.navigation_path().begin();
-       iter != map_msg.navigation_path().end(); ++iter) {
+  for (auto iter = map_msg.navigation_path().begin(); iter != map_msg.navigation_path().end();
+       ++iter) {
     const auto& path = iter->second.path();
     switch (iter->second.path_priority()) {
       case 0:
@@ -175,8 +170,7 @@ TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
             << "Path 1: actual y: " << path.path_point(0).y();
         break;
 
-      default:
-        FAIL() << "We shouldn't get here.";
+      default: FAIL() << "We shouldn't get here.";
     }
   }
 }
@@ -185,8 +179,7 @@ TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "middle.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "right.smoothed");
-  EXPECT_TRUE(
-      GenerateNavigationInfo(navigation_line_filenames_, &navigation_info_));
+  EXPECT_TRUE(GenerateNavigationInfo(navigation_line_filenames_, &navigation_info_));
   navigation_lane_.UpdateNavigationInfo(navigation_info_);
   EXPECT_TRUE(navigation_lane_.GeneratePath());
   EXPECT_GT(navigation_lane_.Path().path().path_point_size(), 0);
@@ -195,8 +188,8 @@ TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
   EXPECT_EQ(3, map_msg.hdmap().lane_size());
 
-  for (auto iter = map_msg.navigation_path().begin();
-       iter != map_msg.navigation_path().end(); ++iter) {
+  for (auto iter = map_msg.navigation_path().begin(); iter != map_msg.navigation_path().end();
+       ++iter) {
     const auto& path = iter->second.path();
     switch (iter->second.path_priority()) {
       case 0:
@@ -220,8 +213,7 @@ TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
             << "Path 2: actual y: " << path.path_point(0).y();
         break;
 
-      default:
-        FAIL() << "We shouldn't get here.";
+      default: FAIL() << "We shouldn't get here.";
     }
   }
 }

@@ -16,6 +16,7 @@
 #include "modules/control/control_component.h"
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
@@ -39,13 +40,12 @@ ControlComponent::ControlComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 bool ControlComponent::Init() {
-  injector_ = std::make_shared<DependencyInjector>();
+  injector_  = std::make_shared<DependencyInjector>();
   init_time_ = Clock::Now();
 
   AINFO << "Control init, starting ...";
 
-  ACHECK(
-      cyber::common::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
@@ -54,8 +54,7 @@ bool ControlComponent::Init() {
 
   // initial controller agent when not using control submodules
   ADEBUG << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
-  if (!FLAGS_use_control_submodules &&
-      !controller_agent_.Init(injector_, &control_conf_).ok()) {
+  if (!FLAGS_use_control_submodules && !controller_agent_.Init(injector_, &control_conf_).ok()) {
     // set controller
     ADEBUG << "original control";
     monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
@@ -63,45 +62,39 @@ bool ControlComponent::Init() {
   }
 
   cyber::ReaderConfig chassis_reader_config;
-  chassis_reader_config.channel_name = FLAGS_chassis_topic;
+  chassis_reader_config.channel_name       = FLAGS_chassis_topic;
   chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
 
-  chassis_reader_ =
-      node_->CreateReader<Chassis>(chassis_reader_config, nullptr);
+  chassis_reader_ = node_->CreateReader<Chassis>(chassis_reader_config, nullptr);
   ACHECK(chassis_reader_ != nullptr);
 
   cyber::ReaderConfig planning_reader_config;
-  planning_reader_config.channel_name = FLAGS_planning_trajectory_topic;
+  planning_reader_config.channel_name       = FLAGS_planning_trajectory_topic;
   planning_reader_config.pending_queue_size = FLAGS_planning_pending_queue_size;
 
-  trajectory_reader_ =
-      node_->CreateReader<ADCTrajectory>(planning_reader_config, nullptr);
+  trajectory_reader_ = node_->CreateReader<ADCTrajectory>(planning_reader_config, nullptr);
   ACHECK(trajectory_reader_ != nullptr);
 
   cyber::ReaderConfig localization_reader_config;
-  localization_reader_config.channel_name = FLAGS_localization_topic;
-  localization_reader_config.pending_queue_size =
-      FLAGS_localization_pending_queue_size;
+  localization_reader_config.channel_name       = FLAGS_localization_topic;
+  localization_reader_config.pending_queue_size = FLAGS_localization_pending_queue_size;
 
-  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      localization_reader_config, nullptr);
+  localization_reader_ =
+      node_->CreateReader<LocalizationEstimate>(localization_reader_config, nullptr);
   ACHECK(localization_reader_ != nullptr);
 
   cyber::ReaderConfig pad_msg_reader_config;
-  pad_msg_reader_config.channel_name = FLAGS_pad_topic;
+  pad_msg_reader_config.channel_name       = FLAGS_pad_topic;
   pad_msg_reader_config.pending_queue_size = FLAGS_pad_msg_pending_queue_size;
 
-  pad_msg_reader_ =
-      node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
+  pad_msg_reader_ = node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
   ACHECK(pad_msg_reader_ != nullptr);
 
   if (!FLAGS_use_control_submodules) {
-    control_cmd_writer_ =
-        node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+    control_cmd_writer_ = node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
     ACHECK(control_cmd_writer_ != nullptr);
   } else {
-    local_view_writer_ =
-        node_->CreateWriter<LocalView>(FLAGS_control_local_view_topic);
+    local_view_writer_ = node_->CreateWriter<LocalView>(FLAGS_control_local_view_topic);
     ACHECK(local_view_writer_ != nullptr);
   }
 
@@ -114,43 +107,39 @@ bool ControlComponent::Init() {
   // should init_vehicle first, let car enter work status, then use status msg
   // trigger control
 
-  AINFO << "Control default driving action is "
-        << DrivingAction_Name(control_conf_.action());
+  AINFO << "Control default driving action is " << DrivingAction_Name(control_conf_.action());
   pad_msg_.set_action(control_conf_.action());
 
   return true;
 }
 
-void ControlComponent::OnPad(const std::shared_ptr<PadMessage> &pad) {
+void ControlComponent::OnPad(const std::shared_ptr<PadMessage>& pad) {
   std::lock_guard<std::mutex> lock(mutex_);
   pad_msg_.CopyFrom(*pad);
   ADEBUG << "Received Pad Msg:" << pad_msg_.DebugString();
   AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
 }
 
-void ControlComponent::OnChassis(const std::shared_ptr<Chassis> &chassis) {
+void ControlComponent::OnChassis(const std::shared_ptr<Chassis>& chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";
   std::lock_guard<std::mutex> lock(mutex_);
   latest_chassis_.CopyFrom(*chassis);
 }
 
-void ControlComponent::OnPlanning(
-    const std::shared_ptr<ADCTrajectory> &trajectory) {
+void ControlComponent::OnPlanning(const std::shared_ptr<ADCTrajectory>& trajectory) {
   ADEBUG << "Received chassis data: run trajectory callback.";
   std::lock_guard<std::mutex> lock(mutex_);
   latest_trajectory_.CopyFrom(*trajectory);
 }
 
-void ControlComponent::OnLocalization(
-    const std::shared_ptr<LocalizationEstimate> &localization) {
+void ControlComponent::OnLocalization(const std::shared_ptr<LocalizationEstimate>& localization) {
   ADEBUG << "Received control data: run localization message callback.";
   std::lock_guard<std::mutex> lock(mutex_);
   latest_localization_.CopyFrom(*localization);
 }
 
-void ControlComponent::OnMonitor(
-    const common::monitor::MonitorMessage &monitor_message) {
-  for (const auto &item : monitor_message.item()) {
+void ControlComponent::OnMonitor(const common::monitor::MonitorMessage& monitor_message) {
+  for (const auto& item : monitor_message.item()) {
     if (item.log_level() == common::monitor::MonitorMessageItem::FATAL) {
       estop_ = true;
       return;
@@ -158,19 +147,16 @@ void ControlComponent::OnMonitor(
   }
 }
 
-Status ControlComponent::ProduceControlCommand(
-    ControlCommand *control_command) {
+Status ControlComponent::ProduceControlCommand(ControlCommand* control_command) {
   Status status = CheckInput(&local_view_);
   // check data
 
   if (!status.ok()) {
-    AERROR_EVERY(100) << "Control input data failed: "
-                      << status.error_message();
+    AERROR_EVERY(100) << "Control input data failed: " << status.error_message();
     control_command->mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    control_command->mutable_engage_advice()->set_reason(
-        status.error_message());
-    estop_ = true;
+    control_command->mutable_engage_advice()->set_reason(status.error_message());
+    estop_        = true;
     estop_reason_ = status.error_message();
   } else {
     Status status_ts = CheckTimestamp(local_view_);
@@ -178,12 +164,10 @@ Status ControlComponent::ProduceControlCommand(
       AERROR << "Input messages timeout";
       // estop_ = true;
       status = status_ts;
-      if (local_view_.chassis().driving_mode() !=
-          apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+      if (local_view_.chassis().driving_mode() != apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
         control_command->mutable_engage_advice()->set_advice(
             apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-        control_command->mutable_engage_advice()->set_reason(
-            status.error_message());
+        control_command->mutable_engage_advice()->set_reason(status.error_message());
       }
     } else {
       control_command->mutable_engage_advice()->set_advice(
@@ -192,29 +176,29 @@ Status ControlComponent::ProduceControlCommand(
   }
 
   // check estop
-  estop_ = control_conf_.enable_persistent_estop()
-               ? estop_ || local_view_.trajectory().estop().is_estop()
-               : local_view_.trajectory().estop().is_estop();
+  estop_ = control_conf_.enable_persistent_estop() ?
+               estop_ || local_view_.trajectory().estop().is_estop() :
+               local_view_.trajectory().estop().is_estop();
 
   if (local_view_.trajectory().estop().is_estop()) {
-    estop_ = true;
+    estop_        = true;
     estop_reason_ = "estop from planning : ";
     estop_reason_ += local_view_.trajectory().estop().reason();
   }
 
   if (local_view_.trajectory().trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
-    estop_ = true;
+    estop_        = true;
     estop_reason_ = "estop for empty planning trajectory, planning headers: " +
                     local_view_.trajectory().header().ShortDebugString();
   }
 
   if (FLAGS_enable_gear_drive_negative_speed_protection) {
-    const double kEpsilon = 0.001;
-    auto first_trajectory_point = local_view_.trajectory().trajectory_point(0);
+    const double kEpsilon               = 0.001;
+    auto         first_trajectory_point = local_view_.trajectory().trajectory_point(0);
     if (local_view_.chassis().gear_location() == Chassis::GEAR_DRIVE &&
         first_trajectory_point.v() < -1 * kEpsilon) {
-      estop_ = true;
+      estop_        = true;
       estop_reason_ = "estop for negative speed when gear_drive";
     }
   }
@@ -226,37 +210,32 @@ Status ControlComponent::ProduceControlCommand(
     }
 
     auto debug = control_command->mutable_debug()->mutable_input_debug();
-    debug->mutable_localization_header()->CopyFrom(
-        local_view_.localization().header());
+    debug->mutable_localization_header()->CopyFrom(local_view_.localization().header());
     debug->mutable_canbus_header()->CopyFrom(local_view_.chassis().header());
-    debug->mutable_trajectory_header()->CopyFrom(
-        local_view_.trajectory().header());
+    debug->mutable_trajectory_header()->CopyFrom(local_view_.trajectory().header());
 
     if (local_view_.trajectory().is_replan()) {
       latest_replan_trajectory_header_ = local_view_.trajectory().header();
     }
 
     if (latest_replan_trajectory_header_.has_sequence_num()) {
-      debug->mutable_latest_replan_trajectory_header()->CopyFrom(
-          latest_replan_trajectory_header_);
+      debug->mutable_latest_replan_trajectory_header()->CopyFrom(latest_replan_trajectory_header_);
     }
     // controller agent
-    Status status_compute = controller_agent_.ComputeControlCommand(
-        &local_view_.localization(), &local_view_.chassis(),
-        &local_view_.trajectory(), control_command);
+    Status status_compute =
+        controller_agent_.ComputeControlCommand(&local_view_.localization(), &local_view_.chassis(),
+                                                &local_view_.trajectory(), control_command);
 
     if (!status_compute.ok()) {
       AERROR << "Control main function failed"
-             << " with localization: "
-             << local_view_.localization().ShortDebugString()
+             << " with localization: " << local_view_.localization().ShortDebugString()
              << " with chassis: " << local_view_.chassis().ShortDebugString()
-             << " with trajectory: "
-             << local_view_.trajectory().ShortDebugString()
+             << " with trajectory: " << local_view_.trajectory().ShortDebugString()
              << " with cmd: " << control_command->ShortDebugString()
              << " status:" << status_compute.error_message();
-      estop_ = true;
+      estop_        = true;
       estop_reason_ = status_compute.error_message();
-      status = status_compute;
+      status        = status_compute;
     }
   }
   // if planning set estop, then no control process triggered
@@ -280,7 +259,7 @@ bool ControlComponent::Proc() {
   const auto start_time = Clock::Now();
 
   chassis_reader_->Observe();
-  const auto &chassis_msg = chassis_reader_->GetLatestObserved();
+  const auto& chassis_msg = chassis_reader_->GetLatestObserved();
   if (chassis_msg == nullptr) {
     AERROR << "Chassis msg is not ready!";
     return false;
@@ -289,7 +268,7 @@ bool ControlComponent::Proc() {
   OnChassis(chassis_msg);
 
   trajectory_reader_->Observe();
-  const auto &trajectory_msg = trajectory_reader_->GetLatestObserved();
+  const auto& trajectory_msg = trajectory_reader_->GetLatestObserved();
   if (trajectory_msg == nullptr) {
     AERROR << "planning msg is not ready!";
     return false;
@@ -297,7 +276,7 @@ bool ControlComponent::Proc() {
   OnPlanning(trajectory_msg);
 
   localization_reader_->Observe();
-  const auto &localization_msg = localization_reader_->GetLatestObserved();
+  const auto& localization_msg = localization_reader_->GetLatestObserved();
   if (localization_msg == nullptr) {
     AERROR << "localization msg is not ready!";
     return false;
@@ -305,10 +284,8 @@ bool ControlComponent::Proc() {
   OnLocalization(localization_msg);
 
   pad_msg_reader_->Observe();
-  const auto &pad_msg = pad_msg_reader_->GetLatestObserved();
-  if (pad_msg != nullptr) {
-    OnPad(pad_msg);
-  }
+  const auto& pad_msg = pad_msg_reader_->GetLatestObserved();
+  if (pad_msg != nullptr) { OnPad(pad_msg); }
 
   {
     // TODO(SHU): to avoid redundent copy
@@ -316,9 +293,7 @@ bool ControlComponent::Proc() {
     local_view_.mutable_chassis()->CopyFrom(latest_chassis_);
     local_view_.mutable_trajectory()->CopyFrom(latest_trajectory_);
     local_view_.mutable_localization()->CopyFrom(latest_localization_);
-    if (pad_msg != nullptr) {
-      local_view_.mutable_pad_msg()->CopyFrom(pad_msg_);
-    }
+    if (pad_msg != nullptr) { local_view_.mutable_pad_msg()->CopyFrom(pad_msg_); }
   }
 
   // use control submodules
@@ -334,11 +309,9 @@ bool ControlComponent::Proc() {
     const auto end_time = Clock::Now();
 
     // measure latency
-    static apollo::common::LatencyRecorder latency_recorder(
-        FLAGS_control_local_view_topic);
-    latency_recorder.AppendLatencyRecord(
-        local_view_.trajectory().header().lidar_timestamp(), start_time,
-        end_time);
+    static apollo::common::LatencyRecorder latency_recorder(FLAGS_control_local_view_topic);
+    latency_recorder.AppendLatencyRecord(local_view_.trajectory().header().lidar_timestamp(),
+                                         start_time, end_time);
 
     local_view_writer_->Write(local_view_);
     return true;
@@ -354,10 +327,8 @@ bool ControlComponent::Proc() {
     pad_received_ = true;
   }
 
-  if (control_conf_.is_control_test_mode() &&
-      control_conf_.control_test_duration() > 0 &&
-      (start_time - init_time_).ToSecond() >
-          control_conf_.control_test_duration()) {
+  if (control_conf_.is_control_test_mode() && control_conf_.control_test_duration() > 0 &&
+      (start_time - init_time_).ToSecond() > control_conf_.control_test_duration()) {
     AERROR << "Control finished testing. exit";
     return false;
   }
@@ -365,8 +336,7 @@ bool ControlComponent::Proc() {
   ControlCommand control_command;
 
   Status status = ProduceControlCommand(&control_command);
-  AERROR_IF(!status.ok()) << "Failed to produce control command:"
-                          << status.error_message();
+  AERROR_IF(!status.ok()) << "Failed to produce control command:" << status.error_message();
 
   if (pad_received_) {
     control_command.mutable_pad_msg()->CopyFrom(pad_msg_);
@@ -374,9 +344,7 @@ bool ControlComponent::Proc() {
   }
 
   // forward estop reason among following control frames.
-  if (estop_) {
-    control_command.mutable_header()->mutable_status()->set_msg(estop_reason_);
-  }
+  if (estop_) { control_command.mutable_header()->mutable_status()->set_msg(estop_reason_); }
 
   // set header
   control_command.mutable_header()->set_lidar_timestamp(
@@ -394,7 +362,7 @@ bool ControlComponent::Proc() {
     return true;
   }
 
-  const auto end_time = Clock::Now();
+  const auto   end_time     = Clock::Now();
   const double time_diff_ms = (end_time - start_time).ToSecond() * 1e3;
   ADEBUG << "total control time spend: " << time_diff_ms << " ms.";
 
@@ -406,81 +374,65 @@ bool ControlComponent::Proc() {
 
   // measure latency
   if (local_view_.trajectory().header().has_lidar_timestamp()) {
-    static apollo::common::LatencyRecorder latency_recorder(
-        FLAGS_control_command_topic);
-    latency_recorder.AppendLatencyRecord(
-        local_view_.trajectory().header().lidar_timestamp(), start_time,
-        end_time);
+    static apollo::common::LatencyRecorder latency_recorder(FLAGS_control_command_topic);
+    latency_recorder.AppendLatencyRecord(local_view_.trajectory().header().lidar_timestamp(),
+                                         start_time, end_time);
   }
 
   control_cmd_writer_->Write(control_command);
   return true;
 }
 
-Status ControlComponent::CheckInput(LocalView *local_view) {
-  ADEBUG << "Received localization:"
-         << local_view->localization().ShortDebugString();
+Status ControlComponent::CheckInput(LocalView* local_view) {
+  ADEBUG << "Received localization:" << local_view->localization().ShortDebugString();
   ADEBUG << "Received chassis:" << local_view->chassis().ShortDebugString();
 
   if (!local_view->trajectory().estop().is_estop() &&
       local_view->trajectory().trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
-    const std::string msg =
-        absl::StrCat("planning has no trajectory point. planning_seq_num:",
-                     local_view->trajectory().header().sequence_num());
+    const std::string msg = absl::StrCat("planning has no trajectory point. planning_seq_num:",
+                                         local_view->trajectory().header().sequence_num());
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, msg);
   }
 
-  for (auto &trajectory_point :
-       *local_view->mutable_trajectory()->mutable_trajectory_point()) {
-    if (std::abs(trajectory_point.v()) <
-            control_conf_.minimum_speed_resolution() &&
-        std::abs(trajectory_point.a()) <
-            control_conf_.max_acceleration_when_stopped()) {
+  for (auto& trajectory_point : *local_view->mutable_trajectory()->mutable_trajectory_point()) {
+    if (std::abs(trajectory_point.v()) < control_conf_.minimum_speed_resolution() &&
+        std::abs(trajectory_point.a()) < control_conf_.max_acceleration_when_stopped()) {
       trajectory_point.set_v(0.0);
       trajectory_point.set_a(0.0);
     }
   }
 
-  injector_->vehicle_state()->Update(local_view->localization(),
-                                     local_view->chassis());
+  injector_->vehicle_state()->Update(local_view->localization(), local_view->chassis());
 
   return Status::OK();
 }
 
-Status ControlComponent::CheckTimestamp(const LocalView &local_view) {
-  if (!control_conf_.enable_input_timestamp_check() ||
-      control_conf_.is_control_test_mode()) {
+Status ControlComponent::CheckTimestamp(const LocalView& local_view) {
+  if (!control_conf_.enable_input_timestamp_check() || control_conf_.is_control_test_mode()) {
     ADEBUG << "Skip input timestamp check by gflags.";
     return Status::OK();
   }
   double current_timestamp = Clock::NowInSeconds();
-  double localization_diff =
-      current_timestamp - local_view.localization().header().timestamp_sec();
-  if (localization_diff > (control_conf_.max_localization_miss_num() *
-                           control_conf_.localization_period())) {
-    AERROR << "Localization msg lost for " << std::setprecision(6)
-           << localization_diff << "s";
+  double localization_diff = current_timestamp - local_view.localization().header().timestamp_sec();
+  if (localization_diff >
+      (control_conf_.max_localization_miss_num() * control_conf_.localization_period())) {
+    AERROR << "Localization msg lost for " << std::setprecision(6) << localization_diff << "s";
     monitor_logger_buffer_.ERROR("Localization msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
 
-  double chassis_diff =
-      current_timestamp - local_view.chassis().header().timestamp_sec();
-  if (chassis_diff >
-      (control_conf_.max_chassis_miss_num() * control_conf_.chassis_period())) {
-    AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
-           << "s";
+  double chassis_diff = current_timestamp - local_view.chassis().header().timestamp_sec();
+  if (chassis_diff > (control_conf_.max_chassis_miss_num() * control_conf_.chassis_period())) {
+    AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff << "s";
     monitor_logger_buffer_.ERROR("Chassis msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
   }
 
-  double trajectory_diff =
-      current_timestamp - local_view.trajectory().header().timestamp_sec();
-  if (trajectory_diff > (control_conf_.max_planning_miss_num() *
-                         control_conf_.trajectory_period())) {
-    AERROR << "Trajectory msg lost for " << std::setprecision(6)
-           << trajectory_diff << "s";
+  double trajectory_diff = current_timestamp - local_view.trajectory().header().timestamp_sec();
+  if (trajectory_diff >
+      (control_conf_.max_planning_miss_num() * control_conf_.trajectory_period())) {
+    AERROR << "Trajectory msg lost for " << std::setprecision(6) << trajectory_diff << "s";
     monitor_logger_buffer_.ERROR("Trajectory msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
   }

@@ -88,29 +88,29 @@ enum KeyCode {
   KEY_LOWER_Z = 122,
 
   // Arrows
-  KEY_LEFT = 65361,
-  KEY_UP = 65362,
-  KEY_RIGHT = 65363,
-  KEY_DOWN = 65364,
-  KEY_SHIFT_LEFT = 130897,
+  KEY_LEFT        = 65361,
+  KEY_UP          = 65362,
+  KEY_RIGHT       = 65363,
+  KEY_DOWN        = 65364,
+  KEY_SHIFT_LEFT  = 130897,
   KEY_SHIFT_RIGHT = 130899,
 
   // Combination with Shift and Control keys
   KEY_CTRL_S = 262259,
-  KEY_ALT_C = 524387,
+  KEY_ALT_C  = 524387,
 
   // Num Lock is on
   // Arrows
-  KEY_LEFT_NUM_LOCK_ON = 1113937,
-  KEY_UP_NUM_LOCK_ON = 1113938,
-  KEY_RIGHT_NUM_LOCK_ON = 1113939,
-  KEY_DOWN_NUM_LOCK_ON = 1113940,
-  KEY_SHIFT_LEFT_NUM_LOCK_ON = 1179475,
+  KEY_LEFT_NUM_LOCK_ON        = 1113937,
+  KEY_UP_NUM_LOCK_ON          = 1113938,
+  KEY_RIGHT_NUM_LOCK_ON       = 1113939,
+  KEY_DOWN_NUM_LOCK_ON        = 1113940,
+  KEY_SHIFT_LEFT_NUM_LOCK_ON  = 1179475,
   KEY_SHIFT_RIGHT_NUM_LOCK_ON = 1179473,
 
   // Combination with Shift and Control keys
   KEY_CTRL_S_NUM_LOCK_ON = 1310835,
-  KEY_ALT_C_NUM_LOCK_ON = 1572963,
+  KEY_ALT_C_NUM_LOCK_ON  = 1572963,
 };  // enum KeyCode
 }  // namespace perception
 }  // namespace apollo

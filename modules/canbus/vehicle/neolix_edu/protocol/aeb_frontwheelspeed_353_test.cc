@@ -16,9 +16,10 @@
 
 #include "modules/canbus/vehicle/neolix_edu/protocol/aeb_frontwheelspeed_353.h"
 
+#include "gtest/gtest.h"
+
 #include "glog/logging.h"
 
-#include "gtest/gtest.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
@@ -31,9 +32,9 @@ class Aebfrontwheelspeed353Test : public ::testing::Test {
 };
 
 TEST_F(Aebfrontwheelspeed353Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t               data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  int32_t               length  = 8;
+  ChassisDetail         cd;
   Aebfrontwheelspeed353 accel_cmd;
   accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b01100111);
@@ -45,21 +46,15 @@ TEST_F(Aebfrontwheelspeed353Test, reset) {
   EXPECT_EQ(data[6], 0b01010011);
   EXPECT_EQ(data[7], 0b01010100);
 
-  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclespeedvalid(),
-            false);
-  EXPECT_DOUBLE_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclespeed(),
-                   106.3125);
+  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclespeedvalid(), false);
+  EXPECT_DOUBLE_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclespeed(), 106.3125);
   EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclerealdirect(), 3);
-  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fl_valid(),
-            false);
+  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fl_valid(), false);
   EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fl(), 254.44);
-  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fr_valid(),
-            false);
+  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fr_valid(), false);
   EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fr(), 208.18);
-  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fl_direct(),
-            1);
-  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fr_direct(),
-            1);
+  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fl_direct(), 1);
+  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fr_direct(), 1);
 }
 
 }  // namespace neolix_edu

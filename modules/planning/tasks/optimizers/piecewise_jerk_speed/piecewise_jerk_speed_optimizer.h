@@ -32,9 +32,9 @@ class PiecewiseJerkSpeedOptimizer : public SpeedOptimizer {
   virtual ~PiecewiseJerkSpeedOptimizer() = default;
 
  private:
-  common::Status Process(const PathData& path_data,
+  common::Status Process(const PathData&                path_data,
                          const common::TrajectoryPoint& init_point,
-                         SpeedData* const speed_data) override;
+                         SpeedData* const               speed_data) override;
 };
 
 }  // namespace planning

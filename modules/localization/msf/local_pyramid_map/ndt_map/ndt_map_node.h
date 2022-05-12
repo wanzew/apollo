@@ -34,26 +34,23 @@ class NdtMapNode : public BaseMapNode {
   ~NdtMapNode();
 
   void Init(const BaseMapConfig* map_config);
-  void Init(const BaseMapConfig* map_config, const MapNodeIndex& index,
-            bool create_map_cells = true);
+  void
+  Init(const BaseMapConfig* map_config, const MapNodeIndex& index, bool create_map_cells = true);
 
   /**@brief Get the resolution of this map nodex. */
   inline float GetMapResolutionZ() const {
-    return static_cast<const NdtMapConfig*>(map_config_)
-        ->map_resolutions_z_[index_.resolution_id_];
+    return static_cast<const NdtMapConfig*>(map_config_)->map_resolutions_z_[index_.resolution_id_];
   }
 
   /**@brief Given the local x, y, altitude index,
    * return the global coordinate.
    */
-  Eigen::Vector3d GetCoordinate3D(unsigned int x, unsigned int y,
-                                  int altitude_index) const;
+  Eigen::Vector3d GetCoordinate3D(unsigned int x, unsigned int y, int altitude_index) const;
 
   /**@brief Given the local x, y, altitude index,
    * return the global coordinate.
    */
-  Eigen::Vector3d GetCoordinateCenter3D(unsigned int x, unsigned int y,
-                                        int altitude_index) const;
+  Eigen::Vector3d GetCoordinateCenter3D(unsigned int x, unsigned int y, int altitude_index) const;
 
   /**@brief Combine two map nodes (Reduce operation in mapreduce).
    * The result is saved in map_node. */

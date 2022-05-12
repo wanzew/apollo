@@ -33,16 +33,11 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
   CHECK_NOTNULL(frame);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "TrafficLightProtectedStageIntersectionCruise plan error";
-  }
+  if (!plan_ok) { AERROR << "TrafficLightProtectedStageIntersectionCruise plan error"; }
 
-  bool stage_done =
-      stage_impl_.CheckDone(*frame, ScenarioConfig::TRAFFIC_LIGHT_PROTECTED,
-                            config_, injector_->planning_context(), true);
-  if (stage_done) {
-    return FinishStage();
-  }
+  bool stage_done = stage_impl_.CheckDone(*frame, ScenarioConfig::TRAFFIC_LIGHT_PROTECTED, config_,
+                                          injector_->planning_context(), true);
+  if (stage_done) { return FinishStage(); }
   return Stage::RUNNING;
 }
 

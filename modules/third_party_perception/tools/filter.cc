@@ -32,17 +32,10 @@ namespace third_party_perception {
 namespace filter {
 
 bool IsPreserved(const RadarObstacle& radar_obstacle) {
-  if (!radar_obstacle.movable()) {
-    return false;
-  }
-  double nearest_l =
-      GetLateralDistanceToNearestLane(radar_obstacle.absolute_position());
-  if (std::abs(nearest_l) > FLAGS_filter_y_distance) {
-    return false;
-  }
-  if (radar_obstacle.count() < FLAGS_keep_radar_frames) {
-    return false;
-  }
+  if (!radar_obstacle.movable()) { return false; }
+  double nearest_l = GetLateralDistanceToNearestLane(radar_obstacle.absolute_position());
+  if (std::abs(nearest_l) > FLAGS_filter_y_distance) { return false; }
+  if (radar_obstacle.count() < FLAGS_keep_radar_frames) { return false; }
   return true;
 }
 

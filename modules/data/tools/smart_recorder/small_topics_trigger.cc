@@ -20,22 +20,16 @@
 #include <string>
 
 #include "cyber/common/log.h"
-
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 
 namespace apollo {
 namespace data {
 
-SmallTopicsTrigger::SmallTopicsTrigger() {
-  trigger_name_ = "SmallTopicsTrigger";
-}
+SmallTopicsTrigger::SmallTopicsTrigger() { trigger_name_ = "SmallTopicsTrigger"; }
 
-bool SmallTopicsTrigger::ShouldRestore(
-    const cyber::record::RecordMessage& msg) const {
-  const std::set<std::string>& small_channels =
-      ChannelPool::Instance()->GetSmallChannels();
-  return trigger_obj_->enabled() &&
-         small_channels.find(msg.channel_name) != small_channels.end();
+bool SmallTopicsTrigger::ShouldRestore(const cyber::record::RecordMessage& msg) const {
+  const std::set<std::string>& small_channels = ChannelPool::Instance()->GetSmallChannels();
+  return trigger_obj_->enabled() && small_channels.find(msg.channel_name) != small_channels.end();
 }
 
 }  // namespace data

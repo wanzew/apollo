@@ -20,6 +20,7 @@
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -27,19 +28,16 @@ namespace planning {
 
 class OpenSpaceFallbackDeciderTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    config_.set_task_type(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER);
-  }
+  virtual void SetUp() { config_.set_task_type(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER); }
 
  protected:
   TaskConfig config_;
 };
 
 TEST_F(OpenSpaceFallbackDeciderTest, Init) {
-  auto injector = std::make_shared<DependencyInjector>();
+  auto                     injector = std::make_shared<DependencyInjector>();
   OpenSpaceFallbackDecider open_space_fallback_decider(config_, injector);
-  EXPECT_EQ(open_space_fallback_decider.Name(),
-            TaskConfig::TaskType_Name(config_.task_type()));
+  EXPECT_EQ(open_space_fallback_decider.Name(), TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 }  // namespace planning

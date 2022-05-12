@@ -18,9 +18,8 @@
 #include <string>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -36,15 +35,13 @@ class BaseLandmarkDetector {
 
   virtual ~BaseLandmarkDetector() = default;
 
-  virtual bool Init(const LandmarkDetectorInitOptions& options =
-                        LandmarkDetectorInitOptions()) = 0;
+  virtual bool Init(const LandmarkDetectorInitOptions& options = LandmarkDetectorInitOptions()) = 0;
 
   // @brief: detect landmark from image.
   // @param [in]: options
   // @param [in/out]: frame
   // landmark type and 2D bbox should be filled, required,
-  virtual bool Detect(const LandmarkDetectorOptions& options,
-                      CameraFrame* frame) = 0;
+  virtual bool Detect(const LandmarkDetectorOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -53,8 +50,7 @@ class BaseLandmarkDetector {
 };  // class BaseLandmarkDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseLandmarkDetector);
-#define REGISTER_LANDMARK_DETECTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseLandmarkDetector, name)
+#define REGISTER_LANDMARK_DETECTOR(name) PERCEPTION_REGISTER_CLASS(BaseLandmarkDetector, name)
 
 }  // namespace camera
 }  // namespace perception

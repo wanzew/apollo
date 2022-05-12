@@ -39,54 +39,45 @@ MPCControllerSubmodule::MPCControllerSubmodule()
 
 MPCControllerSubmodule::~MPCControllerSubmodule() {}
 
-std::string MPCControllerSubmodule::Name() const {
-  return FLAGS_mpc_controller_submodule_name;
-}
+std::string MPCControllerSubmodule::Name() const { return FLAGS_mpc_controller_submodule_name; }
 
 bool MPCControllerSubmodule::Init() {
   injector_ = std::make_shared<DependencyInjector>();
   // TODO(SHU): separate common_control conf from controller conf
-  ACHECK(cyber::common::GetProtoFromFile(FLAGS_mpc_controller_conf_file,
-                                         &mpc_controller_conf_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_mpc_controller_conf_file, &mpc_controller_conf_))
       << "Unable to load control conf file: " << FLAGS_mpc_controller_conf_file;
 
   if (!mpc_controller_.Init(injector_, &mpc_controller_conf_).ok()) {
-    monitor_logger_buffer_.ERROR(
-        "Control init MPC controller failed! Stopping...");
+    monitor_logger_buffer_.ERROR("Control init MPC controller failed! Stopping...");
     return false;
   }
 
-  control_core_writer_ =
-      node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
+  control_core_writer_ = node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
   ACHECK(control_core_writer_ != nullptr);
   return true;
 }
 
-bool MPCControllerSubmodule::Proc(
-    const std::shared_ptr<Preprocessor>& preprocessor_status) {
+bool MPCControllerSubmodule::Proc(const std::shared_ptr<Preprocessor>& preprocessor_status) {
   const auto start_time = Clock::Now();
 
   ControlCommand control_core_command;
   // recording pad msg
   if (preprocessor_status->received_pad_msg()) {
-    control_core_command.mutable_pad_msg()->CopyFrom(
-        preprocessor_status->local_view().pad_msg());
+    control_core_command.mutable_pad_msg()->CopyFrom(preprocessor_status->local_view().pad_msg());
   }
   ADEBUG << "MPC controller submodule started ....";
 
   // skip produce control command when estop for MPC controller
   StatusPb pre_status = preprocessor_status->header().status();
   if (pre_status.error_code() != ErrorCode::OK) {
-    control_core_command.mutable_header()->mutable_status()->CopyFrom(
-        pre_status);
+    control_core_command.mutable_header()->mutable_status()->CopyFrom(pre_status);
     AERROR << "Error in preprocessor submodule.";
     return false;
   }
 
-  Status status = ProduceControlCoreCommand(preprocessor_status->local_view(),
-                                            &control_core_command);
-  AERROR_IF(!status.ok()) << "Failed to produce control command:"
-                          << status.error_message();
+  Status status =
+      ProduceControlCoreCommand(preprocessor_status->local_view(), &control_core_command);
+  AERROR_IF(!status.ok()) << "Failed to produce control command:" << status.error_message();
 
   control_core_command.mutable_header()->set_lidar_timestamp(
       preprocessor_status->header().lidar_timestamp());
@@ -98,31 +89,28 @@ bool MPCControllerSubmodule::Proc(
 
   const auto end_time = Clock::Now();
 
-  static apollo::common::LatencyRecorder latency_recorder(
-      FLAGS_control_core_command_topic);
-  latency_recorder.AppendLatencyRecord(
-      control_core_command.header().lidar_timestamp(), start_time, end_time);
+  static apollo::common::LatencyRecorder latency_recorder(FLAGS_control_core_command_topic);
+  latency_recorder.AppendLatencyRecord(control_core_command.header().lidar_timestamp(), start_time,
+                                       end_time);
 
-  control_core_command.mutable_header()->mutable_status()->set_error_code(
-      status.code());
-  control_core_command.mutable_header()->mutable_status()->set_msg(
-      status.error_message());
+  control_core_command.mutable_header()->mutable_status()->set_error_code(status.code());
+  control_core_command.mutable_header()->mutable_status()->set_msg(status.error_message());
 
   control_core_writer_->Write(control_core_command);
 
   return status.ok();
 }
 
-Status MPCControllerSubmodule::ProduceControlCoreCommand(
-    const LocalView& local_view, ControlCommand* control_core_command) {
+Status MPCControllerSubmodule::ProduceControlCoreCommand(const LocalView& local_view,
+                                                         ControlCommand*  control_core_command) {
   if (local_view.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
     mpc_controller_.Reset();
     AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
   }
 
-  Status status = mpc_controller_.ComputeControlCommand(
-      &local_view.localization(), &local_view.chassis(),
-      &local_view.trajectory(), control_core_command);
+  Status status =
+      mpc_controller_.ComputeControlCommand(&local_view.localization(), &local_view.chassis(),
+                                            &local_view.trajectory(), control_core_command);
 
   ADEBUG << "MPC controller submodule finished.";
 

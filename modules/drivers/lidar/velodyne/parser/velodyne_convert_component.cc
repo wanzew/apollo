@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/lidar/velodyne/parser/velodyne_convert_component.h"
+
 #include <memory>
 #include <string>
 #include <thread>
 
 #include "cyber/cyber.h"
-
-#include "modules/drivers/lidar/velodyne/parser/velodyne_convert_component.h"
 
 namespace apollo {
 namespace drivers {
@@ -35,8 +35,7 @@ bool VelodyneConvertComponent::Init() {
 
   conv_.reset(new Convert());
   conv_->init(velodyne_config);
-  writer_ =
-      node_->CreateWriter<PointCloud>(velodyne_config.convert_channel_name());
+  writer_ = node_->CreateWriter<PointCloud>(velodyne_config.convert_channel_name());
   point_cloud_pool_.reset(new CCObjectPool<PointCloud>(pool_size_));
   point_cloud_pool_->ConstructAll();
   for (int i = 0; i < pool_size_; i++) {
@@ -51,8 +50,7 @@ bool VelodyneConvertComponent::Init() {
   return true;
 }
 
-bool VelodyneConvertComponent::Proc(
-    const std::shared_ptr<VelodyneScan>& scan_msg) {
+bool VelodyneConvertComponent::Proc(const std::shared_ptr<VelodyneScan>& scan_msg) {
   std::shared_ptr<PointCloud> point_cloud_out = point_cloud_pool_->GetObject();
   if (point_cloud_out == nullptr) {
     AWARN << "poin cloud pool return nullptr, will be create new.";

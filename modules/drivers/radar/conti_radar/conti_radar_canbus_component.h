@@ -25,20 +25,20 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/cyber.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/radar/conti_radar/protocol/motion_input_speed_300.h"
 #include "modules/drivers/radar/conti_radar/protocol/motion_input_yawrate_301.h"
 #include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
-#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::drivers
@@ -61,26 +61,23 @@ class ContiRadarCanbusComponent : public apollo::cyber::Component<> {
   bool Init() override;
 
  private:
-  bool OnError(const std::string& error_msg);
-  void RegisterCanClients();
+  bool                      OnError(const std::string& error_msg);
+  void                      RegisterCanClients();
   apollo::common::ErrorCode ConfigureRadar();
-  bool Start();
-  void Stop();
+  bool                      Start();
+  void                      Stop();
 
-  ContiRadarConf conti_radar_conf_;
+  ContiRadarConf                                      conti_radar_conf_;
   std::shared_ptr<apollo::drivers::canbus::CanClient> can_client_;
-  apollo::drivers::canbus::CanReceiver<ContiRadar> can_receiver_;
-  std::unique_ptr<ContiRadarMessageManager> sensor_message_manager_;
-  std::shared_ptr<apollo::cyber::Writer<ContiRadar>> conti_radar_writer_;
-  std::shared_ptr<
-      apollo::cyber::Reader<apollo::localization::LocalizationEstimate>>
-      pose_reader_;
-  void PoseCallback(
-      const std::shared_ptr<apollo::localization::LocalizationEstimate>& pose);
+  apollo::drivers::canbus::CanReceiver<ContiRadar>    can_receiver_;
+  std::unique_ptr<ContiRadarMessageManager>           sensor_message_manager_;
+  std::shared_ptr<apollo::cyber::Writer<ContiRadar>>  conti_radar_writer_;
+  std::shared_ptr<apollo::cyber::Reader<apollo::localization::LocalizationEstimate>> pose_reader_;
+  void     PoseCallback(const std::shared_ptr<apollo::localization::LocalizationEstimate>& pose);
   uint64_t last_nsec_ = 0;
 
-  int64_t last_timestamp_ = 0;
-  bool start_success_ = false;
+  int64_t                                   last_timestamp_ = 0;
+  bool                                      start_success_  = false;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 

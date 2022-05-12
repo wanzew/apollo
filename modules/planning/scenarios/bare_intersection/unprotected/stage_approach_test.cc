@@ -16,9 +16,10 @@
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/stage_approach.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
@@ -28,22 +29,20 @@ namespace bare_intersection {
 class StageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(
-        ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_APPROACH);
+    config_.set_stage_type(ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_APPROACH);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StageApproachTest, Init) {
-  BareIntersectionUnprotectedStageApproach
-      bare_intersection_unprotected_stage_approach(config_, injector_);
+  BareIntersectionUnprotectedStageApproach bare_intersection_unprotected_stage_approach(config_,
+                                                                                        injector_);
   EXPECT_EQ(bare_intersection_unprotected_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_APPROACH));
+            ScenarioConfig::StageType_Name(ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_APPROACH));
 }
 
 }  // namespace bare_intersection

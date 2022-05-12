@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Turnsignalcommand113 : public ::apollo::drivers::canbus::ProtocolData<
-                                 ::apollo::canbus::ChassisDetail> {
+class Turnsignalcommand113
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -41,8 +42,8 @@ class Turnsignalcommand113 : public ::apollo::drivers::canbus::ProtocolData<
   // 'TURN_SIGNAL_CMD_RIGHT'}, 'precision': 1.0, 'len': 8, 'name':
   // 'TURN_SIGNAL_CMD', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
   // '[0|2]', 'bit': 0, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Turnsignalcommand113* set_turn_signal_cmd(
-      Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd);
+  Turnsignalcommand113*
+  set_turn_signal_cmd(Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd);
 
  private:
   // config detail: {'description': 'Lighting control(Command)', 'enum': {0:
@@ -50,9 +51,8 @@ class Turnsignalcommand113 : public ::apollo::drivers::canbus::ProtocolData<
   // 'TURN_SIGNAL_CMD_RIGHT'}, 'precision': 1.0, 'len': 8, 'name':
   // 'TURN_SIGNAL_CMD', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
   // '[0|2]', 'bit': 0, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  void set_p_turn_signal_cmd(
-      uint8_t* data,
-      Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd);
+  void set_p_turn_signal_cmd(uint8_t*                                    data,
+                             Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd);
 
  private:
   Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd_;

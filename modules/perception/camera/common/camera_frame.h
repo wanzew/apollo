@@ -36,9 +36,9 @@ struct CameraFrame {
   // frame sequence id
   int frame_id = 0;
   // data provider
-  DataProvider *data_provider = nullptr;
+  DataProvider* data_provider = nullptr;
   // calibration service
-  BaseCalibrationService *calibration_service = nullptr;
+  BaseCalibrationService* calibration_service = nullptr;
   // hdmap struct
   base::HdmapStructPtr hdmap_struct = nullptr;
   // tracker proposed objects
@@ -49,8 +49,8 @@ struct CameraFrame {
   std::vector<base::ObjectPtr> tracked_objects;
   // feature of all detected object ( num x dim)
   // detect lane mark info
-  std::vector<base::LaneLine> lane_objects;
-  std::vector<float> pred_vpt;
+  std::vector<base::LaneLine>        lane_objects;
+  std::vector<float>                 pred_vpt;
   std::shared_ptr<base::Blob<float>> track_feature_blob = nullptr;
   std::shared_ptr<base::Blob<float>> lane_detected_blob = nullptr;
   // detected traffic lights

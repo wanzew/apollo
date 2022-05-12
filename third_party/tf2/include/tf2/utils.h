@@ -15,25 +15,22 @@
 #ifndef TF2_UTILS_H
 #define TF2_UTILS_H
 
-#include <tf2/LinearMath/Transform.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Transform.h>
 #include <tf2/impl/utils.h>
 
 namespace tf2 {
 
-/** Return the yaw, pitch, roll of anything that can be converted to a tf2::Quaternion
- * The conventions are the usual ROS ones defined in tf2/LineMath/Matrix3x3.h
- * \param a the object to get data from (it represents a rotation/quaternion)
- * \param yaw yaw
- * \param pitch pitch
- * \param roll roll
+/** Return the yaw, pitch, roll of anything that can be converted to a
+ * tf2::Quaternion The conventions are the usual ROS ones defined in
+ * tf2/LineMath/Matrix3x3.h \param a the object to get data from (it represents
+ * a rotation/quaternion) \param yaw yaw \param pitch pitch \param roll roll
  */
 template <class A>
-  void getEulerYPR(const A& a, double& yaw, double& pitch, double& roll)
-  {
-    tf2::Quaternion q = impl::toQuaternion(a);
-    impl::getEulerYPR(q, yaw, pitch, roll);
-  }
+void getEulerYPR(const A& a, double& yaw, double& pitch, double& roll) {
+  tf2::Quaternion q = impl::toQuaternion(a);
+  impl::getEulerYPR(q, yaw, pitch, roll);
+}
 
 /** Return the yaw of anything that can be converted to a tf2::Quaternion
  * The conventions are the usual ROS ones defined in tf2/LineMath/Matrix3x3.h
@@ -43,25 +40,23 @@ template <class A>
  * \param yaw yaw
  */
 template <class A>
-  double getYaw(const A& a)
-  {
-    tf2::Quaternion q = impl::toQuaternion(a);
-    return impl::getYaw(q);
-  }
+double getYaw(const A& a) {
+  tf2::Quaternion q = impl::toQuaternion(a);
+  return impl::getYaw(q);
+}
 
 /** Return the identity for any type that can be converted to a tf2::Transform
  * \return an object of class A that is an identity transform
  */
 template <class A>
-  A getTransformIdentity()
-  {
-    tf2::Transform t;
-    t.setIdentity();
-    A a;
-    convert(t, a);
-    return a;
-  }
-
+A getTransformIdentity() {
+  tf2::Transform t;
+  t.setIdentity();
+  A a;
+  convert(t, a);
+  return a;
 }
 
-#endif //TF2_UTILS_H
+}  // namespace tf2
+
+#endif  // TF2_UTILS_H

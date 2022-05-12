@@ -59,7 +59,7 @@ std::vector<VisitorConfig> InitConfigs(int num) {
 
 TEST(DataVisitorTest, one_channel) {
   auto channel0 = str_hash("/channel");
-  auto dv = std::make_shared<DataVisitor<RawMessage>>(channel0, 10);
+  auto dv       = std::make_shared<DataVisitor<RawMessage>>(channel0, 10);
 
   DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg;
@@ -73,8 +73,7 @@ TEST(DataVisitorTest, one_channel) {
 }
 
 TEST(DataVisitorTest, two_channel) {
-  auto dv =
-      std::make_shared<DataVisitor<RawMessage, RawMessage>>(InitConfigs(2));
+  auto dv = std::make_shared<DataVisitor<RawMessage, RawMessage>>(InitConfigs(2));
 
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;
@@ -92,8 +91,7 @@ TEST(DataVisitorTest, two_channel) {
 }
 
 TEST(DataVisitorTest, three_channel) {
-  auto dv = std::make_shared<DataVisitor<RawMessage, RawMessage, RawMessage>>(
-      InitConfigs(3));
+  auto dv = std::make_shared<DataVisitor<RawMessage, RawMessage, RawMessage>>(InitConfigs(3));
 
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;
@@ -114,9 +112,8 @@ TEST(DataVisitorTest, three_channel) {
 }
 
 TEST(DataVisitorTest, four_channel) {
-  auto dv = std::make_shared<
-      DataVisitor<RawMessage, RawMessage, RawMessage, RawMessage>>(
-      InitConfigs(4));
+  auto dv =
+      std::make_shared<DataVisitor<RawMessage, RawMessage, RawMessage, RawMessage>>(InitConfigs(4));
 
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;

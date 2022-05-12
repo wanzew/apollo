@@ -18,30 +18,30 @@
 #define RTDBADAPTER_H
 
 #include <QObject>
-#include "satpext_global.h"
-#include "rtdbservice.h"
+
 #include "blockhandler.h"
+#include "rtdbservice.h"
+#include "satpext_global.h"
 
 namespace SATP {
-    class Protocol;
+class Protocol;
 }
 
-class SATPEXTSHARED_EXPORT RtdbSender : public RtdbService, public SATP::BlockHandler
-{
-    Q_OBJECT
-public:
-    RtdbSender(RealtimeDatabase *rtdb, SATP::Protocol *protocol, QObject *parent = nullptr);
-    virtual ~RtdbSender();
-    //override BlockHandler
-    bool handleReceiveBlock(uint32_t dataType, const char *block, int size);
-    void handleReady();
+class SATPEXTSHARED_EXPORT RtdbSender : public RtdbService, public SATP::BlockHandler {
+  Q_OBJECT
+ public:
+  RtdbSender(RealtimeDatabase* rtdb, SATP::Protocol* protocol, QObject* parent = nullptr);
+  virtual ~RtdbSender();
+  // override BlockHandler
+  bool handleReceiveBlock(uint32_t dataType, const char* block, int size);
+  void handleReady();
 
-protected:
-    void handleMessage(int type, const char *message, int size);
-    void sendRtdb();
+ protected:
+  void handleMessage(int type, const char* message, int size);
+  void sendRtdb();
 
-private:
-    SATP::Protocol *mProtocol;
+ private:
+  SATP::Protocol* mProtocol;
 };
 
-#endif // RTDBADAPTER_H
+#endif  // RTDBADAPTER_H

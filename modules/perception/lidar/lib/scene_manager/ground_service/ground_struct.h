@@ -25,21 +25,19 @@ namespace lidar {
 
 struct GroundNode {
   Eigen::Vector4f params;
-  float confidence = 0.f;
+  float           confidence = 0.f;
 };
 
 class GroundGrid {
  public:
-  GroundGrid() = default;
+  GroundGrid()  = default;
   ~GroundGrid() = default;
   GroundGrid(const GroundGrid& rhs) { *this = rhs; }
   GroundGrid& operator=(const GroundGrid& rhs) {
     rows_ = rhs.rows_;
     cols_ = rhs.cols_;
     size_ = rhs.size_;
-    if (data_.size() != rhs.data_.size()) {
-      data_.resize(rhs.data_.size());
-    }
+    if (data_.size() != rhs.data_.size()) { data_.resize(rhs.data_.size()); }
     memcpy(data_.data(), rhs.data_.data(), sizeof(GroundNode) * size_);
     nodes_.resize(rows_);
     for (int32_t i = 0; i < rows_; ++i) {
@@ -67,9 +65,7 @@ class GroundGrid {
   // @brief: whether a coordinate is in grid
   // @param [in]: row id r, col id c
   // @return: status
-  bool IsInGrid(int32_t r, int32_t c) {
-    return (r >= 0 && r < rows_ && c >= 0 && c < cols_);
-  }
+  bool IsInGrid(int32_t r, int32_t c) { return (r >= 0 && r < rows_ && c >= 0 && c < cols_); }
   // @brief: row pointer accessor
   // @param [in]: row id
   // @return: row pointer
@@ -95,11 +91,11 @@ class GroundGrid {
   int32_t size() const { return size_; }
 
  protected:
-  std::vector<GroundNode> data_;
+  std::vector<GroundNode>  data_;
   std::vector<GroundNode*> nodes_;
-  int32_t rows_ = 0;
-  int32_t cols_ = 0;
-  int32_t size_ = 0;
+  int32_t                  rows_ = 0;
+  int32_t                  cols_ = 0;
+  int32_t                  size_ = 0;
 };
 
 }  // namespace lidar

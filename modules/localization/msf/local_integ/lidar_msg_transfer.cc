@@ -27,8 +27,7 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
-                                LidarFrame *lidar_frame) {
+void LidarMsgTransfer::Transfer(const drivers::PointCloud& msg, LidarFrame* lidar_frame) {
   CHECK_NOTNULL(lidar_frame);
 
   if (msg.height() > 1 && msg.width() > 1) {
@@ -41,11 +40,9 @@ void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
         if (!std::isnan(pt3d[0])) {
           Eigen::Vector3d pt3d_tem = pt3d;
 
-          if (pt3d_tem[2] > max_height_) {
-            continue;
-          }
-          unsigned char intensity = static_cast<unsigned char>(
-              msg.point(i * msg.width() + j).intensity());
+          if (pt3d_tem[2] > max_height_) { continue; }
+          unsigned char intensity =
+              static_cast<unsigned char>(msg.point(i * msg.width() + j).intensity());
           lidar_frame->pt_xs.push_back(pt3d[0]);
           lidar_frame->pt_ys.push_back(pt3d[1]);
           lidar_frame->pt_zs.push_back(pt3d[2]);
@@ -54,8 +51,8 @@ void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
       }
     }
   } else {
-    AINFO << "Receiving un-organized-point-cloud, width " << msg.width()
-          << " height " << msg.height() << "size " << msg.point_size();
+    AINFO << "Receiving un-organized-point-cloud, width " << msg.width() << " height "
+          << msg.height() << "size " << msg.point_size();
     for (int i = 0; i < msg.point_size(); ++i) {
       Eigen::Vector3d pt3d;
       pt3d[0] = static_cast<double>(msg.point(i).x());
@@ -64,11 +61,8 @@ void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
       if (!std::isnan(pt3d[0])) {
         Eigen::Vector3d pt3d_tem = pt3d;
 
-        if (pt3d_tem[2] > max_height_) {
-          continue;
-        }
-        unsigned char intensity =
-            static_cast<unsigned char>(msg.point(i).intensity());
+        if (pt3d_tem[2] > max_height_) { continue; }
+        unsigned char intensity = static_cast<unsigned char>(msg.point(i).intensity());
         lidar_frame->pt_xs.push_back(pt3d[0]);
         lidar_frame->pt_ys.push_back(pt3d[1]);
         lidar_frame->pt_zs.push_back(pt3d[2]);
@@ -77,13 +71,11 @@ void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
     }
   }
 
-  lidar_frame->measurement_time =
-      cyber::Time(msg.measurement_time()).ToSecond();
+  lidar_frame->measurement_time = cyber::Time(msg.measurement_time()).ToSecond();
   if (FLAGS_lidar_debug_log_flag) {
     AINFO << std::setprecision(15) << "LocalLidar Debug Log: velodyne msg. "
-          << "[time:" << lidar_frame->measurement_time
-          << "][height:" << msg.height() << "][width:" << msg.width()
-          << "][point_cnt:" << msg.point_size() << "]";
+          << "[time:" << lidar_frame->measurement_time << "][height:" << msg.height()
+          << "][width:" << msg.width() << "][point_cnt:" << msg.point_size() << "]";
   }
 }
 

@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/ground_detector/ground_service_detector/ground_service_detector.h"
+
 #include <fstream>
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lidar/lib/ground_detector/ground_service_detector/ground_service_detector.h"
 
 namespace apollo {
 namespace perception {
@@ -32,9 +34,8 @@ class LidarLibGroundServiceDetectorTest : public testing::Test {
     putenv(cyber_path);
     char module_path[] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root =
-        "/apollo/modules/perception/testdata/"
-        "lidar/lib/ground_detector/ground_service_detector";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+                      "lidar/lib/ground_detector/ground_service_detector";
     FLAGS_config_manager_path = "./conf";
     lib::ConfigManager::Instance()->Reset();
   }
@@ -43,36 +44,33 @@ class LidarLibGroundServiceDetectorTest : public testing::Test {
 };
 
 void LoadPlanes(std::string path, GroundNode* node_ptr) {
-  int index = 0;
+  int           index = 0;
   std::ifstream file(path.c_str(), std::ifstream::in);
   while (file.good()) {
     std::string buf;
     getline(file, buf);
-    if (buf.empty()) {
-      continue;
-    }
+    if (buf.empty()) { continue; }
     std::stringstream ss;
     ss << buf;
     ss >> index;
     GroundNode* node = node_ptr + index;
-    ss >> node->params(0) >> node->params(1) >> node->params(2) >>
-        node->params(3) >> node->confidence;
+    ss >> node->params(0) >> node->params(1) >> node->params(2) >> node->params(3) >>
+        node->confidence;
   }
 }
 
-void LoadPoints(const std::string path, std::vector<std::vector<double>>* pts,
-                std::vector<float>* height_gts) {
+void LoadPoints(const std::string                 path,
+                std::vector<std::vector<double>>* pts,
+                std::vector<float>*               height_gts) {
   std::vector<double> pt;
-  std::ifstream file(path.c_str(), std::ifstream::in);
-  double temp;
-  float height;
+  std::ifstream       file(path.c_str(), std::ifstream::in);
+  double              temp;
+  float               height;
   while (file.good()) {
     pt.clear();
     std::string buf;
     getline(file, buf);
-    if (buf.empty()) {
-      continue;
-    }
+    if (buf.empty()) { continue; }
     std::stringstream ss;
     ss << buf;
     for (int i = 0; i < 3; ++i) {
@@ -85,49 +83,42 @@ void LoadPoints(const std::string path, std::vector<std::vector<double>>* pts,
   }
 }
 
-TEST_F(LidarLibGroundServiceDetectorTest,
-       lidar_lib_scene_manager_ground_service_test) {
+TEST_F(LidarLibGroundServiceDetectorTest, lidar_lib_scene_manager_ground_service_test) {
   GroundServiceDetector ground_service_detector;
   EXPECT_EQ(ground_service_detector.Name(), "GroundServiceDetector");
   EXPECT_FALSE(ground_service_detector.Init(GroundDetectorInitOptions()));
 
   EXPECT_TRUE(SceneManager::Instance().Init());
   EXPECT_TRUE(ground_service_detector.Init(GroundDetectorInitOptions()));
-  EXPECT_FALSE(
-      ground_service_detector.Detect(GroundDetectorOptions(), nullptr));
+  EXPECT_FALSE(ground_service_detector.Detect(GroundDetectorOptions(), nullptr));
   LidarFrame frame;
   EXPECT_FALSE(ground_service_detector.Detect(GroundDetectorOptions(), &frame));
   frame.world_cloud = base::PointDCloudPool::Instance().Get();
-  frame.cloud = base::PointFCloudPool::Instance().Get();
+  frame.cloud       = base::PointFCloudPool::Instance().Get();
   EXPECT_FALSE(ground_service_detector.Detect(GroundDetectorOptions(), &frame));
 
   GroundServiceContent ground_service_content;
-  auto ground_service = SceneManager::Instance().Service("GroundService");
+  auto                 ground_service = SceneManager::Instance().Service("GroundService");
   ACHECK(ground_service);
   ground_service->GetServiceContentCopy(&ground_service_content);
   ground_service->UpdateServiceContent(ground_service_content);
 
-  GroundServicePtr ground_service_cast =
-      std::dynamic_pointer_cast<GroundService>(ground_service);
+  GroundServicePtr ground_service_cast = std::dynamic_pointer_cast<GroundService>(ground_service);
 
   // test query
   std::vector<std::vector<double>> world_pts;
-  std::vector<float> height_gts;
-  float out_gt = 0.f;
-  float out = 0.f;
-  GroundNode* node_ptr =
-      ground_service_cast->GetGroundServiceContent()->grid_.DataPtr();
-  ground_service_cast->GetGroundServiceContent()->grid_center_
-      << 461957.33791688998,
+  std::vector<float>               height_gts;
+  float                            out_gt = 0.f;
+  float                            out    = 0.f;
+  GroundNode* node_ptr = ground_service_cast->GetGroundServiceContent()->grid_.DataPtr();
+  ground_service_cast->GetGroundServiceContent()->grid_center_ << 461957.33791688998,
       4404672.5859791003, 19.143968966679999;
-  LoadPlanes(
-      "/apollo/modules/perception/testdata/lidar/lib/ground_detector/"
-      "ground_service_detector/data/resources/planes.txt",
-      node_ptr);
-  LoadPoints(
-      "/apollo/modules/perception/testdata/lidar/lib/ground_detector/"
-      "ground_service_detector/data/resources/points.txt",
-      &world_pts, &height_gts);
+  LoadPlanes("/apollo/modules/perception/testdata/lidar/lib/ground_detector/"
+             "ground_service_detector/data/resources/planes.txt",
+             node_ptr);
+  LoadPoints("/apollo/modules/perception/testdata/lidar/lib/ground_detector/"
+             "ground_service_detector/data/resources/points.txt",
+             &world_pts, &height_gts);
 
   for (size_t i = 0; i < world_pts.size(); ++i) {
     base::PointD world_pt;
@@ -144,7 +135,7 @@ TEST_F(LidarLibGroundServiceDetectorTest,
   EXPECT_TRUE(ground_service_detector.Detect(GroundDetectorOptions(), &frame));
   for (size_t i = 0; i < frame.world_cloud->size(); ++i) {
     out_gt = height_gts[i];
-    out = frame.cloud->points_height(i);
+    out    = frame.cloud->points_height(i);
     EXPECT_NEAR(out_gt, out, 1e-6);
   }
 }

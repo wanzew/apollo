@@ -21,6 +21,7 @@
 #include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -37,13 +38,12 @@ class LearningModelInferenceTrajectoryTaskTest : public ::testing::Test {
   virtual void TearDown() {}
 
  protected:
-  TaskConfig config_;
+  TaskConfig                          config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(LearningModelInferenceTrajectoryTaskTest, Init) {
-  LearningModelInferenceTrajectoryTask learning_model_inference_trajectory_task(
-      config_, injector_);
+  LearningModelInferenceTrajectoryTask learning_model_inference_trajectory_task(config_, injector_);
   EXPECT_EQ(learning_model_inference_trajectory_task.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }

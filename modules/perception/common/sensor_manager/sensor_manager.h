@@ -38,14 +38,12 @@ class SensorManager {
 
   bool IsSensorExist(const std::string& name) const;
 
-  bool GetSensorInfo(const std::string& name,
+  bool GetSensorInfo(const std::string&                    name,
                      apollo::perception::base::SensorInfo* sensor_info) const;
 
-  std::shared_ptr<BaseCameraDistortionModel> GetDistortCameraModel(
-      const std::string& name) const;
+  std::shared_ptr<BaseCameraDistortionModel> GetDistortCameraModel(const std::string& name) const;
 
-  std::shared_ptr<BaseCameraModel> GetUndistortCameraModel(
-      const std::string& name) const;
+  std::shared_ptr<BaseCameraModel> GetUndistortCameraModel(const std::string& name) const;
 
   // sensor type functions
   bool IsHdLidar(const std::string& name) const;
@@ -67,21 +65,17 @@ class SensorManager {
 
  private:
   inline std::string IntrinsicPath(const std::string& frame_id) {
-    std::string intrinsics =
-        FLAGS_obs_sensor_intrinsic_path + "/" + frame_id + "_intrinsics.yaml";
+    std::string intrinsics = FLAGS_obs_sensor_intrinsic_path + "/" + frame_id + "_intrinsics.yaml";
     return intrinsics;
   }
 
  private:
   std::mutex mutex_;
-  bool inited_ = false;
+  bool       inited_ = false;
 
-  std::unordered_map<std::string, apollo::perception::base::SensorInfo>
-      sensor_info_map_;
-  std::unordered_map<std::string, std::shared_ptr<BaseCameraDistortionModel>>
-      distort_model_map_;
-  std::unordered_map<std::string, std::shared_ptr<BaseCameraModel>>
-      undistort_model_map_;
+  std::unordered_map<std::string, apollo::perception::base::SensorInfo>       sensor_info_map_;
+  std::unordered_map<std::string, std::shared_ptr<BaseCameraDistortionModel>> distort_model_map_;
+  std::unordered_map<std::string, std::shared_ptr<BaseCameraModel>>           undistort_model_map_;
 
   DECLARE_SINGLETON(SensorManager)
 };

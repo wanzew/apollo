@@ -37,13 +37,13 @@ TEST(PyramidMapConfigTestSuite, base_config_method) {
   // config.load(config_file);
 
   // case 2: flags are false
-  config.has_intensity_ = false;
-  config.has_intensity_var_ = false;
-  config.has_altitude_ = false;
-  config.has_altitude_var_ = false;
+  config.has_intensity_       = false;
+  config.has_intensity_var_   = false;
+  config.has_altitude_        = false;
+  config.has_altitude_var_    = false;
   config.has_ground_altitude_ = false;
-  config.has_ground_count_ = false;
-  config.has_count_ = false;
+  config.has_ground_count_    = false;
+  config.has_count_           = false;
 
   std::string config_file = "pyramid_map_config.xml";
   config.Save(config_file);
@@ -51,13 +51,13 @@ TEST(PyramidMapConfigTestSuite, base_config_method) {
 
   // case 3: flags are true
   PyramidMapConfig config2("lossy_full_alt");
-  config2.has_intensity_ = true;
-  config2.has_intensity_var_ = true;
-  config2.has_altitude_ = true;
-  config2.has_altitude_var_ = true;
+  config2.has_intensity_       = true;
+  config2.has_intensity_var_   = true;
+  config2.has_altitude_        = true;
+  config2.has_altitude_var_    = true;
   config2.has_ground_altitude_ = true;
-  config2.has_ground_count_ = true;
-  config2.has_count_ = true;
+  config2.has_ground_count_    = true;
+  config2.has_count_           = true;
 
   config_file = "pyramid_map_config2.xml";
   config2.Save(config_file);

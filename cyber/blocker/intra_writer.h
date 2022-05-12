@@ -29,7 +29,7 @@ namespace blocker {
 template <typename MessageT>
 class IntraWriter : public apollo::cyber::Writer<MessageT> {
  public:
-  using MessagePtr = std::shared_ptr<MessageT>;
+  using MessagePtr        = std::shared_ptr<MessageT>;
   using BlockerManagerPtr = std::shared_ptr<BlockerManager>;
 
   explicit IntraWriter(const proto::RoleAttributes& attr);
@@ -58,12 +58,9 @@ template <typename MessageT>
 bool IntraWriter<MessageT>::Init() {
   {
     std::lock_guard<std::mutex> g(this->lock_);
-    if (this->init_) {
-      return true;
-    }
+    if (this->init_) { return true; }
     blocker_manager_ = BlockerManager::Instance();
-    blocker_manager_->GetOrCreateBlocker<MessageT>(
-        BlockerAttr(this->role_attr_.channel_name()));
+    blocker_manager_->GetOrCreateBlocker<MessageT>(BlockerAttr(this->role_attr_.channel_name()));
     this->init_ = true;
   }
   return true;
@@ -73,9 +70,7 @@ template <typename MessageT>
 void IntraWriter<MessageT>::Shutdown() {
   {
     std::lock_guard<std::mutex> g(this->lock_);
-    if (!this->init_) {
-      return;
-    }
+    if (!this->init_) { return; }
     this->init_ = false;
   }
   blocker_manager_ = nullptr;
@@ -83,20 +78,14 @@ void IntraWriter<MessageT>::Shutdown() {
 
 template <typename MessageT>
 bool IntraWriter<MessageT>::Write(const MessageT& msg) {
-  if (!WriterBase::IsInit()) {
-    return false;
-  }
-  return blocker_manager_->Publish<MessageT>(this->role_attr_.channel_name(),
-                                             msg);
+  if (!WriterBase::IsInit()) { return false; }
+  return blocker_manager_->Publish<MessageT>(this->role_attr_.channel_name(), msg);
 }
 
 template <typename MessageT>
 bool IntraWriter<MessageT>::Write(const MessagePtr& msg_ptr) {
-  if (!WriterBase::IsInit()) {
-    return false;
-  }
-  return blocker_manager_->Publish<MessageT>(this->role_attr_.channel_name(),
-                                             msg_ptr);
+  if (!WriterBase::IsInit()) { return false; }
+  return blocker_manager_->Publish<MessageT>(this->role_attr_.channel_name(), msg_ptr);
 }
 
 }  // namespace blocker

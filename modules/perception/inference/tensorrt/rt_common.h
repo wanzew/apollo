@@ -16,13 +16,14 @@
 
 #pragma once
 
+#include <cudnn.h>
+
 #include <map>
 #include <string>
 #include <vector>
 
 #include "NvCaffeParser.h"
 #include "NvInfer.h"
-#include <cudnn.h>
 
 #include "modules/perception/proto/rt.pb.h"
 
@@ -34,17 +35,16 @@ namespace perception {
 namespace inference {
 
 typedef std::map<std::string, std::vector<nvinfer1::Weights>> WeightMap;
-typedef std::map<std::string, nvinfer1::ITensor *> TensorMap;
-typedef std::map<std::string, nvinfer1::DimsCHW> TensorDimsMap;
+typedef std::map<std::string, nvinfer1::ITensor*>             TensorMap;
+typedef std::map<std::string, nvinfer1::DimsCHW>              TensorDimsMap;
 
-nvinfer1::DimsCHW ReshapeDims(const nvinfer1::DimsCHW &dims,
-                              const nvinfer1::DimsCHW &inputDims);
-void ParseNetParam(const NetParameter &net_param,
-                   TensorDimsMap *tensor_dims_map,
-                   std::map<std::string, std::string> *tensor_modify_map,
-                   std::vector<LayerParameter> *order);
+nvinfer1::DimsCHW ReshapeDims(const nvinfer1::DimsCHW& dims, const nvinfer1::DimsCHW& inputDims);
+void              ParseNetParam(const NetParameter&                 net_param,
+                                TensorDimsMap*                      tensor_dims_map,
+                                std::map<std::string, std::string>* tensor_modify_map,
+                                std::vector<LayerParameter>*        order);
 
-bool modify_pool_param(PoolingParameter *pool_param);
+bool modify_pool_param(PoolingParameter* pool_param);
 
 struct ConvParam {
   int kernel_h;
@@ -57,12 +57,11 @@ struct ConvParam {
   int dilation;
 };
 
-bool ParserConvParam(const ConvolutionParameter &conv, ConvParam *param);
+bool ParserConvParam(const ConvolutionParameter& conv, ConvParam* param);
 
-inline nvinfer1::DimsCHW getCHW(const nvinfer1::Dims &d) {
+inline nvinfer1::DimsCHW getCHW(const nvinfer1::Dims& d) {
   assert(d.nbDims >= 3);
-  return nvinfer1::DimsCHW(d.d[d.nbDims - 3], d.d[d.nbDims - 2],
-                           d.d[d.nbDims - 1]);
+  return nvinfer1::DimsCHW(d.d[d.nbDims - 3], d.d[d.nbDims - 2], d.d[d.nbDims - 1]);
 }
 
 }  // namespace inference

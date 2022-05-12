@@ -20,13 +20,14 @@
 #include <string>
 #include <vector>
 
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/task_manager/proto/task_manager.pb.h"
+#include "modules/task_manager/proto/task_manager_config.pb.h"
+
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/task_manager/proto/task_manager.pb.h"
-#include "modules/task_manager/proto/task_manager_config.pb.h"
 #include "modules/task_manager/common/task_manager_gflags.h"
 
 namespace apollo {
@@ -39,8 +40,7 @@ class DeadEndRoutingManager {
    * @brief module initialization function
    * @return initialization status
    */
-  common::Status Init(const task_manager::DeadEndRoutingTask&
-                      dead_end_routing_task);
+  common::Status Init(const task_manager::DeadEndRoutingTask& dead_end_routing_task);
   /**
    * @brief destructor
    */
@@ -48,19 +48,18 @@ class DeadEndRoutingManager {
 
   int GetNumber() const { return cycle_; }
 
-  bool GetNewRouting(const localization::Pose& pose,
-                     routing::RoutingRequest* routing_request);
+  bool GetNewRouting(const localization::Pose& pose, routing::RoutingRequest* routing_request);
 
   bool JudgeCarInDeadEndJunction(const common::math::Vec2d& car_position,
-                                 const common::PointENU& target_point);
+                                 const common::PointENU&    target_point);
 
  private:
-  int cycle_ = 0;
-  bool routing_in_flag_ = true;
-  bool routing_out_flag_ = false;
+  int                                       cycle_            = 0;
+  bool                                      routing_in_flag_  = true;
+  bool                                      routing_out_flag_ = false;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-  routing::RoutingRequest routing_request_in_;
-  routing::RoutingRequest routing_request_out_;
+  routing::RoutingRequest                   routing_request_in_;
+  routing::RoutingRequest                   routing_request_out_;
 };
 
 }  // namespace task_manager

@@ -25,9 +25,8 @@ TEST(HMIWorker, LoadConfigAndMode) {
   const HMIConfig config = HMIWorker::LoadConfig();
   for (const auto& iter : config.modes()) {
     const std::string& mode_conf_file = iter.second;
-    const HMIMode& mode = HMIWorker::LoadMode(mode_conf_file);
-    EXPECT_FALSE(mode.modules().empty())
-        << "No HMI module loaded from " << mode_conf_file;
+    const HMIMode&     mode           = HMIWorker::LoadMode(mode_conf_file);
+    EXPECT_FALSE(mode.modules().empty()) << "No HMI module loaded from " << mode_conf_file;
   }
 }
 

@@ -48,8 +48,7 @@ class CPUDeviceTest : public MultiDeviceTest<CPUDevice<Dtype>> {};
 
 #if USE_GPU == 0
 
-typedef ::testing::Types<CPUDevice<float>, CPUDevice<double>>
-    TestDtypesAndDevices;
+typedef ::testing::Types<CPUDevice<float>, CPUDevice<double>> TestDtypesAndDevices;
 
 #else
 
@@ -62,8 +61,7 @@ struct GPUDevice {
 template <typename Dtype>
 class GPUDeviceTest : public MultiDeviceTest<GPUDevice<Dtype>> {};
 
-typedef ::testing::Types<CPUDevice<float>, CPUDevice<double>, GPUDevice<float>,
-                         GPUDevice<double>>
+typedef ::testing::Types<CPUDevice<float>, CPUDevice<double>, GPUDevice<float>, GPUDevice<double>>
     TestDtypesAndDevices;
 
 #endif

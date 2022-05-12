@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus_component.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 
 namespace apollo {

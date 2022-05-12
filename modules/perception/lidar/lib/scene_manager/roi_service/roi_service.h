@@ -32,7 +32,7 @@ class ROIServiceContent : public SceneServiceContent {
   using Vec2ui = Eigen::Matrix<size_t, 2, 1>;
   enum class DirectionMajor { XMAJOR = 0, YMAJOR = 1 };
 
-  ROIServiceContent() = default;
+  ROIServiceContent()  = default;
   ~ROIServiceContent() = default;
 
   // @brief: get a copy of this service content
@@ -57,11 +57,11 @@ class ROIServiceContent : public SceneServiceContent {
 
  public:
   std::vector<uint64_t> bitmap_;
-  Vec2ui map_size_;
-  double cell_size_ = 0.25;
-  double range_ = 120.0;
-  DirectionMajor major_dir_ = DirectionMajor::XMAJOR;
-  Eigen::Vector3d transform_;
+  Vec2ui                map_size_;
+  double                cell_size_ = 0.25;
+  double                range_     = 120.0;
+  DirectionMajor        major_dir_ = DirectionMajor::XMAJOR;
+  Eigen::Vector3d       transform_;
 };
 
 class ROIService : public SceneService {
@@ -71,25 +71,23 @@ class ROIService : public SceneService {
 
   // @brief: initialize scene service
   // @param [in]: init options
-  bool Init(const SceneServiceInitOptions& options =
-                SceneServiceInitOptions()) override;
+  bool Init(const SceneServiceInitOptions& options = SceneServiceInitOptions()) override;
   // @brief: get service name
   // @return: name
   std::string Name() const override { return "ROIService"; }
 
  public:
   bool QueryIsPointInROI(const Eigen::Vector3d& world_point);
-  bool QueryIsPointInROI(const Eigen::Vector3d& world_point,
-                         const ROIServiceContent& content);
+  bool QueryIsPointInROI(const Eigen::Vector3d& world_point, const ROIServiceContent& content);
 
  protected:
   ROIServiceContent* roi_content_ref_ = nullptr;
 };
 
-typedef std::shared_ptr<ROIServiceContent> ROIServiceContentPtr;
+typedef std::shared_ptr<ROIServiceContent>       ROIServiceContentPtr;
 typedef std::shared_ptr<const ROIServiceContent> ROIServiceContentConstPtr;
 
-typedef std::shared_ptr<ROIService> ROIServicePtr;
+typedef std::shared_ptr<ROIService>       ROIServicePtr;
 typedef std::shared_ptr<const ROIService> ROIServiceConstPtr;
 
 }  // namespace lidar

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -29,9 +30,8 @@ class ROIBoundaryFilterTest : public testing::Test {
     putenv(cyber_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root =
-        "/apollo/modules/perception/testdata/lidar/lib/object_filter_bank/"
-        "roi_boundary";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/lidar/lib/object_filter_bank/"
+                      "roi_boundary";
   }
   void TearDown() {}
 
@@ -43,8 +43,8 @@ void MockLidarFrame(LidarFrame* frame) {
   frame->hdmap_struct.reset(new base::HdmapStruct);
   frame->hdmap_struct->road_polygons.resize(1);
   frame->hdmap_struct->road_boundary.resize(1);
-  auto& polygon = frame->hdmap_struct->road_polygons[0];
-  auto& boundary = frame->hdmap_struct->road_boundary[0];
+  auto&                         polygon  = frame->hdmap_struct->road_polygons[0];
+  auto&                         boundary = frame->hdmap_struct->road_boundary[0];
   base::PolygonDType::PointType point;
   point.x = -20.0;
   point.y = -20.0;
@@ -133,8 +133,8 @@ void ExtendLidarFrame(LidarFrame* frame) {
   frame->segmented_objects[3]->id = 3;
   frame->segmented_objects[3]->lidar_supplement.cloud.resize(1);
   frame->segmented_objects[3]->lidar_supplement.num_points_in_roi = 1;
-  frame->segmented_objects[3]->confidence = 0.11f;
-  frame->segmented_objects[3]->lidar_supplement.is_background = false;
+  frame->segmented_objects[3]->confidence                         = 0.11f;
+  frame->segmented_objects[3]->lidar_supplement.is_background     = false;
 
   frame->segmented_objects[4].reset(new base::Object);
   point.x = 19.9;
@@ -149,8 +149,8 @@ void ExtendLidarFrame(LidarFrame* frame) {
   frame->segmented_objects[4]->id = 4;
   frame->segmented_objects[4]->lidar_supplement.cloud.resize(1);
   frame->segmented_objects[4]->lidar_supplement.num_points_in_roi = 1;
-  frame->segmented_objects[4]->confidence = 0.12f;
-  frame->segmented_objects[4]->lidar_supplement.is_background = false;
+  frame->segmented_objects[4]->confidence                         = 0.12f;
+  frame->segmented_objects[4]->lidar_supplement.is_background     = false;
 
   frame->segmented_objects[5].reset(new base::Object);
   point.x = -19.9;
@@ -165,8 +165,8 @@ void ExtendLidarFrame(LidarFrame* frame) {
   frame->segmented_objects[5]->id = 5;
   frame->segmented_objects[5]->lidar_supplement.cloud.resize(1);
   frame->segmented_objects[5]->lidar_supplement.num_points_in_roi = 1;
-  frame->segmented_objects[5]->confidence = 0.11f;
-  frame->segmented_objects[5]->lidar_supplement.is_background = false;
+  frame->segmented_objects[5]->confidence                         = 0.11f;
+  frame->segmented_objects[5]->lidar_supplement.is_background     = false;
 }
 
 TEST_F(ROIBoundaryFilterTest, roi_boundary_filter_test) {
@@ -188,7 +188,7 @@ TEST_F(ROIBoundaryFilterTest, roi_boundary_filter_test) {
   EXPECT_EQ(frame.segmented_objects.size(), 3);
   for (auto& obj : frame.segmented_objects) {
     obj->lidar_supplement.is_background = false;
-    obj->confidence = 1.0;
+    obj->confidence                     = 1.0;
   }
 
   filter_.distance_to_boundary_threshold_ = 2.0;
@@ -207,8 +207,8 @@ TEST_F(ROIBoundaryFilterTest, roi_boundary_filter_test) {
   for (auto& obj : frame.segmented_objects) {
     obj->lidar_supplement.is_background = false;
   }
-  frame.segmented_objects[0]->confidence = 0.8f;
-  frame.segmented_objects[1]->confidence = 0.4f;
+  frame.segmented_objects[0]->confidence  = 0.8f;
+  frame.segmented_objects[1]->confidence  = 0.4f;
   filter_.distance_to_boundary_threshold_ = -1.f;
   EXPECT_TRUE(filter_.Filter(filter_option, &frame));
   EXPECT_EQ(frame.segmented_objects.size(), 2);
@@ -223,9 +223,9 @@ TEST_F(ROIBoundaryFilterTest, roi_boundary_filter_test) {
   frame.segmented_objects[0]->lidar_supplement.is_background = false;
   frame.segmented_objects[1]->lidar_supplement.is_background = false;
   frame.segmented_objects[2]->lidar_supplement.is_background = false;
-  frame.segmented_objects[0]->confidence = 0.8f;
-  frame.segmented_objects[1]->confidence = 0.4f;
-  filter_.distance_to_boundary_threshold_ = -1.f;
+  frame.segmented_objects[0]->confidence                     = 0.8f;
+  frame.segmented_objects[1]->confidence                     = 0.4f;
+  filter_.distance_to_boundary_threshold_                    = -1.f;
   EXPECT_TRUE(filter_.Filter(filter_option, &frame));
   EXPECT_EQ(frame.segmented_objects.size(), 4);
 }

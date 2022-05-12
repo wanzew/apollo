@@ -19,11 +19,10 @@
 #include <memory>
 #include <string>
 
-#include "cyber/cyber.h"
-
-#include "modules/drivers/gnss/parser/parser.h"
-
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/drivers/gnss/parser/parser.h"
 
 namespace apollo {
 namespace drivers {
@@ -32,8 +31,7 @@ namespace gnss {
 class RtcmParser {
  public:
   using MessagePtr = ::google::protobuf::Message*;
-  RtcmParser(const config::Config& config,
-             const std::shared_ptr<apollo::cyber::Node>& node);
+  RtcmParser(const config::Config& config, const std::shared_ptr<apollo::cyber::Node>& node);
   ~RtcmParser() {}
   bool Init();
   void ParseRtcmData(const std::string& msg);
@@ -43,14 +41,12 @@ class RtcmParser {
   void PublishEphemeris(const MessagePtr& message);
   void PublishObservation(const MessagePtr& message);
 
-  config::Config config_;
-  std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>> gnssephemeris_writer_ =
-      nullptr;
-  std::shared_ptr<apollo::cyber::Writer<EpochObservation>>
-      epochobservation_writer_ = nullptr;
-  bool init_flag_ = false;
-  std::unique_ptr<Parser> rtcm_parser_ = nullptr;
+  config::Config                                           config_;
+  std::shared_ptr<apollo::cyber::Node>                     node_                    = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>>    gnssephemeris_writer_    = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<EpochObservation>> epochobservation_writer_ = nullptr;
+  bool                                                     init_flag_               = false;
+  std::unique_ptr<Parser>                                  rtcm_parser_             = nullptr;
 };
 
 }  // namespace gnss

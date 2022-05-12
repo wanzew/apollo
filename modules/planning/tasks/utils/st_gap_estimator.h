@@ -34,8 +34,7 @@ class StGapEstimator {
 
   static double EstimateSafeYieldingGap();
 
-  static double EstimateProperOvertakingGap(const double target_obs_speed,
-                                            const double adc_speed);
+  static double EstimateProperOvertakingGap(const double target_obs_speed, const double adc_speed);
 
   static double EstimateProperFollowingGap(const double adc_speed);
 

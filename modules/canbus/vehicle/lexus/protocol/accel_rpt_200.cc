@@ -30,12 +30,10 @@ using ::apollo::drivers::canbus::Byte;
 Accelrpt200::Accelrpt200() {}
 const int32_t Accelrpt200::ID = 0x200;
 
-void Accelrpt200::Parse(const std::uint8_t* bytes, int32_t length,
-                        ChassisDetail* chassis) const {
+void Accelrpt200::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_lexus()->mutable_accel_rpt_200()->set_vehicle_fault(
       vehicle_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_rpt_200()->set_pacmod_fault(
-      pacmod_fault(bytes, length));
+  chassis->mutable_lexus()->mutable_accel_rpt_200()->set_pacmod_fault(pacmod_fault(bytes, length));
   chassis->mutable_lexus()->mutable_accel_rpt_200()->set_output_reported_fault(
       output_reported_fault(bytes, length));
   chassis->mutable_lexus()->mutable_accel_rpt_200()->set_input_output_fault(
@@ -44,22 +42,18 @@ void Accelrpt200::Parse(const std::uint8_t* bytes, int32_t length,
       command_output_fault(bytes, length));
   chassis->mutable_lexus()->mutable_accel_rpt_200()->set_override_active(
       override_active(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_rpt_200()->set_enabled(
-      enabled(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_rpt_200()->set_manual_input(
-      manual_input(bytes, length));
+  chassis->mutable_lexus()->mutable_accel_rpt_200()->set_enabled(enabled(bytes, length));
+  chassis->mutable_lexus()->mutable_accel_rpt_200()->set_manual_input(manual_input(bytes, length));
   chassis->mutable_lexus()->mutable_accel_rpt_200()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_rpt_200()->set_output_value(
-      output_value(bytes, length));
+  chassis->mutable_lexus()->mutable_accel_rpt_200()->set_output_value(output_value(bytes, length));
 }
 
 // config detail: {'name': 'vehicle_fault', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 6,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelrpt200::vehicle_fault(const std::uint8_t* bytes,
-                                int32_t length) const {
-  Byte t0(bytes + 0);
+bool Accelrpt200::vehicle_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(6, 1);
 
   bool ret = x;
@@ -69,9 +63,8 @@ bool Accelrpt200::vehicle_fault(const std::uint8_t* bytes,
 // config detail: {'name': 'pacmod_fault', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 5,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelrpt200::pacmod_fault(const std::uint8_t* bytes,
-                               int32_t length) const {
-  Byte t0(bytes + 0);
+bool Accelrpt200::pacmod_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(5, 1);
 
   bool ret = x;
@@ -81,9 +74,8 @@ bool Accelrpt200::pacmod_fault(const std::uint8_t* bytes,
 // config detail: {'name': 'output_reported_fault', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelrpt200::output_reported_fault(const std::uint8_t* bytes,
-                                        int32_t length) const {
-  Byte t0(bytes + 0);
+bool Accelrpt200::output_reported_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(4, 1);
 
   bool ret = x;
@@ -93,9 +85,8 @@ bool Accelrpt200::output_reported_fault(const std::uint8_t* bytes,
 // config detail: {'name': 'input_output_fault', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 3, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelrpt200::input_output_fault(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte t0(bytes + 0);
+bool Accelrpt200::input_output_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -105,9 +96,8 @@ bool Accelrpt200::input_output_fault(const std::uint8_t* bytes,
 // config detail: {'name': 'command_output_fault', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 2, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelrpt200::command_output_fault(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes + 0);
+bool Accelrpt200::command_output_fault(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -117,9 +107,8 @@ bool Accelrpt200::command_output_fault(const std::uint8_t* bytes,
 // config detail: {'name': 'override_active', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelrpt200::override_active(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 0);
+bool Accelrpt200::override_active(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(1, 1);
 
   bool ret = x;
@@ -130,7 +119,7 @@ bool Accelrpt200::override_active(const std::uint8_t* bytes,
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
 bool Accelrpt200::enabled(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;
@@ -140,12 +129,11 @@ bool Accelrpt200::enabled(const std::uint8_t* bytes, int32_t length) const {
 // config detail: {'name': 'manual_input', 'offset': 0.0, 'precision': 0.001,
 // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 15,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Accelrpt200::manual_input(const std::uint8_t* bytes,
-                                 int32_t length) const {
-  Byte t0(bytes + 1);
+double Accelrpt200::manual_input(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -157,12 +145,11 @@ double Accelrpt200::manual_input(const std::uint8_t* bytes,
 // config detail: {'name': 'commanded_value', 'offset': 0.0, 'precision': 0.001,
 // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 31,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Accelrpt200::commanded_value(const std::uint8_t* bytes,
-                                    int32_t length) const {
-  Byte t0(bytes + 3);
+double Accelrpt200::commanded_value(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 4);
+  Byte    t1(bytes + 4);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -174,12 +161,11 @@ double Accelrpt200::commanded_value(const std::uint8_t* bytes,
 // config detail: {'name': 'output_value', 'offset': 0.0, 'precision': 0.001,
 // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 47,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Accelrpt200::output_value(const std::uint8_t* bytes,
-                                 int32_t length) const {
-  Byte t0(bytes + 5);
+double Accelrpt200::output_value(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 6);
+  Byte    t1(bytes + 6);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

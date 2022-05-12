@@ -25,15 +25,13 @@ namespace lidar {
 
 class CloudMask {
  public:
-  CloudMask() = default;
+  CloudMask()  = default;
   ~CloudMask() = default;
 
   // @brief: set mask size and initial value
   // @param [in]: size, mask size
   // @param [in]: value, initial value
-  inline void Set(size_t size, int init_value) {
-    mask_.assign(size, init_value);
-  }
+  inline void Set(size_t size, int init_value) { mask_.assign(size, init_value); }
 
   // @brief: fill mask with given value
   // @param [in]: value
@@ -73,9 +71,8 @@ class CloudMask {
   // @brief: get valid (positive) point cloud from mask
   // @param [in]: source point cloud
   // @param [out]: target point cloud with valid points
-  void GetValidCloud(
-      const base::AttributePointCloud<base::PointF>& source_cloud,
-      base::AttributePointCloud<base::PointF>* target_cloud) const;
+  void GetValidCloud(const base::AttributePointCloud<base::PointF>& source_cloud,
+                     base::AttributePointCloud<base::PointF>*       target_cloud) const;
 
   // @brief; get valid indices from mask
   // @param [in]: indices vector
@@ -102,7 +99,7 @@ class CloudMask {
   // @param [in]: value
   void AddIndicesOfIndices(const base::PointIndices& indices,
                            const base::PointIndices& indices_of_indices,
-                           int value = 1);
+                           int                       value = 1);
 
   // @brief: remove point indices, base::PointIndices version
   // @param [in]: indices
@@ -153,13 +150,10 @@ void CloudMask::RemoveIndices(const std::vector<IntegerType>& indices) {
 }
 
 template <typename IntegerType>
-size_t CloudMask::ValidIndicesCount(
-    const std::vector<IntegerType>& indices) const {
+size_t CloudMask::ValidIndicesCount(const std::vector<IntegerType>& indices) const {
   size_t count = 0;
   for (const auto& id : indices) {
-    if (mask_[id]) {
-      ++count;
-    }
+    if (mask_[id]) { ++count; }
   }
   return count;
 }

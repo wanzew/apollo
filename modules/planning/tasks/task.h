@@ -23,11 +23,12 @@
 #include <memory>
 #include <string>
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -36,8 +37,7 @@ class Task {
  public:
   explicit Task(const TaskConfig& config);
 
-  Task(const TaskConfig& config,
-       const std::shared_ptr<DependencyInjector>& injector);
+  Task(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~Task() = default;
 
@@ -45,16 +45,15 @@ class Task {
 
   const TaskConfig& Config() const { return config_; }
 
-  virtual common::Status Execute(Frame* frame,
-                                 ReferenceLineInfo* reference_line_info);
+  virtual common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info);
 
   virtual common::Status Execute(Frame* frame);
 
  protected:
-  Frame* frame_ = nullptr;
+  Frame*             frame_               = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;
 
-  TaskConfig config_;
+  TaskConfig  config_;
   std::string name_;
 
   std::shared_ptr<DependencyInjector> injector_;

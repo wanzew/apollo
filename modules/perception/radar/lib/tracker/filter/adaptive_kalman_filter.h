@@ -27,15 +27,12 @@ class AdaptiveKalmanFilter : public BaseFilter {
  public:
   AdaptiveKalmanFilter();
   ~AdaptiveKalmanFilter();
-  void Init(const base::Object& object) override;
+  void            Init(const base::Object& object) override;
   Eigen::VectorXd Predict(const double time_diff) override;
-  Eigen::VectorXd UpdateWithObject(const base::Object& new_object,
-                                   double time_diff) override;
-  void GetState(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity);
+  Eigen::VectorXd UpdateWithObject(const base::Object& new_object, double time_diff) override;
+  void            GetState(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity);
   Eigen::Matrix4d GetCovarianceMatrix() override { return p_matrix_; }
-  static void SetQMatrixRatio(double q_matrix_ratio) {
-    s_q_matrix_ratio_ = q_matrix_ratio;
-  }
+  static void     SetQMatrixRatio(double q_matrix_ratio) { s_q_matrix_ratio_ = q_matrix_ratio; }
 
  private:
   Eigen::Vector3d belief_anchor_point_;
@@ -53,7 +50,7 @@ class AdaptiveKalmanFilter : public BaseFilter {
   Eigen::Matrix4d r_matrix_;
   // Optimal Kalman gain
   Eigen::Matrix4d k_matrix_;
-  static double s_q_matrix_ratio_;
+  static double   s_q_matrix_ratio_;
 };
 }  // namespace radar
 }  // namespace perception

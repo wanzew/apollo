@@ -31,9 +31,7 @@ class DisjointSetTest : public testing::Test {
   std::shared_ptr<Universe> universe_;
 };
 
-TEST_F(DisjointSetTest, test_get_sets_num) {
-  EXPECT_EQ(16, universe_->GetSetsNum());
-}
+TEST_F(DisjointSetTest, test_get_sets_num) { EXPECT_EQ(16, universe_->GetSetsNum()); }
 
 TEST_F(DisjointSetTest, test_get_size) {
   EXPECT_EQ(1, universe_->GetSize(0));

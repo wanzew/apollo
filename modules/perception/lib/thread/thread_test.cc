@@ -17,6 +17,7 @@
 #include "modules/perception/lib/thread/thread.h"
 
 #include <thread>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -25,13 +26,15 @@ namespace lib {
 
 class MyThread : public Thread {
  public:
-  MyThread() : Thread(true), value_(0) {}
+  MyThread()
+      : Thread(true)
+      , value_(0) {}
   virtual ~MyThread() {}
 
   int get_value() const { return value_; }
 
-  MyThread(const MyThread &) = delete;
-  MyThread &operator=(const MyThread &) = delete;
+  MyThread(const MyThread&) = delete;
+  MyThread& operator=(const MyThread&) = delete;
 
  protected:
   void Run() override {

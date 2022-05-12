@@ -27,9 +27,9 @@ class Brakereport501Test : public ::testing::Test {
 };
 
 TEST_F(Brakereport501Test, General) {
-  uint8_t data[8] = {0x01, 0x00, 0x01, 0x03, 0x52, 0x01, 0x00, 0x01};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t        data[8] = {0x01, 0x00, 0x01, 0x03, 0x52, 0x01, 0x00, 0x01};
+  int32_t        length  = 8;
+  ChassisDetail  cd;
   Brakereport501 brakereport;
   brakereport.Parse(data, length, &cd);
 

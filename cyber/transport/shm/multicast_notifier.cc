@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include <cstring>
 #include <string>
 
@@ -35,17 +36,13 @@ namespace transport {
 using common::GlobalData;
 
 MulticastNotifier::MulticastNotifier() {
-  if (!Init()) {
-    Shutdown();
-  }
+  if (!Init()) { Shutdown(); }
 }
 
 MulticastNotifier::~MulticastNotifier() { Shutdown(); }
 
 void MulticastNotifier::Shutdown() {
-  if (is_shutdown_.exchange(true)) {
-    return;
-  }
+  if (is_shutdown_.exchange(true)) { return; }
 
   if (notify_fd_ != -1) {
     close(notify_fd_);
@@ -61,22 +58,17 @@ void MulticastNotifier::Shutdown() {
 }
 
 bool MulticastNotifier::Notify(const ReadableInfo& info) {
-  if (is_shutdown_.load()) {
-    return false;
-  }
+  if (is_shutdown_.load()) { return false; }
 
   std::string info_str;
   info.SerializeTo(&info_str);
-  ssize_t nbytes =
-      sendto(notify_fd_, info_str.c_str(), info_str.size(), 0,
-             (struct sockaddr*)&notify_addr_, sizeof(notify_addr_));
+  ssize_t nbytes = sendto(notify_fd_, info_str.c_str(), info_str.size(), 0,
+                          (struct sockaddr*)&notify_addr_, sizeof(notify_addr_));
   return nbytes > 0;
 }
 
 bool MulticastNotifier::Listen(int timeout_ms, ReadableInfo* info) {
-  if (is_shutdown_.load()) {
-    return false;
-  }
+  if (is_shutdown_.load()) { return false; }
 
   if (info == nullptr) {
     AERROR << "info nullptr.";
@@ -84,12 +76,12 @@ bool MulticastNotifier::Listen(int timeout_ms, ReadableInfo* info) {
   }
 
   struct pollfd fds;
-  fds.fd = listen_fd_;
-  fds.events = POLLIN;
+  fds.fd        = listen_fd_;
+  fds.events    = POLLIN;
   int ready_num = poll(&fds, 1, timeout_ms);
   if (ready_num > 0) {
-    char buf[32] = {0};  // larger than ReadableInfo::kSize
-    ssize_t nbytes = recvfrom(listen_fd_, buf, 32, 0, nullptr, nullptr);
+    char    buf[32] = {0};  // larger than ReadableInfo::kSize
+    ssize_t nbytes  = recvfrom(listen_fd_, buf, 32, 0, nullptr, nullptr);
     if (nbytes == -1) {
       AERROR << "fail to recvfrom, " << strerror(errno);
       return false;
@@ -109,14 +101,14 @@ bool MulticastNotifier::Listen(int timeout_ms, ReadableInfo* info) {
 
 bool MulticastNotifier::Init() {
   std::string mcast_ip("239.255.0.100");
-  uint16_t mcast_port = 8888;
+  uint16_t    mcast_port = 8888;
 
   auto& g_conf = GlobalData::Instance()->Config();
   if (g_conf.has_transport_conf() && g_conf.transport_conf().has_shm_conf() &&
       g_conf.transport_conf().shm_conf().has_shm_locator()) {
     auto& locator = g_conf.transport_conf().shm_conf().shm_locator();
-    mcast_ip = locator.ip();
-    mcast_port = static_cast<uint16_t>(locator.port());
+    mcast_ip      = locator.ip();
+    mcast_port    = static_cast<uint16_t>(locator.port());
   }
 
   ADEBUG << "multicast notifier ip: " << mcast_ip;
@@ -129,9 +121,9 @@ bool MulticastNotifier::Init() {
   }
 
   memset(&notify_addr_, 0, sizeof(notify_addr_));
-  notify_addr_.sin_family = AF_INET;
+  notify_addr_.sin_family      = AF_INET;
   notify_addr_.sin_addr.s_addr = inet_addr(mcast_ip.c_str());
-  notify_addr_.sin_port = htons(mcast_port);
+  notify_addr_.sin_port        = htons(mcast_port);
 
   listen_fd_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (listen_fd_ == -1) {
@@ -145,9 +137,9 @@ bool MulticastNotifier::Init() {
   }
 
   memset(&listen_addr_, 0, sizeof(listen_addr_));
-  listen_addr_.sin_family = AF_INET;
+  listen_addr_.sin_family      = AF_INET;
   listen_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
-  listen_addr_.sin_port = htons(mcast_port);
+  listen_addr_.sin_port        = htons(mcast_port);
 
   int yes = 1;
   if (setsockopt(listen_fd_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0) {
@@ -155,15 +147,13 @@ bool MulticastNotifier::Init() {
     return false;
   }
 
-  if (bind(listen_fd_, (struct sockaddr*)&listen_addr_, sizeof(listen_addr_)) <
-      0) {
+  if (bind(listen_fd_, (struct sockaddr*)&listen_addr_, sizeof(listen_addr_)) < 0) {
     AERROR << "fail to bind addr, " << strerror(errno);
     return false;
   }
 
   int loop = 1;
-  if (setsockopt(listen_fd_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop,
-                 sizeof(loop)) < 0) {
+  if (setsockopt(listen_fd_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)) < 0) {
     AERROR << "fail to setsockopt IP_MULTICAST_LOOP, " << strerror(errno);
     return false;
   }
@@ -171,8 +161,7 @@ bool MulticastNotifier::Init() {
   struct ip_mreq mreq;
   mreq.imr_multiaddr.s_addr = inet_addr(mcast_ip.c_str());
   mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-  if (setsockopt(listen_fd_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq,
-                 sizeof(mreq)) < 0) {
+  if (setsockopt(listen_fd_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
     AERROR << "fail to setsockopt IP_ADD_MEMBERSHIP, " << strerror(errno);
     return false;
   }

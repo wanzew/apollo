@@ -18,12 +18,13 @@
 
 #include <string>
 
+#include "modules/audio/proto/audio.pb.h"
+#include "modules/drivers/microphone/proto/audio.pb.h"
+
 #include "modules/audio/common/audio_info.h"
 #include "modules/audio/inference/direction_detection.h"
 #include "modules/audio/inference/moving_detection.h"
 #include "modules/audio/inference/siren_detection.h"
-#include "modules/audio/proto/audio.pb.h"
-#include "modules/drivers/microphone/proto/audio.pb.h"
 
 namespace apollo {
 namespace audio {
@@ -32,14 +33,13 @@ class MessageProcess {
  public:
   MessageProcess() = delete;
 
-  static void OnMicrophone(
-      const apollo::drivers::microphone::config::AudioData& audio_data,
-      const std::string& respeaker_extrinsics_file,
-      AudioInfo* audio_info,
-      DirectionDetection* direction_detection,
-      MovingDetection* moving_detection,
-      SirenDetection* siren_detection,
-      AudioDetection* audio_detection);
+  static void OnMicrophone(const apollo::drivers::microphone::config::AudioData& audio_data,
+                           const std::string&  respeaker_extrinsics_file,
+                           AudioInfo*          audio_info,
+                           DirectionDetection* direction_detection,
+                           MovingDetection*    moving_detection,
+                           SirenDetection*     siren_detection,
+                           AudioDetection*     audio_detection);
 };
 
 }  // namespace audio

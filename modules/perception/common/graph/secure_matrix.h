@@ -42,7 +42,7 @@ class SecureMat {
    */
   void Reserve(const size_t reserve_height, const size_t reserve_width) {
     max_height_ = std::max(reserve_height, max_height_);
-    max_width_ = std::max(reserve_width, max_width_);
+    max_width_  = std::max(reserve_width, max_width_);
     mat_.resize(max_height_, max_width_);
   }
 
@@ -52,12 +52,10 @@ class SecureMat {
    * @return nothing */
   void Resize(const size_t resize_height, const size_t resize_width) {
     height_ = resize_height;
-    width_ = resize_width;
-    if (resize_height <= max_height_ && resize_width <= max_width_) {
-      return;
-    }
+    width_  = resize_width;
+    if (resize_height <= max_height_ && resize_width <= max_width_) { return; }
     max_height_ = std::max(resize_height, max_height_);
-    max_width_ = std::max(resize_width, max_width_);
+    max_width_  = std::max(resize_width, max_width_);
     mat_.resize(max_height_, max_width_);
   }
 
@@ -72,20 +70,16 @@ class SecureMat {
     return oss.str();
   }
 
-  inline const T& operator()(const size_t row, const size_t col) const {
-    return mat_(row, col);
-  }
+  inline const T& operator()(const size_t row, const size_t col) const { return mat_(row, col); }
 
-  inline T& operator()(const size_t row, const size_t col) {
-    return mat_(row, col);
-  }
+  inline T& operator()(const size_t row, const size_t col) { return mat_(row, col); }
 
  private:
   Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat_;
-  size_t max_height_ = 1000;
-  size_t max_width_ = 1000;
-  size_t height_ = 0;
-  size_t width_ = 0;
+  size_t                                           max_height_ = 1000;
+  size_t                                           max_width_  = 1000;
+  size_t                                           height_     = 0;
+  size_t                                           width_      = 0;
 };  // class SecureMat
 
 }  // namespace common

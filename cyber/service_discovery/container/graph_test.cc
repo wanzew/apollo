@@ -17,6 +17,7 @@
 #include "cyber/service_discovery/container/graph.h"
 
 #include <string>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -113,12 +114,12 @@ TEST(GraphTest, graph) {
 
   Vertice c("c");
   Vertice d("d");
-  Edge cd(c, d, "cd");
+  Edge    cd(c, d, "cd");
   g.Insert(cd);
   EXPECT_EQ(g.GetNumOfEdge(), 2);
 
   Vertice e("e");
-  Edge ce(c, e, "ce");
+  Edge    ce(c, e, "ce");
   g.Insert(ce);
   EXPECT_EQ(g.GetNumOfEdge(), 3);
 
@@ -197,7 +198,7 @@ TEST(GraphTest, graph) {
   EXPECT_EQ(g.GetNumOfEdge(), 0);
 
   Vertice q("q");
-  Edge qa;
+  Edge    qa;
   g.Delete(qa);
   qa.set_src(q);
   qa.set_dst(a);

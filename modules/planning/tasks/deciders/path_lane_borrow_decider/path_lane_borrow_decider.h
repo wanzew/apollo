@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -30,15 +31,13 @@ namespace planning {
 
 class PathLaneBorrowDecider : public Decider {
  public:
-  PathLaneBorrowDecider(const TaskConfig& config,
+  PathLaneBorrowDecider(const TaskConfig&                          config,
                         const std::shared_ptr<DependencyInjector>& injector);
 
  private:
-  common::Status Process(Frame* frame,
-                         ReferenceLineInfo* reference_line_info) override;
+  common::Status Process(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-  bool IsNecessaryToBorrowLane(const Frame& frame,
-                               const ReferenceLineInfo& reference_line_info);
+  bool IsNecessaryToBorrowLane(const Frame& frame, const ReferenceLineInfo& reference_line_info);
 
   bool HasSingleReferenceLine(const Frame& frame);
 
@@ -46,17 +45,15 @@ class PathLaneBorrowDecider : public Decider {
 
   bool IsLongTermBlockingObstacle();
 
-  bool IsBlockingObstacleWithinDestination(
-      const ReferenceLineInfo& reference_line_info);
+  bool IsBlockingObstacleWithinDestination(const ReferenceLineInfo& reference_line_info);
 
-  bool IsBlockingObstacleFarFromIntersection(
-      const ReferenceLineInfo& reference_line_info);
+  bool IsBlockingObstacleFarFromIntersection(const ReferenceLineInfo& reference_line_info);
 
   bool IsSidePassableObstacle(const ReferenceLineInfo& reference_line_info);
 
   void CheckLaneBorrow(const ReferenceLineInfo& reference_line_info,
-                       bool* left_neighbor_lane_borrowable,
-                       bool* right_neighbor_lane_borrowable);
+                       bool*                    left_neighbor_lane_borrowable,
+                       bool*                    right_neighbor_lane_borrowable);
 };
 
 }  // namespace planning

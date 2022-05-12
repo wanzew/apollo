@@ -29,18 +29,16 @@ struct MlfMotionRefinerOptions {};
 
 class MlfMotionRefiner {
  public:
-  MlfMotionRefiner() = default;
+  MlfMotionRefiner()  = default;
   ~MlfMotionRefiner() = default;
 
-  bool Init(const MlfMotionRefinerInitOptions& options =
-                MlfMotionRefinerInitOptions());
+  bool Init(const MlfMotionRefinerInitOptions& options = MlfMotionRefinerInitOptions());
 
   // @brief: refine velocity of new object
   // @params [in]: history track data
   // @params [in]: new object to be updated
   // @return: true if velocity is changed
-  bool Refine(const MlfTrackDataConstPtr& track_data,
-              TrackedObjectPtr new_object);
+  bool Refine(const MlfTrackDataConstPtr& track_data, TrackedObjectPtr new_object);
 
   std::string Name() const { return "MlfMotionRefiner"; }
 
@@ -49,9 +47,8 @@ class MlfMotionRefiner {
   // @params[in]: latest history object
   // @params[in]: new object to be updated
   // @return: true if new object is static
-  bool CheckStaticHypothesisByState(
-      const TrackedObjectConstPtr& latest_object,
-      const TrackedObjectConstPtr& new_object) const;
+  bool CheckStaticHypothesisByState(const TrackedObjectConstPtr& latest_object,
+                                    const TrackedObjectConstPtr& new_object) const;
 
   // @brief: check whether new observed object is static or not via
   //         considering the angle velocity change
@@ -59,15 +56,14 @@ class MlfMotionRefiner {
   // @params [in]: new object to be updated
   // @params [in]: max allowed angle change threshold
   // @return: true if new object is static
-  bool CheckStaticHypothesisByVelocityAngleChange(
-      const TrackedObjectConstPtr& latest_object,
-      const TrackedObjectConstPtr& new_object,
-      double reasonable_angle_change_maximum) const;
+  bool CheckStaticHypothesisByVelocityAngleChange(const TrackedObjectConstPtr& latest_object,
+                                                  const TrackedObjectConstPtr& new_object,
+                                                  double reasonable_angle_change_maximum) const;
 
  protected:
-  double claping_acceleration_threshold_ = 10;
-  double claping_speed_threshold_ = 1.0;
-  const double EPSION_TIME = 1e-3;
+  double       claping_acceleration_threshold_ = 10;
+  double       claping_speed_threshold_        = 1.0;
+  const double EPSION_TIME                     = 1e-3;
 };  // class MlfMotionRefiner
 
 }  // namespace lidar

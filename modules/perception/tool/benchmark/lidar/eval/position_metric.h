@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 #include <string>
+
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 
 namespace apollo {
@@ -27,14 +28,13 @@ struct PositionMetricOption {
 };
 
 struct PositionMetric {
-  void cal_position_metric(const ObjectPtr& object,
-                           const PositionMetricOption& option);
+  void cal_position_metric(const ObjectPtr& object, const PositionMetricOption& option);
 
-  double radial_distance = 0.0;
+  double radial_distance     = 0.0;
   double horizontal_distance = 0.0;
-  double vertical_distance = 0.0;
-  double angle = 0.0;
-  bool is_in_roi = false;
+  double vertical_distance   = 0.0;
+  double angle               = 0.0;
+  bool   is_in_roi           = false;
 
   bool is_valid = false;
 };
@@ -42,15 +42,15 @@ struct PositionMetric {
 class BaseRangeInterface {
  public:
   virtual unsigned int get_index(const PositionMetric& position) const = 0;
-  virtual unsigned int get_dim() const = 0;
-  virtual std::string get_element(unsigned int index) const = 0;
+  virtual unsigned int get_dim() const                                 = 0;
+  virtual std::string  get_element(unsigned int index) const           = 0;
 };
 
 class DistanceBasedRangeInterface : public BaseRangeInterface {
  public:
   unsigned int get_index(const PositionMetric& position) const override;
   unsigned int get_dim() const override;
-  std::string get_element(unsigned int index) const override;
+  std::string  get_element(unsigned int index) const override;
 
  public:
   static void set_distance(double distance);
@@ -65,14 +65,14 @@ class DistanceBasedRangeRadarInterface : public BaseRangeInterface {
  public:
   unsigned int get_index(const PositionMetric& position) const override;
   unsigned int get_dim() const override;
-  std::string get_element(unsigned int index) const override;
+  std::string  get_element(unsigned int index) const override;
 };
 
 class ViewBasedRangeInterface : public BaseRangeInterface {
  public:
   unsigned int get_index(const PositionMetric& position) const override;
   unsigned int get_dim() const override;
-  std::string get_element(unsigned int index) const override;
+  std::string  get_element(unsigned int index) const override;
 
  public:
   static void set_front_view_angle(double angle);
@@ -91,7 +91,7 @@ class BoxBasedRangeInterface : public BaseRangeInterface {
  public:
   unsigned int get_index(const PositionMetric& position) const override;
   unsigned int get_dim() const override;
-  std::string get_element(unsigned int index) const override;
+  std::string  get_element(unsigned int index) const override;
 
  public:
   static void set_front_box_distance(double distance);
@@ -108,7 +108,7 @@ class RoiDistanceBasedRangeInterface : public DistanceBasedRangeInterface {
  public:
   unsigned int get_index(const PositionMetric& position) const override;
   unsigned int get_dim() const override;
-  std::string get_element(unsigned int index) const override;
+  std::string  get_element(unsigned int index) const override;
 
  public:
   static void set_ignore_roi_outside(bool ignore);

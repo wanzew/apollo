@@ -27,8 +27,10 @@ namespace perception {
 namespace inference {
 
 BatchStream::BatchStream(int batchSize, int maxBatches, std::string dataPath)
-    : mBatchSize(batchSize), mMaxBatches(maxBatches), mPath(dataPath) {
-  FILE *file = fopen((mPath + "Batch0").c_str(), "rb");
+    : mBatchSize(batchSize)
+    , mMaxBatches(maxBatches)
+    , mPath(dataPath) {
+  FILE* file = fopen((mPath + "Batch0").c_str(), "rb");
   if (file != nullptr) {
     int d[4];
     int fs = static_cast<int>(fread(d, sizeof(int), 4, file));
@@ -42,30 +44,27 @@ BatchStream::BatchStream(int batchSize, int maxBatches, std::string dataPath)
   }
 }
 
-BatchStream::BatchStream() : mPath("") {}
+BatchStream::BatchStream()
+    : mPath("") {}
 
 void BatchStream::reset(int firstBatch) {
   if (mPath != "") {
-    mBatchCount = 0;
-    mFileCount = 0;
+    mBatchCount   = 0;
+    mFileCount    = 0;
     mFileBatchPos = mDims.n();
     skip(firstBatch);
   }
 }
 
 bool BatchStream::next() {
-  if (mBatchCount == mMaxBatches) {
-    return false;
-  }
+  if (mBatchCount == mMaxBatches) { return false; }
 
   for (int csize = 1, batchPos = 0; batchPos < mBatchSize;
        batchPos += csize, mFileBatchPos += csize) {
     CHECK_GT(mFileBatchPos, 0);
     CHECK_LE(mFileBatchPos, mDims.n());
     // mMaxBatches > number of batches in the files
-    if (mFileBatchPos == mDims.n() && !update()) {
-      return false;
-    }
+    if (mFileBatchPos == mDims.n() && !update()) { return false; }
 
     // copy the smaller of: elements left to fulfill the request,
     // or elements left in the file buffer.
@@ -78,8 +77,7 @@ bool BatchStream::next() {
 }
 
 void BatchStream::skip(int skipCount) {
-  if (mBatchSize >= mDims.n() && mBatchSize % mDims.n() == 0 &&
-      mFileBatchPos == mDims.n()) {
+  if (mBatchSize >= mDims.n() && mBatchSize % mDims.n() == 0 && mFileBatchPos == mDims.n()) {
     mFileCount += skipCount * mBatchSize / mDims.n();
     return;
   }
@@ -93,19 +91,15 @@ void BatchStream::skip(int skipCount) {
 
 bool BatchStream::update() {
   std::string inputFileName = absl::StrCat(mPath, "Batch", mFileCount++);
-  FILE *file = fopen(inputFileName.c_str(), "rb");
-  if (file == nullptr) {
-    return false;
-  }
+  FILE*       file          = fopen(inputFileName.c_str(), "rb");
+  if (file == nullptr) { return false; }
 
   int d[4];
   int fs = static_cast<int>(fread(d, sizeof(int), 4, file));
   CHECK_EQ(fs, 4);
-  ACHECK(mDims.n() == d[0] && mDims.c() == d[1] && mDims.h() == d[2] &&
-         mDims.w() == d[3]);
+  ACHECK(mDims.n() == d[0] && mDims.c() == d[1] && mDims.h() == d[2] && mDims.w() == d[3]);
 
-  size_t readInputCount =
-      fread(getFileBatch(), sizeof(float), mDims.n() * mImageSize, file);
+  size_t readInputCount = fread(getFileBatch(), sizeof(float), mDims.n() * mImageSize, file);
   CHECK_EQ(readInputCount, size_t(mDims.n() * mImageSize));
   fclose(file);
   mFileBatchPos = 0;

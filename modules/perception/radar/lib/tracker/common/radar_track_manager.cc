@@ -23,9 +23,7 @@ int RadarTrackManager::RemoveLostTracks() {
   size_t track_count = 0;
   for (size_t i = 0; i < tracks_.size(); ++i) {
     if (!tracks_[i]->IsDead()) {
-      if (i != track_count) {
-        tracks_[track_count] = tracks_[i];
-      }
+      if (i != track_count) { tracks_[track_count] = tracks_[i]; }
       ++track_count;
     }
   }

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "gtest/gtest.h"
+
 #include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/inference/utils/gemm.h"
 #include "modules/perception/inference/utils/resize.h"
@@ -24,9 +25,7 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-TEST(loadTest, test) {
-  ACHECK(!apollo::perception::inference::load_binary_data("unknow.txt"));
-}
+TEST(loadTest, test) { ACHECK(!apollo::perception::inference::load_binary_data("unknow.txt")); }
 
 TEST(UtilTest, GemmTest) {
   base::Blob<float> a;
@@ -35,35 +34,35 @@ TEST(UtilTest, GemmTest) {
   a.Reshape({2, 2});
   b.Reshape({2, 2});
   c.Reshape({3, 3});
-  float *p = a.mutable_cpu_data();
-  p[0] = 1;
-  p[1] = 2;
-  p[2] = 3;
-  p[3] = 4;
-  p = b.mutable_cpu_data();
-  p[0] = 2;
-  p[1] = 3;
-  p[2] = 4;
-  p[3] = 5;
+  float* p = a.mutable_cpu_data();
+  p[0]     = 1;
+  p[1]     = 2;
+  p[2]     = 3;
+  p[3]     = 4;
+  p        = b.mutable_cpu_data();
+  p[0]     = 2;
+  p[1]     = 3;
+  p[2]     = 4;
+  p[3]     = 5;
   inference::CudaUtil::set_device_id(0);
-  inference::GPUGemmFloat(CblasNoTrans, CblasTrans, 2, 2, 2, 1, a.gpu_data(),
-                          b.gpu_data(), 0, c.mutable_gpu_data());
-  const float *out = c.cpu_data();
+  inference::GPUGemmFloat(CblasNoTrans, CblasTrans, 2, 2, 2, 1, a.gpu_data(), b.gpu_data(), 0,
+                          c.mutable_gpu_data());
+  const float* out = c.cpu_data();
   EXPECT_EQ(8, out[0]);
   EXPECT_EQ(14, out[1]);
   EXPECT_EQ(18, out[2]);
   EXPECT_EQ(32, out[3]);
 
-  inference::GPUGemmFloat(CblasNoTrans, CblasNoTrans, 2, 2, 2, 1, a.gpu_data(),
-                          b.gpu_data(), 0, c.mutable_gpu_data());
+  inference::GPUGemmFloat(CblasNoTrans, CblasNoTrans, 2, 2, 2, 1, a.gpu_data(), b.gpu_data(), 0,
+                          c.mutable_gpu_data());
   out = c.cpu_data();
   EXPECT_EQ(out[0], 10);
   EXPECT_EQ(out[1], 13);
   EXPECT_EQ(out[2], 22);
   EXPECT_EQ(out[3], 29);
 
-  inference::GPUGemmFloat(CblasTrans, CblasNoTrans, 2, 2, 2, 1, a.gpu_data(),
-                          b.gpu_data(), 0, c.mutable_gpu_data());
+  inference::GPUGemmFloat(CblasTrans, CblasNoTrans, 2, 2, 2, 1, a.gpu_data(), b.gpu_data(), 0,
+                          c.mutable_gpu_data());
   out = c.cpu_data();
   EXPECT_EQ(out[0], 14);
   EXPECT_EQ(out[1], 18);
@@ -75,11 +74,11 @@ TEST(UtilTest, NormTest) {
   inference::CudaUtil::set_device_id(0);
   {
     inference::GPUL2Norm norm;
-    base::Blob<float> data;
-    const int num = 20;
-    const int dim = 512;
+    base::Blob<float>    data;
+    const int            num = 20;
+    const int            dim = 512;
     data.Reshape({num, dim});
-    float *p = data.mutable_cpu_data();
+    float* p = data.mutable_cpu_data();
     for (int i = 0; i < num; ++i) {
       for (int j = 0; j < dim; ++j) {
         // TODO(gaohan) add a function
@@ -88,7 +87,7 @@ TEST(UtilTest, NormTest) {
       }
     }
     norm.L2Norm(&data);
-    const float *result = data.cpu_data();
+    const float* result = data.cpu_data();
     for (int i = 0; i < num; ++i) {
       float sum = 0.0f;
       for (int j = 0; j < dim; ++j) {
@@ -101,18 +100,18 @@ TEST(UtilTest, NormTest) {
 
   {
     inference::GPUL2Norm norm;
-    base::Blob<float> data;
-    const int num = 0;
-    const int dim = 512;
+    base::Blob<float>    data;
+    const int            num = 0;
+    const int            dim = 512;
     data.Reshape({num, dim});
     norm.L2Norm(&data);
     EXPECT_EQ(data.num(), 0);
   }
 }
 
-const int thread_count = 3;
+const int                   thread_count = 3;
 std::vector<cublasHandle_t> handlers(thread_count, nullptr);
-void CudaUtilFun(int gpu_count, int thread_id) {
+void                        CudaUtilFun(int gpu_count, int thread_id) {
   EXPECT_TRUE(inference::CudaUtil::set_device_id(0));
   for (int i = 1; i < gpu_count; ++i) {
     EXPECT_TRUE(inference::CudaUtil::set_device_id(i));
@@ -134,24 +133,22 @@ TEST(UtilTest, CudaUtilTest) {
 }
 
 TEST(UtilTest, test_resize_gpu) {
-  cv::Mat img = cv::imread("inference_test_data/images/test.jpg");
+  cv::Mat       img = cv::imread("inference_test_data/images/test.jpg");
   base::Image8U src_image(img.rows, img.cols, base::Color::BGR);
 
   std::shared_ptr<apollo::perception::base::Blob<uint8_t>> src_blob(
       new apollo::perception::base::Blob<uint8_t>);
   NppiSize roi;
-  int height = src_image.rows();
-  int width = src_image.cols();
-  roi.height = height;
-  roi.width = width;
+  int      height = src_image.rows();
+  int      width  = src_image.cols();
+  roi.height      = height;
+  roi.width       = width;
   src_blob->Reshape({1, roi.height, roi.width, src_image.channels()});
-  nppiCopy_8u_C3R(src_image.gpu_data(), src_image.width_step(),
-                  src_blob->mutable_gpu_data(),
+  nppiCopy_8u_C3R(src_image.gpu_data(), src_image.width_step(), src_blob->mutable_gpu_data(),
                   src_blob->count(2) * sizeof(uint8_t), roi);
 
   {
-    std::vector<int> shape = {1, img.rows * 0.5, img.cols * 0.5,
-                              img.channels()};
+    std::vector<int> shape = {1, img.rows * 0.5, img.cols * 0.5, img.channels()};
     std::shared_ptr<apollo::perception::base::Blob<float>> dst_blob(
         new apollo::perception::base::Blob<float>(shape));
     EXPECT_TRUE(inference::ResizeGPU(src_image, dst_blob, width, 0));
@@ -169,13 +166,12 @@ TEST(UtilTest, test_resize_gpu) {
   }
 
   {
-    std::vector<int> shape = {1, img.rows * 0.5, img.cols * 0.5,
-                              img.channels()};
+    std::vector<int> shape = {1, img.rows * 0.5, img.cols * 0.5, img.channels()};
     std::shared_ptr<apollo::perception::base::Blob<float>> dst_blob(
         new apollo::perception::base::Blob<float>(shape));
     int mean_bgr[3] = {128, 128, 128};
-    EXPECT_TRUE(inference::ResizeGPU(src_image, dst_blob, width, 0, mean_bgr[0],
-                                     mean_bgr[1], mean_bgr[2], true, 1.0));
+    EXPECT_TRUE(inference::ResizeGPU(src_image, dst_blob, width, 0, mean_bgr[0], mean_bgr[1],
+                                     mean_bgr[2], true, 1.0));
     EXPECT_EQ(dst_blob->shape(0), 1);
     EXPECT_EQ(dst_blob->shape(1), src_image.rows() * 0.5);
     EXPECT_EQ(dst_blob->shape(2), src_image.cols() * 0.5);
@@ -183,13 +179,12 @@ TEST(UtilTest, test_resize_gpu) {
   }
 
   {
-    std::vector<int> shape = {1, img.channels(), img.rows * 0.5,
-                              img.cols * 0.5};
+    std::vector<int> shape = {1, img.channels(), img.rows * 0.5, img.cols * 0.5};
     std::shared_ptr<apollo::perception::base::Blob<float>> dst_blob(
         new apollo::perception::base::Blob<float>(shape));
     int mean_bgr[3] = {128, 128, 128};
-    EXPECT_TRUE(inference::ResizeGPU(src_image, dst_blob, width, 0, mean_bgr[0],
-                                     mean_bgr[1], mean_bgr[2], false, 1.0));
+    EXPECT_TRUE(inference::ResizeGPU(src_image, dst_blob, width, 0, mean_bgr[0], mean_bgr[1],
+                                     mean_bgr[2], false, 1.0));
     EXPECT_EQ(dst_blob->shape(0), 1);
     EXPECT_EQ(dst_blob->shape(1), src_image.channels());
     EXPECT_EQ(dst_blob->shape(2), src_image.rows() * 0.5);
@@ -201,19 +196,17 @@ TEST(UtilTest, test_resize_gpu) {
     std::shared_ptr<apollo::perception::base::Blob<float>> dst_blob(
         new apollo::perception::base::Blob<float>(shape));
     int mean_bgr[3] = {128, 128, 128};
-    EXPECT_FALSE(inference::ResizeGPU(src_image, dst_blob, width, 0,
-                                      mean_bgr[0], mean_bgr[1], mean_bgr[2],
-                                      true, 1.0));
+    EXPECT_FALSE(inference::ResizeGPU(src_image, dst_blob, width, 0, mean_bgr[0], mean_bgr[1],
+                                      mean_bgr[2], true, 1.0));
   }
 
   {
-    std::vector<int> shape = {1, img.rows * 0.5, img.cols * 0.5,
-                              img.channels()};
+    std::vector<int> shape = {1, img.rows * 0.5, img.cols * 0.5, img.channels()};
     std::shared_ptr<apollo::perception::base::Blob<float>> dst_blob(
         new apollo::perception::base::Blob<float>(shape));
     int mean_bgr[3] = {128, 128, 128};
-    EXPECT_TRUE(inference::ResizeGPU(*src_blob, dst_blob, width, 0, mean_bgr[0],
-                                     mean_bgr[1], mean_bgr[2], true, 1.0));
+    EXPECT_TRUE(inference::ResizeGPU(*src_blob, dst_blob, width, 0, mean_bgr[0], mean_bgr[1],
+                                     mean_bgr[2], true, 1.0));
     EXPECT_EQ(dst_blob->shape(0), src_blob->shape(0));
     EXPECT_EQ(dst_blob->shape(1), src_blob->shape(1) * 0.5);
     EXPECT_EQ(dst_blob->shape(2), src_blob->shape(2) * 0.5);
@@ -221,13 +214,12 @@ TEST(UtilTest, test_resize_gpu) {
   }
 
   {
-    std::vector<int> shape = {1, img.channels(), img.rows * 0.5,
-                              img.cols * 0.5};
+    std::vector<int> shape = {1, img.channels(), img.rows * 0.5, img.cols * 0.5};
     std::shared_ptr<apollo::perception::base::Blob<float>> dst_blob(
         new apollo::perception::base::Blob<float>(shape));
     int mean_bgr[3] = {128, 128, 128};
-    EXPECT_TRUE(inference::ResizeGPU(*src_blob, dst_blob, width, 0, mean_bgr[0],
-                                     mean_bgr[1], mean_bgr[2], false, 1.0));
+    EXPECT_TRUE(inference::ResizeGPU(*src_blob, dst_blob, width, 0, mean_bgr[0], mean_bgr[1],
+                                     mean_bgr[2], false, 1.0));
     EXPECT_EQ(dst_blob->shape(0), src_blob->shape(0));
     EXPECT_EQ(dst_blob->shape(1), src_blob->shape(3));
     EXPECT_EQ(dst_blob->shape(2), src_blob->shape(1) * 0.5);
@@ -239,9 +231,8 @@ TEST(UtilTest, test_resize_gpu) {
     std::shared_ptr<apollo::perception::base::Blob<float>> dst_blob(
         new apollo::perception::base::Blob<float>(shape));
     int mean_bgr[3] = {128, 128, 128};
-    EXPECT_FALSE(inference::ResizeGPU(*src_blob, dst_blob, width, 0,
-                                      mean_bgr[0], mean_bgr[1], mean_bgr[2],
-                                      true, 1.0));
+    EXPECT_FALSE(inference::ResizeGPU(*src_blob, dst_blob, width, 0, mean_bgr[0], mean_bgr[1],
+                                      mean_bgr[2], true, 1.0));
   }
 }
 }  // namespace inference

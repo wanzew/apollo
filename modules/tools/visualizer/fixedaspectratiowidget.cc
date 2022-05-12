@@ -22,7 +22,10 @@
 #include <QtWidgets/QStyleOption>
 
 FixedAspectRatioWidget::FixedAspectRatioWidget(QWidget* parent, int index)
-    : QWidget(parent), index_(index), refresh_timer_(this), viewer_() {
+    : QWidget(parent)
+    , index_(index)
+    , refresh_timer_(this)
+    , viewer_() {
   viewer_.setParent(this);
   viewer_.setGeometry(geometry());
 
@@ -42,8 +45,7 @@ void FixedAspectRatioWidget::StartOrStopUpdate(bool b) {
   }
 }
 
-void FixedAspectRatioWidget::SetupDynamicTexture(
-    const std::shared_ptr<Texture>& textureObj) {
+void FixedAspectRatioWidget::SetupDynamicTexture(const std::shared_ptr<Texture>& textureObj) {
   if (textureObj == nullptr) {
     viewer_.default_image_->setSizeChanged();
     viewer_.plane_.set_texture(viewer_.default_image_);
@@ -60,7 +62,7 @@ void FixedAspectRatioWidget::mouseDoubleClickEvent(QMouseEvent* event) {
 }
 
 void FixedAspectRatioWidget::contextMenuEvent(QContextMenuEvent* event) {
-  emit focusOnThis(this);
+  emit  focusOnThis(this);
   QMenu m;
   m.addActions(actions());
   m.exec(event->globalPos());
@@ -90,22 +92,21 @@ void FixedAspectRatioWidget::resizeEvent(QResizeEvent* revent) {
     int h = size.height();
 
     int tmpH = w >> wc;
-    w = tmpH << wc;
+    w        = tmpH << wc;
     size.setWidth(w);
     tmpH *= hc;
     if (tmpH <= h) {
       size.setHeight(tmpH);
     } else {
       tmpH = h / hc;
-      h = tmpH * hc;
+      h    = tmpH * hc;
       size.setHeight(h);
       size.setWidth(tmpH << wc);
     }
   }
 
   viewer_.setGeometry((revent->size().width() - size.width()) / 2,
-                      (revent->size().height() - size.height()) / 2,
-                      size.width(), size.height());
+                      (revent->size().height() - size.height()) / 2, size.width(), size.height());
   QWidget::resizeEvent(revent);
 }
 

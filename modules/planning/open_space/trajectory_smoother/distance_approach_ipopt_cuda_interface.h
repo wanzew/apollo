@@ -20,29 +20,29 @@
 
 #pragma once
 
-#include <vector>
-
 #include <omp.h>
+
+#include <vector>
 
 #include <adolc/adolc.h>
 #include <adolc/adolc_openmp.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
-
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
 
 #include "Eigen/Dense"
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_interface.h"
-#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 #define tag_f 1
 #define tag_g 2
@@ -54,29 +54,44 @@ namespace planning {
 
 class DistanceApproachIPOPTCUDAInterface : public DistanceApproachInterface {
  public:
-  DistanceApproachIPOPTCUDAInterface(
-      const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
-      const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
-      const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
-      const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
-      const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
-      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-      const PlannerOpenSpaceConfig& planner_open_space_config);
+  DistanceApproachIPOPTCUDAInterface(const size_t                  horizon,
+                                     const double                  ts,
+                                     const Eigen::MatrixXd&        ego,
+                                     const Eigen::MatrixXd&        xWS,
+                                     const Eigen::MatrixXd&        uWS,
+                                     const Eigen::MatrixXd&        l_warm_up,
+                                     const Eigen::MatrixXd&        n_warm_up,
+                                     const Eigen::MatrixXd&        x0,
+                                     const Eigen::MatrixXd&        xf,
+                                     const Eigen::MatrixXd&        last_time_u,
+                                     const std::vector<double>&    XYbounds,
+                                     const Eigen::MatrixXi&        obstacles_edges_num,
+                                     const size_t                  obstacles_num,
+                                     const Eigen::MatrixXd&        obstacles_A,
+                                     const Eigen::MatrixXd&        obstacles_b,
+                                     const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachIPOPTCUDAInterface() = default;
 
   /** Method to return some info about the nlp */
-  bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,  // NOLINT
-                    IndexStyleEnum& index_style) override;           // NOLINT
+  bool get_nlp_info(int&            n,
+                    int&            m,
+                    int&            nnz_jac_g,
+                    int&            nnz_h_lag,              // NOLINT
+                    IndexStyleEnum& index_style) override;  // NOLINT
 
   /** Method to return the bounds for my problem */
-  bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l,
-                       double* g_u) override;
+  bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l, double* g_u) override;
 
   /** Method to return the starting point for the algorithm */
-  bool get_starting_point(int n, bool init_x, double* x, bool init_z,
-                          double* z_L, double* z_U, int m, bool init_lambda,
+  bool get_starting_point(int     n,
+                          bool    init_x,
+                          double* x,
+                          bool    init_z,
+                          double* z_L,
+                          double* z_U,
+                          int     m,
+                          bool    init_lambda,
                           double* lambda) override;
 
   /** Method to return the objective value */
@@ -97,31 +112,63 @@ class DistanceApproachIPOPTCUDAInterface : public DistanceApproachInterface {
    *   1) The structure of the jacobian (if "values" is nullptr)
    *   2) The values of the jacobian (if "values" is not nullptr)
    */
-  bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
-                  int* iRow, int* jCol, double* values) override;
+  bool eval_jac_g(int           n,
+                  const double* x,
+                  bool          new_x,
+                  int           m,
+                  int           nele_jac,
+                  int*          iRow,
+                  int*          jCol,
+                  double*       values) override;
   // sequential implementation to jac_g
-  bool eval_jac_g_ser(int n, const double* x, bool new_x, int m, int nele_jac,
-                      int* iRow, int* jCol, double* values);
+  bool eval_jac_g_ser(int           n,
+                      const double* x,
+                      bool          new_x,
+                      int           m,
+                      int           nele_jac,
+                      int*          iRow,
+                      int*          jCol,
+                      double*       values);
   // parallel implementation to jac_g
-  bool eval_jac_g_par(int n, const double* x, bool new_x, int m, int nele_jac,
-                      int* iRow, int* jCol, double* values);
+  bool eval_jac_g_par(int           n,
+                      const double* x,
+                      bool          new_x,
+                      int           m,
+                      int           nele_jac,
+                      int*          iRow,
+                      int*          jCol,
+                      double*       values);
 
   /** Method to return:
    *   1) The structure of the hessian of the lagrangian (if "values" is
    * nullptr) 2) The values of the hessian of the lagrangian (if "values" is not
    * nullptr)
    */
-  bool eval_h(int n, const double* x, bool new_x, double obj_factor, int m,
-              const double* lambda, bool new_lambda, int nele_hess, int* iRow,
-              int* jCol, double* values) override;
+  bool eval_h(int           n,
+              const double* x,
+              bool          new_x,
+              double        obj_factor,
+              int           m,
+              const double* lambda,
+              bool          new_lambda,
+              int           nele_hess,
+              int*          iRow,
+              int*          jCol,
+              double*       values) override;
 
   /** @name Solution Methods */
   /** This method is called when the algorithm is complete so the TNLP can
    * store/write the solution */
-  void finalize_solution(Ipopt::SolverReturn status, int n, const double* x,
-                         const double* z_L, const double* z_U, int m,
-                         const double* g, const double* lambda,
-                         double obj_value, const Ipopt::IpoptData* ip_data,
+  void finalize_solution(Ipopt::SolverReturn               status,
+                         int                               n,
+                         const double*                     x,
+                         const double*                     z_L,
+                         const double*                     z_U,
+                         int                               m,
+                         const double*                     g,
+                         const double*                     lambda,
+                         double                            obj_value,
+                         const Ipopt::IpoptData*           ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
   void get_optimization_results(Eigen::MatrixXd* state_result,
@@ -144,47 +191,47 @@ class DistanceApproachIPOPTCUDAInterface : public DistanceApproachInterface {
   //***************    end   ADOL-C part ***********************************
 
  private:
-  int num_of_variables_ = 0;
-  int num_of_constraints_ = 0;
-  int horizon_ = 0;
-  int lambda_horizon_ = 0;
-  int miu_horizon_ = 0;
-  double ts_ = 0.0;
-  Eigen::MatrixXd ego_;
-  Eigen::MatrixXd xWS_;
-  Eigen::MatrixXd uWS_;
-  Eigen::MatrixXd l_warm_up_;
-  Eigen::MatrixXd n_warm_up_;
-  Eigen::MatrixXd x0_;
-  Eigen::MatrixXd xf_;
-  Eigen::MatrixXd last_time_u_;
+  int                 num_of_variables_   = 0;
+  int                 num_of_constraints_ = 0;
+  int                 horizon_            = 0;
+  int                 lambda_horizon_     = 0;
+  int                 miu_horizon_        = 0;
+  double              ts_                 = 0.0;
+  Eigen::MatrixXd     ego_;
+  Eigen::MatrixXd     xWS_;
+  Eigen::MatrixXd     uWS_;
+  Eigen::MatrixXd     l_warm_up_;
+  Eigen::MatrixXd     n_warm_up_;
+  Eigen::MatrixXd     x0_;
+  Eigen::MatrixXd     xf_;
+  Eigen::MatrixXd     last_time_u_;
   std::vector<double> XYbounds_;
 
   // debug flag
   bool enable_constraint_check_;
 
   // penalty
-  double weight_state_x_ = 0.0;
-  double weight_state_y_ = 0.0;
-  double weight_state_phi_ = 0.0;
-  double weight_state_v_ = 0.0;
-  double weight_input_steer_ = 0.0;
-  double weight_input_a_ = 0.0;
-  double weight_rate_steer_ = 0.0;
-  double weight_rate_a_ = 0.0;
-  double weight_stitching_steer_ = 0.0;
-  double weight_stitching_a_ = 0.0;
-  double weight_first_order_time_ = 0.0;
+  double weight_state_x_           = 0.0;
+  double weight_state_y_           = 0.0;
+  double weight_state_phi_         = 0.0;
+  double weight_state_v_           = 0.0;
+  double weight_input_steer_       = 0.0;
+  double weight_input_a_           = 0.0;
+  double weight_rate_steer_        = 0.0;
+  double weight_rate_a_            = 0.0;
+  double weight_stitching_steer_   = 0.0;
+  double weight_stitching_a_       = 0.0;
+  double weight_first_order_time_  = 0.0;
   double weight_second_order_time_ = 0.0;
 
-  double w_ev_ = 0.0;
-  double l_ev_ = 0.0;
+  double              w_ev_ = 0.0;
+  double              l_ev_ = 0.0;
   std::vector<double> g_;
-  double offset_ = 0.0;
-  Eigen::MatrixXi obstacles_edges_num_;
-  int obstacles_num_ = 0;
-  int obstacles_edges_sum_ = 0;
-  double wheelbase_ = 0.0;
+  double              offset_ = 0.0;
+  Eigen::MatrixXi     obstacles_edges_num_;
+  int                 obstacles_num_       = 0;
+  int                 obstacles_edges_sum_ = 0;
+  double              wheelbase_           = 0.0;
 
   Eigen::MatrixXd state_result_;
   Eigen::MatrixXd dual_l_result_;
@@ -241,19 +288,19 @@ class DistanceApproachIPOPTCUDAInterface : public DistanceApproachInterface {
   double max_miu_ = 0.0;
 
  private:
-  DistanceApproachConfig distance_approach_config_;
-  PlannerOpenSpaceConfig planner_open_space_config_;
+  DistanceApproachConfig     distance_approach_config_;
+  PlannerOpenSpaceConfig     planner_open_space_config_;
   const common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
  private:
   //***************    start ADOL-C part ***********************************
-  double* obj_lam;
-  unsigned int* rind_L; /* row indices    */
-  unsigned int* cind_L; /* column indices */
-  double* hessval;      /* values */
-  int nnz_L = 0;
-  int options_L[4];
+  double*       obj_lam;
+  unsigned int* rind_L;  /* row indices    */
+  unsigned int* cind_L;  /* column indices */
+  double*       hessval; /* values */
+  int           nnz_L = 0;
+  int           options_L[4];
   //***************    end   ADOL-C part ***********************************
 };
 

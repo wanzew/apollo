@@ -20,8 +20,8 @@
 #include <string>
 
 namespace {
-std::mutex m;
-std::string binary_name; // NOLINT
+std::mutex  m;
+std::string binary_name;  // NOLINT
 }  // namespace
 
 namespace apollo {

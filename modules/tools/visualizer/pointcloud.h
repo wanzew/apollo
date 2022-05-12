@@ -19,21 +19,22 @@
 #include <memory>
 
 #include "modules/drivers/proto/pointcloud.pb.h"
+
 #include "modules/tools/visualizer/renderable_object.h"
 
 class QOpenGLShaderProgram;
 
 class PointCloud : public RenderableObject {
  public:
-  explicit PointCloud(int pointCount = 1, int vertex_element_count = 3,
-                      const std::shared_ptr<QOpenGLShaderProgram>&
-                          shaderProgram = NullRenderableObj);
+  explicit PointCloud(
+      int                                          pointCount           = 1,
+      int                                          vertex_element_count = 3,
+      const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram        = NullRenderableObj);
   ~PointCloud(void);
 
   virtual GLenum GetPrimitiveType(void) const { return GL_POINTS; }
 
-  bool FillData(
-      const std::shared_ptr<const apollo::drivers::PointCloud>& pData);
+  bool FillData(const std::shared_ptr<const apollo::drivers::PointCloud>& pData);
 
  private:
   virtual bool FillVertexBuffer(GLfloat* vertexBuffer);

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/prediction/submodules/submodule_output.h"
+
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -24,9 +25,7 @@ void SubmoduleOutput::InsertObstacle(const Obstacle&& obstacle) {
   curr_frame_obstacles_.push_back(obstacle);
 }
 
-void SubmoduleOutput::InsertEgoVehicle(const Obstacle&& ego_vehicle) {
-  ego_vehicle_ = ego_vehicle;
-}
+void SubmoduleOutput::InsertEgoVehicle(const Obstacle&& ego_vehicle) { ego_vehicle_ = ego_vehicle; }
 
 void SubmoduleOutput::set_curr_frame_movable_obstacle_ids(
     const std::vector<int>& curr_frame_movable_obstacle_ids) {
@@ -43,14 +42,11 @@ void SubmoduleOutput::set_curr_frame_considered_obstacle_ids(
   curr_frame_considered_obstacle_ids_ = curr_frame_considered_obstacle_ids;
 }
 
-void SubmoduleOutput::set_frame_start_time(
-    const apollo::cyber::Time& frame_start_time) {
+void SubmoduleOutput::set_frame_start_time(const apollo::cyber::Time& frame_start_time) {
   frame_start_time_ = frame_start_time;
 }
 
-void SubmoduleOutput::set_curr_scenario(const Scenario& scenario) {
-  curr_scenario_ = scenario;
-}
+void SubmoduleOutput::set_curr_scenario(const Scenario& scenario) { curr_scenario_ = scenario; }
 
 const std::vector<Obstacle>& SubmoduleOutput::curr_frame_obstacles() const {
   return curr_frame_obstacles_;
@@ -70,9 +66,7 @@ std::vector<int> SubmoduleOutput::curr_frame_considered_obstacle_ids() const {
   return curr_frame_considered_obstacle_ids_;
 }
 
-const apollo::cyber::Time& SubmoduleOutput::frame_start_time() const {
-  return frame_start_time_;
-}
+const apollo::cyber::Time& SubmoduleOutput::frame_start_time() const { return frame_start_time_; }
 
 }  // namespace prediction
 }  // namespace apollo

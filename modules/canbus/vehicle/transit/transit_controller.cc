@@ -36,23 +36,22 @@ using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 }  // namespace
 
-ErrorCode TransitController::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+TransitController::Init(const VehicleParameter&                                params,
+                        CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+                        MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "TransitController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
 
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
@@ -84,14 +83,12 @@ ErrorCode TransitController::Init(
   adc_motioncontrol1_10_ = dynamic_cast<Adcmotioncontrol110*>(
       message_manager_->GetMutableProtocolDataById(Adcmotioncontrol110::ID));
   if (adc_motioncontrol1_10_ == nullptr) {
-    AERROR
-        << "Adcmotioncontrol110 does not exist in the TransitMessageManager!";
+    AERROR << "Adcmotioncontrol110 does not exist in the TransitMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
   adc_motioncontrollimits1_12_ = dynamic_cast<Adcmotioncontrollimits112*>(
-      message_manager_->GetMutableProtocolDataById(
-          Adcmotioncontrollimits112::ID));
+      message_manager_->GetMutableProtocolDataById(Adcmotioncontrollimits112::ID));
   if (adc_motioncontrollimits1_12_ == nullptr) {
     AERROR << "Adcmotioncontrollimits112 does not exist in the "
               "TransitMessageManager!";
@@ -107,24 +104,18 @@ ErrorCode TransitController::Init(
   }
 
   llc_diag_steeringcontrol_722_ = dynamic_cast<Llcdiagsteeringcontrol722*>(
-      message_manager_->GetMutableProtocolDataById(
-          Llcdiagsteeringcontrol722::ID));
+      message_manager_->GetMutableProtocolDataById(Llcdiagsteeringcontrol722::ID));
   if (llc_diag_steeringcontrol_722_ == nullptr) {
     AERROR << "Llcdiagsteeringcontrol722 does not exist in the "
               "TransitMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  can_sender_->AddMessage(Adcauxiliarycontrol110::ID, adc_auxiliarycontrol_110_,
-                          false);
-  can_sender_->AddMessage(Adcmotioncontrol110::ID, adc_motioncontrol1_10_,
-                          false);
-  can_sender_->AddMessage(Adcmotioncontrollimits112::ID,
-                          adc_motioncontrollimits1_12_, false);
-  can_sender_->AddMessage(Llcdiagbrakecontrol721::ID,
-                          llc_diag_brakecontrol_721_, false);
-  can_sender_->AddMessage(Llcdiagsteeringcontrol722::ID,
-                          llc_diag_steeringcontrol_722_, false);
+  can_sender_->AddMessage(Adcauxiliarycontrol110::ID, adc_auxiliarycontrol_110_, false);
+  can_sender_->AddMessage(Adcmotioncontrol110::ID, adc_motioncontrol1_10_, false);
+  can_sender_->AddMessage(Adcmotioncontrollimits112::ID, adc_motioncontrollimits1_12_, false);
+  can_sender_->AddMessage(Llcdiagbrakecontrol721::ID, llc_diag_brakecontrol_721_, false);
+  can_sender_->AddMessage(Llcdiagsteeringcontrol722::ID, llc_diag_steeringcontrol_722_, false);
 
   // need sleep to ensure all messages received
   AINFO << "TransitController is initialized.";
@@ -166,9 +157,7 @@ Chassis TransitController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -180,8 +169,7 @@ Chassis TransitController::chassis() {
 
   auto& motion20 = transit.llc_motionfeedback1_20();
   if (motion20.has_llc_fbk_throttleposition()) {
-    chassis_.set_throttle_percentage(
-        static_cast<float>(motion20.llc_fbk_throttleposition()));
+    chassis_.set_throttle_percentage(static_cast<float>(motion20.llc_fbk_throttleposition()));
   }
 
   button_pressed_ = (transit.llc_motionfeedback1_20().llc_fbk_state() ==
@@ -189,8 +177,7 @@ Chassis TransitController::chassis() {
 
   if (motion20.has_llc_fbk_brakepercentrear()) {
     // TODO(Udelv): fix scaling
-    chassis_.set_brake_percentage(
-        static_cast<float>(motion20.llc_fbk_brakepercentrear()));
+    chassis_.set_brake_percentage(static_cast<float>(motion20.llc_fbk_brakepercentrear()));
   }
 
   if (motion20.has_llc_fbk_gear()) {
@@ -207,8 +194,7 @@ Chassis TransitController::chassis() {
       case Llc_motionfeedback1_20::LLC_FBK_GEAR_R_REVERSE:
         chassis_.set_gear_location(Chassis::GEAR_REVERSE);
         break;
-      default:
-        break;
+      default: break;
     }
   }
 
@@ -219,27 +205,23 @@ Chassis TransitController::chassis() {
 
   if (motion21.has_llc_fbk_steeringangle()) {
     chassis_.set_steering_percentage(
-        static_cast<float>(-1.0 * motion21.llc_fbk_steeringangle() * M_PI /
-                           180 / vehicle_params_.max_steer_angle() * 100));
+        static_cast<float>(-1.0 * motion21.llc_fbk_steeringangle() * M_PI / 180 /
+                           vehicle_params_.max_steer_angle() * 100));
   }
 
   auto& aux = transit.llc_auxiliaryfeedback_120();
   if (aux.has_llc_fbk_turnsignal()) {
     switch (aux.llc_fbk_turnsignal()) {
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT:
-        chassis_.mutable_signal()->set_turn_signal(
-            common::VehicleSignal::TURN_LEFT);
+        chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_LEFT);
         break;
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT:
-        chassis_.mutable_signal()->set_turn_signal(
-            common::VehicleSignal::TURN_RIGHT);
+        chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_RIGHT);
         break;
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE:
-        chassis_.mutable_signal()->set_turn_signal(
-            common::VehicleSignal::TURN_NONE);
+        chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
         break;
-      default:
-        break;
+      default: break;
     }
   }
 
@@ -264,8 +246,7 @@ ErrorCode TransitController::EnableAutoMode() {
   adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
       Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_ANGLE);
   adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
-      Adc_motioncontrol1_10::
-          ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
+      Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
 
   can_sender_->Update();
   if (!CheckResponse()) {
@@ -328,8 +309,7 @@ ErrorCode TransitController::EnableSpeedOnlyMode() {
   adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
       Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE);
   adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
-      Adc_motioncontrol1_10::
-          ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
+      Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
   can_sender_->Update();
   if (!CheckResponse()) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
@@ -356,44 +336,36 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
   }
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
-      adc_motioncontrol1_10_->set_adc_cmd_gear(
-          Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     case Chassis::GEAR_REVERSE: {
-      adc_motioncontrol1_10_->set_adc_cmd_gear(
-          Adc_motioncontrol1_10::ADC_CMD_GEAR_R_REVERSE);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(Adc_motioncontrol1_10::ADC_CMD_GEAR_R_REVERSE);
       break;
     }
     case Chassis::GEAR_DRIVE: {
-      adc_motioncontrol1_10_->set_adc_cmd_gear(
-          Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
       break;
     }
     case Chassis::GEAR_PARKING: {
-      adc_motioncontrol1_10_->set_adc_cmd_gear(
-          Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARK);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARK);
       break;
     }
     case Chassis::GEAR_LOW: {
-      adc_motioncontrol1_10_->set_adc_cmd_gear(
-          Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
       break;
     }
     case Chassis::GEAR_NONE: {
-      adc_motioncontrol1_10_->set_adc_cmd_gear(
-          Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     case Chassis::GEAR_INVALID: {
       AERROR << "Gear command is invalid!";
-      adc_motioncontrol1_10_->set_adc_cmd_gear(
-          Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     default: {
-      adc_motioncontrol1_10_->set_adc_cmd_gear(
-          Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
   }
@@ -457,9 +429,7 @@ void TransitController::Steer(double angle) {
   }
   // TODO(All): remove -1.0 once Udelv has a complete fix.
   const double real_angle =
-      button_pressed_
-          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI
-          : 0;
+      button_pressed_ ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI : 0;
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
 }
 
@@ -475,9 +445,7 @@ void TransitController::Steer(double angle, double angle_spd) {
 
   // TODO(All): remove -1.0 once Udelv has a complete fix.
   const double real_angle =
-      button_pressed_
-          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI
-          : 0;
+      button_pressed_ ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI : 0;
 
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
   // TODO(QiL) : re-enable the angle_spd ajustment
@@ -525,9 +493,7 @@ void TransitController::SetTurningSignal(const ControlCommand& command) {
   }
 }
 
-void TransitController::ResetProtocol() {
-  message_manager_->ResetSendMessages();
-}
+void TransitController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool TransitController::CheckChassisError() {
   // TODO(QiL): re-design later
@@ -535,7 +501,7 @@ bool TransitController::CheckChassisError() {
 }
 
 void TransitController::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -548,16 +514,15 @@ void TransitController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         !CheckResponse()) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -569,8 +534,7 @@ void TransitController::SecurityDogThreadFunc() {
     }
 
     // 2. vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         !CheckResponse()) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -590,9 +554,8 @@ void TransitController::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR
-          << "Too much time consumption in TransitController looping process:"
-          << elapsed.count();
+      AERROR << "Too much time consumption in TransitController looping process:"
+             << elapsed.count();
     }
   }
 }
@@ -609,12 +572,9 @@ bool TransitController::CheckResponse() {
 
   return (motion1_20.llc_fbk_state() ==
               Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED ||
-          motion1_20.llc_fbk_state() ==
-              Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_ALLOWED ||
-          motion1_20.llc_fbk_state() ==
-              Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_REQUESTED ||
-          motion1_20.llc_fbk_state() ==
-              Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY);
+          motion1_20.llc_fbk_state() == Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_ALLOWED ||
+          motion1_20.llc_fbk_state() == Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_REQUESTED ||
+          motion1_20.llc_fbk_state() == Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY);
 }
 
 void TransitController::set_chassis_error_mask(const int32_t mask) {
@@ -632,14 +592,12 @@ Chassis::ErrorCode TransitController::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void TransitController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void TransitController::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }
 
-bool TransitController::CheckSafetyError(
-    const ::apollo::canbus::ChassisDetail& chassis_detail) {
+bool TransitController::CheckSafetyError(const ::apollo::canbus::ChassisDetail& chassis_detail) {
   return true;
 }
 

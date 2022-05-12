@@ -22,9 +22,10 @@
 
 #include <vector>
 
+#include "osqp/osqp.h"
+
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_solver.h"
-#include "osqp/osqp.h"
 
 namespace apollo {
 namespace planning {
@@ -41,9 +42,9 @@ class OsqpSpline1dSolver : public Spline1dSolver {
   void ResetOsqp();
 
  private:
-  OSQPSettings* settings_ = nullptr;
-  OSQPWorkspace* work_ = nullptr;  // Workspace
-  OSQPData* data_ = nullptr;       // OSQPData
+  OSQPSettings*  settings_ = nullptr;
+  OSQPWorkspace* work_     = nullptr;  // Workspace
+  OSQPData*      data_     = nullptr;  // OSQPData
 };
 
 }  // namespace planning

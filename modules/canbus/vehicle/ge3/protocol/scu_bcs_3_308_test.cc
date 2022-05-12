@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_bcs_3_308.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,28 +28,24 @@ class Scubcs3308Test : public ::testing::Test {
 };
 
 TEST_F(Scubcs3308Test, reset) {
-  Scubcs3308 scubcs3308;
-  int32_t length = 8;
+  Scubcs3308    scubcs3308;
+  int32_t       length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
+  uint8_t       bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
   scubcs3308.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_rrwheelspdvd(),
-                   0);  //
-  EXPECT_DOUBLE_EQ(
-      chassis_detail.ge3().scu_bcs_3_308().bcs_rrwheeldirectionvd(), 1);  //
+                   0);                                                                 //
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_rrwheeldirectionvd(), 1);  //
   EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_rlwheelspdvd(),
-                   1);  //
-  EXPECT_DOUBLE_EQ(
-      chassis_detail.ge3().scu_bcs_3_308().bcs_rlwheeldirectionvd(), 0);  //
+                   1);                                                                 //
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_rlwheeldirectionvd(), 0);  //
   EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_frwheelspdvd(),
-                   0);  //
-  EXPECT_DOUBLE_EQ(
-      chassis_detail.ge3().scu_bcs_3_308().bcs_frwheeldirectionvd(), 1);  //
+                   0);                                                                 //
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_frwheeldirectionvd(), 1);  //
   EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_flwheelspdvd(),
-                   1);  //
-  EXPECT_DOUBLE_EQ(
-      chassis_detail.ge3().scu_bcs_3_308().bcs_flwheeldirectionvd(), 0);  //
+                   1);                                                                 //
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_flwheeldirectionvd(), 0);  //
   EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_rrwheelspd(),
                    34.3125);  //
   EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_bcs_3_308().bcs_rrwheeldirection(),

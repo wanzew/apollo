@@ -130,8 +130,8 @@ template <typename Dtype>
 class BlobSimpleTest : public ::testing::Test {
  protected:
   BlobSimpleTest()
-      : blob_(new Blob<Dtype>()),
-        blob_preshaped_(new Blob<Dtype>(2, 3, 4, 5)) {}
+      : blob_(new Blob<Dtype>())
+      , blob_preshaped_(new Blob<Dtype>(2, 3, 4, 5)) {}
   virtual ~BlobSimpleTest() {
     delete blob_;
     delete blob_preshaped_;
@@ -238,11 +238,13 @@ class BlobMathTest : public MultiDeviceTest<TypeParam> {
   typedef typename TypeParam::Dtype Dtype;
 
  protected:
-  BlobMathTest() : blob_(new Blob<Dtype>(2, 3, 4, 5)), epsilon_(1e-6) {}
+  BlobMathTest()
+      : blob_(new Blob<Dtype>(2, 3, 4, 5))
+      , epsilon_(1e-6) {}
 
   virtual ~BlobMathTest() { delete blob_; }
   Blob<Dtype>* const blob_;
-  Dtype epsilon_;
+  Dtype              epsilon_;
 };
 
 TYPED_TEST_CASE(BlobMathTest, TestDtypesAndDevices);

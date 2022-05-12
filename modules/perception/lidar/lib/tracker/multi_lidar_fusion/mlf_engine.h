@@ -20,11 +20,12 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
 #include "modules/perception/onboard/msg_serializer/msg_serializer.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
@@ -37,17 +38,16 @@ class MlfEngine : public BaseMultiTargetTracker {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  MlfEngine() = default;
+  MlfEngine()          = default;
   virtual ~MlfEngine() = default;
 
-  bool Init(const MultiTargetTrackerInitOptions& options =
-                MultiTargetTrackerInitOptions()) override;
+  bool
+  Init(const MultiTargetTrackerInitOptions& options = MultiTargetTrackerInitOptions()) override;
 
   // @brief: track segmented objects from multiple lidar sensors
   // @params [in]: tracker options
   // @params [in/out]: lidar frame
-  bool Track(const MultiTargetTrackerOptions& options,
-             LidarFrame* frame) override;
+  bool Track(const MultiTargetTrackerOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "MlfEngine"; };
 
@@ -55,25 +55,23 @@ class MlfEngine : public BaseMultiTargetTracker {
   // @brief: split foreground/background objects and attach to tracked objects
   // @params [in]: objects
   // @params [in]: sensor info
-  void SplitAndTransformToTrackedObjects(
-      const std::vector<base::ObjectPtr>& objects,
-      const base::SensorInfo& sensor_info);
+  void SplitAndTransformToTrackedObjects(const std::vector<base::ObjectPtr>& objects,
+                                         const base::SensorInfo&             sensor_info);
 
   // @brief: match tracks and objects and object-track assignment
   // @params [in]: match options
   // @params [in]: objects for match
   // @params [in]: name
   // @params [in/out]: tracks for match and assignment
-  void TrackObjectMatchAndAssign(
-      const MlfTrackObjectMatcherOptions& match_options,
-      const std::vector<TrackedObjectPtr>& objects, const std::string& name,
-      std::vector<MlfTrackDataPtr>* tracks);
+  void TrackObjectMatchAndAssign(const MlfTrackObjectMatcherOptions&  match_options,
+                                 const std::vector<TrackedObjectPtr>& objects,
+                                 const std::string&                   name,
+                                 std::vector<MlfTrackDataPtr>*        tracks);
 
   // @brief: filter tracks
   // @params [in]: tracks for filter
   // @params [in]: frame timestamp
-  void TrackStateFilter(const std::vector<MlfTrackDataPtr>& tracks,
-                        double frame_timestamp);
+  void TrackStateFilter(const std::vector<MlfTrackDataPtr>& tracks, double frame_timestamp);
 
   // @brief: collect track results and store in frame tracked objects
   // @params [in/out]: lidar frame
@@ -83,14 +81,15 @@ class MlfEngine : public BaseMultiTargetTracker {
   // @params: name
   // @params: timestamp
   // @params [in/out]: tracks to be cleaned
-  void RemoveStaleTrackData(const std::string& name, double timestamp,
+  void RemoveStaleTrackData(const std::string&            name,
+                            double                        timestamp,
                             std::vector<MlfTrackDataPtr>* tracks);
 
-//  void AttachDebugInfo(
-//      std::vector<std::shared_ptr<base::Object>>* foreground_objs);
+  //  void AttachDebugInfo(
+  //      std::vector<std::shared_ptr<base::Object>>* foreground_objs);
 
-//  void AttachSemanticPredictedTrajectory(
-//      const std::vector<MlfTrackDataPtr>& tracks);
+  //  void AttachSemanticPredictedTrajectory(
+  //      const std::vector<MlfTrackDataPtr>& tracks);
 
  protected:
   // foreground and background track data
@@ -109,17 +108,17 @@ class MlfEngine : public BaseMultiTargetTracker {
   // main sensor info
   std::set<std::string> main_sensor_;
   // params
-  bool use_histogram_for_match_ = true;
-  size_t histogram_bin_size_ = 10;
-  bool output_predict_objects_ = false;
+  bool   use_histogram_for_match_ = true;
+  size_t histogram_bin_size_      = 10;
+  bool   output_predict_objects_  = false;
   double reserved_invisible_time_ = 0.3;
-  bool use_frame_timestamp_ = false;
+  bool   use_frame_timestamp_     = false;
   // semantic map
-  apollo::prediction::ObstaclesContainer obstacle_container_;
-  apollo::prediction::PoseContainer pose_container_;
+  apollo::prediction::ObstaclesContainer     obstacle_container_;
+  apollo::prediction::PoseContainer          pose_container_;
   apollo::perception::onboard::MsgSerializer serializer_;
-  bool use_semantic_map_ = false;
-//  apollo::perception::EvaluatorManager evaluator_;
+  bool                                       use_semantic_map_ = false;
+  //  apollo::perception::EvaluatorManager evaluator_;
 };
 
 }  // namespace lidar

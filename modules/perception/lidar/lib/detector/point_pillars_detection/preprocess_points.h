@@ -46,19 +46,19 @@ namespace lidar {
 class PreprocessPoints {
  private:
   friend class TestClass;
-  const int max_num_pillars_;
-  const int max_num_points_per_pillar_;
-  const int num_point_feature_;
-  const int grid_x_size_;
-  const int grid_y_size_;
-  const int grid_z_size_;
+  const int   max_num_pillars_;
+  const int   max_num_points_per_pillar_;
+  const int   num_point_feature_;
+  const int   grid_x_size_;
+  const int   grid_y_size_;
+  const int   grid_z_size_;
   const float pillar_x_size_;
   const float pillar_y_size_;
   const float pillar_z_size_;
   const float min_x_range_;
   const float min_y_range_;
   const float min_z_range_;
-  const int num_inds_for_scan_;
+  const int   num_inds_for_scan_;
 
  public:
   /**
@@ -78,13 +78,19 @@ class PreprocessPoints {
    * @param[in] num_inds_for_scan Number of indexes for scan(cumsum)
    * @details Captital variables never change after the compile
    */
-  PreprocessPoints(const int max_num_pillars, const int max_points_per_pillar,
-                   const int num_point_feature, const int grid_x_size,
-                   const int grid_y_size, const int grid_z_size,
-                   const float pillar_x_size, const float pillar_y_size,
-                   const float pillar_z_size, const float min_x_range,
-                   const float min_y_range, const float min_z_range,
-                   const int num_inds_for_scan);
+  PreprocessPoints(const int   max_num_pillars,
+                   const int   max_points_per_pillar,
+                   const int   num_point_feature,
+                   const int   grid_x_size,
+                   const int   grid_y_size,
+                   const int   grid_z_size,
+                   const float pillar_x_size,
+                   const float pillar_y_size,
+                   const float pillar_z_size,
+                   const float min_x_range,
+                   const float min_y_range,
+                   const float min_z_range,
+                   const int   num_inds_for_scan);
 
   /**
    * @brief CPU preprocessing for input pointcloud
@@ -101,10 +107,15 @@ class PreprocessPoints {
    * pointcloud
    * @details Convert pointcloud to pillar representation
    */
-  void Preprocess(const float* in_points_array, int in_num_points, int* x_coors,
-                  int* y_coors, float* num_points_per_pillar,
-                  float* pillar_point_feature, float* pillar_coors,
-                  float* sparse_pillar_map, int* host_pillar_count);
+  void Preprocess(const float* in_points_array,
+                  int          in_num_points,
+                  int*         x_coors,
+                  int*         y_coors,
+                  float*       num_points_per_pillar,
+                  float*       pillar_point_feature,
+                  float*       pillar_coors,
+                  float*       sparse_pillar_map,
+                  int*         host_pillar_count);
 
   /**
    * @brief Initializing variables for preprocessing
@@ -116,8 +127,10 @@ class PreprocessPoints {
    * @param[in] pillar_coors Array for coors of pillars
    * @details Initializeing input arguments with certain values
    */
-  void InitializeVariables(int* coor_to_pillaridx, float* sparse_pillar_map,
-                           float* pillar_point_feature, float* pillar_coors);
+  void InitializeVariables(int*   coor_to_pillaridx,
+                           float* sparse_pillar_map,
+                           float* pillar_point_feature,
+                           float* pillar_coors);
 };
 
 }  // namespace lidar

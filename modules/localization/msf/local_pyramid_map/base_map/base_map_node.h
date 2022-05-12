@@ -45,8 +45,9 @@ class BaseMapNode {
 
   /**@brief Initialize the map node. Call this function first before use it! */
   virtual void Init(const BaseMapConfig* map_config) = 0;
-  virtual void Init(const BaseMapConfig* map_config, const MapNodeIndex& index,
-                    bool create_map_cells = true) = 0;
+  virtual void Init(const BaseMapConfig* map_config,
+                    const MapNodeIndex&  index,
+                    bool                 create_map_cells = true)    = 0;
 
   /**@brief Initialize the map matrix. */
   virtual void InitMapMatrix(const BaseMapConfig* map_config);
@@ -68,10 +69,10 @@ class BaseMapNode {
   /**@brief Given the global coordinate, get the local 2D coordinate of the map
    * cell matrix.
    * <return> If global coordinate (x, y) belongs to this map node. */
-  virtual bool GetCoordinate(const Eigen::Vector2d& coordinate, unsigned int* x,
-                             unsigned int* y) const;
-  virtual bool GetCoordinate(const Eigen::Vector3d& coordinate, unsigned int* x,
-                             unsigned int* y) const;
+  virtual bool
+  GetCoordinate(const Eigen::Vector2d& coordinate, unsigned int* x, unsigned int* y) const;
+  virtual bool
+  GetCoordinate(const Eigen::Vector3d& coordinate, unsigned int* x, unsigned int* y) const;
   /**@brief Given the local 2D coordinate, return the global coordinate. */
   virtual Eigen::Vector2d GetCoordinate(unsigned int x, unsigned int y) const;
 
@@ -84,24 +85,20 @@ class BaseMapNode {
   bool SaveAltitudeImage(const std::string& path) const;
 
   static Eigen::Vector2d ComputeLeftTopCorner(const BaseMapConfig& config,
-                                              const MapNodeIndex& index);
+                                              const MapNodeIndex&  index);
 
   /**@brief Get map cell matrix. */
   inline const BaseMapMatrix& GetMapCellMatrix() const { return *map_matrix_; }
-  inline BaseMapMatrix& GetMapCellMatrix() { return *map_matrix_; }
+  inline BaseMapMatrix&       GetMapCellMatrix() { return *map_matrix_; }
 
   /**@brief Get the map settings. */
   inline const BaseMapConfig& GetMapConfig() const { return *map_config_; }
 
   /**@brief Get the map node config. */
-  inline const BaseMapNodeConfig& GetMapNodeConfig() const {
-    return *map_node_config_;
-  }
+  inline const BaseMapNodeConfig& GetMapNodeConfig() const { return *map_node_config_; }
 
   /**@brief Get the map node index. */
-  inline const MapNodeIndex& GetMapNodeIndex() const {
-    return map_node_config_->node_index_;
-  }
+  inline const MapNodeIndex& GetMapNodeIndex() const { return map_node_config_->node_index_; }
 
   /**@brief Set if the map node is reserved. */
   inline void SetIsReserved(bool is_reserved) { is_reserved_ = is_reserved; }
@@ -118,9 +115,7 @@ class BaseMapNode {
   /**@brief Get if the map node data is ready*/
   inline bool GetIsReady() const { return data_is_ready_; }
 
-  inline const Eigen::Vector2d& GetLeftTopCorner() const {
-    return left_top_corner_;
-  }
+  inline const Eigen::Vector2d& GetLeftTopCorner() const { return left_top_corner_; }
 
   /**@brief Set the left top corner of the map node. */
   inline void SetLeftTopCorner(double x, double y) {
@@ -130,12 +125,10 @@ class BaseMapNode {
 
   /**@brief Get the resolution of this map nodex. */
   inline float GetMapResolution() const {
-    return this->map_config_
-        ->map_resolutions_[map_node_config_->node_index_.resolution_id_];
+    return this->map_config_->map_resolutions_[map_node_config_->node_index_.resolution_id_];
   }
 
-  static Eigen::Vector2d GetLeftTopCorner(const BaseMapConfig& option,
-                                          const MapNodeIndex& index);
+  static Eigen::Vector2d GetLeftTopCorner(const BaseMapConfig& option, const MapNodeIndex& index);
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -143,11 +136,9 @@ class BaseMapNode {
   /**@brief Try to create the map directory. */
   bool CreateMapDirectory(const std::string& path) const;
   /**@brief Try to create the map directory recursively. */
-  bool CreateMapDirectoryRecursively(
-      const std::vector<std::string>& paths) const;
+  bool CreateMapDirectoryRecursively(const std::vector<std::string>& paths) const;
   /**@brief Try to check the map directory recursively. */
-  bool CheckMapDirectoryRecursively(
-      const std::vector<std::string>& paths) const;
+  bool CheckMapDirectoryRecursively(const std::vector<std::string>& paths) const;
 
   /**@brief Load the map cell from a binary chunk.
    */

@@ -28,8 +28,7 @@ struct LidarFrameInitializer {
 
 static const size_t kLidarFramePoolSize = 50;
 
-typedef base::ConcurrentObjectPool<LidarFrame, kLidarFramePoolSize,
-                                   LidarFrameInitializer>
+typedef base::ConcurrentObjectPool<LidarFrame, kLidarFramePoolSize, LidarFrameInitializer>
     LidarFramePool;
 
 }  // namespace lidar

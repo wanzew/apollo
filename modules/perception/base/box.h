@@ -31,22 +31,29 @@ struct BBox2D;
 
 template <typename T>
 struct Rect {
-  Rect() : x(0), y(0), width(0), height(0) {}
+  Rect()
+      : x(0)
+      , y(0)
+      , width(0)
+      , height(0) {}
 
-  Rect(const T &x_in, const T &y_in, const T &width_in, const T &height_in)
-      : x(x_in), y(y_in), width(width_in), height(height_in) {}
+  Rect(const T& x_in, const T& y_in, const T& width_in, const T& height_in)
+      : x(x_in)
+      , y(y_in)
+      , width(width_in)
+      , height(height_in) {}
 
-  explicit Rect(const BBox2D<T> &bbox) {
-    this->x = bbox.xmin;
-    this->y = bbox.ymin;
-    this->width = bbox.xmax - bbox.xmin;
+  explicit Rect(const BBox2D<T>& bbox) {
+    this->x      = bbox.xmin;
+    this->y      = bbox.ymin;
+    this->width  = bbox.xmax - bbox.xmin;
     this->height = bbox.ymax - bbox.ymin;
   }
 
-  Rect<T> &operator=(const BBox2D<T> &bbox) {
-    this->x = bbox.xmin;
-    this->y = bbox.ymin;
-    this->width = bbox.xmax - bbox.xmin;
+  Rect<T>& operator=(const BBox2D<T>& bbox) {
+    this->x      = bbox.xmin;
+    this->y      = bbox.ymin;
+    this->width  = bbox.xmax - bbox.xmin;
     this->height = bbox.ymax - bbox.ymin;
     return *this;
   }
@@ -67,12 +74,11 @@ struct Rect {
 
   std::string ToStr() const {
     std::stringstream ss;
-    ss << "[ " << width << " x " << height << " ] from ( " << x << " , " << y
-       << " )";
+    ss << "[ " << width << " x " << height << " ] from ( " << x << " , " << y << " )";
     return ss.str();
   }
 
-  friend Rect<T> operator&(const Rect<T> &rect1, const Rect<T> &rect2) {
+  friend Rect<T> operator&(const Rect<T>& rect1, const Rect<T>& rect2) {
     T r1_xmin = rect1.x;
     T r1_xmax = rect1.x + rect1.width;
     T r1_ymin = rect1.y;
@@ -81,8 +87,7 @@ struct Rect {
     T r2_xmax = rect2.x + rect2.width;
     T r2_ymin = rect2.y;
     T r2_ymax = rect2.y + rect2.height;
-    if (r2_xmin <= r1_xmax && r2_xmax >= r1_xmin && r2_ymin <= r1_ymax &&
-        r2_ymax >= r1_ymin) {
+    if (r2_xmin <= r1_xmax && r2_xmax >= r1_xmin && r2_ymin <= r1_ymax && r2_ymax >= r1_ymin) {
       T xmin = std::max(r1_xmin, r2_xmin);
       T ymin = std::max(r1_ymin, r2_ymin);
       T xmax = std::min(r1_xmax, r2_xmax);
@@ -93,48 +98,51 @@ struct Rect {
     }
   }
 
-  friend Rect<T> operator|(const Rect<T> &rect1, const Rect<T> &rect2) {
+  friend Rect<T> operator|(const Rect<T>& rect1, const Rect<T>& rect2) {
     Rect<T> ret;
-    ret.x = std::min(rect1.x, rect2.x);
-    ret.y = std::min(rect1.y, rect2.y);
-    ret.width = std::max(rect1.x + rect1.width, rect2.x + rect2.width) - ret.x;
-    ret.height =
-        std::max(rect1.y + rect1.height, rect2.y + rect2.height) - ret.y;
+    ret.x      = std::min(rect1.x, rect2.x);
+    ret.y      = std::min(rect1.y, rect2.y);
+    ret.width  = std::max(rect1.x + rect1.width, rect2.x + rect2.width) - ret.x;
+    ret.height = std::max(rect1.y + rect1.height, rect2.y + rect2.height) - ret.y;
 
     return ret;
   }
 
-  friend inline bool operator==(const Rect &rect1, const Rect &rect2) {
-    return (Equal(rect1.x, rect2.x) && Equal(rect1.y, rect2.y) &&
-            Equal(rect1.width, rect2.width) &&
+  friend inline bool operator==(const Rect& rect1, const Rect& rect2) {
+    return (Equal(rect1.x, rect2.x) && Equal(rect1.y, rect2.y) && Equal(rect1.width, rect2.width) &&
             Equal(rect1.height, rect2.height));
   }
 
-  friend inline bool operator!=(const Rect &rect1, const Rect &rect2) {
-    return !(rect1 == rect2);
-  }
+  friend inline bool operator!=(const Rect& rect1, const Rect& rect2) { return !(rect1 == rect2); }
 
-  T x = 0;  // top-left
-  T y = 0;  // top-left
-  T width = 0;
+  T x      = 0;  // top-left
+  T y      = 0;  // top-left
+  T width  = 0;
   T height = 0;
 };
 
 template <typename T>
 struct BBox2D {
-  BBox2D() : xmin(0), ymin(0), xmax(0), ymax(0) {}
+  BBox2D()
+      : xmin(0)
+      , ymin(0)
+      , xmax(0)
+      , ymax(0) {}
 
-  BBox2D(const T &xmin_in, const T &ymin_in, const T &xmax_in, const T &ymax_in)
-      : xmin(xmin_in), ymin(ymin_in), xmax(xmax_in), ymax(ymax_in) {}
+  BBox2D(const T& xmin_in, const T& ymin_in, const T& xmax_in, const T& ymax_in)
+      : xmin(xmin_in)
+      , ymin(ymin_in)
+      , xmax(xmax_in)
+      , ymax(ymax_in) {}
 
-  explicit BBox2D(const Rect<T> &rect) {
+  explicit BBox2D(const Rect<T>& rect) {
     this->xmin = rect.x;
     this->ymin = rect.y;
     this->xmax = rect.x + rect.width;
     this->ymax = rect.y + rect.height;
   }
 
-  BBox2D<T> &operator=(const Rect<T> &rect) {
+  BBox2D<T>& operator=(const Rect<T>& rect) {
     this->xmin = rect.x;
     this->ymin = rect.y;
     this->xmax = rect.x + rect.width;
@@ -156,12 +164,12 @@ struct BBox2D {
   T ymax = 0;  // bottom-right
 };
 
-typedef Rect<int> RectI;
-typedef Rect<float> RectF;
+typedef Rect<int>    RectI;
+typedef Rect<float>  RectF;
 typedef Rect<double> RectD;
 
-typedef BBox2D<int> BBox2DI;
-typedef BBox2D<float> BBox2DF;
+typedef BBox2D<int>    BBox2DI;
+typedef BBox2D<float>  BBox2DF;
 typedef BBox2D<double> BBox2DD;
 
 }  // namespace base

@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+
 #include "modules/common/math/vec2d.h"
 
 namespace apollo {

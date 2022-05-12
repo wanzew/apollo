@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,13 +25,11 @@ namespace canbus {
 namespace neolix_edu {
 
 class Vcuvehiclestatusreport101
-    : public ::apollo::drivers::canbus::ProtocolData<
-          ::apollo::canbus::ChassisDetail> {
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vcuvehiclestatusreport101();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
@@ -43,15 +42,13 @@ class Vcuvehiclestatusreport101
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_HighVoltageCircuitState',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 2, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_highvoltagecircuitstate(const std::uint8_t* bytes,
-                                   const int32_t length) const;
+  bool vcu_highvoltagecircuitstate(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': '0x0: Disable;0x1:Enable', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_DCDC_EnabledStates',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 3, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_dcdc_enabledstates(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  bool vcu_dcdc_enabledstates(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': '0x0:Standby;0x1:auto drive;0x2:net
   // drive;0x3:remote control;0x4:emergency brake;0x5~0x7:Reserved', 'enum': {0:
@@ -61,22 +58,20 @@ class Vcuvehiclestatusreport101
   // 'Control_Mode_Resp', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|7]', 'bit': 6, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Vcu_vehicle_status_report_101::Control_mode_respType control_mode_resp(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vcu_vehicle_status_report_101::Control_mode_respType
+  control_mode_resp(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_Vehicle_Speed', 'offset': 0.0, 'precision':
   // 0.05625, 'len': 13, 'is_signed_var': False, 'physical_range': '[0|460.69]',
   // 'bit': 15, 'type': 'double', 'order': 'motorola', 'physical_unit': 'Km/h'}
-  double vcu_vehicle_speed(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double vcu_vehicle_speed(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': '0x0:Reserved;0x1:Start;0x2:Stop;0x3:Invalid
   // ', 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':
   // 'VCU_LowBatteryChargingFunctionSt', 'is_signed_var': False,
   // 'physical_range': '[0|0]', 'bit': 17, 'type': 'int', 'order': 'motorola',
   // 'physical_unit': ''}
-  int vcu_lowbatterychargingfunctionst(const std::uint8_t* bytes,
-                                       const int32_t length) const;
+  int vcu_lowbatterychargingfunctionst(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_Display_SOC', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 31,
@@ -92,29 +87,25 @@ class Vcuvehiclestatusreport101
   // Mode;0x2:Reverse Mode', 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':
   // 'VCU_Motor_Direction', 'is_signed_var': False, 'physical_range': '[0|0]',
   // 'bit': 54, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  int vcu_motor_direction(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  int vcu_motor_direction(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_Motor_Speed_Valid',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 55, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_motor_speed_valid(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool vcu_motor_speed_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_StatusRept_AliveCounter', 'offset': 0.0,
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_statusrept_alivecounter(const std::uint8_t* bytes,
-                                  const int32_t length) const;
+  int vcu_statusrept_alivecounter(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_StatusRept_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_statusrept_checksum(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  int vcu_statusrept_checksum(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace neolix_edu

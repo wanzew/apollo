@@ -33,19 +33,14 @@ class SppLabelImage {
  public:
   SppLabelImage() { clusters_.reserve(kDefaultReserveSize); }
   ~SppLabelImage() {
-    if (labels_) {
-      common::IFree2(&labels_);
-    }
-    if (range_mask_) {
-      common::IFree2(&range_mask_);
-    }
+    if (labels_) { common::IFree2(&labels_); }
+    if (range_mask_) { common::IFree2(&range_mask_); }
   }
   // @brief: initialize label image
   // @param [in]: image width
   // @param [in]: image height
   // @param [in]: sensor name
-  void Init(size_t width, size_t height,
-            const std::string& sensor_name = "velodyne64");
+  void Init(size_t width, size_t height, const std::string& sensor_name = "velodyne64");
   // @brief: initialize range mask of label image
   // @param [in]: range
   // @param [in]: boundary distance for mask
@@ -63,8 +58,10 @@ class SppLabelImage {
   // @param [in]: category_map of the same size
   // @param [in]: confidence threshold
   // @param [in]: category threshold
-  void FilterClusters(const float* confidence_map, const float* category_map,
-                      float confidence_threshold, float category_threshold);
+  void FilterClusters(const float* confidence_map,
+                      const float* category_map,
+                      float        confidence_threshold,
+                      float        category_threshold);
   // @brief: calculate class for each cluster, given class map
   // @param [in]: class_map of the same size
   // @param [in]: class number
@@ -86,9 +83,7 @@ class SppLabelImage {
   inline std::vector<SppClusterPtr>& GetClusters() { return clusters_; }
   // @brief: get clusters, const version
   // @return: const clusters
-  inline const std::vector<SppClusterPtr>& GetClusters() const {
-    return clusters_;
-  }
+  inline const std::vector<SppClusterPtr>& GetClusters() const { return clusters_; }
   // @brief: get label row pointer
   // @param [in]: row id
   // @return: row pointer
@@ -131,12 +126,12 @@ class SppLabelImage {
  private:
   // note the correspondence between label and cluster id is
   // label - 1 == cluster id, label zero is reserved for background
-  uint16_t** labels_ = nullptr;
-  size_t width_ = 0;
-  size_t height_ = 0;
-  char** range_mask_ = nullptr;
+  uint16_t**                 labels_     = nullptr;
+  size_t                     width_      = 0;
+  size_t                     height_     = 0;
+  char**                     range_mask_ = nullptr;
   std::vector<SppClusterPtr> clusters_;
-  std::string sensor_name_;
+  std::string                sensor_name_;
 
  private:
   static const size_t kDefaultReserveSize = 500;
@@ -145,7 +140,7 @@ class SppLabelImage {
   DISALLOW_COPY_AND_ASSIGN(SppLabelImage);
 };
 
-typedef std::shared_ptr<SppLabelImage> SppLabelImagePtr;
+typedef std::shared_ptr<SppLabelImage>       SppLabelImagePtr;
 typedef std::shared_ptr<const SppLabelImage> SppLabelImageConstPtr;
 
 }  // namespace lidar

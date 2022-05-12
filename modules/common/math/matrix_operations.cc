@@ -19,13 +19,13 @@
  * @brief Defines some useful matrix operations.
  */
 
+#include "modules/common/math/matrix_operations.h"
+
 #include <cmath>
 #include <utility>
 
 #include "Eigen/Dense"
 #include "Eigen/SVD"
-
-#include "modules/common/math/matrix_operations.h"
 
 /**
  * @namespace apollo::common::math
@@ -35,12 +35,15 @@ namespace apollo {
 namespace common {
 namespace math {
 
-bool ContinuousToDiscrete(const Eigen::MatrixXd &m_a,
-                          const Eigen::MatrixXd &m_b,
-                          const Eigen::MatrixXd &m_c,
-                          const Eigen::MatrixXd &m_d, const double ts,
-                          Eigen::MatrixXd *ptr_a_d, Eigen::MatrixXd *ptr_b_d,
-                          Eigen::MatrixXd *ptr_c_d, Eigen::MatrixXd *ptr_d_d) {
+bool ContinuousToDiscrete(const Eigen::MatrixXd& m_a,
+                          const Eigen::MatrixXd& m_b,
+                          const Eigen::MatrixXd& m_c,
+                          const Eigen::MatrixXd& m_d,
+                          const double           ts,
+                          Eigen::MatrixXd*       ptr_a_d,
+                          Eigen::MatrixXd*       ptr_b_d,
+                          Eigen::MatrixXd*       ptr_c_d,
+                          Eigen::MatrixXd*       ptr_d_d) {
   if (ts <= 0.0) {
     AERROR << "ContinuousToDiscrete : ts is less than or equal to zero";
     return false;
@@ -53,17 +56,15 @@ bool ContinuousToDiscrete(const Eigen::MatrixXd &m_a,
     return false;
   }
 
-  if (m_a.cols() != m_b.rows() || m_b.cols() != m_d.cols() ||
-      m_c.rows() != m_d.rows() || m_a.cols() != m_c.cols()) {
+  if (m_a.cols() != m_b.rows() || m_b.cols() != m_d.cols() || m_c.rows() != m_d.rows() ||
+      m_a.cols() != m_c.cols()) {
     AERROR << "ContinuousToDiscrete: matrix dimensions mismatch";
     return false;
   }
 
-  Eigen::MatrixXd m_identity =
-      Eigen::MatrixXd::Identity(m_a.cols(), m_a.rows());
+  Eigen::MatrixXd m_identity = Eigen::MatrixXd::Identity(m_a.cols(), m_a.rows());
 
-  *ptr_a_d =
-      (m_identity - ts * 0.5 * m_a).inverse() * (m_identity + ts * 0.5 * m_a);
+  *ptr_a_d = (m_identity - ts * 0.5 * m_a).inverse() * (m_identity + ts * 0.5 * m_a);
 
   *ptr_b_d = std::sqrt(ts) * (m_identity - ts * 0.5 * m_a).inverse() * m_b;
 

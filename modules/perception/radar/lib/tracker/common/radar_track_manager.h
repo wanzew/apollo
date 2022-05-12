@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "cyber/common/macros.h"
-
 #include "modules/perception/base/frame.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track.h"
 
@@ -28,14 +27,14 @@ namespace radar {
 
 class RadarTrackManager {
  public:
-  RadarTrackManager() = default;
+  RadarTrackManager()  = default;
   ~RadarTrackManager() = default;
 
-  inline std::vector<RadarTrackPtr> &mutable_tracks() { return tracks_; }
-  inline const std::vector<RadarTrackPtr> &GetTracks() const { return tracks_; }
+  inline std::vector<RadarTrackPtr>&       mutable_tracks() { return tracks_; }
+  inline const std::vector<RadarTrackPtr>& GetTracks() const { return tracks_; }
 
-  void AddTrack(const RadarTrackPtr &track) { tracks_.push_back(track); }
-  int RemoveLostTracks();
+  void AddTrack(const RadarTrackPtr& track) { tracks_.push_back(track); }
+  int  RemoveLostTracks();
   void ClearTracks();
 
  protected:

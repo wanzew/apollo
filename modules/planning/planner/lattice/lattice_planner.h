@@ -23,11 +23,12 @@
 #include <memory>
 #include <string>
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/planner/planner.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -43,9 +44,7 @@ class LatticePlanner : public PlannerWithReferenceLine {
 
   std::string Name() override { return "LATTICE"; }
 
-  common::Status Init(const PlanningConfig& config) override {
-    return common::Status::OK();
-  }
+  common::Status Init(const PlanningConfig& config) override { return common::Status::OK(); }
 
   void Stop() override {}
 
@@ -56,8 +55,8 @@ class LatticePlanner : public PlannerWithReferenceLine {
    * @return OK if planning succeeds; error otherwise.
    */
   common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame,
-                      ADCTrajectory* ptr_computed_trajectory) override;
+                      Frame*                         frame,
+                      ADCTrajectory*                 ptr_computed_trajectory) override;
 
   /**
    * @brief Override function Plan in parent class Planner.
@@ -66,9 +65,9 @@ class LatticePlanner : public PlannerWithReferenceLine {
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  common::Status PlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+  common::Status PlanOnReferenceLine(const common::TrajectoryPoint& planning_init_point,
+                                     Frame*                         frame,
+                                     ReferenceLineInfo*             reference_line_info) override;
 };
 
 }  // namespace planning

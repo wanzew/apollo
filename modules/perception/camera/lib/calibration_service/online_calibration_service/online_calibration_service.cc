@@ -25,18 +25,15 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool OnlineCalibrationService::Init(
-    const CalibrationServiceInitOptions &options) {
+bool OnlineCalibrationService::Init(const CalibrationServiceInitOptions& options) {
   master_sensor_name_ = options.calibrator_working_sensor_name;
-  sensor_name_ = options.calibrator_working_sensor_name;
+  sensor_name_        = options.calibrator_working_sensor_name;
   // Init k_matrix
-  auto &name_intrinsic_map = options.name_intrinsic_map;
-  ACHECK(name_intrinsic_map.find(master_sensor_name_) !=
-         name_intrinsic_map.end());
+  auto& name_intrinsic_map = options.name_intrinsic_map;
+  ACHECK(name_intrinsic_map.find(master_sensor_name_) != name_intrinsic_map.end());
   CameraStatus camera_status;
   name_camera_status_map_.clear();
-  for (auto iter = name_intrinsic_map.begin(); iter != name_intrinsic_map.end();
-       ++iter) {
+  for (auto iter = name_intrinsic_map.begin(); iter != name_intrinsic_map.end(); ++iter) {
     camera_status.k_matrix[0] = static_cast<double>(iter->second(0, 0));
     camera_status.k_matrix[4] = static_cast<double>(iter->second(1, 1));
     camera_status.k_matrix[2] = static_cast<double>(iter->second(0, 2));
@@ -47,18 +44,17 @@ bool OnlineCalibrationService::Init(
   }
   // Only init calibrator on master_sensor
   CalibratorInitOptions calibrator_init_options;
-  calibrator_init_options.image_width = options.image_width;
+  calibrator_init_options.image_width  = options.image_width;
   calibrator_init_options.image_height = options.image_height;
-  calibrator_init_options.focal_x = static_cast<float>(
-      name_camera_status_map_[master_sensor_name_].k_matrix[0]);
-  calibrator_init_options.focal_y = static_cast<float>(
-      name_camera_status_map_[master_sensor_name_].k_matrix[4]);
-  calibrator_init_options.cx = static_cast<float>(
-      name_camera_status_map_[master_sensor_name_].k_matrix[2]);
-  calibrator_init_options.cy = static_cast<float>(
-      name_camera_status_map_[master_sensor_name_].k_matrix[5]);
-  calibrator_.reset(
-      BaseCalibratorRegisterer::GetInstanceByName(options.calibrator_method));
+  calibrator_init_options.focal_x =
+      static_cast<float>(name_camera_status_map_[master_sensor_name_].k_matrix[0]);
+  calibrator_init_options.focal_y =
+      static_cast<float>(name_camera_status_map_[master_sensor_name_].k_matrix[4]);
+  calibrator_init_options.cx =
+      static_cast<float>(name_camera_status_map_[master_sensor_name_].k_matrix[2]);
+  calibrator_init_options.cy =
+      static_cast<float>(name_camera_status_map_[master_sensor_name_].k_matrix[5]);
+  calibrator_.reset(BaseCalibratorRegisterer::GetInstanceByName(options.calibrator_method));
   ACHECK(calibrator_ != nullptr);
   ACHECK(calibrator_->Init(calibrator_init_options))
       << "Failed to init " << options.calibrator_method;
@@ -70,19 +66,15 @@ bool OnlineCalibrationService::BuildIndex() {
   return is_service_ready_;
 }
 
-bool OnlineCalibrationService::QueryDepthOnGroundPlane(int x, int y,
-                                                       double *depth) const {
-  if (!is_service_ready_) {
-    return false;
-  }
+bool OnlineCalibrationService::QueryDepthOnGroundPlane(int x, int y, double* depth) const {
+  if (!is_service_ready_) { return false; }
   ACHECK(depth != nullptr);
   double pixel[2] = {static_cast<double>(x), static_cast<double>(y)};
   double point[3] = {0};
 
-  auto iter = name_camera_status_map_.find(sensor_name_);
+  auto iter    = name_camera_status_map_.find(sensor_name_);
   bool success = common::IBackprojectPlaneIntersectionCanonical(
-      pixel, &(iter->second.k_matrix[0]), &(iter->second.ground_plane[0]),
-      point);
+      pixel, &(iter->second.k_matrix[0]), &(iter->second.ground_plane[0]), point);
   if (!success) {
     *depth = 0.0;
     return false;
@@ -92,18 +84,16 @@ bool OnlineCalibrationService::QueryDepthOnGroundPlane(int x, int y,
   return true;
 }
 
-bool OnlineCalibrationService::QueryPoint3dOnGroundPlane(
-    int x, int y, Eigen::Vector3d *point3d) const {
-  if (!is_service_ready_) {
-    return false;
-  }
+bool OnlineCalibrationService::QueryPoint3dOnGroundPlane(int              x,
+                                                         int              y,
+                                                         Eigen::Vector3d* point3d) const {
+  if (!is_service_ready_) { return false; }
   ACHECK(point3d != nullptr);
   double pixel[2] = {static_cast<double>(x), static_cast<double>(y)};
   double point[3] = {0};
-  auto iter = name_camera_status_map_.find(sensor_name_);
-  bool success = common::IBackprojectPlaneIntersectionCanonical(
-      pixel, &(iter->second.k_matrix[0]), &(iter->second.ground_plane[0]),
-      point);
+  auto   iter     = name_camera_status_map_.find(sensor_name_);
+  bool   success  = common::IBackprojectPlaneIntersectionCanonical(
+      pixel, &(iter->second.k_matrix[0]), &(iter->second.ground_plane[0]), point);
   if (!success) {
     (*point3d)(0) = (*point3d)(1) = (*point3d)(2) = 0.0;
     return false;
@@ -115,18 +105,16 @@ bool OnlineCalibrationService::QueryPoint3dOnGroundPlane(
   return true;
 }
 
-bool OnlineCalibrationService::QueryGroundPlaneInCameraFrame(
-    Eigen::Vector4d *plane_param) const {
+bool OnlineCalibrationService::QueryGroundPlaneInCameraFrame(Eigen::Vector4d* plane_param) const {
   if (plane_param == nullptr) {
     AERROR << "plane_param is nullptr";
     return false;
   }
   if (!is_service_ready_) {
-    (*plane_param)(0) = (*plane_param)(1) = (*plane_param)(2) =
-        (*plane_param)(3) = 0.0;
+    (*plane_param)(0) = (*plane_param)(1) = (*plane_param)(2) = (*plane_param)(3) = 0.0;
     return false;
   }
-  auto iter = name_camera_status_map_.find(sensor_name_);
+  auto iter         = name_camera_status_map_.find(sensor_name_);
   (*plane_param)(0) = iter->second.ground_plane[0];
   (*plane_param)(1) = iter->second.ground_plane[1];
   (*plane_param)(2) = iter->second.ground_plane[2];
@@ -134,8 +122,8 @@ bool OnlineCalibrationService::QueryGroundPlaneInCameraFrame(
   return true;
 }
 
-bool OnlineCalibrationService::QueryCameraToGroundHeightAndPitchAngle(
-    float *height, float *pitch) const {
+bool OnlineCalibrationService::QueryCameraToGroundHeightAndPitchAngle(float* height,
+                                                                      float* pitch) const {
   if (height == nullptr) {
     AERROR << "height is nullptr";
     return false;
@@ -149,12 +137,12 @@ bool OnlineCalibrationService::QueryCameraToGroundHeightAndPitchAngle(
     return false;
   }
   auto iter = name_camera_status_map_.find(sensor_name_);
-  *height = iter->second.camera_ground_height;
-  *pitch = iter->second.pitch_angle;
+  *height   = iter->second.camera_ground_height;
+  *pitch    = iter->second.pitch_angle;
   return true;
 }
 
-void OnlineCalibrationService::Update(CameraFrame *frame) {
+void OnlineCalibrationService::Update(CameraFrame* frame) {
   if (frame == nullptr) {
     AERROR << "frame is nullptr";
     return;
@@ -164,20 +152,18 @@ void OnlineCalibrationService::Update(CameraFrame *frame) {
     CalibratorOptions calibrator_options;
     calibrator_options.lane_objects =
         std::make_shared<std::vector<base::LaneLine>>(frame->lane_objects);
-    calibrator_options.camera2world_pose.reset(
-        new Eigen::Affine3d(frame->camera2world_pose));
+    calibrator_options.camera2world_pose.reset(new Eigen::Affine3d(frame->camera2world_pose));
     calibrator_options.timestamp = &(frame->timestamp);
-    float pitch_angle = 0.f;
-    bool updated = calibrator_->Calibrate(calibrator_options, &pitch_angle);
+    float pitch_angle            = 0.f;
+    bool  updated                = calibrator_->Calibrate(calibrator_options, &pitch_angle);
     // rebuild the service when updated
     if (updated) {
       name_camera_status_map_[master_sensor_name_].pitch_angle = pitch_angle;
-      for (auto iter = name_camera_status_map_.begin();
-           iter != name_camera_status_map_.end(); iter++) {
+      for (auto iter = name_camera_status_map_.begin(); iter != name_camera_status_map_.end();
+           iter++) {
         // update pitch angle
-        iter->second.pitch_angle =
-            iter->second.pitch_angle_diff +
-            name_camera_status_map_[master_sensor_name_].pitch_angle;
+        iter->second.pitch_angle = iter->second.pitch_angle_diff +
+                                   name_camera_status_map_[master_sensor_name_].pitch_angle;
         // update ground plane param
         iter->second.ground_plane[1] = cos(iter->second.pitch_angle);
         iter->second.ground_plane[2] = -sin(iter->second.pitch_angle);
@@ -185,33 +171,26 @@ void OnlineCalibrationService::Update(CameraFrame *frame) {
     }
   }
   auto iter = name_camera_status_map_.find(sensor_name_);
-  AINFO << "camera_ground_height: " << iter->second.camera_ground_height
-        << " meter.";
-  AINFO << "pitch_angle: " << iter->second.pitch_angle * 180.0 / M_PI
-        << " degree.";
+  AINFO << "camera_ground_height: " << iter->second.camera_ground_height << " meter.";
+  AINFO << "pitch_angle: " << iter->second.pitch_angle * 180.0 / M_PI << " degree.";
   // ACHECK(BuildIndex());
   is_service_ready_ = true;
 }
 
 void OnlineCalibrationService::SetCameraHeightAndPitch(
-    const std::map<std::string, float> &name_camera_ground_height_map,
-    const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
-    const float &pitch_angle_master_sensor) {
-  name_camera_status_map_[master_sensor_name_].pitch_angle =
-      pitch_angle_master_sensor;
-  for (auto iter = name_camera_status_map_.begin();
-       iter != name_camera_status_map_.end(); ++iter) {
+    const std::map<std::string, float>& name_camera_ground_height_map,
+    const std::map<std::string, float>& name_camera_pitch_angle_diff_map,
+    const float&                        pitch_angle_master_sensor) {
+  name_camera_status_map_[master_sensor_name_].pitch_angle = pitch_angle_master_sensor;
+  for (auto iter = name_camera_status_map_.begin(); iter != name_camera_status_map_.end(); ++iter) {
     // get iters
-    auto iter_ground_height = name_camera_ground_height_map.find(iter->first);
-    auto iter_pitch_angle_diff =
-        name_camera_pitch_angle_diff_map.find(iter->first);
+    auto iter_ground_height    = name_camera_ground_height_map.find(iter->first);
+    auto iter_pitch_angle_diff = name_camera_pitch_angle_diff_map.find(iter->first);
     ACHECK(iter_ground_height != name_camera_ground_height_map.end());
     ACHECK(iter_pitch_angle_diff != name_camera_pitch_angle_diff_map.end());
     // set camera status
-    name_camera_status_map_[iter->first].camera_ground_height =
-        iter_ground_height->second;
-    name_camera_status_map_[iter->first].pitch_angle_diff =
-        iter_pitch_angle_diff->second;
+    name_camera_status_map_[iter->first].camera_ground_height = iter_ground_height->second;
+    name_camera_status_map_[iter->first].pitch_angle_diff     = iter_pitch_angle_diff->second;
     name_camera_status_map_[iter->first].pitch_angle =
         pitch_angle_master_sensor + iter_pitch_angle_diff->second;
     name_camera_status_map_[iter->first].ground_plane[1] =
@@ -223,9 +202,7 @@ void OnlineCalibrationService::SetCameraHeightAndPitch(
   }
 }
 
-std::string OnlineCalibrationService::Name() const {
-  return "OnlineCalibrationService";
-}
+std::string OnlineCalibrationService::Name() const { return "OnlineCalibrationService"; }
 REGISTER_CALIBRATION_SERVICE(OnlineCalibrationService);
 
 }  // namespace camera

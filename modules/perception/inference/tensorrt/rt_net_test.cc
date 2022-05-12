@@ -28,9 +28,10 @@ namespace inference {
 class TestableRTNet : public RTNet {
  public:
  public:
-  TestableRTNet(const std::string &net_file, const std::string &model_file,
-                const std::vector<std::string> &outputs,
-                const std::vector<std::string> &inputs)
+  TestableRTNet(const std::string&              net_file,
+                const std::string&              model_file,
+                const std::vector<std::string>& outputs,
+                const std::vector<std::string>& inputs)
       : RTNet(net_file, model_file, outputs, inputs) {}
   using RTNet::checkInt8;
   using RTNet::loadLayerWeights;

@@ -27,7 +27,7 @@ namespace monitor {
 
 class RecurrentRunner {
  public:
-  RecurrentRunner(const std::string &name, const double interval);
+  RecurrentRunner(const std::string& name, const double interval);
   virtual ~RecurrentRunner() = default;
 
   // Tick once, which may or may not execute the RunOnce() function, based on
@@ -38,7 +38,7 @@ class RecurrentRunner {
   virtual void RunOnce(const double current_time) = 0;
 
  protected:
-  std::string name_;
+  std::string  name_;
   unsigned int round_count_ = 0;
 
  private:

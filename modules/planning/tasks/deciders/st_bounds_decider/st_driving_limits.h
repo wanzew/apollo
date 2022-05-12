@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
@@ -40,8 +41,7 @@ class STDrivingLimits {
  public:
   STDrivingLimits() {}
 
-  void Init(const double max_acc, const double max_dec, const double max_v,
-            double curr_v);
+  void Init(const double max_acc, const double max_dec, const double max_v, double curr_v);
 
   virtual ~STDrivingLimits() = default;
 
@@ -61,8 +61,10 @@ class STDrivingLimits {
    * @param upper bound in s
    * @param upper bound's corresponding speed.
    */
-  void UpdateBlockingInfo(const double t, const double lower_s,
-                          const double lower_v, const double upper_s,
+  void UpdateBlockingInfo(const double t,
+                          const double lower_s,
+                          const double lower_v,
+                          const double upper_s,
                           const double upper_v);
 
  private:

@@ -45,10 +45,10 @@ class VelodyneConvertComponent : public Component<VelodyneScan> {
   bool Proc(const std::shared_ptr<VelodyneScan>& scan_msg) override;
 
  private:
-  std::shared_ptr<Writer<PointCloud>> writer_;
-  std::unique_ptr<Convert> conv_ = nullptr;
+  std::shared_ptr<Writer<PointCloud>>       writer_;
+  std::unique_ptr<Convert>                  conv_             = nullptr;
   std::shared_ptr<CCObjectPool<PointCloud>> point_cloud_pool_ = nullptr;
-  int pool_size_ = 8;
+  int                                       pool_size_        = 8;
 };
 
 CYBER_REGISTER_COMPONENT(VelodyneConvertComponent)

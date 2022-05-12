@@ -19,6 +19,7 @@
 #include <limits>
 
 #include "gtest/gtest.h"
+
 #include "pcl/io/pcd_io.h"
 
 #include "modules/perception/common/io/io_util.h"
@@ -33,7 +34,7 @@ namespace perception {
 namespace lidar {
 
 bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
-  int ret = 0;
+  int                             ret = 0;
   pcl::PointCloud<pcl::PointXYZI> org_cloud;
   if ((ret = pcl::io::loadPCDFile(file_path, org_cloud)) < 0) {
     AERROR << "Failed to load pcd file: " << file_path << " " << ret;
@@ -48,10 +49,10 @@ bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
       continue;
     }
     base::PointF& pt = cloud_out->at(pid++);
-    pt.x = org_cloud.at(i).x;
-    pt.y = org_cloud.at(i).y;
-    pt.z = org_cloud.at(i).z;
-    pt.intensity = org_cloud.at(i).intensity;
+    pt.x             = org_cloud.at(i).x;
+    pt.y             = org_cloud.at(i).y;
+    pt.z             = org_cloud.at(i).z;
+    pt.intensity     = org_cloud.at(i).intensity;
   }
   cloud_out->resize(pid);
 
@@ -62,38 +63,35 @@ void PrintObjects(const std::vector<base::ObjectPtr>& objects) {
   AINFO << "Total objects num: " << objects.size();
   int obj_id = 0;
   for (auto object : objects) {
-    unsigned cloud_size =
-        static_cast<unsigned>(object->lidar_supplement.cloud.size());
+    unsigned cloud_size = static_cast<unsigned>(object->lidar_supplement.cloud.size());
     AINFO << "Point num of Segment: " << cloud_size;
     std::cout << "-- Object " << obj_id++ << " : ";
-    std::cout << object->ToString() << ", type_probs: " << object->type_probs[0]
-              << ", " << object->type_probs[1] << ", " << object->type_probs[2]
-              << ", " << object->type_probs[3] << ", " << object->type_probs[4]
-              << ", " << object->type_probs[5] << std::endl;
+    std::cout << object->ToString() << ", type_probs: " << object->type_probs[0] << ", "
+              << object->type_probs[1] << ", " << object->type_probs[2] << ", "
+              << object->type_probs[3] << ", " << object->type_probs[4] << ", "
+              << object->type_probs[5] << std::endl;
   }
 }
 
 TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
   unsetenv("CYBER_PATH");
   unsetenv("MODULE_PATH");
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "lidar/lib/segmentation/cnnseg/";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+                    "lidar/lib/segmentation/cnnseg/";
 
-  auto segmentation = std::shared_ptr<CNNSegmentation>(new CNNSegmentation);
+  auto                 segmentation = std::shared_ptr<CNNSegmentation>(new CNNSegmentation);
   LidarDetectorOptions options;
   EXPECT_FALSE(segmentation->Detect(options, nullptr));
   LidarFrame frame_data;
   EXPECT_FALSE(segmentation->Detect(options, &frame_data));
-  frame_data.cloud = base::PointFCloudPool::Instance().Get();
+  frame_data.cloud       = base::PointFCloudPool::Instance().Get();
   frame_data.world_cloud = base::PointDCloudPool::Instance().Get();
   EXPECT_FALSE(segmentation->Detect(options, &frame_data));
 
   EXPECT_TRUE(segmentation->Init());
   EXPECT_TRUE(segmentation->InitClusterAndBackgroundSegmentation());
 
-  std::string pcd_path =
-      "/apollo/modules/perception/testdata/lidar/app/data/";
+  std::string              pcd_path = "/apollo/modules/perception/testdata/lidar/app/data/";
   std::vector<std::string> pcd_file_names;
   common::GetFileList(pcd_path, ".pcd", &pcd_file_names);
   std::string file_name;
@@ -109,11 +107,9 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
             });
   for (size_t i = 0; i < pcd_file_names.size(); ++i) {
     std::shared_ptr<LidarFrame> frame(new LidarFrame);
-    frame->cloud = base::PointFCloudPool::Instance().Get();
+    frame->cloud       = base::PointFCloudPool::Instance().Get();
     frame->world_cloud = base::PointDCloudPool::Instance().Get();
-    if (!LoadPCDFile(pcd_file_names[i], frame->cloud)) {
-      continue;
-    }
+    if (!LoadPCDFile(pcd_file_names[i], frame->cloud)) { continue; }
     frame->world_cloud->resize(frame->cloud->size());
     EXPECT_TRUE(segmentation->Detect(options, frame.get()));
   }
@@ -122,15 +118,13 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
 TEST(CNNSegmentationTest, cnn_segmentation_test) {
   unsetenv("CYBER_PATH");
   unsetenv("MODULE_PATH");
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "lidar/lib/segmentation/cnnseg/";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+                    "lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
-  auto pcl_ptr = std::shared_ptr<base::PointFCloud>(new base::PointFCloud);
-  std::string filename =
-      "/apollo/modules/perception/testdata/lidar/app/data/0002_00.pcd";
-  bool ret = LoadPCDFile(filename, pcl_ptr);
+  auto        pcl_ptr  = std::shared_ptr<base::PointFCloud>(new base::PointFCloud);
+  std::string filename = "/apollo/modules/perception/testdata/lidar/app/data/0002_00.pcd";
+  bool        ret      = LoadPCDFile(filename, pcl_ptr);
   ACHECK(ret) << "Failed to load " << filename;
   // load non ground indices
   base::PointIndices non_ground_indices;
@@ -150,8 +144,8 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   // test segment
   using base::ObjectType;
   LidarDetectorOptions options;
-  LidarFrame frame_data;
-  frame_data.cloud = pcl_ptr;
+  LidarFrame           frame_data;
+  frame_data.cloud       = pcl_ptr;
   frame_data.world_cloud = base::PointDCloudPool::Instance().Get();
   frame_data.world_cloud->resize(pcl_ptr->size());
   frame_data.non_ground_indices = non_ground_indices;

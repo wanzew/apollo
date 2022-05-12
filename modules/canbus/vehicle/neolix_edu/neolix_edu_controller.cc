@@ -35,31 +35,28 @@ using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }  // namespace
 
-ErrorCode Neolix_eduController::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+Neolix_eduController::Init(const VehicleParameter&                                params,
+                           CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+                           MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "Neolix_eduController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  if (can_sender == nullptr) {
-    return ErrorCode::CANBUS_ERROR;
-  }
+  if (can_sender == nullptr) { return ErrorCode::CANBUS_ERROR; }
   can_sender_ = can_sender;
 
   if (message_manager == nullptr) {
@@ -72,8 +69,7 @@ ErrorCode Neolix_eduController::Init(
   ads_brake_command_46_ = dynamic_cast<Adsbrakecommand46*>(
       message_manager_->GetMutableProtocolDataById(Adsbrakecommand46::ID));
   if (ads_brake_command_46_ == nullptr) {
-    AERROR
-        << "Adsbrakecommand46 does not exist in the Neolix_eduMessageManager!";
+    AERROR << "Adsbrakecommand46 does not exist in the Neolix_eduMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
@@ -87,8 +83,7 @@ ErrorCode Neolix_eduController::Init(
   ads_drive_command_50_ = dynamic_cast<Adsdrivecommand50*>(
       message_manager_->GetMutableProtocolDataById(Adsdrivecommand50::ID));
   if (ads_drive_command_50_ == nullptr) {
-    AERROR
-        << "Adsdrivecommand50 does not exist in the Neolix_eduMessageManager!";
+    AERROR << "Adsdrivecommand50 does not exist in the Neolix_eduMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
@@ -111,8 +106,7 @@ ErrorCode Neolix_eduController::Init(
   can_sender_->AddMessage(Adsdiagnosis628::ID, ads_diagnosis_628_, false);
   can_sender_->AddMessage(Adsdrivecommand50::ID, ads_drive_command_50_, false);
   can_sender_->AddMessage(Adsepscommand56::ID, ads_eps_command_56_, false);
-  can_sender_->AddMessage(Adslighthorncommand310::ID,
-                          ads_light_horn_command_310_, false);
+  can_sender_->AddMessage(Adslighthorncommand310::ID, ads_light_horn_command_310_, false);
 
   // need sleep to ensure all messages received
   AINFO << "Neolix_eduController is initialized.";
@@ -154,9 +148,7 @@ Chassis Neolix_eduController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -176,32 +168,28 @@ Chassis Neolix_eduController::chassis() {
         chassis_detail.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl());
     wheelspeed->set_wheel_spd_rr(
         chassis_detail.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr());
-    chassis_.set_speed_mps(
-        (chassis_detail.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fl() +
-         chassis_detail.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fr() +
-         chassis_detail.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl() +
-         chassis_detail.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr()) /
-        4 / 3.6);
+    chassis_.set_speed_mps((chassis_detail.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fl() +
+                            chassis_detail.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fr() +
+                            chassis_detail.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl() +
+                            chassis_detail.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr()) /
+                           4 / 3.6);
   } else {
     chassis_.set_speed_mps(0);
   }
   // 4 SOC
   if (chassis_detail.neolix_edu().has_vcu_vehicle_status_report_101() &&
-      chassis_detail.neolix_edu()
-          .vcu_vehicle_status_report_101()
-          .has_vcu_display_soc()) {
-    chassis_.set_battery_soc_percentage(chassis_detail.neolix_edu()
-                                            .vcu_vehicle_status_report_101()
-                                            .vcu_display_soc());
+      chassis_detail.neolix_edu().vcu_vehicle_status_report_101().has_vcu_display_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.neolix_edu().vcu_vehicle_status_report_101().vcu_display_soc());
   } else {
     chassis_.set_battery_soc_percentage(0);
   }
   // 5 steering
   if (chassis_detail.neolix_edu().has_vcu_eps_report_57() &&
       chassis_detail.neolix_edu().vcu_eps_report_57().has_vcu_real_angle()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.neolix_edu().vcu_eps_report_57().vcu_real_angle() * 100 /
-        vehicle_params_.max_steer_angle() * M_PI / 180));
+    chassis_.set_steering_percentage(
+        static_cast<float>(chassis_detail.neolix_edu().vcu_eps_report_57().vcu_real_angle() * 100 /
+                           vehicle_params_.max_steer_angle() * M_PI / 180));
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -210,8 +198,7 @@ Chassis Neolix_eduController::chassis() {
   if (chassis_detail.neolix_edu().has_vcu_drive_report_52() &&
       chassis_detail.neolix_edu().vcu_drive_report_52().has_vcu_real_torque()) {
     chassis_.set_throttle_percentage(
-        chassis_detail.neolix_edu().vcu_drive_report_52().vcu_real_torque() *
-        2);
+        chassis_detail.neolix_edu().vcu_drive_report_52().vcu_real_torque() * 2);
   } else {
     chassis_.set_throttle_percentage(0);
   }
@@ -227,19 +214,14 @@ Chassis Neolix_eduController::chassis() {
   // 8 gear
   if (chassis_detail.neolix_edu().has_vcu_drive_report_52() &&
       chassis_detail.neolix_edu().vcu_drive_report_52().has_vcu_real_shift()) {
-    chassis_.set_gear_location(
-        (apollo::canbus::Chassis_GearPosition)chassis_detail.neolix_edu()
-            .vcu_drive_report_52()
-            .vcu_real_shift());
+    chassis_.set_gear_location((apollo::canbus::Chassis_GearPosition)chassis_detail.neolix_edu()
+                                   .vcu_drive_report_52()
+                                   .vcu_real_shift());
   }
   // 9 epb
   if (chassis_detail.neolix_edu().has_vcu_brake_report_47() &&
-      chassis_detail.neolix_edu()
-          .vcu_brake_report_47()
-          .has_vcu_real_parking_status()) {
-    if (chassis_detail.neolix_edu()
-            .vcu_brake_report_47()
-            .vcu_real_parking_status() == 1) {
+      chassis_detail.neolix_edu().vcu_brake_report_47().has_vcu_real_parking_status()) {
+    if (chassis_detail.neolix_edu().vcu_brake_report_47().vcu_real_parking_status() == 1) {
       chassis_.set_parking_brake(true);
     } else {
       chassis_.set_parking_brake(false);
@@ -248,18 +230,14 @@ Chassis Neolix_eduController::chassis() {
     chassis_.set_parking_brake(false);
   }
 
-  if (chassis_error_mask_) {
-    chassis_.set_chassis_error_mask(chassis_error_mask_);
-  }
+  if (chassis_error_mask_) { chassis_.set_chassis_error_mask(chassis_error_mask_); }
 
   // give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && !chassis_.parking_brake() &&
       (chassis_.throttle_percentage() == 0.0)) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "CANBUS not ready, firmware error or emergency button pressed!");
   }
@@ -283,8 +261,7 @@ ErrorCode Neolix_eduController::EnableAutoMode() {
   ads_eps_command_56_->set_drive_enable(true);
 
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -336,27 +313,23 @@ void Neolix_eduController::Gear(Chassis::GearPosition gear_position) {
   }
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
-      ads_drive_command_50_->set_auto_shift_command(
-          Ads_drive_command_50::AUTO_SHIFT_COMMAND_N);
+      ads_drive_command_50_->set_auto_shift_command(Ads_drive_command_50::AUTO_SHIFT_COMMAND_N);
       ads_brake_command_46_->set_auto_parking_command(false);
       break;
     }
     case Chassis::GEAR_REVERSE: {
-      ads_drive_command_50_->set_auto_shift_command(
-          Ads_drive_command_50::AUTO_SHIFT_COMMAND_R);
+      ads_drive_command_50_->set_auto_shift_command(Ads_drive_command_50::AUTO_SHIFT_COMMAND_R);
       break;
     }
     case Chassis::GEAR_DRIVE: {
-      ads_drive_command_50_->set_auto_shift_command(
-          Ads_drive_command_50::AUTO_SHIFT_COMMAND_D);
+      ads_drive_command_50_->set_auto_shift_command(Ads_drive_command_50::AUTO_SHIFT_COMMAND_D);
       break;
     }
     case Chassis::GEAR_PARKING: {
       ads_brake_command_46_->set_auto_parking_command(true);
       break;
     }
-    default:
-      break;
+    default: break;
   }
 }
 
@@ -400,8 +373,7 @@ void Neolix_eduController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle = vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   ads_eps_command_56_->set_auto_target_angle(real_angle);
 }
 
@@ -414,8 +386,7 @@ void Neolix_eduController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle = vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   ads_eps_command_56_->set_auto_target_angle(real_angle);
 }
 
@@ -449,9 +420,7 @@ void Neolix_eduController::SetTurningSignal(const ControlCommand& command) {
   // None
 }
 
-void Neolix_eduController::ResetProtocol() {
-  message_manager_->ResetSendMessages();
-}
+void Neolix_eduController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool Neolix_eduController::CheckChassisError() {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
@@ -460,7 +429,7 @@ bool Neolix_eduController::CheckChassisError() {
 }
 
 void Neolix_eduController::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -473,16 +442,15 @@ void Neolix_eduController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -494,8 +462,7 @@ void Neolix_eduController::SecurityDogThreadFunc() {
     }
 
     // 2. vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -527,11 +494,11 @@ void Neolix_eduController::SecurityDogThreadFunc() {
 }
 
 bool Neolix_eduController::CheckResponse(const int32_t flags, bool need_wait) {
-  int32_t retry_num = 20;
+  int32_t       retry_num = 20;
   ChassisDetail chassis_detail;
-  bool is_eps_online = false;
-  bool is_vcu_online = false;
-  bool is_esp_online = false;
+  bool          is_eps_online = false;
+  bool          is_vcu_online = false;
+  bool          is_esp_online = false;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -562,14 +529,12 @@ bool Neolix_eduController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     if (need_wait) {
       --retry_num;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(20));
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
     }
   } while (need_wait && retry_num);
 
   AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+        << ", is_vcu_online:" << is_vcu_online << ", is_esp_online:" << is_esp_online;
 
   return false;
 }
@@ -589,8 +554,7 @@ Chassis::ErrorCode Neolix_eduController::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void Neolix_eduController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void Neolix_eduController::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

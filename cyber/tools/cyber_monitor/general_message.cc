@@ -29,27 +29,22 @@ namespace {
 /**
  * if map has string keys, lexically sort them
  */
-std::vector<int> SortProtobufMapByKeys(
-    const google::protobuf::Message& message,
-    const google::protobuf::FieldDescriptor* field,
-    const google::protobuf::Reflection& reflection, const int size) {
+std::vector<int> SortProtobufMapByKeys(const google::protobuf::Message&         message,
+                                       const google::protobuf::FieldDescriptor* field,
+                                       const google::protobuf::Reflection&      reflection,
+                                       const int                                size) {
   std::vector<int> output;
-  if (0 == size) {
-    return output;
-  }
+  if (0 == size) { return output; }
   if (field->cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE) {
-    const ::google::protobuf::Message& item =
-        reflection.GetRepeatedMessage(message, field, 0);
+    const ::google::protobuf::Message& item = reflection.GetRepeatedMessage(message, field, 0);
     const ::google::protobuf::FieldDescriptor* item_fd =
         item.GetDescriptor()->FindFieldByName("key");
     if (item_fd && field->is_map() &&
-        ::google::protobuf::FieldDescriptor::Type::TYPE_STRING ==
-            item_fd->type()) {
+        ::google::protobuf::FieldDescriptor::Type::TYPE_STRING == item_fd->type()) {
       std::vector<std::pair<std::string, int>> key_indices;
       key_indices.reserve(size);
       for (int i = 0; i < size; ++i) {
-        const ::google::protobuf::Message& item =
-            reflection.GetRepeatedMessage(message, field, i);
+        const ::google::protobuf::Message& item = reflection.GetRepeatedMessage(message, field, i);
         const ::google::protobuf::FieldDescriptor* item_fd =
             item.GetDescriptor()->FindFieldByName("key");
         const std::string key(item.GetReflection()->GetString(item, item_fd));
@@ -71,16 +66,16 @@ std::vector<int> SortProtobufMapByKeys(
 }
 }  // namespace
 
-GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
-                               const google::protobuf::Message* msg,
-                               const google::protobuf::Reflection* reflection,
+GeneralMessage::GeneralMessage(GeneralMessageBase*                      parent,
+                               const google::protobuf::Message*         msg,
+                               const google::protobuf::Reflection*      reflection,
                                const google::protobuf::FieldDescriptor* field)
-    : GeneralMessageBase(parent),
-      item_index_(0),
-      is_folded_(true),
-      field_(field),
-      message_ptr_(msg),
-      reflection_ptr_(reflection) {}
+    : GeneralMessageBase(parent)
+    , item_index_(0)
+    , is_folded_(true)
+    , field_(field)
+    , message_ptr_(msg)
+    , reflection_ptr_(reflection) {}
 
 int GeneralMessage::Render(const Screen* s, int key) {
   s->SetCurrentColor(Screen::WHITE_BLACK);
@@ -91,8 +86,7 @@ int GeneralMessage::Render(const Screen* s, int key) {
       p = p->parent();
     }
 
-    GeneralChannelMessage* channel_msg_ptr =
-        static_cast<GeneralChannelMessage*>(p->parent());
+    GeneralChannelMessage* channel_msg_ptr = static_cast<GeneralChannelMessage*>(p->parent());
     s->AddStr(0, line_no++, "ChannelName: ");
     s->AddStr(channel_msg_ptr->GetChannelName().c_str());
 
@@ -108,10 +102,8 @@ int GeneralMessage::Render(const Screen* s, int key) {
     clear();
 
     auto channel_msg = channel_msg_ptr->CopyMsgPtr();
-    if (!channel_msg_ptr->raw_msg_class_->ParseFromString(
-            channel_msg->message)) {
-      s->AddStr(0, line_no++,
-                "Cannot Parse the message for Real-Time Updating");
+    if (!channel_msg_ptr->raw_msg_class_->ParseFromString(channel_msg->message)) {
+      s->AddStr(0, line_no++, "Cannot Parse the message for Real-Time Updating");
       return line_no;
     }
 
@@ -140,17 +132,13 @@ int GeneralMessage::Render(const Screen* s, int key) {
           case 'n':
           case 'N':
             ++item_index_;
-            if (item_index_ >= size) {
-              item_index_ = 0;
-            }
+            if (item_index_ >= size) { item_index_ = 0; }
             break;
 
           case 'm':
           case 'M':
             --item_index_;
-            if (item_index_ < 0) {
-              item_index_ = size - 1;
-            }
+            if (item_index_ < 0) { item_index_ = size - 1; }
             break;
 
           default: {
@@ -158,26 +146,21 @@ int GeneralMessage::Render(const Screen* s, int key) {
         }
       }
 
-      int lcount = LineCountOfField(*message_ptr_, s->Width(), field_,
-                                    reflection_ptr_, is_folded_);
+      int lcount = LineCountOfField(*message_ptr_, s->Width(), field_, reflection_ptr_, is_folded_);
       page_item_count_ = s->Height() - line_no - 8;
-      if (page_item_count_ < 1) {
-        page_item_count_ = 1;
-      }
+      if (page_item_count_ < 1) { page_item_count_ = 1; }
       pages_ = lcount / page_item_count_ + 1;
       SplitPages(key);
-      int jump_lines = page_index_ * page_item_count_;
+      int                    jump_lines = page_index_ * page_item_count_;
       const std::vector<int> indices(
           SortProtobufMapByKeys(*message_ptr_, field_, *reflection_ptr_, size));
       if (is_folded_) {
-        GeneralMessageBase::PrintField(this, *message_ptr_, &jump_lines, s,
-                                       &line_no, 0, reflection_ptr_, field_,
-                                       indices[item_index_]);
+        GeneralMessageBase::PrintField(this, *message_ptr_, &jump_lines, s, &line_no, 0,
+                                       reflection_ptr_, field_, indices[item_index_]);
       } else {
         for (const int index : indices) {
-          GeneralMessageBase::PrintField(this, *message_ptr_, &jump_lines, s,
-                                         &line_no, 0, reflection_ptr_, field_,
-                                         index);
+          GeneralMessageBase::PrintField(this, *message_ptr_, &jump_lines, s, &line_no, 0,
+                                         reflection_ptr_, field_, index);
         }
       }
     }

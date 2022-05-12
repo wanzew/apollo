@@ -41,27 +41,34 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-PreprocessPoints::PreprocessPoints(
-    const int max_num_pillars, const int max_points_per_pillar,
-    const int num_point_feature, const int grid_x_size, const int grid_y_size,
-    const int grid_z_size, const float pillar_x_size, const float pillar_y_size,
-    const float pillar_z_size, const float min_x_range, const float min_y_range,
-    const float min_z_range, const int num_inds_for_scan)
-    : max_num_pillars_(max_num_pillars),
-      max_num_points_per_pillar_(max_points_per_pillar),
-      num_point_feature_(num_point_feature),
-      grid_x_size_(grid_x_size),
-      grid_y_size_(grid_y_size),
-      grid_z_size_(grid_z_size),
-      pillar_x_size_(pillar_x_size),
-      pillar_y_size_(pillar_y_size),
-      pillar_z_size_(pillar_z_size),
-      min_x_range_(min_x_range),
-      min_y_range_(min_y_range),
-      min_z_range_(min_z_range),
-      num_inds_for_scan_(num_inds_for_scan) {}
+PreprocessPoints::PreprocessPoints(const int   max_num_pillars,
+                                   const int   max_points_per_pillar,
+                                   const int   num_point_feature,
+                                   const int   grid_x_size,
+                                   const int   grid_y_size,
+                                   const int   grid_z_size,
+                                   const float pillar_x_size,
+                                   const float pillar_y_size,
+                                   const float pillar_z_size,
+                                   const float min_x_range,
+                                   const float min_y_range,
+                                   const float min_z_range,
+                                   const int   num_inds_for_scan)
+    : max_num_pillars_(max_num_pillars)
+    , max_num_points_per_pillar_(max_points_per_pillar)
+    , num_point_feature_(num_point_feature)
+    , grid_x_size_(grid_x_size)
+    , grid_y_size_(grid_y_size)
+    , grid_z_size_(grid_z_size)
+    , pillar_x_size_(pillar_x_size)
+    , pillar_y_size_(pillar_y_size)
+    , pillar_z_size_(pillar_z_size)
+    , min_x_range_(min_x_range)
+    , min_y_range_(min_y_range)
+    , min_z_range_(min_z_range)
+    , num_inds_for_scan_(num_inds_for_scan) {}
 
-void PreprocessPoints::InitializeVariables(int* coor_to_pillaridx,
+void PreprocessPoints::InitializeVariables(int*   coor_to_pillaridx,
                                            float* sparse_pillar_map,
                                            float* pillar_point_feature,
                                            float* pillar_coors) {
@@ -77,9 +84,7 @@ void PreprocessPoints::InitializeVariables(int* coor_to_pillaridx,
     }
   }
 
-  for (int i = 0;
-       i < max_num_pillars_ * max_num_points_per_pillar_ * num_point_feature_;
-       ++i) {
+  for (int i = 0; i < max_num_pillars_ * max_num_points_per_pillar_ * num_point_feature_; ++i) {
     pillar_point_feature[i] = 0;
   }
 
@@ -89,37 +94,34 @@ void PreprocessPoints::InitializeVariables(int* coor_to_pillaridx,
 }
 
 void PreprocessPoints::Preprocess(const float* in_points_array,
-                                  int in_num_points, int* x_coors, int* y_coors,
-                                  float* num_points_per_pillar,
-                                  float* pillar_point_feature,
-                                  float* pillar_coors, float* sparse_pillar_map,
-                                  int* host_pillar_count) {
+                                  int          in_num_points,
+                                  int*         x_coors,
+                                  int*         y_coors,
+                                  float*       num_points_per_pillar,
+                                  float*       pillar_point_feature,
+                                  float*       pillar_coors,
+                                  float*       sparse_pillar_map,
+                                  int*         host_pillar_count) {
   int pillar_count = 0;
   // init variables
   int* coor_to_pillaridx = new int[grid_y_size_ * grid_x_size_];
-  InitializeVariables(coor_to_pillaridx, sparse_pillar_map,
-                      pillar_point_feature, pillar_coors);
+  InitializeVariables(coor_to_pillaridx, sparse_pillar_map, pillar_point_feature, pillar_coors);
   for (int i = 0; i < in_num_points; ++i) {
-    int x_coor = std::floor(
-        (in_points_array[i * num_point_feature_ + 0] - min_x_range_) /
-        pillar_x_size_);
-    int y_coor = std::floor(
-        (in_points_array[i * num_point_feature_ + 1] - min_y_range_) /
-        pillar_y_size_);
-    int z_coor = std::floor(
-        (in_points_array[i * num_point_feature_ + 2] - min_z_range_) /
-        pillar_z_size_);
-    if (x_coor < 0 || x_coor >= grid_x_size_ || y_coor < 0 ||
-        y_coor >= grid_y_size_ || z_coor < 0 || z_coor >= grid_z_size_) {
+    int x_coor =
+        std::floor((in_points_array[i * num_point_feature_ + 0] - min_x_range_) / pillar_x_size_);
+    int y_coor =
+        std::floor((in_points_array[i * num_point_feature_ + 1] - min_y_range_) / pillar_y_size_);
+    int z_coor =
+        std::floor((in_points_array[i * num_point_feature_ + 2] - min_z_range_) / pillar_z_size_);
+    if (x_coor < 0 || x_coor >= grid_x_size_ || y_coor < 0 || y_coor >= grid_y_size_ ||
+        z_coor < 0 || z_coor >= grid_z_size_) {
       continue;
     }
     // reverse index
     int pillar_index = coor_to_pillaridx[y_coor * grid_x_size_ + x_coor];
     if (pillar_index == -1) {
       pillar_index = pillar_count;
-      if (pillar_count >= max_num_pillars_) {
-        break;
-      }
+      if (pillar_count >= max_num_pillars_) { break; }
       pillar_count += 1;
       coor_to_pillaridx[y_coor * grid_x_size_ + x_coor] = pillar_index;
 
@@ -131,8 +133,7 @@ void PreprocessPoints::Preprocess(const float* in_points_array,
     int num = num_points_per_pillar[pillar_index];
     if (num < max_num_points_per_pillar_) {
       for (int j = 0; j < num_point_feature_; ++j) {
-        pillar_point_feature[pillar_index * max_num_points_per_pillar_ *
-                                 num_point_feature_ +
+        pillar_point_feature[pillar_index * max_num_points_per_pillar_ * num_point_feature_ +
                              num * num_point_feature_ + j] =
             in_points_array[i * num_point_feature_ + j];
       }

@@ -26,14 +26,13 @@ namespace can {
 
 using apollo::common::ErrorCode;
 
-bool FakeCanClient::Init(const CANCardParameter &param) { return true; }
+bool FakeCanClient::Init(const CANCardParameter& param) { return true; }
 
 ErrorCode FakeCanClient::Start() { return ErrorCode::OK; }
 
 void FakeCanClient::Stop() {}
 
-ErrorCode FakeCanClient::Send(const std::vector<CanFrame> &frames,
-                              int32_t *const frame_num) {
+ErrorCode FakeCanClient::Send(const std::vector<CanFrame>& frames, int32_t* const frame_num) {
   if (frame_num == nullptr) {
     AERROR << "frame_num pointer is null";
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
@@ -52,8 +51,7 @@ ErrorCode FakeCanClient::Send(const std::vector<CanFrame> &frames,
   return ErrorCode::OK;
 }
 
-ErrorCode FakeCanClient::Receive(std::vector<CanFrame> *const frames,
-                                 int32_t *const frame_num) {
+ErrorCode FakeCanClient::Receive(std::vector<CanFrame>* const frames, int32_t* const frame_num) {
   if (frame_num == nullptr || frames == nullptr) {
     AERROR << "frames or frame_num pointer is null";
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
@@ -64,7 +62,7 @@ ErrorCode FakeCanClient::Receive(std::vector<CanFrame> *const frames,
     for (int j = 0; j < MOCK_LEN; ++j) {
       (*frames)[i].data[j] = static_cast<uint8_t>(j);
     }
-    (*frames)[i].id = static_cast<uint32_t>(i);
+    (*frames)[i].id  = static_cast<uint32_t>(i);
     (*frames)[i].len = MOCK_LEN;
     ADEBUG << (*frames)[i].CanFrameString() << "frame_num[" << i << "]";
   }
@@ -73,9 +71,7 @@ ErrorCode FakeCanClient::Receive(std::vector<CanFrame> *const frames,
   return ErrorCode::OK;
 }
 
-std::string FakeCanClient::GetErrorString(const int32_t /*status*/) {
-  return "";
-}
+std::string FakeCanClient::GetErrorString(const int32_t /*status*/) { return ""; }
 
 }  // namespace can
 }  // namespace canbus

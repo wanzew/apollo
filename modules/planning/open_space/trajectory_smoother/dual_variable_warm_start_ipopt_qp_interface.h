@@ -25,15 +25,15 @@
 
 #include <adolc/adolc.h>
 #include <adolc/adolc_sparse.h>
-
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
 
 #include "Eigen/Dense"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
 
 // #define tag_f 1
 // #define tag_g 2
@@ -45,32 +45,38 @@ namespace planning {
 
 class DualVariableWarmStartIPOPTQPInterface : public Ipopt::TNLP {
  public:
-  DualVariableWarmStartIPOPTQPInterface(
-      size_t horizon, double ts, const Eigen::MatrixXd& ego,
-      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-      const Eigen::MatrixXd& xWS,
-      const PlannerOpenSpaceConfig& planner_open_space_config);
+  DualVariableWarmStartIPOPTQPInterface(size_t                        horizon,
+                                        double                        ts,
+                                        const Eigen::MatrixXd&        ego,
+                                        const Eigen::MatrixXi&        obstacles_edges_num,
+                                        const size_t                  obstacles_num,
+                                        const Eigen::MatrixXd&        obstacles_A,
+                                        const Eigen::MatrixXd&        obstacles_b,
+                                        const Eigen::MatrixXd&        xWS,
+                                        const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DualVariableWarmStartIPOPTQPInterface() = default;
 
-  void get_optimization_results(Eigen::MatrixXd* l_warm_up,
-                                Eigen::MatrixXd* n_warm_up) const;
+  void get_optimization_results(Eigen::MatrixXd* l_warm_up, Eigen::MatrixXd* n_warm_up) const;
 
-  void check_solution(const Eigen::MatrixXd& l_warm_up,
-                      const Eigen::MatrixXd& n_warm_up);
+  void check_solution(const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up);
 
   /** Method to return some info about the nlp */
-  bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
-                    IndexStyleEnum& index_style) override;
+  bool get_nlp_info(
+      int& n, int& m, int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) override;
 
   /** Method to return the bounds for my problem */
-  bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l,
-                       double* g_u) override;
+  bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l, double* g_u) override;
 
   /** Method to return the starting point for the algorithm */
-  bool get_starting_point(int n, bool init_x, double* x, bool init_z,
-                          double* z_L, double* z_U, int m, bool init_lambda,
+  bool get_starting_point(int     n,
+                          bool    init_x,
+                          double* x,
+                          bool    init_z,
+                          double* z_L,
+                          double* z_U,
+                          int     m,
+                          bool    init_lambda,
                           double* lambda) override;
 
   /** Method to return the objective value */
@@ -86,25 +92,45 @@ class DualVariableWarmStartIPOPTQPInterface : public Ipopt::TNLP {
    *   1) The structure of the jacobian (if "values" is nullptr)
    *   2) The values of the jacobian (if "values" is not nullptr)
    */
-  bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
-                  int* iRow, int* jCol, double* values) override;
+  bool eval_jac_g(int           n,
+                  const double* x,
+                  bool          new_x,
+                  int           m,
+                  int           nele_jac,
+                  int*          iRow,
+                  int*          jCol,
+                  double*       values) override;
 
   /** Method to return:
    *   1) The structure of the hessian of the lagrangian (if "values" is
    * nullptr) 2) The values of the hessian of the lagrangian (if "values" is not
    * nullptr)
    */
-  bool eval_h(int n, const double* x, bool new_x, double obj_factor, int m,
-              const double* lambda, bool new_lambda, int nele_hess, int* iRow,
-              int* jCol, double* values) override;
+  bool eval_h(int           n,
+              const double* x,
+              bool          new_x,
+              double        obj_factor,
+              int           m,
+              const double* lambda,
+              bool          new_lambda,
+              int           nele_hess,
+              int*          iRow,
+              int*          jCol,
+              double*       values) override;
 
   /** @name Solution Methods */
   /** This method is called when the algorithm is complete so the TNLP can
    * store/write the solution */
-  void finalize_solution(Ipopt::SolverReturn status, int n, const double* x,
-                         const double* z_L, const double* z_U, int m,
-                         const double* g, const double* lambda,
-                         double obj_value, const Ipopt::IpoptData* ip_data,
+  void finalize_solution(Ipopt::SolverReturn               status,
+                         int                               n,
+                         const double*                     x,
+                         const double*                     z_L,
+                         const double*                     z_U,
+                         int                               m,
+                         const double*                     g,
+                         const double*                     lambda,
+                         double                            obj_value,
+                         const Ipopt::IpoptData*           ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
   //***************    start ADOL-C part ***********************************
@@ -121,26 +147,26 @@ class DualVariableWarmStartIPOPTQPInterface : public Ipopt::TNLP {
   //***************    end   ADOL-C part ***********************************
 
  private:
-  int num_of_variables_;
-  int num_of_constraints_;
-  int horizon_;
-  double ts_;
+  int             num_of_variables_;
+  int             num_of_constraints_;
+  int             horizon_;
+  double          ts_;
   Eigen::MatrixXd ego_;
-  int lambda_horizon_ = 0;
-  int miu_horizon_ = 0;
-  int dual_formulation_horizon_ = 0;
+  int             lambda_horizon_           = 0;
+  int             miu_horizon_              = 0;
+  int             dual_formulation_horizon_ = 0;
 
   Eigen::MatrixXd l_warm_up_;
   Eigen::MatrixXd n_warm_up_;
-  double wheelbase_;
+  double          wheelbase_;
 
-  double w_ev_;
-  double l_ev_;
+  double              w_ev_;
+  double              l_ev_;
   std::vector<double> g_;
-  double offset_;
-  Eigen::MatrixXi obstacles_edges_num_;
-  int obstacles_num_;
-  int obstacles_edges_sum_;
+  double              offset_;
+  Eigen::MatrixXi     obstacles_edges_num_;
+  int                 obstacles_num_;
+  int                 obstacles_edges_sum_;
 
   // lagrangian l start index
   int l_start_index_ = 0;
@@ -163,12 +189,12 @@ class DualVariableWarmStartIPOPTQPInterface : public Ipopt::TNLP {
   double min_safety_distance_;
 
   //***************    start ADOL-C part ***********************************
-  double* obj_lam;
-  unsigned int* rind_L; /* row indices    */
-  unsigned int* cind_L; /* column indices */
-  double* hessval;      /* values */
-  int nnz_L;
-  int options_L[4];
+  double*       obj_lam;
+  unsigned int* rind_L;  /* row indices    */
+  unsigned int* cind_L;  /* column indices */
+  double*       hessval; /* values */
+  int           nnz_L;
+  int           options_L[4];
   //***************    end   ADOL-C part ***********************************
 };
 

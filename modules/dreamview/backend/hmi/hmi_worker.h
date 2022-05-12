@@ -46,7 +46,8 @@ namespace dreamview {
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
-  HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
+  HMIWorker()
+      : HMIWorker(cyber::CreateNode("HMI")) {}
   explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
   void Start();
   void Stop();
@@ -58,22 +59,24 @@ class HMIWorker {
   // Register handler which will be called on HMIStatus update.
   // It will be called ASAP if there are changes, or else periodically
   // controlled by FLAGS_hmi_status_update_interval.
-  using StatusUpdateHandler =
-      std::function<void(const bool status_changed, HMIStatus* status)>;
+  using StatusUpdateHandler = std::function<void(const bool status_changed, HMIStatus* status)>;
   inline void RegisterStatusUpdateHandler(StatusUpdateHandler handler) {
     status_update_handlers_.push_back(handler);
   }
 
   // Submit an AudioEvent
-  void SubmitAudioEvent(const uint64_t event_time_ms, const int obstacle_id,
-                        const int audio_type, const int moving_result,
-                        const int audio_direction, const bool is_siren_on);
+  void SubmitAudioEvent(const uint64_t event_time_ms,
+                        const int      obstacle_id,
+                        const int      audio_type,
+                        const int      moving_result,
+                        const int      audio_direction,
+                        const bool     is_siren_on);
 
   // Submit a DriveEvent.
-  void SubmitDriveEvent(const uint64_t event_time_ms,
-                        const std::string& event_msg,
+  void SubmitDriveEvent(const uint64_t                  event_time_ms,
+                        const std::string&              event_msg,
                         const std::vector<std::string>& event_types,
-                        const bool is_reportable);
+                        const bool                      is_reportable);
 
   // Run sensor calibration preprocess
   void SensorCalibrationPreprocess(const std::string& task_type);
@@ -86,7 +89,7 @@ class HMIWorker {
 
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
-  static HMIMode LoadMode(const std::string& mode_config_path);
+  static HMIMode   LoadMode(const std::string& mode_config_path);
 
  private:
   void InitReadersAndWriters();
@@ -113,28 +116,26 @@ class HMIWorker {
   const HMIConfig config_;
 
   // HMI status maintenance.
-  HMIStatus status_;
-  std::atomic<double> last_status_received_s_;
-  bool monitor_timed_out_{true};
-  HMIMode current_mode_;
-  bool status_changed_ = false;
-  size_t last_status_fingerprint_{};
-  bool stop_ = false;
-  mutable boost::shared_mutex status_mutex_;
-  mutable size_t record_count_ = 0;
-  std::future<void> thread_future_;
+  HMIStatus                        status_;
+  std::atomic<double>              last_status_received_s_;
+  bool                             monitor_timed_out_{true};
+  HMIMode                          current_mode_;
+  bool                             status_changed_ = false;
+  size_t                           last_status_fingerprint_{};
+  bool                             stop_ = false;
+  mutable boost::shared_mutex      status_mutex_;
+  mutable size_t                   record_count_ = 0;
+  std::future<void>                thread_future_;
   std::vector<StatusUpdateHandler> status_update_handlers_;
 
   // Cyber members.
-  std::shared_ptr<apollo::cyber::Node> node_;
-  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
-  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
-      localization_reader_;
-  std::shared_ptr<cyber::Writer<HMIStatus>> status_writer_;
-  std::shared_ptr<cyber::Writer<apollo::control::PadMessage>> pad_writer_;
-  std::shared_ptr<cyber::Writer<apollo::audio::AudioEvent>> audio_event_writer_;
-  std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
-      drive_event_writer_;
+  std::shared_ptr<apollo::cyber::Node>                                       node_;
+  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>>                    chassis_reader_;
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>> localization_reader_;
+  std::shared_ptr<cyber::Writer<HMIStatus>>                                  status_writer_;
+  std::shared_ptr<cyber::Writer<apollo::control::PadMessage>>                pad_writer_;
+  std::shared_ptr<cyber::Writer<apollo::audio::AudioEvent>>                  audio_event_writer_;
+  std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>                 drive_event_writer_;
 };
 
 }  // namespace dreamview

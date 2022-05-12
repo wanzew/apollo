@@ -42,16 +42,14 @@ bool GuardianComponent::Init() {
       });
 
   control_cmd_reader_ = node_->CreateReader<ControlCommand>(
-      FLAGS_control_command_topic,
-      [this](const std::shared_ptr<ControlCommand>& cmd) {
+      FLAGS_control_command_topic, [this](const std::shared_ptr<ControlCommand>& cmd) {
         ADEBUG << "Received control data: run control callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         control_cmd_.CopyFrom(*cmd);
       });
 
   system_status_reader_ = node_->CreateReader<SystemStatus>(
-      FLAGS_system_status_topic,
-      [this](const std::shared_ptr<SystemStatus>& status) {
+      FLAGS_system_status_topic, [this](const std::shared_ptr<SystemStatus>& status) {
         ADEBUG << "Received system status data: run system status callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         last_status_received_s_ = Time::Now().ToSecond();
@@ -69,12 +67,10 @@ bool GuardianComponent::Proc() {
   bool safety_mode_triggered = false;
   if (guardian_conf_.guardian_enable()) {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (Time::Now().ToSecond() - last_status_received_s_ >
-        kSecondsTillTimeout) {
+    if (Time::Now().ToSecond() - last_status_received_s_ > kSecondsTillTimeout) {
       safety_mode_triggered = true;
     }
-    safety_mode_triggered =
-        safety_mode_triggered || system_status_.has_safety_mode_trigger_time();
+    safety_mode_triggered = safety_mode_triggered || system_status_.has_safety_mode_trigger_time();
   }
 
   if (safety_mode_triggered) {
@@ -99,17 +95,15 @@ void GuardianComponent::TriggerSafetyMode() {
   AINFO << "Safety state triggered, with system safety mode trigger time : "
         << system_status_.safety_mode_trigger_time();
   std::lock_guard<std::mutex> lock(mutex_);
-  bool sensor_malfunction = false, obstacle_detected = false;
-  if (!chassis_.surround().sonar_enabled() ||
-      chassis_.surround().sonar_fault()) {
+  bool                        sensor_malfunction = false, obstacle_detected = false;
+  if (!chassis_.surround().sonar_enabled() || chassis_.surround().sonar_fault()) {
     AINFO << "Ultrasonic sensor not enabled for faulted, will do emergency "
              "stop!";
     sensor_malfunction = true;
   } else {
     // TODO(QiL) : Load for config
     for (int i = 0; i < chassis_.surround().sonar_range_size(); ++i) {
-      if ((chassis_.surround().sonar_range(i) > 0.0 &&
-           chassis_.surround().sonar_range(i) < 2.5) ||
+      if ((chassis_.surround().sonar_range(i) > 0.0 && chassis_.surround().sonar_range(i) < 2.5) ||
           chassis_.surround().sonar_range(i) > 30) {
         AINFO << "Object detected or ultrasonic sensor fault output, will do "
                  "emergency stop!";
@@ -125,12 +119,11 @@ void GuardianComponent::TriggerSafetyMode() {
 
   // TODO(QiL) : Remove this one once hardware re-alignment is done.
   sensor_malfunction = false;
-  obstacle_detected = false;
+  obstacle_detected  = false;
   AINFO << "Temporarily ignore the ultrasonic sensor output during hardware "
            "re-alignment!";
 
-  if (system_status_.require_emergency_stop() || sensor_malfunction ||
-      obstacle_detected) {
+  if (system_status_.require_emergency_stop() || sensor_malfunction || obstacle_detected) {
     AINFO << "Emergency stop triggered! with system status from monitor as : "
           << system_status_.require_emergency_stop();
     guardian_cmd_.mutable_control_command()->set_brake(

@@ -21,6 +21,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/ctpl/ctpl.h"
 #include "modules/perception/tool/benchmark/lidar/loader/sequence_data_loader.h"
 
@@ -31,9 +32,9 @@ namespace benchmark {
 template <class Dtype>
 struct Cache {
   std::shared_ptr<Dtype> data;
-  bool loaded = false;
-  bool load_success = false;
-  std::future<void> status;
+  bool                   loaded       = false;
+  bool                   load_success = false;
+  std::future<void>      status;
 };
 
 // @brief General asynchronous data loader class, class DataType must implement
@@ -41,12 +42,11 @@ struct Cache {
 template <class DataType>
 class AsyncSequenceDataLoader : public SequenceDataLoader<DataType> {
  public:
-  AsyncSequenceDataLoader() = default;
+  AsyncSequenceDataLoader()  = default;
   ~AsyncSequenceDataLoader() = default;
-  void set(std::size_t cache_size, std::size_t prefetch_size,
-           std::size_t thread_num) {
+  void set(std::size_t cache_size, std::size_t prefetch_size, std::size_t thread_num) {
     std::lock_guard<std::mutex> lock(_mutex);
-    _fixed_cache_size = cache_size;
+    _fixed_cache_size   = cache_size;
     _prefetch_data_size = prefetch_size;
     if (_thread_pool == nullptr) {
       _thread_pool.reset(new ctpl::thread_pool(static_cast<int>(thread_num)));
@@ -66,13 +66,13 @@ class AsyncSequenceDataLoader : public SequenceDataLoader<DataType> {
   using SequenceDataLoader<DataType>::_filenames;
 
  protected:
-  std::size_t _fixed_cache_size = 50;
+  std::size_t _fixed_cache_size   = 50;
   std::size_t _prefetch_data_size = 5;
 
  private:
-  std::map<int, CachePtr> _cached_data;
+  std::map<int, CachePtr>            _cached_data;
   std::unique_ptr<ctpl::thread_pool> _thread_pool;
-  std::mutex _mutex;
+  std::mutex                         _mutex;
 };
 
 // @brief pipeline for query next and query last
@@ -82,14 +82,9 @@ class AsyncSequenceDataLoader : public SequenceDataLoader<DataType> {
 // finally trigger prefetching
 
 template <class DataType>
-bool AsyncSequenceDataLoader<DataType>::query_next(
-    std::shared_ptr<DataType>& data) {  // NOLINT
-  if (_thread_pool == nullptr) {
-    return false;
-  }
-  if (!_initialized) {
-    return false;
-  }
+bool AsyncSequenceDataLoader<DataType>::query_next(std::shared_ptr<DataType>& data) {  // NOLINT
+  if (_thread_pool == nullptr) { return false; }
+  if (!_initialized) { return false; }
   std::lock_guard<std::mutex> lock(_mutex);
   ++_idx;
   if (_idx >= static_cast<int>(_filenames[0].size())) {
@@ -110,10 +105,10 @@ bool AsyncSequenceDataLoader<DataType>::query_next(
     for (auto& names : _filenames) {
       files.push_back(names[_idx]);
     }
-    cache_ptr->loaded = true;
+    cache_ptr->loaded       = true;
     cache_ptr->load_success = cache_ptr->data->load(files);
     _cached_data.emplace(_idx, cache_ptr);
-    data = cache_ptr->data;
+    data         = cache_ptr->data;
     load_success = cache_ptr->load_success;
   } else {
     // loaded
@@ -121,13 +116,12 @@ bool AsyncSequenceDataLoader<DataType>::query_next(
       iter->second->status.wait();
       iter->second->loaded = true;
     }
-    data = iter->second->data;
+    data         = iter->second->data;
     load_success = iter->second->load_success;
   }
   // prefetch next data
-  for (int i = _idx + 1;
-       i <= std::min(static_cast<std::size_t>(_idx) + _prefetch_data_size,
-                     _filenames[0].size() - 1);
+  for (int i = _idx + 1; i <= std::min(static_cast<std::size_t>(_idx) + _prefetch_data_size,
+                                       _filenames[0].size() - 1);
        ++i) {
     auto prefetch_iter = _cached_data.find(i);
     if (prefetch_iter == _cached_data.end()) {
@@ -137,16 +131,14 @@ bool AsyncSequenceDataLoader<DataType>::query_next(
       for (auto& names : _filenames) {
         files.push_back(names[i]);
       }
-      cache_ptr->status = _thread_pool->push([cache_ptr, files](int id) {
-        cache_ptr->load_success = cache_ptr->data->load(files);
-      });
+      cache_ptr->status = _thread_pool->push(
+          [cache_ptr, files](int id) { cache_ptr->load_success = cache_ptr->data->load(files); });
       _cached_data.emplace(i, cache_ptr);
     }
   }
   // clean stale data on the other end
   for (auto citer = _cached_data.begin();
-       citer != _cached_data.end() &&
-       _cached_data.size() > _fixed_cache_size;) {
+       citer != _cached_data.end() && _cached_data.size() > _fixed_cache_size;) {
     if (citer->second->loaded && _idx != citer->first) {
       citer->second->data->release();
       _cached_data.erase(citer++);
@@ -158,18 +150,11 @@ bool AsyncSequenceDataLoader<DataType>::query_next(
 }
 
 template <class DataType>
-bool AsyncSequenceDataLoader<DataType>::query_last(
-    std::shared_ptr<DataType>& data) {  // NOLINT
-  if (_thread_pool == nullptr) {
-    return false;
-  }
-  if (!_initialized) {
-    return false;
-  }
+bool AsyncSequenceDataLoader<DataType>::query_last(std::shared_ptr<DataType>& data) {  // NOLINT
+  if (_thread_pool == nullptr) { return false; }
+  if (!_initialized) { return false; }
   std::lock_guard<std::mutex> lock(_mutex);
-  if (data == nullptr) {
-    data.reset(new DataType);
-  }
+  if (data == nullptr) { data.reset(new DataType); }
   --_idx;
   if (_idx < 0) {
     return false;
@@ -191,7 +176,7 @@ bool AsyncSequenceDataLoader<DataType>::query_last(
     }
     cache_ptr->load_success = cache_ptr->data->load(files);
     _cached_data.emplace(_idx, cache_ptr);
-    data = cache_ptr->data;
+    data         = cache_ptr->data;
     load_success = cache_ptr->load_success;
   } else {
     // loaded
@@ -199,12 +184,11 @@ bool AsyncSequenceDataLoader<DataType>::query_last(
       iter->second->status.wait();
       iter->second->loaded = true;
     }
-    data = iter->second->data;
+    data         = iter->second->data;
     load_success = iter->second->load_success;
   }
   // prefetch last data
-  for (int i = _idx - 1;
-       i >= std::max(_idx - static_cast<int>(_prefetch_data_size), 0); --i) {
+  for (int i = _idx - 1; i >= std::max(_idx - static_cast<int>(_prefetch_data_size), 0); --i) {
     auto prefetch_iter = _cached_data.find(i);
     if (prefetch_iter == _cached_data.end()) {
       CachePtr cache_ptr(new Cache<DataType>);
@@ -213,16 +197,14 @@ bool AsyncSequenceDataLoader<DataType>::query_last(
       for (auto& names : _filenames) {
         files.push_back(names[i]);
       }
-      cache_ptr->status = _thread_pool->push([cache_ptr, files](int id) {
-        cache_ptr->load_success = cache_ptr->data->load(files);
-      });
+      cache_ptr->status = _thread_pool->push(
+          [cache_ptr, files](int id) { cache_ptr->load_success = cache_ptr->data->load(files); });
       _cached_data.emplace(i, cache_ptr);
     }
   }
   // clean stale data on the other end
   for (auto citer = _cached_data.rbegin();
-       citer != _cached_data.rend() &&
-       _cached_data.size() > _fixed_cache_size;) {
+       citer != _cached_data.rend() && _cached_data.size() > _fixed_cache_size;) {
     if (citer->second->loaded && citer->first != _idx) {
       citer->second->data->release();
       _cached_data.erase((++citer).base());

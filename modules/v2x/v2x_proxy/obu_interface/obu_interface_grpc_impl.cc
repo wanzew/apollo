@@ -36,9 +36,9 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 
 ObuInterFaceGrpcImpl::ObuInterFaceGrpcImpl()
-    : grpc_client_(new GrpcClientImpl(grpc::CreateChannel(
-          FLAGS_grpc_client_host + ":" + FLAGS_grpc_client_port,
-          grpc::InsecureChannelCredentials()))) {
+    : grpc_client_(new GrpcClientImpl(
+          grpc::CreateChannel(FLAGS_grpc_client_host + ":" + FLAGS_grpc_client_port,
+                              grpc::InsecureChannelCredentials()))) {
   AINFO << "ObuInterFaceGrpcImpl Start Construct.";
   cli_init_ = grpc_client_->InitFlag();
   grpc_server_.reset(new GrpcServerImpl());
@@ -54,27 +54,22 @@ ObuInterFaceGrpcImpl::~ObuInterFaceGrpcImpl() {
     exit_flag_ = true;
   }
   condition_.notify_all();
-  if (!!thread_grpc_ && thread_grpc_->joinable()) {
-    thread_grpc_->join();
-  }
+  if (!!thread_grpc_ && thread_grpc_->joinable()) { thread_grpc_->join(); }
   AINFO << "close obu interface success";
 }
 
 bool ObuInterFaceGrpcImpl::InitialClient() { return cli_init_; }
 
 bool ObuInterFaceGrpcImpl::InitialServer() {
-  if (!srv_init_) {
-    return false;
-  }
+  if (!srv_init_) { return false; }
   thread_grpc_.reset(new std::thread([this]() { this->ThreadRunServer(); }));
   return thread_grpc_ != nullptr;
 }
 
 void ObuInterFaceGrpcImpl::ThreadRunServer() {
   std::unique_lock<std::mutex> lck(mutex_);
-  auto start = std::chrono::steady_clock::now();
-  std::string server_address(FLAGS_grpc_server_host + ":" +
-                             FLAGS_grpc_server_port);
+  auto                         start = std::chrono::steady_clock::now();
+  std::string   server_address(FLAGS_grpc_server_host + ":" + FLAGS_grpc_server_port);
   ServerBuilder builder;
   // Listen on the given address without any authentication mechanism.
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
@@ -82,31 +77,29 @@ void ObuInterFaceGrpcImpl::ThreadRunServer() {
   // clients. In this case it corresponds to an *synchronous* service.
   builder.RegisterService(grpc_server_.get());
   // Finally assemble the server.
-  auto tmp = builder.BuildAndStart();
-  server_ = std::move(tmp);
-  auto end = std::chrono::steady_clock::now();
+  auto tmp                                = builder.BuildAndStart();
+  server_                                 = std::move(tmp);
+  auto                          end       = std::chrono::steady_clock::now();
   std::chrono::duration<double> time_used = end - start;
-  AINFO << "ObuInterFaceGrpcImpl grpc server has listening on : "
-        << server_address << " time used : " << time_used.count();
+  AINFO << "ObuInterFaceGrpcImpl grpc server has listening on : " << server_address
+        << " time used : " << time_used.count();
   condition_.wait(lck, [&]() { return exit_flag_; });
 }
 
-void ObuInterFaceGrpcImpl::GetV2xTrafficLightFromObu(
-    std::shared_ptr<ObuTrafficLight> *msg) {
+void ObuInterFaceGrpcImpl::GetV2xTrafficLightFromObu(std::shared_ptr<ObuTrafficLight>* msg) {
   grpc_server_->GetMsgFromGrpc(msg);
 }
 
 void ObuInterFaceGrpcImpl::GetV2xObstaclesFromObu(
-    std::shared_ptr<::apollo::v2x::V2XObstacles> *msg) {
+    std::shared_ptr<::apollo::v2x::V2XObstacles>* msg) {
   grpc_server_->GetMsgFromGrpc(msg);
 }
 
-void ObuInterFaceGrpcImpl::GetV2xRsiFromObu(std::shared_ptr<ObuRsi> *msg) {
+void ObuInterFaceGrpcImpl::GetV2xRsiFromObu(std::shared_ptr<ObuRsi>* msg) {
   grpc_server_->GetMsgFromGrpc(msg);
 }
 
-void ObuInterFaceGrpcImpl::SendCarStatusToObu(
-    const std::shared_ptr<CarStatus> &msg) {
+void ObuInterFaceGrpcImpl::SendCarStatusToObu(const std::shared_ptr<CarStatus>& msg) {
   grpc_client_->SendMsgToGrpc(msg);
 }
 }  // namespace v2x

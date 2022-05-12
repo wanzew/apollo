@@ -38,15 +38,13 @@ bool DetectionComponent::Init() {
     return false;
   }
   AINFO << "Lidar Component Configs: " << comp_config.DebugString();
-  output_channel_name_ = comp_config.output_channel_name();
-  sensor_name_ = comp_config.sensor_name();
-  detector_name_ = comp_config.detector_name();
-  lidar2novatel_tf2_child_frame_id_ =
-      comp_config.lidar2novatel_tf2_child_frame_id();
-  lidar_query_tf_offset_ =
-      static_cast<float>(comp_config.lidar_query_tf_offset());
-  enable_hdmap_ = comp_config.enable_hdmap();
-  writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
+  output_channel_name_              = comp_config.output_channel_name();
+  sensor_name_                      = comp_config.sensor_name();
+  detector_name_                    = comp_config.detector_name();
+  lidar2novatel_tf2_child_frame_id_ = comp_config.lidar2novatel_tf2_child_frame_id();
+  lidar_query_tf_offset_            = static_cast<float>(comp_config.lidar_query_tf_offset());
+  enable_hdmap_                     = comp_config.enable_hdmap();
+  writer_                           = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
 
   if (!InitAlgorithmPlugin()) {
     AERROR << "Failed to init detection component algorithm plugin.";
@@ -55,11 +53,9 @@ bool DetectionComponent::Init() {
   return true;
 }
 
-bool DetectionComponent::Proc(
-    const std::shared_ptr<drivers::PointCloud>& message) {
+bool DetectionComponent::Proc(const std::shared_ptr<drivers::PointCloud>& message) {
   AINFO << std::setprecision(16)
-        << "Enter detection component, message timestamp: "
-        << message->measurement_time()
+        << "Enter detection component, message timestamp: " << message->measurement_time()
         << " current timestamp: " << Clock::NowInSeconds();
 
   auto out_message = std::make_shared<LidarFrameMessage>();
@@ -73,70 +69,61 @@ bool DetectionComponent::Proc(
 }
 
 bool DetectionComponent::InitAlgorithmPlugin() {
-  ACHECK(common::SensorManager::Instance()->GetSensorInfo(sensor_name_,
-                                                          &sensor_info_));
+  ACHECK(common::SensorManager::Instance()->GetSensorInfo(sensor_name_, &sensor_info_));
 
   lidar::BaseLidarObstacleDetection* detector =
-      lidar::BaseLidarObstacleDetectionRegisterer::
-      GetInstanceByName(detector_name_);
+      lidar::BaseLidarObstacleDetectionRegisterer::GetInstanceByName(detector_name_);
   CHECK_NOTNULL(detector);
   detector_.reset(detector);
   lidar::LidarObstacleDetectionInitOptions init_options;
-  init_options.sensor_name = sensor_name_;
-  init_options.enable_hdmap_input =
-      FLAGS_obs_enable_hdmap_input && enable_hdmap_;
-  ACHECK(detector_->Init(init_options)) <<
-                            "lidar obstacle detection init error";
+  init_options.sensor_name        = sensor_name_;
+  init_options.enable_hdmap_input = FLAGS_obs_enable_hdmap_input && enable_hdmap_;
+  ACHECK(detector_->Init(init_options)) << "lidar obstacle detection init error";
 
   lidar2world_trans_.Init(lidar2novatel_tf2_child_frame_id_);
   return true;
 }
 
-bool DetectionComponent::InternalProc(
-    const std::shared_ptr<const drivers::PointCloud>& in_message,
-    const std::shared_ptr<LidarFrameMessage>& out_message) {
-  uint32_t seq_num = seq_num_.fetch_add(1);
-  const double timestamp = in_message->measurement_time();
-  const double cur_time = Clock::NowInSeconds();
+bool DetectionComponent::InternalProc(const std::shared_ptr<const drivers::PointCloud>& in_message,
+                                      const std::shared_ptr<LidarFrameMessage>& out_message) {
+  uint32_t     seq_num       = seq_num_.fetch_add(1);
+  const double timestamp     = in_message->measurement_time();
+  const double cur_time      = Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
-  AINFO << std::setprecision(16) << "FRAME_STATISTICS:Lidar:Start:msg_time["
-        << timestamp << "]:sensor[" << sensor_name_ << "]:cur_time[" << cur_time
-        << "]:cur_latency[" << start_latency << "]";
+  AINFO << std::setprecision(16) << "FRAME_STATISTICS:Lidar:Start:msg_time[" << timestamp
+        << "]:sensor[" << sensor_name_ << "]:cur_time[" << cur_time << "]:cur_latency["
+        << start_latency << "]";
 
-  out_message->timestamp_ = timestamp;
+  out_message->timestamp_       = timestamp;
   out_message->lidar_timestamp_ = in_message->header().lidar_timestamp();
-  out_message->seq_num_ = seq_num;
-  out_message->process_stage_ = ProcessStage::LIDAR_DETECTION;
-  out_message->error_code_ = apollo::common::ErrorCode::OK;
+  out_message->seq_num_         = seq_num;
+  out_message->process_stage_   = ProcessStage::LIDAR_DETECTION;
+  out_message->error_code_      = apollo::common::ErrorCode::OK;
 
-  auto& frame = out_message->lidar_frame_;
-  frame = lidar::LidarFramePool::Instance().Get();
-  frame->cloud = base::PointFCloudPool::Instance().Get();
-  frame->timestamp = timestamp;
+  auto& frame        = out_message->lidar_frame_;
+  frame              = lidar::LidarFramePool::Instance().Get();
+  frame->cloud       = base::PointFCloudPool::Instance().Get();
+  frame->timestamp   = timestamp;
   frame->sensor_info = sensor_info_;
 
-  Eigen::Affine3d pose = Eigen::Affine3d::Identity();
-  Eigen::Affine3d pose_novatel = Eigen::Affine3d::Identity();
-  const double lidar_query_tf_timestamp =
-      timestamp - lidar_query_tf_offset_ * 0.001;
-  if (!lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp, &pose,
-                                               &pose_novatel)) {
+  Eigen::Affine3d pose                     = Eigen::Affine3d::Identity();
+  Eigen::Affine3d pose_novatel             = Eigen::Affine3d::Identity();
+  const double    lidar_query_tf_timestamp = timestamp - lidar_query_tf_offset_ * 0.001;
+  if (!lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp, &pose, &pose_novatel)) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Failed to get pose at time: " << lidar_query_tf_timestamp;
     return false;
   }
 
-  frame->lidar2world_pose = pose;
+  frame->lidar2world_pose   = pose;
   frame->novatel2world_pose = pose_novatel;
 
   lidar::LidarObstacleDetectionOptions detect_opts;
   detect_opts.sensor_name = sensor_name_;
   lidar2world_trans_.GetExtrinsics(&detect_opts.sensor2novatel_extrinsics);
-  lidar::LidarProcessResult ret =
-      detector_->Process(detect_opts, in_message, frame.get());
+  lidar::LidarProcessResult ret = detector_->Process(detect_opts, in_message, frame.get());
   if (ret.error_code != lidar::LidarErrorCode::Succeed) {
-    out_message->error_code_ =
-        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
+    out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     AERROR << "Lidar detection process error, " << ret.log;
     return false;
   }

@@ -29,7 +29,7 @@ namespace perception {
 namespace inference {
 
 template <typename T>
-void load_data(const std::string &filename, std::vector<T> *outputs) {
+void load_data(const std::string& filename, std::vector<T>* outputs) {
   std::ifstream ifs(filename, std::ifstream::in);
 
   if (ifs.good()) {
@@ -42,12 +42,11 @@ void load_data(const std::string &filename, std::vector<T> *outputs) {
   }
 }
 
-std::shared_ptr<float> load_binary_data(const std::string &filename);
+std::shared_ptr<float> load_binary_data(const std::string& filename);
 
-bool write_result(const std::string &out_path,
-                  const std::vector<float> &results);
-bool write_result(const std::string &out_path,
-                  const std::map<std::string, std::vector<float>> &results);
+bool write_result(const std::string& out_path, const std::vector<float>& results);
+bool write_result(const std::string&                               out_path,
+                  const std::map<std::string, std::vector<float>>& results);
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo

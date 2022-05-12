@@ -28,7 +28,8 @@ namespace fusion {
 
 class BaseMotionFusion {
  public:
-  explicit BaseMotionFusion(TrackPtr track) : track_ref_(track) {}
+  explicit BaseMotionFusion(TrackPtr track)
+      : track_ref_(track) {}
   virtual ~BaseMotionFusion() {}
   BaseMotionFusion(const BaseMotionFusion&) = delete;
   BaseMotionFusion& operator=(const BaseMotionFusion&) = delete;
@@ -39,11 +40,11 @@ class BaseMotionFusion {
   // @param [in]: measurement
   // @param [in]: target_timestamp
   virtual void UpdateWithMeasurement(const SensorObjectConstPtr& measurement,
-                                     double target_timestamp) = 0;
+                                     double                      target_timestamp) = 0;
 
   virtual void UpdateWithoutMeasurement(const std::string& sensor_id,
-                                        double measurement_timestamp,
-                                        double target_timestamp) = 0;
+                                        double             measurement_timestamp,
+                                        double             target_timestamp) = 0;
 
   virtual std::string Name() const = 0;
 

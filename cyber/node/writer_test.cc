@@ -31,7 +31,7 @@ using proto::Chatter;
 
 TEST(WriterTest, test1) {
   proto::RoleAttributes role;
-  Writer<Chatter> w(role);
+  Writer<Chatter>       w(role);
   EXPECT_TRUE(w.Init());
   EXPECT_TRUE(w.IsInit());
   EXPECT_TRUE(w.GetChannelName().empty());
@@ -40,7 +40,7 @@ TEST(WriterTest, test1) {
 
 TEST(WriterTest, test2) {
   proto::RoleAttributes role;
-  auto qos = role.mutable_qos_profile();
+  auto                  qos = role.mutable_qos_profile();
   qos->set_history(proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos->set_depth(0);
   qos->set_mps(0);

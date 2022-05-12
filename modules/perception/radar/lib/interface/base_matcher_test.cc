@@ -16,8 +16,9 @@
 
 #include "modules/perception/radar/lib/interface/base_matcher.h"
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track_manager.h"
 
@@ -34,11 +35,11 @@ TEST(BaseMatcherTest, base_matcher_test) {
   double distance = BaseMatcher::GetMaxMatchDistance();
   EXPECT_LT(std::fabs(match_distance - distance), 1e-5);
 
-  std::vector<RadarTrackPtr> radar_tracks;
-  base::Frame radar_frame;
+  std::vector<RadarTrackPtr>   radar_tracks;
+  base::Frame                  radar_frame;
   std::vector<TrackObjectPair> assignments;
-  std::vector<size_t> unassigned_tracks;
-  std::vector<size_t> unassigned_objects;
+  std::vector<size_t>          unassigned_tracks;
+  std::vector<size_t>          unassigned_objects;
   matcher->IDMatch(radar_tracks, radar_frame, &assignments, &unassigned_tracks,
                    &unassigned_objects);
   EXPECT_EQ(assignments.size(), 0);
@@ -46,9 +47,9 @@ TEST(BaseMatcherTest, base_matcher_test) {
   EXPECT_EQ(unassigned_objects.size(), 0);
 
   base::ObjectPtr object(new base::Object);
-  object->track_id = 100;
-  double timestamp = 123456789.0;
-  RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
+  object->track_id          = 100;
+  double          timestamp = 123456789.0;
+  RadarTrackPtr   radar_track(new RadarTrack(object, timestamp));
   base::ObjectPtr object2(new base::Object);
   object2->track_id = 101;
   RadarTrackPtr radar_track2(new RadarTrack(object2, timestamp));
@@ -67,9 +68,8 @@ TEST(BaseMatcherTest, base_matcher_test) {
   EXPECT_EQ(unassigned_objects.size(), 1);
 
   TrackObjectMatcherOptions options;
-  bool match_state =
-      matcher->Match(radar_tracks, radar_frame, options, &assignments,
-                     &unassigned_tracks, &unassigned_objects);
+  bool match_state = matcher->Match(radar_tracks, radar_frame, options, &assignments,
+                                    &unassigned_tracks, &unassigned_objects);
   EXPECT_TRUE(match_state);
 }
 

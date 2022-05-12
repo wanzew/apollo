@@ -15,10 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 
+#include "modules/perception/lidar/lib/object_filter_bank/proto/filter_bank_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/object_filter_bank/proto/filter_bank_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -27,12 +28,12 @@ namespace lidar {
 using apollo::cyber::common::GetAbsolutePath;
 
 bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
-  auto config_manager = lib::ConfigManager::Instance();
-  const lib::ModelConfig* model_config = nullptr;
+  auto                    config_manager = lib::ConfigManager::Instance();
+  const lib::ModelConfig* model_config   = nullptr;
   ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
-  std::string config_file;
-  std::string root_path;
+  std::string       config_file;
+  std::string       root_path;
   ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
@@ -41,9 +42,8 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_bank_.clear();
   for (int i = 0; i < config.filter_name_size(); ++i) {
-    const auto& name = config.filter_name(i);
-    BaseObjectFilter* filter =
-        BaseObjectFilterRegisterer::GetInstanceByName(name);
+    const auto&       name   = config.filter_name(i);
+    BaseObjectFilter* filter = BaseObjectFilterRegisterer::GetInstanceByName(name);
     if (!filter) {
       AINFO << "Failed to find object filter: " << name << ", skipped";
       continue;
@@ -58,16 +58,15 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   return true;
 }
 
-bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
-                              LidarFrame* frame) {
+bool ObjectFilterBank::Filter(const ObjectFilterOptions& options, LidarFrame* frame) {
   size_t object_number = frame->segmented_objects.size();
   for (auto& filter : filter_bank_) {
     if (!filter->Filter(options, frame)) {
       AINFO << "Failed to filter objects in: " << filter->Name();
     }
   }
-  AINFO << "Object filter bank, filtered objects size: from " << object_number
-        << " to " << frame->segmented_objects.size();
+  AINFO << "Object filter bank, filtered objects size: from " << object_number << " to "
+        << frame->segmented_objects.size();
   return true;
 }
 

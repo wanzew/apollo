@@ -17,6 +17,7 @@
 #include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_5_511.h"
 
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -29,8 +30,9 @@ using ::apollo::drivers::canbus::Byte;
 Ultrsensor5511::Ultrsensor5511() {}
 const int32_t Ultrsensor5511::ID = 0x511;
 
-void Ultrsensor5511::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
+void Ultrsensor5511::Parse(const std::uint8_t* bytes,
+                           int32_t             length,
+                           ChassisDetail*      chassis) const {
   chassis->mutable_devkit()->mutable_ultr_sensor_5_511()->set_uiuss7_tof_direct(
       uiuss7_tof_direct(bytes, length));
   chassis->mutable_devkit()->mutable_ultr_sensor_5_511()->set_uiuss6_tof_direct(
@@ -44,12 +46,11 @@ void Ultrsensor5511::Parse(const std::uint8_t* bytes, int32_t length,
 // config detail: {'name': 'uiuss7_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
 // 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-double Ultrsensor5511::uiuss7_tof_direct(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 6);
+double Ultrsensor5511::uiuss7_tof_direct(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 7);
+  Byte    t1(bytes + 7);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -61,12 +62,11 @@ double Ultrsensor5511::uiuss7_tof_direct(const std::uint8_t* bytes,
 // config detail: {'name': 'uiuss6_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
 // 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-double Ultrsensor5511::uiuss6_tof_direct(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 4);
+double Ultrsensor5511::uiuss6_tof_direct(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -78,12 +78,11 @@ double Ultrsensor5511::uiuss6_tof_direct(const std::uint8_t* bytes,
 // config detail: {'name': 'uiuss1_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
 // 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-double Ultrsensor5511::uiuss1_tof_direct(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 2);
+double Ultrsensor5511::uiuss1_tof_direct(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -95,12 +94,11 @@ double Ultrsensor5511::uiuss1_tof_direct(const std::uint8_t* bytes,
 // config detail: {'name': 'uiuss0_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
 // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-double Ultrsensor5511::uiuss0_tof_direct(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 0);
+double Ultrsensor5511::uiuss0_tof_direct(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

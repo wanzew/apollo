@@ -23,6 +23,9 @@
 #include <limits>
 
 #include "absl/strings/str_cat.h"
+
+#include "modules/routing/proto/routing.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -37,7 +40,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -55,35 +57,32 @@ FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_frame_history_num) {}
 
 Frame::Frame(uint32_t sequence_num)
-    : sequence_num_(sequence_num),
-      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
+    : sequence_num_(sequence_num)
+    , monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
 
-Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
-             const common::TrajectoryPoint &planning_start_point,
-             const common::VehicleState &vehicle_state,
-             ReferenceLineProvider *reference_line_provider)
-    : sequence_num_(sequence_num),
-      local_view_(local_view),
-      planning_start_point_(planning_start_point),
-      vehicle_state_(vehicle_state),
-      reference_line_provider_(reference_line_provider),
-      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
+Frame::Frame(uint32_t                       sequence_num,
+             const LocalView&               local_view,
+             const common::TrajectoryPoint& planning_start_point,
+             const common::VehicleState&    vehicle_state,
+             ReferenceLineProvider*         reference_line_provider)
+    : sequence_num_(sequence_num)
+    , local_view_(local_view)
+    , planning_start_point_(planning_start_point)
+    , vehicle_state_(vehicle_state)
+    , reference_line_provider_(reference_line_provider)
+    , monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
 
-Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
-             const common::TrajectoryPoint &planning_start_point,
-             const common::VehicleState &vehicle_state)
-    : Frame(sequence_num, local_view, planning_start_point, vehicle_state,
-            nullptr) {}
+Frame::Frame(uint32_t                       sequence_num,
+             const LocalView&               local_view,
+             const common::TrajectoryPoint& planning_start_point,
+             const common::VehicleState&    vehicle_state)
+    : Frame(sequence_num, local_view, planning_start_point, vehicle_state, nullptr) {}
 
-const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
-  return planning_start_point_;
-}
+const common::TrajectoryPoint& Frame::PlanningStartPoint() const { return planning_start_point_; }
 
-const common::VehicleState &Frame::vehicle_state() const {
-  return vehicle_state_;
-}
+const common::VehicleState& Frame::vehicle_state() const { return vehicle_state_; }
 
-bool Frame::Rerouting(PlanningContext *planning_context) {
+bool Frame::Rerouting(PlanningContext* planning_context) {
   if (FLAGS_use_navigation_mode) {
     AERROR << "Rerouting not supported in navigation mode";
     return false;
@@ -99,22 +98,22 @@ bool Frame::Rerouting(PlanningContext *planning_context) {
   auto request = local_view_.routing->routing_request();
   request.clear_header();
 
-  auto point = common::util::PointFactory::ToPointENU(vehicle_state_);
-  double s = 0.0;
-  double l = 0.0;
+  auto                    point = common::util::PointFactory::ToPointENU(vehicle_state_);
+  double                  s     = 0.0;
+  double                  l     = 0.0;
   hdmap::LaneInfoConstPtr lane;
-  if (hdmap_->GetNearestLaneWithHeading(point, 5.0, vehicle_state_.heading(),
-                                        M_PI / 3.0, &lane, &s, &l) != 0) {
-    AERROR << "Failed to find nearest lane from map at position: "
-           << point.DebugString() << ", heading:" << vehicle_state_.heading();
+  if (hdmap_->GetNearestLaneWithHeading(point, 5.0, vehicle_state_.heading(), M_PI / 3.0, &lane, &s,
+                                        &l) != 0) {
+    AERROR << "Failed to find nearest lane from map at position: " << point.DebugString()
+           << ", heading:" << vehicle_state_.heading();
     return false;
   }
   request.clear_waypoint();
-  auto *start_point = request.add_waypoint();
+  auto* start_point = request.add_waypoint();
   start_point->set_id(lane->id().id());
   start_point->set_s(s);
   start_point->mutable_pose()->CopyFrom(point);
-  for (const auto &waypoint : future_route_waypoints_) {
+  for (const auto& waypoint : future_route_waypoints_) {
     // reference_line_provider_->FutureRouteWaypoints()) {
     request.add_waypoint()->CopyFrom(waypoint);
   }
@@ -123,8 +122,7 @@ bool Frame::Rerouting(PlanningContext *planning_context) {
     return false;
   }
 
-  auto *rerouting =
-      planning_context->mutable_planning_status()->mutable_rerouting();
+  auto* rerouting = planning_context->mutable_planning_status()->mutable_rerouting();
   rerouting->set_need_rerouting(true);
   *rerouting->mutable_routing_request() = request;
 
@@ -132,56 +130,46 @@ bool Frame::Rerouting(PlanningContext *planning_context) {
   return true;
 }
 
-const std::list<ReferenceLineInfo> &Frame::reference_line_info() const {
+const std::list<ReferenceLineInfo>& Frame::reference_line_info() const {
   return reference_line_info_;
 }
 
-std::list<ReferenceLineInfo> *Frame::mutable_reference_line_info() {
-  return &reference_line_info_;
-}
+std::list<ReferenceLineInfo>* Frame::mutable_reference_line_info() { return &reference_line_info_; }
 
-void Frame::UpdateReferenceLinePriority(
-    const std::map<std::string, uint32_t> &id_to_priority) {
-  for (const auto &pair : id_to_priority) {
-    const auto id = pair.first;
-    const auto priority = pair.second;
-    auto ref_line_info_itr =
-        std::find_if(reference_line_info_.begin(), reference_line_info_.end(),
-                     [&id](const ReferenceLineInfo &ref_line_info) {
-                       return ref_line_info.Lanes().Id() == id;
-                     });
+void Frame::UpdateReferenceLinePriority(const std::map<std::string, uint32_t>& id_to_priority) {
+  for (const auto& pair : id_to_priority) {
+    const auto id                = pair.first;
+    const auto priority          = pair.second;
+    auto       ref_line_info_itr = std::find_if(
+        reference_line_info_.begin(), reference_line_info_.end(),
+        [&id](const ReferenceLineInfo& ref_line_info) { return ref_line_info.Lanes().Id() == id; });
     if (ref_line_info_itr != reference_line_info_.end()) {
       ref_line_info_itr->SetPriority(priority);
     }
   }
 }
 
-bool Frame::CreateReferenceLineInfo(
-    const std::list<ReferenceLine> &reference_lines,
-    const std::list<hdmap::RouteSegments> &segments) {
+bool Frame::CreateReferenceLineInfo(const std::list<ReferenceLine>&        reference_lines,
+                                    const std::list<hdmap::RouteSegments>& segments) {
   reference_line_info_.clear();
   auto ref_line_iter = reference_lines.begin();
   auto segments_iter = segments.begin();
   while (ref_line_iter != reference_lines.end()) {
-    if (segments_iter->StopForDestination()) {
-      is_near_destination_ = true;
-    }
-    reference_line_info_.emplace_back(vehicle_state_, planning_start_point_,
-                                      *ref_line_iter, *segments_iter);
+    if (segments_iter->StopForDestination()) { is_near_destination_ = true; }
+    reference_line_info_.emplace_back(vehicle_state_, planning_start_point_, *ref_line_iter,
+                                      *segments_iter);
     ++ref_line_iter;
     ++segments_iter;
   }
 
   if (reference_line_info_.size() == 2) {
     common::math::Vec2d xy_point(vehicle_state_.x(), vehicle_state_.y());
-    common::SLPoint first_sl;
-    if (!reference_line_info_.front().reference_line().XYToSL(xy_point,
-                                                              &first_sl)) {
+    common::SLPoint     first_sl;
+    if (!reference_line_info_.front().reference_line().XYToSL(xy_point, &first_sl)) {
       return false;
     }
     common::SLPoint second_sl;
-    if (!reference_line_info_.back().reference_line().XYToSL(xy_point,
-                                                             &second_sl)) {
+    if (!reference_line_info_.back().reference_line().XYToSL(xy_point, &second_sl)) {
       return false;
     }
     const double offset = first_sl.l() - second_sl.l();
@@ -190,7 +178,7 @@ bool Frame::CreateReferenceLineInfo(
   }
 
   bool has_valid_reference_line = false;
-  for (auto &ref_info : reference_line_info_) {
+  for (auto& ref_info : reference_line_info_) {
     if (!ref_info.Init(obstacles())) {
       AERROR << "Failed to init reference line";
     } else {
@@ -204,21 +192,20 @@ bool Frame::CreateReferenceLineInfo(
  * @brief: create static virtual object with lane width,
  *         mainly used for virtual stop wall
  */
-const Obstacle *Frame::CreateStopObstacle(
-    ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id, const double obstacle_s) {
+const Obstacle* Frame::CreateStopObstacle(ReferenceLineInfo* const reference_line_info,
+                                          const std::string&       obstacle_id,
+                                          const double             obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
   }
 
-  const auto &reference_line = reference_line_info->reference_line();
-  const double box_center_s = obstacle_s + FLAGS_virtual_stop_wall_length / 2.0;
-  auto box_center = reference_line.GetReferencePoint(box_center_s);
-  double heading = reference_line.GetReferencePoint(obstacle_s).heading();
+  const auto&             reference_line = reference_line_info->reference_line();
+  const double            box_center_s   = obstacle_s + FLAGS_virtual_stop_wall_length / 2.0;
+  auto                    box_center     = reference_line.GetReferencePoint(box_center_s);
+  double                  heading        = reference_line.GetReferencePoint(obstacle_s).heading();
   static constexpr double kStopWallWidth = 4.0;
-  Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_length,
-                      kStopWallWidth};
+  Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_length, kStopWallWidth};
 
   return CreateStaticVirtualObstacle(obstacle_id, stop_wall_box);
 }
@@ -227,9 +214,9 @@ const Obstacle *Frame::CreateStopObstacle(
  * @brief: create static virtual object with lane width,
  *         mainly used for virtual stop wall
  */
-const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
-                                          const std::string &lane_id,
-                                          const double lane_s) {
+const Obstacle* Frame::CreateStopObstacle(const std::string& obstacle_id,
+                                          const std::string& lane_id,
+                                          const double       lane_s) {
   if (!hdmap_) {
     AERROR << "Invalid HD Map.";
     return nullptr;
@@ -241,9 +228,9 @@ const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
   }
 
   double dest_lane_s = std::max(0.0, lane_s);
-  auto dest_point = lane->GetSmoothPoint(dest_lane_s);
+  auto   dest_point  = lane->GetSmoothPoint(dest_lane_s);
 
-  double lane_left_width = 0.0;
+  double lane_left_width  = 0.0;
   double lane_right_width = 0.0;
   lane->GetWidth(dest_lane_s, &lane_left_width, &lane_right_width);
 
@@ -258,16 +245,16 @@ const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
 /**
  * @brief: create static virtual object with lane width,
  */
-const Obstacle *Frame::CreateStaticObstacle(
-    ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id, const double obstacle_start_s,
-    const double obstacle_end_s) {
+const Obstacle* Frame::CreateStaticObstacle(ReferenceLineInfo* const reference_line_info,
+                                            const std::string&       obstacle_id,
+                                            const double             obstacle_start_s,
+                                            const double             obstacle_end_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
   }
 
-  const auto &reference_line = reference_line_info->reference_line();
+  const auto& reference_line = reference_line_info->reference_line();
 
   // start_xy
   common::SLPoint sl_point;
@@ -288,42 +275,35 @@ const Obstacle *Frame::CreateStaticObstacle(
     return nullptr;
   }
 
-  double left_lane_width = 0.0;
+  double left_lane_width  = 0.0;
   double right_lane_width = 0.0;
-  if (!reference_line.GetLaneWidth(obstacle_start_s, &left_lane_width,
-                                   &right_lane_width)) {
+  if (!reference_line.GetLaneWidth(obstacle_start_s, &left_lane_width, &right_lane_width)) {
     AERROR << "Failed to get lane width at s[" << obstacle_start_s << "]";
     return nullptr;
   }
 
-  common::math::Box2d obstacle_box{
-      common::math::LineSegment2d(obstacle_start_xy, obstacle_end_xy),
-      left_lane_width + right_lane_width};
+  common::math::Box2d obstacle_box{common::math::LineSegment2d(obstacle_start_xy, obstacle_end_xy),
+                                   left_lane_width + right_lane_width};
 
   return CreateStaticVirtualObstacle(obstacle_id, obstacle_box);
 }
 
-const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
-                                                   const Box2d &box) {
-  const auto *object = obstacles_.Find(id);
+const Obstacle* Frame::CreateStaticVirtualObstacle(const std::string& id, const Box2d& box) {
+  const auto* object = obstacles_.Find(id);
   if (object) {
     AWARN << "obstacle " << id << " already exist.";
     return object;
   }
-  auto *ptr =
-      obstacles_.Add(id, *Obstacle::CreateStaticVirtualObstacles(id, box));
-  if (!ptr) {
-    AERROR << "Failed to create virtual obstacle " << id;
-  }
+  auto* ptr = obstacles_.Add(id, *Obstacle::CreateStaticVirtualObstacles(id, box));
+  if (!ptr) { AERROR << "Failed to create virtual obstacle " << id; }
   return ptr;
 }
 
-Status Frame::Init(
-    const common::VehicleStateProvider *vehicle_state_provider,
-    const std::list<ReferenceLine> &reference_lines,
-    const std::list<hdmap::RouteSegments> &segments,
-    const std::vector<routing::LaneWaypoint> &future_route_waypoints,
-    const EgoInfo *ego_info) {
+Status Frame::Init(const common::VehicleStateProvider*       vehicle_state_provider,
+                   const std::list<ReferenceLine>&           reference_lines,
+                   const std::list<hdmap::RouteSegments>&    segments,
+                   const std::vector<routing::LaneWaypoint>& future_route_waypoints,
+                   const EgoInfo*                            ego_info) {
   // TODO(QiL): refactor this to avoid redundant nullptr checks in scenarios.
   auto status = InitFrameData(vehicle_state_provider, ego_info);
   if (!status.ok()) {
@@ -339,15 +319,13 @@ Status Frame::Init(
   return Status::OK();
 }
 
-Status Frame::InitForOpenSpace(
-    const common::VehicleStateProvider *vehicle_state_provider,
-    const EgoInfo *ego_info) {
+Status Frame::InitForOpenSpace(const common::VehicleStateProvider* vehicle_state_provider,
+                               const EgoInfo*                      ego_info) {
   return InitFrameData(vehicle_state_provider, ego_info);
 }
 
-Status Frame::InitFrameData(
-    const common::VehicleStateProvider *vehicle_state_provider,
-    const EgoInfo *ego_info) {
+Status Frame::InitFrameData(const common::VehicleStateProvider* vehicle_state_provider,
+                            const EgoInfo*                      ego_info) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
   vehicle_state_ = vehicle_state_provider->vehicle_state();
@@ -355,23 +333,21 @@ Status Frame::InitFrameData(
     AERROR << "Adc init point is not set";
     return Status(ErrorCode::PLANNING_ERROR, "Adc init point is not set");
   }
-  ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
-         << FLAGS_align_prediction_time;
+  ADEBUG << "Enabled align prediction time ? : " << std::boolalpha << FLAGS_align_prediction_time;
 
   if (FLAGS_align_prediction_time) {
     auto prediction = *(local_view_.prediction_obstacles);
     AlignPredictionTime(vehicle_state_.timestamp(), &prediction);
     local_view_.prediction_obstacles->CopyFrom(prediction);
   }
-  for (auto &ptr :
-       Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
+  for (auto& ptr : Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
     AddObstacle(*ptr);
   }
   if (planning_start_point_.v() < 1e-3) {
-    const auto *collision_obstacle = FindCollisionObstacle(ego_info);
+    const auto* collision_obstacle = FindCollisionObstacle(ego_info);
     if (collision_obstacle != nullptr) {
-      const std::string msg = absl::StrCat(
-          "Found collision with obstacle: ", collision_obstacle->Id());
+      const std::string msg =
+          absl::StrCat("Found collision with obstacle: ", collision_obstacle->Id());
       AERROR << msg;
       monitor_logger_buffer_.ERROR(msg);
       return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -385,38 +361,30 @@ Status Frame::InitFrameData(
   return Status::OK();
 }
 
-const Obstacle *Frame::FindCollisionObstacle(const EgoInfo *ego_info) const {
-  if (obstacles_.Items().empty()) {
-    return nullptr;
-  }
+const Obstacle* Frame::FindCollisionObstacle(const EgoInfo* ego_info) const {
+  if (obstacles_.Items().empty()) { return nullptr; }
 
-  const auto &adc_polygon = Polygon2d(ego_info->ego_box());
-  for (const auto &obstacle : obstacles_.Items()) {
-    if (obstacle->IsVirtual()) {
-      continue;
-    }
+  const auto& adc_polygon = Polygon2d(ego_info->ego_box());
+  for (const auto& obstacle : obstacles_.Items()) {
+    if (obstacle->IsVirtual()) { continue; }
 
-    const auto &obstacle_polygon = obstacle->PerceptionPolygon();
-    if (obstacle_polygon.HasOverlap(adc_polygon)) {
-      return obstacle;
-    }
+    const auto& obstacle_polygon = obstacle->PerceptionPolygon();
+    if (obstacle_polygon.HasOverlap(adc_polygon)) { return obstacle; }
   }
   return nullptr;
 }
 
 uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
-std::string Frame::DebugString() const {
-  return absl::StrCat("Frame: ", sequence_num_);
-}
+std::string Frame::DebugString() const { return absl::StrCat("Frame: ", sequence_num_); }
 
-void Frame::RecordInputDebug(planning_internal::Debug *debug) {
+void Frame::RecordInputDebug(planning_internal::Debug* debug) {
   if (!debug) {
     ADEBUG << "Skip record input into debug";
     return;
   }
-  auto *planning_debug_data = debug->mutable_planning_data();
-  auto *adc_position = planning_debug_data->mutable_adc_position();
+  auto* planning_debug_data = debug->mutable_planning_data();
+  auto* adc_position        = planning_debug_data->mutable_adc_position();
   adc_position->CopyFrom(*local_view_.localization_estimate);
 
   auto debug_chassis = planning_debug_data->mutable_chassis();
@@ -438,63 +406,52 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   */
 }
 
-void Frame::AlignPredictionTime(const double planning_start_time,
-                                PredictionObstacles *prediction_obstacles) {
+void Frame::AlignPredictionTime(const double         planning_start_time,
+                                PredictionObstacles* prediction_obstacles) {
   if (!prediction_obstacles || !prediction_obstacles->has_header() ||
       !prediction_obstacles->header().has_timestamp_sec()) {
     return;
   }
-  double prediction_header_time =
-      prediction_obstacles->header().timestamp_sec();
-  for (auto &obstacle : *prediction_obstacles->mutable_prediction_obstacle()) {
-    for (auto &trajectory : *obstacle.mutable_trajectory()) {
-      for (auto &point : *trajectory.mutable_trajectory_point()) {
+  double prediction_header_time = prediction_obstacles->header().timestamp_sec();
+  for (auto& obstacle : *prediction_obstacles->mutable_prediction_obstacle()) {
+    for (auto& trajectory : *obstacle.mutable_trajectory()) {
+      for (auto& point : *trajectory.mutable_trajectory_point()) {
         point.set_relative_time(prediction_header_time + point.relative_time() -
                                 planning_start_time);
       }
       if (!trajectory.trajectory_point().empty() &&
           trajectory.trajectory_point().begin()->relative_time() < 0) {
         auto it = trajectory.trajectory_point().begin();
-        while (it != trajectory.trajectory_point().end() &&
-               it->relative_time() < 0) {
+        while (it != trajectory.trajectory_point().end() && it->relative_time() < 0) {
           ++it;
         }
-        trajectory.mutable_trajectory_point()->erase(
-            trajectory.trajectory_point().begin(), it);
+        trajectory.mutable_trajectory_point()->erase(trajectory.trajectory_point().begin(), it);
       }
     }
   }
 }
 
-Obstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
+Obstacle* Frame::Find(const std::string& id) { return obstacles_.Find(id); }
 
-void Frame::AddObstacle(const Obstacle &obstacle) {
-  obstacles_.Add(obstacle.Id(), obstacle);
-}
+void Frame::AddObstacle(const Obstacle& obstacle) { obstacles_.Add(obstacle.Id(), obstacle); }
 
 void Frame::ReadTrafficLights() {
   traffic_lights_.clear();
 
   const auto traffic_light_detection = local_view_.traffic_light;
-  if (traffic_light_detection == nullptr) {
-    return;
-  }
-  const double delay = traffic_light_detection->header().timestamp_sec() -
-                       Clock::NowInSeconds();
+  if (traffic_light_detection == nullptr) { return; }
+  const double delay = traffic_light_detection->header().timestamp_sec() - Clock::NowInSeconds();
   if (delay > FLAGS_signal_expire_time_sec) {
-    ADEBUG << "traffic signals msg is expired, delay = " << delay
-           << " seconds.";
+    ADEBUG << "traffic signals msg is expired, delay = " << delay << " seconds.";
     return;
   }
-  for (const auto &traffic_light : traffic_light_detection->traffic_light()) {
+  for (const auto& traffic_light : traffic_light_detection->traffic_light()) {
     traffic_lights_[traffic_light.id()] = &traffic_light;
   }
 }
 
-perception::TrafficLight Frame::GetSignal(
-    const std::string &traffic_light_id) const {
-  const auto *result =
-      apollo::common::util::FindPtrOrNull(traffic_lights_, traffic_light_id);
+perception::TrafficLight Frame::GetSignal(const std::string& traffic_light_id) const {
+  const auto* result = apollo::common::util::FindPtrOrNull(traffic_lights_, traffic_light_id);
   if (result == nullptr) {
     perception::TrafficLight traffic_light;
     traffic_light.set_id(traffic_light_id);
@@ -514,52 +471,44 @@ void Frame::ReadPadMsgDrivingAction() {
   }
 }
 
-void Frame::ResetPadMsgDrivingAction() {
-  pad_msg_driving_action_ = DrivingAction::NONE;
-}
+void Frame::ResetPadMsgDrivingAction() { pad_msg_driving_action_ = DrivingAction::NONE; }
 
-const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
-  double min_cost = std::numeric_limits<double>::infinity();
+const ReferenceLineInfo* Frame::FindDriveReferenceLineInfo() {
+  double min_cost            = std::numeric_limits<double>::infinity();
   drive_reference_line_info_ = nullptr;
-  for (const auto &reference_line_info : reference_line_info_) {
-    if (reference_line_info.IsDrivable() &&
-        reference_line_info.Cost() < min_cost) {
+  for (const auto& reference_line_info : reference_line_info_) {
+    if (reference_line_info.IsDrivable() && reference_line_info.Cost() < min_cost) {
       drive_reference_line_info_ = &reference_line_info;
-      min_cost = reference_line_info.Cost();
+      min_cost                   = reference_line_info.Cost();
     }
   }
   return drive_reference_line_info_;
 }
 
-const ReferenceLineInfo *Frame::FindTargetReferenceLineInfo() {
-  const ReferenceLineInfo *target_reference_line_info = nullptr;
-  for (const auto &reference_line_info : reference_line_info_) {
-    if (reference_line_info.IsChangeLanePath()) {
-      return &reference_line_info;
-    }
+const ReferenceLineInfo* Frame::FindTargetReferenceLineInfo() {
+  const ReferenceLineInfo* target_reference_line_info = nullptr;
+  for (const auto& reference_line_info : reference_line_info_) {
+    if (reference_line_info.IsChangeLanePath()) { return &reference_line_info; }
     target_reference_line_info = &reference_line_info;
   }
   return target_reference_line_info;
 }
 
-const ReferenceLineInfo *Frame::FindFailedReferenceLineInfo() {
-  for (const auto &reference_line_info : reference_line_info_) {
+const ReferenceLineInfo* Frame::FindFailedReferenceLineInfo() {
+  for (const auto& reference_line_info : reference_line_info_) {
     // Find the unsuccessful lane-change path
-    if (!reference_line_info.IsDrivable() &&
-        reference_line_info.IsChangeLanePath()) {
+    if (!reference_line_info.IsDrivable() && reference_line_info.IsChangeLanePath()) {
       return &reference_line_info;
     }
   }
   return nullptr;
 }
 
-const ReferenceLineInfo *Frame::DriveReferenceLineInfo() const {
+const ReferenceLineInfo* Frame::DriveReferenceLineInfo() const {
   return drive_reference_line_info_;
 }
 
-const std::vector<const Obstacle *> Frame::obstacles() const {
-  return obstacles_.Items();
-}
+const std::vector<const Obstacle*> Frame::obstacles() const { return obstacles_.Items(); }
 
 }  // namespace planning
 }  // namespace apollo

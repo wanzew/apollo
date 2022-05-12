@@ -27,18 +27,14 @@ class TimeUtil {
   // @brief: UNIX timestamp to GPS timestamp, in seconds.
   static double Unix2Gps(double unix_time) {
     double gps_time = unix_time - UNIX_GPS_DIFF;
-    if (unix_time < LEAP_SECOND_TIMESTAMP) {
-      gps_time -= 1.0;
-    }
+    if (unix_time < LEAP_SECOND_TIMESTAMP) { gps_time -= 1.0; }
     return gps_time;
   }
 
   // @brief: GPS timestamp to UNIX timestamp, in seconds.
   static double Gps2Unix(double gps_time) {
     double unix_time = gps_time + UNIX_GPS_DIFF;
-    if (unix_time + 1 < LEAP_SECOND_TIMESTAMP) {
-      unix_time += 1.0;
-    }
+    if (unix_time + 1 < LEAP_SECOND_TIMESTAMP) { unix_time += 1.0; }
     return unix_time;
   }
 

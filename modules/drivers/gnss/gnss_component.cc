@@ -22,15 +22,12 @@ namespace gnss {
 using apollo::cyber::proto::RoleAttributes;
 
 GnssDriverComponent::GnssDriverComponent()
-    : monitor_logger_buffer_(
-          apollo::common::monitor::MonitorMessageItem::GNSS) {}
+    : monitor_logger_buffer_(apollo::common::monitor::MonitorMessageItem::GNSS) {}
 
 bool GnssDriverComponent::Init() {
   config::Config gnss_config;
-  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                               &gnss_config)) {
-    monitor_logger_buffer_.ERROR("Unable to load gnss conf file: " +
-                                 config_file_path_);
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_, &gnss_config)) {
+    monitor_logger_buffer_.ERROR("Unable to load gnss conf file: " + config_file_path_);
     return false;
   }
   AINFO << "Gnss config: " << gnss_config.DebugString();

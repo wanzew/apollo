@@ -30,7 +30,7 @@ TEST(PointCloudProcessingCommonTest, transform_point_test) {
   pt_in.x = 10.f;
   pt_in.y = 10.f;
   pt_in.z = 5.f;
-  PointF pt_out;
+  PointF          pt_out;
   Eigen::Affine3d pose = Eigen::Affine3d::Identity();
   TransformPoint(pt_in, pose, &pt_out);
   EXPECT_NEAR(pt_in.x, 10.f, std::numeric_limits<float>::epsilon());
@@ -40,7 +40,7 @@ TEST(PointCloudProcessingCommonTest, transform_point_test) {
 
 TEST(PointCloudProcessingCommonTest, transform_point_cloud_test1) {
   AttributePointCloud<PointF> cloud_in, cloud_out;
-  PointF temp;
+  PointF                      temp;
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 5.f;
@@ -60,11 +60,9 @@ TEST(PointCloudProcessingCommonTest, transform_point_cloud_test1) {
 }
 
 TEST(PointCloudProcessingCommonTest, transform_point_cloud_test2) {
-  std::shared_ptr<AttributePointCloud<PointF>> cloud_in(
-      new AttributePointCloud<PointF>);
-  std::shared_ptr<AttributePointCloud<PointF>> cloud_out(
-      new AttributePointCloud<PointF>);
-  PointF temp;
+  std::shared_ptr<AttributePointCloud<PointF>> cloud_in(new AttributePointCloud<PointF>);
+  std::shared_ptr<AttributePointCloud<PointF>> cloud_out(new AttributePointCloud<PointF>);
+  PointF                                       temp;
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 5.f;
@@ -85,7 +83,7 @@ TEST(PointCloudProcessingCommonTest, transform_point_cloud_test2) {
 
 TEST(PointCloudProcessingCommonTest, transform_point_cloud_test3) {
   AttributePointCloud<PointF> cloud_in_out;
-  PointF temp;
+  PointF                      temp;
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 5.f;
@@ -105,9 +103,8 @@ TEST(PointCloudProcessingCommonTest, transform_point_cloud_test3) {
 }
 
 TEST(PointCloudProcessingCommonTest, transform_point_cloud_test4) {
-  std::shared_ptr<AttributePointCloud<PointF>> cloud_in_out(
-      new AttributePointCloud<PointF>);
-  PointF temp;
+  std::shared_ptr<AttributePointCloud<PointF>> cloud_in_out(new AttributePointCloud<PointF>);
+  PointF                                       temp;
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 5.f;
@@ -118,26 +115,18 @@ TEST(PointCloudProcessingCommonTest, transform_point_cloud_test4) {
   cloud_in_out->push_back(temp);
   Eigen::Affine3d pose = Eigen::Affine3d::Identity();
   TransformPointCloud<PointF>(pose, cloud_in_out.get());
-  EXPECT_NEAR(cloud_in_out->at(0).x, 10.f,
-              std::numeric_limits<float>::epsilon());
-  EXPECT_NEAR(cloud_in_out->at(0).y, 10.f,
-              std::numeric_limits<float>::epsilon());
-  EXPECT_NEAR(cloud_in_out->at(0).z, 5.f,
-              std::numeric_limits<float>::epsilon());
-  EXPECT_NEAR(cloud_in_out->at(1).x, 20.f,
-              std::numeric_limits<float>::epsilon());
-  EXPECT_NEAR(cloud_in_out->at(1).y, -10.f,
-              std::numeric_limits<float>::epsilon());
-  EXPECT_NEAR(cloud_in_out->at(1).z, 15.f,
-              std::numeric_limits<float>::epsilon());
+  EXPECT_NEAR(cloud_in_out->at(0).x, 10.f, std::numeric_limits<float>::epsilon());
+  EXPECT_NEAR(cloud_in_out->at(0).y, 10.f, std::numeric_limits<float>::epsilon());
+  EXPECT_NEAR(cloud_in_out->at(0).z, 5.f, std::numeric_limits<float>::epsilon());
+  EXPECT_NEAR(cloud_in_out->at(1).x, 20.f, std::numeric_limits<float>::epsilon());
+  EXPECT_NEAR(cloud_in_out->at(1).y, -10.f, std::numeric_limits<float>::epsilon());
+  EXPECT_NEAR(cloud_in_out->at(1).z, 15.f, std::numeric_limits<float>::epsilon());
 }
 
 TEST(PointCloudProcessingCommonTest, extract_indiced_cloud_test) {
-  std::shared_ptr<AttributePointCloud<PointF>> cloud_in(
-      new AttributePointCloud<PointF>);
-  std::shared_ptr<AttributePointCloud<PointF>> cloud_out(
-      new AttributePointCloud<PointF>);
-  PointF temp;
+  std::shared_ptr<AttributePointCloud<PointF>> cloud_in(new AttributePointCloud<PointF>);
+  std::shared_ptr<AttributePointCloud<PointF>> cloud_out(new AttributePointCloud<PointF>);
+  PointF                                       temp;
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 5.f;
@@ -148,17 +137,15 @@ TEST(PointCloudProcessingCommonTest, extract_indiced_cloud_test) {
   cloud_in->push_back(temp);
   std::vector<int> indices;
   indices.push_back(1);
-  ExtractIndicedCloud<AttributePointCloud<PointF>>(cloud_in, indices,
-                                                   cloud_out);
+  ExtractIndicedCloud<AttributePointCloud<PointF>>(cloud_in, indices, cloud_out);
   EXPECT_NEAR(cloud_out->at(0).x, 20.f, std::numeric_limits<float>::epsilon());
   EXPECT_NEAR(cloud_out->at(0).y, -10.f, std::numeric_limits<float>::epsilon());
   EXPECT_NEAR(cloud_out->at(0).z, 15.f, std::numeric_limits<float>::epsilon());
 }
 
 TEST(PointCloudProcessingCommonTest, get_min_max_in_3d_test) {
-  PointF temp;
-  std::shared_ptr<AttributePointCloud<PointF>> cloud(
-      new AttributePointCloud<PointF>);
+  PointF                                       temp;
+  std::shared_ptr<AttributePointCloud<PointF>> cloud(new AttributePointCloud<PointF>);
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 10.f;
@@ -211,9 +198,8 @@ TEST(PointCloudProcessingCommonTest, get_min_max_in_3d_test) {
 }
 
 TEST(PointCloudProcessingCommonTest, get_min_max_in_3d_test2) {
-  PointF temp;
-  std::shared_ptr<AttributePointCloud<PointF>> cloud(
-      new AttributePointCloud<PointF>);
+  PointF                                       temp;
+  std::shared_ptr<AttributePointCloud<PointF>> cloud(new AttributePointCloud<PointF>);
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 10.f;
@@ -263,7 +249,7 @@ TEST(PointCloudProcessingCommonTest, get_min_max_in_3d_test2) {
 }
 
 TEST(PointCloudProcessingCommonTest, get_min_max_in_3d_test3) {
-  PointF temp;
+  PointF                      temp;
   AttributePointCloud<PointF> cloud;
   temp.x = 10.f;
   temp.y = 10.f;
@@ -317,7 +303,7 @@ TEST(PointCloudProcessingCommonTest, get_min_max_in_3d_test3) {
 }
 
 TEST(PointCloudProcessingCommonTest, get_min_max_in_3d_test4) {
-  PointF temp;
+  PointF                      temp;
   AttributePointCloud<PointF> cloud;
   temp.x = 10.f;
   temp.y = 10.f;
@@ -368,9 +354,8 @@ TEST(PointCloudProcessingCommonTest, get_min_max_in_3d_test4) {
 }
 
 TEST(PointCloudProcessingCommonTest, calculate_centroid_test) {
-  std::shared_ptr<AttributePointCloud<PointF>> cloud(
-      new AttributePointCloud<PointF>);
-  PointF temp;
+  std::shared_ptr<AttributePointCloud<PointF>> cloud(new AttributePointCloud<PointF>);
+  PointF                                       temp;
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 5.f;

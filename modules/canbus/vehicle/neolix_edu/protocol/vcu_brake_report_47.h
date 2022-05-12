@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Vcubrakereport47 : public ::apollo::drivers::canbus::ProtocolData<
-                             ::apollo::canbus::ChassisDetail> {
+class Vcubrakereport47
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vcubrakereport47();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
@@ -46,15 +46,14 @@ class Vcubrakereport47 : public ::apollo::drivers::canbus::ProtocolData<
   // 'Control_Mode_Resp', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|7]', 'bit': 6, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': 'bit'}
-  Vcu_brake_report_47::Control_mode_respType control_mode_resp(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vcu_brake_report_47::Control_mode_respType control_mode_resp(const std::uint8_t* bytes,
+                                                               const int32_t       length) const;
 
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_Real_Brake_Valid',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_real_brake_valid(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool vcu_real_brake_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_Real_Brake', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 15,
@@ -67,22 +66,19 @@ class Vcubrakereport47 : public ::apollo::drivers::canbus::ProtocolData<
   // 'VCU_Real_Parking_Status', 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 18, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_real_parking_status(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  int vcu_real_parking_status(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_Real_Parking_Valid',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 19, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_real_parking_valid(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  bool vcu_real_parking_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': '0x0:off;0x1:on', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'RampAuxiliaryIndication',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 20, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool rampauxiliaryindication(const std::uint8_t* bytes,
-                               const int32_t length) const;
+  bool rampauxiliaryindication(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VehicleSlope', 'offset': 0.0, 'precision':
   // 0.1758125, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|45]',
@@ -94,15 +90,13 @@ class Vcubrakereport47 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_brakerept_alivecounter(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+  int vcu_brakerept_alivecounter(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_BrakeRept_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_brakerept_checksum(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  int vcu_brakerept_checksum(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace neolix_edu

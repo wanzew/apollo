@@ -51,17 +51,13 @@ std::vector<base::ObjectSubType> kTypeRefinedByRef = {
 
 ObjectTemplateManager::ObjectTemplateManager() {}
 
-bool ObjectTemplateManager::Init(
-    const ObjectTemplateManagerInitOptions &options) {
+bool ObjectTemplateManager::Init(const ObjectTemplateManagerInitOptions& options) {
   lib::MutexLock lock(&mutex_);
-  if (inited_) {
-    return true;
-  }
+  if (inited_) { return true; }
 
   nr_dim_per_tmplt_ = 3;
 
-  std::string config =
-      cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string        config = cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
   ObjectTemplateMeta proto;
   if (!cyber::common::GetProtoFromFile(config, &proto)) {
     AERROR << "Read config failed: " << config;
@@ -134,14 +130,10 @@ bool ObjectTemplateManager::Init(
   LoadVehMinMidMaxTemplates(base::ObjectSubType::TRUCK, proto.truck());
   LoadVehMinMidMaxTemplates(base::ObjectSubType::BUS, proto.bus());
   LoadVehMinMidMaxTemplates(base::ObjectSubType::CYCLIST, proto.cyclist());
-  LoadVehMinMidMaxTemplates(base::ObjectSubType::MOTORCYCLIST,
-                            proto.motorcyclist());
-  LoadVehMinMidMaxTemplates(base::ObjectSubType::TRICYCLIST,
-                            proto.tricyclist());
-  LoadVehMinMidMaxTemplates(base::ObjectSubType::PEDESTRIAN,
-                            proto.pedestrian());
-  LoadVehMinMidMaxTemplates(base::ObjectSubType::TRAFFICCONE,
-                            proto.trafficcone());
+  LoadVehMinMidMaxTemplates(base::ObjectSubType::MOTORCYCLIST, proto.motorcyclist());
+  LoadVehMinMidMaxTemplates(base::ObjectSubType::TRICYCLIST, proto.tricyclist());
+  LoadVehMinMidMaxTemplates(base::ObjectSubType::PEDESTRIAN, proto.pedestrian());
+  LoadVehMinMidMaxTemplates(base::ObjectSubType::TRAFFICCONE, proto.trafficcone());
 
   template_hwl_.resize(0);
   template_hwl_.push_back(min_template_hwl_);
@@ -149,37 +141,30 @@ bool ObjectTemplateManager::Init(
   template_hwl_.push_back(max_template_hwl_);
 
   type_speed_limit_.clear();
-  type_speed_limit_[base::ObjectSubType::UNKNOWN] =
-      proto.unknown().speed_limit();
-  type_speed_limit_[base::ObjectSubType::UNKNOWN_MOVABLE] =
-      proto.unknown_movable().speed_limit();
+  type_speed_limit_[base::ObjectSubType::UNKNOWN]         = proto.unknown().speed_limit();
+  type_speed_limit_[base::ObjectSubType::UNKNOWN_MOVABLE] = proto.unknown_movable().speed_limit();
   type_speed_limit_[base::ObjectSubType::UNKNOWN_UNMOVABLE] =
       proto.unknown_unmovable().speed_limit();
-  type_speed_limit_[base::ObjectSubType::CAR] = proto.car().speed_limit();
-  type_speed_limit_[base::ObjectSubType::VAN] = proto.van().speed_limit();
-  type_speed_limit_[base::ObjectSubType::TRUCK] = proto.truck().speed_limit();
-  type_speed_limit_[base::ObjectSubType::BUS] = proto.bus().speed_limit();
-  type_speed_limit_[base::ObjectSubType::CYCLIST] =
-      proto.cyclist().speed_limit();
-  type_speed_limit_[base::ObjectSubType::MOTORCYCLIST] =
-      proto.motorcyclist().speed_limit();
-  type_speed_limit_[base::ObjectSubType::TRICYCLIST] =
-      proto.tricyclist().speed_limit();
-  type_speed_limit_[base::ObjectSubType::PEDESTRIAN] =
-      proto.pedestrian().speed_limit();
-  type_speed_limit_[base::ObjectSubType::TRAFFICCONE] =
-      proto.trafficcone().speed_limit();
+  type_speed_limit_[base::ObjectSubType::CAR]          = proto.car().speed_limit();
+  type_speed_limit_[base::ObjectSubType::VAN]          = proto.van().speed_limit();
+  type_speed_limit_[base::ObjectSubType::TRUCK]        = proto.truck().speed_limit();
+  type_speed_limit_[base::ObjectSubType::BUS]          = proto.bus().speed_limit();
+  type_speed_limit_[base::ObjectSubType::CYCLIST]      = proto.cyclist().speed_limit();
+  type_speed_limit_[base::ObjectSubType::MOTORCYCLIST] = proto.motorcyclist().speed_limit();
+  type_speed_limit_[base::ObjectSubType::TRICYCLIST]   = proto.tricyclist().speed_limit();
+  type_speed_limit_[base::ObjectSubType::PEDESTRIAN]   = proto.pedestrian().speed_limit();
+  type_speed_limit_[base::ObjectSubType::TRAFFICCONE]  = proto.trafficcone().speed_limit();
 
-  type_can_be_ref_ = kTypeCanBeRef;
+  type_can_be_ref_          = kTypeCanBeRef;
   type_refined_by_template_ = kTypeRefinedByTemplate;
-  type_refined_by_ref_ = kTypeRefinedByRef;
+  type_refined_by_ref_      = kTypeRefinedByRef;
 
   inited_ = true;
   AINFO << "Init object_template_manager success.";
   return true;
 }
 
-void ObjectTemplateManager::LoadVehTemplates(const ObjectTemplate &tmplt) {
+void ObjectTemplateManager::LoadVehTemplates(const ObjectTemplate& tmplt) {
   std::vector<std::tuple<float, float, float>> list_tpl;
   list_tpl.resize(0);
   for (int i = 0; i < tmplt.dim_size(); ++i) {
@@ -194,8 +179,8 @@ void ObjectTemplateManager::LoadVehTemplates(const ObjectTemplate &tmplt) {
   }
 }
 
-void ObjectTemplateManager::LoadVehMinMidMaxTemplates(
-    const base::ObjectSubType &type, const ObjectTemplate &tmplt) {
+void ObjectTemplateManager::LoadVehMinMidMaxTemplates(const base::ObjectSubType& type,
+                                                      const ObjectTemplate&      tmplt) {
   std::vector<std::tuple<float, float, float>> list_tpl;
   list_tpl.resize(0);
   for (int i = 0; i < tmplt.dim_size(); ++i) {
@@ -205,26 +190,22 @@ void ObjectTemplateManager::LoadVehMinMidMaxTemplates(
 
   std::sort(list_tpl.begin(), list_tpl.end());
 
-  int ind_min = 0;
-  int ind_max = static_cast<int>(list_tpl.size()) - 1;
-  int ind_mid = (ind_min + ind_max) / 2;
-  std::vector<float> tmplt_min = {std::get<0>(list_tpl[ind_min]),
-                                  std::get<1>(list_tpl[ind_min]),
+  int                ind_min   = 0;
+  int                ind_max   = static_cast<int>(list_tpl.size()) - 1;
+  int                ind_mid   = (ind_min + ind_max) / 2;
+  std::vector<float> tmplt_min = {std::get<0>(list_tpl[ind_min]), std::get<1>(list_tpl[ind_min]),
                                   std::get<2>(list_tpl[ind_min])};
-  std::vector<float> tmplt_mid = {std::get<0>(list_tpl[ind_mid]),
-                                  std::get<1>(list_tpl[ind_mid]),
+  std::vector<float> tmplt_mid = {std::get<0>(list_tpl[ind_mid]), std::get<1>(list_tpl[ind_mid]),
                                   std::get<2>(list_tpl[ind_mid])};
-  std::vector<float> tmplt_max = {std::get<0>(list_tpl[ind_max]),
-                                  std::get<1>(list_tpl[ind_max]),
+  std::vector<float> tmplt_max = {std::get<0>(list_tpl[ind_max]), std::get<1>(list_tpl[ind_max]),
                                   std::get<2>(list_tpl[ind_max])};
-  min_template_hwl_[type] = tmplt_min;
-  mid_template_hwl_[type] = tmplt_mid;
-  max_template_hwl_[type] = tmplt_max;
+  min_template_hwl_[type]      = tmplt_min;
+  mid_template_hwl_[type]      = tmplt_mid;
+  max_template_hwl_[type]      = tmplt_max;
 }
 
 // util for tmplt search
-float ObjectTemplateManager::Get3dDimensionSimilarity(const float *hwl1,
-                                                      const float *hwl2) {
+float ObjectTemplateManager::Get3dDimensionSimilarity(const float* hwl1, const float* hwl2) {
   ACHECK(hwl1 != nullptr);
   ACHECK(hwl2 != nullptr);
 
@@ -243,61 +224,51 @@ float ObjectTemplateManager::Get3dDimensionSimilarity(const float *hwl1,
 }
 
 // for general visual obj
-float ObjectTemplateManager::VehObjHwlBySearchTemplates(float *hwl, int *index,
-                                                        bool *is_flip) {
+float ObjectTemplateManager::VehObjHwlBySearchTemplates(float* hwl, int* index, bool* is_flip) {
   ACHECK(inited_);
   ACHECK(hwl != nullptr);
 
   float hwl_flip[3] = {hwl[0], hwl[2], hwl[1]};
-  float score_best = -std::numeric_limits<float>::max();
-  int i_best = -1;
-  int i3 = 0;
-  bool from_flip = false;
+  float score_best  = -std::numeric_limits<float>::max();
+  int   i_best      = -1;
+  int   i3          = 0;
+  bool  from_flip   = false;
   for (int i = 0; i < total_nr_tmplts_veh_; ++i) {
-    float score = Get3dDimensionSimilarity(hwl, &veh_hwl_[i3]);
-    float score_flip = Get3dDimensionSimilarity(hwl_flip, &veh_hwl_[i3]);
-    bool from_flip_cur = false;
+    float score         = Get3dDimensionSimilarity(hwl, &veh_hwl_[i3]);
+    float score_flip    = Get3dDimensionSimilarity(hwl_flip, &veh_hwl_[i3]);
+    bool  from_flip_cur = false;
     if (score_flip > score) {
-      score = score_flip;
+      score         = score_flip;
       from_flip_cur = true;
     }
     if (score > score_best) {
       score_best = score;
-      i_best = i;
-      from_flip = from_flip_cur;
+      i_best     = i;
+      from_flip  = from_flip_cur;
     }
     i3 += 3;
   }
-  int i_best_by_3 = i_best * 3;
-  float hwl_tmplt_matched[3] = {veh_hwl_[i_best_by_3],
-                                veh_hwl_[i_best_by_3 + 1],
+  int   i_best_by_3          = i_best * 3;
+  float hwl_tmplt_matched[3] = {veh_hwl_[i_best_by_3], veh_hwl_[i_best_by_3 + 1],
                                 veh_hwl_[i_best_by_3 + 2]};
-  if (from_flip) {
-    std::swap(hwl_tmplt_matched[1], hwl_tmplt_matched[2]);
-  }
+  if (from_flip) { std::swap(hwl_tmplt_matched[1], hwl_tmplt_matched[2]); }
 
-  float dh = fabsf(hwl[0] - hwl_tmplt_matched[0]);
-  float dh_ratio = dh / hwl_tmplt_matched[0];
-  float dw = fabsf(hwl[1] - hwl_tmplt_matched[1]);
-  float dw_ratio = dw / hwl_tmplt_matched[1];
-  float dl = fabsf(hwl[2] - hwl_tmplt_matched[2]);
-  float dl_ratio = dl / hwl_tmplt_matched[2];
+  float dh                  = fabsf(hwl[0] - hwl_tmplt_matched[0]);
+  float dh_ratio            = dh / hwl_tmplt_matched[0];
+  float dw                  = fabsf(hwl[1] - hwl_tmplt_matched[1]);
+  float dw_ratio            = dw / hwl_tmplt_matched[1];
+  float dl                  = fabsf(hwl[2] - hwl_tmplt_matched[2]);
+  float dl_ratio            = dl / hwl_tmplt_matched[2];
   float dh_dw_dl_ratio_mean = (dh_ratio + dw_ratio + dl_ratio) / 3;
-  float dh_ratio_check = std::min(dh_ratio, dh_dw_dl_ratio_mean);
-  if (score_best < kFloatEpsilon || dh_ratio_check > max_dim_change_ratio_) {
-    return -1.0f;
-  }
+  float dh_ratio_check      = std::min(dh_ratio, dh_dw_dl_ratio_mean);
+  if (score_best < kFloatEpsilon || dh_ratio_check > max_dim_change_ratio_) { return -1.0f; }
   ADEBUG << dh_ratio << ", " << dw_ratio << ", " << dl_ratio;
 
   hwl[0] = veh_hwl_[i_best_by_3];
   hwl[1] = veh_hwl_[i_best_by_3 + 1];
   hwl[2] = veh_hwl_[i_best_by_3 + 2];
-  if (index != nullptr) {
-    *index = i_best;
-  }
-  if (is_flip != nullptr) {
-    *is_flip = from_flip;
-  }
+  if (index != nullptr) { *index = i_best; }
+  if (is_flip != nullptr) { *is_flip = from_flip; }
   return score_best;
 }
 

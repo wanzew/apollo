@@ -25,12 +25,10 @@
 namespace apollo {
 namespace perception {
 namespace inference {
-bool ReadProtoFromTextFile(const std::string &filename,
-                           google::protobuf::Message *proto);
-bool ReadProtoFromBinaryFile(const std::string &filename,
-                             google::protobuf::Message *proto);
-bool loadNetParams(const std::string &param_file, NetParameter *param);
-std::string locateFile(const std::string &path, const std::string &input);
+bool        ReadProtoFromTextFile(const std::string& filename, google::protobuf::Message* proto);
+bool        ReadProtoFromBinaryFile(const std::string& filename, google::protobuf::Message* proto);
+bool        loadNetParams(const std::string& param_file, NetParameter* param);
+std::string locateFile(const std::string& path, const std::string& input);
 
 }  // namespace inference
 }  // namespace perception

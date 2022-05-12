@@ -39,13 +39,10 @@ DEFINE_string(canbus_test_file,
 
 // enable receiving guardian command
 // TODO(QiL) : depreciate this after test
-DEFINE_bool(receive_guardian, false,
-            "Enable receiving guardian message on canbus side");
+DEFINE_bool(receive_guardian, false, "Enable receiving guardian message on canbus side");
 
-DEFINE_int32(guardian_cmd_pending_queue_size, 10,
-             "Max guardian cmd pending queue size");
-DEFINE_int32(control_cmd_pending_queue_size, 10,
-             "Max control cmd pending queue size");
+DEFINE_int32(guardian_cmd_pending_queue_size, 10, "Max guardian cmd pending queue size");
+DEFINE_int32(control_cmd_pending_queue_size, 10, "Max control cmd pending queue size");
 
 // enable forward Ultrasonic AEB
 DEFINE_bool(enable_aeb, true, "Enable forward Ultrasonic AEB");

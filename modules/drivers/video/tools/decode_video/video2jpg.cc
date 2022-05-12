@@ -28,8 +28,7 @@ DEFINE_string(output_dir, "", "The directory to output decoded pictures.");
 
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  AINFO << "input video: " << FLAGS_input_video
-        << ". output dir: " << FLAGS_output_dir;
+  AINFO << "input video: " << FLAGS_input_video << ". output dir: " << FLAGS_output_dir;
   FrameProcessor processor(FLAGS_input_video, FLAGS_output_dir);
   if (!processor.ProcessStream()) {
     AERROR << "error: failed to decode file " << FLAGS_input_video;

@@ -22,9 +22,6 @@
 #define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
 #include <proj_api.h>
 
-#include "cyber/cyber.h"
-#include "modules/transform/transform_broadcaster.h"
-
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/proto/gnss.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
@@ -36,7 +33,9 @@
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/drivers/gnss/parser/parser.h"
+#include "modules/transform/transform_broadcaster.h"
 
 namespace apollo {
 namespace drivers {
@@ -44,12 +43,11 @@ namespace gnss {
 
 class DataParser {
  public:
-  using MessagePtr = ::google::protobuf::Message *;
-  DataParser(const config::Config &config,
-             const std::shared_ptr<apollo::cyber::Node> &node);
+  using MessagePtr = ::google::protobuf::Message*;
+  DataParser(const config::Config& config, const std::shared_ptr<apollo::cyber::Node>& node);
   ~DataParser() {}
   bool Init();
-  void ParseRawData(const std::string &msg);
+  void ParseRawData(const std::string& msg);
 
  private:
   void DispatchMessage(Parser::MessageType type, MessagePtr message);
@@ -61,40 +59,34 @@ class DataParser {
   void PublishEphemeris(const MessagePtr message);
   void PublishObservation(const MessagePtr message);
   void PublishHeading(const MessagePtr message);
-  void CheckInsStatus(Ins *ins);
-  void CheckGnssStatus(Gnss *gnss);
-  void GpsToTransformStamped(
-      const std::shared_ptr<apollo::localization::Gps> &gps,
-      apollo::transform::TransformStamped *transform);
+  void CheckInsStatus(Ins* ins);
+  void CheckGnssStatus(Gnss* gnss);
+  void GpsToTransformStamped(const std::shared_ptr<apollo::localization::Gps>& gps,
+                             apollo::transform::TransformStamped*              transform);
 
-  bool init_flag_ = false;
-  config::Config config_;
-  std::unique_ptr<Parser> data_parser_;
+  bool                                    init_flag_ = false;
+  config::Config                          config_;
+  std::unique_ptr<Parser>                 data_parser_;
   apollo::transform::TransformBroadcaster tf_broadcaster_;
 
   GnssStatus gnss_status_;
-  InsStatus ins_status_;
-  uint32_t ins_status_record_ = static_cast<uint32_t>(0);
-  projPJ wgs84pj_source_;
-  projPJ utm_target_;
+  InsStatus  ins_status_;
+  uint32_t   ins_status_record_ = static_cast<uint32_t>(0);
+  projPJ     wgs84pj_source_;
+  projPJ     utm_target_;
 
-  std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<GnssStatus>> gnssstatus_writer_ =
+  std::shared_ptr<apollo::cyber::Node>                 node_                = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<GnssStatus>>   gnssstatus_writer_   = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<InsStatus>>    insstatus_writer_    = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<GnssBestPose>> gnssbestpose_writer_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<apollo::localization::CorrectedImu>> corrimu_writer_ =
       nullptr;
-  std::shared_ptr<apollo::cyber::Writer<InsStatus>> insstatus_writer_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<GnssBestPose>> gnssbestpose_writer_ =
-      nullptr;
-  std::shared_ptr<apollo::cyber::Writer<apollo::localization::CorrectedImu>>
-      corrimu_writer_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<Imu>> rawimu_writer_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<apollo::localization::Gps>>
-      gps_writer_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<InsStat>> insstat_writer_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>> gnssephemeris_writer_ =
-      nullptr;
-  std::shared_ptr<apollo::cyber::Writer<EpochObservation>>
-      epochobservation_writer_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<Heading>> heading_writer_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<Imu>>                       rawimu_writer_        = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<apollo::localization::Gps>> gps_writer_           = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<InsStat>>                   insstat_writer_       = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>>             gnssephemeris_writer_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<EpochObservation>> epochobservation_writer_       = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<Heading>>          heading_writer_                = nullptr;
 };
 
 }  // namespace gnss

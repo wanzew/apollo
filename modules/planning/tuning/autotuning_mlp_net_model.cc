@@ -20,7 +20,7 @@ namespace apollo {
 namespace planning {
 
 void AutotuningMLPModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                             Eigen::MatrixXf* const output) const {
+                             Eigen::MatrixXf* const              output) const {
   Eigen::MatrixXf inp = inputs[0];
   Eigen::MatrixXf temp;
   for (size_t i = 0; i < layers_.size(); ++i) {

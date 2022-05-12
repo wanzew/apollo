@@ -18,11 +18,11 @@
 
 #include <iostream>
 
-PointCloud::PointCloud(
-    int pointCount, int vertexElementCount,
-    const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
-    : RenderableObject(pointCount, vertexElementCount, shaderProgram),
-      buffer_(nullptr) {}
+PointCloud::PointCloud(int                                          pointCount,
+                       int                                          vertexElementCount,
+                       const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
+    : RenderableObject(pointCount, vertexElementCount, shaderProgram)
+    , buffer_(nullptr) {}
 
 PointCloud::~PointCloud(void) {
   if (buffer_) {
@@ -38,14 +38,12 @@ bool PointCloud::FillVertexBuffer(GLfloat* pBuffer) {
     buffer_ = nullptr;
     return true;
   } else {
-    std::cout << "---Error!!! cannot upload data to Graphics Card----"
-              << std::endl;
+    std::cout << "---Error!!! cannot upload data to Graphics Card----" << std::endl;
     return false;
   }
 }
 
-bool PointCloud::FillData(
-    const std::shared_ptr<const apollo::drivers::PointCloud>& pdata) {
+bool PointCloud::FillData(const std::shared_ptr<const apollo::drivers::PointCloud>& pdata) {
   assert(vertex_count() == pdata->point_size());
   buffer_ = new GLfloat[vertex_count() * vertex_element_count()];
   if (buffer_) {
@@ -53,10 +51,10 @@ bool PointCloud::FillData(
 
     for (int i = 0; i < vertex_count(); ++i, tmp += vertex_element_count()) {
       const apollo::drivers::PointXYZIT& point = pdata->point(i);
-      tmp[0] = point.x();
-      tmp[1] = point.z();
-      tmp[2] = -point.y();
-      tmp[3] = static_cast<float>(point.intensity());
+      tmp[0]                                   = point.x();
+      tmp[1]                                   = point.z();
+      tmp[2]                                   = -point.y();
+      tmp[3]                                   = static_cast<float>(point.intensity());
     }
     return true;
   }

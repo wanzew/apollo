@@ -34,27 +34,29 @@ class ImageGpuPreprocessHandler {
     BASE_CUDA_CHECK(cudaSetDevice(dev));
     return 0;
   }
-  int init(const std::string &intrinsics_path, int dev);
-  int handle(uint8_t *src, uint8_t *dst);
+  int init(const std::string& intrinsics_path, int dev);
+  int handle(uint8_t* src, uint8_t* dst);
   int release(void);
 
  private:
-  int load_camera_intrinsics(const std::string &intrinsics_path, int *width,
-                             int *height, std::vector<double> *D,
-                             std::vector<double> *K);
+  int load_camera_intrinsics(const std::string&   intrinsics_path,
+                             int*                 width,
+                             int*                 height,
+                             std::vector<double>* D,
+                             std::vector<double>* K);
 
-  float *_d_mapx = nullptr;
-  float *_d_mapy = nullptr;
-  uint8_t *_d_rgb = nullptr;
-  uint8_t *_d_dst = nullptr;
+  float*   _d_mapx = nullptr;
+  float*   _d_mapy = nullptr;
+  uint8_t* _d_rgb  = nullptr;
+  uint8_t* _d_dst  = nullptr;
 
-  int _width = 0;     // image cols
-  int _height = 0;    // image rows
-  int _in_size = 0;   // size of the input image in byte
-  int _out_size = 0;  // size of the output image in byte
-  int _dev_no = 0;    // device number for gpu
-  bool _inited = false;
-  const int CHANNEL = 3;
+  int       _width    = 0;  // image cols
+  int       _height   = 0;  // image rows
+  int       _in_size  = 0;  // size of the input image in byte
+  int       _out_size = 0;  // size of the output image in byte
+  int       _dev_no   = 0;  // device number for gpu
+  bool      _inited   = false;
+  const int CHANNEL   = 3;
 };
 
 }  // namespace camera

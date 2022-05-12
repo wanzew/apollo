@@ -29,6 +29,7 @@ class SmokeObjectMaintainer {
   SmokeObjectMaintainer() {}
   ~SmokeObjectMaintainer() {}
   bool Add(int idx, base::ObjectPtr obj);
+
  protected:
   std::map<int, base::ObjectPtr> assigned_index_;
 };

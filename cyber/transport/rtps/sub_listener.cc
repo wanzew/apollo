@@ -36,14 +36,13 @@ void SubListener::onNewDataMessage(eprosima::fastrtps::Subscriber* sub) {
   // fetch channel name
   auto channel_id = common::Hash(sub->getAttributes().topic.getTopicName());
   eprosima::fastrtps::SampleInfo_t m_info;
-  UnderlayMessage m;
+  UnderlayMessage                  m;
 
   RETURN_IF(!sub->takeNextData(reinterpret_cast<void*>(&m), &m_info));
   RETURN_IF(m_info.sampleKind != eprosima::fastrtps::ALIVE);
 
   // fetch MessageInfo
-  char* ptr =
-      reinterpret_cast<char*>(&m_info.related_sample_identity.writer_guid());
+  char*    ptr = reinterpret_cast<char*>(&m_info.related_sample_identity.writer_guid());
   Identity sender_id(false);
   sender_id.set_data(ptr);
   msg_info_.set_sender_id(sender_id);
@@ -52,22 +51,19 @@ void SubListener::onNewDataMessage(eprosima::fastrtps::Subscriber* sub) {
   spare_id.set_data(ptr + ID_SIZE);
   msg_info_.set_spare_id(spare_id);
 
-  uint64_t seq_num =
-      ((int64_t)m_info.related_sample_identity.sequence_number().high) << 32 |
-      m_info.related_sample_identity.sequence_number().low;
+  uint64_t seq_num = ((int64_t)m_info.related_sample_identity.sequence_number().high) << 32 |
+                     m_info.related_sample_identity.sequence_number().low;
   msg_info_.set_seq_num(seq_num);
 
   // fetch message string
-  std::shared_ptr<std::string> msg_str =
-      std::make_shared<std::string>(m.data());
+  std::shared_ptr<std::string> msg_str = std::make_shared<std::string>(m.data());
 
   // callback
   callback_(channel_id, msg_str, msg_info_);
 }
 
-void SubListener::onSubscriptionMatched(
-    eprosima::fastrtps::Subscriber* sub,
-    eprosima::fastrtps::MatchingInfo& info) {
+void SubListener::onSubscriptionMatched(eprosima::fastrtps::Subscriber*   sub,
+                                        eprosima::fastrtps::MatchingInfo& info) {
   (void)sub;
   (void)info;
 }

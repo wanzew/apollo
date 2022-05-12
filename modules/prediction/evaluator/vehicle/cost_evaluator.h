@@ -18,9 +18,8 @@
 
 #include <string>
 
-#include "modules/prediction/evaluator/evaluator.h"
-
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -42,8 +41,7 @@ class CostEvaluator : public Evaluator {
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
-                ObstaclesContainer* obstacles_container) override;
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Get the name of evaluator.
@@ -51,12 +49,12 @@ class CostEvaluator : public Evaluator {
   std::string GetName() override { return "COST_EVALUATOR"; }
 
  private:
-  double ComputeProbability(const double obstacle_length,
-                            const double obstacle_width,
+  double ComputeProbability(const double        obstacle_length,
+                            const double        obstacle_width,
                             const LaneSequence& lane_sequence);
 
-  double FrontLateralDistanceCost(const double obstacle_length,
-                                  const double obstacle_width,
+  double FrontLateralDistanceCost(const double        obstacle_length,
+                                  const double        obstacle_width,
                                   const LaneSequence& lane_sequence);
 };
 

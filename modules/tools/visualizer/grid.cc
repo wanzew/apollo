@@ -17,8 +17,8 @@
 #include "modules/tools/visualizer/grid.h"
 
 Grid::Grid(int cellCountBySide)
-    : RenderableObject((cellCountBySide << 2) + 4, 2),
-      grid_color_(128, 128, 128) {}
+    : RenderableObject((cellCountBySide << 2) + 4, 2)
+    , grid_color_(128, 128, 128) {}
 
 bool Grid::FillVertexBuffer(GLfloat* pBuffer) {
   float x = static_cast<float>(CellCount()) / 2.0f;

@@ -21,8 +21,9 @@
 
 #pragma once
 
-#include "modules/control/common/pid_controller.h"
 #include "modules/control/proto/pid_conf.pb.h"
+
+#include "modules/control/common/pid_controller.h"
 
 /**
  * @namespace apollo::control

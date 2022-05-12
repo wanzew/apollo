@@ -44,8 +44,8 @@ void Adsdiagnosis628::UpdateData(uint8_t* data) {
 
 void Adsdiagnosis628::Reset() {
   // TODO(All) :  you should check this manually
-  faultrank_ = 0;
-  adas_fault_code_ = 0;
+  faultrank_            = 0;
+  adas_fault_code_      = 0;
   adas_softwareversion_ = 0;
   adas_hardwareversion_ = 0;
 }
@@ -62,7 +62,7 @@ Adsdiagnosis628* Adsdiagnosis628::set_faultrank(int faultrank) {
 // 'physical_unit': 'bit'}
 void Adsdiagnosis628::set_p_faultrank(uint8_t* data, int faultrank) {
   faultrank = ProtocolData::BoundedValue(0, 5, faultrank);
-  int x = faultrank;
+  int x     = faultrank;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 4, 4);
@@ -76,11 +76,10 @@ Adsdiagnosis628* Adsdiagnosis628::set_adas_fault_code(int adas_fault_code) {
 // config detail: {'name': 'ADAS_Fault_Code', 'offset': 0.0, 'precision': 1.0,
 // 'len': 24, 'is_signed_var': False, 'physical_range': '[0|65535]', 'bit': 3,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adsdiagnosis628::set_p_adas_fault_code(uint8_t* data,
-                                            int adas_fault_code) {
+void Adsdiagnosis628::set_p_adas_fault_code(uint8_t* data, int adas_fault_code) {
   adas_fault_code = ProtocolData::BoundedValue(0, 65535, adas_fault_code);
-  int x = adas_fault_code;
-  uint8_t t = 0;
+  int     x       = adas_fault_code;
+  uint8_t t       = 0;
 
   t = x & 0xF;
   Byte to_set0(data + 3);
@@ -102,8 +101,7 @@ void Adsdiagnosis628::set_p_adas_fault_code(uint8_t* data,
   to_set3.set_value(t, 0, 4);
 }
 
-Adsdiagnosis628* Adsdiagnosis628::set_adas_softwareversion(
-    int adas_softwareversion) {
+Adsdiagnosis628* Adsdiagnosis628::set_adas_softwareversion(int adas_softwareversion) {
   adas_softwareversion_ = adas_softwareversion;
   return this;
 }
@@ -112,18 +110,15 @@ Adsdiagnosis628* Adsdiagnosis628::set_adas_softwareversion(
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|255]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit':
 // 'bit'}
-void Adsdiagnosis628::set_p_adas_softwareversion(uint8_t* data,
-                                                 int adas_softwareversion) {
-  adas_softwareversion =
-      ProtocolData::BoundedValue(0, 255, adas_softwareversion);
-  int x = adas_softwareversion;
+void Adsdiagnosis628::set_p_adas_softwareversion(uint8_t* data, int adas_softwareversion) {
+  adas_softwareversion = ProtocolData::BoundedValue(0, 255, adas_softwareversion);
+  int x                = adas_softwareversion;
 
   Byte to_set(data + 6);
   to_set.set_value(x, 0, 8);
 }
 
-Adsdiagnosis628* Adsdiagnosis628::set_adas_hardwareversion(
-    int adas_hardwareversion) {
+Adsdiagnosis628* Adsdiagnosis628::set_adas_hardwareversion(int adas_hardwareversion) {
   adas_hardwareversion_ = adas_hardwareversion;
   return this;
 }
@@ -132,11 +127,9 @@ Adsdiagnosis628* Adsdiagnosis628::set_adas_hardwareversion(
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|255]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
 // 'bit'}
-void Adsdiagnosis628::set_p_adas_hardwareversion(uint8_t* data,
-                                                 int adas_hardwareversion) {
-  adas_hardwareversion =
-      ProtocolData::BoundedValue(0, 255, adas_hardwareversion);
-  int x = adas_hardwareversion;
+void Adsdiagnosis628::set_p_adas_hardwareversion(uint8_t* data, int adas_hardwareversion) {
+  adas_hardwareversion = ProtocolData::BoundedValue(0, 255, adas_hardwareversion);
+  int x                = adas_hardwareversion;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);

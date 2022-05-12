@@ -32,20 +32,16 @@ class BridgeProtoSerializedBuf {
   BridgeProtoSerializedBuf() {}
   ~BridgeProtoSerializedBuf();
 
-  char *GetFrame(size_t index);
-  bool Serialize(const std::shared_ptr<T> &proto, const std::string &msg_name);
+  char* GetFrame(size_t index);
+  bool  Serialize(const std::shared_ptr<T>& proto, const std::string& msg_name);
 
-  const char *GetSerializedBuf(size_t index) const {
-    return frames_[index].buf_;
-  }
-  size_t GetSerializedBufCount() const { return frames_.size(); }
-  size_t GetSerializedBufSize(size_t index) const {
-    return frames_[index].buf_len_;
-  }
+  const char* GetSerializedBuf(size_t index) const { return frames_[index].buf_; }
+  size_t      GetSerializedBufCount() const { return frames_.size(); }
+  size_t      GetSerializedBufSize(size_t index) const { return frames_[index].buf_len_; }
 
  private:
   struct Buf {
-    char *buf_;
+    char*  buf_;
     size_t buf_len_;
   };
 
@@ -61,21 +57,21 @@ BridgeProtoSerializedBuf<T>::~BridgeProtoSerializedBuf() {
 }
 
 template <typename T>
-bool BridgeProtoSerializedBuf<T>::Serialize(const std::shared_ptr<T> &proto,
-                                            const std::string &msg_name) {
+bool BridgeProtoSerializedBuf<T>::Serialize(const std::shared_ptr<T>& proto,
+                                            const std::string&        msg_name) {
   bsize msg_len = static_cast<bsize>(proto->ByteSizeLong());
-  char *tmp = new char[msg_len]();
+  char* tmp     = new char[msg_len]();
   if (!proto->SerializeToArray(tmp, static_cast<int>(msg_len))) {
     FREE_ARRY(tmp);
     return false;
   }
-  bsize offset = 0;
-  bsize frame_index = 0;
-  uint32_t total_frames = static_cast<uint32_t>(msg_len / FRAME_SIZE +
-                                                (msg_len % FRAME_SIZE ? 1 : 0));
+  bsize    offset      = 0;
+  bsize    frame_index = 0;
+  uint32_t total_frames =
+      static_cast<uint32_t>(msg_len / FRAME_SIZE + (msg_len % FRAME_SIZE ? 1 : 0));
 
   while (offset < msg_len) {
-    bsize left = msg_len - frame_index * FRAME_SIZE;
+    bsize left     = msg_len - frame_index * FRAME_SIZE;
     bsize cpy_size = (left > FRAME_SIZE) ? FRAME_SIZE : left;
 
     BridgeHeader header;
@@ -89,8 +85,8 @@ bool BridgeProtoSerializedBuf<T>::Serialize(const std::shared_ptr<T> &proto,
     header.SetIndex(frame_index);
     header.SetFramePos(frame_index * FRAME_SIZE);
     hsize header_size = header.GetHeaderSize();
-    Buf buf;
-    buf.buf_ = new char[cpy_size + header_size];
+    Buf   buf;
+    buf.buf_     = new char[cpy_size + header_size];
     buf.buf_len_ = cpy_size + header_size;
     header.Serialize(buf.buf_, buf.buf_len_);
     memcpy(buf.buf_ + header_size, tmp + frame_index * FRAME_SIZE, cpy_size);

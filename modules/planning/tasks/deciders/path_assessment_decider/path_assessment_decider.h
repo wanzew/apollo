@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -29,7 +30,7 @@ namespace planning {
 
 class PathAssessmentDecider : public Decider {
  public:
-  PathAssessmentDecider(const TaskConfig& config,
+  PathAssessmentDecider(const TaskConfig&                          config,
                         const std::shared_ptr<DependencyInjector>& injector);
 
  private:
@@ -38,20 +39,16 @@ class PathAssessmentDecider : public Decider {
    *   2. Analyze the paths and label necessary info for speed planning use.
    *   3. Pick the best one and update it into the reference_line.
    */
-  common::Status Process(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info) override;
+  common::Status Process(Frame* const frame, ReferenceLineInfo* const reference_line_info) override;
 
   /////////////////////////////////////////////////////////////////////////////
   // Below are functions called when executing PathAssessmentDecider.
 
-  bool IsValidRegularPath(const ReferenceLineInfo& reference_line_info,
-                          const PathData& path_data);
+  bool IsValidRegularPath(const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
-  bool IsValidFallbackPath(const ReferenceLineInfo& reference_line_info,
-                           const PathData& path_data);
+  bool IsValidFallbackPath(const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
-  void SetPathInfo(const ReferenceLineInfo& reference_line_info,
-                   PathData* const path_data);
+  void SetPathInfo(const ReferenceLineInfo& reference_line_info, PathData* const path_data);
 
   void TrimTailingOutLanePoints(PathData* const path_data);
 
@@ -60,14 +57,13 @@ class PathAssessmentDecider : public Decider {
 
   bool IsGreatlyOffReferenceLine(const PathData& path_data);
 
-  bool IsGreatlyOffRoad(const ReferenceLineInfo& reference_line_info,
-                        const PathData& path_data);
+  bool IsGreatlyOffRoad(const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
-  bool IsCollidingWithStaticObstacles(
-      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+  bool IsCollidingWithStaticObstacles(const ReferenceLineInfo& reference_line_info,
+                                      const PathData&          path_data);
 
   bool IsStopOnReverseNeighborLane(const ReferenceLineInfo& reference_line_info,
-                                   const PathData& path_data);
+                                   const PathData&          path_data);
 
   // * @brief Check if the path ever returns to the self-lane.
   //   * @param reference_line_info
@@ -82,22 +78,22 @@ class PathAssessmentDecider : public Decider {
   // Below are functions used for setting path point type info.
 
   void InitPathPointDecision(
-      const PathData& path_data,
-      std::vector<std::tuple<double, PathData::PathPointType, double>>* const
-          path_point_decision);
+      const PathData&                                                         path_data,
+      std::vector<std::tuple<double, PathData::PathPointType, double>>* const path_point_decision);
 
   void SetPathPointType(
-      const ReferenceLineInfo& reference_line_info, const PathData& path_data,
-      const bool is_lane_change_path,
-      std::vector<std::tuple<double, PathData::PathPointType, double>>* const
-          path_point_decision);
+      const ReferenceLineInfo&                                                reference_line_info,
+      const PathData&                                                         path_data,
+      const bool                                                              is_lane_change_path,
+      std::vector<std::tuple<double, PathData::PathPointType, double>>* const path_point_decision);
 
   void SetObstacleDistance(
-      const ReferenceLineInfo& reference_line_info, const PathData& path_data,
-      std::vector<std::tuple<double, PathData::PathPointType, double>>* const
-          path_point_decision);
+      const ReferenceLineInfo&                                                reference_line_info,
+      const PathData&                                                         path_data,
+      std::vector<std::tuple<double, PathData::PathPointType, double>>* const path_point_decision);
 
-  void RecordDebugInfo(const PathData& path_data, const std::string& debug_name,
+  void RecordDebugInfo(const PathData&          path_data,
+                       const std::string&       debug_name,
                        ReferenceLineInfo* const reference_line_info);
 };
 
@@ -105,15 +101,12 @@ class PathAssessmentDecider : public Decider {
 // Below are helper functions.
 
 int ContainsOutOnReverseLane(
-    const std::vector<std::tuple<double, PathData::PathPointType, double>>&
-        path_point_decision);
+    const std::vector<std::tuple<double, PathData::PathPointType, double>>& path_point_decision);
 
 int GetBackToInLaneIndex(
-    const std::vector<std::tuple<double, PathData::PathPointType, double>>&
-        path_point_decision);
+    const std::vector<std::tuple<double, PathData::PathPointType, double>>& path_point_decision);
 
-bool ComparePathData(const PathData& lhs, const PathData& rhs,
-                     const Obstacle* blocking_obstacle);
+bool ComparePathData(const PathData& lhs, const PathData& rhs, const Obstacle* blocking_obstacle);
 
 }  // namespace planning
 }  // namespace apollo

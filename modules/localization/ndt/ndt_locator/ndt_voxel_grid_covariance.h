@@ -72,9 +72,9 @@ namespace ndt {
 struct Leaf {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Leaf()
-      : nr_points_(0),
-        mean_(Eigen::Vector3d::Zero()),
-        icov_(Eigen::Matrix3d::Zero()) {}
+      : nr_points_(0)
+      , mean_(Eigen::Vector3d::Zero())
+      , icov_(Eigen::Matrix3d::Zero()) {}
 
   /**@brief Get the number of points contained by this voxel. */
   int GetPointCount() const { return nr_points_; }
@@ -93,9 +93,9 @@ struct Leaf {
   Eigen::Matrix3d icov_;
 };
 /**@brief Pointer to VoxelGridCovariance leaf structure */
-typedef Leaf *LeafPtr;
+typedef Leaf* LeafPtr;
 /**@brief Const pointer to VoxelGridCovariance leaf structure */
-typedef const Leaf *LeafConstPtr;
+typedef const Leaf* LeafConstPtr;
 
 /**@brief A searchable voxel structure containing the mean and covariance of the
  * data. */
@@ -105,13 +105,13 @@ class VoxelGridCovariance {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  protected:
-  typedef pcl::PointCloud<PointT> PointCloud;
-  typedef boost::shared_ptr<PointCloud> PointCloudPtr;
+  typedef pcl::PointCloud<PointT>             PointCloud;
+  typedef boost::shared_ptr<PointCloud>       PointCloudPtr;
   typedef boost::shared_ptr<const PointCloud> PointCloudConstPtr;
-  PointCloudConstPtr input_;
+  PointCloudConstPtr                          input_;
 
   Eigen::Vector4f leaf_size_;
-  Eigen::Array4f inverse_leaf_size_;
+  Eigen::Array4f  inverse_leaf_size_;
 
   Eigen::Vector4i min_b_;
   Eigen::Vector4i max_b_;
@@ -122,18 +122,18 @@ class VoxelGridCovariance {
  public:
   /**@brief Constructor. */
   VoxelGridCovariance()
-      : min_points_per_voxel_(6),
-        leaves_(),
-        voxel_centroids_(),
-        voxel_centroids_leaf_indices_(),
-        kdtree_() {
+      : min_points_per_voxel_(6)
+      , leaves_()
+      , voxel_centroids_()
+      , voxel_centroids_leaf_indices_()
+      , kdtree_() {
     leaf_size_.setZero();
     min_b_.setZero();
     max_b_.setZero();
   }
 
   /**@brief Provide a pointer to the input dataset. */
-  void SetInputCloud(const PointCloudConstPtr &cloud) { input_ = cloud; }
+  void SetInputCloud(const PointCloudConstPtr& cloud) { input_ = cloud; }
 
   /**@brief Set the minimum number of points required for a cell to be used
    * (must be 3 or greater for covariance calculation). */
@@ -151,23 +151,18 @@ class VoxelGridCovariance {
   inline int GetMinPointPerVoxel() { return min_points_per_voxel_; }
 
   /**@brief Initializes voxel structure. */
-  inline void filter(const std::vector<Leaf> &cell_leaf,
-                     bool searchable = true) {
+  inline void filter(const std::vector<Leaf>& cell_leaf, bool searchable = true) {
     voxel_centroids_ = PointCloudPtr(new PointCloud);
     SetMap(cell_leaf, voxel_centroids_);
-    if (voxel_centroids_->size() > 0) {
-      kdtree_.setInputCloud(voxel_centroids_);
-    }
+    if (voxel_centroids_->size() > 0) { kdtree_.setInputCloud(voxel_centroids_); }
   }
 
-  void SetMap(const std::vector<Leaf> &map_leaves, PointCloudPtr output);
+  void SetMap(const std::vector<Leaf>& map_leaves, PointCloudPtr output);
 
   /**@brief Get the voxel containing point p. */
   inline LeafConstPtr GetLeaf(int index) {
     typename std::map<size_t, Leaf>::iterator leaf_iter = leaves_.find(index);
-    if (leaf_iter == leaves_.end()) {
-      return nullptr;
-    }
+    if (leaf_iter == leaves_.end()) { return nullptr; }
     LeafConstPtr ret(&(leaf_iter->second));
     return ret;
   }
@@ -176,26 +171,21 @@ class VoxelGridCovariance {
    * \param[in] p the point to get the leaf structure at
    * \return const pointer to leaf structure
    */
-  inline LeafConstPtr GetLeaf(PointT *p) {
+  inline LeafConstPtr GetLeaf(PointT* p) {
     // Generate index associated with p
-    int ijk0 = static_cast<int>((p->x - map_left_top_corner_(0)) *
-                                inverse_leaf_size_[0]) -
-               min_b_[0];
-    int ijk1 = static_cast<int>((p->y - map_left_top_corner_(1)) *
-                                inverse_leaf_size_[1]) -
-               min_b_[1];
-    int ijk2 = static_cast<int>((p->z - map_left_top_corner_(2)) *
-                                inverse_leaf_size_[2]) -
-               min_b_[2];
+    int ijk0 =
+        static_cast<int>((p->x - map_left_top_corner_(0)) * inverse_leaf_size_[0]) - min_b_[0];
+    int ijk1 =
+        static_cast<int>((p->y - map_left_top_corner_(1)) * inverse_leaf_size_[1]) - min_b_[1];
+    int ijk2 =
+        static_cast<int>((p->z - map_left_top_corner_(2)) * inverse_leaf_size_[2]) - min_b_[2];
 
     // Compute the centroid leaf index
     int idx = ijk0 * divb_mul_[0] + ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
 
     // Find leaf associated with index
     typename std::map<size_t, Leaf>::iterator leaf_iter = leaves_.find(idx);
-    if (leaf_iter == leaves_.end()) {
-      return nullptr;
-    }
+    if (leaf_iter == leaves_.end()) { return nullptr; }
     // If such a leaf exists return the pointer to the leaf structure
     LeafConstPtr ret(&(leaf_iter->second));
     return ret;
@@ -203,47 +193,43 @@ class VoxelGridCovariance {
 
   /**@brief Get the voxel containing point p.* \return const pointer to leaf
    * structure */
-  inline LeafConstPtr GetLeaf(Eigen::Vector3f *p) {
+  inline LeafConstPtr GetLeaf(Eigen::Vector3f* p) {
     // Generate index associated with p
-    int ijk0 = static_cast<int>((p->x() - map_left_top_corner_(0)) *
-                                inverse_leaf_size_[0]) -
-               min_b_[0];
-    int ijk1 = static_cast<int>((p->y() - map_left_top_corner_(1)) *
-                                inverse_leaf_size_[1]) -
-               min_b_[1];
-    int ijk2 = static_cast<int>((p->z() - map_left_top_corner_(2)) *
-                                inverse_leaf_size_[2]) -
-               min_b_[2];
+    int ijk0 =
+        static_cast<int>((p->x() - map_left_top_corner_(0)) * inverse_leaf_size_[0]) - min_b_[0];
+    int ijk1 =
+        static_cast<int>((p->y() - map_left_top_corner_(1)) * inverse_leaf_size_[1]) - min_b_[1];
+    int ijk2 =
+        static_cast<int>((p->z() - map_left_top_corner_(2)) * inverse_leaf_size_[2]) - min_b_[2];
 
     // Compute the centroid leaf index
     int idx = ijk0 * divb_mul_[0] + ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
 
     // Find leaf associated with index
     typename std::map<size_t, Leaf>::iterator leaf_iter = leaves_.find(idx);
-    if (leaf_iter == leaves_.end()) {
-      return nullptr;
-    }
+    if (leaf_iter == leaves_.end()) { return nullptr; }
     // If such a leaf exists return the pointer to the leaf structure
     LeafConstPtr ret(&(leaf_iter->second));
     return ret;
   }
 
   /**@brief Get the leaf structure map. */
-  inline const std::map<size_t, Leaf> &GetLeaves() { return leaves_; }
+  inline const std::map<size_t, Leaf>& GetLeaves() { return leaves_; }
 
   /**@brief Get a pointcloud containing the voxel centroids. */
   inline PointCloudPtr GetCentroids() { return voxel_centroids_; }
 
   /**@brief Search for all the nearest occupied voxels of the query point in a
    * given radius. */
-  int RadiusSearch(const PointT &point, double radius,
-                   std::vector<LeafConstPtr> *k_leaves,
-                   std::vector<float> *k_sqr_distances,
-                   unsigned int max_nn = 0);
+  int RadiusSearch(const PointT&              point,
+                   double                     radius,
+                   std::vector<LeafConstPtr>* k_leaves,
+                   std::vector<float>*        k_sqr_distances,
+                   unsigned int               max_nn = 0);
 
-  void GetDisplayCloud(pcl::PointCloud<pcl::PointXYZ> *cell_cloud);
+  void GetDisplayCloud(pcl::PointCloud<pcl::PointXYZ>* cell_cloud);
 
-  inline void SetMapLeftTopCorner(const Eigen::Vector3d &left_top_corner) {
+  inline void SetMapLeftTopCorner(const Eigen::Vector3d& left_top_corner) {
     map_left_top_corner_ = left_top_corner;
   }
 
@@ -252,9 +238,7 @@ class VoxelGridCovariance {
     leaf_size_[1] = ly;
     leaf_size_[2] = lz;
     // Avoid division errors
-    if (leaf_size_[3] == 0) {
-      leaf_size_[3] = 1;
-    }  // Use multiplications instead of divisions
+    if (leaf_size_[3] == 0) { leaf_size_[3] = 1; }  // Use multiplications instead of divisions
     inverse_leaf_size_ = Eigen::Array4f::Ones() / leaf_size_.array();
   }
 

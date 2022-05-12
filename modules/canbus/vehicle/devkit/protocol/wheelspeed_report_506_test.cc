@@ -27,9 +27,9 @@ class Wheelspeedreport506Test : public ::testing::Test {
 };
 
 TEST_F(Wheelspeedreport506Test, General) {
-  uint8_t data[8] = {0x07, 0x01, 0x01, 0x02, 0x8A, 0x03, 0x04, 0x05};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t             data[8] = {0x07, 0x01, 0x01, 0x02, 0x8A, 0x03, 0x04, 0x05};
+  int32_t             length  = 8;
+  ChassisDetail       cd;
   Wheelspeedreport506 wheelspeedreport;
   wheelspeedreport.Parse(data, length, &cd);
 

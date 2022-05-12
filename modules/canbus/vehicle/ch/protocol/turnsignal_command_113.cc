@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/protocol/turnsignal_command_113.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -55,8 +56,7 @@ Turnsignalcommand113* Turnsignalcommand113::set_turn_signal_cmd(
 // 'TURN_SIGNAL_CMD', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|2]', 'bit': 0, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 void Turnsignalcommand113::set_p_turn_signal_cmd(
-    uint8_t* data,
-    Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd) {
+    uint8_t* data, Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd) {
   int x = turn_signal_cmd;
 
   Byte to_set(data + 0);

@@ -23,7 +23,7 @@ namespace apollo {
 namespace cyber {
 
 ParameterClient::ParameterClient(const std::shared_ptr<Node>& node,
-                                 const std::string& service_node_name)
+                                 const std::string&           service_node_name)
     : node_(node) {
   get_parameter_client_ = node_->CreateClient<ParamName, Param>(
       FixParameterServiceName(service_node_name, GET_PARAMETER_SERVICE_NAME));
@@ -35,8 +35,7 @@ ParameterClient::ParameterClient(const std::shared_ptr<Node>& node,
       FixParameterServiceName(service_node_name, LIST_PARAMETERS_SERVICE_NAME));
 }
 
-bool ParameterClient::GetParameter(const std::string& param_name,
-                                   Parameter* parameter) {
+bool ParameterClient::GetParameter(const std::string& param_name, Parameter* parameter) {
   auto request = std::make_shared<ParamName>();
   request->set_value(param_name);
   auto response = get_parameter_client_->SendRequest(request);
@@ -53,7 +52,7 @@ bool ParameterClient::GetParameter(const std::string& param_name,
 }
 
 bool ParameterClient::SetParameter(const Parameter& parameter) {
-  auto request = std::make_shared<Param>(parameter.ToProtoParam());
+  auto request  = std::make_shared<Param>(parameter.ToProtoParam());
   auto response = set_parameter_client_->SendRequest(request);
   if (response == nullptr) {
     AERROR << "Call " << set_parameter_client_->ServiceName() << " failed";

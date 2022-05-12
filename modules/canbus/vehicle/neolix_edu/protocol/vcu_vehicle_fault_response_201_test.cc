@@ -16,9 +16,10 @@
 
 #include "modules/canbus/vehicle/neolix_edu/protocol/vcu_vehicle_fault_response_201.h"
 
+#include "gtest/gtest.h"
+
 #include "glog/logging.h"
 
-#include "gtest/gtest.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
@@ -31,9 +32,9 @@ class Vcuvehiclefaultresponse201Test : public ::testing::Test {
 };
 
 TEST_F(Vcuvehiclefaultresponse201Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t                    data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  int32_t                    length  = 8;
+  ChassisDetail              cd;
   Vcuvehiclefaultresponse201 accel_cmd;
   accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b01100111);
@@ -45,52 +46,28 @@ TEST_F(Vcuvehiclefaultresponse201Test, reset) {
   EXPECT_EQ(data[6], 0b01010011);
   EXPECT_EQ(data[7], 0b01010100);
 
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .vehicle_error_indicationsvcu(),
-            7);
-  EXPECT_EQ(
-      cd.neolix_edu().vcu_vehicle_fault_response_201().brake_system_errorehb(),
-      6);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().vehicle_error_indicationsvcu(), 7);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().brake_system_errorehb(), 6);
   EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().eps_error(), 2);
   EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().motor_error(), 6);
   EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().epb_error(), 3);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .high_voltage_battery_errorbcu(),
-            6);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .automode_exit_reason_losscommuni(),
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().high_voltage_battery_errorbcu(), 6);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().automode_exit_reason_losscommuni(),
             true);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .automode_exit_reason_reqsignalno(),
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().automode_exit_reason_reqsignalno(),
             false);
 
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .automode_exit_reason_low_power(),
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().automode_exit_reason_low_power(),
             false);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .automode_exit_reason_highvolt(),
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().automode_exit_reason_highvolt(),
             false);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .automode_exit_reason_vehicle_flt(),
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().automode_exit_reason_vehicle_flt(),
             true);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .automode_exit_reason_press_emerg(),
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().automode_exit_reason_press_emerg(),
             false);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .automode_exit_reason_press_remot(),
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().automode_exit_reason_press_remot(),
             true);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_fault_response_201()
-                .automode_exit_reason_pdu_control(),
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_fault_response_201().automode_exit_reason_pdu_control(),
             false);
 }
 

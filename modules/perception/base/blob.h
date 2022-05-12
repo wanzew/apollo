@@ -87,25 +87,30 @@ constexpr size_t kMaxBlobAxes = 32;
 template <typename Dtype>
 class Blob {
  public:
-  Blob() : data_(), count_(0), capacity_(0), use_cuda_host_malloc_(false) {}
+  Blob()
+      : data_()
+      , count_(0)
+      , capacity_(0)
+      , use_cuda_host_malloc_(false) {}
   explicit Blob(bool use_cuda_host_malloc)
-      : data_(),
-        count_(0),
-        capacity_(0),
-        use_cuda_host_malloc_(use_cuda_host_malloc) {}
+      : data_()
+      , count_(0)
+      , capacity_(0)
+      , use_cuda_host_malloc_(use_cuda_host_malloc) {}
 
   /// @brief Deprecated; use <code>Blob(const std::vector<int>& shape)</code>.
-  Blob(const int num, const int channels, const int height, const int width,
+  Blob(const int  num,
+       const int  channels,
+       const int  height,
+       const int  width,
        const bool use_cuda_host_malloc = false);
-  explicit Blob(const std::vector<int>& shape,
-                const bool use_cuda_host_malloc = false);
+  explicit Blob(const std::vector<int>& shape, const bool use_cuda_host_malloc = false);
 
   Blob(const Blob&) = delete;
   void operator=(const Blob&) = delete;
 
   /// @brief Deprecated; use `Reshape(const std::vector<int>& shape)`.
-  void Reshape(const int num, const int channels, const int height,
-               const int width);
+  void Reshape(const int num, const int channels, const int height, const int width);
   /**
    * @brief Change the dimensions of the blob, allocating new memory if
    *        necessary.
@@ -120,12 +125,11 @@ class Blob {
    * an error; either Net::Forward or Net::Reshape need to be called to
    * propagate the new input shape to higher layers.
    */
-  void Reshape(const std::vector<int>& shape);
-  void ReshapeLike(const Blob& other);
+  void               Reshape(const std::vector<int>& shape);
+  void               ReshapeLike(const Blob& other);
   inline std::string shape_string() const {
-    return shape_.empty()
-               ? absl::StrCat("(", count_, ")")
-               : absl::StrCat(absl::StrJoin(shape_, " "), " (", count_, ")");
+    return shape_.empty() ? absl::StrCat("(", count_, ")") :
+                            absl::StrCat(absl::StrJoin(shape_, " "), " (", count_, ")");
   }
   inline const std::vector<int>& shape() const { return shape_; }
   /**
@@ -136,9 +140,7 @@ class Blob {
    *        "canonicalized" using CanonicalAxisIndex.
    *        Dies on out of range index.
    */
-  inline int shape(int index) const {
-    return shape_[CanonicalAxisIndex(index)];
-  }
+  inline int shape(int index) const { return shape_[CanonicalAxisIndex(index)]; }
   inline int num_axes() const { return static_cast<int>(shape_.size()); }
   inline int count() const { return count_; }
 
@@ -168,9 +170,7 @@ class Blob {
    *
    * @param start_axis The first axis to include in the slice.
    */
-  inline int count(int start_axis) const {
-    return count(start_axis, num_axes());
-  }
+  inline int count(int start_axis) const { return count(start_axis, num_axes()); }
 
   /**
    * @brief create RoI Blob.
@@ -194,15 +194,11 @@ class Blob {
    *        Dies on out of range index.
    */
   inline int CanonicalAxisIndex(int axis_index) const {
-    CHECK_GE(axis_index, -num_axes())
-        << "axis " << axis_index << " out of range for " << num_axes()
-        << "-D Blob with shape " << shape_string();
-    CHECK_LT(axis_index, num_axes())
-        << "axis " << axis_index << " out of range for " << num_axes()
-        << "-D Blob with shape " << shape_string();
-    if (axis_index < 0) {
-      return axis_index + num_axes();
-    }
+    CHECK_GE(axis_index, -num_axes()) << "axis " << axis_index << " out of range for " << num_axes()
+                                      << "-D Blob with shape " << shape_string();
+    CHECK_LT(axis_index, num_axes()) << "axis " << axis_index << " out of range for " << num_axes()
+                                     << "-D Blob with shape " << shape_string();
+    if (axis_index < 0) { return axis_index + num_axes(); }
     return axis_index;
   }
 
@@ -215,8 +211,7 @@ class Blob {
   /// @brief Deprecated legacy shape accessor width: use shape(3) instead.
   inline int width() const { return LegacyShape(3); }
   inline int LegacyShape(int index) const {
-    CHECK_LE(num_axes(), 4)
-        << "Cannot use legacy accessors on Blobs with > 4 axes.";
+    CHECK_LE(num_axes(), 4) << "Cannot use legacy accessors on Blobs with > 4 axes.";
     CHECK_LT(index, 4);
     CHECK_GE(index, -4);
     if (index >= num_axes() || index < -num_axes()) {
@@ -228,8 +223,7 @@ class Blob {
     return shape(index);
   }
 
-  inline int offset(const int n, const int c = 0, const int h = 0,
-                    const int w = 0) const {
+  inline int offset(const int n, const int c = 0, const int h = 0, const int w = 0) const {
     CHECK_GE(n, 0);
     CHECK_LE(n, num());
     CHECK_GE(channels(), 0);
@@ -264,29 +258,26 @@ class Blob {
    */
   void CopyFrom(const Blob<Dtype>& source, bool reshape = false);
 
-  inline Dtype data_at(const int n, const int c, const int h,
-                       const int w) const {
+  inline Dtype data_at(const int n, const int c, const int h, const int w) const {
     return cpu_data()[offset(n, c, h, w)];
   }
 
-  inline Dtype data_at(const std::vector<int>& index) const {
-    return cpu_data()[offset(index)];
-  }
+  inline Dtype data_at(const std::vector<int>& index) const { return cpu_data()[offset(index)]; }
 
   inline const std::shared_ptr<SyncedMemory>& data() const {
     ACHECK(data_);
     return data_;
   }
 
-  const Dtype* cpu_data() const;
-  void set_cpu_data(Dtype* data);
-  const int* gpu_shape() const;
-  const Dtype* gpu_data() const;
-  void set_gpu_data(Dtype* data);
-  Dtype* mutable_cpu_data();
-  Dtype* mutable_gpu_data();
-  void set_head_gpu() { data_->set_head_gpu(); }
-  void set_head_cpu() { data_->set_head_cpu(); }
+  const Dtype*             cpu_data() const;
+  void                     set_cpu_data(Dtype* data);
+  const int*               gpu_shape() const;
+  const Dtype*             gpu_data() const;
+  void                     set_gpu_data(Dtype* data);
+  Dtype*                   mutable_cpu_data();
+  Dtype*                   mutable_gpu_data();
+  void                     set_head_gpu() { data_->set_head_gpu(); }
+  void                     set_head_cpu() { data_->set_head_cpu(); }
   SyncedMemory::SyncedHead head() const { return data_->head(); }
 
   /**
@@ -303,10 +294,10 @@ class Blob {
  protected:
   std::shared_ptr<SyncedMemory> data_;
   std::shared_ptr<SyncedMemory> shape_data_;
-  std::vector<int> shape_;
-  int count_;
-  int capacity_;
-  bool use_cuda_host_malloc_;
+  std::vector<int>              shape_;
+  int                           count_;
+  int                           capacity_;
+  bool                          use_cuda_host_malloc_;
 };  // class Blob
 
 template <typename Dtype>

@@ -35,11 +35,11 @@ TEST(NaviSpeedTsGraph, Solve1) {
   graph.Reset(1.0, 100.0, 0.0, 0.0, 0.0);
 
   NaviSpeedTsConstraints constraints;
-  constraints.v_max = 20.0;
+  constraints.v_max       = 20.0;
   constraints.v_preffered = 10.0;
-  constraints.a_max = 4.0;
+  constraints.a_max       = 4.0;
   constraints.a_preffered = 2.0;
-  constraints.b_max = 5.0;
+  constraints.b_max       = 5.0;
   constraints.b_preffered = 2.0;
   graph.UpdateConstraints(constraints);
 
@@ -52,9 +52,7 @@ TEST(NaviSpeedTsGraph, Solve1) {
   EXPECT_NEAR(5.0, points[25].t, 0.1);
   EXPECT_NEAR(10.0, points[25].v, 0.1);
   for (const auto& point : points)
-    if (point.s > 25.0) {
-      EXPECT_NEAR(10.0, point.v, 0.1);
-    }
+    if (point.s > 25.0) { EXPECT_NEAR(10.0, point.v, 0.1); }
 }
 
 TEST(NaviSpeedTsGraph, Solve2) {
@@ -63,11 +61,11 @@ TEST(NaviSpeedTsGraph, Solve2) {
   auto get_safe_distance = [](double v) { return 1.0 * v + 2.0; };
 
   NaviSpeedTsConstraints constraints;
-  constraints.v_max = 20.0;
+  constraints.v_max       = 20.0;
   constraints.v_preffered = 10.0;
-  constraints.a_max = 4.0;
+  constraints.a_max       = 4.0;
   constraints.a_preffered = 2.0;
-  constraints.b_max = 5.0;
+  constraints.b_max       = 5.0;
   constraints.b_preffered = 2.0;
   graph.UpdateConstraints(constraints);
 
@@ -79,9 +77,7 @@ TEST(NaviSpeedTsGraph, Solve2) {
   EXPECT_NEAR(0.0, points.front().t, 0.1);
   EXPECT_NEAR(0.0, points.front().v, 0.1);
   for (const auto& point : points)
-    if (point.s > 38.0) {
-      EXPECT_NEAR(0.0, point.v, 0.1);
-    }
+    if (point.s > 38.0) { EXPECT_NEAR(0.0, point.v, 0.1); }
   EXPECT_NEAR(0.0, points.back().v, 0.1);
 }
 
@@ -91,11 +87,11 @@ TEST(NaviSpeedTsGraph, Solve3) {
   auto get_safe_distance = [](double v) { return 1.0 * v + 2.0; };
 
   NaviSpeedTsConstraints constraints;
-  constraints.v_max = 20.0;
+  constraints.v_max       = 20.0;
   constraints.v_preffered = 10.0;
-  constraints.a_max = 4.0;
+  constraints.a_max       = 4.0;
   constraints.a_preffered = 2.0;
-  constraints.b_max = 5.0;
+  constraints.b_max       = 5.0;
   constraints.b_preffered = 2.0;
   graph.UpdateConstraints(constraints);
 

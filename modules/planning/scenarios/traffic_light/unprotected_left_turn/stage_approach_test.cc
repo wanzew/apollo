@@ -16,9 +16,10 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_approach.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -26,26 +27,24 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-class TrafficLightUnprotectedLeftTurnStageApproachTest
-    : public ::testing::Test {
+class TrafficLightUnprotectedLeftTurnStageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(
-        ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH);
+    config_.set_stage_type(ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(TrafficLightUnprotectedLeftTurnStageApproachTest, Init) {
-  TrafficLightUnprotectedLeftTurnStageApproach
-      traffic_light_unprotected_left_turn_stage_approach(config_, injector_);
-  EXPECT_EQ(traffic_light_unprotected_left_turn_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH));
+  TrafficLightUnprotectedLeftTurnStageApproach traffic_light_unprotected_left_turn_stage_approach(
+      config_, injector_);
+  EXPECT_EQ(
+      traffic_light_unprotected_left_turn_stage_approach.Name(),
+      ScenarioConfig::StageType_Name(ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH));
 }
 
 }  // namespace traffic_light

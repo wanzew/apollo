@@ -33,9 +33,7 @@ Parameter::Parameter(const std::string& name) {
   param_.set_type(proto::ParamType::NOT_SET);
 }
 
-Parameter::Parameter(const Parameter& parameter) {
-  param_.CopyFrom(parameter.param_);
-}
+Parameter::Parameter(const Parameter& parameter) { param_.CopyFrom(parameter.param_); }
 
 Parameter::Parameter(const std::string& name, const bool bool_value) {
   param_.set_name(name);
@@ -86,7 +84,8 @@ Parameter::Parameter(const std::string& name, const char* string_value) {
   param_.set_type_name("STRING");
 }
 
-Parameter::Parameter(const std::string& name, const std::string& msg_str,
+Parameter::Parameter(const std::string& name,
+                     const std::string& msg_str,
                      const std::string& full_name,
                      const std::string& proto_desc) {
   param_.set_name(name);
@@ -96,8 +95,7 @@ Parameter::Parameter(const std::string& name, const std::string& msg_str,
   param_.set_proto_desc(proto_desc);
 }
 
-Parameter::Parameter(const std::string& name,
-                     const google::protobuf::Message& msg) {
+Parameter::Parameter(const std::string& name, const google::protobuf::Message& msg) {
   param_.set_name(name);
   std::string str;
   msg.SerializeToString(&str);
@@ -137,8 +135,7 @@ std::string Parameter::DebugString() const {
     }
     case ParamType::PROTOBUF: {
       ProtobufFactory::Instance()->RegisterMessage(Descriptor());
-      auto message =
-          ProtobufFactory::Instance()->GenerateMessageByType(TypeName());
+      auto message = ProtobufFactory::Instance()->GenerateMessageByType(TypeName());
       if (message != nullptr) {
         message->ParseFromString(AsString());
         ss << "\"" << message->ShortDebugString() << "\"";

@@ -36,8 +36,7 @@ class TrajectoryImitationLibtorchInference : public ModelInference {
   /**
    * @brief Constructor
    */
-  explicit TrajectoryImitationLibtorchInference(
-      const LearningModelInferenceTaskConfig& config);
+  explicit TrajectoryImitationLibtorchInference(const LearningModelInferenceTaskConfig& config);
 
   /**
    * @brief Destructor
@@ -86,11 +85,11 @@ class TrajectoryImitationLibtorchInference : public ModelInference {
   /**
    * @brief postprocessing model trajectory output
    */
-  void output_postprocessing(const at::Tensor& torch_output_tensor,
+  void output_postprocessing(const at::Tensor&        torch_output_tensor,
                              LearningDataFrame* const learning_data_frame);
 
   torch::jit::script::Module model_;
-  torch::Device device_;
+  torch::Device              device_;
 };
 
 }  // namespace planning

@@ -17,6 +17,7 @@
 #include "modules/localization/ndt/ndt_locator/ndt_solver.h"
 
 #include "gtest/gtest.h"
+
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_types.h"
 
@@ -31,29 +32,26 @@ namespace apollo {
 namespace localization {
 namespace ndt {
 
-typedef apollo::localization::msf::pyramid_map::NdtMap NdtMap;
-typedef apollo::localization::msf::pyramid_map::NdtMapConfig NdtMapConfig;
-typedef apollo::localization::msf::pyramid_map::NdtMapNode NdtMapNode;
-typedef apollo::localization::msf::pyramid_map::NdtMapCells NdtMapCells;
+typedef apollo::localization::msf::pyramid_map::NdtMap         NdtMap;
+typedef apollo::localization::msf::pyramid_map::NdtMapConfig   NdtMapConfig;
+typedef apollo::localization::msf::pyramid_map::NdtMapNode     NdtMapNode;
+typedef apollo::localization::msf::pyramid_map::NdtMapCells    NdtMapCells;
 typedef apollo::localization::msf::pyramid_map::NdtMapNodePool NdtMapNodePool;
-typedef apollo::localization::msf::pyramid_map::NdtMapMatrix NdtMapMatrix;
-typedef apollo::localization::msf::pyramid_map::MapNodeIndex MapNodeIndex;
+typedef apollo::localization::msf::pyramid_map::NdtMapMatrix   NdtMapMatrix;
+typedef apollo::localization::msf::pyramid_map::MapNodeIndex   MapNodeIndex;
 
 MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
   MapNodeIndex index;
-  char buf[100];
-  sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_,
-         buf, &index.zone_id_, &index.m_, &index.n_);
+  char         buf[100];
+  sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_, buf,
+         &index.zone_id_, &index.m_, &index.n_);
   std::string zone = buf;
-  if (zone == "south") {
-    index.zone_id_ = -index.zone_id_;
-  }
+  if (zone == "south") { index.zone_id_ = -index.zone_id_; }
   std::cout << index << std::endl;
   return index;
 }
 
-bool GetAllMapIndex(const std::string& src_map_folder,
-                    std::list<MapNodeIndex>* buf) {
+bool GetAllMapIndex(const std::string& src_map_folder, std::list<MapNodeIndex>* buf) {
   std::string src_map_path = src_map_folder + "/map";
   buf->clear();
   boost::filesystem::recursive_directory_iterator end_iter;
@@ -62,7 +60,7 @@ bool GetAllMapIndex(const std::string& src_map_folder,
     if (!boost::filesystem::is_directory(*iter)) {
       if (iter->path().extension() == "") {
         std::string tmp = iter->path().string();
-        tmp = tmp.substr(src_map_path.length(), tmp.length());
+        tmp             = tmp.substr(src_map_path.length(), tmp.length());
         buf->push_back(GetMapIndexFromMapFolder(tmp));
       }
     }
@@ -86,23 +84,20 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
   reg.SetTransformationEpsilon(0.01);
 
   // Load input source.
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_source(
-      new pcl::PointCloud<pcl::PointXYZ>());
-  const std::string input_source_file =
-      "/apollo/modules/localization/ndt/test_data/pcds/1.pcd";
-  int ret = pcl::io::loadPCDFile(input_source_file, *cloud_source);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_source(new pcl::PointCloud<pcl::PointXYZ>());
+  const std::string input_source_file = "/apollo/modules/localization/ndt/test_data/pcds/1.pcd";
+  int               ret               = pcl::io::loadPCDFile(input_source_file, *cloud_source);
   EXPECT_LE(ret, 0);
 
   // Load input target.
-  const std::string map_folder =
-      "/apollo/modules/localization/ndt/test_data/ndt_map";
+  const std::string       map_folder = "/apollo/modules/localization/ndt/test_data/ndt_map";
   std::list<MapNodeIndex> buf;
   GetAllMapIndex(map_folder, &buf);
   std::cout << "index size: " << buf.size() << std::endl;
 
   // Initialize NDT map and pool.
   NdtMapConfig ndt_map_config("map_ndt_v01");
-  NdtMap ndt_map(&ndt_map_config);
+  NdtMap       ndt_map(&ndt_map_config);
   ndt_map.SetMapFolderPath(map_folder);
   NdtMapNodePool ndt_map_node_pool(20, 4);
   ndt_map_node_pool.Initial(&ndt_map_config);
@@ -110,28 +105,23 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
   ndt_map.AttachMapNodePool(&ndt_map_node_pool);
 
   // Get the map pointcloud.
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cell_pointcloud(
-      new pcl::PointCloud<pcl::PointXYZ>());
-  std::vector<Leaf> cell_map;
-  Eigen::Vector2d map_left_top_corner(Eigen::Vector2d::Zero());
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cell_pointcloud(new pcl::PointCloud<pcl::PointXYZ>());
+  std::vector<Leaf>                   cell_map;
+  Eigen::Vector2d                     map_left_top_corner(Eigen::Vector2d::Zero());
 
   int index = 0;
   for (auto itr = buf.begin(); itr != buf.end(); ++itr, ++index) {
-    NdtMapNode* ndt_map_node =
-        static_cast<NdtMapNode*>(ndt_map.GetMapNodeSafe(*itr));
+    NdtMapNode* ndt_map_node = static_cast<NdtMapNode*>(ndt_map.GetMapNodeSafe(*itr));
     if (ndt_map_node == nullptr) {
       AERROR << "index: " << index << " is a NULL pointer!" << std::endl;
       continue;
     }
-    NdtMapMatrix& ndt_map_matrix =
-        static_cast<NdtMapMatrix&>(ndt_map_node->GetMapCellMatrix());
+    NdtMapMatrix& ndt_map_matrix = static_cast<NdtMapMatrix&>(ndt_map_node->GetMapCellMatrix());
     const Eigen::Vector2d& left_top_corner = ndt_map_node->GetLeftTopCorner();
-    double resolution = ndt_map_node->GetMapResolution();
-    double resolution_z = ndt_map_node->GetMapResolutionZ();
+    double                 resolution      = ndt_map_node->GetMapResolution();
+    double                 resolution_z    = ndt_map_node->GetMapResolutionZ();
 
-    if (index == 0) {
-      map_left_top_corner = left_top_corner;
-    }
+    if (index == 0) { map_left_top_corner = left_top_corner; }
     if (left_top_corner(0) < map_left_top_corner(0) &&
         left_top_corner(1) < map_left_top_corner(1)) {
       map_left_top_corner = left_top_corner;
@@ -142,8 +132,7 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
         const NdtMapCells& cell_ndt = ndt_map_matrix.GetMapCell(row, col);
-        for (auto it = cell_ndt.cells_.begin(); it != cell_ndt.cells_.end();
-             ++it) {
+        for (auto it = cell_ndt.cells_.begin(); it != cell_ndt.cells_.end(); ++it) {
           unsigned int cell_count = it->second.count_;
 
           if (cell_count >= 6 && it->second.is_icov_available_) {
@@ -151,11 +140,9 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
             leaf.nr_points_ = static_cast<int>(cell_count);
 
             Eigen::Vector3d point(Eigen::Vector3d::Zero());
-            point(0) = left_top_corner(0) +
-                       (static_cast<double>(col)) * resolution +
+            point(0) = left_top_corner(0) + (static_cast<double>(col)) * resolution +
                        static_cast<double>(it->second.centroid_[0]);
-            point(1) = left_top_corner(1) +
-                       (static_cast<double>(row)) * resolution +
+            point(1) = left_top_corner(1) + (static_cast<double>(row)) * resolution +
                        static_cast<double>(it->second.centroid_[1]);
             point(2) = resolution_z * static_cast<double>(it->first) +
                        static_cast<double>(it->second.centroid_[2]);
@@ -166,9 +153,9 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
               leaf.nr_points_ = -1;
             }
             cell_map.push_back(leaf);
-            cell_pointcloud->push_back(pcl::PointXYZ(
-                static_cast<float>(point(0)), static_cast<float>(point(1)),
-                static_cast<float>(point(2))));
+            cell_pointcloud->push_back(pcl::PointXYZ(static_cast<float>(point(0)),
+                                                     static_cast<float>(point(1)),
+                                                     static_cast<float>(point(2))));
           }
         }
       }
@@ -192,26 +179,22 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
   reg.SetInputSource(cloud_source);
 
   // Align
-  pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud(
-      new pcl::PointCloud<pcl::PointXYZ>);
-  Eigen::Quaterniond quat =
-      Eigen::Quaterniond(0.857989, 0.009698, -0.008629, -0.513505);
-  Eigen::Vector3d translation =
-      Eigen::Vector3d(588348.947978, 4141240.223859, -30.094324);
-  Eigen::Vector3d error = Eigen::Vector3d(0.5, -0.5, 0.3);
-  Eigen::Matrix4d transform(Eigen::Matrix4d::Identity());
+  pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  Eigen::Quaterniond quat        = Eigen::Quaterniond(0.857989, 0.009698, -0.008629, -0.513505);
+  Eigen::Vector3d    translation = Eigen::Vector3d(588348.947978, 4141240.223859, -30.094324);
+  Eigen::Vector3d    error       = Eigen::Vector3d(0.5, -0.5, 0.3);
+  Eigen::Matrix4d    transform(Eigen::Matrix4d::Identity());
   transform.block<3, 3>(0, 0) = quat.toRotationMatrix();
   transform.block<3, 1>(0, 3) = translation + error;
   reg.Align(output_cloud, transform.cast<float>());
   EXPECT_EQ(output_cloud->points.size(), cloud_source->points.size());
 
   // Result
-  double fitness_score = reg.GetFitnessScore();
-  bool has_converged = reg.HasConverged();
-  int iteration = reg.GetFinalNumIteration();
-  Eigen::Matrix4f ndt_pose = reg.GetFinalTransformation();
-  AINFO << ndt_pose(0, 3) << ", " << ndt_pose(1, 3) << ", " << ndt_pose(2, 3)
-        << std::endl;
+  double          fitness_score = reg.GetFitnessScore();
+  bool            has_converged = reg.HasConverged();
+  int             iteration     = reg.GetFinalNumIteration();
+  Eigen::Matrix4f ndt_pose      = reg.GetFinalTransformation();
+  AINFO << ndt_pose(0, 3) << ", " << ndt_pose(1, 3) << ", " << ndt_pose(2, 3) << std::endl;
   ASSERT_LE(fitness_score, 2.0);
   ASSERT_TRUE(has_converged);
   ASSERT_LE(iteration, 7);

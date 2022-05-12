@@ -22,6 +22,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -30,8 +31,7 @@ namespace ch {
 
 using ::apollo::drivers::canbus::MessageManager;
 
-class ChMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+class ChMessageManager : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   ChMessageManager();
   virtual ~ChMessageManager();

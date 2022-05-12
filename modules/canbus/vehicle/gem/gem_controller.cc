@@ -37,22 +37,21 @@ using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 }  // namespace
 
-ErrorCode GemController::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+GemController::Init(const VehicleParameter&                                params,
+                    CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+                    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "GemController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
   }
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -72,41 +71,41 @@ ErrorCode GemController::Init(
   message_manager_ = message_manager;
 
   // Sender part
-  brake_cmd_6b_ = dynamic_cast<Brakecmd6b*>(
-      message_manager_->GetMutableProtocolDataById(Brakecmd6b::ID));
+  brake_cmd_6b_ =
+      dynamic_cast<Brakecmd6b*>(message_manager_->GetMutableProtocolDataById(Brakecmd6b::ID));
   if (brake_cmd_6b_ == nullptr) {
     AERROR << "Brakecmd6b does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  accel_cmd_67_ = dynamic_cast<Accelcmd67*>(
-      message_manager_->GetMutableProtocolDataById(Accelcmd67::ID));
+  accel_cmd_67_ =
+      dynamic_cast<Accelcmd67*>(message_manager_->GetMutableProtocolDataById(Accelcmd67::ID));
   if (accel_cmd_67_ == nullptr) {
     AERROR << "Accelcmd67 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  steering_cmd_6d_ = dynamic_cast<Steeringcmd6d*>(
-      message_manager_->GetMutableProtocolDataById(Steeringcmd6d::ID));
+  steering_cmd_6d_ =
+      dynamic_cast<Steeringcmd6d*>(message_manager_->GetMutableProtocolDataById(Steeringcmd6d::ID));
   if (steering_cmd_6d_ == nullptr) {
     AERROR << "Steeringcmd6d does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  shift_cmd_65_ = dynamic_cast<Shiftcmd65*>(
-      message_manager_->GetMutableProtocolDataById(Shiftcmd65::ID));
+  shift_cmd_65_ =
+      dynamic_cast<Shiftcmd65*>(message_manager_->GetMutableProtocolDataById(Shiftcmd65::ID));
   if (shift_cmd_65_ == nullptr) {
     AERROR << "Shiftcmd65 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
-  turn_cmd_63_ = dynamic_cast<Turncmd63*>(
-      message_manager_->GetMutableProtocolDataById(Turncmd63::ID));
+  turn_cmd_63_ =
+      dynamic_cast<Turncmd63*>(message_manager_->GetMutableProtocolDataById(Turncmd63::ID));
   if (turn_cmd_63_ == nullptr) {
     AERROR << "Turncmd63 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
-  global_cmd_69_ = dynamic_cast<Globalcmd69*>(
-      message_manager_->GetMutableProtocolDataById(Globalcmd69::ID));
+  global_cmd_69_ =
+      dynamic_cast<Globalcmd69*>(message_manager_->GetMutableProtocolDataById(Globalcmd69::ID));
   if (global_cmd_69_ == nullptr) {
     AERROR << "Turncmd63 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
@@ -159,9 +158,7 @@ Chassis GemController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -172,8 +169,8 @@ Chassis GemController::chassis() {
   // 5
   if (chassis_detail.gem().has_vehicle_speed_rpt_6f() &&
       chassis_detail.gem().vehicle_speed_rpt_6f().has_vehicle_speed()) {
-    chassis_.set_speed_mps(static_cast<float>(
-        chassis_detail.gem().vehicle_speed_rpt_6f().vehicle_speed()));
+    chassis_.set_speed_mps(
+        static_cast<float>(chassis_detail.gem().vehicle_speed_rpt_6f().vehicle_speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -202,16 +199,13 @@ Chassis GemController::chassis() {
       chassis_detail.gem().shift_rpt_66().has_output_value()) {
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
-    if (chassis_detail.gem().shift_rpt_66().output_value() ==
-        Shift_rpt_66::OUTPUT_VALUE_NEUTRAL) {
+    if (chassis_detail.gem().shift_rpt_66().output_value() == Shift_rpt_66::OUTPUT_VALUE_NEUTRAL) {
       gear_pos = Chassis::GEAR_NEUTRAL;
     }
-    if (chassis_detail.gem().shift_rpt_66().output_value() ==
-        Shift_rpt_66::OUTPUT_VALUE_REVERSE) {
+    if (chassis_detail.gem().shift_rpt_66().output_value() == Shift_rpt_66::OUTPUT_VALUE_REVERSE) {
       gear_pos = Chassis::GEAR_REVERSE;
     }
-    if (chassis_detail.gem().shift_rpt_66().output_value() ==
-        Shift_rpt_66::OUTPUT_VALUE_FORWARD) {
+    if (chassis_detail.gem().shift_rpt_66().output_value() == Shift_rpt_66::OUTPUT_VALUE_FORWARD) {
       gear_pos = Chassis::GEAR_DRIVE;
     }
 
@@ -224,9 +218,9 @@ Chassis GemController::chassis() {
   // TODO(QiL) : verify the unit here.
   if (chassis_detail.gem().has_steering_rpt_1_6e() &&
       chassis_detail.gem().steering_rpt_1_6e().has_output_value()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.gem().steering_rpt_1_6e().output_value() * 100.0 /
-        vehicle_params_.max_steer_angle()));
+    chassis_.set_steering_percentage(
+        static_cast<float>(chassis_detail.gem().steering_rpt_1_6e().output_value() * 100.0 /
+                           vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -248,40 +242,29 @@ Chassis GemController::chassis() {
   // TODO(QiL) : implement the turn light signal here
 
   // 16, 17
-  if (chassis_detail.has_light() &&
-      chassis_detail.light().has_turn_light_type() &&
+  if (chassis_detail.has_light() && chassis_detail.light().has_turn_light_type() &&
       chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
     if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_LEFT);
-    } else if (chassis_detail.light().turn_light_type() ==
-               Light::TURN_RIGHT_ON) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_RIGHT);
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_LEFT);
+    } else if (chassis_detail.light().turn_light_type() == Light::TURN_RIGHT_ON) {
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_RIGHT);
     } else {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_NONE);
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
     }
   } else {
-    chassis_.mutable_signal()->set_turn_signal(
-        common::VehicleSignal::TURN_NONE);
+    chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
   }
 
   // TODO(all): implement the rest here/
   // 26
-  if (chassis_error_mask_) {
-    chassis_.set_chassis_error_mask(chassis_error_mask_);
-  }
+  if (chassis_error_mask_) { chassis_.set_chassis_error_mask(chassis_error_mask_); }
 
   // Give engage_advice based on error_code and canbus feedback
-  if (!chassis_error_mask_ && !chassis_.parking_brake() &&
-      chassis_.throttle_percentage() == 0.0 &&
+  if (!chassis_error_mask_ && !chassis_.parking_brake() && chassis_.throttle_percentage() == 0.0 &&
       chassis_.brake_percentage() != 0.0) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "CANBUS not ready, firmware error or emergency button pressed!");
   }
@@ -301,14 +284,11 @@ ErrorCode GemController::EnableAutoMode() {
     return ErrorCode::OK;
   }
 
-  global_cmd_69_->set_pacmod_enable(
-      Global_cmd_69::PACMOD_ENABLE_CONTROL_ENABLED);
-  global_cmd_69_->set_clear_override(
-      Global_cmd_69::CLEAR_OVERRIDE_CLEAR_ACTIVE_OVERRIDES);
+  global_cmd_69_->set_pacmod_enable(Global_cmd_69::PACMOD_ENABLE_CONTROL_ENABLED);
+  global_cmd_69_->set_clear_override(Global_cmd_69::CLEAR_OVERRIDE_CLEAR_ACTIVE_OVERRIDES);
 
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -439,13 +419,10 @@ void GemController::Steer(double angle, double angle_spd) {
   }
   const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
 
-  const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          vehicle_params_.min_steer_angle_rate(),
-          vehicle_params_.max_steer_angle_rate(),
-          vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
-  steering_cmd_6d_->set_position_value(real_angle)
-      ->set_speed_limit(real_angle_spd);
+  const double real_angle_spd = ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+      vehicle_params_.min_steer_angle_rate(), vehicle_params_.max_steer_angle_rate(),
+      vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
+  steering_cmd_6d_->set_position_value(real_angle)->set_speed_limit(real_angle_spd);
 }
 
 void GemController::SetEpbBreak(const ControlCommand& command) {
@@ -494,7 +471,7 @@ bool GemController::CheckChassisError() {
 }
 
 void GemController::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -507,16 +484,15 @@ void GemController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -528,8 +504,7 @@ void GemController::SecurityDogThreadFunc() {
     }
 
     // 2. vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -553,8 +528,7 @@ void GemController::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR << "Too much time consumption in GemController looping process:"
-             << elapsed.count();
+      AERROR << "Too much time consumption in GemController looping process:" << elapsed.count();
     }
   }
 }
@@ -580,8 +554,7 @@ Chassis::ErrorCode GemController::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void GemController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void GemController::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

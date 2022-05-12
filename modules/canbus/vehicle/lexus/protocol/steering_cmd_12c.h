@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Steeringcmd12c : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Steeringcmd12c
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -100,10 +101,10 @@ class Steeringcmd12c : public ::apollo::drivers::canbus::ProtocolData<
   void set_p_rotation_rate(uint8_t* data, double rotation_rate);
 
  private:
-  bool ignore_overrides_;
-  bool enable_;
-  bool clear_override_;
-  bool clear_faults_;
+  bool   ignore_overrides_;
+  bool   enable_;
+  bool   clear_override_;
+  bool   clear_faults_;
   double position_;
   double rotation_rate_;
 };

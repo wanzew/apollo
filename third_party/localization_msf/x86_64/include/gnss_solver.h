@@ -29,9 +29,9 @@ class GnssSolver {
   GnssSolver();
   ~GnssSolver();
 
- //set before solve
+  // set before solve
   bool set_position_option(int option);
-  int get_position_option();
+  int  get_position_option();
 
   void set_enable_external_prediction(bool b_enable);
   bool get_enable_external_prediction();
@@ -46,21 +46,20 @@ class GnssSolver {
   bool get_enable_half_cycle_ar();
   void enable_cycle_slip_fix();
 
-  //ephemeris
+  // ephemeris
   bool save_gnss_ephemris(const GnssEphemerisMsg& gnss_orbit);
 
-  //observation
+  // observation
   bool save_baser_observation(const EpochObservationMsg& baser_obs);
 
-  int solve(EpochObservationMsg *rover_obs,
-       apollo::localization::msf::GnssPntResultMsg *rover_pnt);
+  int solve(EpochObservationMsg* rover_obs, apollo::localization::msf::GnssPntResultMsg* rover_pnt);
 
-  bool motion_update_xyz(double time_sec,
+  bool motion_update_xyz(double       time_sec,
                          const double position[3],
                          const double std_pos[3][3],
                          const double velocity[3],
                          const double std_vel[3][3]);
-  bool motion_update(double time_sec,
+  bool motion_update(double       time_sec,
                      const double position[3],
                      const double std_pos[3][3],
                      const double velocity[3],
@@ -68,12 +67,11 @@ class GnssSolver {
                      const double euler[3],
                      const double lever_arm[3]);
 
-  double get_leap_second(unsigned int gps_week_num,
-                         double gps_week_second_s);
+  double get_leap_second(unsigned int gps_week_num, double gps_week_second_s);
   double get_ratio();
 
  private:
-  GnssPntSolver *solver_;
+  GnssPntSolver* solver_;
 };
 
 }  // namespace msf

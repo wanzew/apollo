@@ -20,12 +20,14 @@
 
 #include "modules/planning/common/frame.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
-#include "modules/common/util/util.h"
+
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/common/util/util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -43,24 +45,19 @@ class FrameTest : public ::testing::Test {
 };
 
 TEST_F(FrameTest, AlignPredictionTime) {
-  int first_traj_size = prediction_obstacles_.prediction_obstacle(0)
-                            .trajectory(0)
-                            .trajectory_point_size();
+  int first_traj_size =
+      prediction_obstacles_.prediction_obstacle(0).trajectory(0).trajectory_point_size();
   double origin_pred_time = prediction_obstacles_.header().timestamp_sec();
   Frame::AlignPredictionTime(origin_pred_time + 0.1, &prediction_obstacles_);
-  ASSERT_EQ(first_traj_size - 1, prediction_obstacles_.prediction_obstacle(0)
-                                     .trajectory(0)
-                                     .trajectory_point_size());
+  ASSERT_EQ(first_traj_size - 1,
+            prediction_obstacles_.prediction_obstacle(0).trajectory(0).trajectory_point_size());
 
   Frame::AlignPredictionTime(origin_pred_time + 0.5, &prediction_obstacles_);
-  ASSERT_EQ(first_traj_size - 3, prediction_obstacles_.prediction_obstacle(0)
-                                     .trajectory(0)
-                                     .trajectory_point_size());
+  ASSERT_EQ(first_traj_size - 3,
+            prediction_obstacles_.prediction_obstacle(0).trajectory(0).trajectory_point_size());
 
   Frame::AlignPredictionTime(origin_pred_time + 12.0, &prediction_obstacles_);
-  ASSERT_EQ(0, prediction_obstacles_.prediction_obstacle(0)
-                   .trajectory(0)
-                   .trajectory_point_size());
+  ASSERT_EQ(0, prediction_obstacles_.prediction_obstacle(0).trajectory(0).trajectory_point_size());
 }
 
 }  // namespace planning

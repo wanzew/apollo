@@ -18,21 +18,23 @@
 
 #include <set>
 #include <string>
+
 #include "gtest/gtest.h"
 
-#include "cyber/cyber.h"
 #include "cyber/proto/unit_test.pb.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace cyber {
 
 const char TEST_RECORD_FILE[] = "/tmp/py_record_test.record";
-const char CHAN_1[] = "channel/chatter";
-const char CHAN_2[] = "/test2";
-const char MSG_TYPE[] = "apollo.cyber.proto.Test";
-const char PROTO_DESC[] = "1234567890";
-const char MSG_DATA[] = "9876543210";
-const char TEST_FILE[] = "test.record";
+const char CHAN_1[]           = "channel/chatter";
+const char CHAN_2[]           = "/test2";
+const char MSG_TYPE[]         = "apollo.cyber.proto.Test";
+const char PROTO_DESC[]       = "1234567890";
+const char MSG_DATA[]         = "9876543210";
+const char TEST_FILE[]        = "test.record";
 
 TEST(CyberRecordTest, record_readerwriter) {
   record::PyRecordWriter rec_writer;
@@ -66,7 +68,7 @@ TEST(CyberRecordTest, record_readerwriter) {
   EXPECT_EQ(MSG_TYPE, bag_msg.data_type);
   EXPECT_EQ(MSG_TYPE, rec_reader.GetMessageType(channel_name));
   const std::string header_str = rec_reader.GetHeaderString();
-  proto::Header header;
+  proto::Header     header;
   header.ParseFromString(header_str);
   EXPECT_EQ(1, header.major_version());
   EXPECT_EQ(0, header.minor_version());

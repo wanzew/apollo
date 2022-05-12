@@ -18,6 +18,7 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 #include "modules/perception/tool/benchmark/lidar/util/types.h"
 
@@ -27,7 +28,10 @@ namespace benchmark {
 
 class Frame : protected SensorObjects {
  public:
-  Frame() : SensorObjects() { type = VELODYNE_64; }
+  Frame()
+      : SensorObjects() {
+    type = VELODYNE_64;
+  }
 
   // Four elements should be loaded
   // 1. point cloud: _point_cloud
@@ -38,41 +42,29 @@ class Frame : protected SensorObjects {
 
   inline std::string get_name() const { return name; }
 
-  inline const PointCloudConstPtr get_point_cloud() const {
-    return _point_cloud;
-  }
+  inline const PointCloudConstPtr get_point_cloud() const { return _point_cloud; }
 
   inline const std::vector<ObjectPtr>& get_objects() const { return objects; }
 
-  inline const std::vector<ObjectPtr>& get_gt_objects() const {
-    return gt_objects;
-  }
+  inline const std::vector<ObjectPtr>& get_gt_objects() const { return gt_objects; }
 
-  inline const std::vector<std::vector<Eigen::Vector3d>>&
-  get_objects_box_vertices() const {
+  inline const std::vector<std::vector<Eigen::Vector3d>>& get_objects_box_vertices() const {
     return objects_box_vertices;
   }
 
-  inline const std::vector<std::vector<Eigen::Vector3d>>&
-  get_gt_objects_box_vertices() const {
+  inline const std::vector<std::vector<Eigen::Vector3d>>& get_gt_objects_box_vertices() const {
     return gt_objects_box_vertices;
   }
-  inline const std::vector<PointCloud>& get_left_boundary() const {
-    return _left_boundary;
-  }
-  inline const std::vector<PointCloud>& get_right_boundary() const {
-    return _right_boundary;
-  }
+  inline const std::vector<PointCloud>& get_left_boundary() const { return _left_boundary; }
+  inline const std::vector<PointCloud>& get_right_boundary() const { return _right_boundary; }
   inline const std::vector<PointCloud>& get_left_lane_boundary() const {
     return _left_lane_boundary;
   }
   inline const std::vector<PointCloud>& get_right_lane_boundary() const {
     return _right_lane_boundary;
   }
-  inline const std::vector<PointCloud>& get_road_polygon() const {
-    return _road_polygon;
-  }
-  inline void release() {
+  inline const std::vector<PointCloud>& get_road_polygon() const { return _road_polygon; }
+  inline void                           release() {
     _point_cloud = nullptr;
     objects.clear();
     gt_objects.clear();
@@ -101,23 +93,23 @@ class Frame : protected SensorObjects {
 
  private:
   void build_objects_indices(const pcl::KdTreeFLANN<Point>& point_cloud_kdtree,
-                             std::vector<ObjectPtr>* objects_out);
+                             std::vector<ObjectPtr>*        objects_out);
 
   void build_objects_points(std::vector<ObjectPtr>* objects_out);
 
  protected:
-  PointCloudPtr _point_cloud;
-  std::vector<PointCloud> _left_boundary;
-  std::vector<PointCloud> _right_boundary;
-  std::vector<PointCloud> _left_lane_boundary;
-  std::vector<PointCloud> _right_lane_boundary;
-  std::vector<PointCloud> _road_polygon;
-  std::vector<PointCloud> _lane_polygon;
+  PointCloudPtr                _point_cloud;
+  std::vector<PointCloud>      _left_boundary;
+  std::vector<PointCloud>      _right_boundary;
+  std::vector<PointCloud>      _left_lane_boundary;
+  std::vector<PointCloud>      _right_lane_boundary;
+  std::vector<PointCloud>      _road_polygon;
+  std::vector<PointCloud>      _lane_polygon;
   static std::set<std::string> _s_black_list;
-  static bool _s_is_for_visualization;
-  static float _s_distance_to_roi_boundary;
-  static float _s_visible_threshold;
-  static float _s_min_confidence;
+  static bool                  _s_is_for_visualization;
+  static float                 _s_distance_to_roi_boundary;
+  static float                 _s_visible_threshold;
+  static float                 _s_min_confidence;
 };
 
 }  // namespace benchmark

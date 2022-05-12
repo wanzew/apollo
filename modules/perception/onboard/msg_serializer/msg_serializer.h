@@ -17,8 +17,9 @@
 
 #include <vector>
 
-#include "modules/perception/base/object.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/perception/base/object.h"
 
 namespace apollo {
 namespace perception {
@@ -26,18 +27,18 @@ namespace onboard {
 
 class MsgSerializer {
  public:
-  MsgSerializer() = default;
+  MsgSerializer()  = default;
   ~MsgSerializer() = default;
 
-  static bool SerializeMsg(double timestamp, uint64_t lidar_timestamp,
-                           int seq_num,
+  static bool SerializeMsg(double                              timestamp,
+                           uint64_t                            lidar_timestamp,
+                           int                                 seq_num,
                            const std::vector<base::ObjectPtr>& objects,
-                           const apollo::common::ErrorCode& error_code,
-                           PerceptionObstacles* obstacles);
+                           const apollo::common::ErrorCode&    error_code,
+                           PerceptionObstacles*                obstacles);
 
  private:
-  static bool ConvertObjectToPb(const base::ObjectPtr& object_ptr,
-                                PerceptionObstacle* pb_msg);
+  static bool ConvertObjectToPb(const base::ObjectPtr& object_ptr, PerceptionObstacle* pb_msg);
 };
 
 }  // namespace onboard

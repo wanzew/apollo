@@ -51,10 +51,10 @@ class MapManager {
   std::string Name() const { return "MapManager"; }
 
  private:
-  LidarFrame* cached_frame_ = nullptr;
-  map::HDMapInput* hdmap_input_ = nullptr;
+  LidarFrame*      cached_frame_ = nullptr;
+  map::HDMapInput* hdmap_input_  = nullptr;
   // params
-  bool update_pose_ = false;
+  bool   update_pose_         = false;
   double roi_search_distance_ = 80.0;
 
   FRIEND_TEST(LidarLibMapManagerTest, lidar_map_manager_test);

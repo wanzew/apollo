@@ -17,19 +17,18 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ge3 {
 
-class Scu1301 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Scu1301 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Scu1301();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'VIN string character 16', 'offset': 0.0,
@@ -43,24 +42,21 @@ class Scu1301 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 1, 'name': 'SCU_StopButSt', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Scu_1_301::Scu_stopbutstType scu_stopbutst(const std::uint8_t* bytes,
-                                             const int32_t length) const;
+  Scu_1_301::Scu_stopbutstType scu_stopbutst(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'SCU drive mode', 'enum': {0:
   // 'SCU_DRVMODE_INVALID', 1: 'SCU_DRVMODE_MANUAL', 2: 'SCU_DRVMODE_INTERRUPT',
   // 3: 'SCU_DRVMODE_AUTO'}, 'precision': 1.0, 'len': 2, 'name': 'SCU_DrvMode',
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 3,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Scu_1_301::Scu_drvmodeType scu_drvmode(const std::uint8_t* bytes,
-                                         const int32_t length) const;
+  Scu_1_301::Scu_drvmodeType scu_drvmode(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'SCU fault status', 'enum': {0:
   // 'SCU_FAULTST_NORMAL', 1: 'SCU_FAULTST_FAULT'}, 'precision': 1.0, 'len': 4,
   // 'name': 'SCU_FaultSt', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|15]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Scu_1_301::Scu_faultstType scu_faultst(const std::uint8_t* bytes,
-                                         const int32_t length) const;
+  Scu_1_301::Scu_faultstType scu_faultst(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ge3

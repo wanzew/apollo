@@ -34,19 +34,18 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion_radar {
 
-RadarObstacles DelphiToRadarObstacles(
-    const apollo::drivers::DelphiESR& delphi_esr,
-    const apollo::localization::LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles);
+RadarObstacles
+DelphiToRadarObstacles(const apollo::drivers::DelphiESR&                 delphi_esr,
+                       const apollo::localization::LocalizationEstimate& localization,
+                       const RadarObstacles&                             last_radar_obstacles);
 
-RadarObstacles ContiToRadarObstacles(
-    const apollo::drivers::ContiRadar& conti_radar,
-    const apollo::localization::LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles,
-    const apollo::canbus::Chassis& chassis);
+RadarObstacles ContiToRadarObstacles(const apollo::drivers::ContiRadar&                conti_radar,
+                                     const apollo::localization::LocalizationEstimate& localization,
+                                     const RadarObstacles&          last_radar_obstacles,
+                                     const apollo::canbus::Chassis& chassis);
 
-apollo::perception::PerceptionObstacles RadarObstaclesToPerceptionObstacles(
-    const RadarObstacles& radar_obstacles);
+apollo::perception::PerceptionObstacles
+RadarObstaclesToPerceptionObstacles(const RadarObstacles& radar_obstacles);
 
 }  // namespace conversion_radar
 }  // namespace third_party_perception

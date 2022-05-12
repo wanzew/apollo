@@ -16,6 +16,7 @@
 
 #include "cyber/tools/cyber_monitor/screen.h"
 
+#include <ncurses.h>  // NOLINT
 #include <unistd.h>
 
 #include <cstdio>
@@ -27,8 +28,6 @@
 #include "cyber/tools/cyber_monitor/cyber_topology_message.h"
 #include "cyber/tools/cyber_monitor/general_channel_message.h"
 #include "cyber/tools/cyber_monitor/renderable_message.h"
-
-#include <ncurses.h> // NOLINT
 
 namespace {
 constexpr double MinHalfFrameRatio = 12.5;
@@ -76,11 +75,11 @@ const char Screen::InteractiveCmdStr[] =
     "   , -- enable|disable to show all repeated items\n";
 
 Screen::Screen()
-    : current_color_pair_(INVALID),
-      canRun_(false),
-      current_state_(State::RenderMessage),
-      highlight_direction_(0),
-      current_render_obj_(nullptr) {}
+    : current_color_pair_(INVALID)
+    , canRun_(false)
+    , current_state_(State::RenderMessage)
+    , highlight_direction_(0)
+    , current_render_obj_(nullptr) {}
 
 Screen::~Screen() {
   current_render_obj_ = nullptr;
@@ -91,9 +90,7 @@ inline bool Screen::IsInit(void) const { return (stdscr != nullptr); }
 
 void Screen::Init(void) {
   initscr();
-  if (stdscr == nullptr) {
-    return;
-  }
+  if (stdscr == nullptr) { return; }
   nodelay(stdscr, true);
   keypad(stdscr, true);
   meta(stdscr, true);
@@ -120,24 +117,18 @@ int Screen::Width(void) const { return COLS; }
 int Screen::Height(void) const { return LINES; }
 
 void Screen::SetCurrentColor(ColorPair color) const {
-  if (color == INVALID) {
-    return;
-  }
+  if (color == INVALID) { return; }
   if (IsInit()) {
     current_color_pair_ = color;
     attron(COLOR_PAIR(color));
   }
 }
 void Screen::AddStr(int x, int y, const char* str) const {
-  if (IsInit()) {
-    mvaddstr(y, x, str);
-  }
+  if (IsInit()) { mvaddstr(y, x, str); }
 }
 
 void Screen::AddStr(const char* str) const {
-  if (IsInit()) {
-    addstr(str);
-  }
+  if (IsInit()) { addstr(str); }
 }
 
 void Screen::ClearCurrentColor(void) const {
@@ -169,9 +160,7 @@ void Screen::HighlightLine(int line_no) {
     for (int x = 0; x < Width(); ++x) {
       chtype ch = mvinch(line_no + highlight_direction_, x);
       ch &= A_CHARTEXT;
-      if (ch == ' ') {
-        mvaddch(line_no + highlight_direction_, x, ch);
-      }
+      if (ch == ' ') { mvaddch(line_no + highlight_direction_, x, ch); }
     }
     ClearCurrentColor();
 
@@ -206,14 +195,11 @@ int Screen::SwitchState(int ch) {
 }
 
 void Screen::Run() {
-  if (stdscr == nullptr || current_render_obj_ == nullptr) {
-    return;
-  }
+  if (stdscr == nullptr || current_render_obj_ == nullptr) { return; }
 
   highlight_direction_ = 0;
 
-  void (Screen::*showFuncs[])(int) = {&Screen::ShowRenderMessage,
-                                      &Screen::ShowInteractiveCmd};
+  void (Screen::*showFuncs[])(int) = {&Screen::ShowRenderMessage, &Screen::ShowInteractiveCmd};
 
   do {
     int ch = getch();
@@ -228,9 +214,7 @@ void Screen::Run() {
     (this->*showFuncs[static_cast<int>(current_state_)])(ch);
 
     double fr = current_render_obj_->frame_ratio();
-    if (fr < MinHalfFrameRatio) {
-      fr = MinHalfFrameRatio;
-    }
+    if (fr < MinHalfFrameRatio) { fr = MinHalfFrameRatio; }
     int period = static_cast<int>(1000.0 / fr);
     period >>= 1;
     std::this_thread::sleep_for(std::chrono::milliseconds(period));
@@ -246,7 +230,7 @@ void Screen::Resize(void) {
 
 void Screen::ShowRenderMessage(int ch) {
   erase();
-  int line_num = current_render_obj_->Render(this, ch);
+  int       line_num   = current_render_obj_->Render(this, ch);
   const int max_height = std::min(Height(), line_num);
 
   int* y = current_render_obj_->line_no();
@@ -261,22 +245,16 @@ void Screen::ShowRenderMessage(int ch) {
     case KEY_DOWN:
       ++(*y);
       highlight_direction_ = -1;
-      if (*y >= max_height) {
-        *y = max_height - 1;
-      }
+      if (*y >= max_height) { *y = max_height - 1; }
       break;
 
     case 'w':
     case 'W':
     case KEY_UP:
       --(*y);
-      if (*y < 1) {
-        *y = 1;
-      }
+      if (*y < 1) { *y = 1; }
       highlight_direction_ = 1;
-      if (*y < 0) {
-        *y = 0;
-      }
+      if (*y < 0) { *y = 0; }
       break;
 
     case 'a':
@@ -286,7 +264,7 @@ void Screen::ShowRenderMessage(int ch) {
       RenderableMessage* p = current_render_obj_->parent();
       if (p) {
         current_render_obj_ = p;
-        y = p->line_no();
+        y                   = p->line_no();
         clear();
       }
       break;
@@ -302,7 +280,7 @@ void Screen::ShowRenderMessage(int ch) {
       if (child) {
         child->reset_line_page();
         current_render_obj_ = child;
-        y = child->line_no();
+        y                   = child->line_no();
         clear();
       }
       break;

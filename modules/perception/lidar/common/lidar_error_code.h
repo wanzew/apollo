@@ -22,29 +22,26 @@ namespace perception {
 namespace lidar {
 
 enum class LidarErrorCode {
-  Succeed = 0,
-  InitError = 1,
+  Succeed                     = 0,
+  InitError                   = 1,
   PointCloudPreprocessorError = 2,
-  MapManagerError = 3,
-  DetectionError = 4,
-  ObjectBuilderError = 5,
-  ObjectFilterError = 6,
-  ClassifierError = 7,
-  TrackerError = 8,
+  MapManagerError             = 3,
+  DetectionError              = 4,
+  ObjectBuilderError          = 5,
+  ObjectFilterError           = 6,
+  ClassifierError             = 7,
+  TrackerError                = 8,
 };
 
 struct LidarProcessResult {
-  std::string log;
+  std::string    log;
   LidarErrorCode error_code;
 
-  explicit LidarProcessResult(const LidarErrorCode& error_code_in) {
-    error_code = error_code_in;
-  }
+  explicit LidarProcessResult(const LidarErrorCode& error_code_in) { error_code = error_code_in; }
 
-  LidarProcessResult(const LidarErrorCode& error_code_in,
-                     const std::string& log_in) {
+  LidarProcessResult(const LidarErrorCode& error_code_in, const std::string& log_in) {
     error_code = error_code_in;
-    log = log_in;
+    log        = log_in;
   }
 };
 

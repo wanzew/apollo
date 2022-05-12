@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/protocol/fbs2_240.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,10 +28,10 @@ class Fbs2240Test : public ::testing::Test {
 };
 
 TEST_F(Fbs2240Test, reset) {
-  Fbs2240 fbs2;
-  int32_t length = 8;
+  Fbs2240       fbs2;
+  int32_t       length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
+  uint8_t       bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
   fbs2.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs2_240().flwheeldirection(), 0);

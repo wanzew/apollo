@@ -27,14 +27,16 @@ namespace radar {
 
 class ContiArsPreprocessor : public BasePreprocessor {
  public:
-  ContiArsPreprocessor() : BasePreprocessor(), delay_time_(0.0) {}
+  ContiArsPreprocessor()
+      : BasePreprocessor()
+      , delay_time_(0.0) {}
   virtual ~ContiArsPreprocessor() {}
 
   bool Init() override;
 
   bool Preprocess(const drivers::ContiRadar& raw_obstacles,
                   const PreprocessorOptions& options,
-                  drivers::ContiRadar* corrected_obstacles) override;
+                  drivers::ContiRadar*       corrected_obstacles) override;
 
   std::string Name() const override;
 
@@ -42,13 +44,13 @@ class ContiArsPreprocessor : public BasePreprocessor {
 
  private:
   void SkipObjects(const drivers::ContiRadar& raw_obstacles,
-                   drivers::ContiRadar* corrected_obstacles);
+                   drivers::ContiRadar*       corrected_obstacles);
   void ExpandIds(drivers::ContiRadar* corrected_obstacles);
   void CorrectTime(drivers::ContiRadar* corrected_obstacles);
-  int GetNextId();
+  int  GetNextId();
 
-  float delay_time_ = 0.0f;
-  static int current_idx_;
+  float                               delay_time_ = 0.0f;
+  static int                          current_idx_;
   static std::unordered_map<int, int> local2global_;
 
   friend class ContiArsPreprocessorTest;

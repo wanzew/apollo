@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #pragma once
 
 #include <cstdlib>
+
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/filter.h"
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/image.h"
 #include "modules/perception/lidar/detector/ncut_segmentation/common/graph_felzenszwalb/misc.h"
@@ -41,7 +42,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 // dissimilarity measure between pixels
-inline float diff(Image<float> *I, int x1, int y1, int x2, int y2) {
+inline float diff(Image<float>* I, int x1, int y1, int x2, int y2) {
   return std::fabs(imRef(I, x1, y1) - imRef(I, x2, y2));
 }
 /*
@@ -55,15 +56,14 @@ inline float diff(Image<float> *I, int x1, int y1, int x2, int y2) {
  * min_size: minimum component size (enforced by post-processing stage).
  * num_ccs: number of connected components in the segmentation.
  */
-Image<int> *segment_image(Image<float> *im, float sigma, float c, int min_size,
-                          int *num_ccs) {
-  int width = im->width();
+Image<int>* segment_image(Image<float>* im, float sigma, float c, int min_size, int* num_ccs) {
+  int width  = im->width();
   int height = im->height();
   // smooth each color channel
-  Image<float> *smooth_r = smooth(im, sigma);
+  Image<float>* smooth_r = smooth(im, sigma);
   // build graph
-  edge *edges = new edge[width * height * 4];
-  int num = 0;
+  edge* edges = new edge[width * height * 4];
+  int   num   = 0;
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       if (x < width - 1) {
@@ -94,20 +94,19 @@ Image<int> *segment_image(Image<float> *im, float sigma, float c, int min_size,
   }
   delete smooth_r;
   // segment
-  Universe *u = segment_graph(width * height, num, edges, c);
+  Universe* u = segment_graph(width * height, num, edges, c);
   // post process small components
   for (int i = 0; i < num; i++) {
     int a = u->find(edges[i].a);
     int b = u->find(edges[i].b);
-    if ((a != b) && ((u->size(a) < min_size) || (u->size(b) < min_size)))
-      u->join(a, b);
+    if ((a != b) && ((u->size(a) < min_size) || (u->size(b) < min_size))) u->join(a, b);
   }
   delete[] edges;
-  *num_ccs = u->num_sets();
-  Image<int> *output = new Image<int>(width, height);
+  *num_ccs           = u->num_sets();
+  Image<int>* output = new Image<int>(width, height);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      int comp = u->find(y * width + x);
+      int comp            = u->find(y * width + x);
       imRef(output, x, y) = comp;
     }
   }

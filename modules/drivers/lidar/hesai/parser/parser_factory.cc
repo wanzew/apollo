@@ -25,8 +25,7 @@ namespace hesai {
 
 using ::apollo::cyber::Node;
 
-Parser* ParserFactory::CreateParser(const std::shared_ptr<Node>& node,
-                                    const Config& conf) {
+Parser* ParserFactory::CreateParser(const std::shared_ptr<Node>& node, const Config& conf) {
   if (conf.model() == HESAI40P) {
     return new Hesai40Parser(node, conf);
   } else if (conf.model() == HESAI64) {

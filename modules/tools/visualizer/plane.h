@@ -38,12 +38,10 @@ class Plane : public RenderableObject {
   virtual ~Plane(void) { texture_.reset(); }
 
   void set_texture(const std::shared_ptr<Texture>& t) {
-    if (t != texture_) {
-      texture_ = t;
-    }
+    if (t != texture_) { texture_ = t; }
   }
 
-  GLenum GetPrimitiveType(void) const override { return GL_QUADS; }
+  GLenum  GetPrimitiveType(void) const override { return GL_QUADS; }
   GLsizei texWidth(void) const { return texture_->width(); }
   GLsizei texHeight(void) const { return texture_->height(); }
 
@@ -53,6 +51,6 @@ class Plane : public RenderableObject {
   void SetupAllAttrPointer(void) override;
 
  private:
-  GLuint texture_id_;
+  GLuint                   texture_id_;
   std::shared_ptr<Texture> texture_;
 };

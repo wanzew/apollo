@@ -20,10 +20,11 @@
 #include <utility>
 #include <vector>
 
-#include "modules/prediction/common/semantic_map.h"
-#include "modules/prediction/evaluator/evaluator.h"
 #include "torch/extension.h"
 #include "torch/script.h"
+
+#include "modules/prediction/common/semantic_map.h"
+#include "modules/prediction/evaluator/evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -51,17 +52,15 @@ class SemanticLSTMEvaluator : public Evaluator {
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
-                ObstaclesContainer* obstacles_container) override;
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Extract obstacle history
    * @param Obstacle pointer
    *        Feature container in a vector for receiving the obstacle history
    */
-  bool ExtractObstacleHistory(
-      Obstacle* obstacle_ptr,
-      std::vector<std::pair<double, double>>* pos_history);
+  bool ExtractObstacleHistory(Obstacle*                               obstacle_ptr,
+                              std::vector<std::pair<double, double>>* pos_history);
 
   /**
    * @brief Get the name of evaluator.
@@ -77,9 +76,9 @@ class SemanticLSTMEvaluator : public Evaluator {
  private:
   torch::jit::script::Module torch_vehicle_model_;
   torch::jit::script::Module torch_pedestrian_model_;
-  at::Tensor torch_default_output_tensor_;
-  torch::Device device_;
-  SemanticMap* semantic_map_;
+  at::Tensor                 torch_default_output_tensor_;
+  torch::Device              device_;
+  SemanticMap*               semantic_map_;
 };
 
 }  // namespace prediction

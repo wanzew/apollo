@@ -34,30 +34,26 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
 
 RelativeMap::RelativeMap()
-    : monitor_logger_buffer_(MonitorMessageItem::RELATIVE_MAP),
-      vehicle_state_provider_(nullptr) {}
+    : monitor_logger_buffer_(MonitorMessageItem::RELATIVE_MAP)
+    , vehicle_state_provider_(nullptr) {}
 
 Status RelativeMap::Init(common::VehicleStateProvider* vehicle_state_provider) {
   vehicle_state_provider_ = vehicle_state_provider;
   if (!FLAGS_use_navigation_mode) {
     AERROR << "FLAGS_use_navigation_mode is false, system is not configured "
               "for relative map mode";
-    return Status(ErrorCode::RELATIVE_MAP_ERROR,
-                  "FLAGS_use_navigation_mode is not true.");
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, "FLAGS_use_navigation_mode is not true.");
   }
   config_.Clear();
-  if (!cyber::common::GetProtoFromFile(FLAGS_relative_map_config_filename,
-                                       &config_)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_relative_map_config_filename, &config_)) {
     return Status(ErrorCode::RELATIVE_MAP_ERROR,
-                  "Unable to load relative map conf file: " +
-                      FLAGS_relative_map_config_filename);
+                  "Unable to load relative map conf file: " + FLAGS_relative_map_config_filename);
   }
 
   navigation_lane_.SetConfig(config_.navigation_lane());
   navigation_lane_.SetVehicleStateProvider(vehicle_state_provider);
   const auto& map_param = config_.map_param();
-  navigation_lane_.SetDefaultWidth(map_param.default_left_width(),
-                                   map_param.default_right_width());
+  navigation_lane_.SetDefaultWidth(map_param.default_left_width(), map_param.default_right_width());
 
   return Status::OK();
 }
@@ -88,8 +84,7 @@ void RelativeMap::OnNavigationInfo(const NavigationInfo& navigation_info) {
   }
 }
 
-void RelativeMap::OnPerception(
-    const PerceptionObstacles& perception_obstacles) {
+void RelativeMap::OnPerception(const PerceptionObstacles& perception_obstacles) {
   {
     std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
     perception_obstacles_.CopyFrom(perception_obstacles);
@@ -116,7 +111,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   // update vehicle state from localization and chassis
 
   LocalizationEstimate const& localization = localization_;
-  Chassis const& chassis = chassis_;
+  Chassis const&              chassis      = chassis_;
   vehicle_state_provider_->Update(localization, chassis);
   map_msg->mutable_localization()->CopyFrom(localization_);
 
@@ -131,15 +126,13 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   }
 
   if (navigation_lane_.Path().path().path_point().empty()) {
-    LogErrorStatus(map_msg,
-                   "There is no path point in currnet navigation path.");
+    LogErrorStatus(map_msg, "There is no path point in currnet navigation path.");
     return false;
   }
 
   // create map proto from navigation_path
   if (!navigation_lane_.CreateMap(config_.map_param(), map_msg)) {
-    LogErrorStatus(map_msg,
-                   "Failed to create map from current navigation path.");
+    LogErrorStatus(map_msg, "Failed to create map from current navigation path.");
     AERROR << "Failed to create map from navigation path.";
     return false;
   }

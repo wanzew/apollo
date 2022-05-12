@@ -56,7 +56,6 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-
 #include "modules/perception/base/frame.h"
 #include "modules/perception/common/geometry/roi_filter.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -72,7 +71,7 @@ struct RoiFilterOptions {
 
 class BaseRoiFilter {
  public:
-  BaseRoiFilter() = default;
+  BaseRoiFilter()          = default;
   virtual ~BaseRoiFilter() = default;
 
   virtual bool Init() = 0;
@@ -80,8 +79,7 @@ class BaseRoiFilter {
   // @brief: fliter the objects outside the ROI
   // @param [in]: options.
   // @param [in / out]: origin total objects / the objects in the ROI.
-  virtual bool RoiFilter(const RoiFilterOptions& options,
-                         base::FramePtr radar_frame) = 0;
+  virtual bool RoiFilter(const RoiFilterOptions& options, base::FramePtr radar_frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -90,8 +88,7 @@ class BaseRoiFilter {
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseRoiFilter);
-#define PERCEPTION_REGISTER_ROI_FILTER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseRoiFilter, name)
+#define PERCEPTION_REGISTER_ROI_FILTER(name) PERCEPTION_REGISTER_CLASS(BaseRoiFilter, name)
 
 }  // namespace radar
 }  // namespace perception

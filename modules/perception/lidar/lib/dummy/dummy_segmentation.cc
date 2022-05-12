@@ -20,12 +20,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool DummySegmentation::Init(const LidarDetectorInitOptions& options) {
-  return true;
-}
+bool DummySegmentation::Init(const LidarDetectorInitOptions& options) { return true; }
 
-bool DummySegmentation::Detect(const LidarDetectorOptions& options,
-                                LidarFrame* frame) {
+bool DummySegmentation::Detect(const LidarDetectorOptions& options, LidarFrame* frame) {
   return true;
 }
 

@@ -29,25 +29,22 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-XsiSegment::XsiSegment(uint64_t channel_id) : Segment(channel_id) {
+XsiSegment::XsiSegment(uint64_t channel_id)
+    : Segment(channel_id) {
   key_ = static_cast<key_t>(channel_id);
 }
 
 XsiSegment::~XsiSegment() { Destroy(); }
 
 bool XsiSegment::OpenOrCreate() {
-  if (init_) {
-    return true;
-  }
+  if (init_) { return true; }
 
   // create managed_shm_
   int retry = 0;
   int shmid = 0;
   while (retry < 2) {
     shmid = shmget(key_, conf_.managed_shm_size(), 0644 | IPC_CREAT | IPC_EXCL);
-    if (shmid != -1) {
-      break;
-    }
+    if (shmid != -1) { break; }
 
     if (EINVAL == errno) {
       AINFO << "need larger space, recreate.";
@@ -88,8 +85,7 @@ bool XsiSegment::OpenOrCreate() {
   conf_.Update(state_->ceiling_msg_size());
 
   // create field blocks_
-  blocks_ = new (static_cast<char*>(managed_shm_) + sizeof(State))
-      Block[conf_.block_num()];
+  blocks_ = new (static_cast<char*>(managed_shm_) + sizeof(State)) Block[conf_.block_num()];
   if (blocks_ == nullptr) {
     AERROR << "create blocks failed.";
     state_->~State();
@@ -104,9 +100,8 @@ bool XsiSegment::OpenOrCreate() {
   uint32_t i = 0;
   for (; i < conf_.block_num(); ++i) {
     uint8_t* addr =
-        new (static_cast<char*>(managed_shm_) + sizeof(State) +
-             conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size())
-            uint8_t[conf_.block_buf_size()];
+        new (static_cast<char*>(managed_shm_) + sizeof(State) + conf_.block_num() * sizeof(Block) +
+             i * conf_.block_buf_size()) uint8_t[conf_.block_buf_size()];
 
     std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_[i] = addr;
@@ -115,7 +110,7 @@ bool XsiSegment::OpenOrCreate() {
   if (i != conf_.block_num()) {
     AERROR << "create block buf failed.";
     state_->~State();
-    state_ = nullptr;
+    state_  = nullptr;
     blocks_ = nullptr;
     {
       std::lock_guard<std::mutex> _g(block_buf_lock_);
@@ -134,9 +129,7 @@ bool XsiSegment::OpenOrCreate() {
 }
 
 bool XsiSegment::OpenOnly() {
-  if (init_) {
-    return true;
-  }
+  if (init_) { return true; }
 
   // get managed_shm_
   int shmid = shmget(key_, 0, 0644);
@@ -164,8 +157,7 @@ bool XsiSegment::OpenOnly() {
   conf_.Update(state_->ceiling_msg_size());
 
   // get field blocks_
-  blocks_ = reinterpret_cast<Block*>(static_cast<char*>(managed_shm_) +
-                                     sizeof(State));
+  blocks_ = reinterpret_cast<Block*>(static_cast<char*>(managed_shm_) + sizeof(State));
   if (blocks_ == nullptr) {
     AERROR << "get blocks failed.";
     state_ = nullptr;
@@ -177,13 +169,11 @@ bool XsiSegment::OpenOnly() {
   // get block buf
   uint32_t i = 0;
   for (; i < conf_.block_num(); ++i) {
-    uint8_t* addr = reinterpret_cast<uint8_t*>(
-        static_cast<char*>(managed_shm_) + sizeof(State) +
-        conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size());
+    uint8_t* addr =
+        reinterpret_cast<uint8_t*>(static_cast<char*>(managed_shm_) + sizeof(State) +
+                                   conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size());
 
-    if (addr == nullptr) {
-      break;
-    }
+    if (addr == nullptr) { break; }
     std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_[i] = addr;
   }
@@ -191,7 +181,7 @@ bool XsiSegment::OpenOnly() {
   if (i != conf_.block_num()) {
     AERROR << "open only failed.";
     state_->~State();
-    state_ = nullptr;
+    state_  = nullptr;
     blocks_ = nullptr;
     {
       std::lock_guard<std::mutex> _g(block_buf_lock_);
@@ -220,7 +210,7 @@ bool XsiSegment::Remove() {
 }
 
 void XsiSegment::Reset() {
-  state_ = nullptr;
+  state_  = nullptr;
   blocks_ = nullptr;
   {
     std::lock_guard<std::mutex> _g(block_buf_lock_);

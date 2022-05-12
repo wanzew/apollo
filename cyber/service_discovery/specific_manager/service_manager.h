@@ -40,7 +40,7 @@ class ServiceManager : public Manager {
   friend class TopologyManager;
 
  public:
-  using RoleAttrVec = std::vector<RoleAttributes>;
+  using RoleAttrVec     = std::vector<RoleAttributes>;
   using ServerWarehouse = SingleValueWarehouse;
   using ClientWarehouse = MultiValueWarehouse;
 

@@ -40,16 +40,15 @@ namespace record {
 
 class PlayTaskProducer {
  public:
-  using NodePtr = std::shared_ptr<Node>;
-  using ThreadPtr = std::unique_ptr<std::thread>;
-  using TaskBufferPtr = std::shared_ptr<PlayTaskBuffer>;
+  using NodePtr         = std::shared_ptr<Node>;
+  using ThreadPtr       = std::unique_ptr<std::thread>;
+  using TaskBufferPtr   = std::shared_ptr<PlayTaskBuffer>;
   using RecordReaderPtr = std::shared_ptr<RecordReader>;
-  using WriterPtr = std::shared_ptr<Writer<message::RawMessage>>;
-  using WriterMap = std::unordered_map<std::string, WriterPtr>;
-  using MessageTypeMap = std::unordered_map<std::string, std::string>;
+  using WriterPtr       = std::shared_ptr<Writer<message::RawMessage>>;
+  using WriterMap       = std::unordered_map<std::string, WriterPtr>;
+  using MessageTypeMap  = std::unordered_map<std::string, std::string>;
 
-  PlayTaskProducer(const TaskBufferPtr& task_buffer,
-                   const PlayParam& play_param);
+  PlayTaskProducer(const TaskBufferPtr& task_buffer, const PlayParam& play_param);
   virtual ~PlayTaskProducer();
 
   bool Init();
@@ -57,7 +56,7 @@ class PlayTaskProducer {
   void Stop();
 
   const PlayParam& play_param() const { return play_param_; }
-  bool is_stopped() const { return is_stopped_.load(); }
+  bool             is_stopped() const { return is_stopped_.load(); }
 
  private:
   bool ReadRecordInfo();
@@ -65,16 +64,16 @@ class PlayTaskProducer {
   bool CreateWriters();
   void ThreadFunc();
 
-  PlayParam play_param_;
+  PlayParam     play_param_;
   TaskBufferPtr task_buffer_;
-  ThreadPtr produce_th_;
+  ThreadPtr     produce_th_;
 
   std::atomic<bool> is_initialized_;
   std::atomic<bool> is_stopped_;
 
-  NodePtr node_;
-  WriterMap writers_;
-  MessageTypeMap msg_types_;
+  NodePtr                      node_;
+  WriterMap                    writers_;
+  MessageTypeMap               msg_types_;
   std::vector<RecordReaderPtr> record_readers_;
 
   uint64_t earliest_begin_time_;

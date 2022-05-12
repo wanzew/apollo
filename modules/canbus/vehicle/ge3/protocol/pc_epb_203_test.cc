@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_epb_203.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ class Pcepb203Test : public ::testing::Test {
 };
 
 TEST_F(Pcepb203Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t  data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Pcepb203 pcepb203;
   EXPECT_EQ(pcepb203.GetPeriod(), 20 * 1000);
   pcepb203.UpdateData(data);

@@ -65,10 +65,9 @@ SchedulerClassic::SchedulerClassic() {
   } else {
     // if do not set default_proc_num in scheduler conf
     // give a default value
-    uint32_t proc_num = 2;
-    auto& global_conf = GlobalData::Instance()->Config();
-    if (global_conf.has_scheduler_conf() &&
-        global_conf.scheduler_conf().has_default_proc_num()) {
+    uint32_t proc_num    = 2;
+    auto&    global_conf = GlobalData::Instance()->Config();
+    if (global_conf.has_scheduler_conf() && global_conf.scheduler_conf().has_default_proc_num()) {
       proc_num = global_conf.scheduler_conf().default_proc_num();
     }
     task_pool_size_ = proc_num;
@@ -84,14 +83,12 @@ SchedulerClassic::SchedulerClassic() {
 void SchedulerClassic::CreateProcessor() {
   for (auto& group : classic_conf_.groups()) {
     auto& group_name = group.name();
-    auto proc_num = group.processor_num();
-    if (task_pool_size_ == 0) {
-      task_pool_size_ = proc_num;
-    }
+    auto  proc_num   = group.processor_num();
+    if (task_pool_size_ == 0) { task_pool_size_ = proc_num; }
 
-    auto& affinity = group.affinity();
-    auto& processor_policy = group.processor_policy();
-    auto processor_prio = group.processor_prio();
+    auto&            affinity         = group.affinity();
+    auto&            processor_policy = group.processor_policy();
+    auto             processor_prio   = group.processor_prio();
     std::vector<int> cpuset;
     ParseCpuset(group.cpuset(), &cpuset);
 
@@ -102,8 +99,7 @@ void SchedulerClassic::CreateProcessor() {
       auto proc = std::make_shared<Processor>();
       proc->BindContext(ctx);
       SetSchedAffinity(proc->Thread(), cpuset, affinity, i);
-      SetSchedPolicy(proc->Thread(), processor_policy, processor_prio,
-                     proc->Tid());
+      SetSchedPolicy(proc->Thread(), processor_policy, processor_prio, proc->Tid());
       processors_.emplace_back(proc);
     }
   }
@@ -126,9 +122,7 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
 
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
-    if (id_cr_.find(cr->id()) != id_cr_.end()) {
-      return false;
-    }
+    if (id_cr_.find(cr->id()) != id_cr_.end()) { return false; }
     id_cr_[cr->id()] = cr;
   }
 
@@ -142,18 +136,14 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   }
 
   if (cr->priority() >= MAX_PRIO) {
-    AWARN << cr->name() << " prio is greater than MAX_PRIO[ << " << MAX_PRIO
-          << "].";
+    AWARN << cr->name() << " prio is greater than MAX_PRIO[ << " << MAX_PRIO << "].";
     cr->set_priority(MAX_PRIO - 1);
   }
 
   // Enqueue task.
   {
-    WriteLockGuard<AtomicRWLock> lk(
-        ClassicContext::rq_locks_[cr->group_name()].at(cr->priority()));
-    ClassicContext::cr_group_[cr->group_name()]
-        .at(cr->priority())
-        .emplace_back(cr);
+    WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[cr->group_name()].at(cr->priority()));
+    ClassicContext::cr_group_[cr->group_name()].at(cr->priority()).emplace_back(cr);
   }
 
   ClassicContext::Notify(cr->group_name());
@@ -161,16 +151,13 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
 }
 
 bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
-  if (cyber_unlikely(stop_)) {
-    return true;
-  }
+  if (cyber_unlikely(stop_)) { return true; }
 
   {
     ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
     if (id_cr_.find(crid) != id_cr_.end()) {
       auto cr = id_cr_[crid];
-      if (cr->state() == RoutineState::DATA_WAIT ||
-          cr->state() == RoutineState::IO_WAIT) {
+      if (cr->state() == RoutineState::DATA_WAIT || cr->state() == RoutineState::IO_WAIT) {
         cr->SetUpdateFlag();
       }
 
@@ -182,9 +169,7 @@ bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
 }
 
 bool SchedulerClassic::RemoveTask(const std::string& name) {
-  if (cyber_unlikely(stop_)) {
-    return true;
-  }
+  if (cyber_unlikely(stop_)) { return true; }
 
   auto crid = GlobalData::GenerateHashId(name);
   return RemoveCRoutine(crid);

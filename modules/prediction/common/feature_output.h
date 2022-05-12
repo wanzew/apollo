@@ -20,9 +20,10 @@
 #include <string>
 #include <vector>
 
-#include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/proto/offline_features.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+#include "modules/prediction/container/obstacles/obstacle.h"
 
 namespace apollo {
 namespace prediction {
@@ -60,15 +61,16 @@ class FeatureOutput {
    * @brief Insert a data_for_learning
    * @param A feature in proto
    */
-  static void InsertDataForLearning(const Feature& feature,
+  static void InsertDataForLearning(const Feature&             feature,
                                     const std::vector<double>& feature_values,
-                                    const std::string& category,
-                                    const LaneSequence* lane_sequence_ptr);
+                                    const std::string&         category,
+                                    const LaneSequence*        lane_sequence_ptr);
 
-  static void InsertDataForLearning(
-      const Feature& feature, const std::vector<double>& feature_values,
-      const std::vector<std::string>& string_feature_values,
-      const std::string& category, const LaneSequence* lane_sequence_ptr);
+  static void InsertDataForLearning(const Feature&                  feature,
+                                    const std::vector<double>&      feature_values,
+                                    const std::vector<std::string>& string_feature_values,
+                                    const std::string&              category,
+                                    const LaneSequence*             lane_sequence_ptr);
 
   /**
    * @brief Insert a prediction result with predicted trajectories
@@ -77,9 +79,10 @@ class FeatureOutput {
    * @param obstacle_conf
    * @param scenario
    */
-  static void InsertPredictionResult(
-      const Obstacle* obstacle, const PredictionObstacle& prediction_obstacle,
-      const ObstacleConf& obstacle_conf, const Scenario& scenario);
+  static void InsertPredictionResult(const Obstacle*           obstacle,
+                                     const PredictionObstacle& prediction_obstacle,
+                                     const ObstacleConf&       obstacle_conf,
+                                     const Scenario&           scenario);
 
   /**
    * @brief Insert a frame env
@@ -95,10 +98,12 @@ class FeatureOutput {
    * @param lane sequence
    * @param adc trajectory
    */
-  static void InsertDataForTuning(
-      const Feature& feature, const std::vector<double>& feature_values,
-      const std::string& category, const LaneSequence& lane_sequence,
-      const std::vector<apollo::common::TrajectoryPoint>& adc_trajectory);
+  static void
+  InsertDataForTuning(const Feature&                                      feature,
+                      const std::vector<double>&                          feature_values,
+                      const std::string&                                  category,
+                      const LaneSequence&                                 lane_sequence,
+                      const std::vector<apollo::common::TrajectoryPoint>& adc_trajectory);
 
   /**
    * @brief Write features to a file
@@ -156,17 +161,17 @@ class FeatureOutput {
   static int SizeOfDataForTuning();
 
  private:
-  static Features features_;
-  static std::size_t idx_feature_;
-  static ListDataForLearning list_data_for_learning_;
-  static std::size_t idx_learning_;
+  static Features             features_;
+  static std::size_t          idx_feature_;
+  static ListDataForLearning  list_data_for_learning_;
+  static std::size_t          idx_learning_;
   static ListPredictionResult list_prediction_result_;
-  static std::size_t idx_prediction_result_;
-  static ListFrameEnv list_frame_env_;
-  static std::size_t idx_frame_env_;
-  static ListDataForTuning list_data_for_tuning_;
-  static std::size_t idx_tuning_;
-  static std::mutex mutex_feature_;
+  static std::size_t          idx_prediction_result_;
+  static ListFrameEnv         list_frame_env_;
+  static std::size_t          idx_frame_env_;
+  static ListDataForTuning    list_data_for_tuning_;
+  static std::size_t          idx_tuning_;
+  static std::mutex           mutex_feature_;
 };
 
 }  // namespace prediction

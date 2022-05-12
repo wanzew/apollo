@@ -30,12 +30,10 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-enum {
-  VALID_OBJECT_TYPE = static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE) - 2
-};
+enum { VALID_OBJECT_TYPE = static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE) - 2 };
 
-typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, 1> Vectord;
-typedef Eigen::Matrix<int, VALID_OBJECT_TYPE, 1> Vectori;
+typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, 1>                 Vectord;
+typedef Eigen::Matrix<int, VALID_OBJECT_TYPE, 1>                    Vectori;
 typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, VALID_OBJECT_TYPE> Matrixd;
 
 namespace util {
@@ -58,9 +56,8 @@ bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix);
 
 bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
 
-bool LoadMultipleMatricesFile(
-    const std::string& filename,
-    apollo::common::EigenMap<std::string, Matrixd>* matrices);
+bool LoadMultipleMatricesFile(const std::string&                              filename,
+                              apollo::common::EigenMap<std::string, Matrixd>* matrices);
 
 }  // namespace util
 }  // namespace lidar

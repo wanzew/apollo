@@ -18,9 +18,8 @@
 #include <string>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -41,15 +40,14 @@ class BaseObstacleTransformer {
 
   virtual ~BaseObstacleTransformer() = default;
 
-  virtual bool Init(const ObstacleTransformerInitOptions& options =
-                        ObstacleTransformerInitOptions()) = 0;
+  virtual bool
+  Init(const ObstacleTransformerInitOptions& options = ObstacleTransformerInitOptions()) = 0;
 
   // @brief: transform 2d obstacle to 3D obstacle.
   // @param [in]: options
   // @param [in/out]: frame
   // 3D information of obstacle should be filled, required.
-  virtual bool Transform(const ObstacleTransformerOptions& options,
-                         CameraFrame* frame) = 0;
+  virtual bool Transform(const ObstacleTransformerOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -58,8 +56,7 @@ class BaseObstacleTransformer {
 };  // class BaseObstacleTransformer
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstacleTransformer);
-#define REGISTER_OBSTACLE_TRANSFORMER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseObstacleTransformer, name)
+#define REGISTER_OBSTACLE_TRANSFORMER(name) PERCEPTION_REGISTER_CLASS(BaseObstacleTransformer, name)
 
 }  // namespace camera
 }  // namespace perception

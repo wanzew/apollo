@@ -29,8 +29,7 @@ class InformationFilter : public BaseFilter {
   InformationFilter();
   ~InformationFilter() = default;
 
-  bool Init(const Eigen::VectorXd &global_states,
-            const Eigen::MatrixXd &global_uncertainty);
+  bool Init(const Eigen::VectorXd& global_states, const Eigen::MatrixXd& global_uncertainty);
 
   // @brief: Set the obervation of the last moment(imf use
   //         the latest two moment of the observation which
@@ -44,25 +43,25 @@ class InformationFilter : public BaseFilter {
   // @params[IN] last_to_cur_env_uncertainty: the uncertainty brought
   //             by the environment when predict the current state of
   //             last observation.
-  bool SetLastObservation(const Eigen::VectorXd &last_observation,
-                          const Eigen::MatrixXd &last_observation_uncertainty,
-                          const Eigen::MatrixXd &last_to_cur_transform_matrix,
-                          const Eigen::MatrixXd &last_to_cur_env_uncertainty);
+  bool SetLastObservation(const Eigen::VectorXd& last_observation,
+                          const Eigen::MatrixXd& last_observation_uncertainty,
+                          const Eigen::MatrixXd& last_to_cur_transform_matrix,
+                          const Eigen::MatrixXd& last_to_cur_env_uncertainty);
 
   // @brief predict the current state and uncertainty of system
   // @params[IN] transform_matrix: transform the state from the
   //             pre moment to current moment.
   // @params[IN] env_uncertainty_matrix: the uncertainty brought by
   //             the environment when predict system state.
-  bool Predict(const Eigen::MatrixXd &transform_matrix,
-               const Eigen::MatrixXd &env_uncertainty_matrix);
+  bool Predict(const Eigen::MatrixXd& transform_matrix,
+               const Eigen::MatrixXd& env_uncertainty_matrix);
 
   // @brief Use the current observation to correct the prediction.
   // @params[IN] cur_observation: the observation in current moment.
   // @params[IN] cur_observation_uncertainty: the uncertainty of
   //             the current observation
-  bool Correct(const Eigen::VectorXd &current_observation,
-               const Eigen::MatrixXd &current_observation_uncertainty);
+  bool Correct(const Eigen::VectorXd& current_observation,
+               const Eigen::MatrixXd& current_observation_uncertainty);
 
   // @brief get the system state
   Eigen::VectorXd GetStates() const { return global_states_; }
@@ -71,7 +70,7 @@ class InformationFilter : public BaseFilter {
   inline int GetStateNums() const { return states_num_; }
 
   // @brief set the control matrix
-  bool SetControlMatrix(const Eigen::MatrixXd &control_matrix);
+  bool SetControlMatrix(const Eigen::MatrixXd& control_matrix);
 
  protected:
   // @brief whether the observation of last moment has been set

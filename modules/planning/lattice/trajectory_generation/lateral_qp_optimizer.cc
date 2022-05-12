@@ -24,8 +24,8 @@ namespace planning {
 PiecewiseJerkTrajectory1d LateralQPOptimizer::GetOptimalTrajectory() const {
   ACHECK(!opt_d_.empty() && !opt_d_prime_.empty() && !opt_d_pprime_.empty());
 
-  PiecewiseJerkTrajectory1d optimal_trajectory(
-      opt_d_.front(), opt_d_prime_.front(), opt_d_pprime_.front());
+  PiecewiseJerkTrajectory1d optimal_trajectory(opt_d_.front(), opt_d_prime_.front(),
+                                               opt_d_pprime_.front());
 
   for (size_t i = 1; i < opt_d_.size(); ++i) {
     double j = (opt_d_pprime_[i] - opt_d_pprime_[i - 1]) / delta_s_;
@@ -34,10 +34,9 @@ PiecewiseJerkTrajectory1d LateralQPOptimizer::GetOptimalTrajectory() const {
   return optimal_trajectory;
 }
 
-std::vector<common::FrenetFramePoint> LateralQPOptimizer::GetFrenetFramePath()
-    const {
+std::vector<common::FrenetFramePoint> LateralQPOptimizer::GetFrenetFramePath() const {
   std::vector<common::FrenetFramePoint> frenet_frame_path;
-  double accumulated_s = 0.0;
+  double                                accumulated_s = 0.0;
   for (size_t i = 0; i < opt_d_.size(); ++i) {
     common::FrenetFramePoint frenet_frame_point;
     frenet_frame_point.set_s(accumulated_s);

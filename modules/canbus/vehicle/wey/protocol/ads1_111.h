@@ -17,14 +17,14 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace wey {
 
-class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -63,8 +63,7 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
   // 1.0, 'len': 1, 'name': 'ADS_Driveoff_Req', 'is_signed_var': False,
   // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Ads1111* set_ads_driveoff_req(
-      Ads1_111::Ads_driveoff_reqType ads_driveoff_req);
+  Ads1111* set_ads_driveoff_req(Ads1_111::Ads_driveoff_reqType ads_driveoff_req);
 
   // config detail: {'description': 'target deceleration value from AEB',
   // 'offset': -16.0, 'precision': 0.000488, 'len': 16, 'name':
@@ -78,8 +77,7 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
   // 'ADS_AEB_TgtDecel_Req', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Ads1111* set_ads_aeb_tgtdecel_req(
-      Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
+  Ads1111* set_ads_aeb_tgtdecel_req(Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
 
  private:
   // config detail: {'description': 'ADS request ESP/VLC to decelerate until
@@ -88,8 +86,7 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
   // 'ADS_DecToStop', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
   // '[0|1]', 'bit': 17, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_ads_dectostop(uint8_t* data,
-                           Ads1_111::Ads_dectostopType ads_dectostop);
+  void set_p_ads_dectostop(uint8_t* data, Ads1_111::Ads_dectostopType ads_dectostop);
 
   // config detail: {'description': 'The status of the ADS control unit.The
   // ADS mode should be contained in every message sent by ADS', 'enum': {0:
@@ -110,8 +107,7 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
   // 1.0, 'len': 1, 'name': 'ADS_Driveoff_Req', 'is_signed_var': False,
   // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  void set_p_ads_driveoff_req(uint8_t* data,
-                              Ads1_111::Ads_driveoff_reqType ads_driveoff_req);
+  void set_p_ads_driveoff_req(uint8_t* data, Ads1_111::Ads_driveoff_reqType ads_driveoff_req);
 
   // config detail: {'description': 'target deceleration value from AEB',
   // 'offset': -16.0, 'precision': 0.000488, 'len': 16, 'name':
@@ -125,15 +121,15 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
   // 'ADS_AEB_TgtDecel_Req', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_ads_aeb_tgtdecel_req(
-      uint8_t* data, Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
+  void set_p_ads_aeb_tgtdecel_req(uint8_t*                           data,
+                                  Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
 
  private:
-  Ads1_111::Ads_dectostopType ads_dectostop_;
-  Ads1_111::Ads_modeType ads_mode_;
-  double ads_taracce_ = 0.0;
-  Ads1_111::Ads_driveoff_reqType ads_driveoff_req_;
-  double ads_aeb_taracce_ = 0.0;
+  Ads1_111::Ads_dectostopType        ads_dectostop_;
+  Ads1_111::Ads_modeType             ads_mode_;
+  double                             ads_taracce_ = 0.0;
+  Ads1_111::Ads_driveoff_reqType     ads_driveoff_req_;
+  double                             ads_aeb_taracce_ = 0.0;
   Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req_;
 };
 

@@ -29,9 +29,8 @@ namespace prediction {
 class JunctionPredictorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    const std::string file =
-        "modules/prediction/testdata/"
-        "single_perception_vehicle_injunction.pb.txt";
+    const std::string file = "modules/prediction/testdata/"
+                             "single_perception_vehicle_injunction.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
     FLAGS_enable_all_junction = true;
   }
@@ -41,13 +40,12 @@ class JunctionPredictorTest : public KMLMapBasedTest {
 };
 
 TEST_F(JunctionPredictorTest, InJunctionCase) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
   JunctionMLPEvaluator junction_mlp_evaluator;
-  ObstaclesContainer container;
+  ObstaclesContainer   container;
   container.GetJunctionAnalyzer()->Init("j2");
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);

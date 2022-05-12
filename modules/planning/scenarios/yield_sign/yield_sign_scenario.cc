@@ -20,12 +20,13 @@
 
 #include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 
-#include "cyber/common/log.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
+#include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/yield_sign/stage_approach.h"
 #include "modules/planning/scenarios/yield_sign/stage_creep.h"
 
@@ -36,19 +37,16 @@ namespace yield_sign {
 
 using apollo::hdmap::HDMapUtil;
 
-using StopSignLaneVehicles =
-    std::unordered_map<std::string, std::vector<std::string>>;
+using StopSignLaneVehicles = std::unordered_map<std::string, std::vector<std::string>>;
 
-apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
-               const std::shared_ptr<DependencyInjector>& injector)>
+apollo::common::util::Factory<ScenarioConfig::StageType,
+                              Stage,
+                              Stage* (*)(const ScenarioConfig::StageConfig&         stage_config,
+                                         const std::shared_ptr<DependencyInjector>& injector)>
     YieldSignScenario::s_stage_factory_;
 
 void YieldSignScenario::Init() {
-  if (init_) {
-    return;
-  }
+  if (init_) { return; }
 
   Scenario::Init();
 
@@ -57,8 +55,7 @@ void YieldSignScenario::Init() {
     return;
   }
 
-  const auto& yield_sign_status =
-      injector_->planning_context()->planning_status().yield_sign();
+  const auto& yield_sign_status = injector_->planning_context()->planning_status().yield_sign();
 
   if (yield_sign_status.current_yield_sign_overlap_id().empty()) {
     AERROR << "Could not find yield-sign(s)";
@@ -66,16 +63,11 @@ void YieldSignScenario::Init() {
   }
 
   context_.current_yield_sign_overlap_ids.clear();
-  for (int i = 0; i < yield_sign_status.current_yield_sign_overlap_id_size();
-       i++) {
-    const std::string yield_sign_overlap_id =
-        yield_sign_status.current_yield_sign_overlap_id(i);
+  for (int i = 0; i < yield_sign_status.current_yield_sign_overlap_id_size(); i++) {
+    const std::string yield_sign_overlap_id = yield_sign_status.current_yield_sign_overlap_id(i);
     hdmap::YieldSignInfoConstPtr yield_sign =
-        HDMapUtil::BaseMap().GetYieldSignById(
-            hdmap::MakeMapId(yield_sign_overlap_id));
-    if (!yield_sign) {
-      AERROR << "Could not find yield sign: " << yield_sign_overlap_id;
-    }
+        HDMapUtil::BaseMap().GetYieldSignById(hdmap::MakeMapId(yield_sign_overlap_id));
+    if (!yield_sign) { AERROR << "Could not find yield sign: " << yield_sign_overlap_id; }
 
     context_.current_yield_sign_overlap_ids.push_back(yield_sign_overlap_id);
   }
@@ -84,34 +76,25 @@ void YieldSignScenario::Init() {
 }
 
 void YieldSignScenario::RegisterStages() {
-  if (!s_stage_factory_.Empty()) {
-    s_stage_factory_.Clear();
-  }
-  s_stage_factory_.Register(
-      ScenarioConfig::YIELD_SIGN_APPROACH,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new YieldSignStageApproach(config, injector);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::YIELD_SIGN_CREEP,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new YieldSignStageCreep(config, injector);
-      });
+  if (!s_stage_factory_.Empty()) { s_stage_factory_.Clear(); }
+  s_stage_factory_.Register(ScenarioConfig::YIELD_SIGN_APPROACH,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new YieldSignStageApproach(config, injector);
+                            });
+  s_stage_factory_.Register(ScenarioConfig::YIELD_SIGN_CREEP,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new YieldSignStageCreep(config, injector);
+                            });
 }
 
-std::unique_ptr<Stage> YieldSignScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
-  if (s_stage_factory_.Empty()) {
-    RegisterStages();
-  }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config, injector);
-  if (ptr) {
-    ptr->SetContext(&context_);
-  }
+std::unique_ptr<Stage>
+YieldSignScenario::CreateStage(const ScenarioConfig::StageConfig&         stage_config,
+                               const std::shared_ptr<DependencyInjector>& injector) {
+  if (s_stage_factory_.Empty()) { RegisterStages(); }
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(), stage_config, injector);
+  if (ptr) { ptr->SetContext(&context_); }
   return ptr;
 }
 

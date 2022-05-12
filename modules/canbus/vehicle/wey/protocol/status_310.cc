@@ -30,28 +30,21 @@ using ::apollo::drivers::canbus::Byte;
 Status310::Status310() {}
 const int32_t Status310::ID = 0x310;
 
-void Status310::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
+void Status310::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_wey()->mutable_status_310()->set_longitudeaccvalid(
       longitudeaccvalid(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_lateralaccevalid(
       lateralaccevalid(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_vehdynyawratevalid(
       vehdynyawratevalid(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_flwheelspdvalid(
-      flwheelspdvalid(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_frwheelspdvalid(
-      frwheelspdvalid(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_rlwheelspdvalid(
-      rlwheelspdvalid(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_rrwheelspdvalid(
-      rrwheelspdvalid(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_vehiclespdvalid(
-      vehiclespdvalid(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_flwheelspdvalid(flwheelspdvalid(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_frwheelspdvalid(frwheelspdvalid(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_rlwheelspdvalid(rlwheelspdvalid(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_rrwheelspdvalid(rrwheelspdvalid(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_vehiclespdvalid(vehiclespdvalid(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_longitudedrivingmode(
       longitudedrivingmode(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_engspdvalid(
-      engspdvalid(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_engspdvalid(engspdvalid(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_accepedaloverride(
       accepedaloverride(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_brakepedalstatus(
@@ -60,51 +53,36 @@ void Status310::Parse(const std::uint8_t* bytes, int32_t length,
       espbrakelightsts(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_epbswtpositionvalid(
       epbswtpositionvalid(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_epbsts(
-      epbsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_epbsts(epbsts(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_currentgearvalid(
       currentgearvalid(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_epstrqsnsrsts(
-      epstrqsnsrsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_epstrqsnsrsts(epstrqsnsrsts(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_eps_interferdetdvalid(
       eps_interferdetdvalid(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_epshandsdetnsts(
-      epshandsdetnsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_epshandsdetnsts(epshandsdetnsts(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_eps_handsdetnstsvalid(
       eps_handsdetnstsvalid(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_steerwheelanglesign(
       steerwheelanglesign(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_steerwheelspdsign(
       steerwheelspdsign(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_driverdoorsts(
-      driverdoorsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_rldoorsts(
-      rldoorsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_driverdoorsts(driverdoorsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_rldoorsts(rldoorsts(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_passengerdoorsts(
       passengerdoorsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_rrdoorsts(
-      rrdoorsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_frontfoglmpsts(
-      frontfoglmpsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_rearfoglmpsts(
-      rearfoglmpsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_lowbeamsts(
-      lowbeamsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_highbeamsts(
-      highbeamsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_leftturnlampsts(
-      leftturnlampsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_rrdoorsts(rrdoorsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_frontfoglmpsts(frontfoglmpsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_rearfoglmpsts(rearfoglmpsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_lowbeamsts(lowbeamsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_highbeamsts(highbeamsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_leftturnlampsts(leftturnlampsts(bytes, length));
   chassis->mutable_wey()->mutable_status_310()->set_rightturnlampsts(
       rightturnlampsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_bcm_availsts(
-      bcm_availsts(bytes, length));
-  chassis->mutable_wey()->mutable_status_310()->set_brakelmpsts(
-      brakelmpsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_bcm_availsts(bcm_availsts(bytes, length));
+  chassis->mutable_wey()->mutable_status_310()->set_brakelmpsts(brakelmpsts(bytes, length));
   // Added for response check
-  chassis->mutable_check_response()->set_is_esp_online(
-      longitudedrivingmode(bytes, length) != 0);
-  chassis->mutable_check_response()->set_is_vcu_online(
-      longitudedrivingmode(bytes, length) != 0);
+  chassis->mutable_check_response()->set_is_esp_online(longitudedrivingmode(bytes, length) != 0);
+  chassis->mutable_check_response()->set_is_vcu_online(longitudedrivingmode(bytes, length) != 0);
 }
 
 // config detail: {'description': 'Longitude acceleration valid', 'enum':
@@ -112,13 +90,12 @@ void Status310::Parse(const std::uint8_t* bytes, int32_t length,
 // 'precision': 1.0, 'len': 1, 'name': 'longitudeaccvalid', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 15, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::LongitudeaccvalidType Status310::longitudeaccvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Status_310::LongitudeaccvalidType Status310::longitudeaccvalid(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(7, 1);
 
-  Status_310::LongitudeaccvalidType ret =
-      static_cast<Status_310::LongitudeaccvalidType>(x);
+  Status_310::LongitudeaccvalidType ret = static_cast<Status_310::LongitudeaccvalidType>(x);
   return ret;
 }
 
@@ -127,13 +104,12 @@ Status_310::LongitudeaccvalidType Status310::longitudeaccvalid(
 // 'precision': 1.0, 'len': 1,'name':'lateralaccevalid','is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::LateralaccevalidType Status310::lateralaccevalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Status_310::LateralaccevalidType Status310::lateralaccevalid(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(7, 1);
 
-  Status_310::LateralaccevalidType ret =
-      static_cast<Status_310::LateralaccevalidType>(x);
+  Status_310::LateralaccevalidType ret = static_cast<Status_310::LateralaccevalidType>(x);
   return ret;
 }
 
@@ -142,13 +118,12 @@ Status_310::LateralaccevalidType Status310::lateralaccevalid(
 // 'precision': 1.0, 'len': 1, 'name': 'vehdynyawratevalid', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 6, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::VehdynyawratevalidType Status310::vehdynyawratevalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Status_310::VehdynyawratevalidType Status310::vehdynyawratevalid(const std::uint8_t* bytes,
+                                                                 int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(6, 1);
 
-  Status_310::VehdynyawratevalidType ret =
-      static_cast<Status_310::VehdynyawratevalidType>(x);
+  Status_310::VehdynyawratevalidType ret = static_cast<Status_310::VehdynyawratevalidType>(x);
   return ret;
 }
 
@@ -157,13 +132,12 @@ Status_310::VehdynyawratevalidType Status310::vehdynyawratevalid(
 // 'precision': 1.0, 'len': 1, 'name': 'flwheelspdvalid','is_signed_var':False,
 // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 5, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::FlwheelspdvalidType Status310::flwheelspdvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Status_310::FlwheelspdvalidType Status310::flwheelspdvalid(const std::uint8_t* bytes,
+                                                           int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(5, 1);
 
-  Status_310::FlwheelspdvalidType ret =
-      static_cast<Status_310::FlwheelspdvalidType>(x);
+  Status_310::FlwheelspdvalidType ret = static_cast<Status_310::FlwheelspdvalidType>(x);
   return ret;
 }
 
@@ -172,13 +146,12 @@ Status_310::FlwheelspdvalidType Status310::flwheelspdvalid(
 // 'precision': 1.0, 'len': 1, 'name':'frwheelspdvalid','is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 53, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::FrwheelspdvalidType Status310::frwheelspdvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 6);
+Status_310::FrwheelspdvalidType Status310::frwheelspdvalid(const std::uint8_t* bytes,
+                                                           int32_t             length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(5, 1);
 
-  Status_310::FrwheelspdvalidType ret =
-      static_cast<Status_310::FrwheelspdvalidType>(x);
+  Status_310::FrwheelspdvalidType ret = static_cast<Status_310::FrwheelspdvalidType>(x);
   return ret;
 }
 
@@ -187,13 +160,12 @@ Status_310::FrwheelspdvalidType Status310::frwheelspdvalid(
 // 'len': 1, 'name': 'rlwheelspdvalid', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 3, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::RlwheelspdvalidType Status310::rlwheelspdvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Status_310::RlwheelspdvalidType Status310::rlwheelspdvalid(const std::uint8_t* bytes,
+                                                           int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(3, 1);
 
-  Status_310::RlwheelspdvalidType ret =
-      static_cast<Status_310::RlwheelspdvalidType>(x);
+  Status_310::RlwheelspdvalidType ret = static_cast<Status_310::RlwheelspdvalidType>(x);
   return ret;
 }
 
@@ -202,13 +174,12 @@ Status_310::RlwheelspdvalidType Status310::rlwheelspdvalid(
 // 'len': 1, 'name': 'rrwheelspdvalid', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 2, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::RrwheelspdvalidType Status310::rrwheelspdvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Status_310::RrwheelspdvalidType Status310::rrwheelspdvalid(const std::uint8_t* bytes,
+                                                           int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(2, 1);
 
-  Status_310::RrwheelspdvalidType ret =
-      static_cast<Status_310::RrwheelspdvalidType>(x);
+  Status_310::RrwheelspdvalidType ret = static_cast<Status_310::RrwheelspdvalidType>(x);
   return ret;
 }
 
@@ -217,13 +188,12 @@ Status_310::RrwheelspdvalidType Status310::rrwheelspdvalid(
 // 1: 'VEHICLESPDVALID_VALID'}, 'precision': 1.0, 'len': 1, 'name':
 // 'vehiclespdvalid', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Status_310::VehiclespdvalidType Status310::vehiclespdvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Status_310::VehiclespdvalidType Status310::vehiclespdvalid(const std::uint8_t* bytes,
+                                                           int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
-  Status_310::VehiclespdvalidType ret =
-      static_cast<Status_310::VehiclespdvalidType>(x);
+  Status_310::VehiclespdvalidType ret = static_cast<Status_310::VehiclespdvalidType>(x);
   return ret;
 }
 
@@ -236,13 +206,12 @@ Status_310::VehiclespdvalidType Status310::vehiclespdvalid(
 // 'name': 'longitudedrivingmode', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|3]', 'bit': 14, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::LongitudedrivingmodeType Status310::longitudedrivingmode(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Status_310::LongitudedrivingmodeType Status310::longitudedrivingmode(const std::uint8_t* bytes,
+                                                                     int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(5, 2);
 
-  Status_310::LongitudedrivingmodeType ret =
-      static_cast<Status_310::LongitudedrivingmodeType>(x);
+  Status_310::LongitudedrivingmodeType ret = static_cast<Status_310::LongitudedrivingmodeType>(x);
   return ret;
 }
 
@@ -252,8 +221,8 @@ Status_310::LongitudedrivingmodeType Status310::longitudedrivingmode(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 12,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
 Status_310::EngspdvalidType Status310::engspdvalid(const std::uint8_t* bytes,
-                                                   int32_t length) const {
-  Byte t0(bytes + 1);
+                                                   int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(3, 2);
 
   Status_310::EngspdvalidType ret = static_cast<Status_310::EngspdvalidType>(x);
@@ -265,13 +234,12 @@ Status_310::EngspdvalidType Status310::engspdvalid(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'accepedaloverride', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 19, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::AccepedaloverrideType Status310::accepedaloverride(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+Status_310::AccepedaloverrideType Status310::accepedaloverride(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(3, 1);
 
-  Status_310::AccepedaloverrideType ret =
-      static_cast<Status_310::AccepedaloverrideType>(x);
+  Status_310::AccepedaloverrideType ret = static_cast<Status_310::AccepedaloverrideType>(x);
   return ret;
 }
 
@@ -282,13 +250,12 @@ Status_310::AccepedaloverrideType Status310::accepedaloverride(
 // 'precision': 1.0, 'len': 2, 'name': 'brakepedalstatus',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
 // 'bit': 9, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Status_310::BrakepedalstatusType Status310::brakepedalstatus(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Status_310::BrakepedalstatusType Status310::brakepedalstatus(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 2);
 
-  Status_310::BrakepedalstatusType ret =
-      static_cast<Status_310::BrakepedalstatusType>(x);
+  Status_310::BrakepedalstatusType ret = static_cast<Status_310::BrakepedalstatusType>(x);
   return ret;
 }
 
@@ -297,13 +264,12 @@ Status_310::BrakepedalstatusType Status310::brakepedalstatus(
 // 'precision': 1.0, 'len': 1, 'name': 'espbrakelightsts', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 29, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::EspbrakelightstsType Status310::espbrakelightsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Status_310::EspbrakelightstsType Status310::espbrakelightsts(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(5, 1);
 
-  Status_310::EspbrakelightstsType ret =
-      static_cast<Status_310::EspbrakelightstsType>(x);
+  Status_310::EspbrakelightstsType ret = static_cast<Status_310::EspbrakelightstsType>(x);
   return ret;
 }
 
@@ -312,13 +278,12 @@ Status_310::EspbrakelightstsType Status310::espbrakelightsts(
 // 'precision': 1.0, 'len': 1, 'name': 'epbswtpositionvalid',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]',
 // 'bit': 20, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Status_310::EpbswtpositionvalidType Status310::epbswtpositionvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+Status_310::EpbswtpositionvalidType Status310::epbswtpositionvalid(const std::uint8_t* bytes,
+                                                                   int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(4, 1);
 
-  Status_310::EpbswtpositionvalidType ret =
-      static_cast<Status_310::EpbswtpositionvalidType>(x);
+  Status_310::EpbswtpositionvalidType ret = static_cast<Status_310::EpbswtpositionvalidType>(x);
   return ret;
 }
 
@@ -327,9 +292,8 @@ Status_310::EpbswtpositionvalidType Status310::epbswtpositionvalid(
 // 'precision': 1.0, 'len': 2, 'name': 'epbsts', 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 18, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::EpbstsType Status310::epbsts(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 2);
+Status_310::EpbstsType Status310::epbsts(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(1, 2);
 
   Status_310::EpbstsType ret = static_cast<Status_310::EpbstsType>(x);
@@ -341,13 +305,12 @@ Status_310::EpbstsType Status310::epbsts(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'currentgearvalid', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 25, 'type':
 // 'enum', 'order': 'motorola', 'physical_unit': ''}
-Status_310::CurrentgearvalidType Status310::currentgearvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Status_310::CurrentgearvalidType Status310::currentgearvalid(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(1, 1);
 
-  Status_310::CurrentgearvalidType ret =
-      static_cast<Status_310::CurrentgearvalidType>(x);
+  Status_310::CurrentgearvalidType ret = static_cast<Status_310::CurrentgearvalidType>(x);
   return ret;
 }
 
@@ -356,13 +319,12 @@ Status_310::CurrentgearvalidType Status310::currentgearvalid(
 // 'len': 1, 'name': 'epstrqsnsrsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::EpstrqsnsrstsType Status310::epstrqsnsrsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Status_310::EpstrqsnsrstsType Status310::epstrqsnsrsts(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(7, 1);
 
-  Status_310::EpstrqsnsrstsType ret =
-      static_cast<Status_310::EpstrqsnsrstsType>(x);
+  Status_310::EpstrqsnsrstsType ret = static_cast<Status_310::EpstrqsnsrstsType>(x);
   return ret;
 }
 
@@ -372,13 +334,12 @@ Status_310::EpstrqsnsrstsType Status310::epstrqsnsrsts(
 // 'name': 'eps_interferdetdvalid', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 38, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::Eps_interferdetdvalidType Status310::eps_interferdetdvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+Status_310::Eps_interferdetdvalidType Status310::eps_interferdetdvalid(const std::uint8_t* bytes,
+                                                                       int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(6, 1);
 
-  Status_310::Eps_interferdetdvalidType ret =
-      static_cast<Status_310::Eps_interferdetdvalidType>(x);
+  Status_310::Eps_interferdetdvalidType ret = static_cast<Status_310::Eps_interferdetdvalidType>(x);
   return ret;
 }
 
@@ -388,13 +349,12 @@ Status_310::Eps_interferdetdvalidType Status310::eps_interferdetdvalid(
 // 'name': 'epshandsdetnsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 27, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::EpshandsdetnstsType Status310::epshandsdetnsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Status_310::EpshandsdetnstsType Status310::epshandsdetnsts(const std::uint8_t* bytes,
+                                                           int32_t             length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(3, 1);
 
-  Status_310::EpshandsdetnstsType ret =
-      static_cast<Status_310::EpshandsdetnstsType>(x);
+  Status_310::EpshandsdetnstsType ret = static_cast<Status_310::EpshandsdetnstsType>(x);
   return ret;
 }
 
@@ -404,13 +364,12 @@ Status_310::EpshandsdetnstsType Status310::epshandsdetnsts(
 // 'eps_handsdetnstsvalid', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 34, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::Eps_handsdetnstsvalidType Status310::eps_handsdetnstsvalid(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+Status_310::Eps_handsdetnstsvalidType Status310::eps_handsdetnstsvalid(const std::uint8_t* bytes,
+                                                                       int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(2, 1);
 
-  Status_310::Eps_handsdetnstsvalidType ret =
-      static_cast<Status_310::Eps_handsdetnstsvalidType>(x);
+  Status_310::Eps_handsdetnstsvalidType ret = static_cast<Status_310::Eps_handsdetnstsvalidType>(x);
   return ret;
 }
 
@@ -420,13 +379,12 @@ Status_310::Eps_handsdetnstsvalidType Status310::eps_handsdetnstsvalid(
 // 'name': 'steerwheelanglesign', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 32, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::SteerwheelanglesignType Status310::steerwheelanglesign(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+Status_310::SteerwheelanglesignType Status310::steerwheelanglesign(const std::uint8_t* bytes,
+                                                                   int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 1);
 
-  Status_310::SteerwheelanglesignType ret =
-      static_cast<Status_310::SteerwheelanglesignType>(x);
+  Status_310::SteerwheelanglesignType ret = static_cast<Status_310::SteerwheelanglesignType>(x);
   return ret;
 }
 
@@ -435,13 +393,12 @@ Status_310::SteerwheelanglesignType Status310::steerwheelanglesign(
 // 'precision': 1.0, 'len': 1, 'name': 'steerwheelspdsign', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 40, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-Status_310::SteerwheelspdsignType Status310::steerwheelspdsign(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 5);
+Status_310::SteerwheelspdsignType Status310::steerwheelspdsign(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 1);
 
-  Status_310::SteerwheelspdsignType ret =
-      static_cast<Status_310::SteerwheelspdsignType>(x);
+  Status_310::SteerwheelspdsignType ret = static_cast<Status_310::SteerwheelspdsignType>(x);
   return ret;
 }
 
@@ -450,13 +407,12 @@ Status_310::SteerwheelspdsignType Status310::steerwheelspdsign(
 // 'len': 1, 'name': 'driverdoorsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 47, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::DriverdoorstsType Status310::driverdoorsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 5);
+Status_310::DriverdoorstsType Status310::driverdoorsts(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(7, 1);
 
-  Status_310::DriverdoorstsType ret =
-      static_cast<Status_310::DriverdoorstsType>(x);
+  Status_310::DriverdoorstsType ret = static_cast<Status_310::DriverdoorstsType>(x);
   return ret;
 }
 
@@ -465,9 +421,8 @@ Status_310::DriverdoorstsType Status310::driverdoorsts(
 // 'name': 'rldoorsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 54, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::RldoorstsType Status310::rldoorsts(const std::uint8_t* bytes,
-                                               int32_t length) const {
-  Byte t0(bytes + 6);
+Status_310::RldoorstsType Status310::rldoorsts(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(6, 1);
 
   Status_310::RldoorstsType ret = static_cast<Status_310::RldoorstsType>(x);
@@ -479,13 +434,12 @@ Status_310::RldoorstsType Status310::rldoorsts(const std::uint8_t* bytes,
 // 'len': 1, 'name': 'passengerdoorsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 45, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::PassengerdoorstsType Status310::passengerdoorsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 5);
+Status_310::PassengerdoorstsType Status310::passengerdoorsts(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(5, 1);
 
-  Status_310::PassengerdoorstsType ret =
-      static_cast<Status_310::PassengerdoorstsType>(x);
+  Status_310::PassengerdoorstsType ret = static_cast<Status_310::PassengerdoorstsType>(x);
   return ret;
 }
 
@@ -493,9 +447,8 @@ Status_310::PassengerdoorstsType Status310::passengerdoorsts(
 // {0: 'RRDOORSTS_CLOSED', 1: 'RRDOORSTS_OPEN'}, 'precision': 1.0, 'len': 1,
 // 'name': 'rrdoorsts', 'is_signed_var': False, 'offset': 0.0,'physical_range':
 // '[0|1]', 'bit': 44, 'type': 'enum', 'order': 'motorola', 'physical_unit':''}
-Status_310::RrdoorstsType Status310::rrdoorsts(const std::uint8_t* bytes,
-                                               int32_t length) const {
-  Byte t0(bytes + 5);
+Status_310::RrdoorstsType Status310::rrdoorsts(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(4, 1);
 
   Status_310::RrdoorstsType ret = static_cast<Status_310::RrdoorstsType>(x);
@@ -507,13 +460,12 @@ Status_310::RrdoorstsType Status310::rrdoorsts(const std::uint8_t* bytes,
 // 3: 'FRONTFOGLMPSTS_NOT_AVAILABLE'}, 'precision': 1.0, 'len': 2, 'name':
 // 'frontfoglmpsts', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|3]', 'bit': 43, 'type': 'enum', 'order': 'motorola', 'physical_unit':''}
-Status_310::FrontfoglmpstsType Status310::frontfoglmpsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 5);
+Status_310::FrontfoglmpstsType Status310::frontfoglmpsts(const std::uint8_t* bytes,
+                                                         int32_t             length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(2, 2);
 
-  Status_310::FrontfoglmpstsType ret =
-      static_cast<Status_310::FrontfoglmpstsType>(x);
+  Status_310::FrontfoglmpstsType ret = static_cast<Status_310::FrontfoglmpstsType>(x);
   return ret;
 }
 
@@ -522,13 +474,12 @@ Status_310::FrontfoglmpstsType Status310::frontfoglmpsts(
 // 'name': 'rearfoglmpsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 51, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::RearfoglmpstsType Status310::rearfoglmpsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 6);
+Status_310::RearfoglmpstsType Status310::rearfoglmpsts(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(3, 1);
 
-  Status_310::RearfoglmpstsType ret =
-      static_cast<Status_310::RearfoglmpstsType>(x);
+  Status_310::RearfoglmpstsType ret = static_cast<Status_310::RearfoglmpstsType>(x);
   return ret;
 }
 
@@ -537,9 +488,8 @@ Status_310::RearfoglmpstsType Status310::rearfoglmpsts(
 // 'name': 'lowbeamsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 49, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::LowbeamstsType Status310::lowbeamsts(const std::uint8_t* bytes,
-                                                 int32_t length) const {
-  Byte t0(bytes + 6);
+Status_310::LowbeamstsType Status310::lowbeamsts(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(1, 1);
 
   Status_310::LowbeamstsType ret = static_cast<Status_310::LowbeamstsType>(x);
@@ -552,8 +502,8 @@ Status_310::LowbeamstsType Status310::lowbeamsts(const std::uint8_t* bytes,
 // 'physical_range': '[0|1]', 'bit': 63, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
 Status_310::HighbeamstsType Status310::highbeamsts(const std::uint8_t* bytes,
-                                                   int32_t length) const {
-  Byte t0(bytes + 7);
+                                                   int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(7, 1);
 
   Status_310::HighbeamstsType ret = static_cast<Status_310::HighbeamstsType>(x);
@@ -565,13 +515,12 @@ Status_310::HighbeamstsType Status310::highbeamsts(const std::uint8_t* bytes,
 // 'len': 1, 'name': 'leftturnlampsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 62, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::LeftturnlampstsType Status310::leftturnlampsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+Status_310::LeftturnlampstsType Status310::leftturnlampsts(const std::uint8_t* bytes,
+                                                           int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(6, 1);
 
-  Status_310::LeftturnlampstsType ret =
-      static_cast<Status_310::LeftturnlampstsType>(x);
+  Status_310::LeftturnlampstsType ret = static_cast<Status_310::LeftturnlampstsType>(x);
   return ret;
 }
 
@@ -580,13 +529,12 @@ Status_310::LeftturnlampstsType Status310::leftturnlampsts(
 // 'len': 1, 'name': 'rightturnlampsts', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 60, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-Status_310::RightturnlampstsType Status310::rightturnlampsts(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+Status_310::RightturnlampstsType Status310::rightturnlampsts(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(4, 1);
 
-  Status_310::RightturnlampstsType ret =
-      static_cast<Status_310::RightturnlampstsType>(x);
+  Status_310::RightturnlampstsType ret = static_cast<Status_310::RightturnlampstsType>(x);
   return ret;
 }
 
@@ -597,12 +545,11 @@ Status_310::RightturnlampstsType Status310::rightturnlampsts(
 // 'physical_range': '[0|3]', 'bit': 58, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
 Status_310::Bcm_availstsType Status310::bcm_availsts(const std::uint8_t* bytes,
-                                                     int32_t length) const {
-  Byte t0(bytes + 7);
+                                                     int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(1, 2);
 
-  Status_310::Bcm_availstsType ret =
-      static_cast<Status_310::Bcm_availstsType>(x);
+  Status_310::Bcm_availstsType ret = static_cast<Status_310::Bcm_availstsType>(x);
   return ret;
 }
 
@@ -612,8 +559,8 @@ Status_310::Bcm_availstsType Status310::bcm_availsts(const std::uint8_t* bytes,
 // 'physical_range': '[0|1]', 'bit': 56, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
 Status_310::BrakelmpstsType Status310::brakelmpsts(const std::uint8_t* bytes,
-                                                   int32_t length) const {
-  Byte t0(bytes + 7);
+                                                   int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 1);
 
   Status_310::BrakelmpstsType ret = static_cast<Status_310::BrakelmpstsType>(x);

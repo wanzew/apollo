@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+
 #include <sys/resource.h>
 #include <sys/time.h>
-
-#include "modules/common/monitor_log/monitor_log_buffer.h"
 
 #include "gtest/gtest.h"
 
@@ -30,8 +30,8 @@ namespace monitor {
 
 class MonitorBufferTest : public ::testing::Test {
  protected:
-  void SetUp() override { cyber::Init("monitor_log_buffer_test"); }
-  void TearDown() override {}
+  void             SetUp() override { cyber::Init("monitor_log_buffer_test"); }
+  void             TearDown() override {}
   MonitorLogBuffer buffer_{MonitorMessageItem::CONTROL};
 };
 
@@ -53,7 +53,7 @@ TEST_F(MonitorBufferTest, AddMonitorMsgItem) {
   buffer_.AddMonitorMsgItem(MonitorMessageItem::ERROR, "TestError");
   EXPECT_EQ(MonitorMessageItem::ERROR, buffer_.level_);
   ASSERT_EQ(1, buffer_.monitor_msg_items_.size());
-  const auto &item = buffer_.monitor_msg_items_.back();
+  const auto& item = buffer_.monitor_msg_items_.back();
   EXPECT_EQ(MonitorMessageItem::ERROR, item.first);
   EXPECT_EQ("TestError", item.second);
 }

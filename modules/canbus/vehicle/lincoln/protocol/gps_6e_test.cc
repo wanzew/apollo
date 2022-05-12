@@ -23,10 +23,10 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Gps6eTest, General) {
-  uint8_t data[8] = {0x56, 0x52, 0x53, 0x54, 0xF1, 0xF2, 0xF3, 0xF4};
-  int32_t length = 8;
+  uint8_t       data[8] = {0x56, 0x52, 0x53, 0x54, 0xF1, 0xF2, 0xF3, 0xF4};
+  int32_t       length  = 8;
   ChassisDetail cd;
-  Gps6e gps;
+  Gps6e         gps;
   gps.Parse(data, length, &cd);
 
   EXPECT_EQ(cd.basic().year(), 86);

@@ -18,7 +18,6 @@
 #include <string>
 
 #include "cyber/common/macros.h"
-
 #include "modules/perception/base/object.h"
 
 namespace apollo {
@@ -26,16 +25,15 @@ namespace perception {
 namespace radar {
 class BaseFilter {
  public:
-  BaseFilter() : name_("BaseFilter") {}
+  BaseFilter()
+      : name_("BaseFilter") {}
   virtual ~BaseFilter() {}
-  virtual void Init(const base::Object& object) = 0;
-  virtual Eigen::VectorXd Predict(double time_diff) = 0;
-  virtual Eigen::VectorXd UpdateWithObject(const base::Object& new_object,
-                                           double time_diff) = 0;
-  virtual void GetState(Eigen::Vector3d* anchor_point,
-                        Eigen::Vector3d* velocity) = 0;
-  virtual Eigen::Matrix4d GetCovarianceMatrix() = 0;
-  std::string Name() { return name_; }
+  virtual void            Init(const base::Object& object)                                   = 0;
+  virtual Eigen::VectorXd Predict(double time_diff)                                          = 0;
+  virtual Eigen::VectorXd UpdateWithObject(const base::Object& new_object, double time_diff) = 0;
+  virtual void            GetState(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity) = 0;
+  virtual Eigen::Matrix4d GetCovarianceMatrix()                                              = 0;
+  std::string             Name() { return name_; }
 
  protected:
   std::string name_;

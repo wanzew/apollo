@@ -46,10 +46,10 @@ void Headlightcmd118::UpdateData(uint8_t* data) {
 void Headlightcmd118::Reset() {
   // TODO(QiL) you should check this manually
   ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
-  clear_faults_ = false;
-  headlight_cmd_ = Headlight_cmd_118::HEADLIGHT_CMD_HEADLIGHTS_OFF;
+  enable_           = false;
+  clear_override_   = false;
+  clear_faults_     = false;
+  headlight_cmd_    = Headlight_cmd_118::HEADLIGHT_CMD_HEADLIGHTS_OFF;
 }
 
 Headlightcmd118* Headlightcmd118::set_ignore_overrides(bool ignore_overrides) {
@@ -60,8 +60,7 @@ Headlightcmd118* Headlightcmd118::set_ignore_overrides(bool ignore_overrides) {
 // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-void Headlightcmd118::set_p_ignore_overrides(uint8_t* data,
-                                             bool ignore_overrides) {
+void Headlightcmd118::set_p_ignore_overrides(uint8_t* data, bool ignore_overrides) {
   uint8_t x = ignore_overrides;
 
   Byte to_set(data + 0);
@@ -113,8 +112,8 @@ void Headlightcmd118::set_p_clear_faults(uint8_t* data, bool clear_faults) {
   to_set.set_value(static_cast<uint8_t>(x), 3, 1);
 }
 
-Headlightcmd118* Headlightcmd118::set_headlight_cmd(
-    Headlight_cmd_118::Headlight_cmdType headlight_cmd) {
+Headlightcmd118*
+Headlightcmd118::set_headlight_cmd(Headlight_cmd_118::Headlight_cmdType headlight_cmd) {
   headlight_cmd_ = headlight_cmd;
   return this;
 }
@@ -124,8 +123,8 @@ Headlightcmd118* Headlightcmd118::set_headlight_cmd(
 // 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 15, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-void Headlightcmd118::set_p_headlight_cmd(
-    uint8_t* data, Headlight_cmd_118::Headlight_cmdType headlight_cmd) {
+void Headlightcmd118::set_p_headlight_cmd(uint8_t*                             data,
+                                          Headlight_cmd_118::Headlight_cmdType headlight_cmd) {
   uint8_t x = headlight_cmd;
 
   Byte to_set(data + 1);

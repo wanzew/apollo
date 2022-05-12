@@ -27,48 +27,39 @@ namespace onboard {
 
 bool RadarDetectionComponent::Init() {
   RadarComponentConfig comp_config;
-  if (!GetProtoConfig(&comp_config)) {
-    return false;
-  }
+  if (!GetProtoConfig(&comp_config)) { return false; }
   AINFO << "Radar Component Configs: " << comp_config.DebugString();
 
   // To load component configs
-  tf_child_frame_id_ = comp_config.tf_child_frame_id();
+  tf_child_frame_id_      = comp_config.tf_child_frame_id();
   radar_forward_distance_ = comp_config.radar_forward_distance();
-  preprocessor_method_ = comp_config.radar_preprocessor_method();
-  perception_method_ = comp_config.radar_perception_method();
-  pipeline_name_ = comp_config.radar_pipeline_name();
-  odometry_channel_name_ = comp_config.odometry_channel_name();
+  preprocessor_method_    = comp_config.radar_preprocessor_method();
+  perception_method_      = comp_config.radar_perception_method();
+  pipeline_name_          = comp_config.radar_pipeline_name();
+  odometry_channel_name_  = comp_config.odometry_channel_name();
 
-  if (!common::SensorManager::Instance()->GetSensorInfo(
-          comp_config.radar_name(), &radar_info_)) {
-    AERROR << "Failed to get sensor info, sensor name: "
-           << comp_config.radar_name();
+  if (!common::SensorManager::Instance()->GetSensorInfo(comp_config.radar_name(), &radar_info_)) {
+    AERROR << "Failed to get sensor info, sensor name: " << comp_config.radar_name();
     return false;
   }
 
-  writer_ = node_->CreateWriter<SensorFrameMessage>(
-      comp_config.output_channel_name());
+  writer_ = node_->CreateWriter<SensorFrameMessage>(comp_config.output_channel_name());
 
   // Init algorithm plugin
   ACHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   radar2world_trans_.Init(tf_child_frame_id_);
   radar2novatel_trans_.Init(tf_child_frame_id_);
-  localization_subscriber_.Init(
-      odometry_channel_name_,
-      odometry_channel_name_ + '_' + comp_config.radar_name());
+  localization_subscriber_.Init(odometry_channel_name_,
+                                odometry_channel_name_ + '_' + comp_config.radar_name());
   return true;
 }
 
 bool RadarDetectionComponent::Proc(const std::shared_ptr<ContiRadar>& message) {
-  AINFO << "Enter radar preprocess, message timestamp: "
-        << message->header().timestamp_sec() << " current timestamp "
-        << Clock::NowInSeconds();
+  AINFO << "Enter radar preprocess, message timestamp: " << message->header().timestamp_sec()
+        << " current timestamp " << Clock::NowInSeconds();
   auto out_message = std::make_shared<SensorFrameMessage>();
 
-  if (!InternalProc(message, out_message)) {
-    return false;
-  }
+  if (!InternalProc(message, out_message)) { return false; }
   writer_->Write(out_message);
   AINFO << "Send radar processing output message.";
   return true;
@@ -81,51 +72,45 @@ bool RadarDetectionComponent::InitAlgorithmPlugin() {
     ACHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   radar::BasePreprocessor* preprocessor =
-      radar::BasePreprocessorRegisterer::GetInstanceByName(
-          preprocessor_method_);
+      radar::BasePreprocessorRegisterer::GetInstanceByName(preprocessor_method_);
   CHECK_NOTNULL(preprocessor);
   radar_preprocessor_.reset(preprocessor);
   ACHECK(radar_preprocessor_->Init()) << "Failed to init radar preprocessor.";
   radar::BaseRadarObstaclePerception* radar_perception =
-      radar::BaseRadarObstaclePerceptionRegisterer::GetInstanceByName(
-          perception_method_);
+      radar::BaseRadarObstaclePerceptionRegisterer::GetInstanceByName(perception_method_);
   ACHECK(radar_perception != nullptr)
       << "No radar obstacle perception named: " << perception_method_;
   radar_perception_.reset(radar_perception);
-  ACHECK(radar_perception_->Init(pipeline_name_))
-      << "Failed to init radar perception.";
+  ACHECK(radar_perception_->Init(pipeline_name_)) << "Failed to init radar perception.";
   AINFO << "Init algorithm plugin successfully.";
   return true;
 }
 
-bool RadarDetectionComponent::InternalProc(
-    const std::shared_ptr<ContiRadar>& in_message,
-    std::shared_ptr<SensorFrameMessage> out_message) {
+bool RadarDetectionComponent::InternalProc(const std::shared_ptr<ContiRadar>&  in_message,
+                                           std::shared_ptr<SensorFrameMessage> out_message) {
   PERF_FUNCTION_WITH_INDICATOR(radar_info_.name);
   ContiRadar raw_obstacles = *in_message;
   {
     std::unique_lock<std::mutex> lock(_mutex);
     ++seq_num_;
   }
-  double timestamp = in_message->header().timestamp_sec();
-  const double cur_time = Clock::NowInSeconds();
+  double       timestamp     = in_message->header().timestamp_sec();
+  const double cur_time      = Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << timestamp
-        << "]:cur_time[" << cur_time << "]:cur_latency[" << start_latency
-        << "]";
+  AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << timestamp << "]:cur_time[" << cur_time
+        << "]:cur_latency[" << start_latency << "]";
   PERF_BLOCK_START();
   // Init preprocessor_options
   radar::PreprocessorOptions preprocessor_options;
-  ContiRadar corrected_obstacles;
-  radar_preprocessor_->Preprocess(raw_obstacles, preprocessor_options,
-                                  &corrected_obstacles);
+  ContiRadar                 corrected_obstacles;
+  radar_preprocessor_->Preprocess(raw_obstacles, preprocessor_options, &corrected_obstacles);
   PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "radar_preprocessor");
   timestamp = corrected_obstacles.header().timestamp_sec();
 
-  out_message->timestamp_ = timestamp;
-  out_message->seq_num_ = seq_num_;
+  out_message->timestamp_     = timestamp;
+  out_message->seq_num_       = seq_num_;
   out_message->process_stage_ = ProcessStage::LONG_RANGE_RADAR_DETECTION;
-  out_message->sensor_id_ = radar_info_.name;
+  out_message->sensor_id_     = radar_info_.name;
 
   // Init radar perception options
   radar::RadarPerceptionOptions options;
@@ -145,12 +130,11 @@ bool RadarDetectionComponent::InternalProc(
     return true;
   }
   PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetSensor2worldTrans");
-  Eigen::Matrix4d radar2world_pose = radar_trans.matrix();
-  options.detector_options.radar2world_pose = &radar2world_pose;
-  Eigen::Matrix4d radar2novatel_trans_m = radar2novatel_trans.matrix();
+  Eigen::Matrix4d radar2world_pose             = radar_trans.matrix();
+  options.detector_options.radar2world_pose    = &radar2world_pose;
+  Eigen::Matrix4d radar2novatel_trans_m        = radar2novatel_trans.matrix();
   options.detector_options.radar2novatel_trans = &radar2novatel_trans_m;
-  if (!GetCarLocalizationSpeed(timestamp,
-                               &(options.detector_options.car_linear_speed),
+  if (!GetCarLocalizationSpeed(timestamp, &(options.detector_options.car_linear_speed),
                                &(options.detector_options.car_angular_speed))) {
     AERROR << "Failed to call get_car_speed. [timestamp: " << timestamp;
     // return false;
@@ -171,33 +155,29 @@ bool RadarDetectionComponent::InternalProc(
   // Init track_options
   // Init object_builder_options
   std::vector<base::ObjectPtr> radar_objects;
-  if (!radar_perception_->Perceive(corrected_obstacles, options,
-                                   &radar_objects)) {
-    out_message->error_code_ =
-        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
+  if (!radar_perception_->Perceive(corrected_obstacles, options, &radar_objects)) {
+    out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     AERROR << "RadarDetector Proc failed.";
     return true;
   }
   out_message->frame_.reset(new base::Frame());
-  out_message->frame_->sensor_info = radar_info_;
-  out_message->frame_->timestamp = timestamp;
+  out_message->frame_->sensor_info       = radar_info_;
+  out_message->frame_->timestamp         = timestamp;
   out_message->frame_->sensor2world_pose = radar_trans;
-  out_message->frame_->objects = radar_objects;
+  out_message->frame_->objects           = radar_objects;
 
   const double end_timestamp = Clock::NowInSeconds();
-  const double end_latency =
-      (end_timestamp - in_message->header().timestamp_sec()) * 1e3;
-  AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
-        << in_message->header().timestamp_sec() << "]:cur_time["
-        << end_timestamp << "]:cur_latency[" << end_latency << "]";
+  const double end_latency   = (end_timestamp - in_message->header().timestamp_sec()) * 1e3;
+  AINFO << "FRAME_STATISTICS:Radar:End:msg_time[" << in_message->header().timestamp_sec()
+        << "]:cur_time[" << end_timestamp << "]:cur_latency[" << end_latency << "]";
   PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "radar_perception");
 
   return true;
 }
 
-bool RadarDetectionComponent::GetCarLocalizationSpeed(
-    double timestamp, Eigen::Vector3f* car_linear_speed,
-    Eigen::Vector3f* car_angular_speed) {
+bool RadarDetectionComponent::GetCarLocalizationSpeed(double           timestamp,
+                                                      Eigen::Vector3f* car_linear_speed,
+                                                      Eigen::Vector3f* car_angular_speed) {
   if (car_linear_speed == nullptr) {
     AERROR << "car_linear_speed is not available";
     return false;
@@ -213,18 +193,12 @@ bool RadarDetectionComponent::GetCarLocalizationSpeed(
     AERROR << "Cannot get car speed.";
     return false;
   }
-  (*car_linear_speed)[0] =
-      static_cast<float>(loct_ptr->pose().linear_velocity().x());
-  (*car_linear_speed)[1] =
-      static_cast<float>(loct_ptr->pose().linear_velocity().y());
-  (*car_linear_speed)[2] =
-      static_cast<float>(loct_ptr->pose().linear_velocity().z());
-  (*car_angular_speed)[0] =
-      static_cast<float>(loct_ptr->pose().angular_velocity().x());
-  (*car_angular_speed)[1] =
-      static_cast<float>(loct_ptr->pose().angular_velocity().y());
-  (*car_angular_speed)[2] =
-      static_cast<float>(loct_ptr->pose().angular_velocity().z());
+  (*car_linear_speed)[0]  = static_cast<float>(loct_ptr->pose().linear_velocity().x());
+  (*car_linear_speed)[1]  = static_cast<float>(loct_ptr->pose().linear_velocity().y());
+  (*car_linear_speed)[2]  = static_cast<float>(loct_ptr->pose().linear_velocity().z());
+  (*car_angular_speed)[0] = static_cast<float>(loct_ptr->pose().angular_velocity().x());
+  (*car_angular_speed)[1] = static_cast<float>(loct_ptr->pose().angular_velocity().y());
+  (*car_angular_speed)[2] = static_cast<float>(loct_ptr->pose().angular_velocity().z());
 
   return true;
 }

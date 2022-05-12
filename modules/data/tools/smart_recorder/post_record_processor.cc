@@ -23,11 +23,11 @@
 #include <memory>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_viewer.h"
-
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
 
@@ -46,8 +46,7 @@ bool PostRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   }
   LoadSourceRecords();
   if (source_record_files_.empty()) {
-    AERROR << "source record dir does not have any records: "
-           << source_record_dir_;
+    AERROR << "source record dir does not have any records: " << source_record_dir_;
     return false;
   }
   if (!RecordProcessor::Init(trigger_conf)) {
@@ -60,10 +59,9 @@ bool PostRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
 bool PostRecordProcessor::Process() {
   // First scan, get intervals
   for (const std::string& record : source_record_files_) {
-    const auto reader = std::make_shared<RecordReader>(
-        absl::StrCat(source_record_dir_, "/", record));
-    RecordViewer viewer(reader, 0,
-                        std::numeric_limits<uint64_t>::max(),
+    const auto reader =
+        std::make_shared<RecordReader>(absl::StrCat(source_record_dir_, "/", record));
+    RecordViewer viewer(reader, 0, std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << record << ":" << viewer.begin_time() << " - " << viewer.end_time();
     for (const auto& msg : viewer) {
@@ -76,18 +74,15 @@ bool PostRecordProcessor::Process() {
   IntervalPool::Instance()->ReorgIntervals();
   IntervalPool::Instance()->PrintIntervals();
   for (const std::string& record : source_record_files_) {
-    const auto reader = std::make_shared<RecordReader>(
-        absl::StrCat(source_record_dir_, "/", record));
-    RecordViewer viewer(reader, 0,
-                        std::numeric_limits<uint64_t>::max(),
+    const auto reader =
+        std::make_shared<RecordReader>(absl::StrCat(source_record_dir_, "/", record));
+    RecordViewer viewer(reader, 0, std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     for (const auto& msg : viewer) {
       // If the message fall into generated intervals,
       // or required by any triggers, restore it
-      if (IntervalPool::Instance()->MessageFallIntoRange(msg.time) ||
-          ShouldRestore(msg)) {
-        writer_->WriteChannel(msg.channel_name,
-                              reader->GetMessageType(msg.channel_name),
+      if (IntervalPool::Instance()->MessageFallIntoRange(msg.time) || ShouldRestore(msg)) {
+        writer_->WriteChannel(msg.channel_name, reader->GetMessageType(msg.channel_name),
                               reader->GetProtoDesc(msg.channel_name));
         writer_->WriteMessage(msg.channel_name, msg.content, msg.time);
       }
@@ -97,10 +92,10 @@ bool PostRecordProcessor::Process() {
 }
 
 std::string PostRecordProcessor::GetDefaultOutputFile() const {
-  std::string src_file_name = source_record_files_.front();
+  std::string       src_file_name = source_record_files_.front();
   const std::string record_flag(".record");
-  src_file_name.resize(src_file_name.size() - src_file_name.find(record_flag) +
-                       record_flag.size() + 1);
+  src_file_name.resize(src_file_name.size() - src_file_name.find(record_flag) + record_flag.size() +
+                       1);
   return absl::StrCat(restored_output_dir_, "/", src_file_name);
 }
 
@@ -113,8 +108,7 @@ void PostRecordProcessor::LoadSourceRecords() {
   struct dirent* dp = nullptr;
   while ((dp = readdir(dirp)) != nullptr) {
     const std::string file_name = dp->d_name;
-    if (dp->d_type == DT_REG &&
-        file_name.find(".record") != std::string::npos) {
+    if (dp->d_type == DT_REG && file_name.find(".record") != std::string::npos) {
       source_record_files_.push_back(file_name);
     }
   }

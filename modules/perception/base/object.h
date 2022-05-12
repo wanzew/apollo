@@ -19,6 +19,7 @@
 #include <vector>
 
 #include <boost/circular_buffer.hpp>
+
 #include "Eigen/Core"
 
 #include "modules/perception/base/object_supplement.h"
@@ -36,7 +37,7 @@ struct alignas(16) Object {
 
   Object();
   std::string ToString() const;
-  void Reset();
+  void        Reset();
 
   // @brief object id per frame, required
   int id = -1;
@@ -105,22 +106,22 @@ struct alignas(16) Object {
   MotionState motion_state = MotionState::UNKNOWN;
   // // Tailgating (trajectory of objects)
   std::array<Eigen::Vector3d, 100> drops;
-  std::size_t drop_num = 0;
+  std::size_t                      drop_num = 0;
   // // CIPV
   bool b_cipv = false;
   // @brief brake light, left-turn light and right-turn light score, optional
   CarLight car_light;
   // @brief sensor-specific object supplements, optional
-  LidarObjectSupplement lidar_supplement;
-  RadarObjectSupplement radar_supplement;
+  LidarObjectSupplement  lidar_supplement;
+  RadarObjectSupplement  radar_supplement;
   CameraObjectSupplement camera_supplement;
   FusionObjectSupplement fusion_supplement;
 
   // @debug feature to be used for semantic mapping
-//  std::shared_ptr<apollo::prediction::Feature> feature;
+  //  std::shared_ptr<apollo::prediction::Feature> feature;
 };
 
-using ObjectPtr = std::shared_ptr<Object>;
+using ObjectPtr      = std::shared_ptr<Object>;
 using ObjectConstPtr = std::shared_ptr<const Object>;
 
 }  // namespace base

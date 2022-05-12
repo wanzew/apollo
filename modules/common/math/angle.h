@@ -57,8 +57,7 @@ namespace math {
 template <typename T>
 class Angle {
  public:
-  static_assert(std::numeric_limits<T>::is_integer &&
-                    std::numeric_limits<T>::is_signed,
+  static_assert(std::numeric_limits<T>::is_integer && std::numeric_limits<T>::is_signed,
                 "T must be a signed integer type");
 
   /**
@@ -84,14 +83,14 @@ class Angle {
    * @param value Angle in degrees
    * @return Angle object
    */
-  explicit Angle(const T value = 0) : value_(value) {}
+  explicit Angle(const T value = 0)
+      : value_(value) {}
 
   /// Internal representation of pi
   static constexpr T RAW_PI = std::numeric_limits<T>::min();
 
   /// Internal representation of pi/2
-  static constexpr T RAW_PI_2 =
-      static_cast<T>(-(std::numeric_limits<T>::min() >> 1));
+  static constexpr T RAW_PI_2 = static_cast<T>(-(std::numeric_limits<T>::min() >> 1));
 
   /// Used for converting angle units
   static constexpr double DEG_TO_RAW = RAW_PI / -180.0;
@@ -169,7 +168,7 @@ class Angle {
   T value_;
 };
 
-using Angle8 = Angle<int8_t>;
+using Angle8  = Angle<int8_t>;
 using Angle16 = Angle<int16_t>;
 using Angle32 = Angle<int32_t>;
 using Angle64 = Angle<int64_t>;

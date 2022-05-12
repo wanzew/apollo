@@ -21,6 +21,7 @@
 #include "modules/planning/common/reference_line_info.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
@@ -41,12 +42,10 @@ TEST_F(ReferenceLineInfoTest, BasicTest) {
   EXPECT_EQ(reference_line_info_.trajectory_type(), ADCTrajectory::NORMAL);
 
   reference_line_info_.set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
-  EXPECT_EQ(reference_line_info_.trajectory_type(),
-            ADCTrajectory::PATH_FALLBACK);
+  EXPECT_EQ(reference_line_info_.trajectory_type(), ADCTrajectory::PATH_FALLBACK);
 
   reference_line_info_.set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
-  EXPECT_EQ(reference_line_info_.trajectory_type(),
-            ADCTrajectory::SPEED_FALLBACK);
+  EXPECT_EQ(reference_line_info_.trajectory_type(), ADCTrajectory::SPEED_FALLBACK);
 }
 
 }  // namespace planning

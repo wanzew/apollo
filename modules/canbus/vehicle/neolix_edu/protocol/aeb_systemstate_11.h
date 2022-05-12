@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Aebsystemstate11 : public ::apollo::drivers::canbus::ProtocolData<
-                             ::apollo::canbus::ChassisDetail> {
+class Aebsystemstate11
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Aebsystemstate11();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': '0x00:read only;0x01:brake enable',
@@ -109,8 +109,7 @@ class Aebsystemstate11 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|15]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int aeb_livecounter_rear(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  int aeb_livecounter_rear(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'AEB_Cheksum', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,

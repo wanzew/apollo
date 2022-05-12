@@ -31,8 +31,7 @@ static const size_t kTrackPoolSize = 3000;
 
 // pool typedef collections,
 // developer should add pool type to the PoolInitialize function in .cc file
-typedef base::ConcurrentObjectPool<Track, kTrackPoolSize, TrackInitializer>
-    TrackPool;
+typedef base::ConcurrentObjectPool<Track, kTrackPoolSize, TrackInitializer> TrackPool;
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo

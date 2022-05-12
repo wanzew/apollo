@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_eps_204.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ class Pceps204Test : public ::testing::Test {
 };
 
 TEST_F(Pceps204Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t  data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Pceps204 pceps204;
   EXPECT_EQ(pceps204.GetPeriod(), 20 * 1000);
   pceps204.UpdateData(data);

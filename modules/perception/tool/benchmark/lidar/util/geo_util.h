@@ -49,31 +49,33 @@ void quaternion_to_rotation_matrix(const T* quat, T* R) {
   R[5] = 2 * (yz - rx);
 }
 
-bool is_point_xy_in_polygon2d_xy(const Point& point, const PointCloud& polygon,
-                                 float distance_to_boundary);
+bool is_point_xy_in_polygon2d_xy(const Point&      point,
+                                 const PointCloud& polygon,
+                                 float             distance_to_boundary);
 
 inline bool approx_equal(float a, float b) {
-  return std::abs(a - b) <= std::max(std::abs(a), std::abs(b)) *
-                                std::numeric_limits<float>::epsilon();
+  return std::abs(a - b) <=
+         std::max(std::abs(a), std::abs(b)) * std::numeric_limits<float>::epsilon();
 }
 
 inline bool strictly_less(float a, float b) {
-  return (b - a) > std::max(std::abs(a), std::abs(b)) *
-                       std::numeric_limits<float>::epsilon();
+  return (b - a) > std::max(std::abs(a), std::abs(b)) * std::numeric_limits<float>::epsilon();
 }
 
 enum class Orientation {
-  left = 1,
-  right = -1,
+  left      = 1,
+  right     = -1,
   collinear = 0,
 };
 
 struct VisPoint {
   VisPoint() = default;
 
-  VisPoint(float x, float y) : point(Eigen::Vector2f(x, y)) {}
+  VisPoint(float x, float y)
+      : point(Eigen::Vector2f(x, y)) {}
 
-  explicit VisPoint(const Eigen::Vector2f& point_) : point(point_) {}
+  explicit VisPoint(const Eigen::Vector2f& point_)
+      : point(point_) {}
 
   bool operator<(const VisPoint& other) const;
 
@@ -91,13 +93,9 @@ struct VisPoint {
 
   VisPoint operator-() const { return VisPoint(-x(), -y()); }
 
-  VisPoint operator*(float scale) const {
-    return VisPoint(x() * scale, y() * scale);
-  }
+  VisPoint operator*(float scale) const { return VisPoint(x() * scale, y() * scale); }
 
-  VisPoint operator/(float scale) const {
-    return VisPoint(x() / scale, y() / scale);
-  }
+  VisPoint operator/(float scale) const { return VisPoint(x() / scale, y() / scale); }
 
   friend std::ostream& operator<<(std::ostream& output, const VisPoint& p) {
     output << "(" << p.x() << ", " << p.y() << ")";
@@ -112,13 +110,9 @@ struct VisPoint {
 
   inline float& y() { return point.y(); }
 
-  inline float dot(const VisPoint& other) const {
-    return x() * other.x() + y() * other.y();
-  }
+  inline float dot(const VisPoint& other) const { return x() * other.x() + y() * other.y(); }
 
-  inline float cross(const VisPoint& other) const {
-    return x() * other.y() - y() * other.x();
-  }
+  inline float cross(const VisPoint& other) const { return x() * other.y() - y() * other.x(); }
 
   inline float length_squared() const { return x() * x() + y() * y(); }
 
@@ -129,7 +123,9 @@ struct Segment {
   Segment() = default;
 
   Segment(const VisPoint& start, const VisPoint& end, int idx = -2)
-      : start(start), end(end), idx(idx) {}
+      : start(start)
+      , end(end)
+      , idx(idx) {}
 
   bool operator<(const Segment& other) const;
 
@@ -138,22 +134,19 @@ struct Segment {
   bool operator!=(const Segment& other) const;
 
   friend std::ostream& operator<<(std::ostream& output, const Segment& s) {
-    output << "Segment: start: " << s.start << ", end: " << s.end
-           << ", idx: " << s.idx;
+    output << "Segment: start: " << s.start << ", end: " << s.end << ", idx: " << s.idx;
     return output;
   }
 
   VisPoint start, end;
-  int idx = -2;
+  int      idx = -2;
 };
 
 // position relation between Point B and line OA
-Orientation compute_orientation(const VisPoint& o, const VisPoint& a,
-                                const VisPoint& b);
+Orientation compute_orientation(const VisPoint& o, const VisPoint& a, const VisPoint& b);
 
 // calculate intersection point between ray and segment
-bool intersects(const VisPoint& ray, const Segment& segment,
-                VisPoint* intersection);
+bool intersects(const VisPoint& ray, const Segment& segment, VisPoint* intersection);
 
 }  // namespace benchmark
 }  // namespace perception

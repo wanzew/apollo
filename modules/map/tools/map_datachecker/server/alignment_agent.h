@@ -24,6 +24,7 @@
 
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
+
 #include "modules/map/tools/map_datachecker/server/eight_route.h"
 #include "modules/map/tools/map_datachecker/server/pose_collection_agent.h"
 #include "modules/map/tools/map_datachecker/server/static_align.h"
@@ -33,26 +34,23 @@ namespace hdmap {
 
 typedef State AlignmentAgentState;
 
-template <typename ALIGNMENT_TYPE, typename REQUEST_TYPE,
-          typename RESPONSE_TYPE>
+template <typename ALIGNMENT_TYPE, typename REQUEST_TYPE, typename RESPONSE_TYPE>
 class AlignmentAgent {
  public:
-  AlignmentAgent(
-      std::shared_ptr<JsonConf> sp_conf,
-      std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
-    sp_conf_ = sp_conf;
+  AlignmentAgent(std::shared_ptr<JsonConf>            sp_conf,
+                 std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
+    sp_conf_                  = sp_conf;
     sp_pose_collection_agent_ = sp_pose_collection_agent;
   }
 
   void Reset() {
     sp_alignment_ = std::make_shared<ALIGNMENT_TYPE>(sp_conf_);
-    state_ = AlignmentAgentState::IDLE;
-    need_stop_ = false;
+    state_        = AlignmentAgentState::IDLE;
+    need_stop_    = false;
   }
 
-  grpc::Status ProcessGrpcRequest(grpc::ServerContext *context,
-                                  REQUEST_TYPE *request,
-                                  RESPONSE_TYPE *response) {
+  grpc::Status
+  ProcessGrpcRequest(grpc::ServerContext* context, REQUEST_TYPE* request, RESPONSE_TYPE* response) {
     AINFO << "AlignmentAgent request: " << request->DebugString();
     switch (request->cmd()) {
       case CmdType::START:
@@ -76,7 +74,7 @@ class AlignmentAgent {
     return grpc::Status::OK;
   }
 
-  int AlignmentStart(REQUEST_TYPE *request, RESPONSE_TYPE *response) {
+  int AlignmentStart(REQUEST_TYPE* request, RESPONSE_TYPE* response) {
     if (AlignmentAgentState::RUNNING == GetState()) {
       AINFO << "AlignmentAgent is running. do need start again";
       response->set_code(ErrorCode::ERROR_REPEATED_START);
@@ -114,8 +112,7 @@ class AlignmentAgent {
           break;
         }
         AINFO << "sleep " << sp_conf_->alignment_featch_pose_sleep << " sec";
-        auto seconds =
-            std::chrono::seconds(sp_conf_->alignment_featch_pose_sleep);
+        auto seconds = std::chrono::seconds(sp_conf_->alignment_featch_pose_sleep);
         std::this_thread::sleep_for(seconds);
       }
       stopped_ = true;
@@ -126,13 +123,11 @@ class AlignmentAgent {
   }
 
   std::shared_ptr<std::vector<FramePose>> GetPoses() const {
-    if (sp_pose_collection_agent_ == nullptr) {
-      return nullptr;
-    }
+    if (sp_pose_collection_agent_ == nullptr) { return nullptr; }
     return sp_pose_collection_agent_->GetPoses();
   }
 
-  int AlignmentCheck(REQUEST_TYPE *request, RESPONSE_TYPE *response) {
+  int AlignmentCheck(REQUEST_TYPE* request, RESPONSE_TYPE* response) {
     if (AlignmentAgentState::IDLE == GetState()) {
       AINFO << "AlignmentAgent is idle. this call will be refused";
       response->set_code(ErrorCode::ERROR_CHECK_BEFORE_START);
@@ -146,12 +141,11 @@ class AlignmentAgent {
       return 0;
     }
 
-    ErrorCode code = sp_alignment_->GetReturnState();
-    double progress = sp_alignment_->GetProgress();
+    ErrorCode code     = sp_alignment_->GetReturnState();
+    double    progress = sp_alignment_->GetProgress();
     response->set_code(code);
     response->set_progress(progress);
-    if (code == ErrorCode::ERROR_VERIFY_NO_GNSSPOS ||
-        code == ErrorCode::ERROR_GNSS_SIGNAL_FAIL) {
+    if (code == ErrorCode::ERROR_VERIFY_NO_GNSSPOS || code == ErrorCode::ERROR_GNSS_SIGNAL_FAIL) {
       stopped_ = true;
       SetState(AlignmentAgentState::IDLE);
       return -1;
@@ -159,7 +153,7 @@ class AlignmentAgent {
     return 0;
   }
 
-  int AlignmentStop(REQUEST_TYPE *request, RESPONSE_TYPE *response) {
+  int AlignmentStop(REQUEST_TYPE* request, RESPONSE_TYPE* response) {
     response->set_code(ErrorCode::SUCCESS);
     if (sp_alignment_ == nullptr) {
       response->set_progress(0.0);
@@ -171,16 +165,16 @@ class AlignmentAgent {
     return 0;
   }
 
-  void SetState(AlignmentAgentState state) { state_ = state; }
+  void                SetState(AlignmentAgentState state) { state_ = state; }
   AlignmentAgentState GetState() const { return state_; }
 
  private:
-  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
-  std::shared_ptr<ALIGNMENT_TYPE> sp_alignment_ = nullptr;
+  std::shared_ptr<JsonConf>            sp_conf_                  = nullptr;
+  std::shared_ptr<ALIGNMENT_TYPE>      sp_alignment_             = nullptr;
   std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent_ = nullptr;
-  AlignmentAgentState state_;
-  bool need_stop_;
-  bool stopped_;
+  AlignmentAgentState                  state_;
+  bool                                 need_stop_;
+  bool                                 stopped_;
 };
 
 }  // namespace hdmap

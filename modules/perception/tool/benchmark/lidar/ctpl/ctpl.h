@@ -48,7 +48,7 @@
 #include "boost/lockfree/queue.hpp"
 
 #ifndef _ctplThreadPoolLength_
-#define _ctplThreadPoolLength_ 100
+#  define _ctplThreadPoolLength_ 100
 #endif
 
 // thread pool to run user's functors with signature
@@ -60,7 +60,10 @@ namespace ctpl {
 
 class thread_pool {
  public:
-  thread_pool() : q(_ctplThreadPoolLength_) { this->init(); }
+  thread_pool()
+      : q(_ctplThreadPoolLength_) {
+    this->init();
+  }
   explicit thread_pool(int nThreads, int queueSize = _ctplThreadPoolLength_)
       : q(queueSize) {
     this->init();
@@ -80,8 +83,8 @@ class thread_pool {
   int size() { return static_cast<int>(this->threads.size()); }
 
   // number of idle threads
-  int n_idle() { return this->nWaiting; }
-  std::thread &get_thread(int i) { return *this->threads[i]; }
+  int          n_idle() { return this->nWaiting; }
+  std::thread& get_thread(int i) { return *this->threads[i]; }
 
   // change the number of threads in the pool
   // should be called from one thread, otherwise be careful to not interleave,
@@ -108,24 +111,24 @@ class thread_pool {
           std::unique_lock<std::mutex> lock(this->mutex);
           this->cv.notify_all();
         }
-        this->threads.resize(
-            nThreads);  // safe to delete because the threads are detached
-        this->flags.resize(nThreads);  // safe to delete because the threads
-                                       // have copies of shared_ptr of the
-                                       // flags, not originals
+        this->threads.resize(nThreads);  // safe to delete because the threads are detached
+        this->flags.resize(nThreads);    // safe to delete because the threads
+                                         // have copies of shared_ptr of the
+                                         // flags, not originals
       }
     }
   }
 
   // empty the queue
   void clear_queue() {
-    std::function<void(int id)> *_f;
-    while (this->q.pop(_f)) delete _f;  // empty the queue
+    std::function<void(int id)>* _f;
+    while (this->q.pop(_f))
+      delete _f;  // empty the queue
   }
 
   // pops a functional wraper to the original function
   std::function<void(int)> pop() {
-    std::function<void(int id)> *_f = nullptr;
+    std::function<void(int id)>* _f = nullptr;
     this->q.pop(_f);
     std::unique_ptr<std::function<void(int id)>> func(
         _f);  // at return, delete the function even if an exception occurred
@@ -168,11 +171,9 @@ class thread_pool {
   }
 
   template <typename F, typename... Rest>
-  auto push(F &&f, Rest &&... rest) -> std::future<decltype(f(0, rest...))> {
-    auto pck =
-        std::make_shared<std::packaged_task<decltype(f(0, rest...))(int)>>(
-            std::bind(std::forward<F>(f), std::placeholders::_1,
-                      std::forward<Rest>(rest)...));
+  auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(0, rest...))> {
+    auto pck = std::make_shared<std::packaged_task<decltype(f(0, rest...))(int)>>(
+        std::bind(std::forward<F>(f), std::placeholders::_1, std::forward<Rest>(rest)...));
 
     auto _f = new std::function<void(int id)>([pck](int id) { (*pck)(id); });
     this->q.push(_f);
@@ -188,9 +189,8 @@ class thread_pool {
   // operator returns std::future, where the user can get the result and rethrow
   // the catched exceptins
   template <typename F>
-  auto push(F &&f) -> std::future<decltype(f(0))> {
-    auto pck = std::make_shared<std::packaged_task<decltype(f(0))(int)>>(
-        std::forward<F>(f));
+  auto push(F&& f) -> std::future<decltype(f(0))> {
+    auto pck = std::make_shared<std::packaged_task<decltype(f(0))(int)>>(std::forward<F>(f));
 
     auto _f = new std::function<void(int id)>([pck](int id) { (*pck)(id); });
     this->q.push(_f);
@@ -203,23 +203,22 @@ class thread_pool {
 
  private:
   // deleted
-  thread_pool(const thread_pool &);             // = delete;
-  thread_pool(thread_pool &&);                  // = delete;
-  thread_pool &operator=(const thread_pool &);  // = delete;
-  thread_pool &operator=(thread_pool &&);       // = delete;
+  thread_pool(const thread_pool&);             // = delete;
+  thread_pool(thread_pool&&);                  // = delete;
+  thread_pool& operator=(const thread_pool&);  // = delete;
+  thread_pool& operator=(thread_pool&&);       // = delete;
 
   void set_thread(int i) {
     std::shared_ptr<std::atomic<bool>> flag(
         this->flags[i]);  // a copy of the shared ptr to the flag
     auto f = [this, i, flag /* a copy of the shared ptr to the flag */]() {
-      std::atomic<bool> &_flag = *flag;
-      std::function<void(int id)> *_f;
-      bool isPop = this->q.pop(_f);
+      std::atomic<bool>&           _flag = *flag;
+      std::function<void(int id)>* _f;
+      bool                         isPop = this->q.pop(_f);
       while (true) {
         while (isPop) {  // if there is anything in the queue
-          std::unique_ptr<std::function<void(int id)>> func(
-              _f);  // at return, delete the function even if an exception
-                    // occurred
+          std::unique_ptr<std::function<void(int id)>> func(_f);  // at return, delete the function
+                                                                  // even if an exception occurred
           (*_f)(i);
 
           if (_flag)
@@ -243,24 +242,23 @@ class thread_pool {
                    // then return
       }
     };
-    this->threads[i].reset(
-        new std::thread(f));  // compiler may not support std::make_unique()
+    this->threads[i].reset(new std::thread(f));  // compiler may not support std::make_unique()
   }
 
   void init() {
     this->nWaiting = 0;
-    this->isStop = false;
-    this->isDone = false;
+    this->isStop   = false;
+    this->isDone   = false;
   }
 
-  std::vector<std::unique_ptr<std::thread>> threads;
-  std::vector<std::shared_ptr<std::atomic<bool>>> flags;
-  mutable boost::lockfree::queue<std::function<void(int id)> *> q;
-  std::atomic<bool> isDone;
-  std::atomic<bool> isStop;
+  std::vector<std::unique_ptr<std::thread>>                    threads;
+  std::vector<std::shared_ptr<std::atomic<bool>>>              flags;
+  mutable boost::lockfree::queue<std::function<void(int id)>*> q;
+  std::atomic<bool>                                            isDone;
+  std::atomic<bool>                                            isStop;
   std::atomic<int> nWaiting;  // how many threads are waiting
 
-  std::mutex mutex;
+  std::mutex              mutex;
   std::condition_variable cv;
 };
 }  // namespace ctpl

@@ -32,10 +32,9 @@ namespace lidar {
 
 class FusedClassifier : public BaseClassifier {
  public:
-  FusedClassifier() = default;
+  FusedClassifier()  = default;
   ~FusedClassifier() = default;
-  bool Init(
-      const ClassifierInitOptions& options = ClassifierInitOptions()) override;
+  bool Init(const ClassifierInitOptions& options = ClassifierInitOptions()) override;
 
   bool Classify(const ClassifierOptions& options, LidarFrame* frame) override;
 
@@ -46,17 +45,17 @@ class FusedClassifier : public BaseClassifier {
   FRIEND_TEST(FusedClassifierTest, test_one_sequence_fusion);
   FRIEND_TEST(FusedClassifierTest, test_one_sequence_fusion_bad_timestamp);
   ObjectSequence sequence_;
-  double temporal_window_ = 20.0;
-  bool enable_temporal_fusion_ = true;
-  bool use_tracked_objects_ = true;
+  double         temporal_window_        = 20.0;
+  bool           enable_temporal_fusion_ = true;
+  bool           use_tracked_objects_    = true;
 
   std::string one_shot_fusion_method_;
   std::string sequence_fusion_method_;
 
-  BaseOneShotTypeFusion* one_shot_fuser_;
+  BaseOneShotTypeFusion*  one_shot_fuser_;
   BaseSequenceTypeFusion* sequence_fuser_;
 
-  TypeFusionOption option_;
+  TypeFusionOption     option_;
   TypeFusionInitOption init_option_;
 };  // class FusedClassifier
 

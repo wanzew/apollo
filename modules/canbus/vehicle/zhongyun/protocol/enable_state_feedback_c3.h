@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class Enablestatefeedbackc3 : public ::apollo::drivers::canbus::ProtocolData<
-                                  ::apollo::canbus::ChassisDetail> {
+class Enablestatefeedbackc3
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Enablestatefeedbackc3();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'Parking_enable_state', 'enum': {0:
@@ -38,8 +38,8 @@ class Enablestatefeedbackc3 : public ::apollo::drivers::canbus::ProtocolData<
   // 'PARKING_ENABLE_STATE_PARKING_TAKEOVER'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit':
   // 32, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Enable_state_feedback_c3::Parking_enable_stateType parking_enable_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Enable_state_feedback_c3::Parking_enable_stateType
+  parking_enable_state(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'Steering_enable_state', 'enum': {0:
   // 'STEERING_ENABLE_STATE_STEERING_MANUALCONTROL', 1:
@@ -47,8 +47,8 @@ class Enablestatefeedbackc3 : public ::apollo::drivers::canbus::ProtocolData<
   // 'STEERING_ENABLE_STATE_STEERING_MANUAL_TAKEOVER'}, 'precision': 1.0, 'len':
   // 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit':
   // 8, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Enable_state_feedback_c3::Steering_enable_stateType steering_enable_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Enable_state_feedback_c3::Steering_enable_stateType
+  steering_enable_state(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'Gear_enable_actual', 'enum': {0:
   // 'GEAR_ENABLE_ACTUAL_GEAR_MANUALCONTROL', 1:
@@ -56,24 +56,24 @@ class Enablestatefeedbackc3 : public ::apollo::drivers::canbus::ProtocolData<
   // 'GEAR_ENABLE_ACTUAL_GEAR_MANUAL_TAKEOVER'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Enable_state_feedback_c3::Gear_enable_actualType gear_enable_actual(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Enable_state_feedback_c3::Gear_enable_actualType gear_enable_actual(const std::uint8_t* bytes,
+                                                                      const int32_t length) const;
 
   // config detail: {'name': 'Driven_enable_state', 'enum': {0:
   // 'DRIVEN_ENABLE_STATE_DRIVE_MANUAL', 1: 'DRIVEN_ENABLE_STATE_DRIVE_AUTO', 2:
   // 'DRIVEN_ENABLE_STATE_DRIVE_TAKEOVER'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit':
   // 16, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Enable_state_feedback_c3::Driven_enable_stateType driven_enable_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Enable_state_feedback_c3::Driven_enable_stateType driven_enable_state(const std::uint8_t* bytes,
+                                                                        const int32_t length) const;
 
   // config detail: {'name': 'Brake_enable_state', 'enum': {0:
   // 'BRAKE_ENABLE_STATE_BRAKE_MANUAL', 1: 'BRAKE_ENABLE_STATE_BRAKE_AUTO', 2:
   // 'BRAKE_ENABLE_STATE_BRAKE_TAKEOVER'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit':
   // 24, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Enable_state_feedback_c3::Brake_enable_stateType brake_enable_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Enable_state_feedback_c3::Brake_enable_stateType brake_enable_state(const std::uint8_t* bytes,
+                                                                      const int32_t length) const;
 };
 
 }  // namespace zhongyun

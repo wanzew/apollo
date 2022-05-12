@@ -58,28 +58,20 @@ class Track {
   SensorObjectConstPtr GetLatestRadarObject() const;
   SensorObjectConstPtr GetLatestCameraObject() const;
 
-  inline FusedObjectPtr GetFusedObject() { return fused_object_; }
+  inline FusedObjectPtr      GetFusedObject() { return fused_object_; }
   inline SensorId2ObjectMap& GetLidarObjects() { return lidar_objects_; }
 
-  inline const SensorId2ObjectMap& GetLidarObjects() const {
-    return lidar_objects_;
-  }
+  inline const SensorId2ObjectMap& GetLidarObjects() const { return lidar_objects_; }
 
   inline SensorId2ObjectMap& GetRadarObjects() { return radar_objects_; }
 
-  inline const SensorId2ObjectMap& GetRadarObjects() const {
-    return radar_objects_;
-  }
+  inline const SensorId2ObjectMap& GetRadarObjects() const { return radar_objects_; }
 
   inline SensorId2ObjectMap& GetCameraObjects() { return camera_objects_; }
 
-  inline const SensorId2ObjectMap& GetCameraObjects() const {
-    return camera_objects_;
-  }
+  inline const SensorId2ObjectMap& GetCameraObjects() const { return camera_objects_; }
 
-  inline int GetTrackId() const {
-    return fused_object_->GetBaseObject()->track_id;
-  }
+  inline int GetTrackId() const { return fused_object_->GetBaseObject()->track_id; }
 
   inline double GetTrackingPeriod() const { return tracking_period_; }
 
@@ -107,8 +99,7 @@ class Track {
 
   void UpdateWithSensorObject(const SensorObjectPtr& obj);
 
-  void UpdateWithoutSensorObject(const std::string& sensor_id,
-                                 double measurement_timestamp);
+  void UpdateWithoutSensorObject(const std::string& sensor_id, double measurement_timestamp);
 
   std::string DebugString() const;
 
@@ -117,34 +108,32 @@ class Track {
   void UpdateSupplementState(const SensorObjectPtr& src_object = nullptr);
   void UpdateUnfusedState(const SensorObjectPtr& src_object);
 
-  SensorObjectConstPtr GetLatestSensorObject(
-      const SensorId2ObjectMap& objects) const;
-  void UpdateSensorObject(SensorId2ObjectMap* objects,
-                          const SensorObjectPtr& obj);
-  void UpdateSensorObjectWithoutMeasurement(SensorId2ObjectMap* objects,
-                                            const std::string& sensor_id,
-                                            double measurement_timestamp,
-                                            double max_invisible_period);
-  void UpdateSensorObjectWithMeasurement(SensorId2ObjectMap* objects,
-                                         const std::string& sensor_id,
-                                         double measurement_timestamp,
-                                         double max_invisible_period);
-  void UpdateWithSensorObjectForBackground(const SensorObjectPtr& obj);
-  void UpdateWithoutSensorObjectForBackground(const std::string& sensor_id,
-                                              double measurement_timestamp);
+  SensorObjectConstPtr GetLatestSensorObject(const SensorId2ObjectMap& objects) const;
+  void                 UpdateSensorObject(SensorId2ObjectMap* objects, const SensorObjectPtr& obj);
+  void                 UpdateSensorObjectWithoutMeasurement(SensorId2ObjectMap* objects,
+                                                            const std::string&  sensor_id,
+                                                            double              measurement_timestamp,
+                                                            double              max_invisible_period);
+  void                 UpdateSensorObjectWithMeasurement(SensorId2ObjectMap* objects,
+                                                         const std::string&  sensor_id,
+                                                         double              measurement_timestamp,
+                                                         double              max_invisible_period);
+  void                 UpdateWithSensorObjectForBackground(const SensorObjectPtr& obj);
+  void                 UpdateWithoutSensorObjectForBackground(const std::string& sensor_id,
+                                                              double             measurement_timestamp);
 
  protected:
   SensorId2ObjectMap lidar_objects_;
   SensorId2ObjectMap radar_objects_;
   SensorId2ObjectMap camera_objects_;
 
-  FusedObjectPtr fused_object_ = nullptr;
-  double tracking_period_ = 0.0;
-  double existence_prob_ = 0.0;
-  double toic_prob_ = 0.0;
+  FusedObjectPtr fused_object_    = nullptr;
+  double         tracking_period_ = 0.0;
+  double         existence_prob_  = 0.0;
+  double         toic_prob_       = 0.0;
 
   bool is_background_ = false;
-  bool is_alive_ = true;
+  bool is_alive_      = true;
 
   size_t tracked_times_ = 0;
 
@@ -157,7 +146,7 @@ class Track {
   static double s_max_camera_invisible_period_;
 };
 
-typedef std::shared_ptr<Track> TrackPtr;
+typedef std::shared_ptr<Track>       TrackPtr;
 typedef std::shared_ptr<const Track> TrackConstPtr;
 
 }  // namespace fusion

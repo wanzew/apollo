@@ -30,7 +30,7 @@ namespace perception {
 namespace base {
 
 static const size_t kPoolDefaultExtendNum = 10;
-static const size_t kPoolDefaultSize = 100;
+static const size_t kPoolDefaultSize      = 100;
 
 // @brief default initializer used in concurrent object pool
 template <class T>
@@ -38,7 +38,8 @@ struct ObjectPoolDefaultInitializer {
   void operator()(T* t) const {}
 };
 // @brief concurrent object pool with dynamic size
-template <class ObjectType, size_t N = kPoolDefaultSize,
+template <class ObjectType,
+          size_t N          = kPoolDefaultSize,
           class Initializer = ObjectPoolDefaultInitializer<ObjectType>>
 class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
  public:
@@ -56,9 +57,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     ObjectType* ptr = nullptr;
     {
       std::lock_guard<std::mutex> lock(mutex_);
-      if (queue_.empty()) {
-        Add(1 + kPoolDefaultExtendNum);
-      }
+      if (queue_.empty()) { Add(1 + kPoolDefaultExtendNum); }
       ptr = queue_.front();
       queue_.pop();
     }
@@ -76,15 +75,12 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
   // @brief overrided function to get batch of smart pointers
   // @params[IN] num: batch number
   // @params[OUT] data: vector container to store the pointers
-  void BatchGet(size_t num,
-                std::vector<std::shared_ptr<ObjectType>>* data) override {
+  void BatchGet(size_t num, std::vector<std::shared_ptr<ObjectType>>* data) override {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     std::vector<ObjectType*> buffer(num, nullptr);
     {
       std::lock_guard<std::mutex> lock(mutex_);
-      if (queue_.size() < num) {
-        Add(num - queue_.size() + kPoolDefaultExtendNum);
-      }
+      if (queue_.size() < num) { Add(num - queue_.size() + kPoolDefaultExtendNum); }
       for (size_t i = 0; i < num; ++i) {
         buffer[i] = queue_.front();
         queue_.pop();
@@ -94,11 +90,10 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     // after releasing the mutex
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
-      data->emplace_back(
-          std::shared_ptr<ObjectType>(buffer[i], [&](ObjectType* obj_ptr) {
-            std::lock_guard<std::mutex> lock(mutex_);
-            queue_.push(obj_ptr);
-          }));
+      data->emplace_back(std::shared_ptr<ObjectType>(buffer[i], [&](ObjectType* obj_ptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        queue_.push(obj_ptr);
+      }));
     }
 #else
     for (size_t i = 0; i < num; ++i) {
@@ -110,15 +105,12 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
   // @params[IN] num: batch number
   // @params[IN] is_front: indicating insert to front or back of the list
   // @params[OUT] data: list container to store the pointers
-  void BatchGet(size_t num, bool is_front,
-                std::list<std::shared_ptr<ObjectType>>* data) override {
+  void BatchGet(size_t num, bool is_front, std::list<std::shared_ptr<ObjectType>>* data) override {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     std::vector<ObjectType*> buffer(num, nullptr);
     {
       std::lock_guard<std::mutex> lock(mutex_);
-      if (queue_.size() < num) {
-        Add(num - queue_.size() + kPoolDefaultExtendNum);
-      }
+      if (queue_.size() < num) { Add(num - queue_.size() + kPoolDefaultExtendNum); }
       for (size_t i = 0; i < num; ++i) {
         buffer[i] = queue_.front();
         queue_.pop();
@@ -128,22 +120,21 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     // after releasing the mutex
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
-      is_front ? data->emplace_front(std::shared_ptr<ObjectType>(
-                     buffer[i],
-                     [&](ObjectType* obj_ptr) {
-                       std::lock_guard<std::mutex> lock(mutex_);
-                       queue_.push(obj_ptr);
-                     }))
-               : data->emplace_back(std::shared_ptr<ObjectType>(
-                     buffer[i], [&](ObjectType* obj_ptr) {
-                       std::lock_guard<std::mutex> lock(mutex_);
-                       queue_.push(obj_ptr);
-                     }));
+      is_front ?
+          data->emplace_front(std::shared_ptr<ObjectType>(buffer[i],
+                                                          [&](ObjectType* obj_ptr) {
+                                                            std::lock_guard<std::mutex> lock(
+                                                                mutex_);
+                                                            queue_.push(obj_ptr);
+                                                          })) :
+          data->emplace_back(std::shared_ptr<ObjectType>(buffer[i], [&](ObjectType* obj_ptr) {
+            std::lock_guard<std::mutex> lock(mutex_);
+            queue_.push(obj_ptr);
+          }));
     }
 #else
     for (size_t i = 0; i < num; ++i) {
-      is_front ? data->emplace_front(new ObjectType)
-               : data->emplace_back(new ObjectType);
+      is_front ? data->emplace_front(new ObjectType) : data->emplace_back(new ObjectType);
     }
 #endif
   }
@@ -151,15 +142,12 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
   // @params[IN] num: batch number
   // @params[IN] is_front: indicating insert to front or back of the deque
   // @params[OUT] data: deque container to store the pointers
-  void BatchGet(size_t num, bool is_front,
-                std::deque<std::shared_ptr<ObjectType>>* data) override {
+  void BatchGet(size_t num, bool is_front, std::deque<std::shared_ptr<ObjectType>>* data) override {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     std::vector<ObjectType*> buffer(num, nullptr);
     {
       std::lock_guard<std::mutex> lock(mutex_);
-      if (queue_.size() < num) {
-        Add(num - queue_.size() + kPoolDefaultExtendNum);
-      }
+      if (queue_.size() < num) { Add(num - queue_.size() + kPoolDefaultExtendNum); }
       for (size_t i = 0; i < num; ++i) {
         buffer[i] = queue_.front();
         queue_.pop();
@@ -167,22 +155,21 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     }
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
-      is_front ? data->emplace_front(std::shared_ptr<ObjectType>(
-                     buffer[i],
-                     [&](ObjectType* obj_ptr) {
-                       std::lock_guard<std::mutex> lock(mutex_);
-                       queue_.push(obj_ptr);
-                     }))
-               : data->emplace_back(std::shared_ptr<ObjectType>(
-                     buffer[i], [&](ObjectType* obj_ptr) {
-                       std::lock_guard<std::mutex> lock(mutex_);
-                       queue_.push(obj_ptr);
-                     }));
+      is_front ?
+          data->emplace_front(std::shared_ptr<ObjectType>(buffer[i],
+                                                          [&](ObjectType* obj_ptr) {
+                                                            std::lock_guard<std::mutex> lock(
+                                                                mutex_);
+                                                            queue_.push(obj_ptr);
+                                                          })) :
+          data->emplace_back(std::shared_ptr<ObjectType>(buffer[i], [&](ObjectType* obj_ptr) {
+            std::lock_guard<std::mutex> lock(mutex_);
+            queue_.push(obj_ptr);
+          }));
     }
 #else
     for (size_t i = 0; i < num; ++i) {
-      is_front ? data->emplace_front(new ObjectType)
-               : data->emplace_back(new ObjectType);
+      is_front ? data->emplace_front(new ObjectType) : data->emplace_back(new ObjectType);
     }
 #endif
   }
@@ -190,9 +177,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
   // @brief overrided function to set capacity
   void set_capacity(size_t capacity) override {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (capacity_ < capacity) {
-      Add(capacity - capacity_);
-    }
+    if (capacity_ < capacity) { Add(capacity - capacity_); }
   }
   // @brief get remained object number
   size_t RemainedNum() override { return queue_.size(); }
@@ -232,13 +217,13 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     capacity_ = kDefaultCacheSize;
 #endif
   }
-  std::mutex mutex_;
+  std::mutex              mutex_;
   std::queue<ObjectType*> queue_;
   // @brief point to a continuous memory of default pool size
-  ObjectType* cache_ = nullptr;
+  ObjectType*  cache_ = nullptr;
   const size_t kDefaultCacheSize;
   // @brief list to store extended memory, not as efficient
-  std::list<ObjectType*> extended_cache_;
+  std::list<ObjectType*>   extended_cache_;
   static const Initializer kInitializer;
 };
 

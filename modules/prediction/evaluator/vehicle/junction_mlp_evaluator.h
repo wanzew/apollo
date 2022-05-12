@@ -50,8 +50,7 @@ class JunctionMLPEvaluator : public Evaluator {
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
-                ObstaclesContainer* obstacles_container) override;
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Extract feature vector
@@ -59,8 +58,8 @@ class JunctionMLPEvaluator : public Evaluator {
    * @param Obstacles container
    * @param Feature container in a vector for receiving the feature values
    */
-  void ExtractFeatureValues(Obstacle* obstacle_ptr,
-                            ObstaclesContainer* obstacles_container,
+  void ExtractFeatureValues(Obstacle*            obstacle_ptr,
+                            ObstaclesContainer*  obstacles_container,
                             std::vector<double>* feature_values);
 
   /**
@@ -74,8 +73,7 @@ class JunctionMLPEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        Feature container in a vector for receiving the feature values
    */
-  void SetObstacleFeatureValues(Obstacle* obstacle_ptr,
-                                std::vector<double>* const feature_values);
+  void SetObstacleFeatureValues(Obstacle* obstacle_ptr, std::vector<double>* const feature_values);
 
   /**
    * @brief Set ego vehicle feature vector
@@ -83,8 +81,8 @@ class JunctionMLPEvaluator : public Evaluator {
    * @param Obstacles container
    * @param Feature container in a vector for receiving the feature values
    */
-  void SetEgoVehicleFeatureValues(Obstacle* obstacle_ptr,
-                                  ObstaclesContainer* obstacles_container,
+  void SetEgoVehicleFeatureValues(Obstacle*                  obstacle_ptr,
+                                  ObstaclesContainer*        obstacles_container,
                                   std::vector<double>* const feature_values);
 
   /**
@@ -92,8 +90,7 @@ class JunctionMLPEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        Feature container in a vector for receiving the feature values
    */
-  void SetJunctionFeatureValues(Obstacle* obstacle_ptr,
-                                std::vector<double>* const feature_values);
+  void SetJunctionFeatureValues(Obstacle* obstacle_ptr, std::vector<double>* const feature_values);
 
   /**
    * @brief Load model file
@@ -109,7 +106,7 @@ class JunctionMLPEvaluator : public Evaluator {
   static const size_t JUNCTION_FEATURE_SIZE = 12 * 8;
 
   torch::jit::script::Module torch_model_;
-  torch::Device device_;
+  torch::Device              device_;
 };
 
 }  // namespace prediction

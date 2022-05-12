@@ -36,25 +36,25 @@ class Auxiliarycontrol_110_test : public ::testing::Test {
 };
 
 TEST_F(Auxiliarycontrol_110_test, General) {
-  uint8_t data[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const int adc_auxcontrol_counter = 2;
-  const int adc_auxcontrol_checksum = 127;
+  uint8_t    data[8]                        = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
+  const int  adc_auxcontrol_counter         = 2;
+  const int  adc_auxcontrol_checksum        = 127;
   const bool adc_cmd_inverter_controlenable = 0;
-  const bool adc_cmd_inverter = 0;
-  const int adc_cmd_wiper = 5;
-  const bool adc_cmd_pdu_controlenable = 0;
-  const bool adc_cmd_pdu_ch8 = 0;
-  const bool adc_cmd_pdu_ch7 = 0;
-  const bool adc_cmd_pdu_ch6 = 0;
-  const bool adc_cmd_pdu_ch5 = 0;
-  const bool adc_cmd_pdu_ch4 = 0;
-  const bool adc_cmd_pdu_ch3 = 0;
-  const bool adc_cmd_pdu_ch2 = 0;
-  const bool adc_cmd_pdu_ch1 = 0;
-  const bool adc_cmd_hazardlights = 0;
-  const bool adc_cmd_highbeam = 0;
-  const bool adc_cmd_lowbeam = 0;
-  const bool adc_cmd_horn = 0;
+  const bool adc_cmd_inverter               = 0;
+  const int  adc_cmd_wiper                  = 5;
+  const bool adc_cmd_pdu_controlenable      = 0;
+  const bool adc_cmd_pdu_ch8                = 0;
+  const bool adc_cmd_pdu_ch7                = 0;
+  const bool adc_cmd_pdu_ch6                = 0;
+  const bool adc_cmd_pdu_ch5                = 0;
+  const bool adc_cmd_pdu_ch4                = 0;
+  const bool adc_cmd_pdu_ch3                = 0;
+  const bool adc_cmd_pdu_ch2                = 0;
+  const bool adc_cmd_pdu_ch1                = 0;
+  const bool adc_cmd_hazardlights           = 0;
+  const bool adc_cmd_highbeam               = 0;
+  const bool adc_cmd_lowbeam                = 0;
+  const bool adc_cmd_horn                   = 0;
   Adc_auxiliarycontrol_110::Adc_cmd_turnsignalType adc_cmd_turnsignal =
       Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT;
   const uint8_t equivalent_6 = 0xa9;
@@ -65,8 +65,7 @@ TEST_F(Auxiliarycontrol_110_test, General) {
 
   control_.set_p_adc_auxcontrol_counter(data, adc_auxcontrol_counter);
   control_.set_p_adc_auxcontrol_checksum(data, adc_auxcontrol_checksum);
-  control_.set_p_adc_cmd_inverter_controlenable(data,
-                                                adc_cmd_inverter_controlenable);
+  control_.set_p_adc_cmd_inverter_controlenable(data, adc_cmd_inverter_controlenable);
   control_.set_p_adc_cmd_inverter(data, adc_cmd_inverter);
   control_.set_p_adc_cmd_wiper(data, adc_cmd_wiper);
   control_.set_p_adc_cmd_pdu_controlenable(data, adc_cmd_pdu_controlenable);

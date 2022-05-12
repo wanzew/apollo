@@ -15,11 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/base/object_pool.h"
 
+#include "gtest/gtest.h"
+
 #include "modules/perception/base/light_object_pool.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_pool_types.h"
-
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -36,7 +36,7 @@ TEST(ObjectPoolTest, basic_test) {
 
 TEST(ObjectPoolTest, dummy_object_pool_test) {
   typedef DummyObjectPool<Object> TestObjectPool;
-  std::shared_ptr<Object> obj = TestObjectPool::Instance().Get();
+  std::shared_ptr<Object>         obj = TestObjectPool::Instance().Get();
   EXPECT_NE(obj, nullptr);
   TestObjectPool::Instance().set_capacity(10);
   EXPECT_EQ(TestObjectPool::Instance().get_capacity(), 0);
@@ -82,7 +82,7 @@ TEST(ObjectPoolTest, dummy_object_pool_test) {
 TEST(ObjectPoolTest, concurrent_object_pool_capacity_test) {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
   typedef ConcurrentObjectPool<Object> TestObjectPool;
-  size_t capacity = TestObjectPool::Instance().RemainedNum();
+  size_t                               capacity = TestObjectPool::Instance().RemainedNum();
   TestObjectPool::Instance().set_capacity(capacity - 10);
   EXPECT_EQ(TestObjectPool::Instance().RemainedNum(), capacity);
   TestObjectPool::Instance().set_capacity(capacity + 10);
@@ -92,8 +92,8 @@ TEST(ObjectPoolTest, concurrent_object_pool_capacity_test) {
 
 TEST(ObjectPoolTest, concurrent_object_pool_get_test) {
   typedef ConcurrentObjectPool<Object> TestObjectPool;
-  auto& instance = TestObjectPool::Instance();
-  size_t size = instance.RemainedNum();
+  auto&                                instance = TestObjectPool::Instance();
+  size_t                               size     = instance.RemainedNum();
   std::vector<std::shared_ptr<Object>> memory;
   for (size_t i = 0; i < size; ++i) {
     memory.push_back(instance.Get());
@@ -112,9 +112,9 @@ TEST(ObjectPoolTest, concurrent_object_pool_get_test) {
 
 TEST(ObjectPoolTest, concurrent_object_pool_batch_get_vec_test) {
   typedef ConcurrentObjectPool<Object> TestObjectPool;
-  auto& instance = TestObjectPool::Instance();
+  auto&                                instance = TestObjectPool::Instance();
 #ifndef PERCEPTION_BASE_DISABLE_POOL
-  size_t size = instance.RemainedNum();
+  size_t                               size = instance.RemainedNum();
   std::vector<std::shared_ptr<Object>> memory;
   for (size_t i = 0; i < size - 1; ++i) {
     memory.push_back(instance.Get());
@@ -143,9 +143,9 @@ TEST(ObjectPoolTest, concurrent_object_pool_batch_get_vec_test) {
 
 TEST(ObjectPoolTest, concurrent_object_pool_batch_get_list_test) {
   typedef ConcurrentObjectPool<Object> TestObjectPool;
-  auto& instance = TestObjectPool::Instance();
+  auto&                                instance = TestObjectPool::Instance();
 #ifndef PERCEPTION_BASE_DISABLE_POOL
-  size_t size = instance.RemainedNum();
+  size_t                               size = instance.RemainedNum();
   std::vector<std::shared_ptr<Object>> memory;
   for (size_t i = 0; i < size - 1; ++i) {
     memory.push_back(instance.Get());
@@ -175,9 +175,9 @@ TEST(ObjectPoolTest, concurrent_object_pool_batch_get_list_test) {
 
 TEST(ObjectPoolTest, concurrent_object_pool_batch_get_deque_test) {
   typedef ConcurrentObjectPool<Object> TestObjectPool;
-  auto& instance = TestObjectPool::Instance();
+  auto&                                instance = TestObjectPool::Instance();
 #ifndef PERCEPTION_BASE_DISABLE_POOL
-  size_t size = instance.RemainedNum();
+  size_t                               size = instance.RemainedNum();
   std::vector<std::shared_ptr<Object>> memory;
   for (size_t i = 0; i < size - 1; ++i) {
     memory.push_back(instance.Get());
@@ -210,7 +210,7 @@ TEST(ObjectPoolTest, concurrent_object_pool_batch_get_deque_test) {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
 TEST(ObjectPoolTest, concurrent_object_pool_constructor_test) {
   typedef ConcurrentObjectPool<Object, 10> TestObjectPool;
-  auto& pool = TestObjectPool::Instance();
+  auto&                                    pool = TestObjectPool::Instance();
   EXPECT_EQ(pool.RemainedNum(), 10);
   EXPECT_EQ(pool.get_capacity(), 10);
 }
@@ -223,8 +223,7 @@ struct TestObjectPoolInitializer {
 TEST(ObjectPoolTest, concurrent_object_pool_initializer_test) {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
   {
-    typedef ConcurrentObjectPool<Object, 10, TestObjectPoolInitializer>
-        TestObjectPool;
+    typedef ConcurrentObjectPool<Object, 10, TestObjectPoolInitializer> TestObjectPool;
     std::shared_ptr<Object> ptr = TestObjectPool::Instance().Get();
     EXPECT_EQ(ptr->id, 1);
     {
@@ -254,7 +253,7 @@ TEST(ObjectPoolTest, concurrent_object_pool_initializer_test) {
 #endif
   {
     typedef ConcurrentObjectPool<Object> TestObjectPool;
-    std::shared_ptr<Object> ptr = TestObjectPool::Instance().Get();
+    std::shared_ptr<Object>              ptr = TestObjectPool::Instance().Get();
     EXPECT_EQ(ptr->id, -1);
     {
       std::vector<std::shared_ptr<Object>> object_vec;
@@ -295,9 +294,9 @@ TEST(ObjectPoolTest, light_object_pool_capacity_test) {
 }
 
 TEST(ObjectPoolTest, light_object_pool_get_test) {
-  typedef LightObjectPool<Object> TestObjectPool;
-  auto& instance = TestObjectPool::Instance();
-  size_t size = instance.RemainedNum();
+  typedef LightObjectPool<Object>      TestObjectPool;
+  auto&                                instance = TestObjectPool::Instance();
+  size_t                               size     = instance.RemainedNum();
   std::vector<std::shared_ptr<Object>> memory;
   for (size_t i = 0; i < size; ++i) {
     memory.push_back(instance.Get());
@@ -311,9 +310,9 @@ TEST(ObjectPoolTest, light_object_pool_get_test) {
 }
 
 TEST(ObjectPoolTest, light_object_pool_batch_get_vec_test) {
-  typedef LightObjectPool<Object> TestObjectPool;
-  auto& instance = TestObjectPool::Instance();
-  size_t size = instance.RemainedNum();
+  typedef LightObjectPool<Object>      TestObjectPool;
+  auto&                                instance = TestObjectPool::Instance();
+  size_t                               size     = instance.RemainedNum();
   std::vector<std::shared_ptr<Object>> memory;
   for (size_t i = 0; i < size - 1; ++i) {
     memory.push_back(instance.Get());
@@ -338,9 +337,9 @@ TEST(ObjectPoolTest, light_object_pool_batch_get_vec_test) {
 }
 
 TEST(ObjectPoolTest, light_object_pool_batch_get_list_test) {
-  typedef LightObjectPool<Object> TestObjectPool;
-  auto& instance = TestObjectPool::Instance();
-  size_t size = instance.RemainedNum();
+  typedef LightObjectPool<Object>      TestObjectPool;
+  auto&                                instance = TestObjectPool::Instance();
+  size_t                               size     = instance.RemainedNum();
   std::vector<std::shared_ptr<Object>> memory;
   for (size_t i = 0; i < size - 1; ++i) {
     memory.push_back(instance.Get());
@@ -366,9 +365,9 @@ TEST(ObjectPoolTest, light_object_pool_batch_get_list_test) {
 }
 
 TEST(ObjectPoolTest, light_object_pool_batch_get_deque_test) {
-  typedef LightObjectPool<Object> TestObjectPool;
-  auto& instance = TestObjectPool::Instance();
-  size_t size = instance.RemainedNum();
+  typedef LightObjectPool<Object>      TestObjectPool;
+  auto&                                instance = TestObjectPool::Instance();
+  size_t                               size     = instance.RemainedNum();
   std::vector<std::shared_ptr<Object>> memory;
   for (size_t i = 0; i < size - 1; ++i) {
     memory.push_back(instance.Get());
@@ -397,15 +396,14 @@ TEST(ObjectPoolTest, light_object_pool_batch_get_deque_test) {
 
 TEST(ObjectPoolTest, light_object_pool_constructor_test) {
   typedef LightObjectPool<Object, 10> TestObjectPool;
-  auto& pool = TestObjectPool::Instance();
+  auto&                               pool = TestObjectPool::Instance();
   EXPECT_EQ(pool.RemainedNum(), 10);
   EXPECT_EQ(pool.get_capacity(), 10);
 }
 
 TEST(ObjectPoolTest, light_object_pool_initializer_test) {
   {
-    typedef LightObjectPool<Object, 10, TestObjectPoolInitializer>
-        TestObjectPool;
+    typedef LightObjectPool<Object, 10, TestObjectPoolInitializer> TestObjectPool;
     std::shared_ptr<Object> ptr = TestObjectPool::Instance().Get();
     EXPECT_EQ(ptr->id, 1);
     {
@@ -434,7 +432,7 @@ TEST(ObjectPoolTest, light_object_pool_initializer_test) {
   }
   {
     typedef LightObjectPool<Object> TestObjectPool;
-    std::shared_ptr<Object> ptr = TestObjectPool::Instance().Get();
+    std::shared_ptr<Object>         ptr = TestObjectPool::Instance().Get();
     EXPECT_EQ(ptr->id, -1);
     {
       std::vector<std::shared_ptr<Object>> object_vec;

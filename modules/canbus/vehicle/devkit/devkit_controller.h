@@ -22,14 +22,15 @@
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/devkit/protocol/brake_command_101.h"
 #include "modules/canbus/vehicle/devkit/protocol/gear_command_103.h"
 #include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
 #include "modules/canbus/vehicle/devkit/protocol/steering_command_102.h"
 #include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
 
 namespace apollo {
 namespace canbus {
@@ -41,11 +42,10 @@ class DevkitController final : public VehicleController {
 
   virtual ~DevkitController();
 
-  ::apollo::common::ErrorCode Init(
-      const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
-      override;
+  ::apollo::common::ErrorCode
+  Init(const VehicleParameter&                                params,
+       CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+       MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) override;
 
   bool Start() override;
 
@@ -69,7 +69,7 @@ class DevkitController final : public VehicleController {
 
  private:
   // main logical function for operation the car enter or exit the auto driving
-  void Emergency() override;
+  void                        Emergency() override;
   ::apollo::common::ErrorCode EnableAutoMode() override;
   ::apollo::common::ErrorCode DisableAutoMode() override;
   ::apollo::common::ErrorCode EnableSteeringOnlyMode() override;
@@ -104,37 +104,36 @@ class DevkitController final : public VehicleController {
   void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
   void SetBeam(const ::apollo::control::ControlCommand& command) override;
   void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetTurningSignal(const ::apollo::control::ControlCommand& command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
 
  private:
-  void SecurityDogThreadFunc();
-  virtual bool CheckResponse(const int32_t flags, bool need_wait);
-  void set_chassis_error_mask(const int32_t mask);
-  int32_t chassis_error_mask();
+  void               SecurityDogThreadFunc();
+  virtual bool       CheckResponse(const int32_t flags, bool need_wait);
+  void               set_chassis_error_mask(const int32_t mask);
+  int32_t            chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
-  void set_chassis_error_code(const Chassis::ErrorCode& error_code);
+  void               set_chassis_error_code(const Chassis::ErrorCode& error_code);
 
  private:
   // control protocol
-  Brakecommand101* brake_command_101_ = nullptr;
-  Gearcommand103* gear_command_103_ = nullptr;
-  Parkcommand104* park_command_104_ = nullptr;
+  Brakecommand101*    brake_command_101_    = nullptr;
+  Gearcommand103*     gear_command_103_     = nullptr;
+  Parkcommand104*     park_command_104_     = nullptr;
   Steeringcommand102* steering_command_102_ = nullptr;
   Throttlecommand100* throttle_command_100_ = nullptr;
 
-  Chassis chassis_;
+  Chassis                      chassis_;
   std::unique_ptr<std::thread> thread_;
-  bool is_chassis_error_ = false;
+  bool                         is_chassis_error_ = false;
 
-  std::mutex chassis_error_code_mutex_;
+  std::mutex         chassis_error_code_mutex_;
   Chassis::ErrorCode chassis_error_code_ = Chassis::NO_ERROR;
 
   std::mutex chassis_mask_mutex_;
-  int32_t chassis_error_mask_ = 0;
+  int32_t    chassis_error_mask_ = 0;
 };
 
 }  // namespace devkit

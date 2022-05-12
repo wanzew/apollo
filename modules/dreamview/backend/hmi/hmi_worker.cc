@@ -37,21 +37,21 @@
 #include "modules/dreamview/backend/fuel_monitor/preprocess_monitor.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
-DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
+DEFINE_string(hmi_modes_config_path,
+              "/apollo/modules/dreamview/conf/hmi_modes",
               "HMI modes config path.");
 
 DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
 
-DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
-              "Vehicles config path.");
+DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data", "Vehicles config path.");
 
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
 
-DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
+DEFINE_string(current_mode_db_key,
+              "/apollo/hmi/status:current_mode",
               "Key to store hmi_status.current_mode in KV DB.");
 
-DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
-              "Default HMI Mode when there is no cache.");
+DEFINE_string(default_hmi_mode, "Mkz Standard Debug", "Default HMI Mode when there is no cache.");
 
 namespace apollo {
 namespace dreamview {
@@ -90,20 +90,19 @@ std::string TitleCase(std::string_view origin) {
 // List subdirs and return a dict of {subdir_title: subdir_path}.
 Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
   Map<std::string, std::string> result;
-  const auto subdirs = cyber::common::ListSubPaths(dir);
+  const auto                    subdirs = cyber::common::ListSubPaths(dir);
   for (const auto& subdir : subdirs) {
     const auto subdir_title = TitleCase(subdir);
-    const auto subdir_path = absl::StrCat(dir, "/", subdir);
+    const auto subdir_path  = absl::StrCat(dir, "/", subdir);
     result.insert({subdir_title, subdir_path});
   }
   return result;
 }
 
 // List files by pattern and return a dict of {file_title: file_path}.
-Map<std::string, std::string> ListFilesAsDict(std::string_view dir,
-                                              std::string_view extension) {
+Map<std::string, std::string> ListFilesAsDict(std::string_view dir, std::string_view extension) {
   Map<std::string, std::string> result;
-  const std::string pattern = absl::StrCat(dir, "/*", extension);
+  const std::string             pattern = absl::StrCat(dir, "/*", extension);
   for (const std::string& file_path : cyber::common::Glob(pattern)) {
     // Remove the extension and convert to title case as the file title.
     const std::string filename = cyber::common::GetFileName(file_path);
@@ -115,10 +114,8 @@ Map<std::string, std::string> ListFilesAsDict(std::string_view dir,
 }
 
 template <class FlagType, class ValueType>
-void SetGlobalFlag(std::string_view flag_name, const ValueType& value,
-                   FlagType* flag) {
-  constexpr char kGlobalFlagfile[] =
-      "/apollo/modules/common/data/global_flagfile.txt";
+void SetGlobalFlag(std::string_view flag_name, const ValueType& value, FlagType* flag) {
+  constexpr char kGlobalFlagfile[] = "/apollo/modules/common/data/global_flagfile.txt";
   if (*flag != value) {
     *flag = value;
     // Overwrite global flagfile.
@@ -140,38 +137,34 @@ void System(std::string_view cmd) {
 }  // namespace
 
 HMIWorker::HMIWorker(const std::shared_ptr<Node>& node)
-    : config_(LoadConfig()), node_(node) {
+    : config_(LoadConfig())
+    , node_(node) {
   InitStatus();
 }
 
 void HMIWorker::Start() {
   InitReadersAndWriters();
-  RegisterStatusUpdateHandler(
-      [this](const bool status_changed, HMIStatus* status) {
-        apollo::common::util::FillHeader("HMI", status);
-        status_writer_->Write(*status);
-        status->clear_header();
-      });
+  RegisterStatusUpdateHandler([this](const bool status_changed, HMIStatus* status) {
+    apollo::common::util::FillHeader("HMI", status);
+    status_writer_->Write(*status);
+    status->clear_header();
+  });
   ResetComponentStatusTimer();
   thread_future_ = cyber::Async(&HMIWorker::StatusUpdateThreadLoop, this);
 }
 
 void HMIWorker::Stop() {
   stop_ = true;
-  if (thread_future_.valid()) {
-    thread_future_.get();
-  }
+  if (thread_future_.valid()) { thread_future_.get(); }
 }
 
 HMIConfig HMIWorker::LoadConfig() {
   HMIConfig config;
   // Get available modes, maps and vehicles by listing data directory.
-  *config.mutable_modes() =
-      ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  ACHECK(!config.modes().empty())
-      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
+  *config.mutable_modes() = ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
+  ACHECK(!config.modes().empty()) << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
 
-  *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
+  *config.mutable_maps()     = ListDirAsDict(FLAGS_maps_data_path);
   *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);
   AINFO << "Loaded HMI config: " << config.DebugString();
   return config;
@@ -183,12 +176,11 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
       << "Unable to parse HMIMode from file " << mode_config_path;
   // Translate cyber_modules to regular modules.
   for (const auto& iter : mode.cyber_modules()) {
-    const std::string& module_name = iter.first;
+    const std::string& module_name  = iter.first;
     const CyberModule& cyber_module = iter.second;
     // Each cyber module should have at least one dag file.
     ACHECK(!cyber_module.dag_files().empty())
-        << "None dag file is provided for " << module_name << " module in "
-        << mode_config_path;
+        << "None dag file is provided for " << module_name << " module in " << mode_config_path;
 
     Module& module = LookupOrInsert(mode.mutable_modules(), module_name, {});
     module.set_required_for_safety(cyber_module.required_for_safety());
@@ -230,8 +222,8 @@ void HMIWorker::InitStatus() {
     if (mode == FLAGS_vehicle_calibration_mode) {
       FuelMonitorManager::Instance()->RegisterFuelMonitor(
           mode, std::make_unique<DataCollectionMonitor>());
-      FuelMonitorManager::Instance()->RegisterFuelMonitor(
-          mode, std::make_unique<PreprocessMonitor>());
+      FuelMonitorManager::Instance()->RegisterFuelMonitor(mode,
+                                                          std::make_unique<PreprocessMonitor>());
     } else if (mode == FLAGS_lidar_calibration_mode) {
       FuelMonitorManager::Instance()->RegisterFuelMonitor(
           mode, std::make_unique<PreprocessMonitor>("lidar_to_gnss"));
@@ -246,9 +238,7 @@ void HMIWorker::InitStatus() {
     status_.add_maps(map_entry.first);
 
     // If current FLAG_map_dir is available, set it as current_map.
-    if (map_entry.second == FLAGS_map_dir) {
-      status_.set_current_map(map_entry.first);
-    }
+    if (map_entry.second == FLAGS_map_dir) { status_.set_current_map(map_entry.first); }
   }
 
   // Populate vehicles and current_vehicle.
@@ -261,8 +251,7 @@ void HMIWorker::InitStatus() {
   //   2. CachedMode if it's stored in KV database.
   //   3. default_hmi_mode if it is available.
   //   4. Pick the first available mode.
-  const std::string cached_mode =
-      KVDB::Get(FLAGS_current_mode_db_key).value_or("");
+  const std::string cached_mode = KVDB::Get(FLAGS_current_mode_db_key).value_or("");
   if (FLAGS_use_navigation_mode && ContainsKey(modes, kNavigationModeName)) {
     ChangeMode(kNavigationModeName);
   } else if (ContainsKey(modes, cached_mode)) {
@@ -275,32 +264,26 @@ void HMIWorker::InitStatus() {
 }
 
 void HMIWorker::InitReadersAndWriters() {
-  status_writer_ = node_->CreateWriter<HMIStatus>(FLAGS_hmi_status_topic);
-  pad_writer_ = node_->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
-  audio_event_writer_ =
-      node_->CreateWriter<AudioEvent>(FLAGS_audio_event_topic);
-  drive_event_writer_ =
-      node_->CreateWriter<DriveEvent>(FLAGS_drive_event_topic);
+  status_writer_      = node_->CreateWriter<HMIStatus>(FLAGS_hmi_status_topic);
+  pad_writer_         = node_->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
+  audio_event_writer_ = node_->CreateWriter<AudioEvent>(FLAGS_audio_event_topic);
+  drive_event_writer_ = node_->CreateWriter<DriveEvent>(FLAGS_drive_event_topic);
 
   node_->CreateReader<SystemStatus>(
-      FLAGS_system_status_topic,
-      [this](const std::shared_ptr<SystemStatus>& system_status) {
+      FLAGS_system_status_topic, [this](const std::shared_ptr<SystemStatus>& system_status) {
         this->ResetComponentStatusTimer();
 
         WLock wlock(status_mutex_);
 
         const bool is_realtime_msg =
-            FLAGS_use_sim_time
-                ? system_status->is_realtime_in_simulation()
-                : Clock::NowInSeconds() -
-                          system_status->header().timestamp_sec() <
-                      FLAGS_system_status_lifetime_seconds;
+            FLAGS_use_sim_time ? system_status->is_realtime_in_simulation() :
+                                 Clock::NowInSeconds() - system_status->header().timestamp_sec() <
+                                     FLAGS_system_status_lifetime_seconds;
         // Update modules running status from realtime SystemStatus.
         if (is_realtime_msg) {
           for (auto& iter : *status_.mutable_modules()) {
             auto* status = FindOrNull(system_status->hmi_modules(), iter.first);
-            iter.second =
-                status != nullptr && status->status() == ComponentStatus::OK;
+            iter.second  = status != nullptr && status->status() == ComponentStatus::OK;
           }
         }
         // Update monitored components status.
@@ -316,8 +299,7 @@ void HMIWorker::InitReadersAndWriters() {
 
         // Update other components status.
         for (auto& iter : *status_.mutable_other_components()) {
-          auto* status =
-              FindOrNull(system_status->other_components(), iter.first);
+          auto* status = FindOrNull(system_status->other_components(), iter.first);
           if (status != nullptr) {
             iter.second.CopyFrom(*status);
           } else {
@@ -327,16 +309,14 @@ void HMIWorker::InitReadersAndWriters() {
         }
 
         // Check if the status is changed.
-        const size_t new_fingerprint =
-            apollo::common::util::MessageFingerprint(status_);
+        const size_t new_fingerprint = apollo::common::util::MessageFingerprint(status_);
         if (last_status_fingerprint_ != new_fingerprint) {
-          status_changed_ = true;
+          status_changed_          = true;
           last_status_fingerprint_ = new_fingerprint;
         }
       });
 
-  localization_reader_ =
-      node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
   // Received Chassis, trigger action if there is high beam signal.
   chassis_reader_ = node_->CreateReader<Chassis>(
       FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
@@ -354,70 +334,45 @@ void HMIWorker::InitReadersAndWriters() {
 bool HMIWorker::Trigger(const HMIAction action) {
   AINFO << "HMIAction " << HMIAction_Name(action) << " was triggered!";
   switch (action) {
-    case HMIAction::NONE:
-      break;
-    case HMIAction::SETUP_MODE:
-      SetupMode();
-      break;
-    case HMIAction::ENTER_AUTO_MODE:
-      return ChangeDrivingMode(Chassis::COMPLETE_AUTO_DRIVE);
-    case HMIAction::DISENGAGE:
-      return ChangeDrivingMode(Chassis::COMPLETE_MANUAL);
-    case HMIAction::RESET_MODE:
-      ResetMode();
-      break;
-    default:
-      AERROR << "HMIAction not implemented, yet!";
-      return false;
+    case HMIAction::NONE: break;
+    case HMIAction::SETUP_MODE: SetupMode(); break;
+    case HMIAction::ENTER_AUTO_MODE: return ChangeDrivingMode(Chassis::COMPLETE_AUTO_DRIVE);
+    case HMIAction::DISENGAGE: return ChangeDrivingMode(Chassis::COMPLETE_MANUAL);
+    case HMIAction::RESET_MODE: ResetMode(); break;
+    default: AERROR << "HMIAction not implemented, yet!"; return false;
   }
   return true;
 }
 
 bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
-  AINFO << "HMIAction " << HMIAction_Name(action) << "(" << value
-        << ") was triggered!";
+  AINFO << "HMIAction " << HMIAction_Name(action) << "(" << value << ") was triggered!";
   switch (action) {
-    case HMIAction::CHANGE_MODE:
-      ChangeMode(value);
-      break;
-    case HMIAction::CHANGE_MAP:
-      ChangeMap(value);
-      break;
-    case HMIAction::CHANGE_VEHICLE:
-      ChangeVehicle(value);
-      break;
-    case HMIAction::START_MODULE:
-      StartModule(value);
-      break;
-    case HMIAction::STOP_MODULE:
-      StopModule(value);
-      break;
-    default:
-      AERROR << "HMIAction not implemented, yet!";
-      return false;
+    case HMIAction::CHANGE_MODE: ChangeMode(value); break;
+    case HMIAction::CHANGE_MAP: ChangeMap(value); break;
+    case HMIAction::CHANGE_VEHICLE: ChangeVehicle(value); break;
+    case HMIAction::START_MODULE: StartModule(value); break;
+    case HMIAction::STOP_MODULE: StopModule(value); break;
+    default: AERROR << "HMIAction not implemented, yet!"; return false;
   }
   return true;
 }
 
 void HMIWorker::SubmitAudioEvent(const uint64_t event_time_ms,
-                                 const int obstacle_id, const int audio_type,
-                                 const int moving_result,
-                                 const int audio_direction,
-                                 const bool is_siren_on) {
+                                 const int      obstacle_id,
+                                 const int      audio_type,
+                                 const int      moving_result,
+                                 const int      audio_direction,
+                                 const bool     is_siren_on) {
   std::shared_ptr<AudioEvent> audio_event = std::make_shared<AudioEvent>();
   apollo::common::util::FillHeader("HMI", audio_event.get());
   // Here we reuse the header time field as the event occurring time.
   // A better solution might be adding an event time field to DriveEvent proto
   // to make it clear.
-  audio_event->mutable_header()->set_timestamp_sec(
-      static_cast<double>(event_time_ms) / 1000.0);
+  audio_event->mutable_header()->set_timestamp_sec(static_cast<double>(event_time_ms) / 1000.0);
   audio_event->set_id(obstacle_id);
-  audio_event->set_audio_type(
-      static_cast<apollo::audio::AudioType>(audio_type));
-  audio_event->set_moving_result(
-      static_cast<apollo::audio::MovingResult>(moving_result));
-  audio_event->set_audio_direction(
-      static_cast<apollo::audio::AudioDirection>(audio_direction));
+  audio_event->set_audio_type(static_cast<apollo::audio::AudioType>(audio_type));
+  audio_event->set_moving_result(static_cast<apollo::audio::MovingResult>(moving_result));
+  audio_event->set_audio_direction(static_cast<apollo::audio::AudioDirection>(audio_direction));
   audio_event->set_siren_is_on(is_siren_on);
 
   // Read the current localization pose
@@ -436,17 +391,16 @@ void HMIWorker::SubmitAudioEvent(const uint64_t event_time_ms,
   audio_event_writer_->Write(audio_event);
 }
 
-void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
-                                 const std::string& event_msg,
+void HMIWorker::SubmitDriveEvent(const uint64_t                  event_time_ms,
+                                 const std::string&              event_msg,
                                  const std::vector<std::string>& event_types,
-                                 const bool is_reportable) {
+                                 const bool                      is_reportable) {
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
   apollo::common::util::FillHeader("HMI", drive_event.get());
   // TODO(xiaoxq): Here we reuse the header time field as the event occurring
   // time. A better solution might be adding the field to DriveEvent proto to
   // make it clear.
-  drive_event->mutable_header()->set_timestamp_sec(
-      static_cast<double>(event_time_ms) / 1000.0);
+  drive_event->mutable_header()->set_timestamp_sec(static_cast<double>(event_time_ms) / 1000.0);
   drive_event->set_event(event_msg);
   drive_event->set_is_reportable(is_reportable);
   for (const auto& type_name : event_types) {
@@ -462,16 +416,15 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
 
 void HMIWorker::SensorCalibrationPreprocess(const std::string& task_type) {
   std::string start_command = absl::StrCat(
-      "nohup bash /apollo/modules/tools/sensor_calibration/extract_data.sh -t ",
-      task_type, " &");
+      "nohup bash /apollo/modules/tools/sensor_calibration/extract_data.sh -t ", task_type, " &");
   System(start_command);
 }
 
 void HMIWorker::VehicleCalibrationPreprocess() {
-  std::string start_command = absl::StrCat(
-      "nohup bash /apollo/modules/tools/vehicle_calibration/preprocess.sh "
-      "--vehicle_type=\"",
-      status_.current_vehicle(), "\" --record_num=", record_count_, " &");
+  std::string start_command =
+      absl::StrCat("nohup bash /apollo/modules/tools/vehicle_calibration/preprocess.sh "
+                   "--vehicle_type=\"",
+                   status_.current_vehicle(), "\" --record_num=", record_count_, " &");
   System(start_command);
 }
 
@@ -487,18 +440,12 @@ bool HMIWorker::ChangeDrivingMode(const Chassis::DrivingMode mode) {
 
   auto pad = std::make_shared<control::PadMessage>();
   switch (mode) {
-    case Chassis::COMPLETE_MANUAL:
-      pad->set_action(DrivingAction::RESET);
-      break;
-    case Chassis::COMPLETE_AUTO_DRIVE:
-      pad->set_action(DrivingAction::START);
-      break;
-    default:
-      AFATAL << "Change driving mode to " << mode_name << " not implemented!";
-      return false;
+    case Chassis::COMPLETE_MANUAL: pad->set_action(DrivingAction::RESET); break;
+    case Chassis::COMPLETE_AUTO_DRIVE: pad->set_action(DrivingAction::START); break;
+    default: AFATAL << "Change driving mode to " << mode_name << " not implemented!"; return false;
   }
 
-  static constexpr int kMaxTries = 3;
+  static constexpr int  kMaxTries    = 3;
   static constexpr auto kTryInterval = std::chrono::milliseconds(500);
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
@@ -528,9 +475,7 @@ void HMIWorker::ChangeMap(const std::string& map_name) {
   {
     // Update current_map status.
     WLock wlock(status_mutex_);
-    if (status_.current_map() == map_name) {
-      return;
-    }
+    if (status_.current_map() == map_name) { return; }
     status_.set_current_map(map_name);
     status_changed_ = true;
   }
@@ -549,9 +494,7 @@ void HMIWorker::ChangeVehicle(const std::string& vehicle_name) {
   {
     // Update current_vehicle status.
     WLock wlock(status_mutex_);
-    if (status_.current_vehicle() == vehicle_name) {
-      return;
-    }
+    if (status_.current_vehicle() == vehicle_name) { return; }
     status_.set_current_vehicle(vehicle_name);
     status_changed_ = true;
   }
@@ -561,9 +504,7 @@ void HMIWorker::ChangeVehicle(const std::string& vehicle_name) {
   auto* monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
   if (monitors != nullptr) {
     for (const auto& monitor : *monitors) {
-      if (monitor.second->IsEnabled()) {
-        monitor.second->Restart();
-      }
+      if (monitor.second->IsEnabled()) { monitor.second->Restart(); }
     }
   }
 }
@@ -577,9 +518,7 @@ void HMIWorker::ChangeMode(const std::string& mode_name) {
   {
     RLock rlock(status_mutex_);
     // Skip if mode doesn't actually change.
-    if (status_.current_mode() == mode_name) {
-      return;
-    }
+    if (status_.current_mode() == mode_name) { return; }
   }
   ResetMode();
 
@@ -668,16 +607,14 @@ void HMIWorker::StatusUpdateThreadLoop() {
     bool status_changed = false;
     {
       WLock wlock(status_mutex_);
-      status_changed = status_changed_;
+      status_changed  = status_changed_;
       status_changed_ = false;
     }
     // If status doesn't change, check if we reached update interval.
     if (!status_changed) {
       static double next_update_time = 0;
-      const double now = Clock::NowInSeconds();
-      if (now < next_update_time) {
-        continue;
-      }
+      const double  now              = Clock::NowInSeconds();
+      if (now < next_update_time) { continue; }
       next_update_time = now + FLAGS_status_publish_interval;
     }
 
@@ -690,28 +627,26 @@ void HMIWorker::StatusUpdateThreadLoop() {
 }
 
 void HMIWorker::ResetComponentStatusTimer() {
-  last_status_received_s_ = Clock::NowInSeconds();
+  last_status_received_s_  = Clock::NowInSeconds();
   last_status_fingerprint_ = 0;
 }
 
 void HMIWorker::UpdateComponentStatus() {
   constexpr double kSecondsTillTimeout(2.5);
-  const double now = Clock::NowInSeconds();
+  const double     now = Clock::NowInSeconds();
   if (now - last_status_received_s_.load() > kSecondsTillTimeout) {
     if (!monitor_timed_out_) {
       WLock wlock(status_mutex_);
 
-      const uint64_t now_ms = static_cast<uint64_t>(now * 2e3);
+      const uint64_t        now_ms        = static_cast<uint64_t>(now * 2e3);
       static constexpr bool kIsReportable = true;
       SubmitDriveEvent(now_ms, "Monitor timed out", {"PROBLEM"}, kIsReportable);
       AWARN << "System fault. Auto disengage.";
       Trigger(HMIAction::DISENGAGE);
 
-      for (auto& monitored_component :
-           *status_.mutable_monitored_components()) {
+      for (auto& monitored_component : *status_.mutable_monitored_components()) {
         monitored_component.second.set_status(ComponentStatus::UNKNOWN);
-        monitored_component.second.set_message(
-            "Status not reported by Monitor.");
+        monitored_component.second.set_message("Status not reported by Monitor.");
       }
       status_changed_ = true;
     }

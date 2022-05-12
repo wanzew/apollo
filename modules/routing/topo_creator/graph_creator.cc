@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "absl/strings/match.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
@@ -53,17 +54,16 @@ bool IsAllowedToCross(const LaneBoundary& boundary) {
 
 }  // namespace
 
-GraphCreator::GraphCreator(const std::string& base_map_file_path,
-                           const std::string& dump_topo_file_path,
+GraphCreator::GraphCreator(const std::string&   base_map_file_path,
+                           const std::string&   dump_topo_file_path,
                            const RoutingConfig& routing_conf)
-    : base_map_file_path_(base_map_file_path),
-      dump_topo_file_path_(dump_topo_file_path),
-      routing_conf_(routing_conf) {}
+    : base_map_file_path_(base_map_file_path)
+    , dump_topo_file_path_(dump_topo_file_path)
+    , routing_conf_(routing_conf) {}
 
 bool GraphCreator::Create() {
   if (absl::EndsWith(base_map_file_path_, ".xml")) {
-    if (!hdmap::adapter::OpendriveAdapter::LoadData(base_map_file_path_,
-                                                    &pbmap_)) {
+    if (!hdmap::adapter::OpendriveAdapter::LoadData(base_map_file_path_, &pbmap_)) {
       AERROR << "Failed to load base map file from " << base_map_file_path_;
       return false;
     }
@@ -92,27 +92,23 @@ bool GraphCreator::Create() {
   }
 
   InitForbiddenLanes();
-  const double min_turn_radius =
-      VehicleConfigHelper::GetConfig().vehicle_param().min_turn_radius();
+  const double min_turn_radius = VehicleConfigHelper::GetConfig().vehicle_param().min_turn_radius();
 
   for (const auto& lane : pbmap_.lane()) {
     const auto& lane_id = lane.id().id();
     if (forbidden_lane_id_set_.find(lane_id) != forbidden_lane_id_set_.end()) {
-      ADEBUG << "Ignored lane id: " << lane_id
-             << " because its type is NOT CITY_DRIVING.";
+      ADEBUG << "Ignored lane id: " << lane_id << " because its type is NOT CITY_DRIVING.";
       continue;
     }
-    if (lane.turn() == hdmap::Lane::U_TURN &&
-        !IsValidUTurn(lane, min_turn_radius)) {
+    if (lane.turn() == hdmap::Lane::U_TURN && !IsValidUTurn(lane, min_turn_radius)) {
       ADEBUG << "The u-turn lane radius is too small for the vehicle to turn";
       continue;
     }
     AINFO << "Current lane id: " << lane_id;
     node_index_map_[lane_id] = graph_.node_size();
-    const auto iter = road_id_map_.find(lane_id);
+    const auto iter          = road_id_map_.find(lane_id);
     if (iter != road_id_map_.end()) {
-      node_creator::GetPbNode(lane, iter->second, routing_conf_,
-                              graph_.add_node());
+      node_creator::GetPbNode(lane, iter->second, routing_conf_, graph_.add_node());
     } else {
       AWARN << "Failed to find road id of lane " << lane_id;
       node_creator::GetPbNode(lane, "", routing_conf_, graph_.add_node());
@@ -122,16 +118,13 @@ bool GraphCreator::Create() {
   for (const auto& lane : pbmap_.lane()) {
     const auto& lane_id = lane.id().id();
     if (forbidden_lane_id_set_.find(lane_id) != forbidden_lane_id_set_.end()) {
-      ADEBUG << "Ignored lane id: " << lane_id
-             << " because its type is NOT CITY_DRIVING.";
+      ADEBUG << "Ignored lane id: " << lane_id << " because its type is NOT CITY_DRIVING.";
       continue;
     }
     const auto& from_node = graph_.node(node_index_map_[lane_id]);
 
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
-    if (lane.length() < FLAGS_min_length_for_lane_change) {
-      continue;
-    }
+    if (lane.length() < FLAGS_min_length_for_lane_change) { continue; }
     if (lane.has_left_boundary() && IsAllowedToCross(lane.left_boundary())) {
       AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
     }
@@ -143,11 +136,10 @@ bool GraphCreator::Create() {
 
   if (!absl::EndsWith(dump_topo_file_path_, ".bin") &&
       !absl::EndsWith(dump_topo_file_path_, ".txt")) {
-    AERROR << "Failed to dump topo data into file, incorrect file type "
-           << dump_topo_file_path_;
+    AERROR << "Failed to dump topo data into file, incorrect file type " << dump_topo_file_path_;
     return false;
   }
-  auto type_pos = dump_topo_file_path_.find_last_of(".") + 1;
+  auto        type_pos = dump_topo_file_path_.find_last_of(".") + 1;
   std::string bin_file = dump_topo_file_path_.replace(type_pos, 3, "bin");
   std::string txt_file = dump_topo_file_path_.replace(type_pos, 3, "txt");
   if (!cyber::common::SetProtoToASCIIFile(graph_, txt_file)) {
@@ -163,32 +155,25 @@ bool GraphCreator::Create() {
   return true;
 }
 
-std::string GraphCreator::GetEdgeID(const std::string& from_id,
-                                    const std::string& to_id) {
+std::string GraphCreator::GetEdgeID(const std::string& from_id, const std::string& to_id) {
   return from_id + "->" + to_id;
 }
 
-void GraphCreator::AddEdge(const Node& from_node,
+void GraphCreator::AddEdge(const Node&                 from_node,
                            const RepeatedPtrField<Id>& to_node_vec,
-                           const Edge::DirectionType& type) {
+                           const Edge::DirectionType&  type) {
   for (const auto& to_id : to_node_vec) {
-    if (forbidden_lane_id_set_.find(to_id.id()) !=
-        forbidden_lane_id_set_.end()) {
+    if (forbidden_lane_id_set_.find(to_id.id()) != forbidden_lane_id_set_.end()) {
       ADEBUG << "Ignored lane [id = " << to_id.id();
       continue;
     }
     const std::string edge_id = GetEdgeID(from_node.lane_id(), to_id.id());
-    if (showed_edge_id_set_.count(edge_id) != 0) {
-      continue;
-    }
+    if (showed_edge_id_set_.count(edge_id) != 0) { continue; }
     showed_edge_id_set_.insert(edge_id);
     const auto& iter = node_index_map_.find(to_id.id());
-    if (iter == node_index_map_.end()) {
-      continue;
-    }
+    if (iter == node_index_map_.end()) { continue; }
     const auto& to_node = graph_.node(iter->second);
-    edge_creator::GetPbEdge(from_node, to_node, type, routing_conf_,
-                            graph_.add_edge());
+    edge_creator::GetPbEdge(from_node, to_node, type, routing_conf_, graph_.add_edge());
   }
 }
 
@@ -206,17 +191,15 @@ bool GraphCreator::IsValidUTurn(const hdmap::Lane& lane, const double radius) {
     points.insert(points.end(), segment.line_segment().point().begin(),
                   segment.line_segment().point().end());
   }
-  if (points.empty()) {
-    return false;
-  }
-  Vec2d p1{points.front().x(), points.front().y()};
-  const auto& mid = points[points.size() / 2];
-  Vec2d p2{mid.x(), mid.y()};
-  Vec2d p3{points.back().x(), points.back().y()};
-  Vec2d q1 = ((p1 + p2) / 2);                  // middle of p1---p2
-  Vec2d q2 = (p2 - p1).rotate(M_PI / 2) + q1;  // perpendicular to p1-p2
-  Vec2d q3 = ((p2 + p3) / 2);                  // middle of p2 -- p3
-  Vec2d q4 = (p3 - p2).rotate(M_PI / 2) + q3;  // perpendicular to p2-p3
+  if (points.empty()) { return false; }
+  Vec2d        p1{points.front().x(), points.front().y()};
+  const auto&  mid = points[points.size() / 2];
+  Vec2d        p2{mid.x(), mid.y()};
+  Vec2d        p3{points.back().x(), points.back().y()};
+  Vec2d        q1 = ((p1 + p2) / 2);                  // middle of p1---p2
+  Vec2d        q2 = (p2 - p1).rotate(M_PI / 2) + q1;  // perpendicular to p1-p2
+  Vec2d        q3 = ((p2 + p3) / 2);                  // middle of p2 -- p3
+  Vec2d        q4 = (p3 - p2).rotate(M_PI / 2) + q3;  // perpendicular to p2-p3
   const double s1 = CrossProd(q3, q1, q2);
   if (std::fabs(s1) < kMathEpsilon) {  // q3 is the circle center
     return q3.DistanceTo(p1) >= radius;
@@ -234,9 +217,7 @@ bool GraphCreator::IsValidUTurn(const hdmap::Lane& lane, const double radius) {
 
 void GraphCreator::InitForbiddenLanes() {
   for (const auto& lane : pbmap_.lane()) {
-    if (lane.type() != hdmap::Lane::CITY_DRIVING) {
-      forbidden_lane_id_set_.insert(lane.id().id());
-    }
+    if (lane.type() != hdmap::Lane::CITY_DRIVING) { forbidden_lane_id_set_.insert(lane.id().id()); }
   }
 }
 

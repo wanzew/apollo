@@ -21,6 +21,7 @@
 #include "modules/planning/common/ego_info.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -30,8 +31,8 @@ namespace apollo {
 namespace planning {
 
 TEST(EgoInfoTest, EgoInfoSimpleTest) {
-  const auto p = common::util::PointFactory::ToPathPoint(1.23, 3.23, 52.18, 0.0,
-                                                         0.1, 0.3, 0.32, 0.4);
+  const auto p =
+      common::util::PointFactory::ToPathPoint(1.23, 3.23, 52.18, 0.0, 0.1, 0.3, 0.32, 0.4);
   common::TrajectoryPoint tp;
   tp.mutable_path_point()->CopyFrom(p);
   auto ego_info = std::make_unique<EgoInfo>();
@@ -40,14 +41,14 @@ TEST(EgoInfoTest, EgoInfoSimpleTest) {
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().y(), p.y());
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().z(), p.z());
 
-  uint32_t sequence_num = 0;
+  uint32_t                sequence_num = 0;
   common::TrajectoryPoint planning_start_point;
-  common::VehicleState vehicle_state;
-  ReferenceLineProvider reference_line_provider;
+  common::VehicleState    vehicle_state;
+  ReferenceLineProvider   reference_line_provider;
 
   LocalView dummy_local_view;
-  Frame frame(sequence_num, dummy_local_view, planning_start_point,
-              vehicle_state, &reference_line_provider);
+  Frame     frame(sequence_num, dummy_local_view, planning_start_point, vehicle_state,
+              &reference_line_provider);
   ego_info->CalculateFrontObstacleClearDistance(frame.obstacles());
 }
 

@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -25,8 +26,7 @@ namespace neolix_edu {
 
 using ::apollo::drivers::canbus::MessageManager;
 
-class Neolix_eduMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+class Neolix_eduMessageManager : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   Neolix_eduMessageManager();
   virtual ~Neolix_eduMessageManager();

@@ -46,11 +46,11 @@ namespace lidar {
 
 typedef struct {
   float w;
-  int a;
-  int b;
+  int   a;
+  int   b;
 } edge;
 
-bool operator<(const edge &a, const edge &b) { return a.w < b.w; }
+bool operator<(const edge& a, const edge& b) { return a.w < b.w; }
 
 /*
  * Segment a graph
@@ -62,22 +62,22 @@ bool operator<(const edge &a, const edge &b) { return a.w < b.w; }
  * edges: array of edges.
  * c: constant for threshold function.
  */
-Universe *segment_graph(int num_vertices, int num_edges, edge *edges, float c) {
+Universe* segment_graph(int num_vertices, int num_edges, edge* edges, float c) {
   // sort edges by weight
   std::sort(edges, edges + num_edges);
 
   // make a disjoint-set forest
-  Universe *u = new Universe(num_vertices);
+  Universe* u = new Universe(num_vertices);
 
   // init thresholds
-  float *threshold = new float[num_vertices];
+  float* threshold = new float[num_vertices];
   for (int i = 0; i < num_vertices; i++) {
     threshold[i] = THRESHOLD(1, c);
   }
 
   // for each edge, in non-decreasing weight order...
   for (int i = 0; i < num_edges; i++) {
-    edge *pedge = &edges[i];
+    edge* pedge = &edges[i];
 
     // components connected by this edge
     int a = u->find(pedge->a);
@@ -85,7 +85,7 @@ Universe *segment_graph(int num_vertices, int num_edges, edge *edges, float c) {
     if (a != b) {
       if ((pedge->w <= threshold[a]) && (pedge->w <= threshold[b])) {
         u->join(a, b);
-        a = u->find(a);
+        a            = u->find(a);
         threshold[a] = pedge->w + THRESHOLD(u->size(a), c);
       }
     }

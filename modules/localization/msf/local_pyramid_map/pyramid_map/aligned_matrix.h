@@ -31,14 +31,13 @@ class AlignedMatrix {
   explicit AlignedMatrix(const AlignedMatrix<Scalar, aligned_len>& matrix);
   ~AlignedMatrix();
 
-  void Init(int rows, int cols);
-  void MakeEmpty();
-  void MakeEmpty(int start_id, int end_id);
-  int GetRow() const;
-  int GetCol() const;
+  void    Init(int rows, int cols);
+  void    MakeEmpty();
+  void    MakeEmpty(int start_id, int end_id);
+  int     GetRow() const;
+  int     GetCol() const;
   Scalar* GetData();
-  void SetData(const Scalar* data, unsigned int data_size,
-               unsigned int start_id);
+  void    SetData(const Scalar* data, unsigned int data_size, unsigned int start_id);
 
   AlignedMatrix& operator=(const AlignedMatrix<Scalar, aligned_len>& matrix);
 
@@ -47,24 +46,24 @@ class AlignedMatrix {
   inline const Scalar* operator[](int row) const { return row_data_[row]; }
 
  protected:
-  Scalar* data_ = nullptr;
+  Scalar*  data_     = nullptr;
   Scalar** row_data_ = nullptr;
-  int rows_ = 0;
-  int cols_ = 0;
+  int      rows_     = 0;
+  int      cols_     = 0;
 
  private:
-  void* raw_ptr_ = nullptr;
-  int raw_size_ = 0;
+  void* raw_ptr_  = nullptr;
+  int   raw_size_ = 0;
 };
 
 template <typename Scalar, int aligned_len>
 AlignedMatrix<Scalar, aligned_len>::AlignedMatrix()
-    : data_(nullptr),
-      row_data_(nullptr),
-      rows_(0),
-      cols_(0),
-      raw_ptr_(nullptr),
-      raw_size_(0) {}
+    : data_(nullptr)
+    , row_data_(nullptr)
+    , rows_(0)
+    , cols_(0)
+    , raw_ptr_(nullptr)
+    , raw_size_(0) {}
 
 template <typename Scalar, int aligned_len>
 AlignedMatrix<Scalar, aligned_len>::AlignedMatrix(
@@ -73,16 +72,14 @@ AlignedMatrix<Scalar, aligned_len>::AlignedMatrix(
   cols_ = matrix.cols_;
 
   raw_size_ = matrix.raw_size_;
-  raw_ptr_ = malloc(raw_size_);
+  raw_ptr_  = malloc(raw_size_);
 
   row_data_ = reinterpret_cast<Scalar**>(malloc(sizeof(Scalar*) * rows_));
 
   unsigned char* ptr = reinterpret_cast<unsigned char*>(raw_ptr_);
-  int idx = 0;
+  int            idx = 0;
   while (idx < aligned_len) {
-    if ((uint64_t)(ptr) % aligned_len == 0) {
-      break;
-    }
+    if ((uint64_t)(ptr) % aligned_len == 0) { break; }
     ++ptr;
     ++idx;
   }
@@ -100,7 +97,7 @@ AlignedMatrix<Scalar, aligned_len>::~AlignedMatrix() {
   if (raw_ptr_) {
     free(raw_ptr_);
     raw_size_ = 0;
-    raw_ptr_ = nullptr;
+    raw_ptr_  = nullptr;
   }
 
   if (row_data_) {
@@ -108,7 +105,7 @@ AlignedMatrix<Scalar, aligned_len>::~AlignedMatrix() {
     row_data_ = nullptr;
   }
 
-  data_ = nullptr;
+  data_     = nullptr;
   raw_size_ = 0;
 }
 
@@ -117,7 +114,7 @@ void AlignedMatrix<Scalar, aligned_len>::Init(int rows, int cols) {
   if (raw_ptr_) {
     free(raw_ptr_);
     raw_size_ = 0;
-    raw_ptr_ = nullptr;
+    raw_ptr_  = nullptr;
   }
 
   if (row_data_) {
@@ -129,16 +126,14 @@ void AlignedMatrix<Scalar, aligned_len>::Init(int rows, int cols) {
   cols_ = cols;
 
   raw_size_ = static_cast<int>(sizeof(Scalar)) * (rows * cols) + aligned_len;
-  raw_ptr_ = malloc(raw_size_);
+  raw_ptr_  = malloc(raw_size_);
 
   row_data_ = reinterpret_cast<Scalar**>(malloc(sizeof(Scalar*) * rows_));
 
   unsigned char* ptr = reinterpret_cast<unsigned char*>(raw_ptr_);
-  int idx = 0;
+  int            idx = 0;
   while (idx < aligned_len) {
-    if ((uint64_t)(ptr) % aligned_len == 0) {
-      break;
-    }
+    if ((uint64_t)(ptr) % aligned_len == 0) { break; }
     ++ptr;
     ++idx;
   }
@@ -180,18 +175,18 @@ Scalar* AlignedMatrix<Scalar, aligned_len>::GetData() {
 
 template <typename Scalar, int aligned_len>
 void AlignedMatrix<Scalar, aligned_len>::SetData(const Scalar* data,
-                                                 unsigned int data_size,
-                                                 unsigned int start_id) {
+                                                 unsigned int  data_size,
+                                                 unsigned int  start_id) {
   memcpy(data_ + start_id, data, sizeof(Scalar) * data_size);
 }
 
 template <typename Scalar, int aligned_len>
-AlignedMatrix<Scalar, aligned_len>& AlignedMatrix<Scalar, aligned_len>::
-operator=(const AlignedMatrix<Scalar, aligned_len>& matrix) {
+AlignedMatrix<Scalar, aligned_len>&
+AlignedMatrix<Scalar, aligned_len>::operator=(const AlignedMatrix<Scalar, aligned_len>& matrix) {
   if (raw_ptr_) {
     free(raw_ptr_);
     raw_size_ = 0;
-    raw_ptr_ = nullptr;
+    raw_ptr_  = nullptr;
   }
 
   if (row_data_) {
@@ -203,16 +198,14 @@ operator=(const AlignedMatrix<Scalar, aligned_len>& matrix) {
   cols_ = matrix.cols_;
 
   raw_size_ = matrix.raw_size_;
-  raw_ptr_ = malloc(raw_size_);
+  raw_ptr_  = malloc(raw_size_);
 
   row_data_ = reinterpret_cast<Scalar**>(malloc(sizeof(Scalar*) * rows_));
 
   unsigned char* ptr = reinterpret_cast<unsigned char*>(raw_ptr_);
-  int idx = 0;
+  int            idx = 0;
   while (idx < aligned_len) {
-    if ((uint64_t)(ptr) % aligned_len == 0) {
-      break;
-    }
+    if ((uint64_t)(ptr) % aligned_len == 0) { break; }
     ++ptr;
     ++idx;
   }

@@ -21,7 +21,9 @@
 #include <vector>
 
 #include "Eigen/Dense"
+
 #include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -48,8 +50,7 @@ double Relu(const double value);
  * @param vector The input.
  * @return The output of Softmax function.
  */
-std::vector<double> Softmax(const std::vector<double>& value,
-                            bool use_exp = true);
+std::vector<double> Softmax(const std::vector<double>& value, bool use_exp = true);
 
 /**
  * @brief Solve quadratic equation.
@@ -67,8 +68,10 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
  * @return order of derivative to evaluate.
  */
 double EvaluateQuinticPolynomial(const std::array<double, 6>& coeffs,
-                                 const double t, const uint32_t order,
-                                 const double end_t, const double end_v);
+                                 const double                 t,
+                                 const uint32_t               order,
+                                 const double                 end_t,
+                                 const double                 end_v);
 
 /**
  * @brief Evaluate quartic polynomial.
@@ -77,8 +80,10 @@ double EvaluateQuinticPolynomial(const std::array<double, 6>& coeffs,
  * @return order of derivative to evaluate.
  */
 double EvaluateQuarticPolynomial(const std::array<double, 5>& coeffs,
-                                 const double t, const uint32_t order,
-                                 const double end_t, const double end_v);
+                                 const double                 t,
+                                 const uint32_t               order,
+                                 const double                 end_t,
+                                 const double                 end_v);
 
 /**
  * @brief Evaluate cubic polynomial.
@@ -88,20 +93,21 @@ double EvaluateQuarticPolynomial(const std::array<double, 5>& coeffs,
  * @param end_v ending velocity for extrapolation.
  * @return order of derivative to evaluate.
  */
-double EvaluateCubicPolynomial(
-    const std::array<double, 4>& coefs, const double t, const uint32_t order,
-    const double end_t = std::numeric_limits<double>::infinity(),
-    const double end_v = 0.0);
+double EvaluateCubicPolynomial(const std::array<double, 4>& coefs,
+                               const double                 t,
+                               const uint32_t               order,
+                               const double end_t = std::numeric_limits<double>::infinity(),
+                               const double end_v = 0.0);
 
 template <std::size_t N>
-std::array<double, 2 * N - 2> ComputePolynomial(
-    const std::array<double, N - 1>& start_state,
-    const std::array<double, N - 1>& end_state, const double param);
+std::array<double, 2 * N - 2> ComputePolynomial(const std::array<double, N - 1>& start_state,
+                                                const std::array<double, N - 1>& end_state,
+                                                const double                     param);
 
 template <>
-inline std::array<double, 4> ComputePolynomial<3>(
-    const std::array<double, 2>& start_state,
-    const std::array<double, 2>& end_state, const double param) {
+inline std::array<double, 4> ComputePolynomial<3>(const std::array<double, 2>& start_state,
+                                                  const std::array<double, 2>& end_state,
+                                                  const double                 param) {
   std::array<double, 4> coefs;
   coefs[0] = start_state[0];
   coefs[1] = start_state[1];
@@ -110,14 +116,13 @@ inline std::array<double, 4> ComputePolynomial<3>(
   auto m1 = end_state[1] - start_state[1];
 
   auto param_p3 = param * param * param;
-  coefs[3] = (m1 * param - 2.0 * m0) / param_p3;
+  coefs[3]      = (m1 * param - 2.0 * m0) / param_p3;
 
   coefs[2] = (m1 - 3.0 * coefs[3] * param * param) / param * 0.5;
   return coefs;
 }
 
-double GetSByConstantAcceleration(const double v0, const double acceleration,
-                                  const double t);
+double GetSByConstantAcceleration(const double v0, const double acceleration, const double t);
 
 }  // namespace math_util
 
@@ -128,7 +133,8 @@ namespace predictor_util {
  * @param translate_y The translation along y-axis.
  * @param point The point to be translated.
  */
-void TranslatePoint(const double translate_x, const double translate_y,
+void TranslatePoint(const double             translate_x,
+                    const double             translate_y,
                     common::TrajectoryPoint* point);
 
 /**
@@ -141,11 +147,13 @@ void TranslatePoint(const double translate_x, const double translate_y,
  * @param trajectory point interval period
  * @param generated trajectory points
  */
-void GenerateFreeMoveTrajectoryPoints(
-    Eigen::Matrix<double, 6, 1>* state,
-    const Eigen::Matrix<double, 6, 6>& transition, double theta,
-    const double start_time, const std::size_t num, const double period,
-    std::vector<common::TrajectoryPoint>* points);
+void GenerateFreeMoveTrajectoryPoints(Eigen::Matrix<double, 6, 1>*          state,
+                                      const Eigen::Matrix<double, 6, 6>&    transition,
+                                      double                                theta,
+                                      const double                          start_time,
+                                      const std::size_t                     num,
+                                      const double                          period,
+                                      std::vector<common::TrajectoryPoint>* points);
 
 /**
  * @brief Adjust a speed value according to a curvature. If the input speed

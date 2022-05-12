@@ -44,7 +44,7 @@ TEST(RawMessageTest, serialize_to_array) {
 }
 
 TEST(RawMessageTest, serialize_to_string) {
-  RawMessage msg("serialize_to_string");
+  RawMessage  msg("serialize_to_string");
   std::string str("");
   EXPECT_FALSE(msg.SerializeToString(nullptr));
   EXPECT_TRUE(msg.SerializeToString(&str));
@@ -58,7 +58,7 @@ TEST(RawMessageTest, parse_from_string) {
 }
 
 TEST(RawMessageTest, parse_from_array) {
-  RawMessage msg;
+  RawMessage  msg;
   std::string str("parse_from_array");
   EXPECT_FALSE(msg.ParseFromArray(nullptr, static_cast<int>(str.size())));
   EXPECT_FALSE(msg.ParseFromArray(str.data(), 0));
@@ -68,7 +68,7 @@ TEST(RawMessageTest, parse_from_array) {
 }
 
 TEST(RawMessageTest, message_type) {
-  RawMessage msg;
+  RawMessage  msg;
   std::string msg_type = RawMessage::TypeName();
   EXPECT_EQ(msg_type, "apollo.cyber.message.RawMessage");
 

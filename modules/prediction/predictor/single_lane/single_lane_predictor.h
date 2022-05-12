@@ -46,8 +46,8 @@ class SingleLanePredictor : public SequencePredictor {
    * @return If predicted successfully
    */
   bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
-               Obstacle* obstacle,
-               ObstaclesContainer* obstacles_container) override;
+               Obstacle*                     obstacle,
+               ObstaclesContainer*           obstacles_container) override;
 
  protected:
   /**
@@ -58,10 +58,11 @@ class SingleLanePredictor : public SequencePredictor {
    * @param Prediction period
    * @param A vector of generated trajectory points
    */
-  void GenerateTrajectoryPoints(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* points);
+  void GenerateTrajectoryPoints(const Obstacle&                               obstacle,
+                                const LaneSequence&                           lane_sequence,
+                                const double                                  total_time,
+                                const double                                  period,
+                                std::vector<apollo::common::TrajectoryPoint>* points);
 };
 
 }  // namespace prediction

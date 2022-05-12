@@ -68,14 +68,20 @@ class EulerAnglesZXY {
   /**
    * @brief Constructs an identity rotation.
    */
-  EulerAnglesZXY() : roll_(0), pitch_(0), yaw_(0) {}
+  EulerAnglesZXY()
+      : roll_(0)
+      , pitch_(0)
+      , yaw_(0) {}
 
   /**
    * @brief Constructs a rotation using only yaw (i.e., around the z-axis).
    *
    * @param yaw The yaw of the car
    */
-  explicit EulerAnglesZXY(T yaw) : roll_(0), pitch_(0), yaw_(yaw) {}
+  explicit EulerAnglesZXY(T yaw)
+      : roll_(0)
+      , pitch_(0)
+      , yaw_(yaw) {}
 
   /**
    * @brief Constructs a rotation using arbitrary roll, pitch, and yaw.
@@ -85,7 +91,9 @@ class EulerAnglesZXY {
    * @param yaw The yaw of the car
    */
   EulerAnglesZXY(T roll, T pitch, T yaw)
-      : roll_(roll), pitch_(pitch), yaw_(yaw) {}
+      : roll_(roll)
+      , pitch_(pitch)
+      , yaw_(yaw) {}
 
   /**
    * @brief Constructs a rotation using components of a quaternion.
@@ -96,11 +104,11 @@ class EulerAnglesZXY {
    * @param qz Quaternion z-coordinate
    */
   EulerAnglesZXY(T qw, T qx, T qy, T qz)
-      : roll_(std::atan2(static_cast<T>(2.0) * (qw * qy - qx * qz),
-                         static_cast<T>(2.0) * (Square<T>(qw) + Square<T>(qz)) -
-                             static_cast<T>(1.0))),
-        pitch_(std::asin(static_cast<T>(2.0) * (qw * qx + qy * qz))),
-        yaw_(std::atan2(static_cast<T>(2.0) * (qw * qz - qx * qy),
+      : roll_(
+            std::atan2(static_cast<T>(2.0) * (qw * qy - qx * qz),
+                       static_cast<T>(2.0) * (Square<T>(qw) + Square<T>(qz)) - static_cast<T>(1.0)))
+      , pitch_(std::asin(static_cast<T>(2.0) * (qw * qx + qy * qz)))
+      , yaw_(std::atan2(static_cast<T>(2.0) * (qw * qz - qx * qy),
                         static_cast<T>(2.0) * (Square<T>(qw) + Square<T>(qy)) -
                             static_cast<T>(1.0))) {}
 
@@ -108,7 +116,7 @@ class EulerAnglesZXY {
    * @brief Constructs a rotation from quaternion.
    * @param q Quaternion
    */
-  explicit EulerAnglesZXY(const Eigen::Quaternion<T> &q)
+  explicit EulerAnglesZXY(const Eigen::Quaternion<T>& q)
       : EulerAnglesZXY(q.w(), q.x(), q.y(), q.z()) {}
 
   /**
@@ -133,9 +141,9 @@ class EulerAnglesZXY {
    * @brief Normalizes roll_, pitch_, and yaw_ to [-PI, PI).
    */
   void Normalize() {
-    roll_ = NormalizeAngle(roll_);
+    roll_  = NormalizeAngle(roll_);
     pitch_ = NormalizeAngle(pitch_);
-    yaw_ = NormalizeAngle(yaw_);
+    yaw_   = NormalizeAngle(yaw_);
   }
 
   /**
@@ -153,9 +161,9 @@ class EulerAnglesZXY {
    */
   Eigen::Quaternion<T> ToQuaternion() const {
     T coeff = static_cast<T>(0.5);
-    T r = roll_ * coeff;
-    T p = pitch_ * coeff;
-    T y = yaw_ * coeff;
+    T r     = roll_ * coeff;
+    T p     = pitch_ * coeff;
+    T y     = yaw_ * coeff;
 
     T sr = std::sin(r);
     T sp = std::sin(p);
@@ -169,9 +177,7 @@ class EulerAnglesZXY {
     T qx = cr * sp * cy - sr * cp * sy;
     T qy = cr * sp * sy + sr * cp * cy;
     T qz = cr * cp * sy + sr * sp * cy;
-    if (qw < 0.0) {
-      return {-qw, -qx, -qy, -qz};
-    }
+    if (qw < 0.0) { return {-qw, -qx, -qy, -qz}; }
     return {qw, qx, qy, qz};
   }
 

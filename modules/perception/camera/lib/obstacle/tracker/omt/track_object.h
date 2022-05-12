@@ -26,13 +26,13 @@ namespace perception {
 namespace camera {
 struct alignas(16) TrackObject {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  PatchIndicator indicator;
-  double timestamp;
-  base::BBox2DF projected_box;
+  PatchIndicator  indicator;
+  double          timestamp;
+  base::BBox2DF   projected_box;
   base::ObjectPtr object;
 };
 typedef std::shared_ptr<TrackObject> TrackObjectPtr;
-typedef std::vector<TrackObjectPtr> TrackObjectPtrs;
+typedef std::vector<TrackObjectPtr>  TrackObjectPtrs;
 // struct TrackFeature {
 //   TrackFeature(int frame_id, std::shared_ptr<base::Blob<float>> blob);
 //   int frame_id_;

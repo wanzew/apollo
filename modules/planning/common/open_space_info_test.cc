@@ -20,6 +20,7 @@
 #include "modules/planning/common/open_space_info.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/routing/proto/routing.pb.h"
@@ -38,8 +39,9 @@ class OpenSpaceInfoTest : public ::testing::Test {
 TEST_F(OpenSpaceInfoTest, Init) { EXPECT_NE(&open_space_info_, nullptr); }
 
 bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary,
-                                   const double s, double* ptr_l_min,
-                                   double* ptr_l_max);
+                                   const double      s,
+                                   double*           ptr_l_min,
+                                   double*           ptr_l_max);
 
 }  // namespace planning
 }  // namespace apollo

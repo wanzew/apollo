@@ -16,9 +16,10 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_standby.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
@@ -33,16 +34,14 @@ class StageStandbyTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StageStandbyTest, Init) {
-  EmergencyPullOverStageStandby emergency_pull_over_stage_standby(config_,
-                                                                  injector_);
+  EmergencyPullOverStageStandby emergency_pull_over_stage_standby(config_, injector_);
   EXPECT_EQ(emergency_pull_over_stage_standby.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY));
+            ScenarioConfig::StageType_Name(ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY));
 }
 
 }  // namespace emergency_pull_over

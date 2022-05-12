@@ -30,14 +30,14 @@ struct HistogramEstimatorParams {
   HistogramEstimatorParams() { Init(); }
   void Init();
 
-  int nr_bins_in_histogram = 0;
-  float data_sp = 0.0f;  // start point
-  float data_ep = 0.0f;  // end point => [data_sp, data_ep)
-  float step_bin = 0.0f;
+  int   nr_bins_in_histogram = 0;
+  float data_sp              = 0.0f;  // start point
+  float data_ep              = 0.0f;  // end point => [data_sp, data_ep)
+  float step_bin             = 0.0f;
 
-  std::vector<uint32_t> smooth_kernel = {};
-  int smooth_kernel_width = 0;  // only consider odd number
-  int smooth_kernel_radius = 0;
+  std::vector<uint32_t> smooth_kernel        = {};
+  int                   smooth_kernel_width  = 0;  // only consider odd number
+  int                   smooth_kernel_radius = 0;
 
   float hat_min_allowed = 0.0f;
   float hat_std_allowed = 0.0f;
@@ -46,7 +46,7 @@ struct HistogramEstimatorParams {
 
   float decay_factor = 0.0f;
 
-  void operator=(const HistogramEstimatorParams &params) {
+  void operator=(const HistogramEstimatorParams& params) {
     nr_bins_in_histogram = params.nr_bins_in_histogram;
 
     data_sp = params.data_sp;
@@ -94,7 +94,7 @@ class HistogramEstimator {
 
   ~HistogramEstimator() {}
 
-  void Init(const HistogramEstimatorParams *params = nullptr);
+  void Init(const HistogramEstimatorParams* params = nullptr);
 
   bool Push(float val) {
     if (val < params_.data_sp || val >= params_.data_ep) {
@@ -105,9 +105,7 @@ class HistogramEstimator {
       return false;
     }
     int index = GetIndex(val);
-    if (index < 0 || index >= params_.nr_bins_in_histogram) {
-      return false;
-    }
+    if (index < 0 || index >= params_.nr_bins_in_histogram) { return false; }
     ++hist_[index];
     val_cur_ = val;
     return true;
@@ -118,7 +116,7 @@ class HistogramEstimator {
     val_cur_ = val_estimation_ = 0.0f;
   }
 
-  const std::vector<uint32_t> &get_hist() const { return hist_; }
+  const std::vector<uint32_t>& get_hist() const { return hist_; }
 
   float get_val_cur() const { return val_cur_; }
 
@@ -139,31 +137,29 @@ class HistogramEstimator {
   }
 
   float GetValFromIndex(int index) const {
-    return (params_.data_sp +
-            (static_cast<float>(index) + 0.5f) * params_.step_bin);
+    return (params_.data_sp + (static_cast<float>(index) + 0.5f) * params_.step_bin);
   }
 
-  void Smooth(const uint32_t *hist_input, int nr_bins, uint32_t *hist_output);
+  void Smooth(const uint32_t* hist_input, int nr_bins, uint32_t* hist_output);
 
-  bool IsGoodShape(const uint32_t *hist, int nr_bins, int max_index);
+  bool IsGoodShape(const uint32_t* hist, int nr_bins, int max_index);
 
-  void GetPeakIndexAndMass(const uint32_t *hist, int nr_bins, int *index,
-                           uint32_t *mass);
+  void GetPeakIndexAndMass(const uint32_t* hist, int nr_bins, int* index, uint32_t* mass);
 
-  void Decay(uint32_t *hist, int nr_bins) {
+  void Decay(uint32_t* hist, int nr_bins) {
     float df = params_.decay_factor;
     for (int i = 0; i < nr_bins; ++i) {
       hist[i] = static_cast<uint32_t>(static_cast<float>(hist[i]) * df);
     }
   }
 
-  void GenerateHat(float *hist_hat, int nr_bins);
+  void GenerateHat(float* hist_hat, int nr_bins);
 
   // bool SaveHist(const std::string &filename,
   //               const uint32_t *hist, int nr_bins);
 
  private:
-  std::vector<uint32_t> hist_ = {};
+  std::vector<uint32_t> hist_        = {};
   std::vector<uint32_t> hist_buffer_ = {};
 
   std::vector<float> hist_hat_ = {};
@@ -171,8 +167,8 @@ class HistogramEstimator {
   HistogramEstimatorParams params_;
 
   float step_bin_reversed_ = 0.0f;
-  float val_cur_ = 0.0f;
-  float val_estimation_ = 0.0f;
+  float val_cur_           = 0.0f;
+  float val_estimation_    = 0.0f;
 };
 
 }  // namespace camera

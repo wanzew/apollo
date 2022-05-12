@@ -30,7 +30,7 @@ namespace apollo {
 namespace drivers {
 namespace canbus {
 
-const int32_t CAN_FRAME_SIZE = 8;
+const int32_t CAN_FRAME_SIZE         = 8;
 const int32_t MAX_CAN_SEND_FRAME_LEN = 1;
 const int32_t MAX_CAN_RECV_FRAME_LEN = 10;
 

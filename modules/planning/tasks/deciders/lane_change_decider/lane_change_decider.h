@@ -24,9 +24,10 @@
 #include <memory>
 #include <string>
 
-#include "modules/map/pnc_map/route_segments.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
+
+#include "modules/map/pnc_map/route_segments.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -34,8 +35,7 @@ namespace planning {
 
 class LaneChangeDecider : public Decider {
  public:
-  LaneChangeDecider(const TaskConfig& config,
-                    const std::shared_ptr<DependencyInjector>& injector);
+  LaneChangeDecider(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector);
 
   /**
    * @brief A static function to check if the ChangeLanePath type of reference
@@ -55,40 +55,35 @@ class LaneChangeDecider : public Decider {
    *        angle range is perception blocking
    */
   static bool IsPerceptionBlocked(const ReferenceLineInfo& reference_line_info,
-                                  const double search_beam_length,
-                                  const double search_beam_radius_intensity,
-                                  const double search_range,
-                                  const double is_block_angle_threshold);
+                                  const double             search_beam_length,
+                                  const double             search_beam_radius_intensity,
+                                  const double             search_range,
+                                  const double             is_block_angle_threshold);
 
-  static void UpdatePreparationDistance(
-      const bool is_opt_succeed, const Frame* frame,
-      const ReferenceLineInfo* const reference_line_info,
-      PlanningContext* planning_context);
+  static void UpdatePreparationDistance(const bool                     is_opt_succeed,
+                                        const Frame*                   frame,
+                                        const ReferenceLineInfo* const reference_line_info,
+                                        PlanningContext*               planning_context);
 
  private:
-  common::Status Process(
-      Frame* frame,
-      ReferenceLineInfo* const current_reference_line_info) override;
+  common::Status Process(Frame*                   frame,
+                         ReferenceLineInfo* const current_reference_line_info) override;
 
   static bool HysteresisFilter(const double obstacle_distance,
                                const double safe_distance,
                                const double distance_buffer,
-                               const bool is_obstacle_blocking);
+                               const bool   is_obstacle_blocking);
 
-  void UpdateStatus(ChangeLaneStatus::Status status_code,
-                    const std::string& path_id);
-  void UpdateStatus(double timestamp, ChangeLaneStatus::Status status_code,
-                    const std::string& path_id);
+  void UpdateStatus(ChangeLaneStatus::Status status_code, const std::string& path_id);
+  void
+  UpdateStatus(double timestamp, ChangeLaneStatus::Status status_code, const std::string& path_id);
 
-  void PrioritizeChangeLane(
-      const bool is_prioritize_change_lane,
-      std::list<ReferenceLineInfo>* reference_line_info) const;
+  void PrioritizeChangeLane(const bool                    is_prioritize_change_lane,
+                            std::list<ReferenceLineInfo>* reference_line_info) const;
 
-  void RemoveChangeLane(
-      std::list<ReferenceLineInfo>* reference_line_info) const;
+  void RemoveChangeLane(std::list<ReferenceLineInfo>* reference_line_info) const;
 
-  std::string GetCurrentPathId(
-      const std::list<ReferenceLineInfo>& reference_line_info) const;
+  std::string GetCurrentPathId(const std::list<ReferenceLineInfo>& reference_line_info) const;
 };
 
 }  // namespace planning

@@ -15,9 +15,11 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/transit/protocol/llc_auxiliaryfeedback_120.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/transit.pb.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -36,9 +38,9 @@ class llc_auxiliaryfeedback_120Test : public ::testing ::Test {
 };
 
 TEST_F(llc_auxiliaryfeedback_120Test, General) {
-  const uint8_t kData[4] = {0xFB, 0xFF, 0xFF, 0xFF};
-  int32_t length = 1;
-  int32_t turnsignal_len = 2;
+  const uint8_t kData[4]       = {0xFB, 0xFF, 0xFF, 0xFF};
+  int32_t       length         = 1;
+  int32_t       turnsignal_len = 2;
   EXPECT_FALSE(Llcauxiliary_feedback120_.llc_fbk_inverter(kData, length));
   EXPECT_TRUE(Llcauxiliary_feedback120_.llc_fbk_pdu_ch8(kData, length));
   EXPECT_TRUE(Llcauxiliary_feedback120_.llc_fbk_pdu_ch7(kData, length));
@@ -53,14 +55,12 @@ TEST_F(llc_auxiliaryfeedback_120Test, General) {
   EXPECT_TRUE(Llcauxiliary_feedback120_.llc_fbk_horn(kData, length));
   EXPECT_TRUE(Llcauxiliary_feedback120_.llc_fbk_buzzeron(kData, length));
 
-  EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_turnsignal(kData, turnsignal_len),
-            3);
+  EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_turnsignal(kData, turnsignal_len), 3);
 
   EXPECT_TRUE(Llcauxiliary_feedback120_.llc_fbk_lowbeam(kData, length));
   EXPECT_TRUE(Llcauxiliary_feedback120_.llc_fbk_highbeam(kData, length));
   EXPECT_TRUE(Llcauxiliary_feedback120_.llc_fbk_ledredon(kData, length));
-  EXPECT_TRUE(
-      Llcauxiliary_feedback120_.llc_fbk_autonomybuttonpressed(kData, length));
+  EXPECT_TRUE(Llcauxiliary_feedback120_.llc_fbk_autonomybuttonpressed(kData, length));
 }
 
 }  // namespace transit

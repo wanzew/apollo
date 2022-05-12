@@ -21,12 +21,12 @@
 #include "gtest/gtest.h"
 
 TEST(ROIPoolFloorTest, test) {
-  int pooled_h = 7;
-  int pooled_w = 7;
-  bool use_floor = true;
-  int feat_channel = 1;
+  int   pooled_h      = 7;
+  int   pooled_w      = 7;
+  bool  use_floor     = true;
+  int   feat_channel  = 1;
   float spatial_scale = 16.0f;
-  auto roi_layer = new apollo::perception::inference::ROIPoolingLayer<float>(
+  auto  roi_layer     = new apollo::perception::inference::ROIPoolingLayer<float>(
       pooled_h, pooled_w, use_floor, spatial_scale, feat_channel);
   std::vector<int> feat_shape{2, feat_channel, 30, 30};
   std::vector<int> rois_shape{4, 5};
@@ -46,26 +46,26 @@ TEST(ROIPoolFloorTest, test) {
     }
   }
   auto rois_data = rois_b->mutable_cpu_data();
-  rois_data[0] = 0;
-  rois_data[1] = 2.2f;
-  rois_data[2] = 2.3f;
-  rois_data[3] = 2.6f;
-  rois_data[4] = 2.7f;
-  rois_data[5] = 0;
-  rois_data[6] = 1.8f;
-  rois_data[7] = 1.7f;
-  rois_data[8] = 4.60f;
-  rois_data[9] = 4.75f;
-  rois_data[10] = 0;
-  rois_data[11] = 2.2f;
-  rois_data[12] = 2.3f;
-  rois_data[13] = 1.6f;
-  rois_data[14] = 1.7f;
-  rois_data[15] = 0;
-  rois_data[16] = -1.2f;
-  rois_data[17] = -2.3f;
-  rois_data[18] = 500.6f;
-  rois_data[19] = 500.7f;
+  rois_data[0]   = 0;
+  rois_data[1]   = 2.2f;
+  rois_data[2]   = 2.3f;
+  rois_data[3]   = 2.6f;
+  rois_data[4]   = 2.7f;
+  rois_data[5]   = 0;
+  rois_data[6]   = 1.8f;
+  rois_data[7]   = 1.7f;
+  rois_data[8]   = 4.60f;
+  rois_data[9]   = 4.75f;
+  rois_data[10]  = 0;
+  rois_data[11]  = 2.2f;
+  rois_data[12]  = 2.3f;
+  rois_data[13]  = 1.6f;
+  rois_data[14]  = 1.7f;
+  rois_data[15]  = 0;
+  rois_data[16]  = -1.2f;
+  rois_data[17]  = -2.3f;
+  rois_data[18]  = 500.6f;
+  rois_data[19]  = 500.7f;
   std::vector<std::shared_ptr<apollo::perception::base::Blob<float>>> bottoms;
   bottoms.push_back(feat_b);
   bottoms.push_back(rois_b);
@@ -92,12 +92,12 @@ TEST(ROIPoolFloorTest, test) {
   ASSERT_EQ(top->cpu_data()[195], 0);
 }
 TEST(ROIPoolRoundTest, test) {
-  int pooled_h = 7;
-  int pooled_w = 7;
-  bool use_floor = false;
-  int feat_channel = 1;
+  int   pooled_h      = 7;
+  int   pooled_w      = 7;
+  bool  use_floor     = false;
+  int   feat_channel  = 1;
   float spatial_scale = 16.0f;
-  auto roi_layer = new apollo::perception::inference::ROIPoolingLayer<float>(
+  auto  roi_layer     = new apollo::perception::inference::ROIPoolingLayer<float>(
       pooled_h, pooled_w, use_floor, spatial_scale, feat_channel);
   std::vector<int> feat_shape{2, feat_channel, 30, 30};
   std::vector<int> rois_shape{4, 5};
@@ -118,26 +118,26 @@ TEST(ROIPoolRoundTest, test) {
   }
 
   auto rois_data = rois_b->mutable_cpu_data();
-  rois_data[0] = 0;
-  rois_data[1] = 2.2f;
-  rois_data[2] = 2.3f;
-  rois_data[3] = 2.6f;
-  rois_data[4] = 2.7f;
-  rois_data[5] = 0;
-  rois_data[6] = 1.8f;
-  rois_data[7] = 1.7f;
-  rois_data[8] = 4.60f;
-  rois_data[9] = 4.75f;
-  rois_data[10] = 0;
-  rois_data[11] = 2.2f;
-  rois_data[12] = 2.3f;
-  rois_data[13] = 1.6f;
-  rois_data[14] = 1.7f;
-  rois_data[15] = 0;
-  rois_data[16] = -1.2f;
-  rois_data[17] = -2.3f;
-  rois_data[18] = 500.6f;
-  rois_data[19] = 500.7f;
+  rois_data[0]   = 0;
+  rois_data[1]   = 2.2f;
+  rois_data[2]   = 2.3f;
+  rois_data[3]   = 2.6f;
+  rois_data[4]   = 2.7f;
+  rois_data[5]   = 0;
+  rois_data[6]   = 1.8f;
+  rois_data[7]   = 1.7f;
+  rois_data[8]   = 4.60f;
+  rois_data[9]   = 4.75f;
+  rois_data[10]  = 0;
+  rois_data[11]  = 2.2f;
+  rois_data[12]  = 2.3f;
+  rois_data[13]  = 1.6f;
+  rois_data[14]  = 1.7f;
+  rois_data[15]  = 0;
+  rois_data[16]  = -1.2f;
+  rois_data[17]  = -2.3f;
+  rois_data[18]  = 500.6f;
+  rois_data[19]  = 500.7f;
   std::vector<std::shared_ptr<apollo::perception::base::Blob<float>>> bottoms;
   bottoms.push_back(feat_b);
   bottoms.push_back(rois_b);

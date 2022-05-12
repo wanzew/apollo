@@ -17,14 +17,14 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ge3 {
 
-class Pcbcs202 : public ::apollo::drivers::canbus::ProtocolData<
-                     ::apollo::canbus::ChassisDetail> {
+class Pcbcs202 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -47,8 +47,7 @@ class Pcbcs202 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 1, 'name': 'PC_BrkPedEnable', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Pcbcs202* set_pc_brkpedenable(
-      Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable);
+  Pcbcs202* set_pc_brkpedenable(Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable);
 
  private:
   // config detail: {'description': 'Brake pedal request', 'offset': 0.0,
@@ -62,11 +61,10 @@ class Pcbcs202 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 1, 'name': 'PC_BrkPedEnable', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_pc_brkpedenable(uint8_t* data,
-                             Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable);
+  void set_p_pc_brkpedenable(uint8_t* data, Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable);
 
  private:
-  double pc_brkpedreq_;
+  double                          pc_brkpedreq_;
   Pc_bcs_202::Pc_brkpedenableType pc_brkpedenable_;
 };
 

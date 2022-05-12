@@ -28,8 +28,8 @@ using apollo::cyber::common::GlobalData;
 static const char* const task_prefix = "/internal/task";
 
 TaskManager::TaskManager()
-    : task_queue_size_(1000),
-      task_queue_(new base::BoundedQueue<std::function<void()>>()) {
+    : task_queue_size_(1000)
+    , task_queue_(new base::BoundedQueue<std::function<void()>>()) {
   if (!task_queue_->Init(task_queue_size_, new base::BlockWaitStrategy())) {
     AERROR << "Task queue init failed";
     throw std::runtime_error("Task queue init failed");
@@ -61,9 +61,7 @@ TaskManager::TaskManager()
 TaskManager::~TaskManager() { Shutdown(); }
 
 void TaskManager::Shutdown() {
-  if (stop_.exchange(true)) {
-    return;
-  }
+  if (stop_.exchange(true)) { return; }
   for (uint32_t i = 0; i < num_threads_; i++) {
     scheduler::Instance()->RemoveTask(task_prefix + std::to_string(i));
   }

@@ -21,11 +21,10 @@
 
 namespace SATP {
 
-class FileSenderHandler
-{
-public:
-    virtual void handleSendFileFinished(const QString &fileName) = 0;
+class FileSenderHandler {
+ public:
+  virtual void handleSendFileFinished(const QString& fileName) = 0;
 };
 
-}
-#endif // FILESENDERHANDLER_H
+}  // namespace SATP
+#endif  // FILESENDERHANDLER_H

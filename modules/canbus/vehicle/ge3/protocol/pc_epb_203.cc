@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_epb_203.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -41,7 +42,7 @@ void Pcepb203::UpdateData(uint8_t* data) {
 
 void Pcepb203::Reset() {
   // you should check this manually
-  pc_epbreq_ = Pc_epb_203::PC_EPBREQ_INVALID;
+  pc_epbreq_    = Pc_epb_203::PC_EPBREQ_INVALID;
   pc_epbenable_ = Pc_epb_203::PC_EPBENABLE_DISABLE;
 }
 
@@ -55,16 +56,14 @@ Pcepb203* Pcepb203::set_pc_epbreq(Pc_epb_203::Pc_epbreqType pc_epbreq) {
 // 'precision': 1.0, 'len': 2, 'name': 'PC_EpbReq', 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
-void Pcepb203::set_p_pc_epbreq(uint8_t* data,
-                               Pc_epb_203::Pc_epbreqType pc_epbreq) {
+void Pcepb203::set_p_pc_epbreq(uint8_t* data, Pc_epb_203::Pc_epbreqType pc_epbreq) {
   int x = pc_epbreq;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 0, 2);
 }
 
-Pcepb203* Pcepb203::set_pc_epbenable(
-    Pc_epb_203::Pc_epbenableType pc_epbenable) {
+Pcepb203* Pcepb203::set_pc_epbenable(Pc_epb_203::Pc_epbenableType pc_epbenable) {
   pc_epbenable_ = pc_epbenable;
   return this;
 }
@@ -74,8 +73,7 @@ Pcepb203* Pcepb203::set_pc_epbenable(
 // 1, 'name': 'PC_EpbEnable', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcepb203::set_p_pc_epbenable(uint8_t* data,
-                                  Pc_epb_203::Pc_epbenableType pc_epbenable) {
+void Pcepb203::set_p_pc_epbenable(uint8_t* data, Pc_epb_203::Pc_epbenableType pc_epbenable) {
   int x = pc_epbenable;
 
   Byte to_set(data + 0);

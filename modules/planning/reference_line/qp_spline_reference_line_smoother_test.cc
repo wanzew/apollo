@@ -20,11 +20,13 @@
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 #include "gtest/gtest.h"
+
+#include "modules/planning/proto/reference_line_smoother_config.pb.h"
+
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/proto/reference_line_smoother_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 
@@ -38,15 +40,15 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
     smoother_.reset(new QpSplineReferenceLineSmoother(config_));
     hdmap_.LoadMapFromFile(map_file);
     const std::string lane_id = "1_-1";
-    lane_info_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(lane_id));
+    lane_info_ptr             = hdmap_.GetLaneById(hdmap::MakeMapId(lane_id));
     if (!lane_info_ptr) {
       AERROR << "failed to find lane " << lane_id << " from map " << map_file;
       return;
     }
     std::vector<ReferencePoint> ref_points;
-    const auto& points = lane_info_ptr->points();
-    const auto& headings = lane_info_ptr->headings();
-    const auto& accumulate_s = lane_info_ptr->accumulate_s();
+    const auto&                 points       = lane_info_ptr->points();
+    const auto&                 headings     = lane_info_ptr->headings();
+    const auto&                 accumulate_s = lane_info_ptr->accumulate_s();
     for (size_t i = 0; i < points.size(); ++i) {
       std::vector<hdmap::LaneWaypoint> waypoint;
       waypoint.emplace_back(lane_info_ptr, accumulate_s[i]);
@@ -57,47 +59,44 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
     vehicle_position_ = points[0];
   }
 
-  const std::string map_file =
-      "/apollo/modules/planning/testdata/garage_map/base_map.txt";
+  const std::string map_file = "/apollo/modules/planning/testdata/garage_map/base_map.txt";
 
-  hdmap::HDMap hdmap_;
-  common::math::Vec2d vehicle_position_;
-  ReferenceLineSmootherConfig config_;
+  hdmap::HDMap                           hdmap_;
+  common::math::Vec2d                    vehicle_position_;
+  ReferenceLineSmootherConfig            config_;
   std::unique_ptr<ReferenceLineSmoother> smoother_;
-  std::unique_ptr<ReferenceLine> reference_line_;
-  hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
+  std::unique_ptr<ReferenceLine>         reference_line_;
+  hdmap::LaneInfoConstPtr                lane_info_ptr = nullptr;
 };
 
 TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_DOUBLE_EQ(153.87421245682503, reference_line_->Length());
   std::vector<AnchorPoint> anchor_points;
-  const double interval = 10.0;
-  int num_of_anchors =
-      std::max(2, static_cast<int>(reference_line_->Length() / interval + 0.5));
+  const double             interval = 10.0;
+  int num_of_anchors = std::max(2, static_cast<int>(reference_line_->Length() / interval + 0.5));
   std::vector<double> anchor_s;
-  common::util::uniform_slice(0.0, reference_line_->Length(),
-                              num_of_anchors - 1, &anchor_s);
+  common::util::uniform_slice(0.0, reference_line_->Length(), num_of_anchors - 1, &anchor_s);
   for (const double s : anchor_s) {
     anchor_points.emplace_back();
-    auto& last_anchor = anchor_points.back();
-    auto ref_point = reference_line_->GetReferencePoint(s);
+    auto& last_anchor      = anchor_points.back();
+    auto  ref_point        = reference_line_->GetReferencePoint(s);
     last_anchor.path_point = ref_point.ToPathPoint(s);
     // TODO(All): change the longitudinal and lateral directions in code
-    last_anchor.lateral_bound = 2.0;
+    last_anchor.lateral_bound      = 2.0;
     last_anchor.longitudinal_bound = 0.2;
   }
   anchor_points.front().longitudinal_bound = 1e-6;
-  anchor_points.front().lateral_bound = 1e-6;
-  anchor_points.back().longitudinal_bound = 1e-6;
-  anchor_points.back().lateral_bound = 1e-6;
+  anchor_points.front().lateral_bound      = 1e-6;
+  anchor_points.back().longitudinal_bound  = 1e-6;
+  anchor_points.back().lateral_bound       = 1e-6;
   smoother_->SetAnchorPoints(anchor_points);
 
   auto start = std::chrono::system_clock::now();
 
   EXPECT_TRUE(smoother_->Smooth(*reference_line_, &smoothed_reference_line));
 
-  auto end = std::chrono::system_clock::now();
+  auto                          end  = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end - start;
   std::cout << "Time to solver is " << diff.count() << " s\n";
 

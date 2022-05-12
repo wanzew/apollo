@@ -29,7 +29,7 @@ namespace blocker {
 using apollo::cyber::proto::UnitTest;
 
 TEST(BlockerTest, constructor) {
-  BlockerAttr attr(10, "channel");
+  BlockerAttr       attr(10, "channel");
   Blocker<UnitTest> blocker(attr);
   EXPECT_EQ(blocker.capacity(), 10);
   EXPECT_EQ(blocker.channel_name(), "channel");
@@ -39,7 +39,7 @@ TEST(BlockerTest, constructor) {
 }
 
 TEST(BlockerTest, set_capacity) {
-  BlockerAttr attr(0, "channel");
+  BlockerAttr       attr(0, "channel");
   Blocker<UnitTest> blocker(attr);
   EXPECT_EQ(blocker.capacity(), 0);
 
@@ -59,7 +59,7 @@ TEST(BlockerTest, set_capacity) {
 }
 
 TEST(BlockerTest, publish) {
-  BlockerAttr attr(10, "channel");
+  BlockerAttr       attr(10, "channel");
   Blocker<UnitTest> blocker(attr);
 
   auto msg1 = std::make_shared<UnitTest>();
@@ -98,12 +98,12 @@ TEST(BlockerTest, publish) {
 }
 
 TEST(BlockerTest, subscribe) {
-  BlockerAttr attr(10, "channel");
+  BlockerAttr       attr(10, "channel");
   Blocker<UnitTest> blocker(attr);
 
   auto received_msg = std::make_shared<UnitTest>();
-  bool res = blocker.Subscribe(
-      "BlockerTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
+  bool res =
+      blocker.Subscribe("BlockerTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
         received_msg->CopyFrom(*msg);
       });
 
@@ -118,10 +118,9 @@ TEST(BlockerTest, subscribe) {
   EXPECT_EQ(received_msg->class_name(), msg1->class_name());
   EXPECT_EQ(received_msg->case_name(), msg1->case_name());
 
-  res = blocker.Subscribe(
-      "BlockerTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
-        received_msg->CopyFrom(*msg);
-      });
+  res = blocker.Subscribe("BlockerTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
+    received_msg->CopyFrom(*msg);
+  });
 
   EXPECT_FALSE(res);
 }

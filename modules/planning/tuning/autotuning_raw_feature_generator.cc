@@ -35,16 +35,18 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 
 AutotuningRawFeatureGenerator::AutotuningRawFeatureGenerator(
-    const double time_range, const size_t num_points,
-    const ReferenceLineInfo& reference_line_info, const Frame& frame,
-    const SpeedLimit& speed_limit)
-    : reference_line_info_(reference_line_info),
-      frame_(frame),
-      speed_limit_(speed_limit),
-      obs_boundaries_(num_points, std::vector<std::array<double, 3>>()),
-      stop_boundaries_(num_points, std::vector<std::array<double, 3>>()),
-      nudge_boundaries_(num_points, std::vector<std::array<double, 3>>()),
-      side_pass_boundaries_(num_points, std::vector<std::array<double, 3>>()) {
+    const double             time_range,
+    const size_t             num_points,
+    const ReferenceLineInfo& reference_line_info,
+    const Frame&             frame,
+    const SpeedLimit&        speed_limit)
+    : reference_line_info_(reference_line_info)
+    , frame_(frame)
+    , speed_limit_(speed_limit)
+    , obs_boundaries_(num_points, std::vector<std::array<double, 3>>())
+    , stop_boundaries_(num_points, std::vector<std::array<double, 3>>())
+    , nudge_boundaries_(num_points, std::vector<std::array<double, 3>>())
+    , side_pass_boundaries_(num_points, std::vector<std::array<double, 3>>()) {
   CHECK_GT(num_points, 0U);
   CHECK_GT(time_range, kMinTimeRange);
   double res = time_range / static_cast<double>(num_points);
@@ -55,21 +57,20 @@ AutotuningRawFeatureGenerator::AutotuningRawFeatureGenerator(
 
 common::Status AutotuningRawFeatureGenerator::EvaluateTrajectory(
     const std::vector<common::TrajectoryPoint>& trajectory,
-    autotuning::TrajectoryRawFeature* const trajectory_feature) const {
+    autotuning::TrajectoryRawFeature* const     trajectory_feature) const {
   return common::Status::OK();
 }
 
 common::Status AutotuningRawFeatureGenerator::EvaluateTrajectoryPoint(
-    const common::TrajectoryPoint& trajectory_point,
-    autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
-    const {
+    const common::TrajectoryPoint&               trajectory_point,
+    autotuning::TrajectoryPointRawFeature* const trajectory_point_feature) const {
   return common::Status::OK();
 }
 
 common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
-    const common::SpeedPoint& speed_point, const size_t index,
-    autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
-    const {
+    const common::SpeedPoint&                    speed_point,
+    const size_t                                 index,
+    autotuning::TrajectoryPointRawFeature* const trajectory_point_feature) const {
   auto* speed_feature = trajectory_point_feature->mutable_speed_feature();
   // setup basic speed profile
   const double s = speed_point.s();
@@ -89,15 +90,14 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
 
   // extracting obstacle related infos
 
-  autotuning::SpeedPointRawFeature_ObjectDecisionFeature* decision_obj =
-      nullptr;
+  autotuning::SpeedPointRawFeature_ObjectDecisionFeature* decision_obj = nullptr;
   for (const auto& stop_obs : stop_boundaries_[index]) {
-    double lower_s = stop_obs[0];
-    double speed = stop_obs[2];
+    double lower_s  = stop_obs[0];
+    double speed    = stop_obs[2];
     double distance = 0.0;
     // stop line is in the front
     if (lower_s < s) {
-      distance = lower_s - s;
+      distance     = lower_s - s;
       decision_obj = speed_feature->add_stop();
     } else {
       decision_obj = speed_feature->add_collision();
@@ -107,16 +107,16 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
   }
 
   for (const auto& obs : obs_boundaries_[index]) {
-    double lower_s = obs[0];
-    double upper_s = obs[1];
-    double speed = obs[2];
+    double lower_s  = obs[0];
+    double upper_s  = obs[1];
+    double speed    = obs[2];
     double distance = 0.0;
     if (upper_s < s) {
       decision_obj = speed_feature->add_overtake();
-      distance = s - upper_s;
+      distance     = s - upper_s;
     } else if (lower_s > s) {
       decision_obj = speed_feature->add_follow();
-      distance = lower_s - s;
+      distance     = lower_s - s;
     } else {
       decision_obj = speed_feature->add_collision();
     }
@@ -127,7 +127,7 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
 }
 
 common::Status AutotuningRawFeatureGenerator::EvaluateSpeedProfile(
-    const std::vector<common::SpeedPoint>& speed_profile,
+    const std::vector<common::SpeedPoint>&  speed_profile,
     autotuning::TrajectoryRawFeature* const trajectory_feature) const {
   if (speed_profile.size() != eval_time_.size()) {
     const std::string msg = "mismatched evaluated time and speed profile size";
@@ -136,8 +136,7 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedProfile(
   }
   for (size_t i = 0; i < eval_time_.size(); ++i) {
     auto* trajectory_point_feature = trajectory_feature->add_point_feature();
-    auto status =
-        EvaluateSpeedPoint(speed_profile[i], i, trajectory_point_feature);
+    auto  status = EvaluateSpeedPoint(speed_profile[i], i, trajectory_point_feature);
     if (status != common::Status::OK()) {
       const std::string msg = "Extracting speed profile error";
       AERROR << msg;
@@ -151,7 +150,7 @@ void AutotuningRawFeatureGenerator::GenerateSTBoundaries(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decision = reference_line_info.path_decision();
   for (auto* obstacle : path_decision.obstacles().Items()) {
-    auto id = obstacle->Id();
+    auto         id    = obstacle->Id();
     const double speed = obstacle->speed();
     if (!obstacle->path_st_boundary().IsEmpty()) {
       // fill discretized boundary info
@@ -160,12 +159,12 @@ void AutotuningRawFeatureGenerator::GenerateSTBoundaries(
   }
 }
 
-void AutotuningRawFeatureGenerator::ConvertToDiscretizedBoundaries(
-    const STBoundary& boundary, const double speed) {
+void AutotuningRawFeatureGenerator::ConvertToDiscretizedBoundaries(const STBoundary& boundary,
+                                                                   const double      speed) {
   for (size_t i = 0; i < eval_time_.size(); ++i) {
     double upper = 0.0;
     double lower = 0.0;
-    bool suc = boundary.GetBoundarySRange(eval_time_[i], &upper, &lower);
+    bool   suc   = boundary.GetBoundarySRange(eval_time_[i], &upper, &lower);
     if (suc) {
       if (boundary.boundary_type() == STBoundary::BoundaryType::STOP) {
         stop_boundaries_[i].push_back({{lower, upper, speed}});

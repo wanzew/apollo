@@ -25,7 +25,7 @@ namespace scheduler {
 
 class CvWrapper {
  public:
-  CvWrapper& operator=(const CvWrapper& other) = delete;
+  CvWrapper&               operator=(const CvWrapper& other) = delete;
   std::condition_variable& Cv() { return cv_; }
 
  private:

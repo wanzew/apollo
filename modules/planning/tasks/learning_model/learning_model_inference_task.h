@@ -33,22 +33,18 @@ namespace planning {
 
 class LearningModelInferenceTask : public Task {
  public:
-  LearningModelInferenceTask(
-      const TaskConfig &config,
-      const std::shared_ptr<DependencyInjector> &injector);
+  LearningModelInferenceTask(const TaskConfig&                          config,
+                             const std::shared_ptr<DependencyInjector>& injector);
 
-  apollo::common::Status Execute(
-      Frame *frame, ReferenceLineInfo *reference_line_info) override;
+  apollo::common::Status Execute(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
-  apollo::common::Status Process(Frame *frame);
+  apollo::common::Status Process(Frame* frame);
 
-  void ConvertADCFutureTrajectory(
-      const std::vector<TrajectoryPointFeature> &trajectory,
-      std::vector<common::TrajectoryPoint> *adc_future_trajectory);
+  void ConvertADCFutureTrajectory(const std::vector<TrajectoryPointFeature>& trajectory,
+                                  std::vector<common::TrajectoryPoint>*      adc_future_trajectory);
 
-  std::unique_ptr<TrajectoryImitationLibtorchInference>
-      trajectory_imitation_inference_;
+  std::unique_ptr<TrajectoryImitationLibtorchInference> trajectory_imitation_inference_;
 };
 
 }  // namespace planning

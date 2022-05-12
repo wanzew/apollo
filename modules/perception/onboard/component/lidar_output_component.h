@@ -26,7 +26,7 @@ namespace onboard {
 
 class LidarOutputComponent : public cyber::Component<SensorFrameMessage> {
  public:
-  LidarOutputComponent() = default;
+  LidarOutputComponent()  = default;
   ~LidarOutputComponent() = default;
 
   bool Init() override;

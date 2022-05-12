@@ -17,11 +17,11 @@
 
 #include <memory>
 
-#include "cyber/time/time.h"
+#include "modules/drivers/lidar/proto/velodyne.pb.h"
 
+#include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
-#include "modules/drivers/lidar/proto/velodyne.pb.h"
 
 using apollo::cyber::Time;
 
@@ -51,11 +51,9 @@ bool CompensatorComponent::Init() {
   return true;
 }
 
-bool CompensatorComponent::Proc(
-    const std::shared_ptr<PointCloud>& point_cloud) {
-  const auto start_time = Time::Now();
-  std::shared_ptr<PointCloud> point_cloud_compensated =
-      compensator_pool_->GetObject();
+bool CompensatorComponent::Proc(const std::shared_ptr<PointCloud>& point_cloud) {
+  const auto                  start_time              = Time::Now();
+  std::shared_ptr<PointCloud> point_cloud_compensated = compensator_pool_->GetObject();
   if (point_cloud_compensated == nullptr) {
     AWARN << "compensator fail to getobject, will be new";
     point_cloud_compensated = std::make_shared<PointCloud>();
@@ -67,18 +65,15 @@ bool CompensatorComponent::Proc(
   }
   point_cloud_compensated->Clear();
   if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
-    const auto end_time = Time::Now();
-    const auto diff = end_time - start_time;
-    const auto meta_diff =
-        end_time - Time(point_cloud_compensated->header().lidar_timestamp());
+    const auto end_time  = Time::Now();
+    const auto diff      = end_time - start_time;
+    const auto meta_diff = end_time - Time(point_cloud_compensated->header().lidar_timestamp());
     AINFO << "compenstator diff (ms):" << (diff.ToNanosecond() / 1e6)
-          << ";meta (ns):"
-          << point_cloud_compensated->header().lidar_timestamp()
+          << ";meta (ns):" << point_cloud_compensated->header().lidar_timestamp()
           << ";meta diff (ms): " << (meta_diff.ToNanosecond() / 1e6);
     static common::LatencyRecorder latency_recorder(FLAGS_pointcloud_topic);
-    latency_recorder.AppendLatencyRecord(
-        point_cloud_compensated->header().lidar_timestamp(), start_time,
-        end_time);
+    latency_recorder.AppendLatencyRecord(point_cloud_compensated->header().lidar_timestamp(),
+                                         start_time, end_time);
 
     point_cloud_compensated->mutable_header()->set_sequence_num(seq_);
     writer_->Write(point_cloud_compensated);

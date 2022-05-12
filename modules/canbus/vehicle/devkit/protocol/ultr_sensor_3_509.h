@@ -17,44 +17,40 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Ultrsensor3509 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Ultrsensor3509
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Ultrsensor3509();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'uiUSS5_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
   // 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-  double uiuss5_tof_direct(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double uiuss5_tof_direct(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'uiUSS4_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
   // 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-  double uiuss4_tof_direct(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double uiuss4_tof_direct(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'uiUSS3_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
   // 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-  double uiuss3_tof_direct(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double uiuss3_tof_direct(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'uiUSS2_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
   // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-  double uiuss2_tof_direct(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double uiuss2_tof_direct(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace devkit

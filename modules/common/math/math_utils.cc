@@ -25,23 +25,19 @@ namespace math {
 
 double Sqr(const double x) { return x * x; }
 
-double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2) {
+double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1, const Vec2d& end_point_2) {
   return (end_point_1 - start_point).CrossProd(end_point_2 - start_point);
 }
 
-double InnerProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2) {
+double InnerProd(const Vec2d& start_point, const Vec2d& end_point_1, const Vec2d& end_point_2) {
   return (end_point_1 - start_point).InnerProd(end_point_2 - start_point);
 }
 
-double CrossProd(const double x0, const double y0, const double x1,
-                 const double y1) {
+double CrossProd(const double x0, const double y0, const double x1, const double y1) {
   return x0 * y1 - x1 * y0;
 }
 
-double InnerProd(const double x0, const double y0, const double x1,
-                 const double y1) {
+double InnerProd(const double x0, const double y0, const double x1, const double y1) {
   return x0 * x1 + y0 * y1;
 }
 
@@ -52,20 +48,14 @@ double WrapAngle(const double angle) {
 
 double NormalizeAngle(const double angle) {
   double a = std::fmod(angle + M_PI, 2.0 * M_PI);
-  if (a < 0.0) {
-    a += (2.0 * M_PI);
-  }
+  if (a < 0.0) { a += (2.0 * M_PI); }
   return a - M_PI;
 }
 
-double AngleDiff(const double from, const double to) {
-  return NormalizeAngle(to - from);
-}
+double AngleDiff(const double from, const double to) { return NormalizeAngle(to - from); }
 
 int RandomInt(const int s, const int t, unsigned int rand_seed) {
-  if (s >= t) {
-    return s;
-  }
+  if (s >= t) { return s; }
   return s + rand_r(&rand_seed) % (t - s + 1);
 }
 
@@ -75,12 +65,10 @@ double RandomDouble(const double s, const double t, unsigned int rand_seed) {
 
 // Gaussian
 double Gaussian(const double u, const double std, const double x) {
-  return (1.0 / std::sqrt(2 * M_PI * std * std)) *
-         std::exp(-(x - u) * (x - u) / (2 * std * std));
+  return (1.0 / std::sqrt(2 * M_PI * std * std)) * std::exp(-(x - u) * (x - u) / (2 * std * std));
 }
 
-Eigen::Vector2d RotateVector2d(const Eigen::Vector2d& v_in,
-                               const double theta) {
+Eigen::Vector2d RotateVector2d(const Eigen::Vector2d& v_in, const double theta) {
   const double cos_theta = std::cos(theta);
   const double sin_theta = std::sin(theta);
 
@@ -91,7 +79,7 @@ Eigen::Vector2d RotateVector2d(const Eigen::Vector2d& v_in,
 }
 
 std::pair<double, double> Cartesian2Polar(double x, double y) {
-  double r = std::sqrt(x * x + y * y);
+  double r     = std::sqrt(x * x + y * y);
   double theta = std::atan2(y, x);
   return std::make_pair(r, theta);
 }

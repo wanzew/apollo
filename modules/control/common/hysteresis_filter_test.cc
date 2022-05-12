@@ -25,13 +25,13 @@ namespace apollo {
 namespace control {
 
 TEST(HysteresisFilter, TriangleHysteresis) {
-  HysteresisFilter hysteresis_filter;
+  HysteresisFilter    hysteresis_filter;
   std::vector<double> triangle_input(20, 0.0);
   std::vector<double> filter_output(20, 0.0);
-  double threshold = 0.0;
-  double hysteresis_upper = 1.5;
-  double hysteresis_lower = 2.5;
-  int state = 0;
+  double              threshold        = 0.0;
+  double              hysteresis_upper = 1.5;
+  double              hysteresis_lower = 2.5;
+  int                 state            = 0;
   for (int i = 0; i < 10; ++i) {
     triangle_input[i] = i - 5;
   }
@@ -42,8 +42,8 @@ TEST(HysteresisFilter, TriangleHysteresis) {
   // First state turning point is threshold + hysteresis_upper
   for (int i = 0; i < 7; ++i) {
     int expected_filter_state = 0;
-    hysteresis_filter.filter(triangle_input[i], threshold, hysteresis_upper,
-                             hysteresis_lower, &state, &filter_output[i]);
+    hysteresis_filter.filter(triangle_input[i], threshold, hysteresis_upper, hysteresis_lower,
+                             &state, &filter_output[i]);
     EXPECT_EQ(state, expected_filter_state);
     if (triangle_input[i] > threshold + hysteresis_upper) {
       EXPECT_EQ(hysteresis_upper + threshold, filter_output[i]);
@@ -57,8 +57,8 @@ TEST(HysteresisFilter, TriangleHysteresis) {
   // Next state turning point is threshold - hysteresis_lower
   for (int i = 7; i < 18; ++i) {
     int expected_filter_state = 1;
-    hysteresis_filter.filter(triangle_input[i], threshold, hysteresis_upper,
-                             hysteresis_lower, &state, &filter_output[i]);
+    hysteresis_filter.filter(triangle_input[i], threshold, hysteresis_upper, hysteresis_lower,
+                             &state, &filter_output[i]);
     EXPECT_EQ(state, expected_filter_state);
     if (triangle_input[i] > threshold + hysteresis_upper) {
       EXPECT_EQ(hysteresis_upper + threshold, filter_output[i]);
@@ -72,8 +72,8 @@ TEST(HysteresisFilter, TriangleHysteresis) {
   // Next state turning point is threshold + hysteresis_upper
   for (int i = 18; i < 20; ++i) {
     int expected_filter_state = 0;
-    hysteresis_filter.filter(triangle_input[i], threshold, hysteresis_upper,
-                             hysteresis_lower, &state, &filter_output[i]);
+    hysteresis_filter.filter(triangle_input[i], threshold, hysteresis_upper, hysteresis_lower,
+                             &state, &filter_output[i]);
     EXPECT_EQ(state, expected_filter_state);
     if (triangle_input[i] > threshold + hysteresis_upper) {
       EXPECT_EQ(hysteresis_upper + threshold, filter_output[i]);

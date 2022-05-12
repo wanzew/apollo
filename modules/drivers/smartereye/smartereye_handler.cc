@@ -16,6 +16,7 @@
 #include "modules/drivers/smartereye/smartereye_handler.h"
 
 #include <math.h>
+
 #include <iostream>
 #include <string>
 
@@ -34,9 +35,7 @@ SmartereyeHandler::SmartereyeHandler(std::string name)
   pCallbackFunc = nullptr;
 }
 
-SmartereyeHandler::~SmartereyeHandler() {
-  pCallbackFunc = nullptr;
-}
+SmartereyeHandler::~SmartereyeHandler() { pCallbackFunc = nullptr; }
 
 bool SmartereyeHandler::SetCallback(CallbackFunc ptr) {
   pCallbackFunc = ptr;
@@ -44,8 +43,8 @@ bool SmartereyeHandler::SetCallback(CallbackFunc ptr) {
   return true;
 }
 
-void SmartereyeHandler::handleRawFrame(const RawImageFrame *rawFrame) {
-  pCallbackFunc(const_cast<RawImageFrame *>(rawFrame));
+void SmartereyeHandler::handleRawFrame(const RawImageFrame* rawFrame) {
+  pCallbackFunc(const_cast<RawImageFrame*>(rawFrame));
 }
 
 }  // namespace smartereye

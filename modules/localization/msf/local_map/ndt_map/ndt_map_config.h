@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 
 namespace apollo {

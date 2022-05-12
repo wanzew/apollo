@@ -20,8 +20,9 @@
 #include <string>
 #include <vector>
 
-#include "modules/prediction/network/net_layer.h"
 #include "modules/prediction/proto/network_model.pb.h"
+
+#include "modules/prediction/network/net_layer.h"
 
 /**
  * @namespace apollo::prediction::network
@@ -54,8 +55,7 @@ class NetModel {
    * @param Inputs to a network
    * @param Output of a network will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output) const = 0;
+  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) const = 0;
 
   /**
    * @brief Set the internal state of a network model
@@ -108,8 +108,8 @@ class NetModel {
 
  protected:
   std::vector<std::unique_ptr<Layer>> layers_;
-  NetParameter net_parameter_;
-  bool ok_ = false;
+  NetParameter                        net_parameter_;
+  bool                                ok_ = false;
 };
 
 }  // namespace network

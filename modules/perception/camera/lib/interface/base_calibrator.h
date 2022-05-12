@@ -20,27 +20,26 @@
 #include <vector>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
 struct CalibratorInitOptions : public BaseInitOptions {
-  int image_width = 0;
-  int image_height = 0;
-  float focal_x = 0.0f;
-  float focal_y = 0.0f;
-  float cx = 0.0f;
-  float cy = 0.0f;
+  int   image_width  = 0;
+  int   image_height = 0;
+  float focal_x      = 0.0f;
+  float focal_y      = 0.0f;
+  float cx           = 0.0f;
+  float cy           = 0.0f;
 };
 
 struct CalibratorOptions {
   std::shared_ptr<std::vector<base::LaneLine>> lane_objects;
-  std::shared_ptr<Eigen::Affine3d> camera2world_pose;
-  double *timestamp = nullptr;
+  std::shared_ptr<Eigen::Affine3d>             camera2world_pose;
+  double*                                      timestamp = nullptr;
 };
 
 class BaseCalibrator {
@@ -49,24 +48,21 @@ class BaseCalibrator {
 
   virtual ~BaseCalibrator() = default;
 
-  virtual bool Init(
-      const CalibratorInitOptions &options = CalibratorInitOptions()) = 0;
+  virtual bool Init(const CalibratorInitOptions& options = CalibratorInitOptions()) = 0;
 
   // @brief: refine 3D location of detected obstacles.
   // @param [in]: options
   // @param [in/out]: pitch_angle
-  virtual bool Calibrate(const CalibratorOptions &options,
-                         float *pitch_angle) = 0;
+  virtual bool Calibrate(const CalibratorOptions& options, float* pitch_angle) = 0;
 
   virtual std::string Name() const = 0;
 
-  BaseCalibrator(const BaseCalibrator &) = delete;
-  BaseCalibrator &operator=(const BaseCalibrator &) = delete;
+  BaseCalibrator(const BaseCalibrator&) = delete;
+  BaseCalibrator& operator=(const BaseCalibrator&) = delete;
 };  // class BaseCalibrator
 
 PERCEPTION_REGISTER_REGISTERER(BaseCalibrator);
-#define REGISTER_CALIBRATOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseCalibrator, name)
+#define REGISTER_CALIBRATOR(name) PERCEPTION_REGISTER_CLASS(BaseCalibrator, name)
 
 }  // namespace camera
 }  // namespace perception

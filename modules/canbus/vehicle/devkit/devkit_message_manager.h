@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -25,8 +26,7 @@ namespace devkit {
 
 using ::apollo::drivers::canbus::MessageManager;
 
-class DevkitMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+class DevkitMessageManager : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   DevkitMessageManager();
   virtual ~DevkitMessageManager();

@@ -27,7 +27,8 @@ class KalmanFilterTest : public ::testing::Test {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  KalmanFilterTest() : kf_() {}
+  KalmanFilterTest()
+      : kf_() {}
 
   virtual void SetUp() {
     // Initial state
@@ -81,7 +82,7 @@ class KalmanFilterTest : public ::testing::Test {
 
 TEST_F(KalmanFilterTest, SyntheticTrackingTest) {
   kf_.Predict();
-  Eigen::Matrix<double, 2, 1> state = kf_.GetStateEstimate();
+  Eigen::Matrix<double, 2, 1> state     = kf_.GetStateEstimate();
   Eigen::Matrix<double, 2, 2> state_cov = kf_.GetStateCovariance();
   EXPECT_DOUBLE_EQ(1.0, state(0, 0));
   EXPECT_DOUBLE_EQ(1.0, state(1, 0));
@@ -93,7 +94,7 @@ TEST_F(KalmanFilterTest, SyntheticTrackingTest) {
   Eigen::Matrix<double, 1, 1> z;
   z(0, 0) = 1.0;
   kf_.Correct(z);
-  state = kf_.GetStateEstimate();
+  state     = kf_.GetStateEstimate();
   state_cov = kf_.GetStateCovariance();
 
   EXPECT_DOUBLE_EQ(1.0, state(0, 0));

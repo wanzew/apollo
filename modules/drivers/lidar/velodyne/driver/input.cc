@@ -20,16 +20,14 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
-                                         const uint8_t* bytes) {
+bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time, const uint8_t* bytes) {
   unsigned int gprmc_index = 206;
 
-  int field_count = 0;
-  int time_field_index = 0;
+  int field_count          = 0;
+  int time_field_index     = 0;
   int validity_field_index = 0;
-  int date_field_index = 0;
-  while (++gprmc_index < POSITIONING_DATA_PACKET_SIZE - 6 &&
-         bytes[gprmc_index] != '*') {
+  int date_field_index     = 0;
+  while (++gprmc_index < POSITIONING_DATA_PACKET_SIZE - 6 && bytes[gprmc_index] != '*') {
     if (bytes[gprmc_index] == ',') {
       ++field_count;
       if (field_count == 1 && time_field_index == 0) {
@@ -47,35 +45,27 @@ bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
     }
   }
 
-  if (gprmc_index == POSITIONING_DATA_PACKET_SIZE - 6) {
-    return false;
-  }
+  if (gprmc_index == POSITIONING_DATA_PACKET_SIZE - 6) { return false; }
 
-  nmea_time->year =
-      static_cast<uint16_t>((bytes[date_field_index + 4] - '0') * 10 +
-                            (bytes[date_field_index + 5] - '0'));
-  nmea_time->mon =
-      static_cast<uint16_t>((bytes[date_field_index + 2] - '0') * 10 +
-                            (bytes[date_field_index + 3] - '0'));
-  nmea_time->day = static_cast<uint16_t>((bytes[date_field_index] - '0') * 10 +
+  nmea_time->year = static_cast<uint16_t>((bytes[date_field_index + 4] - '0') * 10 +
+                                          (bytes[date_field_index + 5] - '0'));
+  nmea_time->mon  = static_cast<uint16_t>((bytes[date_field_index + 2] - '0') * 10 +
+                                         (bytes[date_field_index + 3] - '0'));
+  nmea_time->day  = static_cast<uint16_t>((bytes[date_field_index] - '0') * 10 +
                                          (bytes[date_field_index + 1] - '0'));
   nmea_time->hour = static_cast<uint16_t>((bytes[time_field_index] - '0') * 10 +
                                           (bytes[time_field_index + 1] - '0'));
-  nmea_time->min =
-      static_cast<uint16_t>((bytes[time_field_index + 2] - '0') * 10 +
-                            (bytes[time_field_index + 3] - '0'));
-  nmea_time->sec =
-      static_cast<uint16_t>((bytes[time_field_index + 4] - '0') * 10 +
-                            (bytes[time_field_index + 5] - '0'));
+  nmea_time->min  = static_cast<uint16_t>((bytes[time_field_index + 2] - '0') * 10 +
+                                         (bytes[time_field_index + 3] - '0'));
+  nmea_time->sec  = static_cast<uint16_t>((bytes[time_field_index + 4] - '0') * 10 +
+                                         (bytes[time_field_index + 5] - '0'));
 
-  if (nmea_time->year < 0 || nmea_time->year > 99 || nmea_time->mon > 12 ||
-      nmea_time->mon < 1 || nmea_time->day > 31 || nmea_time->day < 1 ||
-      nmea_time->hour > 23 || nmea_time->hour < 0 || nmea_time->min > 59 ||
-      nmea_time->min < 0 || nmea_time->sec > 59 || nmea_time->sec < 0) {
-    AERROR << "Invalid GPS time:  " << nmea_time->year << "-" << nmea_time->mon
-           << "-" << nmea_time->day << " " << nmea_time->hour << ":"
-           << nmea_time->min << ":" << nmea_time->sec
-           << ", make sure have connected to GPS device";
+  if (nmea_time->year < 0 || nmea_time->year > 99 || nmea_time->mon > 12 || nmea_time->mon < 1 ||
+      nmea_time->day > 31 || nmea_time->day < 1 || nmea_time->hour > 23 || nmea_time->hour < 0 ||
+      nmea_time->min > 59 || nmea_time->min < 0 || nmea_time->sec > 59 || nmea_time->sec < 0) {
+    AERROR << "Invalid GPS time:  " << nmea_time->year << "-" << nmea_time->mon << "-"
+           << nmea_time->day << " " << nmea_time->hour << ":" << nmea_time->min << ":"
+           << nmea_time->sec << ", make sure have connected to GPS device";
     return false;
   }
   return true;

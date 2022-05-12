@@ -25,4 +25,4 @@
 #  define SATPEXTSHARED_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif // SATPEXT_GLOBAL_H
+#endif  // SATPEXT_GLOBAL_H

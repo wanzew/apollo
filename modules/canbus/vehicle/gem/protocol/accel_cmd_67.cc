@@ -35,9 +35,7 @@ uint32_t Accelcmd67::GetPeriod() const {
   return PERIOD;
 }
 
-void Accelcmd67::UpdateData(uint8_t* data) {
-  set_p_accel_cmd(data, accel_cmd_);
-}
+void Accelcmd67::UpdateData(uint8_t* data) { set_p_accel_cmd(data, accel_cmd_); }
 
 void Accelcmd67::Reset() {
   // TODO(QiL) :you should check this manually
@@ -54,7 +52,7 @@ Accelcmd67* Accelcmd67::set_accel_cmd(double accel_cmd) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
 void Accelcmd67::set_p_accel_cmd(uint8_t* data, double accel_cmd) {
   accel_cmd = ProtocolData::BoundedValue(0.0, 1.0, accel_cmd);
-  int x = static_cast<int>(accel_cmd / 0.001000);
+  int     x = static_cast<int>(accel_cmd / 0.001000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);

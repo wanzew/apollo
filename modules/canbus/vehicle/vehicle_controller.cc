@@ -29,32 +29,26 @@ Chassis::DrivingMode VehicleController::driving_mode() {
   return driving_mode_;
 }
 
-void VehicleController::set_driving_mode(
-    const Chassis::DrivingMode &driving_mode) {
+void VehicleController::set_driving_mode(const Chassis::DrivingMode& driving_mode) {
   std::lock_guard<std::mutex> lock(mode_mutex_);
   driving_mode_ = driving_mode;
 }
 
-ErrorCode VehicleController::SetDrivingMode(
-    const Chassis::DrivingMode &driving_mode) {
+ErrorCode VehicleController::SetDrivingMode(const Chassis::DrivingMode& driving_mode) {
   if (driving_mode == Chassis::EMERGENCY_MODE) {
     AINFO << "Can't set vehicle to EMERGENCY_MODE driving mode.";
     return ErrorCode::CANBUS_ERROR;
   }
 
   // vehicle in emergency mode only response to manual mode to reset.
-  if (this->driving_mode() == Chassis::EMERGENCY_MODE &&
-      driving_mode != Chassis::COMPLETE_MANUAL) {
-    AINFO
-        << "Vehicle in EMERGENCY_MODE, only response to COMPLETE_MANUAL mode.";
+  if (this->driving_mode() == Chassis::EMERGENCY_MODE && driving_mode != Chassis::COMPLETE_MANUAL) {
+    AINFO << "Vehicle in EMERGENCY_MODE, only response to COMPLETE_MANUAL mode.";
     AINFO << "Only response to RESET ACTION.";
     return ErrorCode::CANBUS_ERROR;
   }
 
   // if current mode is same as previous, no need to set.
-  if (this->driving_mode() == driving_mode) {
-    return ErrorCode::OK;
-  }
+  if (this->driving_mode() == driving_mode) { return ErrorCode::OK; }
 
   switch (driving_mode) {
     case Chassis::COMPLETE_AUTO_DRIVE: {
@@ -85,13 +79,12 @@ ErrorCode VehicleController::SetDrivingMode(
       }
       break;
     }
-    default:
-      break;
+    default: break;
   }
   return ErrorCode::OK;
 }
 
-ErrorCode VehicleController::Update(const ControlCommand &control_command) {
+ErrorCode VehicleController::Update(const ControlCommand& control_command) {
   if (!is_initialized_) {
     AERROR << "Controller is not initialized.";
     return ErrorCode::CANBUS_ERROR;
@@ -99,8 +92,7 @@ ErrorCode VehicleController::Update(const ControlCommand &control_command) {
 
   // Execute action to transform driving mode
   if (control_command.has_pad_msg() && control_command.pad_msg().has_action()) {
-    AINFO << "Canbus received pad msg: "
-          << control_command.pad_msg().ShortDebugString();
+    AINFO << "Canbus received pad msg: " << control_command.pad_msg().ShortDebugString();
     Chassis::DrivingMode mode = Chassis::COMPLETE_MANUAL;
     switch (control_command.pad_msg().action()) {
       case control::DrivingAction::START: {
@@ -118,9 +110,7 @@ ErrorCode VehicleController::Update(const ControlCommand &control_command) {
       }
     }
     auto error_code = SetDrivingMode(mode);
-    if (error_code != ErrorCode::OK) {
-      AERROR << "Failed to set driving mode.";
-    }
+    if (error_code != ErrorCode::OK) { AERROR << "Failed to set driving mode."; }
   }
 
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
@@ -144,8 +134,7 @@ ErrorCode VehicleController::Update(const ControlCommand &control_command) {
   }
 
   if ((driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-       driving_mode() == Chassis::AUTO_SPEED_ONLY ||
-       driving_mode() == Chassis::AUTO_STEER_ONLY) &&
+       driving_mode() == Chassis::AUTO_SPEED_ONLY || driving_mode() == Chassis::AUTO_STEER_ONLY) &&
       control_command.has_signal()) {
     SetHorn(control_command);
     SetTurningSignal(control_command);

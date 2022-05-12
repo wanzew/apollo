@@ -69,15 +69,16 @@ inline void py_waitforshutdown() { return WaitForShutdown(); }
 
 class PyWriter {
  public:
-  PyWriter(const std::string& channel, const std::string& type,
-           const uint32_t qos_depth, Node* node)
-      : channel_name_(channel),
-        data_type_(type),
-        qos_depth_(qos_depth),
-        node_(node) {
+  PyWriter(const std::string& channel,
+           const std::string& type,
+           const uint32_t     qos_depth,
+           Node*              node)
+      : channel_name_(channel)
+      , data_type_(type)
+      , qos_depth_(qos_depth)
+      , node_(node) {
     std::string proto_desc;
-    message::ProtobufFactory::Instance()->GetDescriptorString(type,
-                                                              &proto_desc);
+    message::ProtobufFactory::Instance()->GetDescriptorString(type, &proto_desc);
     if (proto_desc.empty()) {
       AWARN << "cpp can't find proto_desc msgtype->" << data_type_;
       return;
@@ -98,10 +99,10 @@ class PyWriter {
   }
 
  private:
-  std::string channel_name_;
-  std::string data_type_;
-  uint32_t qos_depth_;
-  Node* node_ = nullptr;
+  std::string                                     channel_name_;
+  std::string                                     data_type_;
+  uint32_t                                        qos_depth_;
+  Node*                                           node_ = nullptr;
   std::shared_ptr<Writer<message::PyMessageWrap>> writer_;
 };
 
@@ -109,18 +110,19 @@ const char RAWDATATYPE[] = "RawData";
 class PyReader {
  public:
   PyReader(const std::string& channel, const std::string& type, Node* node)
-      : channel_name_(channel), data_type_(type), node_(node), func_(nullptr) {
+      : channel_name_(channel)
+      , data_type_(type)
+      , node_(node)
+      , func_(nullptr) {
     if (data_type_.compare(RAWDATATYPE) == 0) {
-      auto f =
-          [this](const std::shared_ptr<const message::PyMessageWrap>& request) {
-            this->cb(request);
-          };
+      auto f = [this](const std::shared_ptr<const message::PyMessageWrap>& request) {
+        this->cb(request);
+      };
       reader_ = node_->CreateReader<message::PyMessageWrap>(channel, f);
     } else {
-      auto f =
-          [this](const std::shared_ptr<const message::RawMessage>& request) {
-            this->cb_rawmsg(request);
-          };
+      auto f = [this](const std::shared_ptr<const message::RawMessage>& request) {
+        this->cb_rawmsg(request);
+      };
       reader_rawmsg_ = node_->CreateReader<message::RawMessage>(channel, f);
     }
   }
@@ -128,16 +130,14 @@ class PyReader {
   void register_func(int (*func)(const char*)) { func_ = func; }
 
   std::string read(bool wait = false) {
-    std::string msg("");
+    std::string                  msg("");
     std::unique_lock<std::mutex> ul(msg_lock_);
     if (!cache_.empty()) {
       msg = std::move(cache_.front());
       cache_.pop_front();
     }
 
-    if (!wait) {
-      return msg;
-    }
+    if (!wait) { return msg; }
 
     msg_cond_.wait(ul, [this] { return !this->cache_.empty(); });
     if (!cache_.empty()) {
@@ -154,9 +154,7 @@ class PyReader {
       std::lock_guard<std::mutex> lg(msg_lock_);
       cache_.push_back(message->data());
     }
-    if (func_) {
-      func_(channel_name_.c_str());
-    }
+    if (func_) { func_(channel_name_.c_str()); }
     msg_cond_.notify_one();
   }
 
@@ -165,20 +163,18 @@ class PyReader {
       std::lock_guard<std::mutex> lg(msg_lock_);
       cache_.push_back(message->message);
     }
-    if (func_) {
-      func_(channel_name_.c_str());
-    }
+    if (func_) { func_(channel_name_.c_str()); }
     msg_cond_.notify_one();
   }
 
   std::string channel_name_;
   std::string data_type_;
-  Node* node_ = nullptr;
-  int (*func_)(const char*) = nullptr;
+  Node*       node_                                       = nullptr;
+  int (*func_)(const char*)                               = nullptr;
   std::shared_ptr<Reader<message::PyMessageWrap>> reader_ = nullptr;
-  std::deque<std::string> cache_;
-  std::mutex msg_lock_;
-  std::condition_variable msg_cond_;
+  std::deque<std::string>                         cache_;
+  std::mutex                                      msg_lock_;
+  std::condition_variable                         msg_cond_;
 
   std::shared_ptr<Reader<message::RawMessage>> reader_rawmsg_ = nullptr;
 };
@@ -186,20 +182,17 @@ class PyReader {
 using PyMsgWrapPtr = std::shared_ptr<message::PyMessageWrap>;
 class PyService {
  public:
-  PyService(const std::string& service_name, const std::string& data_type,
-            Node* node)
-      : node_(node),
-        service_name_(service_name),
-        data_type_(data_type),
-        func_(nullptr) {
-    auto f = [this](
-                 const std::shared_ptr<const message::PyMessageWrap>& request,
-                 std::shared_ptr<message::PyMessageWrap>& response) {
+  PyService(const std::string& service_name, const std::string& data_type, Node* node)
+      : node_(node)
+      , service_name_(service_name)
+      , data_type_(data_type)
+      , func_(nullptr) {
+    auto f = [this](const std::shared_ptr<const message::PyMessageWrap>& request,
+                    std::shared_ptr<message::PyMessageWrap>&             response) {
       response = this->cb(request);
     };
     service_ =
-        node_->CreateService<message::PyMessageWrap, message::PyMessageWrap>(
-            service_name, f);
+        node_->CreateService<message::PyMessageWrap, message::PyMessageWrap>(service_name, f);
   }
 
   void register_func(int (*func)(const char*)) { func_ = func; }
@@ -219,15 +212,12 @@ class PyService {
   }
 
  private:
-  PyMsgWrapPtr cb(
-      const std::shared_ptr<const message::PyMessageWrap>& request) {
+  PyMsgWrapPtr cb(const std::shared_ptr<const message::PyMessageWrap>& request) {
     std::lock_guard<std::mutex> lg(msg_lock_);
 
     request_cache_.push_back(request->data());
 
-    if (func_) {
-      func_(service_name_.c_str());
-    }
+    if (func_) { func_(service_name_.c_str()); }
 
     std::string msg("");
     if (!response_cache_.empty()) {
@@ -240,24 +230,23 @@ class PyService {
     return response;
   }
 
-  Node* node_;
+  Node*       node_;
   std::string service_name_;
   std::string data_type_;
   int (*func_)(const char*) = nullptr;
-  std::shared_ptr<Service<message::PyMessageWrap, message::PyMessageWrap>>
-      service_;
-  std::mutex msg_lock_;
-  std::deque<std::string> request_cache_;
-  std::deque<std::string> response_cache_;
+  std::shared_ptr<Service<message::PyMessageWrap, message::PyMessageWrap>> service_;
+  std::mutex                                                               msg_lock_;
+  std::deque<std::string>                                                  request_cache_;
+  std::deque<std::string>                                                  response_cache_;
 };
 
 class PyClient {
  public:
   PyClient(const std::string& name, const std::string& data_type, Node* node)
-      : node_(node), service_name_(name), data_type_(data_type) {
-    client_ =
-        node_->CreateClient<message::PyMessageWrap, message::PyMessageWrap>(
-            name);
+      : node_(node)
+      , service_name_(name)
+      , data_type_(data_type) {
+    client_ = node_->CreateClient<message::PyMessageWrap, message::PyMessageWrap>(name);
   }
 
   std::string send_request(std::string request) {
@@ -275,16 +264,16 @@ class PyClient {
   }
 
  private:
-  Node* node_;
-  std::string service_name_;
-  std::string data_type_;
-  std::shared_ptr<Client<message::PyMessageWrap, message::PyMessageWrap>>
-      client_;
+  Node*                                                                   node_;
+  std::string                                                             service_name_;
+  std::string                                                             data_type_;
+  std::shared_ptr<Client<message::PyMessageWrap, message::PyMessageWrap>> client_;
 };
 
 class PyNode {
  public:
-  explicit PyNode(const std::string& node_name) : node_name_(node_name) {
+  explicit PyNode(const std::string& node_name)
+      : node_name_(node_name) {
     node_ = CreateNode(node_name);
   }
 
@@ -293,11 +282,9 @@ class PyNode {
     AINFO << "PyNode " << node_name_ << " exit.";
   }
 
-  PyWriter* create_writer(const std::string& channel, const std::string& type,
-                          uint32_t qos_depth = 1) {
-    if (node_) {
-      return new PyWriter(channel, type, qos_depth, node_.get());
-    }
+  PyWriter*
+  create_writer(const std::string& channel, const std::string& type, uint32_t qos_depth = 1) {
+    if (node_) { return new PyWriter(channel, type, qos_depth, node_.get()); }
     AINFO << "Py_Node: node_ is null, new PyWriter failed!";
     return nullptr;
   }
@@ -307,31 +294,24 @@ class PyNode {
   }
 
   PyReader* create_reader(const std::string& channel, const std::string& type) {
-    if (node_) {
-      return new PyReader(channel, type, node_.get());
-    }
+    if (node_) { return new PyReader(channel, type, node_.get()); }
     return nullptr;
   }
 
-  PyService* create_service(const std::string& service,
-                            const std::string& type) {
-    if (node_) {
-      return new PyService(service, type, node_.get());
-    }
+  PyService* create_service(const std::string& service, const std::string& type) {
+    if (node_) { return new PyService(service, type, node_.get()); }
     return nullptr;
   }
 
   PyClient* create_client(const std::string& service, const std::string& type) {
-    if (node_) {
-      return new PyClient(service, type, node_.get());
-    }
+    if (node_) { return new PyClient(service, type, node_.get()); }
     return nullptr;
   }
 
   std::shared_ptr<Node> get_node() { return node_; }
 
  private:
-  std::string node_name_;
+  std::string           node_name_;
   std::shared_ptr<Node> node_ = nullptr;
 };
 
@@ -340,8 +320,8 @@ class PyChannelUtils {
   // Get debugstring of rawmsgdata
   // Pls make sure the msg_type of rawmsg is matching
   // Used in cyber_channel echo command
-  static std::string get_debugstring_by_msgtype_rawmsgdata(
-      const std::string& msg_type, const std::string& rawmsgdata) {
+  static std::string get_debugstring_by_msgtype_rawmsgdata(const std::string& msg_type,
+                                                           const std::string& rawmsgdata) {
     if (msg_type.empty()) {
       AERROR << "parse rawmessage the msg_type is null";
       return "";
@@ -353,7 +333,7 @@ class PyChannelUtils {
 
     if (raw_msg_class_ == nullptr) {
       auto rawFactory = message::ProtobufFactory::Instance();
-      raw_msg_class_ = rawFactory->GenerateMessageByType(msg_type);
+      raw_msg_class_  = rawFactory->GenerateMessageByType(msg_type);
     }
 
     if (raw_msg_class_ == nullptr) {
@@ -370,14 +350,14 @@ class PyChannelUtils {
   }
 
   static std::string get_msgtype_by_channelname(const std::string& channel_name,
-                                                uint8_t sleep_s = 0) {
+                                                uint8_t            sleep_s = 0) {
     if (channel_name.empty()) {
       AERROR << "channel_name is null";
       return "";
     }
     auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
-    auto channel_manager = topology->channel_manager();
+    auto        channel_manager = topology->channel_manager();
     std::string msg_type("");
     channel_manager->GetMsgType(channel_name, &msg_type);
     return msg_type;
@@ -386,7 +366,7 @@ class PyChannelUtils {
   static std::vector<std::string> get_active_channels(uint8_t sleep_s = 2) {
     auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
-    auto channel_manager = topology->channel_manager();
+    auto                     channel_manager = topology->channel_manager();
     std::vector<std::string> channels;
     channel_manager->GetChannelNames(&channels);
     return channels;
@@ -427,7 +407,7 @@ class PyNodeUtils {
   static std::vector<std::string> get_active_nodes(uint8_t sleep_s = 2) {
     auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
-    std::vector<std::string> node_names;
+    std::vector<std::string>    node_names;
     std::vector<RoleAttributes> nodes;
     topology->node_manager()->GetNodes(&nodes);
     if (nodes.empty()) {
@@ -445,8 +425,7 @@ class PyNodeUtils {
     return node_names;
   }
 
-  static std::string get_node_attr(const std::string& node_name,
-                                   uint8_t sleep_s = 2) {
+  static std::string get_node_attr(const std::string& node_name, uint8_t sleep_s = 2) {
     auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
 
@@ -467,10 +446,10 @@ class PyNodeUtils {
     return "";
   }
 
-  static std::vector<std::string> get_readersofnode(
-      const std::string& node_name, uint8_t sleep_s = 2) {
+  static std::vector<std::string> get_readersofnode(const std::string& node_name,
+                                                    uint8_t            sleep_s = 2) {
     std::vector<std::string> reader_channels;
-    auto topology = service_discovery::TopologyManager::Instance();
+    auto                     topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
     if (!topology->node_manager()->HasNode(node_name)) {
       AERROR << "no node named: " << node_name;
@@ -478,21 +457,19 @@ class PyNodeUtils {
     }
 
     std::vector<RoleAttributes> readers;
-    auto channel_mgr = topology->channel_manager();
+    auto                        channel_mgr = topology->channel_manager();
     channel_mgr->GetReadersOfNode(node_name, &readers);
     for (auto& reader : readers) {
-      if (reader.channel_name() == "param_event") {
-        continue;
-      }
+      if (reader.channel_name() == "param_event") { continue; }
       reader_channels.emplace_back(reader.channel_name());
     }
     return reader_channels;
   }
 
-  static std::vector<std::string> get_writersofnode(
-      const std::string& node_name, uint8_t sleep_s = 2) {
+  static std::vector<std::string> get_writersofnode(const std::string& node_name,
+                                                    uint8_t            sleep_s = 2) {
     std::vector<std::string> writer_channels;
-    auto topology = service_discovery::TopologyManager::Instance();
+    auto                     topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
     if (!topology->node_manager()->HasNode(node_name)) {
       AERROR << "no node named: " << node_name;
@@ -500,12 +477,10 @@ class PyNodeUtils {
     }
 
     std::vector<RoleAttributes> writers;
-    auto channel_mgr = topology->channel_manager();
+    auto                        channel_mgr = topology->channel_manager();
     channel_mgr->GetWritersOfNode(node_name, &writers);
     for (auto& writer : writers) {
-      if (writer.channel_name() == "param_event") {
-        continue;
-      }
+      if (writer.channel_name() == "param_event") { continue; }
       writer_channels.emplace_back(writer.channel_name());
     }
     return writer_channels;
@@ -517,7 +492,7 @@ class PyServiceUtils {
   static std::vector<std::string> get_active_services(uint8_t sleep_s = 2) {
     auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
-    std::vector<std::string> srv_names;
+    std::vector<std::string>    srv_names;
     std::vector<RoleAttributes> services;
     topology->service_manager()->GetServers(&services);
     if (services.empty()) {
@@ -535,8 +510,7 @@ class PyServiceUtils {
     return srv_names;
   }
 
-  static std::string get_service_attr(const std::string& service_name,
-                                      uint8_t sleep_s = 2) {
+  static std::string get_service_attr(const std::string& service_name, uint8_t sleep_s = 2) {
     auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
 

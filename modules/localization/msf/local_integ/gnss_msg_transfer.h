@@ -22,6 +22,7 @@
 #pragma once
 
 #include "localization_msf/gnss_struct.h"
+
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
 /**
@@ -34,23 +35,18 @@ namespace msf {
 
 class GnssMagTransfer {
  public:
-  static void Transfer(const apollo::drivers::gnss::BandObservation& in,
-                       BandObservationMsg* out);
+  static void Transfer(const apollo::drivers::gnss::BandObservation& in, BandObservationMsg* out);
 
   static void Transfer(const apollo::drivers::gnss::SatelliteObservation& in,
-                       SatelliteObservationMsg* out);
+                       SatelliteObservationMsg*                           out);
 
-  static void Transfer(const apollo::drivers::gnss::EpochObservation& in,
-                       EpochObservationMsg* out);
+  static void Transfer(const apollo::drivers::gnss::EpochObservation& in, EpochObservationMsg* out);
 
-  static void Transfer(const apollo::drivers::gnss::KepplerOrbit& in,
-                       KepplerOrbitMsg* out);
+  static void Transfer(const apollo::drivers::gnss::KepplerOrbit& in, KepplerOrbitMsg* out);
 
-  static void Transfer(const apollo::drivers::gnss::GlonassOrbit& in,
-                       GlonassOrbitMsg* out);
+  static void Transfer(const apollo::drivers::gnss::GlonassOrbit& in, GlonassOrbitMsg* out);
 
-  static void Transfer(const apollo::drivers::gnss::GnssEphemeris& in,
-                       GnssEphemerisMsg* out);
+  static void Transfer(const apollo::drivers::gnss::GnssEphemeris& in, GnssEphemerisMsg* out);
 };
 
 }  // namespace msf

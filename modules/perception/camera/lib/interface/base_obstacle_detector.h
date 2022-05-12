@@ -29,7 +29,7 @@ namespace camera {
 
 struct ObstacleDetectorInitOptions : public BaseInitOptions {
   std::shared_ptr<base::BaseCameraModel> base_camera_model = nullptr;
-  Eigen::Matrix3f intrinsics;
+  Eigen::Matrix3f                        intrinsics;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
@@ -42,26 +42,23 @@ class BaseObstacleDetector {
 
   virtual ~BaseObstacleDetector() = default;
 
-  virtual bool Init(const ObstacleDetectorInitOptions &options =
-                        ObstacleDetectorInitOptions()) = 0;
+  virtual bool Init(const ObstacleDetectorInitOptions& options = ObstacleDetectorInitOptions()) = 0;
 
   // @brief: detect obstacle from image.
   // @param [in]: options
   // @param [in/out]: frame
   // obstacle type and 2D bbox should be filled, required,
   // 3D information of obstacle can be filled, optional.
-  virtual bool Detect(const ObstacleDetectorOptions &options,
-                      CameraFrame *frame) = 0;
+  virtual bool Detect(const ObstacleDetectorOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
-  BaseObstacleDetector(const BaseObstacleDetector &) = delete;
-  BaseObstacleDetector &operator=(const BaseObstacleDetector &) = delete;
+  BaseObstacleDetector(const BaseObstacleDetector&) = delete;
+  BaseObstacleDetector& operator=(const BaseObstacleDetector&) = delete;
 };  // class BaseObstacleDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstacleDetector);
-#define REGISTER_OBSTACLE_DETECTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseObstacleDetector, name)
+#define REGISTER_OBSTACLE_DETECTOR(name) PERCEPTION_REGISTER_CLASS(BaseObstacleDetector, name)
 
 }  // namespace camera
 }  // namespace perception

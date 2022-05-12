@@ -19,8 +19,6 @@
 #include <memory>
 #include <thread>
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
@@ -32,6 +30,7 @@
 #include "modules/canbus/vehicle/neolix_edu/protocol/ads_drive_command_50.h"
 #include "modules/canbus/vehicle/neolix_edu/protocol/ads_eps_command_56.h"
 #include "modules/canbus/vehicle/neolix_edu/protocol/ads_light_horn_command_310.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {
 namespace canbus {
@@ -41,11 +40,10 @@ class Neolix_eduController final : public VehicleController {
  public:
   virtual ~Neolix_eduController();
 
-  ::apollo::common::ErrorCode Init(
-      const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
-      override;
+  ::apollo::common::ErrorCode
+  Init(const VehicleParameter&                                params,
+       CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+       MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) override;
 
   bool Start() override;
 
@@ -65,7 +63,7 @@ class Neolix_eduController final : public VehicleController {
 
  private:
   // main logical function for operation the car enter or exit the auto driving
-  void Emergency() override;
+  void                        Emergency() override;
   ::apollo::common::ErrorCode EnableAutoMode() override;
   ::apollo::common::ErrorCode DisableAutoMode() override;
   ::apollo::common::ErrorCode EnableSteeringOnlyMode() override;
@@ -100,37 +98,36 @@ class Neolix_eduController final : public VehicleController {
   void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
   void SetBeam(const ::apollo::control::ControlCommand& command) override;
   void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetTurningSignal(const ::apollo::control::ControlCommand& command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
 
  private:
-  void SecurityDogThreadFunc();
-  virtual bool CheckResponse(const int32_t flags, bool need_wait);
-  void set_chassis_error_mask(const int32_t mask);
-  int32_t chassis_error_mask();
+  void               SecurityDogThreadFunc();
+  virtual bool       CheckResponse(const int32_t flags, bool need_wait);
+  void               set_chassis_error_mask(const int32_t mask);
+  int32_t            chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
-  void set_chassis_error_code(const Chassis::ErrorCode& error_code);
+  void               set_chassis_error_code(const Chassis::ErrorCode& error_code);
 
  private:
   // control protocol
-  Adsbrakecommand46* ads_brake_command_46_ = nullptr;
-  Adsdiagnosis628* ads_diagnosis_628_ = nullptr;
-  Adsdrivecommand50* ads_drive_command_50_ = nullptr;
-  Adsepscommand56* ads_eps_command_56_ = nullptr;
+  Adsbrakecommand46*      ads_brake_command_46_       = nullptr;
+  Adsdiagnosis628*        ads_diagnosis_628_          = nullptr;
+  Adsdrivecommand50*      ads_drive_command_50_       = nullptr;
+  Adsepscommand56*        ads_eps_command_56_         = nullptr;
   Adslighthorncommand310* ads_light_horn_command_310_ = nullptr;
 
-  Chassis chassis_;
+  Chassis                      chassis_;
   std::unique_ptr<std::thread> thread_;
-  bool is_chassis_error_ = false;
+  bool                         is_chassis_error_ = false;
 
-  std::mutex chassis_error_code_mutex_;
+  std::mutex         chassis_error_code_mutex_;
   Chassis::ErrorCode chassis_error_code_ = Chassis::NO_ERROR;
 
   std::mutex chassis_mask_mutex_;
-  int32_t chassis_error_mask_ = 0;
+  int32_t    chassis_error_mask_ = 0;
 };
 
 }  // namespace neolix_edu

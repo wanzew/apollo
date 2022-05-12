@@ -32,10 +32,9 @@ class ProcessMonitor : public RecurrentRunner {
   void RunOnce(const double current_time) override;
 
  private:
-  static void UpdateStatus(
-      const std::vector<std::string>& running_processes,
-      const apollo::dreamview::ProcessMonitorConfig& config,
-      ComponentStatus* status);
+  static void UpdateStatus(const std::vector<std::string>&                running_processes,
+                           const apollo::dreamview::ProcessMonitorConfig& config,
+                           ComponentStatus*                               status);
 };
 
 }  // namespace monitor

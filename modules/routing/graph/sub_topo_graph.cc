@@ -27,47 +27,40 @@ namespace routing {
 
 namespace {
 
-const double MIN_DIFF_LENGTH = 0.1e-6;             // in meters
-const double MIN_INTERNAL_FOR_NODE = 0.01;         // in meters
-const double MIN_POTENTIAL_LANE_CHANGE_LEN = 3.0;  // in meters
+const double MIN_DIFF_LENGTH               = 0.1e-6;  // in meters
+const double MIN_INTERNAL_FOR_NODE         = 0.01;    // in meters
+const double MIN_POTENTIAL_LANE_CHANGE_LEN = 3.0;     // in meters
 
-bool IsCloseEnough(double s1, double s2) {
-  return std::fabs(s1 - s2) < MIN_DIFF_LENGTH;
-}
+bool IsCloseEnough(double s1, double s2) { return std::fabs(s1 - s2) < MIN_DIFF_LENGTH; }
 
-void MergeBlockRange(const TopoNode* topo_node,
+void MergeBlockRange(const TopoNode*                topo_node,
                      const std::vector<NodeSRange>& origin_range,
-                     std::vector<NodeSRange>* block_range) {
+                     std::vector<NodeSRange>*       block_range) {
   std::vector<NodeSRange> sorted_origin_range;
-  sorted_origin_range.insert(sorted_origin_range.end(), origin_range.begin(),
-                             origin_range.end());
+  sorted_origin_range.insert(sorted_origin_range.end(), origin_range.begin(), origin_range.end());
   sort(sorted_origin_range.begin(), sorted_origin_range.end());
-  int cur_index = 0;
+  int cur_index  = 0;
   int total_size = static_cast<int>(sorted_origin_range.size());
   while (cur_index < total_size) {
     NodeSRange range(sorted_origin_range[cur_index]);
     ++cur_index;
-    while (cur_index < total_size &&
-           range.MergeRangeOverlap(sorted_origin_range[cur_index])) {
+    while (cur_index < total_size && range.MergeRangeOverlap(sorted_origin_range[cur_index])) {
       ++cur_index;
     }
-    if (range.EndS() < topo_node->StartS() ||
-        range.StartS() > topo_node->EndS()) {
-      continue;
-    }
+    if (range.EndS() < topo_node->StartS() || range.StartS() > topo_node->EndS()) { continue; }
     range.SetStartS(std::max(topo_node->StartS(), range.StartS()));
     range.SetEndS(std::min(topo_node->EndS(), range.EndS()));
     block_range->push_back(std::move(range));
   }
 }
 
-void GetSortedValidRange(const TopoNode* topo_node,
+void GetSortedValidRange(const TopoNode*                topo_node,
                          const std::vector<NodeSRange>& origin_range,
-                         std::vector<NodeSRange>* valid_range) {
+                         std::vector<NodeSRange>*       valid_range) {
   std::vector<NodeSRange> block_range;
   MergeBlockRange(topo_node, origin_range, &block_range);
-  double start_s = topo_node->StartS();
-  double end_s = topo_node->EndS();
+  double              start_s = topo_node->StartS();
+  double              end_s   = topo_node->EndS();
   std::vector<double> all_value;
   all_value.push_back(start_s);
   for (const auto& range : block_range) {
@@ -83,17 +76,16 @@ void GetSortedValidRange(const TopoNode* topo_node,
 
 bool IsReachable(const TopoNode* from_node, const TopoNode* to_node) {
   double start_s = to_node->StartS() / to_node->Length() * from_node->Length();
-  start_s = std::max(start_s, from_node->StartS());
-  double end_s = to_node->EndS() / to_node->Length() * from_node->Length();
-  end_s = std::min(end_s, from_node->EndS());
+  start_s        = std::max(start_s, from_node->StartS());
+  double end_s   = to_node->EndS() / to_node->Length() * from_node->Length();
+  end_s          = std::min(end_s, from_node->EndS());
   return (end_s - start_s > MIN_POTENTIAL_LANE_CHANGE_LEN);
 }
 
 }  // namespace
 
 SubTopoGraph::SubTopoGraph(
-    const std::unordered_map<const TopoNode*, std::vector<NodeSRange> >&
-        black_map) {
+    const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>& black_map) {
   std::vector<NodeSRange> valid_range;
   for (const auto& map_iter : black_map) {
     valid_range.clear();
@@ -113,62 +105,49 @@ SubTopoGraph::SubTopoGraph(
 SubTopoGraph::~SubTopoGraph() {}
 
 void SubTopoGraph::GetSubInEdgesIntoSubGraph(
-    const TopoEdge* edge,
-    std::unordered_set<const TopoEdge*>* const sub_edges) const {
-  const auto* from_node = edge->FromNode();
-  const auto* to_node = edge->ToNode();
+    const TopoEdge* edge, std::unordered_set<const TopoEdge*>* const sub_edges) const {
+  const auto*                   from_node = edge->FromNode();
+  const auto*                   to_node   = edge->ToNode();
   std::unordered_set<TopoNode*> sub_nodes;
-  if (from_node->IsSubNode() || to_node->IsSubNode() ||
-      !GetSubNodes(to_node, &sub_nodes)) {
+  if (from_node->IsSubNode() || to_node->IsSubNode() || !GetSubNodes(to_node, &sub_nodes)) {
     sub_edges->insert(edge);
     return;
   }
   for (const auto* sub_node : sub_nodes) {
     for (const auto* in_edge : sub_node->InFromAllEdge()) {
-      if (in_edge->FromNode() == from_node) {
-        sub_edges->insert(in_edge);
-      }
+      if (in_edge->FromNode() == from_node) { sub_edges->insert(in_edge); }
     }
   }
 }
 
 void SubTopoGraph::GetSubOutEdgesIntoSubGraph(
-    const TopoEdge* edge,
-    std::unordered_set<const TopoEdge*>* const sub_edges) const {
-  const auto* from_node = edge->FromNode();
-  const auto* to_node = edge->ToNode();
+    const TopoEdge* edge, std::unordered_set<const TopoEdge*>* const sub_edges) const {
+  const auto*                   from_node = edge->FromNode();
+  const auto*                   to_node   = edge->ToNode();
   std::unordered_set<TopoNode*> sub_nodes;
-  if (from_node->IsSubNode() || to_node->IsSubNode() ||
-      !GetSubNodes(from_node, &sub_nodes)) {
+  if (from_node->IsSubNode() || to_node->IsSubNode() || !GetSubNodes(from_node, &sub_nodes)) {
     sub_edges->insert(edge);
     return;
   }
   for (const auto* sub_node : sub_nodes) {
     for (const auto* out_edge : sub_node->OutToAllEdge()) {
-      if (out_edge->ToNode() == to_node) {
-        sub_edges->insert(out_edge);
-      }
+      if (out_edge->ToNode() == to_node) { sub_edges->insert(out_edge); }
     }
   }
 }
 
-const TopoNode* SubTopoGraph::GetSubNodeWithS(const TopoNode* topo_node,
-                                              double s) const {
+const TopoNode* SubTopoGraph::GetSubNodeWithS(const TopoNode* topo_node, double s) const {
   const auto& map_iter = sub_node_range_sorted_map_.find(topo_node);
-  if (map_iter == sub_node_range_sorted_map_.end()) {
-    return topo_node;
-  }
+  if (map_iter == sub_node_range_sorted_map_.end()) { return topo_node; }
   const auto& sorted_vec = map_iter->second;
   // sorted vec can't be empty!
   int index = BinarySearchForStartS(sorted_vec, s);
-  if (index < 0) {
-    return nullptr;
-  }
+  if (index < 0) { return nullptr; }
   return sorted_vec[index].GetTopoNode();
 }
 
-void SubTopoGraph::InitSubNodeByValidRange(
-    const TopoNode* topo_node, const std::vector<NodeSRange>& valid_range) {
+void SubTopoGraph::InitSubNodeByValidRange(const TopoNode*                topo_node,
+                                           const std::vector<NodeSRange>& valid_range) {
   // Attention: no matter topo node has valid_range or not,
   // create map value first;
   auto& sub_node_vec = sub_node_range_sorted_map_[topo_node];
@@ -176,9 +155,7 @@ void SubTopoGraph::InitSubNodeByValidRange(
 
   std::vector<TopoNode*> sub_node_sorted_vec;
   for (const auto& range : valid_range) {
-    if (range.Length() < MIN_INTERNAL_FOR_NODE) {
-      continue;
-    }
+    if (range.Length() < MIN_INTERNAL_FOR_NODE) { continue; }
     std::shared_ptr<TopoNode> sub_topo_node_ptr;
     sub_topo_node_ptr.reset(new TopoNode(topo_node, range));
     sub_node_vec.emplace_back(sub_topo_node_ptr.get(), range);
@@ -188,7 +165,7 @@ void SubTopoGraph::InitSubNodeByValidRange(
   }
 
   for (size_t i = 1; i < sub_node_sorted_vec.size(); ++i) {
-    auto* pre_node = sub_node_sorted_vec[i - 1];
+    auto* pre_node  = sub_node_sorted_vec[i - 1];
     auto* next_node = sub_node_sorted_vec[i];
     if (IsCloseEnough(pre_node->EndS(), next_node->StartS())) {
       Edge edge;
@@ -207,9 +184,7 @@ void SubTopoGraph::InitSubNodeByValidRange(
 
 void SubTopoGraph::InitSubEdge(const TopoNode* topo_node) {
   std::unordered_set<TopoNode*> sub_nodes;
-  if (!GetSubNodes(topo_node, &sub_nodes)) {
-    return;
-  }
+  if (!GetSubNodes(topo_node, &sub_nodes)) { return; }
 
   for (auto* sub_node : sub_nodes) {
     InitInSubNodeSubEdge(sub_node, topo_node->InFromAllEdge());
@@ -217,67 +192,54 @@ void SubTopoGraph::InitSubEdge(const TopoNode* topo_node) {
   }
 }
 
-void SubTopoGraph::InitInSubNodeSubEdge(
-    TopoNode* const sub_node,
-    const std::unordered_set<const TopoEdge*> origin_edge) {
+void SubTopoGraph::InitInSubNodeSubEdge(TopoNode* const                           sub_node,
+                                        const std::unordered_set<const TopoEdge*> origin_edge) {
   std::unordered_set<TopoNode*> other_sub_nodes;
   for (const auto* in_edge : origin_edge) {
     if (GetSubNodes(in_edge->FromNode(), &other_sub_nodes)) {
       for (auto* sub_from_node : other_sub_nodes) {
-        if (!sub_from_node->IsOverlapEnough(sub_node, in_edge)) {
-          continue;
-        }
+        if (!sub_from_node->IsOverlapEnough(sub_node, in_edge)) { continue; }
         std::shared_ptr<TopoEdge> topo_edge_ptr;
-        topo_edge_ptr.reset(
-            new TopoEdge(in_edge->PbEdge(), sub_from_node, sub_node));
+        topo_edge_ptr.reset(new TopoEdge(in_edge->PbEdge(), sub_from_node, sub_node));
         sub_node->AddInEdge(topo_edge_ptr.get());
         sub_from_node->AddOutEdge(topo_edge_ptr.get());
         topo_edges_.push_back(std::move(topo_edge_ptr));
       }
     } else if (in_edge->FromNode()->IsOverlapEnough(sub_node, in_edge)) {
       std::shared_ptr<TopoEdge> topo_edge_ptr;
-      topo_edge_ptr.reset(
-          new TopoEdge(in_edge->PbEdge(), in_edge->FromNode(), sub_node));
+      topo_edge_ptr.reset(new TopoEdge(in_edge->PbEdge(), in_edge->FromNode(), sub_node));
       sub_node->AddInEdge(topo_edge_ptr.get());
       topo_edges_.push_back(std::move(topo_edge_ptr));
     }
   }
 }
 
-void SubTopoGraph::InitOutSubNodeSubEdge(
-    TopoNode* const sub_node,
-    const std::unordered_set<const TopoEdge*> origin_edge) {
+void SubTopoGraph::InitOutSubNodeSubEdge(TopoNode* const                           sub_node,
+                                         const std::unordered_set<const TopoEdge*> origin_edge) {
   std::unordered_set<TopoNode*> other_sub_nodes;
   for (const auto* out_edge : origin_edge) {
     if (GetSubNodes(out_edge->ToNode(), &other_sub_nodes)) {
       for (auto* sub_to_node : other_sub_nodes) {
-        if (!sub_node->IsOverlapEnough(sub_to_node, out_edge)) {
-          continue;
-        }
+        if (!sub_node->IsOverlapEnough(sub_to_node, out_edge)) { continue; }
         std::shared_ptr<TopoEdge> topo_edge_ptr;
-        topo_edge_ptr.reset(
-            new TopoEdge(out_edge->PbEdge(), sub_node, sub_to_node));
+        topo_edge_ptr.reset(new TopoEdge(out_edge->PbEdge(), sub_node, sub_to_node));
         sub_node->AddOutEdge(topo_edge_ptr.get());
         sub_to_node->AddInEdge(topo_edge_ptr.get());
         topo_edges_.push_back(std::move(topo_edge_ptr));
       }
     } else if (sub_node->IsOverlapEnough(out_edge->ToNode(), out_edge)) {
       std::shared_ptr<TopoEdge> topo_edge_ptr;
-      topo_edge_ptr.reset(
-          new TopoEdge(out_edge->PbEdge(), sub_node, out_edge->ToNode()));
+      topo_edge_ptr.reset(new TopoEdge(out_edge->PbEdge(), sub_node, out_edge->ToNode()));
       sub_node->AddOutEdge(topo_edge_ptr.get());
       topo_edges_.push_back(std::move(topo_edge_ptr));
     }
   }
 }
 
-bool SubTopoGraph::GetSubNodes(
-    const TopoNode* node,
-    std::unordered_set<TopoNode*>* const sub_nodes) const {
+bool SubTopoGraph::GetSubNodes(const TopoNode*                      node,
+                               std::unordered_set<TopoNode*>* const sub_nodes) const {
   const auto& iter = sub_node_map_.find(node);
-  if (iter == sub_node_map_.end()) {
-    return false;
-  }
+  if (iter == sub_node_map_.end()) { return false; }
   sub_nodes->clear();
   sub_nodes->insert(iter->second.begin(), iter->second.end());
   return true;
@@ -285,75 +247,55 @@ bool SubTopoGraph::GetSubNodes(
 
 void SubTopoGraph::AddPotentialEdge(const TopoNode* topo_node) {
   std::unordered_set<TopoNode*> sub_nodes;
-  if (!GetSubNodes(topo_node, &sub_nodes)) {
-    return;
-  }
+  if (!GetSubNodes(topo_node, &sub_nodes)) { return; }
   for (auto* sub_node : sub_nodes) {
     AddPotentialInEdge(sub_node, topo_node->InFromLeftOrRightEdge());
     AddPotentialOutEdge(sub_node, topo_node->OutToLeftOrRightEdge());
   }
 }
 
-void SubTopoGraph::AddPotentialInEdge(
-    TopoNode* const sub_node,
-    const std::unordered_set<const TopoEdge*> origin_edge) {
+void SubTopoGraph::AddPotentialInEdge(TopoNode* const                           sub_node,
+                                      const std::unordered_set<const TopoEdge*> origin_edge) {
   std::unordered_set<TopoNode*> other_sub_nodes;
   for (const auto* in_edge : origin_edge) {
     if (GetSubNodes(in_edge->FromNode(), &other_sub_nodes)) {
       for (auto* sub_from_node : other_sub_nodes) {
-        if (sub_node->GetInEdgeFrom(sub_from_node) != nullptr) {
-          continue;
-        }
-        if (!IsReachable(sub_from_node, sub_node)) {
-          continue;
-        }
+        if (sub_node->GetInEdgeFrom(sub_from_node) != nullptr) { continue; }
+        if (!IsReachable(sub_from_node, sub_node)) { continue; }
         std::shared_ptr<TopoEdge> topo_edge_ptr;
-        topo_edge_ptr.reset(
-            new TopoEdge(in_edge->PbEdge(), sub_from_node, sub_node));
+        topo_edge_ptr.reset(new TopoEdge(in_edge->PbEdge(), sub_from_node, sub_node));
         sub_node->AddInEdge(topo_edge_ptr.get());
         sub_from_node->AddOutEdge(topo_edge_ptr.get());
         topo_edges_.push_back(std::move(topo_edge_ptr));
       }
     } else {
-      if (sub_node->GetInEdgeFrom(in_edge->FromNode()) != nullptr) {
-        continue;
-      }
+      if (sub_node->GetInEdgeFrom(in_edge->FromNode()) != nullptr) { continue; }
       std::shared_ptr<TopoEdge> topo_edge_ptr;
-      topo_edge_ptr.reset(
-          new TopoEdge(in_edge->PbEdge(), in_edge->FromNode(), sub_node));
+      topo_edge_ptr.reset(new TopoEdge(in_edge->PbEdge(), in_edge->FromNode(), sub_node));
       sub_node->AddInEdge(topo_edge_ptr.get());
       topo_edges_.push_back(std::move(topo_edge_ptr));
     }
   }
 }
 
-void SubTopoGraph::AddPotentialOutEdge(
-    TopoNode* const sub_node,
-    const std::unordered_set<const TopoEdge*> origin_edge) {
+void SubTopoGraph::AddPotentialOutEdge(TopoNode* const                           sub_node,
+                                       const std::unordered_set<const TopoEdge*> origin_edge) {
   std::unordered_set<TopoNode*> other_sub_nodes;
   for (const auto* out_edge : origin_edge) {
     if (GetSubNodes(out_edge->ToNode(), &other_sub_nodes)) {
       for (auto* sub_to_node : other_sub_nodes) {
-        if (sub_node->GetOutEdgeTo(sub_to_node) != nullptr) {
-          continue;
-        }
-        if (!IsReachable(sub_node, sub_to_node)) {
-          continue;
-        }
+        if (sub_node->GetOutEdgeTo(sub_to_node) != nullptr) { continue; }
+        if (!IsReachable(sub_node, sub_to_node)) { continue; }
         std::shared_ptr<TopoEdge> topo_edge_ptr;
-        topo_edge_ptr.reset(
-            new TopoEdge(out_edge->PbEdge(), sub_node, sub_to_node));
+        topo_edge_ptr.reset(new TopoEdge(out_edge->PbEdge(), sub_node, sub_to_node));
         sub_node->AddOutEdge(topo_edge_ptr.get());
         sub_to_node->AddInEdge(topo_edge_ptr.get());
         topo_edges_.push_back(std::move(topo_edge_ptr));
       }
     } else {
-      if (sub_node->GetOutEdgeTo(out_edge->ToNode()) != nullptr) {
-        continue;
-      }
+      if (sub_node->GetOutEdgeTo(out_edge->ToNode()) != nullptr) { continue; }
       std::shared_ptr<TopoEdge> topo_edge_ptr;
-      topo_edge_ptr.reset(
-          new TopoEdge(out_edge->PbEdge(), sub_node, out_edge->ToNode()));
+      topo_edge_ptr.reset(new TopoEdge(out_edge->PbEdge(), sub_node, out_edge->ToNode()));
       sub_node->AddOutEdge(topo_edge_ptr.get());
       topo_edges_.push_back(std::move(topo_edge_ptr));
     }

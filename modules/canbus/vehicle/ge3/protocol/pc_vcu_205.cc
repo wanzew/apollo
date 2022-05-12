@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_vcu_205.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -45,12 +46,12 @@ void Pcvcu205::UpdateData(uint8_t* data) {
 
 void Pcvcu205::Reset() {
   // you should check this manually
-  pc_accpedreq_ = 0.0;
+  pc_accpedreq_    = 0.0;
   pc_accpedenable_ = Pc_vcu_205::PC_ACCPEDENABLE_DISABLE;
-  pc_torqreq_ = 0.0;
-  pc_torqenable_ = Pc_vcu_205::PC_TORQENABLE_DISABLE;
-  pc_gearreq_ = Pc_vcu_205::PC_GEARREQ_INVALID;
-  pc_gearenable_ = Pc_vcu_205::PC_GEARENABLE_DISABLE;
+  pc_torqreq_      = 0.0;
+  pc_torqenable_   = Pc_vcu_205::PC_TORQENABLE_DISABLE;
+  pc_gearreq_      = Pc_vcu_205::PC_GEARREQ_INVALID;
+  pc_gearenable_   = Pc_vcu_205::PC_GEARENABLE_DISABLE;
 }
 
 Pcvcu205* Pcvcu205::set_pc_accpedreq(double pc_accpedreq) {
@@ -64,8 +65,8 @@ Pcvcu205* Pcvcu205::set_pc_accpedreq(double pc_accpedreq) {
 // 'motorola', 'physical_unit': '%'}
 void Pcvcu205::set_p_pc_accpedreq(uint8_t* data, double pc_accpedreq) {
   pc_accpedreq = ProtocolData::BoundedValue(0.0, 100.0, pc_accpedreq);
-  int x = static_cast<int>(pc_accpedreq / 0.050000);
-  uint8_t t = 0;
+  int     x    = static_cast<int>(pc_accpedreq / 0.050000);
+  uint8_t t    = 0;
 
   t = x & 0xF;
   Byte to_set0(data + 2);
@@ -77,8 +78,7 @@ void Pcvcu205::set_p_pc_accpedreq(uint8_t* data, double pc_accpedreq) {
   to_set1.set_value(t, 0, 8);
 }
 
-Pcvcu205* Pcvcu205::set_pc_accpedenable(
-    Pc_vcu_205::Pc_accpedenableType pc_accpedenable) {
+Pcvcu205* Pcvcu205::set_pc_accpedenable(Pc_vcu_205::Pc_accpedenableType pc_accpedenable) {
   pc_accpedenable_ = pc_accpedenable;
   return this;
 }
@@ -88,8 +88,8 @@ Pcvcu205* Pcvcu205::set_pc_accpedenable(
 // 'precision': 1.0, 'len': 1, 'name': 'PC_AccPedEnable', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 6, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': ''}
-void Pcvcu205::set_p_pc_accpedenable(
-    uint8_t* data, Pc_vcu_205::Pc_accpedenableType pc_accpedenable) {
+void Pcvcu205::set_p_pc_accpedenable(uint8_t*                        data,
+                                     Pc_vcu_205::Pc_accpedenableType pc_accpedenable) {
   int x = pc_accpedenable;
 
   Byte to_set(data + 0);
@@ -107,8 +107,8 @@ Pcvcu205* Pcvcu205::set_pc_torqreq(double pc_torqreq) {
 // 'motorola', 'physical_unit': 'Nm'}
 void Pcvcu205::set_p_pc_torqreq(uint8_t* data, double pc_torqreq) {
   pc_torqreq = ProtocolData::BoundedValue(-3000.0, 3000.0, pc_torqreq);
-  int x = static_cast<int>((pc_torqreq - -3000.000000) / 1.500000);
-  uint8_t t = 0;
+  int     x  = static_cast<int>((pc_torqreq - -3000.000000) / 1.500000);
+  uint8_t t  = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 3);
@@ -120,8 +120,7 @@ void Pcvcu205::set_p_pc_torqreq(uint8_t* data, double pc_torqreq) {
   to_set1.set_value(t, 0, 4);
 }
 
-Pcvcu205* Pcvcu205::set_pc_torqenable(
-    Pc_vcu_205::Pc_torqenableType pc_torqenable) {
+Pcvcu205* Pcvcu205::set_pc_torqenable(Pc_vcu_205::Pc_torqenableType pc_torqenable) {
   pc_torqenable_ = pc_torqenable;
   return this;
 }
@@ -131,8 +130,7 @@ Pcvcu205* Pcvcu205::set_pc_torqenable(
 // 1, 'name': 'PC_TorqEnable', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 5, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcvcu205::set_p_pc_torqenable(
-    uint8_t* data, Pc_vcu_205::Pc_torqenableType pc_torqenable) {
+void Pcvcu205::set_p_pc_torqenable(uint8_t* data, Pc_vcu_205::Pc_torqenableType pc_torqenable) {
   int x = pc_torqenable;
 
   Byte to_set(data + 0);
@@ -150,16 +148,14 @@ Pcvcu205* Pcvcu205::set_pc_gearreq(Pc_vcu_205::Pc_gearreqType pc_gearreq) {
 // 'name': 'PC_GearReq', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|7]', 'bit': 2, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcvcu205::set_p_pc_gearreq(uint8_t* data,
-                                Pc_vcu_205::Pc_gearreqType pc_gearreq) {
+void Pcvcu205::set_p_pc_gearreq(uint8_t* data, Pc_vcu_205::Pc_gearreqType pc_gearreq) {
   int x = pc_gearreq;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 0, 3);
 }
 
-Pcvcu205* Pcvcu205::set_pc_gearenable(
-    Pc_vcu_205::Pc_gearenableType pc_gearenable) {
+Pcvcu205* Pcvcu205::set_pc_gearenable(Pc_vcu_205::Pc_gearenableType pc_gearenable) {
   pc_gearenable_ = pc_gearenable;
   return this;
 }
@@ -169,8 +165,7 @@ Pcvcu205* Pcvcu205::set_pc_gearenable(
 // 1, 'name': 'PC_GearEnable', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Pcvcu205::set_p_pc_gearenable(
-    uint8_t* data, Pc_vcu_205::Pc_gearenableType pc_gearenable) {
+void Pcvcu205::set_p_pc_gearenable(uint8_t* data, Pc_vcu_205::Pc_gearenableType pc_gearenable) {
   int x = pc_gearenable;
 
   Byte to_set(data + 0);

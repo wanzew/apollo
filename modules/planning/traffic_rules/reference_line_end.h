@@ -34,12 +34,11 @@ namespace planning {
  */
 class ReferenceLineEnd : public TrafficRule {
  public:
-  ReferenceLineEnd(const TrafficRuleConfig& config,
+  ReferenceLineEnd(const TrafficRuleConfig&                   config,
                    const std::shared_ptr<DependencyInjector>& injector);
   virtual ~ReferenceLineEnd() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   static constexpr char const* REF_LINE_END_VO_ID_PREFIX = "REF_END_";

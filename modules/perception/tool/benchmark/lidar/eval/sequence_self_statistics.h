@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/base/sequence_maintainer.h"
 
 namespace apollo {
@@ -30,8 +31,8 @@ class SequenceSelfStatistics {
   void reset();
 
   bool add_objects(const std::vector<ObjectPtr>& objects, KeyType key);
-  void get_classification_type_change_rates(
-      std::vector<std::vector<double>>* rate_per_class, double* rate) const;
+  void get_classification_type_change_rates(std::vector<std::vector<double>>* rate_per_class,
+                                            double*                           rate) const;
 
  protected:
   void add_statistics(SequenceType<KeyType>* sequence);

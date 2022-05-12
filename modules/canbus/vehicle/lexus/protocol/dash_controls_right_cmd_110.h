@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Dashcontrolsrightcmd110 : public ::apollo::drivers::canbus::ProtocolData<
-                                    ::apollo::canbus::ChassisDetail> {
+class Dashcontrolsrightcmd110
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Dashcontrolsrightcmd110();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0,
@@ -62,8 +62,8 @@ class Dashcontrolsrightcmd110 : public ::apollo::drivers::canbus::ProtocolData<
   // 'DASH_CONTROLS_BUTTON_DASH_CONTROL_DOWN'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Dash_controls_right_cmd_110::Dash_controls_buttonType dash_controls_button(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Dash_controls_right_cmd_110::Dash_controls_buttonType
+  dash_controls_button(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace lexus

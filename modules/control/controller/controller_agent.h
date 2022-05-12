@@ -24,12 +24,13 @@
 #include <memory>
 #include <vector>
 
-#include "modules/common/util/factory.h"
-#include "modules/control/common/dependency_injector.h"
-#include "modules/control/controller/controller.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "modules/common/util/factory.h"
+#include "modules/control/common/dependency_injector.h"
+#include "modules/control/controller/controller.h"
 
 /**
  * @namespace apollo::control
@@ -51,7 +52,7 @@ class ControllerAgent {
    * @return Status initialization status
    */
   common::Status Init(std::shared_ptr<DependencyInjector> injector,
-                      const ControlConf *control_conf);
+                      const ControlConf*                  control_conf);
 
   /**
    * @brief compute control command based on current vehicle status
@@ -62,10 +63,10 @@ class ControllerAgent {
    * @param cmd control command
    * @return Status computation status
    */
-  common::Status ComputeControlCommand(
-      const localization::LocalizationEstimate *localization,
-      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
-      control::ControlCommand *cmd);
+  common::Status ComputeControlCommand(const localization::LocalizationEstimate* localization,
+                                       const canbus::Chassis*                    chassis,
+                                       const planning::ADCTrajectory*            trajectory,
+                                       control::ControlCommand*                  cmd);
 
   /**
    * @brief reset ControllerAgent
@@ -79,15 +80,14 @@ class ControllerAgent {
    * Register new controllers. If you need to add a new type of controller,
    * You should first register your controller in this function.
    */
-  void RegisterControllers(const ControlConf *control_conf);
+  void RegisterControllers(const ControlConf* control_conf);
 
-  common::Status InitializeConf(const ControlConf *control_conf);
+  common::Status InitializeConf(const ControlConf* control_conf);
 
-  const ControlConf *control_conf_ = nullptr;
-  common::util::Factory<ControlConf::ControllerType, Controller>
-      controller_factory_;
-  std::vector<std::unique_ptr<Controller>> controller_list_;
-  std::shared_ptr<DependencyInjector> injector_ = nullptr;
+  const ControlConf*                                             control_conf_ = nullptr;
+  common::util::Factory<ControlConf::ControllerType, Controller> controller_factory_;
+  std::vector<std::unique_ptr<Controller>>                       controller_list_;
+  std::shared_ptr<DependencyInjector>                            injector_ = nullptr;
 };
 
 }  // namespace control

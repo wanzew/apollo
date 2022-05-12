@@ -25,7 +25,7 @@ namespace cyber {
 namespace base {
 
 TEST(SlotTest, zero_input_param) {
-  char ch = '0';
+  char   ch = '0';
   Slot<> slot_a([&ch]() { ch = 'a'; });
   EXPECT_TRUE(slot_a.connected());
 
@@ -51,7 +51,7 @@ TEST(SlotTest, zero_input_param) {
 }
 
 TEST(SlotTest, two_input_params) {
-  int sum = 0;
+  int            sum = 0;
   Slot<int, int> slot_a([&sum](int lhs, int rhs) { sum = lhs + rhs; });
   EXPECT_TRUE(slot_a.connected());
 
@@ -81,7 +81,7 @@ TEST(ConnectionTest, null_signal) {
   EXPECT_FALSE(conn_a.Disconnect());
   EXPECT_FALSE(conn_a.HasSlot(nullptr));
 
-  auto slot = std::make_shared<Slot<>>([]() {});
+  auto         slot = std::make_shared<Slot<>>([]() {});
   Connection<> conn_b(slot, nullptr);
   EXPECT_TRUE(conn_b.IsConnected());
   EXPECT_FALSE(conn_b.Disconnect());
@@ -95,7 +95,7 @@ TEST(ConnectionTest, null_signal) {
   EXPECT_FALSE(conn_a.Disconnect());
   EXPECT_TRUE(conn_a.HasSlot(slot));
 
-  Signal<> sig;
+  Signal<>     sig;
   Connection<> conn_c(nullptr, &sig);
   EXPECT_FALSE(conn_c.Disconnect());
 }
@@ -103,10 +103,10 @@ TEST(ConnectionTest, null_signal) {
 TEST(SignalTest, module) {
   Signal<int, int> sig;
 
-  int sum_a = 0;
+  int  sum_a  = 0;
   auto conn_a = sig.Connect([&sum_a](int lhs, int rhs) { sum_a = lhs + rhs; });
 
-  int sum_b = 0;
+  int  sum_b  = 0;
   auto conn_b = sig.Connect([&sum_b](int lhs, int rhs) { sum_b = lhs + rhs; });
 
   int lhs = 1, rhs = 2;
@@ -119,8 +119,8 @@ TEST(SignalTest, module) {
   EXPECT_TRUE(sig.Disconnect(conn_b));
   sum_a = 0;
   sum_b = 0;
-  lhs = 3;
-  rhs = 4;
+  lhs   = 3;
+  rhs   = 4;
   sig(lhs, rhs);
   EXPECT_EQ(sum_a, lhs + rhs);
   EXPECT_NE(sum_b, lhs + rhs);
@@ -128,8 +128,8 @@ TEST(SignalTest, module) {
   sig.DisconnectAllSlots();
   sum_a = 0;
   sum_b = 0;
-  lhs = 5;
-  rhs = 6;
+  lhs   = 5;
+  rhs   = 6;
   sig(lhs, rhs);
   EXPECT_NE(sum_a, lhs + rhs);
   EXPECT_NE(sum_b, lhs + rhs);

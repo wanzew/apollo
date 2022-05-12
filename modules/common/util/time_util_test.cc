@@ -24,19 +24,19 @@ namespace util {
 
 TEST(TimeUtilTest, TestUnix2Gps) {
   double unix_time = 1476761767;
-  double gps_time = TimeUtil::Unix2Gps(unix_time);
+  double gps_time  = TimeUtil::Unix2Gps(unix_time);
   EXPECT_NEAR(gps_time, 1160796984, 0.000001);
 
   double unix_time1 = 1483228799;
-  double gps_time1 = TimeUtil::Unix2Gps(unix_time1);
+  double gps_time1  = TimeUtil::Unix2Gps(unix_time1);
   EXPECT_NEAR(gps_time1, 1167264017, 0.000001);
 }
 
 TEST(TimeUtilTest, TestGps2Unix) {
-  double gps_time = 1160796984;
+  double gps_time  = 1160796984;
   double unix_time = TimeUtil::Gps2Unix(gps_time);
   EXPECT_NEAR(unix_time, 1476761767, 0.000001);
-  double gps_time1 = 1260796984;
+  double gps_time1  = 1260796984;
   double unix_time1 = TimeUtil::Gps2Unix(gps_time1);
   EXPECT_NEAR(unix_time1, 1576761766, 0.000001);
 }

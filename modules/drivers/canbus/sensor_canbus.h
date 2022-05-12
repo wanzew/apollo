@@ -28,9 +28,11 @@
 #include <utility>
 #include <vector>
 
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/component/component.h"
-
 #include "cyber/time/time.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
@@ -38,8 +40,6 @@
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
 
 /**
@@ -72,8 +72,7 @@ class SensorCanbus : public apollo::cyber::Component<> {
   // TODO(lizh): check whether we need a new msg item, say
   // MonitorMessageItem::SENSORCANBUS
   SensorCanbus()
-      : monitor_logger_buffer_(
-            apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+      : monitor_logger_buffer_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
   ~SensorCanbus();
 
   /**
@@ -87,20 +86,20 @@ class SensorCanbus : public apollo::cyber::Component<> {
   void PublishSensorData();
   void OnTimer();
   void DataTrigger();
-  bool OnError(const std::string &error_msg);
+  bool OnError(const std::string& error_msg);
   void RegisterCanClients();
 
-  SensorCanbusConf canbus_conf_;
-  std::unique_ptr<CanClient> can_client_;
-  CanReceiver<SensorType> can_receiver_;
+  SensorCanbusConf                                    canbus_conf_;
+  std::unique_ptr<CanClient>                          can_client_;
+  CanReceiver<SensorType>                             can_receiver_;
   std::unique_ptr<canbus::MessageManager<SensorType>> sensor_message_manager_;
-  std::unique_ptr<std::thread> thread_;
+  std::unique_ptr<std::thread>                        thread_;
 
-  int64_t last_timestamp_ = 0;
-  std::unique_ptr<cyber::Timer> timer_;
-  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-  std::mutex mutex_;
-  volatile bool data_trigger_running_ = false;
+  int64_t                             last_timestamp_ = 0;
+  std::unique_ptr<cyber::Timer>       timer_;
+  common::monitor::MonitorLogBuffer   monitor_logger_buffer_;
+  std::mutex                          mutex_;
+  volatile bool                       data_trigger_running_ = false;
   std::shared_ptr<Writer<SensorType>> sensor_writer_;
 };
 
@@ -117,18 +116,14 @@ bool SensorCanbus<SensorType>::Init() {
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::Instance();
+  auto* can_factory = CanClientFactory::Instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(canbus_conf_.can_card_parameter());
-  if (!can_client_) {
-    return OnError("Failed to create can client.");
-  }
+  if (!can_client_) { return OnError("Failed to create can client."); }
   AINFO << "Can client is successfully created.";
 
   sensor_message_manager_.reset(new canbus::MessageManager<SensorType>());
-  if (sensor_message_manager_ == nullptr) {
-    return OnError("Failed to create message manager.");
-  }
+  if (sensor_message_manager_ == nullptr) { return OnError("Failed to create message manager."); }
   AINFO << "Sensor message manager is successfully created.";
 
   if (can_receiver_.Init(can_client_.get(), sensor_message_manager_.get(),
@@ -143,15 +138,11 @@ bool SensorCanbus<SensorType>::Init() {
 template <typename SensorType>
 bool SensorCanbus<SensorType>::Start() {
   // 1. init and start the can card hardware
-  if (can_client_->Start() != ErrorCode::OK) {
-    return OnError("Failed to start can client");
-  }
+  if (can_client_->Start() != ErrorCode::OK) { return OnError("Failed to start can client"); }
   AINFO << "Can client is started.";
 
   // 2. start receive first then send
-  if (can_receiver_.Start() != ErrorCode::OK) {
-    return OnError("Failed to start can receiver.");
-  }
+  if (can_receiver_.Start() != ErrorCode::OK) { return OnError("Failed to start can receiver."); }
   AINFO << "Can receiver is started.";
 
   // 3. set timer to trigger publish info periodically
@@ -159,8 +150,8 @@ bool SensorCanbus<SensorType>::Start() {
   // no need for timer.
   if (FLAGS_sensor_freq > 0) {
     double duration_ms = 1000.0 / FLAGS_sensor_freq;
-    timer_.reset(new cyber::Timer(static_cast<uint32_t>(duration_ms),
-                                  [this]() { this->OnTimer(); }, false));
+    timer_.reset(new cyber::Timer(
+        static_cast<uint32_t>(duration_ms), [this]() { this->OnTimer(); }, false));
     timer_->Start();
   } else {
     data_trigger_running_ = true;
@@ -184,7 +175,7 @@ void SensorCanbus<SensorType>::OnTimer() {
 
 template <typename SensorType>
 void SensorCanbus<SensorType>::DataTrigger() {
-  std::condition_variable *cvar = sensor_message_manager_->GetMutableCVar();
+  std::condition_variable* cvar = sensor_message_manager_->GetMutableCVar();
   while (data_trigger_running_) {
     std::unique_lock<std::mutex> lock(mutex_);
     cvar->wait(lock);
@@ -195,9 +186,7 @@ void SensorCanbus<SensorType>::DataTrigger() {
 
 template <typename SensorType>
 SensorCanbus<SensorType>::~SensorCanbus() {
-  if (FLAGS_sensor_freq > 0) {
-    timer_->Stop();
-  }
+  if (FLAGS_sensor_freq > 0) { timer_->Stop(); }
 
   can_receiver_.Stop();
   can_client_->Stop();
@@ -215,7 +204,7 @@ SensorCanbus<SensorType>::~SensorCanbus() {
 
 // Send the error to monitor and return it
 template <typename SensorType>
-bool SensorCanbus<SensorType>::OnError(const std::string &error_msg) {
+bool SensorCanbus<SensorType>::OnError(const std::string& error_msg) {
   monitor_logger_buffer_.ERROR(error_msg);
   return false;
 }

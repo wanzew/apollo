@@ -27,13 +27,10 @@ using base::ReadLockGuard;
 using base::WriteLockGuard;
 using proto::RoleAttributes;
 
-bool SingleValueWarehouse::Add(uint64_t key, const RolePtr& role,
-                               bool ignore_if_exist) {
+bool SingleValueWarehouse::Add(uint64_t key, const RolePtr& role, bool ignore_if_exist) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   if (!ignore_if_exist) {
-    if (roles_.find(key) != roles_.end()) {
-      return false;
-    }
+    if (roles_.find(key) != roles_.end()) { return false; }
   }
   roles_[key] = role;
   return true;
@@ -56,13 +53,9 @@ void SingleValueWarehouse::Remove(uint64_t key) {
 
 void SingleValueWarehouse::Remove(uint64_t key, const RolePtr& role) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
-  auto search = roles_.find(key);
-  if (search == roles_.end()) {
-    return;
-  }
-  if (!search->second->Match(role->attributes())) {
-    return;
-  }
+  auto                         search = roles_.find(key);
+  if (search == roles_.end()) { return; }
+  if (!search->second->Match(role->attributes())) { return; }
   roles_.erase(search);
 }
 
@@ -86,43 +79,32 @@ bool SingleValueWarehouse::Search(uint64_t key) {
 bool SingleValueWarehouse::Search(uint64_t key, RolePtr* first_matched_role) {
   RETURN_VAL_IF_NULL(first_matched_role, false);
   ReadLockGuard<AtomicRWLock> lock(rw_lock_);
-  auto search = roles_.find(key);
-  if (search == roles_.end()) {
-    return false;
-  }
+  auto                        search = roles_.find(key);
+  if (search == roles_.end()) { return false; }
   *first_matched_role = search->second;
   return true;
 }
 
-bool SingleValueWarehouse::Search(uint64_t key,
-                                  RoleAttributes* first_matched_role_attr) {
+bool SingleValueWarehouse::Search(uint64_t key, RoleAttributes* first_matched_role_attr) {
   RETURN_VAL_IF_NULL(first_matched_role_attr, false);
   RolePtr role;
-  if (!Search(key, &role)) {
-    return false;
-  }
+  if (!Search(key, &role)) { return false; }
   first_matched_role_attr->CopyFrom(role->attributes());
   return true;
 }
 
-bool SingleValueWarehouse::Search(uint64_t key,
-                                  std::vector<RolePtr>* matched_roles) {
+bool SingleValueWarehouse::Search(uint64_t key, std::vector<RolePtr>* matched_roles) {
   RETURN_VAL_IF_NULL(matched_roles, false);
   RolePtr role;
-  if (!Search(key, &role)) {
-    return false;
-  }
+  if (!Search(key, &role)) { return false; }
   matched_roles->emplace_back(role);
   return true;
 }
 
-bool SingleValueWarehouse::Search(
-    uint64_t key, std::vector<RoleAttributes>* matched_roles_attr) {
+bool SingleValueWarehouse::Search(uint64_t key, std::vector<RoleAttributes>* matched_roles_attr) {
   RETURN_VAL_IF_NULL(matched_roles_attr, false);
   RolePtr role;
-  if (!Search(key, &role)) {
-    return false;
-  }
+  if (!Search(key, &role)) { return false; }
   matched_roles_attr->emplace_back(role->attributes());
   return true;
 }
@@ -132,8 +114,7 @@ bool SingleValueWarehouse::Search(const RoleAttributes& target_attr) {
   return Search(target_attr, &role);
 }
 
-bool SingleValueWarehouse::Search(const RoleAttributes& target_attr,
-                                  RolePtr* first_matched_role) {
+bool SingleValueWarehouse::Search(const RoleAttributes& target_attr, RolePtr* first_matched_role) {
   RETURN_VAL_IF_NULL(first_matched_role, false);
   ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {
@@ -146,12 +127,10 @@ bool SingleValueWarehouse::Search(const RoleAttributes& target_attr,
 }
 
 bool SingleValueWarehouse::Search(const RoleAttributes& target_attr,
-                                  RoleAttributes* first_matched_role_attr) {
+                                  RoleAttributes*       first_matched_role_attr) {
   RETURN_VAL_IF_NULL(first_matched_role_attr, false);
   RolePtr role;
-  if (!Search(target_attr, &role)) {
-    return false;
-  }
+  if (!Search(target_attr, &role)) { return false; }
   first_matched_role_attr->CopyFrom(role->attributes());
   return true;
 }
@@ -159,7 +138,7 @@ bool SingleValueWarehouse::Search(const RoleAttributes& target_attr,
 bool SingleValueWarehouse::Search(const RoleAttributes& target_attr,
                                   std::vector<RolePtr>* matched_roles) {
   RETURN_VAL_IF_NULL(matched_roles, false);
-  bool find = false;
+  bool                        find = false;
   ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {
     if (item.second->Match(target_attr)) {
@@ -170,11 +149,10 @@ bool SingleValueWarehouse::Search(const RoleAttributes& target_attr,
   return find;
 }
 
-bool SingleValueWarehouse::Search(
-    const RoleAttributes& target_attr,
-    std::vector<RoleAttributes>* matched_roles_attr) {
+bool SingleValueWarehouse::Search(const RoleAttributes&        target_attr,
+                                  std::vector<RoleAttributes>* matched_roles_attr) {
   RETURN_VAL_IF_NULL(matched_roles_attr, false);
-  bool find = false;
+  bool                        find = false;
   ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {
     if (item.second->Match(target_attr)) {
@@ -193,8 +171,7 @@ void SingleValueWarehouse::GetAllRoles(std::vector<RolePtr>* roles) {
   }
 }
 
-void SingleValueWarehouse::GetAllRoles(
-    std::vector<RoleAttributes>* roles_attr) {
+void SingleValueWarehouse::GetAllRoles(std::vector<RoleAttributes>* roles_attr) {
   RETURN_IF_NULL(roles_attr);
   ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {

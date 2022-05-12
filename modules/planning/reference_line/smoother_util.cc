@@ -18,9 +18,10 @@
  * @file
  **/
 
+#include "gflags/gflags.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gflags/gflags.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/future.h"
 #include "modules/common/util/util.h"
@@ -44,22 +45,19 @@ using apollo::hdmap::MapPathPoint;
 
 class SmootherUtil {
  public:
-  explicit SmootherUtil(const std::string& filename) : filename_(filename) {
+  explicit SmootherUtil(const std::string& filename)
+      : filename_(filename) {
     std::ifstream ifs(filename.c_str(), std::ifstream::in);
-    std::string point_str;
+    std::string   point_str;
     while (std::getline(ifs, point_str)) {
       size_t idx = point_str.find(',');
-      if (idx == std::string::npos) {
-        continue;
-      }
+      if (idx == std::string::npos) { continue; }
       auto x_str = point_str.substr(0, idx);
       auto y_str = point_str.substr(idx + 1);
       raw_points_.emplace_back(std::stod(x_str), std::stod(y_str));
     }
-    ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
-                                           &config_))
-        << "Failed to read smoother config file: "
-        << FLAGS_smoother_config_filename;
+    ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename, &config_))
+        << "Failed to read smoother config file: " << FLAGS_smoother_config_filename;
   }
 
   bool Smooth() {
@@ -70,20 +68,17 @@ class SmootherUtil {
     size_t i = 1;
     {
       std::vector<ReferencePoint> ref_points;
-      double s = 0.0;
+      double                      s = 0.0;
       for (; s < FLAGS_smooth_length && i < raw_points_.size(); ++i) {
         LineSegment2d segment(raw_points_[i - 1], raw_points_[i]);
-        ref_points.emplace_back(MapPathPoint(raw_points_[i], segment.heading()),
-                                0.0, 0.0);
+        ref_points.emplace_back(MapPathPoint(raw_points_[i], segment.heading()), 0.0, 0.0);
         s += segment.length();
       }
       ReferenceLine init_ref(ref_points);
       // Prefer "std::make_unique" to direct use of "new".
       // Reference "https://herbsutter.com/gotw/_102/" for details.
-      auto smoother_ptr =
-          std::make_unique<QpSplineReferenceLineSmoother>(config_);
-      auto anchors =
-          CreateAnchorPoints(init_ref.reference_points().front(), init_ref);
+      auto smoother_ptr = std::make_unique<QpSplineReferenceLineSmoother>(config_);
+      auto anchors      = CreateAnchorPoints(init_ref.reference_points().front(), init_ref);
       smoother_ptr->SetAnchorPoints(anchors);
       ReferenceLine smoothed_init_ref;
       if (!smoother_ptr->Smooth(init_ref, &smoothed_init_ref)) {
@@ -107,31 +102,28 @@ class SmootherUtil {
         prev_half_ref.XYToSL(raw_points_[i + 1], &sl);
         ++i;
       }
-      s = 0.0;
-      j = i;
+      s               = 0.0;
+      j               = i;
       auto ref_points = prev_half_ref.reference_points();
       while (j + 1 < raw_points_.size() && s < FLAGS_smooth_length / 2.0) {
         Vec2d vec = raw_points_[j + 1] - raw_points_[j];
         s += vec.Length();
-        ref_points.emplace_back(MapPathPoint(raw_points_[j], vec.Angle()), 0.0,
-                                0.0);
+        ref_points.emplace_back(MapPathPoint(raw_points_[j], vec.Angle()), 0.0, 0.0);
         ++j;
       }
       i = j;
       ReferenceLine local_ref(ref_points);
-      auto anchors = CreateAnchorPoints(ref_points.front(), local_ref);
+      auto          anchors = CreateAnchorPoints(ref_points.front(), local_ref);
       // Prefer "std::make_unique" to direct use of "new".
       // Reference "https://herbsutter.com/gotw/_102/" for details.
-      auto smoother_ptr =
-          std::make_unique<QpSplineReferenceLineSmoother>(config_);
+      auto smoother_ptr = std::make_unique<QpSplineReferenceLineSmoother>(config_);
       smoother_ptr->SetAnchorPoints(anchors);
       ReferenceLine smoothed_local_ref;
       if (!smoother_ptr->Smooth(local_ref, &smoothed_local_ref)) {
         AERROR << "Failed to smooth reference line";
         return false;
       }
-      ref_points_.insert(ref_points_.end(),
-                         smoothed_local_ref.reference_points().begin(),
+      ref_points_.insert(ref_points_.end(), smoothed_local_ref.reference_points().begin(),
                          smoothed_local_ref.reference_points().end());
     }
     return true;
@@ -150,8 +142,7 @@ class SmootherUtil {
       const auto& point = ref_points_[i];
       ofs << std::fixed << "{\"kappa\": " << point.kappa() << ", \"s\": " << s
           << ", \"theta\": " << point.heading() << ", \"x\":" << point.x()
-          << ", \"y\":" << point.y() << ", \"dkappa\":" << point.dkappa()
-          << "}";
+          << ", \"y\":" << point.y() << ", \"dkappa\":" << point.dkappa() << "}";
       s += DistanceXY(point, ref_points_[i + 1]);
     }
     ofs.close();
@@ -160,14 +151,12 @@ class SmootherUtil {
 
  private:
   std::vector<AnchorPoint> CreateAnchorPoints(const ReferencePoint& init_point,
-                                              const ReferenceLine& ref_line) {
+                                              const ReferenceLine&  ref_line) {
     std::vector<AnchorPoint> anchor_points;
-    int num_of_anchors = std::max(
-        2, static_cast<int>(
-               ref_line.Length() / config_.max_constraint_interval() + 0.5));
+    int                      num_of_anchors =
+        std::max(2, static_cast<int>(ref_line.Length() / config_.max_constraint_interval() + 0.5));
     std::vector<double> anchor_s;
-    common::util::uniform_slice(0.0, ref_line.Length(), num_of_anchors - 1,
-                                &anchor_s);
+    common::util::uniform_slice(0.0, ref_line.Length(), num_of_anchors - 1, &anchor_s);
     common::SLPoint sl;
     if (!ref_line.XYToSL(init_point, &sl)) {
       AERROR << "Failed to project init point to reference line";
@@ -175,13 +164,11 @@ class SmootherUtil {
     }
     bool set_init_point = false;
     for (const double s : anchor_s) {
-      if (s + config_.max_constraint_interval() / 2.0 < sl.s()) {
-        continue;
-      }
+      if (s + config_.max_constraint_interval() / 2.0 < sl.s()) { continue; }
       ReferencePoint ref_point;
       if (!set_init_point) {
         set_init_point = true;
-        ref_point = init_point;
+        ref_point      = init_point;
       } else {
         ref_point = ref_line.GetReferencePoint(s);
       }
@@ -192,25 +179,25 @@ class SmootherUtil {
       anchor.path_point.set_s(s);
       anchor.path_point.set_theta(ref_point.heading());
       anchor.path_point.set_kappa(ref_point.kappa());
-      anchor.lateral_bound = config_.max_lateral_boundary_bound();
+      anchor.lateral_bound      = config_.max_lateral_boundary_bound();
       anchor.longitudinal_bound = config_.longitudinal_boundary_bound();
       anchor_points.emplace_back(anchor);
     }
     anchor_points.front().longitudinal_bound = 0;
-    anchor_points.front().lateral_bound = 0;
-    anchor_points.front().enforced = true;
-    anchor_points.back().longitudinal_bound = 0;
-    anchor_points.back().lateral_bound = 0;
-    anchor_points.back().enforced = true;
+    anchor_points.front().lateral_bound      = 0;
+    anchor_points.front().enforced           = true;
+    anchor_points.back().longitudinal_bound  = 0;
+    anchor_points.back().lateral_bound       = 0;
+    anchor_points.back().enforced            = true;
     return anchor_points;
   }
 
  private:
-  std::string filename_;
+  std::string                      filename_;
   std::vector<common::math::Vec2d> raw_points_;
-  std::vector<ReferencePoint> ref_points_;
-  ReferenceLine smoothed_ref_;
-  ReferenceLineSmootherConfig config_;
+  std::vector<ReferencePoint>      ref_points_;
+  ReferenceLine                    smoothed_ref_;
+  ReferenceLineSmootherConfig      config_;
 };
 
 }  // namespace planning
@@ -225,9 +212,7 @@ int main(int argc, char* argv[]) {
     return 0;
   }
   apollo::planning::SmootherUtil smoother_util(FLAGS_input_file);
-  if (!smoother_util.Smooth()) {
-    AERROR << "Failed to smooth a the line";
-  }
+  if (!smoother_util.Smooth()) { AERROR << "Failed to smooth a the line"; }
   if (FLAGS_output_file.empty()) {
     FLAGS_output_file = FLAGS_input_file + ".smoothed";
     AINFO << "Output file not provided, set to: " << FLAGS_output_file;

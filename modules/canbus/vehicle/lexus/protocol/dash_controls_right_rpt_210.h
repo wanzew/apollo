@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Dashcontrolsrightrpt210 : public ::apollo::drivers::canbus::ProtocolData<
-                                    ::apollo::canbus::ChassisDetail> {
+class Dashcontrolsrightrpt210
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -43,8 +44,8 @@ class Dashcontrolsrightrpt210 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|255]', 'bit': 31, 'type': 'enum', 'order':
   // 'motorola', 'physical_unit': ''}
-  Dashcontrolsrightrpt210* set_output_value(
-      Dash_controls_right_rpt_210::Output_valueType output_value);
+  Dashcontrolsrightrpt210*
+  set_output_value(Dash_controls_right_rpt_210::Output_valueType output_value);
 
   // config detail: {'name': 'COMMANDED_VALUE', 'enum': {0:
   // 'COMMANDED_VALUE_DASH_CONTROL_NONE', 1: 'COMMANDED_VALUE_DASH_CONTROL_OK',
@@ -53,8 +54,8 @@ class Dashcontrolsrightrpt210 : public ::apollo::drivers::canbus::ProtocolData<
   // 5: 'COMMANDED_VALUE_DASH_CONTROL_DOWN'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 23, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Dashcontrolsrightrpt210* set_commanded_value(
-      Dash_controls_right_rpt_210::Commanded_valueType commanded_value);
+  Dashcontrolsrightrpt210*
+  set_commanded_value(Dash_controls_right_rpt_210::Commanded_valueType commanded_value);
 
   // config detail: {'name': 'VEHICLE_FAULT', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 6,
@@ -75,8 +76,7 @@ class Dashcontrolsrightrpt210 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  Dashcontrolsrightrpt210* set_output_reported_fault(
-      bool output_reported_fault);
+  Dashcontrolsrightrpt210* set_output_reported_fault(bool output_reported_fault);
 
   // config detail: {'name': 'INPUT_OUTPUT_FAULT', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
@@ -102,8 +102,8 @@ class Dashcontrolsrightrpt210 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|255]', 'bit': 15, 'type': 'enum', 'order':
   // 'motorola', 'physical_unit': ''}
-  Dashcontrolsrightrpt210* set_manual_input(
-      Dash_controls_right_rpt_210::Manual_inputType manual_input);
+  Dashcontrolsrightrpt210*
+  set_manual_input(Dash_controls_right_rpt_210::Manual_inputType manual_input);
 
  private:
   // config detail: {'name': 'OUTPUT_VALUE', 'enum': {0:
@@ -113,9 +113,8 @@ class Dashcontrolsrightrpt210 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|255]', 'bit': 31, 'type': 'enum', 'order':
   // 'motorola', 'physical_unit': ''}
-  void set_p_output_value(
-      uint8_t* data,
-      Dash_controls_right_rpt_210::Output_valueType output_value);
+  void set_p_output_value(uint8_t*                                      data,
+                          Dash_controls_right_rpt_210::Output_valueType output_value);
 
   // config detail: {'name': 'COMMANDED_VALUE', 'enum': {0:
   // 'COMMANDED_VALUE_DASH_CONTROL_NONE', 1: 'COMMANDED_VALUE_DASH_CONTROL_OK',
@@ -124,9 +123,8 @@ class Dashcontrolsrightrpt210 : public ::apollo::drivers::canbus::ProtocolData<
   // 5: 'COMMANDED_VALUE_DASH_CONTROL_DOWN'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit':
   // 23, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_commanded_value(
-      uint8_t* data,
-      Dash_controls_right_rpt_210::Commanded_valueType commanded_value);
+  void set_p_commanded_value(uint8_t*                                         data,
+                             Dash_controls_right_rpt_210::Commanded_valueType commanded_value);
 
   // config detail: {'name': 'VEHICLE_FAULT', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 6,
@@ -173,21 +171,20 @@ class Dashcontrolsrightrpt210 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|255]', 'bit': 15, 'type': 'enum', 'order':
   // 'motorola', 'physical_unit': ''}
-  void set_p_manual_input(
-      uint8_t* data,
-      Dash_controls_right_rpt_210::Manual_inputType manual_input);
+  void set_p_manual_input(uint8_t*                                      data,
+                          Dash_controls_right_rpt_210::Manual_inputType manual_input);
 
  private:
-  Dash_controls_right_rpt_210::Output_valueType output_value_;
+  Dash_controls_right_rpt_210::Output_valueType    output_value_;
   Dash_controls_right_rpt_210::Commanded_valueType commanded_value_;
-  bool vehicle_fault_;
-  bool pacmod_fault_;
-  bool override_active_;
-  bool output_reported_fault_;
-  bool input_output_fault_;
-  bool enabled_;
-  bool command_output_fault_;
-  Dash_controls_right_rpt_210::Manual_inputType manual_input_;
+  bool                                             vehicle_fault_;
+  bool                                             pacmod_fault_;
+  bool                                             override_active_;
+  bool                                             output_reported_fault_;
+  bool                                             input_output_fault_;
+  bool                                             enabled_;
+  bool                                             command_output_fault_;
+  Dash_controls_right_rpt_210::Manual_inputType    manual_input_;
 };
 
 }  // namespace lexus

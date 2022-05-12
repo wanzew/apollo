@@ -24,6 +24,9 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
@@ -32,8 +35,6 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/task_config.pb.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/dp_st_cost.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/st_graph_point.h"
 
@@ -42,10 +43,10 @@ namespace planning {
 
 class GriddedPathTimeGraph {
  public:
-  GriddedPathTimeGraph(const StGraphData& st_graph_data,
-                       const DpStSpeedOptimizerConfig& dp_config,
+  GriddedPathTimeGraph(const StGraphData&                  st_graph_data,
+                       const DpStSpeedOptimizerConfig&     dp_config,
                        const std::vector<const Obstacle*>& obstacles,
-                       const common::TrajectoryPoint& init_point);
+                       const common::TrajectoryPoint&      init_point);
 
   common::Status Search(SpeedData* const speed_data);
 
@@ -60,26 +61,30 @@ class GriddedPathTimeGraph {
 
   // defined for cyber task
   struct StGraphMessage {
-    StGraphMessage(const uint32_t c_, const int32_t r_) : c(c_), r(r_) {}
+    StGraphMessage(const uint32_t c_, const int32_t r_)
+        : c(c_)
+        , r(r_) {}
     uint32_t c;
     uint32_t r;
   };
   void CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg);
 
-  double CalculateEdgeCost(const STPoint& first, const STPoint& second,
-                           const STPoint& third, const STPoint& forth,
-                           const double speed_limit, const double cruise_speed);
+  double CalculateEdgeCost(const STPoint& first,
+                           const STPoint& second,
+                           const STPoint& third,
+                           const STPoint& forth,
+                           const double   speed_limit,
+                           const double   cruise_speed);
   double CalculateEdgeCostForSecondCol(const uint32_t row,
-                                       const double speed_limit,
-                                       const double cruise_speed);
+                                       const double   speed_limit,
+                                       const double   cruise_speed);
   double CalculateEdgeCostForThirdCol(const uint32_t curr_row,
                                       const uint32_t pre_row,
-                                      const double speed_limit,
-                                      const double cruise_speed);
+                                      const double   speed_limit,
+                                      const double   cruise_speed);
 
   // get the row-range of next time step
-  void GetRowRange(const StGraphPoint& point, size_t* next_highest_row,
-                   size_t* next_lowest_row);
+  void GetRowRange(const StGraphPoint& point, size_t* next_highest_row, size_t* next_lowest_row);
 
  private:
   const StGraphData& st_graph_data_;
@@ -104,16 +109,16 @@ class GriddedPathTimeGraph {
   // cost utility with configuration;
   DpStCost dp_st_cost_;
 
-  double total_length_t_ = 0.0;
-  double unit_t_ = 0.0;
-  uint32_t dimension_t_ = 0;
+  double   total_length_t_ = 0.0;
+  double   unit_t_         = 0.0;
+  uint32_t dimension_t_    = 0;
 
-  double total_length_s_ = 0.0;
-  double dense_unit_s_ = 0.0;
-  double sparse_unit_s_ = 0.0;
-  uint32_t dense_dimension_s_ = 0;
+  double   total_length_s_     = 0.0;
+  double   dense_unit_s_       = 0.0;
+  double   sparse_unit_s_      = 0.0;
+  uint32_t dense_dimension_s_  = 0;
   uint32_t sparse_dimension_s_ = 0;
-  uint32_t dimension_s_ = 0;
+  uint32_t dimension_s_        = 0;
 
   double max_acceleration_ = 0.0;
   double max_deceleration_ = 0.0;

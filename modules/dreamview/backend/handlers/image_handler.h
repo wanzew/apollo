@@ -23,10 +23,11 @@
 #include <memory>
 #include <vector>
 
-#include "cyber/cyber.h"
+#include "CivetServer.h"
+
 #include "modules/drivers/proto/sensor_image.pb.h"
 
-#include "CivetServer.h"
+#include "cyber/cyber.h"
 
 /**
  * @namespace apollo::dreamview
@@ -48,21 +49,20 @@ class ImageHandler : public CivetHandler {
 
   ImageHandler();
 
-  bool handleGet(CivetServer *server, struct mg_connection *conn);
+  bool handleGet(CivetServer* server, struct mg_connection* conn);
 
  private:
   template <typename SensorMsgsImage>
-  void OnImage(const std::shared_ptr<SensorMsgsImage> &image);
+  void OnImage(const std::shared_ptr<SensorMsgsImage>& image);
 
-  void OnImageFront(const std::shared_ptr<apollo::drivers::Image> &image);
-  void OnImageShort(
-      const std::shared_ptr<apollo::drivers::CompressedImage> &image);
+  void OnImageFront(const std::shared_ptr<apollo::drivers::Image>& image);
+  void OnImageShort(const std::shared_ptr<apollo::drivers::CompressedImage>& image);
 
   std::vector<uint8_t> send_buffer_;
-  std::atomic<int> requests_;
+  std::atomic<int>     requests_;
 
   // mutex lock and condition variable to protect the received image
-  std::mutex mutex_;
+  std::mutex              mutex_;
   std::condition_variable cvar_;
 
   std::unique_ptr<cyber::Node> node_;

@@ -16,8 +16,9 @@
 
 #include "modules/localization/rtk/rtk_localization.h"
 
-#include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
+
+#include "google/protobuf/text_format.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -32,9 +33,8 @@ class RTKLocalizationTest : public ::testing::Test {
 
  protected:
   template <class T>
-  void load_data(const std::string &filename, T *data) {
-    ACHECK(cyber::common::GetProtoFromFile(filename, data))
-        << "Failed to open file " << filename;
+  void load_data(const std::string& filename, T* data) {
+    ACHECK(cyber::common::GetProtoFromFile(filename, data)) << "Failed to open file " << filename;
   }
 
   std::unique_ptr<RTKLocalization> rtk_localizatoin_;
@@ -50,11 +50,10 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &imu2);
 
     apollo::localization::CorrectedImu expected_result;
-    load_data("modules/localization/testdata/1_imu_result.pb.txt",
-              &expected_result);
+    load_data("modules/localization/testdata/1_imu_result.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
-    double timestamp = 1173545122.69;
+    double                             timestamp = 1173545122.69;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
@@ -69,11 +68,10 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/2_imu_2.pb.txt", &imu2);
 
     apollo::localization::CorrectedImu expected_result;
-    load_data("modules/localization/testdata/2_imu_result.pb.txt",
-              &expected_result);
+    load_data("modules/localization/testdata/2_imu_result.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
-    double timestamp = 1173545122.2001;
+    double                             timestamp = 1173545122.2001;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
@@ -91,7 +89,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
-    double timestamp = 1173545122;
+    double                             timestamp = 1173545122;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
@@ -109,7 +107,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
-    double timestamp = 1173545122.70;
+    double                             timestamp = 1173545122.70;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
@@ -125,20 +123,16 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
     load_data("modules/localization/testdata/3_imu_1.pb.txt", &imu);
 
     apollo::localization::LocalizationEstimate expected_result;
-    load_data("modules/localization/testdata/3_localization_result_2.pb.txt",
-              &expected_result);
+    load_data("modules/localization/testdata/3_localization_result_2.pb.txt", &expected_result);
 
     apollo::localization::LocalizationEstimate localization;
     rtk_localizatoin_->ComposeLocalizationMsg(gps, imu, &localization);
 
     EXPECT_EQ(1, localization.header().sequence_num());
     EXPECT_STREQ("localization", localization.header().module_name().c_str());
-    EXPECT_NEAR(expected_result.pose().position().x(),
-                localization.pose().position().x(), 1.0e-7);
-    EXPECT_NEAR(expected_result.pose().position().y(),
-                localization.pose().position().y(), 1.0e-7);
-    EXPECT_NEAR(expected_result.pose().position().z(),
-                localization.pose().position().z(), 1.0e-7);
+    EXPECT_NEAR(expected_result.pose().position().x(), localization.pose().position().x(), 1.0e-7);
+    EXPECT_NEAR(expected_result.pose().position().y(), localization.pose().position().y(), 1.0e-7);
+    EXPECT_NEAR(expected_result.pose().position().z(), localization.pose().position().z(), 1.0e-7);
   }
 
   // TODO(Qi Luo) Update test once got new imu data for euler angle.

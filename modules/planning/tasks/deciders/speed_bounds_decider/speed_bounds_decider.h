@@ -22,9 +22,10 @@
 
 #include <memory>
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -32,18 +33,15 @@ namespace planning {
 
 class SpeedBoundsDecider : public Decider {
  public:
-  SpeedBoundsDecider(const TaskConfig& config,
-                     const std::shared_ptr<DependencyInjector>& injector);
+  SpeedBoundsDecider(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector);
 
  private:
-  common::Status Process(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info) override;
+  common::Status Process(Frame* const frame, ReferenceLineInfo* const reference_line_info) override;
 
   double SetSpeedFallbackDistance(PathDecision* const path_decision);
 
-  void RecordSTGraphDebug(
-      const StGraphData& st_graph_data,
-      planning_internal::STGraphDebug* st_graph_debug) const;
+  void RecordSTGraphDebug(const StGraphData&               st_graph_data,
+                          planning_internal::STGraphDebug* st_graph_debug) const;
 
  private:
   SpeedBoundsDeciderConfig speed_bounds_config_;

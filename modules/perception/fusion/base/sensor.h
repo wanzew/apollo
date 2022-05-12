@@ -56,9 +56,7 @@ class Sensor {
 
   void AddFrame(const base::FrameConstPtr& frame_ptr);
 
-  inline static void SetMaxCachedFrameNumber(size_t number) {
-    kMaxCachedFrameNum = number;
-  }
+  inline static void SetMaxCachedFrameNumber(size_t number) { kMaxCachedFrameNum = number; }
 
   void SetLatestQueryTimestamp(const double latest_query_timestamp) {
     latest_query_timestamp_ = latest_query_timestamp;

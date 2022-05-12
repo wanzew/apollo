@@ -43,19 +43,18 @@ void Adsbrakecommand46::UpdateData(uint8_t* data) {
   ++auto_drivercmd_alivecounter_;
   auto_drivercmd_alivecounter_ = (auto_drivercmd_alivecounter_) % 16;
   set_p_auto_drivercmd_alivecounter(data, auto_drivercmd_alivecounter_);
-  auto_drivercmd_checksum_ =
-      data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
+  auto_drivercmd_checksum_ = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
   set_p_auto_drivercmd_checksum(data, auto_drivercmd_checksum_);
 }
 
 void Adsbrakecommand46::Reset() {
   // TODO(All) :  you should check this manually
-  drive_enable_ = false;
-  auto_brake_command_ = 0;
-  auto_parking_command_ = false;
-  epb_rampauxiliarycommand_ = false;
+  drive_enable_                = false;
+  auto_brake_command_          = 0;
+  auto_parking_command_        = false;
+  epb_rampauxiliarycommand_    = false;
   auto_drivercmd_alivecounter_ = 0;
-  auto_drivercmd_checksum_ = 0;
+  auto_drivercmd_checksum_     = 0;
 }
 
 Adsbrakecommand46* Adsbrakecommand46::set_drive_enable(bool drive_enable) {
@@ -74,8 +73,7 @@ void Adsbrakecommand46::set_p_drive_enable(uint8_t* data, bool drive_enable) {
   to_set.set_value(x, 0, 1);
 }
 
-Adsbrakecommand46* Adsbrakecommand46::set_auto_brake_command(
-    int auto_brake_command) {
+Adsbrakecommand46* Adsbrakecommand46::set_auto_brake_command(int auto_brake_command) {
   auto_brake_command_ = auto_brake_command;
   return this;
 }
@@ -83,17 +81,15 @@ Adsbrakecommand46* Adsbrakecommand46::set_auto_brake_command(
 // config detail: {'name': 'AUTO_Brake_Command', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adsbrakecommand46::set_p_auto_brake_command(uint8_t* data,
-                                                 int auto_brake_command) {
+void Adsbrakecommand46::set_p_auto_brake_command(uint8_t* data, int auto_brake_command) {
   auto_brake_command = ProtocolData::BoundedValue(0, 100, auto_brake_command);
-  int x = auto_brake_command;
+  int x              = auto_brake_command;
 
   Byte to_set(data + 2);
   to_set.set_value(x, 0, 8);
 }
 
-Adsbrakecommand46* Adsbrakecommand46::set_auto_parking_command(
-    bool auto_parking_command) {
+Adsbrakecommand46* Adsbrakecommand46::set_auto_parking_command(bool auto_parking_command) {
   auto_parking_command_ = auto_parking_command;
   return this;
 }
@@ -102,16 +98,14 @@ Adsbrakecommand46* Adsbrakecommand46::set_auto_parking_command(
 // 'precision': 1.0, 'len': 1, 'name': 'AUTO_Parking_Command', 'is_signed_var':
 // False, 'physical_range': '[0|0]', 'bit': 24, 'type': 'bool', 'order':
 // 'motorola', 'physical_unit': ''}
-void Adsbrakecommand46::set_p_auto_parking_command(uint8_t* data,
-                                                   bool auto_parking_command) {
+void Adsbrakecommand46::set_p_auto_parking_command(uint8_t* data, bool auto_parking_command) {
   int x = auto_parking_command;
 
   Byte to_set(data + 3);
   to_set.set_value(x, 0, 1);
 }
 
-Adsbrakecommand46* Adsbrakecommand46::set_epb_rampauxiliarycommand(
-    bool epb_rampauxiliarycommand) {
+Adsbrakecommand46* Adsbrakecommand46::set_epb_rampauxiliarycommand(bool epb_rampauxiliarycommand) {
   epb_rampauxiliarycommand_ = epb_rampauxiliarycommand;
   return this;
 }
@@ -120,16 +114,16 @@ Adsbrakecommand46* Adsbrakecommand46::set_epb_rampauxiliarycommand(
 // 'precision': 1.0, 'len': 1, 'name': 'EPB_RampAuxiliaryCommand',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 25, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-void Adsbrakecommand46::set_p_epb_rampauxiliarycommand(
-    uint8_t* data, bool epb_rampauxiliarycommand) {
+void Adsbrakecommand46::set_p_epb_rampauxiliarycommand(uint8_t* data,
+                                                       bool     epb_rampauxiliarycommand) {
   int x = epb_rampauxiliarycommand;
 
   Byte to_set(data + 3);
   to_set.set_value(x, 1, 1);
 }
 
-Adsbrakecommand46* Adsbrakecommand46::set_auto_drivercmd_alivecounter(
-    int auto_drivercmd_alivecounter) {
+Adsbrakecommand46*
+Adsbrakecommand46::set_auto_drivercmd_alivecounter(int auto_drivercmd_alivecounter) {
   auto_drivercmd_alivecounter_ = auto_drivercmd_alivecounter;
   return this;
 }
@@ -137,18 +131,16 @@ Adsbrakecommand46* Adsbrakecommand46::set_auto_drivercmd_alivecounter(
 // config detail: {'name': 'AUTO_DriverCmd_AliveCounter', 'offset': 0.0,
 // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adsbrakecommand46::set_p_auto_drivercmd_alivecounter(
-    uint8_t* data, int auto_drivercmd_alivecounter) {
-  auto_drivercmd_alivecounter =
-      ProtocolData::BoundedValue(0, 15, auto_drivercmd_alivecounter);
-  int x = auto_drivercmd_alivecounter;
+void Adsbrakecommand46::set_p_auto_drivercmd_alivecounter(uint8_t* data,
+                                                          int      auto_drivercmd_alivecounter) {
+  auto_drivercmd_alivecounter = ProtocolData::BoundedValue(0, 15, auto_drivercmd_alivecounter);
+  int x                       = auto_drivercmd_alivecounter;
 
   Byte to_set(data + 6);
   to_set.set_value(x, 0, 4);
 }
 
-Adsbrakecommand46* Adsbrakecommand46::set_auto_drivercmd_checksum(
-    int auto_drivercmd_checksum) {
+Adsbrakecommand46* Adsbrakecommand46::set_auto_drivercmd_checksum(int auto_drivercmd_checksum) {
   auto_drivercmd_checksum_ = auto_drivercmd_checksum;
   return this;
 }
@@ -156,11 +148,9 @@ Adsbrakecommand46* Adsbrakecommand46::set_auto_drivercmd_checksum(
 // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adsbrakecommand46::set_p_auto_drivercmd_checksum(
-    uint8_t* data, int auto_drivercmd_checksum) {
-  auto_drivercmd_checksum =
-      ProtocolData::BoundedValue(0, 255, auto_drivercmd_checksum);
-  int x = auto_drivercmd_checksum;
+void Adsbrakecommand46::set_p_auto_drivercmd_checksum(uint8_t* data, int auto_drivercmd_checksum) {
+  auto_drivercmd_checksum = ProtocolData::BoundedValue(0, 255, auto_drivercmd_checksum);
+  int x                   = auto_drivercmd_checksum;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);

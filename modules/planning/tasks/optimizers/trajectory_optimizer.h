@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/tasks/task.h"
@@ -32,12 +33,12 @@ namespace planning {
 
 class TrajectoryOptimizer : public Task {
  public:
-  explicit TrajectoryOptimizer(const TaskConfig &config);
-  TrajectoryOptimizer(const TaskConfig &config,
-                      const std::shared_ptr<DependencyInjector> &injector);
+  explicit TrajectoryOptimizer(const TaskConfig& config);
+  TrajectoryOptimizer(const TaskConfig&                          config,
+                      const std::shared_ptr<DependencyInjector>& injector);
   virtual ~TrajectoryOptimizer() = default;
 
-  apollo::common::Status Execute(Frame *frame) override;
+  apollo::common::Status Execute(Frame* frame) override;
 
  protected:
   virtual apollo::common::Status Process() = 0;

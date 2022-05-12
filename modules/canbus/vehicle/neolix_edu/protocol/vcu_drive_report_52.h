@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Vcudrivereport52 : public ::apollo::drivers::canbus::ProtocolData<
-                             ::apollo::canbus::ChassisDetail> {
+class Vcudrivereport52
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vcudrivereport52();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
@@ -46,8 +46,8 @@ class Vcudrivereport52 : public ::apollo::drivers::canbus::ProtocolData<
   // 'Control_Mode_Resp', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|7]', 'bit': 6, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Vcu_drive_report_52::Control_mode_respType control_mode_resp(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vcu_drive_report_52::Control_mode_respType control_mode_resp(const std::uint8_t* bytes,
+                                                               const int32_t       length) const;
 
   // config detail: {'description':
   // '0x0:N\xe6\xa1\xa3;0x1:D\xe6\xa1\xa3;0x2:R\xe6\xa1\xa3;0x3:Reserved',
@@ -56,22 +56,20 @@ class Vcudrivereport52 : public ::apollo::drivers::canbus::ProtocolData<
   // 2, 'name': 'VCU_Real_Shift', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|3]', 'bit': 9, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Vcu_drive_report_52::Vcu_real_shiftType vcu_real_shift(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vcu_drive_report_52::Vcu_real_shiftType vcu_real_shift(const std::uint8_t* bytes,
+                                                         const int32_t       length) const;
 
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_Real_Shift_Valid',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 10, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_real_shift_valid(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool vcu_real_shift_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_Real_Torque_Valid',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 11, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_real_torque_valid(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool vcu_real_torque_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_Real_Torque', 'offset': -665.0, 'precision':
   // 0.02, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
@@ -82,22 +80,19 @@ class Vcudrivereport52 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_LimitedTorqueMode',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 32, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_limitedtorquemode(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool vcu_limitedtorquemode(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_DriveRept_AliveCounter', 'offset': 0.0,
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_driverept_alivecounter(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+  int vcu_driverept_alivecounter(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_DriveRept_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_driverept_checksum(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  int vcu_driverept_checksum(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace neolix_edu

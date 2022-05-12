@@ -42,15 +42,15 @@ enum class MapVersion {
 class BaseMapConfig {
  public:
   /**@brief The constructor gives the default map settings. */
-  explicit BaseMapConfig(const std::string &map_version = "0.1");
+  explicit BaseMapConfig(const std::string& map_version = "0.1");
   /**@brief The deconstructor. */
   virtual ~BaseMapConfig();
   /**@brief Save the map option to a XML file. */
-  bool Save(const std::string &file_path);
+  bool Save(const std::string& file_path);
   /**@brief Load the map option from a XML file. */
-  bool Load(const std::string &file_path);
+  bool Load(const std::string& file_path);
   /**@brief Set map_version. */
-  void SetMapVersion(const std::string &map_version);
+  void SetMapVersion(const std::string& map_version);
   /**@brief Set map_node_size. */
   void SetMapNodeSize(unsigned int size_x, unsigned int size_y);
   /**@brief Set map_ground_height_offset. */
@@ -64,9 +64,9 @@ class BaseMapConfig {
   /**@brief Set multi resolutions. */
   void SetMultiResolutions();
   /**@brief Set node_md5_map. */
-  void SetNodeMd5Map(const std::map<std::string, std::string> &node_md5_map);
+  void SetNodeMd5Map(const std::map<std::string, std::string>& node_md5_map);
   /**@brief Add a node md5 pair. */
-  void AddNodeMd5(const std::string &node_path, const std::string &md5);
+  void AddNodeMd5(const std::string& node_path, const std::string& md5);
   /**@brief Get map version. */
   MapVersion GetMapVersion() const;
 
@@ -102,9 +102,9 @@ class BaseMapConfig {
 
  protected:
   /**@brief Create the XML structure. */
-  virtual bool CreateXml(boost::property_tree::ptree *config) const;
+  virtual bool CreateXml(boost::property_tree::ptree* config) const;
   /**@brief Load the map options from a XML structure. */
-  virtual bool LoadXml(const boost::property_tree::ptree &config);
+  virtual bool LoadXml(const boost::property_tree::ptree& config);
 };
 
 }  // namespace pyramid_map

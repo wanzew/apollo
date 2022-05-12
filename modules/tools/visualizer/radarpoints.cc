@@ -15,18 +15,16 @@
  *****************************************************************************/
 
 #include "radarpoints.h"
-#include <cmath>
 
+#include <cmath>
 #include <iostream>
 
-RadarPoints::RadarPoints(
-    const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
-    : RenderableObject(1, 3, shaderProgram),
-      color_(1.0f, 0.0f, 0.0f),
-      buffer_(nullptr) {}
+RadarPoints::RadarPoints(const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
+    : RenderableObject(1, 3, shaderProgram)
+    , color_(1.0f, 0.0f, 0.0f)
+    , buffer_(nullptr) {}
 
-bool RadarPoints::FillData(
-    const std::shared_ptr<const apollo::drivers::RadarObstacles>& rawData) {
+bool RadarPoints::FillData(const std::shared_ptr<const apollo::drivers::RadarObstacles>& rawData) {
   bool ret = false;
 
   set_vertex_count(rawData->radar_obstacle_size());
@@ -34,15 +32,13 @@ bool RadarPoints::FillData(
 
   if (buffer_) {
     GLfloat* ptr = buffer_;
-    const ::google::protobuf::Map<::google::protobuf::int32,
-                                  apollo::drivers::RadarObstacle>&
+    const ::google::protobuf::Map<::google::protobuf::int32, apollo::drivers::RadarObstacle>&
         radarObstacles = rawData->radar_obstacle();
     for (::google::protobuf::Map<::google::protobuf::int32,
-                                 apollo::drivers::RadarObstacle>::const_iterator
-             iter = radarObstacles.cbegin();
+                                 apollo::drivers::RadarObstacle>::const_iterator iter =
+             radarObstacles.cbegin();
          iter != radarObstacles.cend(); ++iter, ptr += vertex_element_count()) {
-      const apollo::common::Point2D& position =
-          iter->second.absolute_position();
+      const apollo::common::Point2D& position = iter->second.absolute_position();
 
       ptr[0] = static_cast<float>(position.x());
       ptr[1] = static_cast<float>(position.y());
@@ -62,8 +58,7 @@ bool RadarPoints::FillVertexBuffer(GLfloat* pBuffer) {
     buffer_ = nullptr;
     return true;
   } else {
-    std::cout << "---Error!!! cannot upload data to Graphics Card----"
-              << std::endl;
+    std::cout << "---Error!!! cannot upload data to Graphics Card----" << std::endl;
     return false;
   }
 }

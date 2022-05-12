@@ -20,8 +20,7 @@ namespace perception {
 namespace onboard {
 
 DEFINE_int32(obs_msg_buffer_size, 200, "buffer size for odometry_subscriber");
-DEFINE_double(obs_buffer_match_precision, 0.01,
-              "match_precision for odometry_subscriber");
+DEFINE_double(obs_buffer_match_precision, 0.01, "match_precision for odometry_subscriber");
 
 }  // namespace onboard
 }  // namespace perception

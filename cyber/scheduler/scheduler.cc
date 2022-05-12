@@ -34,13 +34,12 @@ namespace scheduler {
 
 using apollo::cyber::common::GlobalData;
 
-bool Scheduler::CreateTask(const RoutineFactory& factory,
-                           const std::string& name) {
+bool Scheduler::CreateTask(const RoutineFactory& factory, const std::string& name) {
   return CreateTask(factory.create_routine(), name, factory.GetDataVisitor());
 }
 
-bool Scheduler::CreateTask(std::function<void()>&& func,
-                           const std::string& name,
+bool Scheduler::CreateTask(std::function<void()>&&          func,
+                           const std::string&               name,
                            std::shared_ptr<DataVisitorBase> visitor) {
   if (cyber_unlikely(stop_.load())) {
     ADEBUG << "scheduler is stoped, cannot create task!";
@@ -54,15 +53,11 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   cr->set_name(name);
   AINFO << "create croutine: " << name;
 
-  if (!DispatchTask(cr)) {
-    return false;
-  }
+  if (!DispatchTask(cr)) { return false; }
 
   if (visitor != nullptr) {
     visitor->RegisterNotifyCallback([this, task_id]() {
-      if (cyber_unlikely(stop_.load())) {
-        return;
-      }
+      if (cyber_unlikely(stop_.load())) { return; }
       this->NotifyProcessor(task_id);
     });
   }
@@ -70,9 +65,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
 }
 
 bool Scheduler::NotifyTask(uint64_t crid) {
-  if (cyber_unlikely(stop_.load())) {
-    return true;
-  }
+  if (cyber_unlikely(stop_.load())) { return true; }
   return NotifyProcessor(crid);
 }
 
@@ -90,7 +83,7 @@ void Scheduler::ProcessLevelResourceControl() {
 void Scheduler::SetInnerThreadAttr(const std::string& name, std::thread* thr) {
   if (thr != nullptr && inner_thr_confs_.find(name) != inner_thr_confs_.end()) {
     auto th_conf = inner_thr_confs_[name];
-    auto cpuset = th_conf.cpuset();
+    auto cpuset  = th_conf.cpuset();
 
     std::vector<int> cpus;
     ParseCpuset(cpuset, &cpus);
@@ -101,7 +94,7 @@ void Scheduler::SetInnerThreadAttr(const std::string& name, std::thread* thr) {
 
 void Scheduler::CheckSchedStatus() {
   std::string snap_info;
-  auto now = Time::Now().ToNanosecond();
+  auto        now = Time::Now().ToNanosecond();
   for (auto processor : processors_) {
     auto snap = processor->ProcSnapshot();
     if (snap->execute_start_time.load()) {
@@ -112,8 +105,7 @@ void Scheduler::CheckSchedStatus() {
           .append(":")
           .append(std::to_string(execute_time));
     } else {
-      snap_info.append(std::to_string(snap->processor_id.load()))
-          .append(":idle");
+      snap_info.append(std::to_string(snap->processor_id.load())).append(":idle");
     }
     snap_info.append(", ");
   }
@@ -123,9 +115,7 @@ void Scheduler::CheckSchedStatus() {
 }
 
 void Scheduler::Shutdown() {
-  if (cyber_unlikely(stop_.exchange(true))) {
-    return;
-  }
+  if (cyber_unlikely(stop_.exchange(true))) { return; }
 
   for (auto& ctx : pctxs_) {
     ctx->Shutdown();

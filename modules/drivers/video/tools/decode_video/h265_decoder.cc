@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/video/tools/decode_video/h265_decoder.h"
+
 #include <algorithm>
 
 #include "cyber/common/log.h"
-#include "modules/drivers/video/tools/decode_video/h265_decoder.h"
 
 namespace apollo {
 namespace drivers {
@@ -59,13 +60,13 @@ bool H265Decoder::Init() {
     return false;
   }
   // Put sample parameters and open it
-  codec_ctx_jpeg_->bit_rate = 400000;
+  codec_ctx_jpeg_->bit_rate   = 400000;
   codec_ctx_jpeg_->codec_type = AVMEDIA_TYPE_VIDEO;
-  codec_ctx_jpeg_->codec_id = AV_CODEC_ID_MJPEG;
-  codec_ctx_jpeg_->width = 1920;
-  codec_ctx_jpeg_->height = 1080;
-  codec_ctx_jpeg_->time_base = (AVRational){1, 15};
-  codec_ctx_jpeg_->pix_fmt = AV_PIX_FMT_YUVJ422P;
+  codec_ctx_jpeg_->codec_id   = AV_CODEC_ID_MJPEG;
+  codec_ctx_jpeg_->width      = 1920;
+  codec_ctx_jpeg_->height     = 1080;
+  codec_ctx_jpeg_->time_base  = (AVRational){1, 15};
+  codec_ctx_jpeg_->pix_fmt    = AV_PIX_FMT_YUVJ422P;
   if (avcodec_open2(codec_ctx_jpeg_, codec_jpeg, nullptr) < 0) {
     AERROR << "error: could not open jpeg context";
     return false;
@@ -88,23 +89,19 @@ void H265Decoder::Release() {
   }
 }
 
-H265Decoder::DecodingResult H265Decoder::Process(
-    const uint8_t* indata, const int32_t insize,
-    std::vector<uint8_t>* outdata) const {
+H265Decoder::DecodingResult H265Decoder::Process(const uint8_t*        indata,
+                                                 const int32_t         insize,
+                                                 std::vector<uint8_t>* outdata) const {
   AVPacket apt;
   outdata->clear();
   av_init_packet(&apt);
   int got_picture = 0;
-  apt.data = const_cast<uint8_t*>(indata);
-  apt.size = insize;
-  if (apt.size == 0) {
-    apt.data = nullptr;
-  }
-  int ret =
-      avcodec_decode_video2(codec_ctx_h265_, yuv_frame_, &got_picture, &apt);
+  apt.data        = const_cast<uint8_t*>(indata);
+  apt.size        = insize;
+  if (apt.size == 0) { apt.data = nullptr; }
+  int ret = avcodec_decode_video2(codec_ctx_h265_, yuv_frame_, &got_picture, &apt);
   if (ret < 0) {
-    AERROR << "error: decode failed: input_framesize = " << apt.size
-           << ". error code = " << ret;
+    AERROR << "error: decode failed: input_framesize = " << apt.size << ". error code = " << ret;
     return H265Decoder::DecodingResult::FATAL;
   }
   if (!got_picture) {
@@ -114,7 +111,7 @@ H265Decoder::DecodingResult H265Decoder::Process(
   }
   av_packet_unref(&apt);
   got_picture = 0;
-  ret = avcodec_encode_video2(codec_ctx_jpeg_, &apt, yuv_frame_, &got_picture);
+  ret         = avcodec_encode_video2(codec_ctx_jpeg_, &apt, yuv_frame_, &got_picture);
   if (ret < 0) {
     AERROR << "error: jpeg encode failed, error code = " << ret;
     return H265Decoder::DecodingResult::FATAL;

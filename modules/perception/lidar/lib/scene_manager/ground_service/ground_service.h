@@ -27,7 +27,7 @@ namespace lidar {
 
 class GroundServiceContent : public SceneServiceContent {
  public:
-  GroundServiceContent() = default;
+  GroundServiceContent()  = default;
   ~GroundServiceContent() = default;
   // @brief: get a copy of this service content
   // @param [out]: copy of the service content
@@ -38,31 +38,30 @@ class GroundServiceContent : public SceneServiceContent {
   // @brief: get service content name
   // @return: name
   std::string Name() const override { return "GroundServiceContent"; }
-  bool Init(double roi_x, double roi_y, uint32_t rows, uint32_t cols);
+  bool        Init(double roi_x, double roi_y, uint32_t rows, uint32_t cols);
 
  public:
   // @brief: mapping function from point to grid index
   // @param [in]: point in world frame
   // @param [out] grid index
   // @return: false if exceeding the range
-  bool PointToGrid(const Eigen::Vector3d& world_point,
-                   uint32_t* grid_index) const;
+  bool PointToGrid(const Eigen::Vector3d& world_point, uint32_t* grid_index) const;
   // @brief: compute distance of point to ground plane
   // @param [in]: point in world frame
   // @return: distance
   float PointToPlaneDistance(const Eigen::Vector3d& world_point) const;
 
  public:
-  GroundGrid grid_;
+  GroundGrid      grid_;
   Eigen::Vector3d grid_center_;
-  uint32_t rows_ = 0;  // y
-  uint32_t cols_ = 0;  // x
-  double resolution_x_ = 0.0;
-  double resolution_y_ = 0.0;
-  double bound_x_min_ = 0.0;
-  double bound_y_min_ = 0.0;
-  double bound_x_max_ = 0.0;
-  double bound_y_max_ = 0.0;
+  uint32_t        rows_         = 0;  // y
+  uint32_t        cols_         = 0;  // x
+  double          resolution_x_ = 0.0;
+  double          resolution_y_ = 0.0;
+  double          bound_x_min_  = 0.0;
+  double          bound_y_min_  = 0.0;
+  double          bound_x_max_  = 0.0;
+  double          bound_y_max_  = 0.0;
 };
 
 class GroundService : public SceneService {
@@ -71,15 +70,12 @@ class GroundService : public SceneService {
   ~GroundService() { ground_content_ref_ = nullptr; }
   // @brief: initialize scene service
   // @param [in]: init options
-  bool Init(const SceneServiceInitOptions& options =
-                SceneServiceInitOptions()) override;
+  bool Init(const SceneServiceInitOptions& options = SceneServiceInitOptions()) override;
   // @brief: get service name
   // @return: name
   std::string Name() const override { return "GroundService"; }
 
-  GroundServiceContent* GetGroundServiceContent() const {
-    return ground_content_ref_;
-  }
+  GroundServiceContent* GetGroundServiceContent() const { return ground_content_ref_; }
 
  public:
   // @brief: Query point to ground distance
@@ -90,18 +86,17 @@ class GroundService : public SceneService {
   // @param [in]: point in world frame
   // @param [in]: outside service content
   // @return: distance
-  float QueryPointToGroundDistance(const Eigen::Vector3d& world_point,
+  float QueryPointToGroundDistance(const Eigen::Vector3d&      world_point,
                                    const GroundServiceContent& content);
 
  protected:
   GroundServiceContent* ground_content_ref_ = nullptr;
 };
 
-typedef std::shared_ptr<GroundServiceContent> GroundServiceContentPtr;
-typedef std::shared_ptr<const GroundServiceContent>
-    GroundServiceContentConstPtr;
+typedef std::shared_ptr<GroundServiceContent>       GroundServiceContentPtr;
+typedef std::shared_ptr<const GroundServiceContent> GroundServiceContentConstPtr;
 
-typedef std::shared_ptr<GroundService> GroundServicePtr;
+typedef std::shared_ptr<GroundService>       GroundServicePtr;
 typedef std::shared_ptr<const GroundService> GroundServiceConstPtr;
 
 }  // namespace lidar

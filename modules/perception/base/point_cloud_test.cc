@@ -162,7 +162,7 @@ TEST(PointCloudTest, point_cloud_constructor_test) {
 
 TEST(PointCloudTest, point_cloud_interface_test) {
   typedef PointCloud<PointF> TestPointCloud;
-  TestPointCloud cloud;
+  TestPointCloud             cloud;
   cloud.reserve(2);
   cloud.resize(2);
   EXPECT_FALSE(cloud.IsOrganized());
@@ -195,8 +195,7 @@ TEST(PointCloudTest, point_cloud_interface_test) {
   EXPECT_EQ(&(cloud[2]), &(cloud.back()));
   const_check_eq(cloud);
 
-  for (auto it = cloud.mutable_points()->begin();
-       it != cloud.mutable_points()->end(); ++it) {
+  for (auto it = cloud.mutable_points()->begin(); it != cloud.mutable_points()->end(); ++it) {
     EXPECT_EQ(it->x, 0.f);
   }
   for (auto it = cloud.points().begin(); it != cloud.points().end(); ++it) {
@@ -261,10 +260,10 @@ TEST(PointCloudTest, attribute_point_cloud_interface_test) {
   organized_cloud.resize(4);
   EXPECT_TRUE(organized_cloud.IsOrganized());
   organized_cloud.mutable_points_timestamp()->at(3) = 1.0;
-  organized_cloud.mutable_points_height()->at(3) = 0.5f;
-  organized_cloud.mutable_points_beam_id()->at(3) = 1;
-  organized_cloud.mutable_points_label()->at(3) = 2;
-  auto const_check_eq_organized = [](const TestPointCloud& cloud) {
+  organized_cloud.mutable_points_height()->at(3)    = 0.5f;
+  organized_cloud.mutable_points_beam_id()->at(3)   = 1;
+  organized_cloud.mutable_points_label()->at(3)     = 2;
+  auto const_check_eq_organized                     = [](const TestPointCloud& cloud) {
     EXPECT_EQ(cloud.points_timestamp().at(3), 1.0);
     EXPECT_EQ(cloud.points_height().at(3), 0.5f);
     EXPECT_EQ(cloud.points_beam_id().at(3), 1);
@@ -285,16 +284,16 @@ TEST(PointCloudTest, attribute_point_cloud_interface_test) {
   EXPECT_FALSE(cloud.SwapPoint(3, 0));
 
   cloud.resize(2);
-  cloud[0].x = 1.f;
+  cloud[0].x                              = 1.f;
   cloud.mutable_points_timestamp()->at(0) = 0.0;
-  cloud.mutable_points_height()->at(0) = 0.f;
-  cloud.mutable_points_beam_id()->at(0) = 0;
-  cloud.mutable_points_label()->at(0) = 0;
-  cloud[1].x = 2.f;
+  cloud.mutable_points_height()->at(0)    = 0.f;
+  cloud.mutable_points_beam_id()->at(0)   = 0;
+  cloud.mutable_points_label()->at(0)     = 0;
+  cloud[1].x                              = 2.f;
   cloud.mutable_points_timestamp()->at(1) = 1.0;
-  cloud.mutable_points_height()->at(1) = 1.f;
-  cloud.mutable_points_beam_id()->at(1) = 1;
-  cloud.mutable_points_label()->at(1) = 1;
+  cloud.mutable_points_height()->at(1)    = 1.f;
+  cloud.mutable_points_beam_id()->at(1)   = 1;
+  cloud.mutable_points_label()->at(1)     = 1;
 
   EXPECT_TRUE(cloud.SwapPoint(0, 1));
   EXPECT_EQ(cloud[0].x, 2.f);
@@ -310,11 +309,11 @@ TEST(PointCloudTest, attribute_point_cloud_interface_test) {
 
   TestPointCloud cloud2;
   cloud2.resize(1);
-  cloud2[0].x = 10.f;
+  cloud2[0].x                              = 10.f;
   cloud2.mutable_points_timestamp()->at(0) = 10.0;
-  cloud2.mutable_points_height()->at(0) = 10.f;
-  cloud2.mutable_points_beam_id()->at(0) = 10;
-  cloud2.mutable_points_label()->at(0) = 10;
+  cloud2.mutable_points_height()->at(0)    = 10.f;
+  cloud2.mutable_points_beam_id()->at(0)   = 10;
+  cloud2.mutable_points_label()->at(0)     = 10;
 
   EXPECT_FALSE(cloud.CopyPoint(0, 10, cloud2));
   EXPECT_TRUE(cloud.CopyPoint(0, 0, cloud2));
@@ -332,9 +331,9 @@ TEST(PointCloudTest, attribute_point_cloud_interface_test) {
 
   cloud.resize(2);
   cloud.mutable_points_timestamp()->at(1) = 2.0;
-  cloud.mutable_points_height()->at(1) = 3.f;
-  cloud.mutable_points_beam_id()->at(1) = 4;
-  cloud.mutable_points_label()->at(1) = 5;
+  cloud.mutable_points_height()->at(1)    = 3.f;
+  cloud.mutable_points_beam_id()->at(1)   = 4;
+  cloud.mutable_points_label()->at(1)     = 5;
 
   cloud2.clear();
   cloud2.SwapPointCloud(&cloud);
@@ -353,12 +352,11 @@ TEST(PointCloudTest, transform_test) {
   affine.rotate(Eigen::AngleAxisd(M_PI / 2, Eigen::Vector3d(1, 0, 0)));
   affine.translate(Eigen::Vector3d(1, 1, 1));
   typedef AttributePointCloud<PointF> TestPointCloud;
-  TestPointCloud cloud(4, 4);
+  TestPointCloud                      cloud(4, 4);
   cloud.set_timestamp(1.0);
   EXPECT_EQ(cloud.get_timestamp(), 1.0);
   cloud.set_sensor_to_world_pose(affine);
-  EXPECT_EQ((cloud.sensor_to_world_pose().matrix() - affine.matrix()).trace(),
-            0.0);
+  EXPECT_EQ((cloud.sensor_to_world_pose().matrix() - affine.matrix()).trace(), 0.0);
   cloud.RotatePointCloud(false);
   EXPECT_EQ(cloud.sensor_to_world_pose().linear().trace(), 3.0);
   cloud.TransformPointCloud(false);

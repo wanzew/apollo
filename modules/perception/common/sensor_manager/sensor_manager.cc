@@ -17,11 +17,12 @@
 
 #include <utility>
 
+#include "modules/perception/proto/sensor_meta_schema.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/sensor_meta_schema.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -37,9 +38,7 @@ SensorManager::SensorManager() { CHECK_EQ(this->Init(), true); }
 
 bool SensorManager::Init() {
   std::lock_guard<std::mutex> lock(mutex_);
-  if (inited_) {
-    return true;
-  }
+  if (inited_) { return true; }
 
   sensor_info_map_.clear();
   distort_model_map_.clear();
@@ -56,32 +55,29 @@ bool SensorManager::Init() {
 
   auto AddSensorInfo = [this](const SensorMeta& sensor_meta_proto) {
     SensorInfo sensor_info;
-    sensor_info.name = sensor_meta_proto.name();
-    sensor_info.type = static_cast<SensorType>(sensor_meta_proto.type());
-    sensor_info.orientation =
-        static_cast<SensorOrientation>(sensor_meta_proto.orientation());
-    sensor_info.frame_id = sensor_meta_proto.name();
+    sensor_info.name        = sensor_meta_proto.name();
+    sensor_info.type        = static_cast<SensorType>(sensor_meta_proto.type());
+    sensor_info.orientation = static_cast<SensorOrientation>(sensor_meta_proto.orientation());
+    sensor_info.frame_id    = sensor_meta_proto.name();
 
-    auto pair = sensor_info_map_.insert(
-        make_pair(sensor_meta_proto.name(), sensor_info));
+    auto pair = sensor_info_map_.insert(make_pair(sensor_meta_proto.name(), sensor_info));
     if (!pair.second) {
       AERROR << "Duplicate sensor name error.";
       return false;
     }
 
     if (this->IsCamera(sensor_info.type)) {
-      std::shared_ptr<BrownCameraDistortionModel> distort_model(
-          new BrownCameraDistortionModel());
+      std::shared_ptr<BrownCameraDistortionModel> distort_model(new BrownCameraDistortionModel());
       auto intrinsic_file = IntrinsicPath(sensor_info.frame_id);
       if (!LoadBrownCameraIntrinsic(intrinsic_file, distort_model.get())) {
         AERROR << "Failed to load camera intrinsic:" << intrinsic_file;
         return false;
       }
-      distort_model_map_.insert(make_pair(
-          sensor_meta_proto.name(),
-          std::dynamic_pointer_cast<BaseCameraDistortionModel>(distort_model)));
-      undistort_model_map_.insert(make_pair(sensor_meta_proto.name(),
-                                            distort_model->get_camera_model()));
+      distort_model_map_.insert(
+          make_pair(sensor_meta_proto.name(),
+                    std::dynamic_pointer_cast<BaseCameraDistortionModel>(distort_model)));
+      undistort_model_map_.insert(
+          make_pair(sensor_meta_proto.name(), distort_model->get_camera_model()));
     }
     return true;
   };
@@ -102,31 +98,28 @@ bool SensorManager::IsSensorExist(const std::string& name) const {
   return sensor_info_map_.find(name) != sensor_info_map_.end();
 }
 
-bool SensorManager::GetSensorInfo(const std::string& name,
-                                  SensorInfo* sensor_info) const {
+bool SensorManager::GetSensorInfo(const std::string& name, SensorInfo* sensor_info) const {
   if (sensor_info == nullptr) {
     AERROR << "Nullptr error.";
     return false;
   }
 
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return false;
-  }
+  if (itr == sensor_info_map_.end()) { return false; }
 
   *sensor_info = itr->second;
   return true;
 }
 
-std::shared_ptr<BaseCameraDistortionModel> SensorManager::GetDistortCameraModel(
-    const std::string& name) const {
+std::shared_ptr<BaseCameraDistortionModel>
+SensorManager::GetDistortCameraModel(const std::string& name) const {
   const auto& itr = distort_model_map_.find(name);
 
   return itr == distort_model_map_.end() ? nullptr : itr->second;
 }
 
-std::shared_ptr<BaseCameraModel> SensorManager::GetUndistortCameraModel(
-    const std::string& name) const {
+std::shared_ptr<BaseCameraModel>
+SensorManager::GetUndistortCameraModel(const std::string& name) const {
   const auto& itr = undistort_model_map_.find(name);
 
   return itr == undistort_model_map_.end() ? nullptr : itr->second;
@@ -134,9 +127,7 @@ std::shared_ptr<BaseCameraModel> SensorManager::GetUndistortCameraModel(
 
 bool SensorManager::IsHdLidar(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return false;
-  }
+  if (itr == sensor_info_map_.end()) { return false; }
 
   SensorType type = itr->second.type;
   return this->IsHdLidar(type);
@@ -149,9 +140,7 @@ bool SensorManager::IsHdLidar(const SensorType& type) const {
 
 bool SensorManager::IsLdLidar(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return false;
-  }
+  if (itr == sensor_info_map_.end()) { return false; }
 
   SensorType type = itr->second.type;
   return this->IsLdLidar(type);
@@ -163,9 +152,7 @@ bool SensorManager::IsLdLidar(const SensorType& type) const {
 
 bool SensorManager::IsLidar(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return false;
-  }
+  if (itr == sensor_info_map_.end()) { return false; }
 
   SensorType type = itr->second.type;
   return this->IsLidar(type);
@@ -177,39 +164,31 @@ bool SensorManager::IsLidar(const SensorType& type) const {
 
 bool SensorManager::IsRadar(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return false;
-  }
+  if (itr == sensor_info_map_.end()) { return false; }
 
   SensorType type = itr->second.type;
   return this->IsRadar(type);
 }
 
 bool SensorManager::IsRadar(const SensorType& type) const {
-  return type == SensorType::SHORT_RANGE_RADAR ||
-         type == SensorType::LONG_RANGE_RADAR;
+  return type == SensorType::SHORT_RANGE_RADAR || type == SensorType::LONG_RANGE_RADAR;
 }
 
 bool SensorManager::IsCamera(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return false;
-  }
+  if (itr == sensor_info_map_.end()) { return false; }
 
   SensorType type = itr->second.type;
   return this->IsCamera(type);
 }
 
 bool SensorManager::IsCamera(const SensorType& type) const {
-  return type == SensorType::MONOCULAR_CAMERA ||
-         type == SensorType::STEREO_CAMERA;
+  return type == SensorType::MONOCULAR_CAMERA || type == SensorType::STEREO_CAMERA;
 }
 
 bool SensorManager::IsUltrasonic(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return false;
-  }
+  if (itr == sensor_info_map_.end()) { return false; }
 
   SensorType type = itr->second.type;
   return this->IsUltrasonic(type);

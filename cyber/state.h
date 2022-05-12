@@ -39,7 +39,7 @@ enum State : std::uint8_t {
 };
 
 State GetState();
-void SetState(const State& state);
+void  SetState(const State& state);
 
 inline bool OK() { return GetState() == STATE_INITIALIZED; }
 
@@ -55,9 +55,7 @@ inline void WaitForShutdown() {
 
 inline void AsyncShutdown() {
   pid_t pid = getpid();
-  if (kill(pid, SIGINT) != 0) {
-    AERROR << strerror(errno);
-  }
+  if (kill(pid, SIGINT) != 0) { AERROR << strerror(errno); }
 }
 
 }  // namespace cyber

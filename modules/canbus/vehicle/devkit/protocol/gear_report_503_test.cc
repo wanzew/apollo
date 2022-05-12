@@ -27,8 +27,8 @@ class Gearreport503Test : public ::testing::Test {
 };
 
 TEST_F(Gearreport503Test, General) {
-  uint8_t data[8] = {0x04, 0x01, 0x01, 0x10, 0x90, 0x01, 0x00, 0x01};
-  int32_t length = 8;
+  uint8_t       data[8] = {0x04, 0x01, 0x01, 0x10, 0x90, 0x01, 0x00, 0x01};
+  int32_t       length  = 8;
   ChassisDetail cd;
   Gearreport503 gearreport;
   gearreport.Parse(data, length, &cd);

@@ -24,23 +24,23 @@ namespace base {
 
 // @brief general object type
 enum class ObjectType {
-  UNKNOWN = 0,
-  UNKNOWN_MOVABLE = 1,
+  UNKNOWN           = 0,
+  UNKNOWN_MOVABLE   = 1,
   UNKNOWN_UNMOVABLE = 2,
-  PEDESTRIAN = 3,
-  BICYCLE = 4,
-  VEHICLE = 5,
-  MAX_OBJECT_TYPE = 6,
+  PEDESTRIAN        = 3,
+  BICYCLE           = 4,
+  VEHICLE           = 5,
+  MAX_OBJECT_TYPE   = 6,
 };
 
 // @brief internal object type used by lidar perception
 enum class InternalObjectType {
-  INT_BACKGROUND = 0,
-  INT_SMALLMOT = 1,
-  INT_PEDESTRIAN = 2,
-  INT_NONMOT = 3,
-  INT_BIGMOT = 4,
-  INT_UNKNOWN = 5,
+  INT_BACKGROUND      = 0,
+  INT_SMALLMOT        = 1,
+  INT_PEDESTRIAN      = 2,
+  INT_NONMOT          = 3,
+  INT_BIGMOT          = 4,
+  INT_UNKNOWN         = 5,
   INT_MAX_OBJECT_TYPE = 6,
 };
 
@@ -61,25 +61,25 @@ enum class VisualObjectType {
 
 // @brief fine-grained object types
 enum class ObjectSubType {
-  UNKNOWN = 0,
-  UNKNOWN_MOVABLE = 1,
+  UNKNOWN           = 0,
+  UNKNOWN_MOVABLE   = 1,
   UNKNOWN_UNMOVABLE = 2,
-  CAR = 3,
-  VAN = 4,
-  TRUCK = 5,
-  BUS = 6,
-  CYCLIST = 7,
-  MOTORCYCLIST = 8,
-  TRICYCLIST = 9,
-  PEDESTRIAN = 10,
-  TRAFFICCONE = 11,
-  MAX_OBJECT_TYPE = 12,
+  CAR               = 3,
+  VAN               = 4,
+  TRUCK             = 5,
+  BUS               = 6,
+  CYCLIST           = 7,
+  MOTORCYCLIST      = 8,
+  TRICYCLIST        = 9,
+  PEDESTRIAN        = 10,
+  TRAFFICCONE       = 11,
+  MAX_OBJECT_TYPE   = 12,
 };
 
 // @brief motion state
 enum class MotionState {
-  UNKNOWN = 0,
-  MOVING = 1,
+  UNKNOWN    = 0,
+  MOVING     = 1,
   STATIONARY = 2,
 };
 
@@ -101,12 +101,11 @@ const std::map<VisualLandmarkType, std::string> kVisualLandmarkType2NameMap = {
     {VisualLandmarkType::TrafficLight, "TrafficLight"},
 };
 
-const std::map<std::string, base::VisualLandmarkType>
-    kVisualLandmarkName2TypeMap = {
-        {"RoadArrow", VisualLandmarkType::RoadArrow},
-        {"RoadText", VisualLandmarkType::RoadText},
-        {"TrafficSign", VisualLandmarkType::TrafficSign},
-        {"TrafficLight", VisualLandmarkType::TrafficLight},
+const std::map<std::string, base::VisualLandmarkType> kVisualLandmarkName2TypeMap = {
+    {"RoadArrow", VisualLandmarkType::RoadArrow},
+    {"RoadText", VisualLandmarkType::RoadText},
+    {"TrafficSign", VisualLandmarkType::TrafficSign},
+    {"TrafficLight", VisualLandmarkType::TrafficLight},
 };
 
 /**

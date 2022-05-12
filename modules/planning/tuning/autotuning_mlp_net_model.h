@@ -26,7 +26,7 @@ namespace planning {
 
 class AutotuningMLPModel : public prediction::network::NetModel {
  public:
-  AutotuningMLPModel() = default;
+  AutotuningMLPModel()          = default;
   virtual ~AutotuningMLPModel() = default;
   /**
    * @brief Compute the model output from inputs according to a defined layers'
@@ -34,8 +34,7 @@ class AutotuningMLPModel : public prediction::network::NetModel {
    * @param Inputs to the network
    * @param Output of the network will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) const override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) const override;
 };
 
 }  // namespace planning

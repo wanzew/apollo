@@ -22,7 +22,6 @@ bool CommonComponentSample::Init() {
 
 bool CommonComponentSample::Proc(const std::shared_ptr<Driver>& msg0,
                                  const std::shared_ptr<Driver>& msg1) {
-  AINFO << "Start common component Proc [" << msg0->msg_id() << "] ["
-        << msg1->msg_id() << "]";
+  AINFO << "Start common component Proc [" << msg0->msg_id() << "] [" << msg1->msg_id() << "]";
   return true;
 }

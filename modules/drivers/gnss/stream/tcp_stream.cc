@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/gnss/stream/tcp_stream.h"
+
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -28,17 +30,17 @@
 
 #include "cyber/cyber.h"
 #include "modules/drivers/gnss/stream/stream.h"
-#include "modules/drivers/gnss/stream/tcp_stream.h"
 
 namespace apollo {
 namespace drivers {
 namespace gnss {
 
-TcpStream::TcpStream(const char* address, uint16_t port, uint32_t timeout_usec,
-                     bool auto_reconnect)
-    : sockfd_(-1), errno_(0), auto_reconnect_(auto_reconnect) {
-  peer_addr_ = inet_addr(address);
-  peer_port_ = htons(port);
+TcpStream::TcpStream(const char* address, uint16_t port, uint32_t timeout_usec, bool auto_reconnect)
+    : sockfd_(-1)
+    , errno_(0)
+    , auto_reconnect_(auto_reconnect) {
+  peer_addr_    = inet_addr(address);
+  peer_port_    = htons(port);
   timeout_usec_ = timeout_usec;
 }
 
@@ -48,8 +50,7 @@ void TcpStream::open() {
   int fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (fd < 0) {
     // error
-    AERROR << "create socket failed, errno: " << errno << ", "
-           << strerror(errno);
+    AERROR << "create socket failed, errno: " << errno << ", " << strerror(errno);
     return;
   }
 
@@ -57,9 +58,7 @@ void TcpStream::open() {
 }
 
 bool TcpStream::InitSocket() {
-  if (sockfd_ < 0) {
-    return false;
-  }
+  if (sockfd_ < 0) { return false; }
 
   // block or not block
   if (timeout_usec_ != 0) {
@@ -77,15 +76,13 @@ bool TcpStream::InitSocket() {
     }
 
     timeval block_to = {timeout_usec_ / 1000000, timeout_usec_ % 1000000};
-    if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVTIMEO, &block_to,
-                   sizeof(block_to)) < 0) {
+    if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVTIMEO, &block_to, sizeof(block_to)) < 0) {
       ::close(sockfd_);
       AERROR << "setsockopt set rcv timeout failed, error: " << strerror(errno);
       return false;
     }
 
-    if (setsockopt(sockfd_, SOL_SOCKET, SO_SNDTIMEO, &block_to,
-                   sizeof(block_to)) < 0) {
+    if (setsockopt(sockfd_, SOL_SOCKET, SO_SNDTIMEO, &block_to, sizeof(block_to)) < 0) {
       ::close(sockfd_);
       AERROR << "setsockopt set snd timeout failed, error: " << strerror(errno);
       return false;
@@ -106,14 +103,13 @@ bool TcpStream::InitSocket() {
   }
 
   // disable Nagle
-  int ret = 0;
+  int ret    = 0;
   int enable = 1;
-  ret = setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY,
-                   reinterpret_cast<void*>(&enable), sizeof(enable));
+  ret        = setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<void*>(&enable),
+                   sizeof(enable));
   if (ret == -1) {
     ::close(sockfd_);
-    AERROR << "setsockopt disable Nagle failed, errno: " << errno << ", "
-           << strerror(errno);
+    AERROR << "setsockopt disable Nagle failed, errno: " << errno << ", " << strerror(errno);
     return false;
   }
 
@@ -131,9 +127,7 @@ void TcpStream::close() {
 bool TcpStream::Reconnect() {
   if (auto_reconnect_) {
     Disconnect();
-    if (Connect()) {
-      return true;
-    }
+    if (Connect()) { return true; }
   }
   return false;
 }
@@ -147,18 +141,16 @@ bool TcpStream::Connect() {
     }
   }
 
-  if (status_ == Stream::Status::CONNECTED) {
-    return true;
-  }
+  if (status_ == Stream::Status::CONNECTED) { return true; }
 
-  fd_set fds;
-  timeval timeo = {10, 0};
-  int ret = 0;
+  fd_set      fds;
+  timeval     timeo = {10, 0};
+  int         ret   = 0;
   sockaddr_in peer_addr;
 
   bzero(&peer_addr, sizeof(peer_addr));
-  peer_addr.sin_family = AF_INET;
-  peer_addr.sin_port = peer_port_;
+  peer_addr.sin_family      = AF_INET;
+  peer_addr.sin_port        = peer_port_;
   peer_addr.sin_addr.s_addr = peer_addr_;
 
   int fd_flags = fcntl(sockfd_, F_GETFL);
@@ -167,15 +159,15 @@ bool TcpStream::Connect() {
     return false;
   }
 
-  while ((ret = ::connect(sockfd_, reinterpret_cast<sockaddr*>(&peer_addr),
-                          sizeof(peer_addr))) < 0) {
+  while ((ret = ::connect(sockfd_, reinterpret_cast<sockaddr*>(&peer_addr), sizeof(peer_addr))) <
+         0) {
     if (errno == EINTR) {
       AINFO << "Tcp connect return EINTR, continue.";
       continue;
     } else {
       if ((errno != EISCONN) && (errno != EINPROGRESS) && (errno != EALREADY)) {
         status_ = Stream::Status::ERROR;
-        errno_ = errno;
+        errno_  = errno;
         AERROR << "Connect failed, error: " << strerror(errno);
         return false;
       }
@@ -185,25 +177,25 @@ bool TcpStream::Connect() {
       ret = select(sockfd_ + 1, NULL, &fds, NULL, &timeo);
       if (ret < 0) {
         status_ = Stream::Status::ERROR;
-        errno_ = errno;
+        errno_  = errno;
         AERROR << "Wait connect failed, error: " << strerror(errno);
         return false;
       } else if (ret == 0) {
         AINFO << "Tcp connect timeout.";
         return false;
       } else if (FD_ISSET(sockfd_, &fds)) {
-        int error = 0;
-        socklen_t len = sizeof(int);
+        int       error = 0;
+        socklen_t len   = sizeof(int);
 
         if (getsockopt(sockfd_, SOL_SOCKET, SO_ERROR, &error, &len) < 0) {
           status_ = Stream::Status::ERROR;
-          errno_ = errno;
+          errno_  = errno;
           AERROR << "Getsockopt failed, error: " << strerror(errno);
           return false;
         }
         if (error != 0) {
           status_ = Stream::Status::ERROR;
-          errno_ = errno;
+          errno_  = errno;
           AERROR << "Socket error: " << strerror(errno);
           return false;
         }
@@ -212,7 +204,7 @@ bool TcpStream::Connect() {
         break;
       } else {
         status_ = Stream::Status::ERROR;
-        errno_ = errno;
+        errno_  = errno;
         AERROR << "Should not be here.";
         return false;
       }
@@ -222,7 +214,7 @@ bool TcpStream::Connect() {
   if (!InitSocket()) {
     close();
     status_ = Stream::Status::ERROR;
-    errno_ = errno;
+    errno_  = errno;
     AERROR << "Failed to init socket.";
     return false;
   }
@@ -247,14 +239,10 @@ size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
 
   if (status_ != Stream::Status::CONNECTED) {
     Reconnect();
-    if (status_ != Stream::Status::CONNECTED) {
-      return 0;
-    }
+    if (status_ != Stream::Status::CONNECTED) { return 0; }
   }
 
-  if (!Readable(10000)) {
-    return 0;
-  }
+  if (!Readable(10000)) { return 0; }
 
   while ((ret = ::recv(sockfd_, buffer, max_length, 0)) < 0) {
     if (errno == EINTR) {
@@ -263,7 +251,7 @@ size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
       // error
       if (errno != EAGAIN) {
         status_ = Stream::Status::ERROR;
-        errno_ = errno;
+        errno_  = errno;
         AERROR << "Read errno " << errno << ", error " << strerror(errno);
       }
     }
@@ -273,11 +261,9 @@ size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
 
   if (ret == 0) {
     status_ = Stream::Status::ERROR;
-    errno_ = errno;
+    errno_  = errno;
     AERROR << "Remote closed.";
-    if (Reconnect()) {
-      AINFO << "Reconnect tcp success.";
-    }
+    if (Reconnect()) { AINFO << "Reconnect tcp success."; }
   }
 
   return ret;
@@ -288,9 +274,7 @@ size_t TcpStream::write(const uint8_t* buffer, size_t length) {
 
   if (status_ != Stream::Status::CONNECTED) {
     Reconnect();
-    if (status_ != Stream::Status::CONNECTED) {
-      return 0;
-    }
+    if (status_ != Stream::Status::CONNECTED) { return 0; }
   }
 
   while (length > 0) {
@@ -302,10 +286,10 @@ size_t TcpStream::write(const uint8_t* buffer, size_t length) {
         // error
         if (errno == EPIPE || errno == ECONNRESET) {
           status_ = Stream::Status::DISCONNECTED;
-          errno_ = errno;
+          errno_  = errno;
         } else if (errno != EAGAIN) {
           status_ = Stream::Status::ERROR;
-          errno_ = errno;
+          errno_  = errno;
         }
         return total_nsent;
       }
@@ -322,16 +306,16 @@ size_t TcpStream::write(const uint8_t* buffer, size_t length) {
 bool TcpStream::Readable(uint32_t timeout_us) {
   // Setup a select call to block for serial data or a timeout
   timespec timeout_ts;
-  fd_set readfds;
+  fd_set   readfds;
   FD_ZERO(&readfds);
   FD_SET(sockfd_, &readfds);
 
-  timeout_ts.tv_sec = timeout_us / 1000000;
+  timeout_ts.tv_sec  = timeout_us / 1000000;
   timeout_ts.tv_nsec = (timeout_us % 1000000) * 1000;
-  int r = pselect(sockfd_ + 1, &readfds, NULL, NULL, &timeout_ts, NULL);
+  int r              = pselect(sockfd_ + 1, &readfds, NULL, NULL, &timeout_ts, NULL);
   if (r < 0) {
     status_ = Stream::Status::ERROR;
-    errno_ = errno;
+    errno_  = errno;
     AERROR << "Failed to wait tcp data: " << errno << ", " << strerror(errno);
     return false;
   } else if (r == 0 || !FD_ISSET(sockfd_, &readfds)) {
@@ -341,8 +325,7 @@ bool TcpStream::Readable(uint32_t timeout_us) {
   return true;
 }
 
-Stream* Stream::create_tcp(const char* address, uint16_t port,
-                           uint32_t timeout_usec) {
+Stream* Stream::create_tcp(const char* address, uint16_t port, uint32_t timeout_usec) {
   return new TcpStream(address, port, timeout_usec);
 }
 

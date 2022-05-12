@@ -22,73 +22,74 @@ namespace apollo {
 namespace v2x {
 namespace ft {
 
-void Pb2Object(const PerceptionObstacle &obstacle, base::Object *object,
-               const std::string &frame_id, double timestamp_object) {
+void Pb2Object(const PerceptionObstacle& obstacle,
+               base::Object*             object,
+               const std::string&        frame_id,
+               double                    timestamp_object) {
   Eigen::Vector3d value;
   Eigen::Matrix3d variance;
   variance.setIdentity();
   object->type_probs.push_back(0.85);
   object->sub_type_probs.push_back(0.85);
   object->type = static_cast<base::ObjectType>(obstacle.type());
-  variance = variance * 1;
+  variance     = variance * 1;
   switch (obstacle.sub_type()) {
     case PerceptionObstacle::ST_UNKNOWN:
       object->sub_type = base::ObjectSubType::UNKNOWN;
-      variance = variance * 3;
+      variance         = variance * 3;
       break;
 
     case PerceptionObstacle::ST_UNKNOWN_MOVABLE:
       object->sub_type = base::ObjectSubType::UNKNOWN_MOVABLE;
-      variance = variance * 2;
+      variance         = variance * 2;
       break;
 
     case PerceptionObstacle::ST_CAR:
       object->sub_type = base::ObjectSubType::CAR;
-      variance = variance * 0.8;
+      variance         = variance * 0.8;
       break;
 
     case PerceptionObstacle::ST_VAN:
       object->sub_type = base::ObjectSubType::VAN;
-      variance = variance * 1;
+      variance         = variance * 1;
       break;
 
     case PerceptionObstacle::ST_TRUCK:
       object->sub_type = base::ObjectSubType::TRUCK;
-      variance = variance * 3;
+      variance         = variance * 3;
       break;
 
     case PerceptionObstacle::ST_BUS:
       object->sub_type = base::ObjectSubType::BUS;
-      variance = variance * 3;
+      variance         = variance * 3;
       break;
 
     case PerceptionObstacle::ST_CYCLIST:
       object->sub_type = base::ObjectSubType::CYCLIST;
-      variance = variance * 0.8;
+      variance         = variance * 0.8;
       break;
 
     case PerceptionObstacle::ST_MOTORCYCLIST:
       object->sub_type = base::ObjectSubType::MOTORCYCLIST;
-      variance = variance * 0.8;
+      variance         = variance * 0.8;
       break;
 
     case PerceptionObstacle::ST_TRICYCLIST:
       object->sub_type = base::ObjectSubType::TRICYCLIST;
-      variance = variance * 0.8;
+      variance         = variance * 0.8;
       break;
 
     case PerceptionObstacle::ST_PEDESTRIAN:
       object->sub_type = base::ObjectSubType::PEDESTRIAN;
-      variance = variance * 0.8;
+      variance         = variance * 0.8;
       break;
 
     case PerceptionObstacle::ST_TRAFFICCONE:
       object->sub_type = base::ObjectSubType::TRAFFICCONE;
-      variance = variance * 0.8;
+      variance         = variance * 0.8;
       break;
 
-    default:
-      break;
+    default: break;
   }
   if (obstacle.has_timestamp()) {
     object->timestamp = obstacle.timestamp();
@@ -97,18 +98,17 @@ void Pb2Object(const PerceptionObstacle &obstacle, base::Object *object,
   }
   value << obstacle.position().x(), obstacle.position().y(), 0.0;
   object->position.Set(value, variance);
-  value << obstacle.velocity().x(), obstacle.velocity().y(),
-      obstacle.velocity().z();
+  value << obstacle.velocity().x(), obstacle.velocity().y(), obstacle.velocity().z();
   object->velocity.Set(value, variance);
   object->theta.Set(obstacle.theta(), 0.5);
   object->sensor_type = base::SensorType::MONOCULAR_CAMERA;
-  object->track_id = obstacle.id();
-  object->frame_id = frame_id;
+  object->track_id    = obstacle.id();
+  object->frame_id    = frame_id;
   variance.setIdentity();
   value << obstacle.length(), obstacle.width(), obstacle.height();
   object->size.Set(value, variance);
   std::vector<base::Info3d> polygon_info3d;
-  for (auto &polygon_point : obstacle.polygon_point()) {
+  for (auto& polygon_point : obstacle.polygon_point()) {
     base::Info3d point;
     value << polygon_point.x(), polygon_point.y(), polygon_point.z();
     point.Set(value, variance);
@@ -117,69 +117,54 @@ void Pb2Object(const PerceptionObstacle &obstacle, base::Object *object,
   object->polygon = polygon_info3d;
 }
 
-void V2xPb2Object(const apollo::v2x::V2XObstacle &obstacle,
-                  base::Object *object, const std::string &frame_id,
-                  double timestamp_object) {
+void V2xPb2Object(const apollo::v2x::V2XObstacle& obstacle,
+                  base::Object*                   object,
+                  const std::string&              frame_id,
+                  double                          timestamp_object) {
   Pb2Object(obstacle.perception_obstacle(), object, frame_id, timestamp_object);
   if (obstacle.has_v2x_info() && obstacle.v2x_info().v2x_type_size() > 0 &&
-      obstacle.v2x_info().v2x_type(0) ==
-          ::apollo::v2x::V2XInformation::ZOMBIES_CAR) {
+      obstacle.v2x_info().v2x_type(0) == ::apollo::v2x::V2XInformation::ZOMBIES_CAR) {
     object->v2x_type = base::V2xType::ZOMBIES_CAR;
   }
 }
 
-base::Object Pb2Object(const PerceptionObstacle &obstacle,
-                       const std::string &frame_id) {
-  base::Object object;
+base::Object Pb2Object(const PerceptionObstacle& obstacle, const std::string& frame_id) {
+  base::Object    object;
   Eigen::Vector3d value;
   Eigen::Matrix3d variance;
   variance.setIdentity();
   object.timestamp = obstacle.timestamp();
   // object
-  value << obstacle.position().x(), obstacle.position().y(),
-      obstacle.position().z();
+  value << obstacle.position().x(), obstacle.position().y(), obstacle.position().z();
 
   object.position.Set(value, variance);
-  value << obstacle.velocity().x(), obstacle.velocity().y(),
-      obstacle.velocity().z();
+  value << obstacle.velocity().x(), obstacle.velocity().y(), obstacle.velocity().z();
   object.velocity.Set(value, variance);
   object.theta.Set(obstacle.theta(), 0.5);
   object.sensor_type = base::SensorType::MONOCULAR_CAMERA;
-  object.track_id = obstacle.id();
-  object.frame_id = frame_id;
+  object.track_id    = obstacle.id();
+  object.frame_id    = frame_id;
   value << obstacle.length(), obstacle.width(), obstacle.height();
   object.size.Set(value, variance);
   object.type_probs.push_back(0.85);
   object.sub_type_probs.push_back(0.85);
   object.type = static_cast<base::ObjectType>(obstacle.type());
   switch (obstacle.sub_type()) {
-    case PerceptionObstacle::ST_UNKNOWN:
-      object.sub_type = base::ObjectSubType::UNKNOWN;
-      break;
+    case PerceptionObstacle::ST_UNKNOWN: object.sub_type = base::ObjectSubType::UNKNOWN; break;
 
     case PerceptionObstacle::ST_UNKNOWN_MOVABLE:
       object.sub_type = base::ObjectSubType::UNKNOWN_MOVABLE;
       break;
 
-    case PerceptionObstacle::ST_CAR:
-      object.sub_type = base::ObjectSubType::CAR;
-      break;
+    case PerceptionObstacle::ST_CAR: object.sub_type = base::ObjectSubType::CAR; break;
 
-    case PerceptionObstacle::ST_VAN:
-      object.sub_type = base::ObjectSubType::VAN;
-      break;
+    case PerceptionObstacle::ST_VAN: object.sub_type = base::ObjectSubType::VAN; break;
 
-    case PerceptionObstacle::ST_TRUCK:
-      object.sub_type = base::ObjectSubType::TRUCK;
-      break;
+    case PerceptionObstacle::ST_TRUCK: object.sub_type = base::ObjectSubType::TRUCK; break;
 
-    case PerceptionObstacle::ST_BUS:
-      object.sub_type = base::ObjectSubType::BUS;
-      break;
+    case PerceptionObstacle::ST_BUS: object.sub_type = base::ObjectSubType::BUS; break;
 
-    case PerceptionObstacle::ST_CYCLIST:
-      object.sub_type = base::ObjectSubType::CYCLIST;
-      break;
+    case PerceptionObstacle::ST_CYCLIST: object.sub_type = base::ObjectSubType::CYCLIST; break;
 
     case PerceptionObstacle::ST_MOTORCYCLIST:
       object.sub_type = base::ObjectSubType::MOTORCYCLIST;
@@ -197,13 +182,12 @@ base::Object Pb2Object(const PerceptionObstacle &obstacle,
       object.sub_type = base::ObjectSubType::TRAFFICCONE;
       break;
 
-    default:
-      break;
+    default: break;
   }
   return object;
 }
 
-PerceptionObstacle Object2Pb(const base::Object &object) {
+PerceptionObstacle Object2Pb(const base::Object& object) {
   PerceptionObstacle obstacle;
   // times
   obstacle.set_timestamp(object.timestamp);
@@ -225,33 +209,21 @@ PerceptionObstacle Object2Pb(const base::Object &object) {
   obstacle.set_height(object.size.height());
   obstacle.set_type(static_cast<PerceptionObstacle::Type>(object.type));
   switch (object.sub_type) {
-    case base::ObjectSubType::UNKNOWN:
-      obstacle.set_sub_type(PerceptionObstacle::ST_UNKNOWN);
-      break;
+    case base::ObjectSubType::UNKNOWN: obstacle.set_sub_type(PerceptionObstacle::ST_UNKNOWN); break;
 
     case base::ObjectSubType::UNKNOWN_MOVABLE:
       obstacle.set_sub_type(PerceptionObstacle::ST_UNKNOWN_MOVABLE);
       break;
 
-    case base::ObjectSubType::CAR:
-      obstacle.set_sub_type(PerceptionObstacle::ST_CAR);
-      break;
+    case base::ObjectSubType::CAR: obstacle.set_sub_type(PerceptionObstacle::ST_CAR); break;
 
-    case base::ObjectSubType::VAN:
-      obstacle.set_sub_type(PerceptionObstacle::ST_VAN);
-      break;
+    case base::ObjectSubType::VAN: obstacle.set_sub_type(PerceptionObstacle::ST_VAN); break;
 
-    case base::ObjectSubType::TRUCK:
-      obstacle.set_sub_type(PerceptionObstacle::ST_TRUCK);
-      break;
+    case base::ObjectSubType::TRUCK: obstacle.set_sub_type(PerceptionObstacle::ST_TRUCK); break;
 
-    case base::ObjectSubType::BUS:
-      obstacle.set_sub_type(PerceptionObstacle::ST_BUS);
-      break;
+    case base::ObjectSubType::BUS: obstacle.set_sub_type(PerceptionObstacle::ST_BUS); break;
 
-    case base::ObjectSubType::CYCLIST:
-      obstacle.set_sub_type(PerceptionObstacle::ST_CYCLIST);
-      break;
+    case base::ObjectSubType::CYCLIST: obstacle.set_sub_type(PerceptionObstacle::ST_CYCLIST); break;
 
     case base::ObjectSubType::MOTORCYCLIST:
       obstacle.set_sub_type(PerceptionObstacle::ST_MOTORCYCLIST);
@@ -269,29 +241,26 @@ PerceptionObstacle Object2Pb(const base::Object &object) {
       obstacle.set_sub_type(PerceptionObstacle::ST_TRAFFICCONE);
       break;
 
-    default:
-      break;
+    default: break;
   }
   return obstacle;
 }
 
-void FillObjectPolygonFromBBox3D(PerceptionObstacle *object_ptr) {
+void FillObjectPolygonFromBBox3D(PerceptionObstacle* object_ptr) {
   struct PolygoPoint {
     double x = 0.0;
     double y = 0.0;
     double z = 0.0;
   };
 
-  if (!object_ptr) {
-    return;
-  }
-  const double length = object_ptr->length();
-  const double width = object_ptr->width();
-  double hl = length / 2;
-  double hw = width / 2;
-  double cos_theta = std::cos(object_ptr->theta());
-  double sin_theta = std::sin(object_ptr->theta());
-  PolygoPoint polygon[4];
+  if (!object_ptr) { return; }
+  const double length    = object_ptr->length();
+  const double width     = object_ptr->width();
+  double       hl        = length / 2;
+  double       hw        = width / 2;
+  double       cos_theta = std::cos(object_ptr->theta());
+  double       sin_theta = std::sin(object_ptr->theta());
+  PolygoPoint  polygon[4];
   polygon[0].x = hl * cos_theta - hw * sin_theta + object_ptr->position().x();
   polygon[0].y = hl * sin_theta + hw * cos_theta + object_ptr->position().y();
   polygon[0].z = object_ptr->position().z();
@@ -312,7 +281,7 @@ void FillObjectPolygonFromBBox3D(PerceptionObstacle *object_ptr) {
   }
 }
 
-void Object2Pb(const base::Object &object, PerceptionObstacle *obstacle) {
+void Object2Pb(const base::Object& object, PerceptionObstacle* obstacle) {
   // times
   obstacle->set_timestamp(object.timestamp);
   // id
@@ -346,21 +315,13 @@ void Object2Pb(const base::Object &object, PerceptionObstacle *obstacle) {
       obstacle->set_sub_type(PerceptionObstacle::ST_UNKNOWN_UNMOVABLE);
       break;
 
-    case base::ObjectSubType::CAR:
-      obstacle->set_sub_type(PerceptionObstacle::ST_CAR);
-      break;
+    case base::ObjectSubType::CAR: obstacle->set_sub_type(PerceptionObstacle::ST_CAR); break;
 
-    case base::ObjectSubType::VAN:
-      obstacle->set_sub_type(PerceptionObstacle::ST_VAN);
-      break;
+    case base::ObjectSubType::VAN: obstacle->set_sub_type(PerceptionObstacle::ST_VAN); break;
 
-    case base::ObjectSubType::TRUCK:
-      obstacle->set_sub_type(PerceptionObstacle::ST_TRUCK);
-      break;
+    case base::ObjectSubType::TRUCK: obstacle->set_sub_type(PerceptionObstacle::ST_TRUCK); break;
 
-    case base::ObjectSubType::BUS:
-      obstacle->set_sub_type(PerceptionObstacle::ST_BUS);
-      break;
+    case base::ObjectSubType::BUS: obstacle->set_sub_type(PerceptionObstacle::ST_BUS); break;
 
     case base::ObjectSubType::CYCLIST:
       obstacle->set_sub_type(PerceptionObstacle::ST_CYCLIST);
@@ -382,38 +343,34 @@ void Object2Pb(const base::Object &object, PerceptionObstacle *obstacle) {
       obstacle->set_sub_type(PerceptionObstacle::ST_TRAFFICCONE);
       break;
 
-    default:
-      break;
+    default: break;
   }
   obstacle->set_source(PerceptionObstacle::HOST_VEHICLE);
   if (object.v2x_type == base::V2xType::ZOMBIES_CAR) {
-    obstacle->mutable_v2x_info()->add_v2x_type(
-        ::apollo::perception::V2XInformation::ZOMBIES_CAR);
+    obstacle->mutable_v2x_info()->add_v2x_type(::apollo::perception::V2XInformation::ZOMBIES_CAR);
     obstacle->set_source(PerceptionObstacle::V2X);
   }
   if (object.v2x_type == base::V2xType::BLIND_ZONE) {
-    obstacle->mutable_v2x_info()->add_v2x_type(
-        ::apollo::perception::V2XInformation::BLIND_ZONE);
+    obstacle->mutable_v2x_info()->add_v2x_type(::apollo::perception::V2XInformation::BLIND_ZONE);
     obstacle->set_source(PerceptionObstacle::V2X);
   }
 }
 
-void Object2V2xPb(const base::Object &object, V2XObstacle *obstacle) {
+void Object2V2xPb(const base::Object& object, V2XObstacle* obstacle) {
   PerceptionObstacle perception_obstacle;
   Object2Pb(object, &perception_obstacle);
   obstacle->mutable_perception_obstacle()->CopyFrom(perception_obstacle);
 }
 
-double Pbs2Objects(const PerceptionObstacles &obstacles,
-                   std::vector<base::Object> *objects,
-                   const std::string &frame_id) {
+double Pbs2Objects(const PerceptionObstacles& obstacles,
+                   std::vector<base::Object>* objects,
+                   const std::string&         frame_id) {
   double timestamp = std::numeric_limits<double>::max();
   objects->clear();
   double timestamp_object = 0.0;
   if (obstacles.perception_obstacle_size() > 0 &&
       obstacles.perception_obstacle(0).has_timestamp() == false) {
-    if (obstacles.header().has_camera_timestamp() &&
-        obstacles.header().camera_timestamp() > 10.0) {
+    if (obstacles.header().has_camera_timestamp() && obstacles.header().camera_timestamp() > 10.0) {
       timestamp_object = obstacles.header().camera_timestamp() / 1.0e9;
     } else {
       timestamp_object = obstacles.header().lidar_timestamp() / 1.0e9;
@@ -421,54 +378,49 @@ double Pbs2Objects(const PerceptionObstacles &obstacles,
   }
   for (int j = 0; j < obstacles.perception_obstacle_size(); ++j) {
     base::Object object;
-    Pb2Object(obstacles.perception_obstacle(j), &object, frame_id,
-              timestamp_object);
+    Pb2Object(obstacles.perception_obstacle(j), &object, frame_id, timestamp_object);
     objects->push_back(object);
-    if (timestamp > object.timestamp) {
-      timestamp = object.timestamp;
-    }
+    if (timestamp > object.timestamp) { timestamp = object.timestamp; }
   }
 
   return timestamp;
 }
 
-void CarstatusPb2Object(const LocalizationEstimate &carstatus,
-                        base::Object *object, const std::string &frame_id) {
+void CarstatusPb2Object(const LocalizationEstimate& carstatus,
+                        base::Object*               object,
+                        const std::string&          frame_id) {
   Eigen::Vector3d value;
   Eigen::Matrix3d variance;
   variance.setIdentity();
   object->type_probs.push_back(0.85);
   object->sub_type_probs.push_back(0.85);
-  object->type = base::ObjectType::VEHICLE;
+  object->type     = base::ObjectType::VEHICLE;
   object->sub_type = base::ObjectSubType::CAR;
   object->v2x_type = base::V2xType::HOST_VEHICLE;
-  variance = variance * 0.8;
-  value << carstatus.pose().position().x(), carstatus.pose().position().y(),
-      0.0;
+  variance         = variance * 0.8;
+  value << carstatus.pose().position().x(), carstatus.pose().position().y(), 0.0;
   object->position.Set(value, variance);
-  value << carstatus.pose().linear_velocity().x(),
-      carstatus.pose().linear_velocity().y(),
+  value << carstatus.pose().linear_velocity().x(), carstatus.pose().linear_velocity().y(),
       carstatus.pose().linear_velocity().z();
   object->velocity.Set(value, variance);
   object->theta.Set(carstatus.pose().heading(), 0.5);
   object->sensor_type = base::SensorType::MONOCULAR_CAMERA;
-  object->track_id = 0;
-  object->frame_id = frame_id;
+  object->track_id    = 0;
+  object->frame_id    = frame_id;
   variance.setIdentity();
   value << 5.02203, 2.13135, 2.17711;
   object->size.Set(value, variance);
   object->timestamp = carstatus.header().timestamp_sec();
 }
 
-double V2xPbs2Objects(const V2XObstacles &obstacles,
-                      std::vector<base::Object> *objects,
-                      const std::string &frame_id) {
+double V2xPbs2Objects(const V2XObstacles&        obstacles,
+                      std::vector<base::Object>* objects,
+                      const std::string&         frame_id) {
   double timestamp = std::numeric_limits<double>::max();
   objects->clear();
   double timestamp_object = 0.0;
   if (obstacles.v2x_obstacle_size() > 0 &&
-      obstacles.v2x_obstacle(0).perception_obstacle().has_timestamp() ==
-          false) {
+      obstacles.v2x_obstacle(0).perception_obstacle().has_timestamp() == false) {
     if (obstacles.header().has_camera_timestamp()) {
       timestamp_object = obstacles.header().camera_timestamp() / 1000000000.0;
     } else {
@@ -477,44 +429,33 @@ double V2xPbs2Objects(const V2XObstacles &obstacles,
   }
   for (int j = 0; j < obstacles.v2x_obstacle_size(); ++j) {
     base::Object object;
-    V2xPb2Object(obstacles.v2x_obstacle(j), &object, frame_id,
-                 timestamp_object);
+    V2xPb2Object(obstacles.v2x_obstacle(j), &object, frame_id, timestamp_object);
     objects->push_back(object);
-    if (timestamp > object.timestamp) {
-      timestamp = object.timestamp;
-    }
+    if (timestamp > object.timestamp) { timestamp = object.timestamp; }
   }
 
   return timestamp;
 }
 
-void Objects2Pbs(const std::vector<base::Object> &objects,
+void Objects2Pbs(const std::vector<base::Object>&     objects,
                  std::shared_ptr<PerceptionObstacles> obstacles) {
   obstacles->mutable_perception_obstacle()->Clear();
-  if (objects.size() < 1) {
-    return;
-  }
+  if (objects.size() < 1) { return; }
   // obstacles->mutable_header()->set_frame_id(objects[0].frame_id);
-  for (const auto &object : objects) {
-    if (object.v2x_type == base::V2xType::HOST_VEHICLE) {
-      continue;
-    }
+  for (const auto& object : objects) {
+    if (object.v2x_type == base::V2xType::HOST_VEHICLE) { continue; }
     PerceptionObstacle obstacle;
     Object2Pb(object, &obstacle);
     obstacles->add_perception_obstacle()->CopyFrom(obstacle);
   }
 }
 
-void Objects2V2xPbs(const std::vector<base::Object> &objects,
-                    std::shared_ptr<V2XObstacles> obstacles) {
+void Objects2V2xPbs(const std::vector<base::Object>& objects,
+                    std::shared_ptr<V2XObstacles>    obstacles) {
   obstacles->mutable_v2x_obstacle()->Clear();
-  if (objects.size() < 1) {
-    return;
-  }
-  for (const auto &object : objects) {
-    if (object.v2x_type == base::V2xType::HOST_VEHICLE) {
-      continue;
-    }
+  if (objects.size() < 1) { return; }
+  for (const auto& object : objects) {
+    if (object.v2x_type == base::V2xType::HOST_VEHICLE) { continue; }
     V2XObstacle obstacle;
     Object2V2xPb(object, &obstacle);
     obstacles->add_v2x_obstacle()->CopyFrom(obstacle);

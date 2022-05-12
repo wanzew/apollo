@@ -18,8 +18,9 @@
 
 #include <thread>
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 #include "modules/perception/lib/thread/thread.h"
 
 namespace apollo {
@@ -29,7 +30,8 @@ namespace lib {
 class PushThread : public Thread {
  public:
   explicit PushThread(ConcurrentQueue<int>* queue)
-      : Thread(true), queue_(queue) {}
+      : Thread(true)
+      , queue_(queue) {}
   virtual ~PushThread() {}
 
  protected:
@@ -57,7 +59,8 @@ class PushThread : public Thread {
 class PopThread : public Thread {
  public:
   explicit PopThread(ConcurrentQueue<int>* queue)
-      : Thread(true), queue_(queue) {}
+      : Thread(true)
+      , queue_(queue) {}
   virtual ~PopThread() {}
 
  protected:
@@ -83,7 +86,7 @@ class ConcurrentQueueTest : public testing::Test {
  protected:
   virtual void SetUp() {
     push_thread_ = new PushThread(&con_queue_);
-    pop_thread_ = new PopThread(&con_queue_);
+    pop_thread_  = new PopThread(&con_queue_);
   }
 
   virtual void TearDown() {
@@ -93,8 +96,8 @@ class ConcurrentQueueTest : public testing::Test {
 
  protected:
   ConcurrentQueue<int> con_queue_;
-  PushThread* push_thread_;
-  PopThread* pop_thread_;
+  PushThread*          push_thread_;
+  PopThread*           pop_thread_;
 };
 
 TEST_F(ConcurrentQueueTest, TestAll) {

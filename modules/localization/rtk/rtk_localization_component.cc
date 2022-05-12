@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/rtk/rtk_localization_component.h"
+
 #include "cyber/time/clock.h"
 
 namespace apollo {
@@ -40,18 +41,15 @@ bool RTKLocalizationComponent::Init() {
 
 bool RTKLocalizationComponent::InitConfig() {
   rtk_config::Config rtk_config;
-  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                               &rtk_config)) {
-    return false;
-  }
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_, &rtk_config)) { return false; }
   AINFO << "Rtk localization config: " << rtk_config.DebugString();
 
-  localization_topic_ = rtk_config.localization_topic();
-  localization_status_topic_ = rtk_config.localization_status_topic();
-  imu_topic_ = rtk_config.imu_topic();
-  gps_topic_ = rtk_config.gps_topic();
-  gps_status_topic_ = rtk_config.gps_status_topic();
-  broadcast_tf_frame_id_ = rtk_config.broadcast_tf_frame_id();
+  localization_topic_          = rtk_config.localization_topic();
+  localization_status_topic_   = rtk_config.localization_status_topic();
+  imu_topic_                   = rtk_config.imu_topic();
+  gps_topic_                   = rtk_config.gps_topic();
+  gps_status_topic_            = rtk_config.gps_status_topic();
+  broadcast_tf_frame_id_       = rtk_config.broadcast_tf_frame_id();
   broadcast_tf_child_frame_id_ = rtk_config.broadcast_tf_child_frame_id();
 
   localization_->InitConfig(rtk_config);
@@ -61,27 +59,24 @@ bool RTKLocalizationComponent::InitConfig() {
 
 bool RTKLocalizationComponent::InitIO() {
   corrected_imu_listener_ = node_->CreateReader<localization::CorrectedImu>(
-      imu_topic_, std::bind(&RTKLocalization::ImuCallback, localization_.get(),
-                            std::placeholders::_1));
+      imu_topic_,
+      std::bind(&RTKLocalization::ImuCallback, localization_.get(), std::placeholders::_1));
   ACHECK(corrected_imu_listener_);
 
   gps_status_listener_ = node_->CreateReader<drivers::gnss::InsStat>(
-      gps_status_topic_, std::bind(&RTKLocalization::GpsStatusCallback,
-                                   localization_.get(), std::placeholders::_1));
+      gps_status_topic_,
+      std::bind(&RTKLocalization::GpsStatusCallback, localization_.get(), std::placeholders::_1));
   ACHECK(gps_status_listener_);
 
-  localization_talker_ =
-      node_->CreateWriter<LocalizationEstimate>(localization_topic_);
+  localization_talker_ = node_->CreateWriter<LocalizationEstimate>(localization_topic_);
   ACHECK(localization_talker_);
 
-  localization_status_talker_ =
-      node_->CreateWriter<LocalizationStatus>(localization_status_topic_);
+  localization_status_talker_ = node_->CreateWriter<LocalizationStatus>(localization_status_topic_);
   ACHECK(localization_status_talker_);
   return true;
 }
 
-bool RTKLocalizationComponent::Proc(
-    const std::shared_ptr<localization::Gps>& gps_msg) {
+bool RTKLocalizationComponent::Proc(const std::shared_ptr<localization::Gps>& gps_msg) {
   localization_->GpsCallback(gps_msg);
 
   if (localization_->IsServiceStarted()) {
@@ -100,8 +95,7 @@ bool RTKLocalizationComponent::Proc(
   return true;
 }
 
-void RTKLocalizationComponent::PublishPoseBroadcastTF(
-    const LocalizationEstimate& localization) {
+void RTKLocalizationComponent::PublishPoseBroadcastTF(const LocalizationEstimate& localization) {
   // broadcast tf message
   apollo::transform::TransformStamped tf2_msg;
 
@@ -124,8 +118,7 @@ void RTKLocalizationComponent::PublishPoseBroadcastTF(
   tf2_broadcaster_->SendTransform(tf2_msg);
 }
 
-void RTKLocalizationComponent::PublishPoseBroadcastTopic(
-    const LocalizationEstimate& localization) {
+void RTKLocalizationComponent::PublishPoseBroadcastTopic(const LocalizationEstimate& localization) {
   localization_talker_->Write(localization);
 }
 

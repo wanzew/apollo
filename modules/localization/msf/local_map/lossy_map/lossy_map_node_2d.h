@@ -25,7 +25,8 @@ namespace msf {
 
 class LossyMapNode2D : public BaseMapNode {
  public:
-  LossyMapNode2D() : BaseMapNode(new LossyMapMatrix2D(), new ZlibStrategy()) {}
+  LossyMapNode2D()
+      : BaseMapNode(new LossyMapMatrix2D(), new ZlibStrategy()) {}
   ~LossyMapNode2D() {}
 };
 

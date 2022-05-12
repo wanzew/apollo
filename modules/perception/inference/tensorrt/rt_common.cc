@@ -24,12 +24,11 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-nvinfer1::DimsCHW ReshapeDims(const nvinfer1::DimsCHW &dims,
-                              const nvinfer1::DimsCHW &inputDims) {
-  nvinfer1::DimsCHW outDims = inputDims;
-  int count = inputDims.d[0] * inputDims.d[1] * inputDims.d[2];
-  int constant = 1;
-  int axis_inference = -1;
+nvinfer1::DimsCHW ReshapeDims(const nvinfer1::DimsCHW& dims, const nvinfer1::DimsCHW& inputDims) {
+  nvinfer1::DimsCHW outDims        = inputDims;
+  int               count          = inputDims.d[0] * inputDims.d[1] * inputDims.d[2];
+  int               constant       = 1;
+  int               axis_inference = -1;
   for (int i = 0; i < inputDims.nbDims; ++i) {
     if (dims.d[i] == 0) {
       outDims.d[i] = inputDims.d[i];
@@ -38,17 +37,17 @@ nvinfer1::DimsCHW ReshapeDims(const nvinfer1::DimsCHW &dims,
       constant *= dims.d[i];
     } else if (dims.d[i] == -1) {
       CHECK_EQ(axis_inference, -1);
-      outDims.d[i] = count / constant;
+      outDims.d[i]   = count / constant;
       axis_inference = i;
     }
   }
   return outDims;
 }
 
-void ParseNetParam(const NetParameter &net_param,
-                   TensorDimsMap *tensor_dims_map,
-                   std::map<std::string, std::string> *tensor_modify_map,
-                   std::vector<LayerParameter> *order) {
+void ParseNetParam(const NetParameter&                 net_param,
+                   TensorDimsMap*                      tensor_dims_map,
+                   std::map<std::string, std::string>* tensor_modify_map,
+                   std::vector<LayerParameter>*        order) {
   for (int i = 0; i < net_param.layer_size(); ++i) {
     LayerParameter tensorrt_layer_param = net_param.layer(i);
     if (tensorrt_layer_param.type() == "Input") {
@@ -57,10 +56,9 @@ void ParseNetParam(const NetParameter &net_param,
         nvinfer1::DimsCHW dims{static_cast<int>(input.shape(j).dim(1)),
                                static_cast<int>(input.shape(j).dim(2)),
                                static_cast<int>(input.shape(j).dim(3))};
-        auto name = tensorrt_layer_param.top(j);
+        auto              name = tensorrt_layer_param.top(j);
         tensor_dims_map->insert(std::make_pair(name, dims));
-        tensor_modify_map->insert(
-            std::make_pair(name, tensorrt_layer_param.top(j)));
+        tensor_modify_map->insert(std::make_pair(name, tensorrt_layer_param.top(j)));
       }
     } else if (net_param.layer(i).type() == "Pooling") {
       if (tensorrt_layer_param.pooling_param().pad() == 0) {
@@ -71,7 +69,7 @@ void ParseNetParam(const NetParameter &net_param,
       fake_layer_param.set_type("Padding");
       fake_layer_param.set_name(absl::StrCat("padding_split_", i));
       fake_layer_param.clear_pooling_param();
-      auto pad_param = fake_layer_param.mutable_padding_param();
+      auto pad_param  = fake_layer_param.mutable_padding_param();
       auto pool_param = tensorrt_layer_param.mutable_pooling_param();
       modify_pool_param(pool_param);
       pad_param->set_pad_l(pool_param->pad_w());
@@ -90,29 +88,20 @@ void ParseNetParam(const NetParameter &net_param,
   }
 }
 
-bool ParserConvParam(const ConvolutionParameter &conv, ConvParam *param) {
+bool ParserConvParam(const ConvolutionParameter& conv, ConvParam* param) {
   if (conv.has_kernel_h() || conv.has_kernel_w()) {
-    if (conv.kernel_size_size() != 0) {
-      return false;
-    }
+    if (conv.kernel_size_size() != 0) { return false; }
     param->kernel_h = conv.kernel_h();
     param->kernel_w = conv.kernel_w();
   } else {
-    if (conv.kernel_size_size() < 1) {
-      return false;
-    }
+    if (conv.kernel_size_size() < 1) { return false; }
     param->kernel_h = conv.kernel_size(0);
-    param->kernel_w = (conv.kernel_size_size() > 1 ? conv.kernel_size(1)
-                                                   : conv.kernel_size(0));
+    param->kernel_w = (conv.kernel_size_size() > 1 ? conv.kernel_size(1) : conv.kernel_size(0));
   }
-  if (param->kernel_h == 0 || param->kernel_w == 0) {
-    return false;
-  }
+  if (param->kernel_h == 0 || param->kernel_w == 0) { return false; }
 
   if (conv.has_pad_h() || conv.has_pad_w()) {
-    if (conv.pad_size() != 0) {
-      return false;
-    }
+    if (conv.pad_size() != 0) { return false; }
     param->padding_h = conv.pad_h();
     param->padding_w = conv.pad_w();
   } else {
@@ -121,32 +110,25 @@ bool ParserConvParam(const ConvolutionParameter &conv, ConvParam *param) {
   }
 
   if (conv.has_stride_h() || conv.has_stride_w()) {
-    if (conv.stride_size() != 0) {
-      return false;
-    }
+    if (conv.stride_size() != 0) { return false; }
     param->stride_h = conv.stride_h();
     param->stride_w = conv.stride_w();
   } else {
     param->stride_h = (conv.stride().empty() ? 1 : conv.stride(0));
-    param->stride_w =
-        (conv.stride_size() > 1 ? conv.stride(1) : param->stride_h);
+    param->stride_w = (conv.stride_size() > 1 ? conv.stride(1) : param->stride_h);
   }
-  if (param->stride_h == 0 || param->stride_w == 0) {
-    return false;
-  }
+  if (param->stride_h == 0 || param->stride_w == 0) { return false; }
 
   param->dilation = conv.dilation().empty() ? 1 : conv.dilation(0);
   return true;
 }
 
-bool modify_pool_param(PoolingParameter *pool_param) {
+bool modify_pool_param(PoolingParameter* pool_param) {
   if (pool_param->has_kernel_size()) {
     pool_param->set_kernel_h(pool_param->kernel_size());
     pool_param->set_kernel_w(pool_param->kernel_size());
   }
-  if (pool_param->kernel_w() == 0 || pool_param->kernel_h() == 0) {
-    return false;
-  }
+  if (pool_param->kernel_w() == 0 || pool_param->kernel_h() == 0) { return false; }
   if (pool_param->has_pad()) {
     pool_param->set_pad_h(pool_param->pad());
     pool_param->set_pad_w(pool_param->pad());
@@ -155,9 +137,7 @@ bool modify_pool_param(PoolingParameter *pool_param) {
     pool_param->set_stride_h(pool_param->stride());
     pool_param->set_stride_w(pool_param->stride());
   }
-  if (pool_param->stride_w() == 0 || pool_param->stride_h() == 0) {
-    return false;
-  }
+  if (pool_param->stride_w() == 0 || pool_param->stride_h() == 0) { return false; }
   return true;
 }
 

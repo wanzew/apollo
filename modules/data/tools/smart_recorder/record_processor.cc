@@ -18,7 +18,6 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
 #include "modules/data/tools/smart_recorder/drive_event_trigger.h"
 #include "modules/data/tools/smart_recorder/emergency_mode_trigger.h"
 #include "modules/data/tools/smart_recorder/hard_brake_trigger.h"
@@ -37,8 +36,8 @@ using cyber::record::RecordWriter;
 
 RecordProcessor::RecordProcessor(const std::string& source_record_dir,
                                  const std::string& restored_output_dir)
-    : source_record_dir_(source_record_dir),
-      restored_output_dir_(restored_output_dir) {}
+    : source_record_dir_(source_record_dir)
+    , restored_output_dir_(restored_output_dir) {}
 
 bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   // Init input/output
@@ -58,10 +57,8 @@ bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   // Init writer
   static constexpr uint64_t kMBToKB = 1024UL;
   writer_.reset(new RecordWriter());
-  writer_->SetIntervalOfFileSegmentation(
-      trigger_conf.segment_setting().time_segment());
-  writer_->SetSizeOfFileSegmentation(
-      trigger_conf.segment_setting().size_segment() * kMBToKB);
+  writer_->SetIntervalOfFileSegmentation(trigger_conf.segment_setting().time_segment());
+  writer_->SetSizeOfFileSegmentation(trigger_conf.segment_setting().size_segment() * kMBToKB);
   const std::string output_file = GetDefaultOutputFile();
   AINFO << "output file path: " << output_file;
   if (!writer_->Open(output_file)) {
@@ -70,8 +67,8 @@ bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   }
   // Init intervals pool
   IntervalPool::Instance()->Reset();
-  IntervalPool::Instance()->SetIntervalEventLogFilePath(
-      trigger_conf.trigger_log_file_path(), GetFileName(restored_output_dir_));
+  IntervalPool::Instance()->SetIntervalEventLogFilePath(trigger_conf.trigger_log_file_path(),
+                                                        GetFileName(restored_output_dir_));
   return true;
 }
 
@@ -91,12 +88,9 @@ bool RecordProcessor::InitTriggers(const SmartRecordTrigger& trigger_conf) {
   return true;
 }
 
-bool RecordProcessor::ShouldRestore(
-    const cyber::record::RecordMessage& msg) const {
+bool RecordProcessor::ShouldRestore(const cyber::record::RecordMessage& msg) const {
   for (const auto& trigger : triggers_) {
-    if (trigger->ShouldRestore(msg)) {
-      return true;
-    }
+    if (trigger->ShouldRestore(msg)) { return true; }
   }
   return false;
 }

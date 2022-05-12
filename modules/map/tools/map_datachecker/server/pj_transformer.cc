@@ -50,11 +50,10 @@ PJTransformer::~PJTransformer() {
     pj_utm_ = nullptr;
   }
 }
-int PJTransformer::LatlongToUtm(int64_t point_count, int point_offset,
-                                double *x, double *y, double *z) {
+int PJTransformer::LatlongToUtm(
+    int64_t point_count, int point_offset, double* x, double* y, double* z) {
   if (!pj_latlong_ || !pj_utm_) {
-    AERROR << "pj_latlong_:" << pj_latlong_ << "pj_utm_:" << pj_utm_
-           << std::endl;
+    AERROR << "pj_latlong_:" << pj_latlong_ << "pj_utm_:" << pj_utm_ << std::endl;
     return -1;
   }
   return pj_transform(pj_latlong_, pj_utm_, point_count, point_offset, x, y, z);

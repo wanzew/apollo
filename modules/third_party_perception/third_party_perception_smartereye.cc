@@ -27,26 +27,22 @@ namespace third_party_perception {
 
 using apollo::perception::PerceptionObstacles;
 
-ThirdPartyPerceptionSmartereye::ThirdPartyPerceptionSmartereye(
-          apollo::cyber::Node* const node) :ThirdPartyPerception(node) {
-  smartereye_obstacles_reader_ =
-      node_->CreateReader<apollo::drivers::SmartereyeObstacles>(
+ThirdPartyPerceptionSmartereye::ThirdPartyPerceptionSmartereye(apollo::cyber::Node* const node)
+    : ThirdPartyPerception(node) {
+  smartereye_obstacles_reader_ = node_->CreateReader<apollo::drivers::SmartereyeObstacles>(
       FLAGS_smartereye_obstacles_topic,
-      [this](const std::shared_ptr<
-      apollo::drivers::SmartereyeObstacles> &message) {
+      [this](const std::shared_ptr<apollo::drivers::SmartereyeObstacles>& message) {
         OnSmartereye(*message.get());
       });
-  smartereye_lanemark_reader_ =
-      node_->CreateReader<apollo::drivers::SmartereyeLanemark>(
+  smartereye_lanemark_reader_ = node_->CreateReader<apollo::drivers::SmartereyeLanemark>(
       FLAGS_smartereye_lanemark_topic,
-      [this](const std::shared_ptr<
-      apollo::drivers::SmartereyeLanemark> &message) {
+      [this](const std::shared_ptr<apollo::drivers::SmartereyeLanemark>& message) {
         OnSmartereyeLanemark(*message.get());
       });
 }
 
 void ThirdPartyPerceptionSmartereye::OnSmartereye(
-              const apollo::drivers::SmartereyeObstacles& message) {
+    const apollo::drivers::SmartereyeObstacles& message) {
   ADEBUG << "Received smartereye data: run smartereye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   eye_obstacles_ = conversion_smartereye::SmartereyeToPerceptionObstacles(
@@ -54,14 +50,13 @@ void ThirdPartyPerceptionSmartereye::OnSmartereye(
 }
 
 void ThirdPartyPerceptionSmartereye::OnSmartereyeLanemark(
-              const apollo::drivers::SmartereyeLanemark& message) {
+    const apollo::drivers::SmartereyeLanemark& message) {
   ADEBUG << "Received smartereye data: run smartereye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   smartereye_lanemark_.CopyFrom(message);
 }
 
-bool ThirdPartyPerceptionSmartereye::Process(
-            PerceptionObstacles* const response) {
+bool ThirdPartyPerceptionSmartereye::Process(PerceptionObstacles* const response) {
   ADEBUG << "Timer is triggered: publish PerceptionObstacles";
   CHECK_NOTNULL(response);
 

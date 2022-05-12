@@ -50,23 +50,20 @@ void Adcmotioncontrol110::UpdateData(uint8_t* data) {
 
 void Adcmotioncontrol110::Reset() {
   // TODO(All) :  you should check this manually
-  adc_cmd_steerwheelangle_ = 0.0;
-  adc_cmd_steeringcontrolmode_ =
-      Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE;
-  adc_cmd_parkingbrake_ = false;
-  adc_cmd_gear_ = Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARK;
+  adc_cmd_steerwheelangle_     = 0.0;
+  adc_cmd_steeringcontrolmode_ = Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE;
+  adc_cmd_parkingbrake_        = false;
+  adc_cmd_gear_                = Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARK;
   adc_motioncontrol1_checksum_ = 0;
-  adc_cmd_brakepercentage_ = 0.0;
-  adc_cmd_throttleposition_ = 0.0;
-  adc_motioncontrol1_counter_ = 0;
-  adc_cmd_autonomyrequest_ =
-      Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_NOT_REQUESTED;
-  adc_cmd_longitudinalcontrolmode_ =
-      Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_NONE;
+  adc_cmd_brakepercentage_     = 0.0;
+  adc_cmd_throttleposition_    = 0.0;
+  adc_motioncontrol1_counter_  = 0;
+  adc_cmd_autonomyrequest_ = Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_NOT_REQUESTED;
+  adc_cmd_longitudinalcontrolmode_ = Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_NONE;
 }
 
-Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_steerwheelangle(
-    double adc_cmd_steerwheelangle) {
+Adcmotioncontrol110*
+Adcmotioncontrol110::set_adc_cmd_steerwheelangle(double adc_cmd_steerwheelangle) {
   adc_cmd_steerwheelangle_ = adc_cmd_steerwheelangle;
   return this;
 }
@@ -76,12 +73,11 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_steerwheelangle(
 // 'ADC_CMD_SteerWheelAngle', 'is_signed_var': True, 'physical_range':
 // '[-1638.4|1638.35]', 'bit': 27, 'type': 'double', 'order': 'intel',
 // 'physical_unit': 'deg'}
-void Adcmotioncontrol110::set_p_adc_cmd_steerwheelangle(
-    uint8_t* data, double adc_cmd_steerwheelangle) {
-  adc_cmd_steerwheelangle =
-      ProtocolData::BoundedValue(-1638.4, 1638.35, adc_cmd_steerwheelangle);
-  int x = static_cast<int>(adc_cmd_steerwheelangle / -0.050000);
-  uint8_t t = 0;
+void Adcmotioncontrol110::set_p_adc_cmd_steerwheelangle(uint8_t* data,
+                                                        double   adc_cmd_steerwheelangle) {
+  adc_cmd_steerwheelangle = ProtocolData::BoundedValue(-1638.4, 1638.35, adc_cmd_steerwheelangle);
+  int     x               = static_cast<int>(adc_cmd_steerwheelangle / -0.050000);
+  uint8_t t               = 0;
 
   t = static_cast<uint8_t>(x & 0x1F);
   Byte to_set0(data + 3);
@@ -99,8 +95,7 @@ void Adcmotioncontrol110::set_p_adc_cmd_steerwheelangle(
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_steeringcontrolmode(
-    Adc_motioncontrol1_10::Adc_cmd_steeringcontrolmodeType
-        adc_cmd_steeringcontrolmode) {
+    Adc_motioncontrol1_10::Adc_cmd_steeringcontrolmodeType adc_cmd_steeringcontrolmode) {
   adc_cmd_steeringcontrolmode_ = adc_cmd_steeringcontrolmode;
   return this;
 }
@@ -113,16 +108,15 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_steeringcontrolmode(
 // 'physical_range': '[0|3]', 'bit': 4, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
 void Adcmotioncontrol110::set_p_adc_cmd_steeringcontrolmode(
-    uint8_t* data, Adc_motioncontrol1_10::Adc_cmd_steeringcontrolmodeType
-                       adc_cmd_steeringcontrolmode) {
+    uint8_t*                                               data,
+    Adc_motioncontrol1_10::Adc_cmd_steeringcontrolmodeType adc_cmd_steeringcontrolmode) {
   int x = adc_cmd_steeringcontrolmode;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 4, 2);
 }
 
-Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_parkingbrake(
-    bool adc_cmd_parkingbrake) {
+Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_parkingbrake(bool adc_cmd_parkingbrake) {
   adc_cmd_parkingbrake_ = adc_cmd_parkingbrake;
   return this;
 }
@@ -131,16 +125,15 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_parkingbrake(
 // 0.0, 'precision': 1.0, 'len': 1, 'name': 'ADC_CMD_ParkingBrake',
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 53, 'type': 'bool',
 // 'order': 'intel', 'physical_unit': 'T/F'}
-void Adcmotioncontrol110::set_p_adc_cmd_parkingbrake(
-    uint8_t* data, bool adc_cmd_parkingbrake) {
+void Adcmotioncontrol110::set_p_adc_cmd_parkingbrake(uint8_t* data, bool adc_cmd_parkingbrake) {
   int x = adc_cmd_parkingbrake;
 
   Byte to_set(data + 6);
   to_set.set_value(static_cast<uint8_t>(x), 5, 1);
 }
 
-Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_gear(
-    Adc_motioncontrol1_10::Adc_cmd_gearType adc_cmd_gear) {
+Adcmotioncontrol110*
+Adcmotioncontrol110::set_adc_cmd_gear(Adc_motioncontrol1_10::Adc_cmd_gearType adc_cmd_gear) {
   adc_cmd_gear_ = adc_cmd_gear;
   return this;
 }
@@ -151,16 +144,16 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_gear(
 // 'ADC_CMD_GEAR_R_REVERSE'}, 'precision': 1.0, 'len': 3, 'name':
 // 'ADC_CMD_Gear', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
 // '[0|7]', 'bit': 50, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-void Adcmotioncontrol110::set_p_adc_cmd_gear(
-    uint8_t* data, Adc_motioncontrol1_10::Adc_cmd_gearType adc_cmd_gear) {
+void Adcmotioncontrol110::set_p_adc_cmd_gear(uint8_t*                                data,
+                                             Adc_motioncontrol1_10::Adc_cmd_gearType adc_cmd_gear) {
   int x = adc_cmd_gear;
 
   Byte to_set(data + 6);
   to_set.set_value(static_cast<uint8_t>(x), 2, 3);
 }
 
-Adcmotioncontrol110* Adcmotioncontrol110::set_adc_motioncontrol1_checksum(
-    int adc_motioncontrol1_checksum) {
+Adcmotioncontrol110*
+Adcmotioncontrol110::set_adc_motioncontrol1_checksum(int adc_motioncontrol1_checksum) {
   adc_motioncontrol1_checksum_ = adc_motioncontrol1_checksum;
   return this;
 }
@@ -169,18 +162,17 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_motioncontrol1_checksum(
 // 'precision': 1.0, 'len': 8, 'name': 'ADC_MotionControl1_Checksum',
 // 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type':
 // 'int', 'order': 'intel', 'physical_unit': ''}
-void Adcmotioncontrol110::set_p_adc_motioncontrol1_checksum(
-    uint8_t* data, int adc_motioncontrol1_checksum) {
-  adc_motioncontrol1_checksum =
-      ProtocolData::BoundedValue(0, 255, adc_motioncontrol1_checksum);
-  int x = adc_motioncontrol1_checksum;
+void Adcmotioncontrol110::set_p_adc_motioncontrol1_checksum(uint8_t* data,
+                                                            int      adc_motioncontrol1_checksum) {
+  adc_motioncontrol1_checksum = ProtocolData::BoundedValue(0, 255, adc_motioncontrol1_checksum);
+  int x                       = adc_motioncontrol1_checksum;
 
   Byte to_set(data + 7);
   to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
-Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_brakepercentage(
-    double adc_cmd_brakepercentage) {
+Adcmotioncontrol110*
+Adcmotioncontrol110::set_adc_cmd_brakepercentage(double adc_cmd_brakepercentage) {
   adc_cmd_brakepercentage_ = adc_cmd_brakepercentage;
   return this;
 }
@@ -190,12 +182,11 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_brakepercentage(
 // 'ADC_CMD_BrakePercentage', 'is_signed_var': False, 'physical_range':
 // '[0|113.8132]', 'bit': 6, 'type': 'double', 'order': 'intel',
 // 'physical_unit': '%'}
-void Adcmotioncontrol110::set_p_adc_cmd_brakepercentage(
-    uint8_t* data, double adc_cmd_brakepercentage) {
-  adc_cmd_brakepercentage =
-      ProtocolData::BoundedValue(0.0, 113.8132, adc_cmd_brakepercentage);
-  int x = static_cast<int>(adc_cmd_brakepercentage / 0.055600);
-  uint8_t t = 0;
+void Adcmotioncontrol110::set_p_adc_cmd_brakepercentage(uint8_t* data,
+                                                        double   adc_cmd_brakepercentage) {
+  adc_cmd_brakepercentage = ProtocolData::BoundedValue(0.0, 113.8132, adc_cmd_brakepercentage);
+  int     x               = static_cast<int>(adc_cmd_brakepercentage / 0.055600);
+  uint8_t t               = 0;
 
   t = static_cast<uint8_t>(x & 0x3);
   Byte to_set0(data + 0);
@@ -212,8 +203,8 @@ void Adcmotioncontrol110::set_p_adc_cmd_brakepercentage(
   to_set2.set_value(t, 0, 1);
 }
 
-Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_throttleposition(
-    double adc_cmd_throttleposition) {
+Adcmotioncontrol110*
+Adcmotioncontrol110::set_adc_cmd_throttleposition(double adc_cmd_throttleposition) {
   adc_cmd_throttleposition_ = adc_cmd_throttleposition;
   return this;
 }
@@ -223,12 +214,11 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_throttleposition(
 // 'ADC_CMD_ThrottlePosition', 'is_signed_var': False, 'physical_range':
 // '[0|100]', 'bit': 17, 'type': 'double', 'order': 'intel', 'physical_unit':
 // '%'}
-void Adcmotioncontrol110::set_p_adc_cmd_throttleposition(
-    uint8_t* data, double adc_cmd_throttleposition) {
-  adc_cmd_throttleposition =
-      ProtocolData::BoundedValue(0.0, 100.0, adc_cmd_throttleposition);
-  int x = static_cast<int>(adc_cmd_throttleposition / 0.100000);
-  uint8_t t = 0;
+void Adcmotioncontrol110::set_p_adc_cmd_throttleposition(uint8_t* data,
+                                                         double   adc_cmd_throttleposition) {
+  adc_cmd_throttleposition = ProtocolData::BoundedValue(0.0, 100.0, adc_cmd_throttleposition);
+  int     x                = static_cast<int>(adc_cmd_throttleposition / 0.100000);
+  uint8_t t                = 0;
 
   t = static_cast<uint8_t>(x & 0x7F);
   Byte to_set0(data + 2);
@@ -240,8 +230,8 @@ void Adcmotioncontrol110::set_p_adc_cmd_throttleposition(
   to_set1.set_value(t, 0, 3);
 }
 
-Adcmotioncontrol110* Adcmotioncontrol110::set_adc_motioncontrol1_counter(
-    int adc_motioncontrol1_counter) {
+Adcmotioncontrol110*
+Adcmotioncontrol110::set_adc_motioncontrol1_counter(int adc_motioncontrol1_counter) {
   adc_motioncontrol1_counter_ = adc_motioncontrol1_counter;
   return this;
 }
@@ -250,19 +240,17 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_motioncontrol1_counter(
 // 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':
 // 'ADC_MotionControl1_Counter', 'is_signed_var': False, 'physical_range':
 // '[0|3]', 'bit': 54, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
-void Adcmotioncontrol110::set_p_adc_motioncontrol1_counter(
-    uint8_t* data, int adc_motioncontrol1_counter) {
-  adc_motioncontrol1_counter =
-      ProtocolData::BoundedValue(0, 3, adc_motioncontrol1_counter);
-  int x = adc_motioncontrol1_counter;
+void Adcmotioncontrol110::set_p_adc_motioncontrol1_counter(uint8_t* data,
+                                                           int      adc_motioncontrol1_counter) {
+  adc_motioncontrol1_counter = ProtocolData::BoundedValue(0, 3, adc_motioncontrol1_counter);
+  int x                      = adc_motioncontrol1_counter;
 
   Byte to_set(data + 6);
   to_set.set_value(static_cast<uint8_t>(x), 6, 2);
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_autonomyrequest(
-    Adc_motioncontrol1_10::Adc_cmd_autonomyrequestType
-        adc_cmd_autonomyrequest) {
+    Adc_motioncontrol1_10::Adc_cmd_autonomyrequestType adc_cmd_autonomyrequest) {
   adc_cmd_autonomyrequest_ = adc_cmd_autonomyrequest;
   return this;
 }
@@ -275,8 +263,7 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_autonomyrequest(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 void Adcmotioncontrol110::set_p_adc_cmd_autonomyrequest(
-    uint8_t* data, Adc_motioncontrol1_10::Adc_cmd_autonomyrequestType
-                       adc_cmd_autonomyrequest) {
+    uint8_t* data, Adc_motioncontrol1_10::Adc_cmd_autonomyrequestType adc_cmd_autonomyrequest) {
   int x = adc_cmd_autonomyrequest;
 
   Byte to_set(data + 0);
@@ -284,8 +271,7 @@ void Adcmotioncontrol110::set_p_adc_cmd_autonomyrequest(
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_longitudinalcontrolmode(
-    Adc_motioncontrol1_10::Adc_cmd_longitudinalcontrolmodeType
-        adc_cmd_longitudinalcontrolmode) {
+    Adc_motioncontrol1_10::Adc_cmd_longitudinalcontrolmodeType adc_cmd_longitudinalcontrolmode) {
   adc_cmd_longitudinalcontrolmode_ = adc_cmd_longitudinalcontrolmode;
   return this;
 }
@@ -299,8 +285,8 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_longitudinalcontrolmode(
 // 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 2, 'type': 'enum', 'order':
 // 'intel', 'physical_unit': ''}
 void Adcmotioncontrol110::set_p_adc_cmd_longitudinalcontrolmode(
-    uint8_t* data, Adc_motioncontrol1_10::Adc_cmd_longitudinalcontrolmodeType
-                       adc_cmd_longitudinalcontrolmode) {
+    uint8_t*                                                   data,
+    Adc_motioncontrol1_10::Adc_cmd_longitudinalcontrolmodeType adc_cmd_longitudinalcontrolmode) {
   int x = adc_cmd_longitudinalcontrolmode;
 
   Byte to_set(data + 0);

@@ -31,64 +31,50 @@ Vcuvehiclefaultresponse201::Vcuvehiclefaultresponse201() {}
 const int32_t Vcuvehiclefaultresponse201::ID = 0x201;
 
 void Vcuvehiclefaultresponse201::Parse(const std::uint8_t* bytes,
-                                       int32_t length,
-                                       ChassisDetail* chassis) const {
+                                       int32_t             length,
+                                       ChassisDetail*      chassis) const {
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_vehicle_error_indicationsvcu(
-          vehicle_error_indicationsvcu(bytes, length));
+      ->set_vehicle_error_indicationsvcu(vehicle_error_indicationsvcu(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
       ->set_brake_system_errorehb(brake_system_errorehb(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_vehicle_fault_response_201()->set_eps_error(
+      eps_error(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_vehicle_fault_response_201()->set_motor_error(
+      motor_error(bytes, length));
+  chassis->mutable_neolix_edu()->mutable_vcu_vehicle_fault_response_201()->set_epb_error(
+      epb_error(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_eps_error(eps_error(bytes, length));
+      ->set_high_voltage_battery_errorbcu(high_voltage_battery_errorbcu(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_motor_error(motor_error(bytes, length));
+      ->set_automode_exit_reason_losscommuni(automode_exit_reason_losscommuni(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_epb_error(epb_error(bytes, length));
+      ->set_automode_exit_reason_reqsignalno(automode_exit_reason_reqsignalno(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_high_voltage_battery_errorbcu(
-          high_voltage_battery_errorbcu(bytes, length));
+      ->set_automode_exit_reason_low_power(automode_exit_reason_low_power(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_automode_exit_reason_losscommuni(
-          automode_exit_reason_losscommuni(bytes, length));
+      ->set_automode_exit_reason_highvolt(automode_exit_reason_highvolt(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_automode_exit_reason_reqsignalno(
-          automode_exit_reason_reqsignalno(bytes, length));
+      ->set_automode_exit_reason_vehicle_flt(automode_exit_reason_vehicle_flt(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_automode_exit_reason_low_power(
-          automode_exit_reason_low_power(bytes, length));
+      ->set_automode_exit_reason_press_emerg(automode_exit_reason_press_emerg(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_automode_exit_reason_highvolt(
-          automode_exit_reason_highvolt(bytes, length));
+      ->set_automode_exit_reason_press_remot(automode_exit_reason_press_remot(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_automode_exit_reason_vehicle_flt(
-          automode_exit_reason_vehicle_flt(bytes, length));
+      ->set_automode_exit_reason_pdu_control(automode_exit_reason_pdu_control(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
-      ->set_automode_exit_reason_press_emerg(
-          automode_exit_reason_press_emerg(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_vehicle_fault_response_201()
-      ->set_automode_exit_reason_press_remot(
-          automode_exit_reason_press_remot(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_vehicle_fault_response_201()
-      ->set_automode_exit_reason_pdu_control(
-          automode_exit_reason_pdu_control(bytes, length));
-  chassis->mutable_neolix_edu()
-      ->mutable_vcu_vehicle_fault_response_201()
-      ->set_vcu_faultrept_alivecounter(
-          vcu_faultrept_alivecounter(bytes, length));
+      ->set_vcu_faultrept_alivecounter(vcu_faultrept_alivecounter(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_vehicle_fault_response_201()
       ->set_vcu_faultrept_checksum(vcu_faultrept_checksum(bytes, length));
@@ -99,9 +85,9 @@ void Vcuvehiclefaultresponse201::Parse(const std::uint8_t* bytes,
 // 0.0, 'precision': 1.0, 'len': 4, 'name': 'vehicle_error_indicationsvcu',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 3, 'type': 'int',
 // 'order': 'motorola', 'physical_unit': ''}
-int Vcuvehiclefaultresponse201::vehicle_error_indicationsvcu(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+int Vcuvehiclefaultresponse201::vehicle_error_indicationsvcu(const std::uint8_t* bytes,
+                                                             int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 4);
 
   int ret = x;
@@ -114,8 +100,8 @@ int Vcuvehiclefaultresponse201::vehicle_error_indicationsvcu(
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int',
 // 'order': 'motorola', 'physical_unit': ''}
 int Vcuvehiclefaultresponse201::brake_system_errorehb(const std::uint8_t* bytes,
-                                                      int32_t length) const {
-  Byte t0(bytes + 0);
+                                                      int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(4, 4);
 
   int ret = x;
@@ -127,9 +113,8 @@ int Vcuvehiclefaultresponse201::brake_system_errorehb(const std::uint8_t* bytes,
 // 0.0, 'precision': 1.0, 'len': 4, 'name': 'eps_error', 'is_signed_var': False,
 // 'physical_range': '[0|0]', 'bit': 11, 'type': 'int', 'order': 'motorola',
 // 'physical_unit': ''}
-int Vcuvehiclefaultresponse201::eps_error(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 1);
+int Vcuvehiclefaultresponse201::eps_error(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 4);
 
   int ret = x;
@@ -141,9 +126,8 @@ int Vcuvehiclefaultresponse201::eps_error(const std::uint8_t* bytes,
 // 0.0, 'precision': 1.0, 'len': 4, 'name': 'motor_error', 'is_signed_var':
 // False, 'physical_range': '[0|0]', 'bit': 15, 'type': 'int', 'order':
 // 'motorola', 'physical_unit': ''}
-int Vcuvehiclefaultresponse201::motor_error(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 1);
+int Vcuvehiclefaultresponse201::motor_error(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(4, 4);
 
   int ret = x;
@@ -155,9 +139,8 @@ int Vcuvehiclefaultresponse201::motor_error(const std::uint8_t* bytes,
 // 0.0, 'precision': 1.0, 'len': 4, 'name': 'epb_error', 'is_signed_var': False,
 // 'physical_range': '[0|0]', 'bit': 19, 'type': 'int', 'order': 'motorola',
 // 'physical_unit': ''}
-int Vcuvehiclefaultresponse201::epb_error(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 2);
+int Vcuvehiclefaultresponse201::epb_error(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 4);
 
   int ret = x;
@@ -169,9 +152,9 @@ int Vcuvehiclefaultresponse201::epb_error(const std::uint8_t* bytes,
 // 0.0, 'precision': 1.0, 'len': 4, 'name': 'high_voltage_battery_errorbcu',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 23, 'type': 'int',
 // 'order': 'motorola', 'physical_unit': ''}
-int Vcuvehiclefaultresponse201::high_voltage_battery_errorbcu(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+int Vcuvehiclefaultresponse201::high_voltage_battery_errorbcu(const std::uint8_t* bytes,
+                                                              int32_t             length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(4, 4);
 
   int ret = x;
@@ -182,9 +165,9 @@ int Vcuvehiclefaultresponse201::high_voltage_battery_errorbcu(
 // 'precision': 1.0, 'len': 1, 'name': 'automode_exit_reason_losscommuni',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 32, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Vcuvehiclefaultresponse201::automode_exit_reason_losscommuni(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcuvehiclefaultresponse201::automode_exit_reason_losscommuni(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;
@@ -195,9 +178,9 @@ bool Vcuvehiclefaultresponse201::automode_exit_reason_losscommuni(
 // 'precision': 1.0, 'len': 1, 'name': 'automode_exit_reason_reqsignalno',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 33, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Vcuvehiclefaultresponse201::automode_exit_reason_reqsignalno(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcuvehiclefaultresponse201::automode_exit_reason_reqsignalno(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(1, 1);
 
   bool ret = x;
@@ -208,9 +191,9 @@ bool Vcuvehiclefaultresponse201::automode_exit_reason_reqsignalno(
 // 'precision': 1.0, 'len': 1, 'name': 'automode_exit_reason_low_power',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 34, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Vcuvehiclefaultresponse201::automode_exit_reason_low_power(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcuvehiclefaultresponse201::automode_exit_reason_low_power(const std::uint8_t* bytes,
+                                                                int32_t             length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -221,9 +204,9 @@ bool Vcuvehiclefaultresponse201::automode_exit_reason_low_power(
 // 'precision': 1.0, 'len': 1, 'name': 'automode_exit_reason_highvolt',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 35, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Vcuvehiclefaultresponse201::automode_exit_reason_highvolt(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcuvehiclefaultresponse201::automode_exit_reason_highvolt(const std::uint8_t* bytes,
+                                                               int32_t             length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -234,9 +217,9 @@ bool Vcuvehiclefaultresponse201::automode_exit_reason_highvolt(
 // 'precision': 1.0, 'len': 1, 'name': 'automode_exit_reason_vehicle_flt',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 36, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Vcuvehiclefaultresponse201::automode_exit_reason_vehicle_flt(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcuvehiclefaultresponse201::automode_exit_reason_vehicle_flt(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(4, 1);
 
   bool ret = x;
@@ -247,9 +230,9 @@ bool Vcuvehiclefaultresponse201::automode_exit_reason_vehicle_flt(
 // 'precision': 1.0, 'len': 1, 'name': 'automode_exit_reason_press_emerg',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 37, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Vcuvehiclefaultresponse201::automode_exit_reason_press_emerg(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcuvehiclefaultresponse201::automode_exit_reason_press_emerg(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(5, 1);
 
   bool ret = x;
@@ -260,9 +243,9 @@ bool Vcuvehiclefaultresponse201::automode_exit_reason_press_emerg(
 // 'precision': 1.0, 'len': 1, 'name': 'automode_exit_reason_press_remot',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 38, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Vcuvehiclefaultresponse201::automode_exit_reason_press_remot(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcuvehiclefaultresponse201::automode_exit_reason_press_remot(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(6, 1);
 
   bool ret = x;
@@ -273,9 +256,9 @@ bool Vcuvehiclefaultresponse201::automode_exit_reason_press_remot(
 // 'precision': 1.0, 'len': 1, 'name': 'automode_exit_reason_pdu_control',
 // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 39, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Vcuvehiclefaultresponse201::automode_exit_reason_pdu_control(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 4);
+bool Vcuvehiclefaultresponse201::automode_exit_reason_pdu_control(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(7, 1);
 
   bool ret = x;
@@ -285,9 +268,9 @@ bool Vcuvehiclefaultresponse201::automode_exit_reason_pdu_control(
 // config detail: {'name': 'vcu_faultrept_alivecounter', 'offset': 0.0,
 // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Vcuvehiclefaultresponse201::vcu_faultrept_alivecounter(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 6);
+int Vcuvehiclefaultresponse201::vcu_faultrept_alivecounter(const std::uint8_t* bytes,
+                                                           int32_t             length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 4);
 
   int ret = x;
@@ -297,9 +280,9 @@ int Vcuvehiclefaultresponse201::vcu_faultrept_alivecounter(
 // config detail: {'name': 'vcu_faultrept_checksum', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-int Vcuvehiclefaultresponse201::vcu_faultrept_checksum(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+int Vcuvehiclefaultresponse201::vcu_faultrept_checksum(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;

@@ -29,11 +29,11 @@ class NodeSRange {
   NodeSRange(double s1, double s2);
   virtual ~NodeSRange() = default;
 
-  bool operator<(const NodeSRange& other) const;
-  bool IsValid() const;
+  bool   operator<(const NodeSRange& other) const;
+  bool   IsValid() const;
   double StartS() const;
   double EndS() const;
-  bool IsEnoughForChangeLane() const;
+  bool   IsEnoughForChangeLane() const;
   double Length() const;
 
   void SetStartS(double start_s);
@@ -42,7 +42,7 @@ class NodeSRange {
 
  private:
   double start_s_ = 0.0;
-  double end_s_ = 0.0;
+  double end_s_   = 0.0;
 };
 
 }  // namespace routing

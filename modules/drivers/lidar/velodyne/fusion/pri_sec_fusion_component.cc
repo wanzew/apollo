@@ -41,13 +41,11 @@ bool PriSecFusionComponent::Init() {
   return true;
 }
 
-bool PriSecFusionComponent::Proc(
-    const std::shared_ptr<PointCloud>& point_cloud) {
-  auto target = std::make_shared<PointCloud>(*point_cloud);
+bool PriSecFusionComponent::Proc(const std::shared_ptr<PointCloud>& point_cloud) {
+  auto target         = std::make_shared<PointCloud>(*point_cloud);
   auto fusion_readers = readers_;
-  auto start_time = Time::Now().ToSecond();
-  while ((Time::Now().ToSecond() - start_time) < conf_.wait_time_s() &&
-         fusion_readers.size() > 0) {
+  auto start_time     = Time::Now().ToSecond();
+  while ((Time::Now().ToSecond() - start_time) < conf_.wait_time_s() && fusion_readers.size() > 0) {
     for (auto itr = fusion_readers.begin(); itr != fusion_readers.end();) {
       (*itr)->Observe();
       if (!(*itr)->Empty()) {
@@ -71,19 +69,18 @@ bool PriSecFusionComponent::Proc(
   return true;
 }
 
-bool PriSecFusionComponent::IsExpired(
-    const std::shared_ptr<PointCloud>& target,
-    const std::shared_ptr<PointCloud>& source) {
+bool PriSecFusionComponent::IsExpired(const std::shared_ptr<PointCloud>& target,
+                                      const std::shared_ptr<PointCloud>& source) {
   auto diff = target->measurement_time() - source->measurement_time();
   return diff * 1000 > conf_.max_interval_ms();
 }
 
 bool PriSecFusionComponent::QueryPoseAffine(const std::string& target_frame_id,
                                             const std::string& source_frame_id,
-                                            Eigen::Affine3d* pose) {
+                                            Eigen::Affine3d*   pose) {
   std::string err_string;
-  if (!buffer_ptr_->canTransform(target_frame_id, source_frame_id,
-                                 cyber::Time(0), 0.02f, &err_string)) {
+  if (!buffer_ptr_->canTransform(target_frame_id, source_frame_id, cyber::Time(0), 0.02f,
+                                 &err_string)) {
     AERROR << "Can not find transform. "
            << "target_id:" << target_frame_id << " frame_id:" << source_frame_id
            << " Error info: " << err_string;
@@ -91,26 +88,25 @@ bool PriSecFusionComponent::QueryPoseAffine(const std::string& target_frame_id,
   }
   apollo::transform::TransformStamped stamped_transform;
   try {
-    stamped_transform = buffer_ptr_->lookupTransform(
-        target_frame_id, source_frame_id, cyber::Time(0));
+    stamped_transform =
+        buffer_ptr_->lookupTransform(target_frame_id, source_frame_id, cyber::Time(0));
   } catch (tf2::TransformException& ex) {
     AERROR << ex.what();
     return false;
   }
-  *pose =
-      Eigen::Translation3d(stamped_transform.transform().translation().x(),
-                           stamped_transform.transform().translation().y(),
-                           stamped_transform.transform().translation().z()) *
-      Eigen::Quaterniond(stamped_transform.transform().rotation().qw(),
-                         stamped_transform.transform().rotation().qx(),
-                         stamped_transform.transform().rotation().qy(),
-                         stamped_transform.transform().rotation().qz());
+  *pose = Eigen::Translation3d(stamped_transform.transform().translation().x(),
+                               stamped_transform.transform().translation().y(),
+                               stamped_transform.transform().translation().z()) *
+          Eigen::Quaterniond(stamped_transform.transform().rotation().qw(),
+                             stamped_transform.transform().rotation().qx(),
+                             stamped_transform.transform().rotation().qy(),
+                             stamped_transform.transform().rotation().qz());
   return true;
 }
 
-void PriSecFusionComponent::AppendPointCloud(
-    std::shared_ptr<PointCloud> point_cloud,
-    std::shared_ptr<PointCloud> point_cloud_add, const Eigen::Affine3d& pose) {
+void PriSecFusionComponent::AppendPointCloud(std::shared_ptr<PointCloud> point_cloud,
+                                             std::shared_ptr<PointCloud> point_cloud_add,
+                                             const Eigen::Affine3d&      pose) {
   if (std::isnan(pose(0, 0))) {
     for (auto& point : point_cloud_add->point()) {
       PointXYZIT* point_new = point_cloud->add_point();
@@ -134,15 +130,15 @@ void PriSecFusionComponent::AppendPointCloud(
         point_new->set_intensity(point.intensity());
         point_new->set_timestamp(point.timestamp());
         Eigen::Matrix<float, 3, 1> pt(point.x(), point.y(), point.z());
-        point_new->set_x(static_cast<float>(
-            pose(0, 0) * pt.coeffRef(0) + pose(0, 1) * pt.coeffRef(1) +
-            pose(0, 2) * pt.coeffRef(2) + pose(0, 3)));
-        point_new->set_y(static_cast<float>(
-            pose(1, 0) * pt.coeffRef(0) + pose(1, 1) * pt.coeffRef(1) +
-            pose(1, 2) * pt.coeffRef(2) + pose(1, 3)));
-        point_new->set_z(static_cast<float>(
-            pose(2, 0) * pt.coeffRef(0) + pose(2, 1) * pt.coeffRef(1) +
-            pose(2, 2) * pt.coeffRef(2) + pose(2, 3)));
+        point_new->set_x(static_cast<float>(pose(0, 0) * pt.coeffRef(0) +
+                                            pose(0, 1) * pt.coeffRef(1) +
+                                            pose(0, 2) * pt.coeffRef(2) + pose(0, 3)));
+        point_new->set_y(static_cast<float>(pose(1, 0) * pt.coeffRef(0) +
+                                            pose(1, 1) * pt.coeffRef(1) +
+                                            pose(1, 2) * pt.coeffRef(2) + pose(1, 3)));
+        point_new->set_z(static_cast<float>(pose(2, 0) * pt.coeffRef(0) +
+                                            pose(2, 1) * pt.coeffRef(1) +
+                                            pose(2, 2) * pt.coeffRef(2) + pose(2, 3)));
       }
     }
   }
@@ -154,8 +150,7 @@ void PriSecFusionComponent::AppendPointCloud(
 bool PriSecFusionComponent::Fusion(std::shared_ptr<PointCloud> target,
                                    std::shared_ptr<PointCloud> source) {
   Eigen::Affine3d pose;
-  if (QueryPoseAffine(target->header().frame_id(), source->header().frame_id(),
-                      &pose)) {
+  if (QueryPoseAffine(target->header().frame_id(), source->header().frame_id(), &pose)) {
     AppendPointCloud(target, source, pose);
     return true;
   }

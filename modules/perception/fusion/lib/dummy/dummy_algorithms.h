@@ -32,38 +32,39 @@ namespace fusion {
 
 class DummyFusionSystem : public BaseFusionSystem {
  public:
-  DummyFusionSystem() = default;
-  ~DummyFusionSystem() = default;
+  DummyFusionSystem()                         = default;
+  ~DummyFusionSystem()                        = default;
   DummyFusionSystem(const DummyFusionSystem&) = delete;
   DummyFusionSystem& operator=(const DummyFusionSystem&) = delete;
 
-  bool Init(const FusionInitOptions& options) override;
+  bool        Init(const FusionInitOptions& options) override;
   std::string Name() const override { return "DummyFusionSystem"; }
 
-  bool Fuse(const FusionOptions& options,
-            const base::FrameConstPtr& sensor_frame,
+  bool Fuse(const FusionOptions&          options,
+            const base::FrameConstPtr&    sensor_frame,
             std::vector<base::ObjectPtr>* fused_objects) override;
 };
 
 class DummyDataAssociation : public BaseDataAssociation {
  public:
-  DummyDataAssociation() = default;
-  ~DummyDataAssociation() = default;
+  DummyDataAssociation()                            = default;
+  ~DummyDataAssociation()                           = default;
   DummyDataAssociation(const DummyDataAssociation&) = delete;
   DummyDataAssociation& operator=(const DummyDataAssociation&) = delete;
 
   bool Init() override;
   bool Associate(const AssociationOptions& options,
-                 SensorFramePtr sensor_measurements, ScenePtr scene,
-                 AssociationResult* association_result) override;
+                 SensorFramePtr            sensor_measurements,
+                 ScenePtr                  scene,
+                 AssociationResult*        association_result) override;
 
   std::string Name() const override { return "DummyDataAssociation"; }
 };
 
 class DummyTracker : public BaseTracker {
  public:
-  DummyTracker() = default;
-  ~DummyTracker() = default;
+  DummyTracker()                    = default;
+  ~DummyTracker()                   = default;
   DummyTracker(const DummyTracker&) = delete;
   DummyTracker& operator=(const DummyTracker&) = delete;
 
@@ -71,12 +72,12 @@ class DummyTracker : public BaseTracker {
 
   void UpdateWithMeasurement(const TrackerOptions& options,
                              const SensorObjectPtr measurement,
-                             double target_timestamp) override;
+                             double                target_timestamp) override;
 
   void UpdateWithoutMeasurement(const TrackerOptions& options,
-                                const std::string& sensor_id,
-                                double measurement_timestamp,
-                                double target_timestamp) override;
+                                const std::string&    sensor_id,
+                                double                measurement_timestamp,
+                                double                target_timestamp) override;
 
   std::string Name() const override { return "DummyTracker"; }
 };

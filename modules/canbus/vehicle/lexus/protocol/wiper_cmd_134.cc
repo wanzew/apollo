@@ -46,10 +46,10 @@ void Wipercmd134::UpdateData(uint8_t* data) {
 void Wipercmd134::Reset() {
   // TODO(QiL) you should check this manually
   ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
-  wiper_cmd_ = Wiper_cmd_134::WIPER_CMD_WIPERS_OFF;
-  clear_faults_ = false;
+  enable_           = false;
+  clear_override_   = false;
+  wiper_cmd_        = Wiper_cmd_134::WIPER_CMD_WIPERS_OFF;
+  clear_faults_     = false;
 }
 
 Wipercmd134* Wipercmd134::set_ignore_overrides(bool ignore_overrides) {
@@ -97,8 +97,7 @@ void Wipercmd134::set_p_clear_override(uint8_t* data, bool clear_override) {
   to_set.set_value(x, 2, 1);
 }
 
-Wipercmd134* Wipercmd134::set_wiper_cmd(
-    Wiper_cmd_134::Wiper_cmdType wiper_cmd) {
+Wipercmd134* Wipercmd134::set_wiper_cmd(Wiper_cmd_134::Wiper_cmdType wiper_cmd) {
   wiper_cmd_ = wiper_cmd;
   return this;
 }
@@ -110,8 +109,7 @@ Wipercmd134* Wipercmd134::set_wiper_cmd(
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|7]', 'bit': 15, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Wipercmd134::set_p_wiper_cmd(uint8_t* data,
-                                  Wiper_cmd_134::Wiper_cmdType wiper_cmd) {
+void Wipercmd134::set_p_wiper_cmd(uint8_t* data, Wiper_cmd_134::Wiper_cmdType wiper_cmd) {
   uint8_t x = wiper_cmd;
 
   Byte to_set(data + 1);

@@ -26,10 +26,10 @@ namespace apollo {
 namespace planning {
 
 TEST(AutotuningSpeedFeatureBuilder, test_case_two) {
-  AutotuningSpeedFeatureBuilder feature_builder;
-  autotuning::TrajectoryRawFeature raw_feature;
-  autotuning::TrajectoryPointRawFeature raw_point_feature;
-  autotuning::TrajectoryFeature input_feature;
+  AutotuningSpeedFeatureBuilder          feature_builder;
+  autotuning::TrajectoryRawFeature       raw_feature;
+  autotuning::TrajectoryPointRawFeature  raw_point_feature;
+  autotuning::TrajectoryFeature          input_feature;
   autotuning::TrajectoryPointwiseFeature point_feature;
   auto status = feature_builder.BuildFeature(raw_feature, &input_feature);
   EXPECT_TRUE(status.ok());

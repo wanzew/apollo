@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/protocol/ads_eps_113.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ class Adseps113Test : public ::testing::Test {
 };
 
 TEST_F(Adseps113Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t   data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Adseps113 adseps;
   EXPECT_EQ(adseps.GetPeriod(), 20 * 1000);
   adseps.UpdateData(data);

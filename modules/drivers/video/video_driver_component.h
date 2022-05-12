@@ -20,11 +20,12 @@
 #include <string>
 #include <thread>
 
+#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/drivers/video/proto/video_h265cfg.pb.h"
+
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/drivers/video/driver.h"
-#include "modules/drivers/video/proto/video_h265cfg.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -38,9 +39,7 @@ using apollo::drivers::video::config::CameraH265Config;
 class CompCameraH265Compressed : public Component<> {
  public:
   ~CompCameraH265Compressed() {
-    if (video_thread_->joinable()) {
-      video_thread_->join();
-    }
+    if (video_thread_->joinable()) { video_thread_->join(); }
   }
   bool Init();
 
@@ -48,11 +47,11 @@ class CompCameraH265Compressed : public Component<> {
   void VideoPoll();
 
   std::shared_ptr<apollo::cyber::Writer<CompressedImage>> writer_;
-  std::shared_ptr<std::thread> video_thread_;
-  volatile bool runing_;
-  std::unique_ptr<CameraDriver> camera_deivce_;
-  std::string record_folder_;
-  std::shared_ptr<CompressedImage> pb_image_ = nullptr;
+  std::shared_ptr<std::thread>                            video_thread_;
+  volatile bool                                           runing_;
+  std::unique_ptr<CameraDriver>                           camera_deivce_;
+  std::string                                             record_folder_;
+  std::shared_ptr<CompressedImage>                        pb_image_ = nullptr;
 };
 
 CYBER_REGISTER_COMPONENT(CompCameraH265Compressed);

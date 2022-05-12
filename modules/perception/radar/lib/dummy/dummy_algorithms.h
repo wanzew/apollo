@@ -31,13 +31,14 @@ namespace radar {
 
 class DummyPreprocessor : public BasePreprocessor {
  public:
-  DummyPreprocessor() : BasePreprocessor() {}
+  DummyPreprocessor()
+      : BasePreprocessor() {}
   virtual ~DummyPreprocessor() = default;
 
-  bool Init() override;
-  bool Preprocess(const drivers::ContiRadar& raw_obstacles,
-                  const PreprocessorOptions& options,
-                  drivers::ContiRadar* corrected_obstacles) override;
+  bool        Init() override;
+  bool        Preprocess(const drivers::ContiRadar& raw_obstacles,
+                         const PreprocessorOptions& options,
+                         drivers::ContiRadar*       corrected_obstacles) override;
   std::string Name() const override;
 
  private:
@@ -46,30 +47,30 @@ class DummyPreprocessor : public BasePreprocessor {
 
 class DummyDetector : public BaseDetector {
  public:
-  DummyDetector() : BaseDetector() {}
+  DummyDetector()
+      : BaseDetector() {}
   virtual ~DummyDetector() = default;
 
-  bool Init() override;
-  bool Detect(const drivers::ContiRadar& corrected_obstacles,
-              const DetectorOptions& options,
-              base::FramePtr detected_frame) override;
+  bool        Init() override;
+  bool        Detect(const drivers::ContiRadar& corrected_obstacles,
+                     const DetectorOptions&     options,
+                     base::FramePtr             detected_frame) override;
   std::string Name() const override;
 
  private:
-  void ContiObs2Frame(const drivers::ContiRadar& corrected_obstacles,
-                      base::FramePtr radar_frame);
+  void ContiObs2Frame(const drivers::ContiRadar& corrected_obstacles, base::FramePtr radar_frame);
 
   DISALLOW_COPY_AND_ASSIGN(DummyDetector);
 };
 
 class DummyRoiFilter : public BaseRoiFilter {
  public:
-  DummyRoiFilter() : BaseRoiFilter() {}
+  DummyRoiFilter()
+      : BaseRoiFilter() {}
   virtual ~DummyRoiFilter() = default;
 
-  bool Init() override;
-  bool RoiFilter(const RoiFilterOptions& options,
-                 base::FramePtr radar_frame) override;
+  bool        Init() override;
+  bool        RoiFilter(const RoiFilterOptions& options, base::FramePtr radar_frame) override;
   std::string Name() const override;
 
  private:

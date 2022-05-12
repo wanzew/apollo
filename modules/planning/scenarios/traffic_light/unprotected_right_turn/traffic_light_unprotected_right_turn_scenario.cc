@@ -20,14 +20,15 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_creep.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_intersection_cruise.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_stop.h"
@@ -40,9 +41,7 @@ namespace traffic_light {
 using apollo::hdmap::HDMapUtil;
 
 void TrafficLightUnprotectedRightTurnScenario::Init() {
-  if (init_) {
-    return;
-  }
+  if (init_) { return; }
 
   Scenario::Init();
 
@@ -60,66 +59,53 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
   }
 
   context_.current_traffic_light_overlap_ids.clear();
-  for (int i = 0;
-       i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
+  for (int i = 0; i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
     const std::string traffic_light_overlap_id =
         traffic_light_status.current_traffic_light_overlap_id(i);
     hdmap::SignalInfoConstPtr traffic_light =
-        HDMapUtil::BaseMap().GetSignalById(
-            hdmap::MakeMapId(traffic_light_overlap_id));
-    if (!traffic_light) {
-      AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
-    }
+        HDMapUtil::BaseMap().GetSignalById(hdmap::MakeMapId(traffic_light_overlap_id));
+    if (!traffic_light) { AERROR << "Could not find traffic light: " << traffic_light_overlap_id; }
 
-    context_.current_traffic_light_overlap_ids.push_back(
-        traffic_light_overlap_id);
+    context_.current_traffic_light_overlap_ids.push_back(traffic_light_overlap_id);
   }
 
   init_ = true;
 }
 
-apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
-               const std::shared_ptr<DependencyInjector>& injector)>
+apollo::common::util::Factory<ScenarioConfig::StageType,
+                              Stage,
+                              Stage* (*)(const ScenarioConfig::StageConfig&         stage_config,
+                                         const std::shared_ptr<DependencyInjector>& injector)>
     TrafficLightUnprotectedRightTurnScenario::s_stage_factory_;
 
 void TrafficLightUnprotectedRightTurnScenario::RegisterStages() {
-  if (!s_stage_factory_.Empty()) {
-    s_stage_factory_.Clear();
-  }
-  s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new TrafficLightUnprotectedRightTurnStageStop(config, injector);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new TrafficLightUnprotectedRightTurnStageCreep(config, injector);
-      });
+  if (!s_stage_factory_.Empty()) { s_stage_factory_.Clear(); }
+  s_stage_factory_.Register(ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new TrafficLightUnprotectedRightTurnStageStop(config,
+                                                                                   injector);
+                            });
+  s_stage_factory_.Register(ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new TrafficLightUnprotectedRightTurnStageCreep(config,
+                                                                                    injector);
+                            });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE,
-      [](const ScenarioConfig::StageConfig& config,
+      [](const ScenarioConfig::StageConfig&         config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new TrafficLightUnprotectedRightTurnStageIntersectionCruise(
-            config, injector);
+        return new TrafficLightUnprotectedRightTurnStageIntersectionCruise(config, injector);
       });
 }
 
 std::unique_ptr<Stage> TrafficLightUnprotectedRightTurnScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config,
+    const ScenarioConfig::StageConfig&         stage_config,
     const std::shared_ptr<DependencyInjector>& injector) {
-  if (s_stage_factory_.Empty()) {
-    RegisterStages();
-  }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config, injector);
-  if (ptr) {
-    ptr->SetContext(&context_);
-  }
+  if (s_stage_factory_.Empty()) { RegisterStages(); }
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(), stage_config, injector);
+  if (ptr) { ptr->SetContext(&context_); }
   return ptr;
 }
 
@@ -131,8 +117,7 @@ bool TrafficLightUnprotectedRightTurnScenario::GetScenarioConfig() {
     AERROR << "miss scenario specific config";
     return false;
   }
-  context_.scenario_config.CopyFrom(
-      config_.traffic_light_unprotected_right_turn_config());
+  context_.scenario_config.CopyFrom(config_.traffic_light_unprotected_right_turn_config());
   return true;
 }
 

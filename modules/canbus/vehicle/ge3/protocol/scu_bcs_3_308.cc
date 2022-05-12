@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_bcs_3_308.h"
+
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -28,8 +30,7 @@ using ::apollo::drivers::canbus::Byte;
 Scubcs3308::Scubcs3308() {}
 const int32_t Scubcs3308::ID = 0x308;
 
-void Scubcs3308::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
+void Scubcs3308::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rrwheelspdvd(
       bcs_rrwheelspdvd(bytes, length));
   chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rrwheeldirectionvd(
@@ -69,13 +70,12 @@ void Scubcs3308::Parse(const std::uint8_t* bytes, int32_t length,
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_rrwheelspdvd', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 57, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_rrwheelspdvdType Scubcs3308::bcs_rrwheelspdvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+Scu_bcs_3_308::Bcs_rrwheelspdvdType Scubcs3308::bcs_rrwheelspdvd(const std::uint8_t* bytes,
+                                                                 int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_bcs_3_308::Bcs_rrwheelspdvdType ret =
-      static_cast<Scu_bcs_3_308::Bcs_rrwheelspdvdType>(x);
+  Scu_bcs_3_308::Bcs_rrwheelspdvdType ret = static_cast<Scu_bcs_3_308::Bcs_rrwheelspdvdType>(x);
   return ret;
 }
 
@@ -85,9 +85,9 @@ Scu_bcs_3_308::Bcs_rrwheelspdvdType Scubcs3308::bcs_rrwheelspdvd(
 // 'bcs_rrwheeldirectionvd', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 58, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_rrwheeldirectionvdType Scubcs3308::bcs_rrwheeldirectionvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+Scu_bcs_3_308::Bcs_rrwheeldirectionvdType
+Scubcs3308::bcs_rrwheeldirectionvd(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(2, 1);
 
   Scu_bcs_3_308::Bcs_rrwheeldirectionvdType ret =
@@ -100,13 +100,12 @@ Scu_bcs_3_308::Bcs_rrwheeldirectionvdType Scubcs3308::bcs_rrwheeldirectionvd(
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_rlwheelspdvd', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 41, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_rlwheelspdvdType Scubcs3308::bcs_rlwheelspdvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 5);
+Scu_bcs_3_308::Bcs_rlwheelspdvdType Scubcs3308::bcs_rlwheelspdvd(const std::uint8_t* bytes,
+                                                                 int32_t             length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_bcs_3_308::Bcs_rlwheelspdvdType ret =
-      static_cast<Scu_bcs_3_308::Bcs_rlwheelspdvdType>(x);
+  Scu_bcs_3_308::Bcs_rlwheelspdvdType ret = static_cast<Scu_bcs_3_308::Bcs_rlwheelspdvdType>(x);
   return ret;
 }
 
@@ -116,9 +115,9 @@ Scu_bcs_3_308::Bcs_rlwheelspdvdType Scubcs3308::bcs_rlwheelspdvd(
 // 'bcs_rlwheeldirectionvd', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 42, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_rlwheeldirectionvdType Scubcs3308::bcs_rlwheeldirectionvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 5);
+Scu_bcs_3_308::Bcs_rlwheeldirectionvdType
+Scubcs3308::bcs_rlwheeldirectionvd(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(2, 1);
 
   Scu_bcs_3_308::Bcs_rlwheeldirectionvdType ret =
@@ -131,13 +130,12 @@ Scu_bcs_3_308::Bcs_rlwheeldirectionvdType Scubcs3308::bcs_rlwheeldirectionvd(
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_frwheelspdvd', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 25, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_frwheelspdvdType Scubcs3308::bcs_frwheelspdvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Scu_bcs_3_308::Bcs_frwheelspdvdType Scubcs3308::bcs_frwheelspdvd(const std::uint8_t* bytes,
+                                                                 int32_t             length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_bcs_3_308::Bcs_frwheelspdvdType ret =
-      static_cast<Scu_bcs_3_308::Bcs_frwheelspdvdType>(x);
+  Scu_bcs_3_308::Bcs_frwheelspdvdType ret = static_cast<Scu_bcs_3_308::Bcs_frwheelspdvdType>(x);
   return ret;
 }
 
@@ -147,9 +145,9 @@ Scu_bcs_3_308::Bcs_frwheelspdvdType Scubcs3308::bcs_frwheelspdvd(
 // 'bcs_frwheeldirectionvd', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 26, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_frwheeldirectionvdType Scubcs3308::bcs_frwheeldirectionvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Scu_bcs_3_308::Bcs_frwheeldirectionvdType
+Scubcs3308::bcs_frwheeldirectionvd(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(2, 1);
 
   Scu_bcs_3_308::Bcs_frwheeldirectionvdType ret =
@@ -162,13 +160,12 @@ Scu_bcs_3_308::Bcs_frwheeldirectionvdType Scubcs3308::bcs_frwheeldirectionvd(
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_flwheelspdvd', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 9, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_flwheelspdvdType Scubcs3308::bcs_flwheelspdvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_bcs_3_308::Bcs_flwheelspdvdType Scubcs3308::bcs_flwheelspdvd(const std::uint8_t* bytes,
+                                                                 int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(1, 1);
 
-  Scu_bcs_3_308::Bcs_flwheelspdvdType ret =
-      static_cast<Scu_bcs_3_308::Bcs_flwheelspdvdType>(x);
+  Scu_bcs_3_308::Bcs_flwheelspdvdType ret = static_cast<Scu_bcs_3_308::Bcs_flwheelspdvdType>(x);
   return ret;
 }
 
@@ -178,9 +175,9 @@ Scu_bcs_3_308::Bcs_flwheelspdvdType Scubcs3308::bcs_flwheelspdvd(
 // 'bcs_flwheeldirectionvd', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 10, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_flwheeldirectionvdType Scubcs3308::bcs_flwheeldirectionvd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_bcs_3_308::Bcs_flwheeldirectionvdType
+Scubcs3308::bcs_flwheeldirectionvd(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(2, 1);
 
   Scu_bcs_3_308::Bcs_flwheeldirectionvdType ret =
@@ -192,12 +189,11 @@ Scu_bcs_3_308::Bcs_flwheeldirectionvdType Scubcs3308::bcs_flwheeldirectionvd(
 // 'precision': 0.05625, 'len': 13, 'name': 'bcs_rrwheelspd', 'is_signed_var':
 // False, 'physical_range': '[0|240]', 'bit': 55, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'km/h'}
-double Scubcs3308::bcs_rrwheelspd(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 6);
+double Scubcs3308::bcs_rrwheelspd(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 7);
+  Byte    t1(bytes + 7);
   int32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
@@ -211,9 +207,9 @@ double Scubcs3308::bcs_rrwheelspd(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_rrwheeldirection', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 56, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_rrwheeldirectionType Scubcs3308::bcs_rrwheeldirection(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+Scu_bcs_3_308::Bcs_rrwheeldirectionType Scubcs3308::bcs_rrwheeldirection(const std::uint8_t* bytes,
+                                                                         int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 1);
 
   Scu_bcs_3_308::Bcs_rrwheeldirectionType ret =
@@ -225,12 +221,11 @@ Scu_bcs_3_308::Bcs_rrwheeldirectionType Scubcs3308::bcs_rrwheeldirection(
 // 'precision': 0.05625, 'len': 13, 'name': 'bcs_rlwheelspd', 'is_signed_var':
 // False, 'physical_range': '[0|240]', 'bit': 39, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'km/h'}
-double Scubcs3308::bcs_rlwheelspd(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 4);
+double Scubcs3308::bcs_rlwheelspd(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
@@ -244,9 +239,9 @@ double Scubcs3308::bcs_rlwheelspd(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_rlwheeldirection', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 40, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_rlwheeldirectionType Scubcs3308::bcs_rlwheeldirection(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 5);
+Scu_bcs_3_308::Bcs_rlwheeldirectionType Scubcs3308::bcs_rlwheeldirection(const std::uint8_t* bytes,
+                                                                         int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 1);
 
   Scu_bcs_3_308::Bcs_rlwheeldirectionType ret =
@@ -258,12 +253,11 @@ Scu_bcs_3_308::Bcs_rlwheeldirectionType Scubcs3308::bcs_rlwheeldirection(
 // 'precision': 0.05625, 'len': 13, 'name': 'bcs_frwheelspd', 'is_signed_var':
 // False, 'physical_range': '[0|240]', 'bit': 23, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'km/h'}
-double Scubcs3308::bcs_frwheelspd(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 2);
+double Scubcs3308::bcs_frwheelspd(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
@@ -277,9 +271,9 @@ double Scubcs3308::bcs_frwheelspd(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_frwheeldirection', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 24, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_frwheeldirectionType Scubcs3308::bcs_frwheeldirection(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+Scu_bcs_3_308::Bcs_frwheeldirectionType Scubcs3308::bcs_frwheeldirection(const std::uint8_t* bytes,
+                                                                         int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 1);
 
   Scu_bcs_3_308::Bcs_frwheeldirectionType ret =
@@ -291,12 +285,11 @@ Scu_bcs_3_308::Bcs_frwheeldirectionType Scubcs3308::bcs_frwheeldirection(
 // 'precision': 0.05625, 'len': 13, 'name': 'bcs_flwheelspd', 'is_signed_var':
 // False, 'physical_range': '[0|240]', 'bit': 7, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'km/h'}
-double Scubcs3308::bcs_flwheelspd(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 0);
+double Scubcs3308::bcs_flwheelspd(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
@@ -310,9 +303,9 @@ double Scubcs3308::bcs_flwheelspd(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'bcs_flwheeldirection', 'is_signed_var':
 // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 8, 'type': 'enum',
 // 'order': 'motorola', 'physical_unit': '-'}
-Scu_bcs_3_308::Bcs_flwheeldirectionType Scubcs3308::bcs_flwheeldirection(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Scu_bcs_3_308::Bcs_flwheeldirectionType Scubcs3308::bcs_flwheeldirection(const std::uint8_t* bytes,
+                                                                         int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 1);
 
   Scu_bcs_3_308::Bcs_flwheeldirectionType ret =

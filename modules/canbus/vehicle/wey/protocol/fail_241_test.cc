@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/protocol/fail_241.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,10 +28,10 @@ class Fail241Test : public ::testing::Test {
 };
 
 TEST_F(Fail241Test, reset) {
-  Fail241 fail1;
-  int32_t length = 8;
+  Fail241       fail1;
+  int32_t       length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x95, 0x12, 0x13, 0x14};
+  uint8_t       bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x95, 0x12, 0x13, 0x14};
 
   fail1.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().fail_241().engfail(), 1);

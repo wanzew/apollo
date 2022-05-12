@@ -30,28 +30,25 @@ struct ObjectInitializer {
 
 template <typename T>
 struct PointCloudInitializer {
-  void operator()(AttributePointCloud<Point<T>>* cloud) const {
-    cloud->clear();
-  }
+  void operator()(AttributePointCloud<Point<T>>* cloud) const { cloud->clear(); }
 };
 
 struct FrameInitializer {
   void operator()(Frame* frame) const { frame->Reset(); }
 };
 
-static const size_t kObjectPoolSize = 10000;
+static const size_t kObjectPoolSize     = 10000;
 static const size_t kPointCloudPoolSize = 1000;
-static const size_t kFramePoolSize = 100;
+static const size_t kFramePoolSize      = 100;
 
-using ObjectPool =
-    ConcurrentObjectPool<Object, kObjectPoolSize, ObjectInitializer>;
-using PointFCloudPool =
-    ConcurrentObjectPool<AttributePointCloud<PointF>, kPointCloudPoolSize,
-                         PointCloudInitializer<float>>;
-using PointDCloudPool =
-    ConcurrentObjectPool<AttributePointCloud<PointD>, kPointCloudPoolSize,
-                         PointCloudInitializer<double>>;
-using FramePool = ConcurrentObjectPool<Frame, kFramePoolSize, FrameInitializer>;
+using ObjectPool      = ConcurrentObjectPool<Object, kObjectPoolSize, ObjectInitializer>;
+using PointFCloudPool = ConcurrentObjectPool<AttributePointCloud<PointF>,
+                                             kPointCloudPoolSize,
+                                             PointCloudInitializer<float>>;
+using PointDCloudPool = ConcurrentObjectPool<AttributePointCloud<PointD>,
+                                             kPointCloudPoolSize,
+                                             PointCloudInitializer<double>>;
+using FramePool       = ConcurrentObjectPool<Frame, kFramePoolSize, FrameInitializer>;
 
 }  // namespace base
 }  // namespace perception

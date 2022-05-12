@@ -19,10 +19,12 @@
 #include <string>
 #include <utility>
 
+#include "gtest/gtest.h"
+
+#include "modules/control/proto/control_conf.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
-#include "modules/control/proto/control_conf.pb.h"
 
 namespace apollo {
 namespace control {
@@ -30,8 +32,7 @@ namespace control {
 class Interpolation2DTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string control_conf_file =
-        "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
+    std::string control_conf_file = "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
   }
 
@@ -40,55 +41,45 @@ class Interpolation2DTest : public ::testing::Test {
 };
 
 TEST_F(Interpolation2DTest, normal) {
-  Interpolation2D::DataType xyz{std::make_tuple(0.3, 0.2, 0.6),
-                                std::make_tuple(10.1, 15.2, 5.5),
+  Interpolation2D::DataType xyz{std::make_tuple(0.3, 0.2, 0.6), std::make_tuple(10.1, 15.2, 5.5),
                                 std::make_tuple(20.2, 10.3, 30.5)};
 
   Interpolation2D estimator;
   EXPECT_TRUE(estimator.Init(xyz));
 
   for (unsigned i = 0; i < xyz.size(); i++) {
-    EXPECT_DOUBLE_EQ(std::get<2>(xyz[i]),
-                     estimator.Interpolate(std::make_pair(
-                         std::get<0>(xyz[i]), std::get<1>(xyz[i]))));
+    EXPECT_DOUBLE_EQ(std::get<2>(xyz[i]), estimator.Interpolate(std::make_pair(
+                                              std::get<0>(xyz[i]), std::get<1>(xyz[i]))));
   }
 
-  EXPECT_DOUBLE_EQ(4.7000000000000002,
-                   estimator.Interpolate(std::make_pair(8.5, 14)));
-  EXPECT_DOUBLE_EQ(26.292079207920793,
-                   estimator.Interpolate(std::make_pair(18.5, 12)));
+  EXPECT_DOUBLE_EQ(4.7000000000000002, estimator.Interpolate(std::make_pair(8.5, 14)));
+  EXPECT_DOUBLE_EQ(26.292079207920793, estimator.Interpolate(std::make_pair(18.5, 12)));
 
   // out of range
-  EXPECT_DOUBLE_EQ(0.59999999999999998,
-                   estimator.Interpolate(std::make_pair(-5, 12)));
+  EXPECT_DOUBLE_EQ(0.59999999999999998, estimator.Interpolate(std::make_pair(-5, 12)));
   EXPECT_DOUBLE_EQ(30.5, estimator.Interpolate(std::make_pair(30, 12)));
   EXPECT_DOUBLE_EQ(30.5, estimator.Interpolate(std::make_pair(30, -0.5)));
-  EXPECT_DOUBLE_EQ(5.4500000000000002,
-                   estimator.Interpolate(std::make_pair(10, -0.5)));
-  EXPECT_DOUBLE_EQ(5.4500000000000002,
-                   estimator.Interpolate(std::make_pair(10, 40)));
+  EXPECT_DOUBLE_EQ(5.4500000000000002, estimator.Interpolate(std::make_pair(10, -0.5)));
+  EXPECT_DOUBLE_EQ(5.4500000000000002, estimator.Interpolate(std::make_pair(10, 40)));
   EXPECT_DOUBLE_EQ(30.5, estimator.Interpolate(std::make_pair(40, 40)));
 }
 
 TEST_F(Interpolation2DTest, calibration_table) {
-  const auto &calibration_table =
-      control_conf_.lon_controller_conf().calibration_table();
+  const auto& calibration_table = control_conf_.lon_controller_conf().calibration_table();
   AINFO << "Throttle calibration table:" << calibration_table.DebugString();
 
   Interpolation2D::DataType xyz;
 
-  for (const auto &calibration : calibration_table.calibration()) {
-    xyz.push_back(std::make_tuple(calibration.speed(),
-                                  calibration.acceleration(),
-                                  calibration.command()));
+  for (const auto& calibration : calibration_table.calibration()) {
+    xyz.push_back(
+        std::make_tuple(calibration.speed(), calibration.acceleration(), calibration.command()));
   }
   Interpolation2D estimator;
   EXPECT_TRUE(estimator.Init(xyz));
 
-  for (const auto &elem : xyz) {
+  for (const auto& elem : xyz) {
     EXPECT_DOUBLE_EQ(std::get<2>(elem),
-                     estimator.Interpolate(
-                         std::make_pair(std::get<0>(elem), std::get<1>(elem))));
+                     estimator.Interpolate(std::make_pair(std::get<0>(elem), std::get<1>(elem))));
   }
 }
 

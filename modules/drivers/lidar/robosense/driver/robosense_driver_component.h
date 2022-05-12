@@ -46,7 +46,7 @@ class RobosenseComponent : public Component<> {
 
  private:
   std::shared_ptr<RobosenseDriver> driver_;
-  Config conf_;
+  Config                           conf_;
 };
 
 CYBER_REGISTER_COMPONENT(RobosenseComponent)

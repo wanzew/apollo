@@ -37,7 +37,7 @@ using croutine::CRoutine;
 
 class ChoreographyContext : public ProcessorContext {
  public:
-  bool RemoveCRoutine(uint64_t crid);
+  bool                      RemoveCRoutine(uint64_t crid);
   std::shared_ptr<CRoutine> NextRoutine() override;
 
   bool Enqueue(const std::shared_ptr<CRoutine>&);
@@ -46,13 +46,12 @@ class ChoreographyContext : public ProcessorContext {
   void Shutdown() override;
 
  private:
-  std::mutex mtx_wq_;
+  std::mutex              mtx_wq_;
   std::condition_variable cv_wq_;
-  int notify = 0;
+  int                     notify = 0;
 
-  AtomicRWLock rq_lk_;
-  std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>>
-      cr_queue_;
+  AtomicRWLock                                                               rq_lk_;
+  std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>> cr_queue_;
 };
 
 }  // namespace scheduler

@@ -30,21 +30,17 @@ class SppCCDetector {
   SppCCDetector() = default;
 
   ~SppCCDetector() {
-    if (nodes_ != nullptr) {
-      common::IFree2(&nodes_);
-    }
+    if (nodes_ != nullptr) { common::IFree2(&nodes_); }
   }
   // @brief: initialize detector
   // @param [in]: rows of feature map
   // @param [in]: cols of feature map
   void Init(int rows, int cols) {
     if (rows_ * cols_ != rows * cols) {
-      if (nodes_ != nullptr) {
-        common::IFree2(&nodes_);
-      }
+      if (nodes_ != nullptr) { common::IFree2(&nodes_); }
       nodes_ = common::IAlloc2<Node>(rows, cols);
-      rows_ = static_cast<int>(rows);
-      cols_ = static_cast<int>(cols);
+      rows_  = static_cast<int>(rows);
+      cols_  = static_cast<int>(cols);
     }
     CleanNodes();
   }
@@ -53,8 +49,10 @@ class SppCCDetector {
   // @param [in]: center offset map
   // @param [in]: scale of offset map
   // @param [in]: objectness threshold
-  void SetData(const float* const* prob_map, const float* offset_map,
-               float scale, float objectness_threshold);
+  void SetData(const float* const* prob_map,
+               const float*        offset_map,
+               float               scale,
+               float               objectness_threshold);
   // @brief: detect clusters
   // @param [out]: label image
   // @return: label number
@@ -78,15 +76,15 @@ class SppCCDetector {
  private:
   struct Node {
     uint32_t center_node = 0;
-    uint32_t parent = 0;
-    uint16_t id = 0;
+    uint32_t parent      = 0;
+    uint16_t id          = 0;
     // Note, we compress node_rank, traversed, is_center and is_object
     // in one 16bits variable, the arrangemant is as following
     // |is_center(1bit)|is_object(1bit)|traversed(3bit)|node_rank(11bit)|
     uint16_t status = 0;
 
     inline uint16_t get_node_rank() { return status & 2047; }
-    inline void set_node_rank(uint16_t node_rank) {
+    inline void     set_node_rank(uint16_t node_rank) {
       status &= 63488;
       status |= node_rank;
     }
@@ -132,17 +130,17 @@ class SppCCDetector {
   void DisjointSetUnion(Node* x, Node* y);
 
  private:
-  int rows_ = 0;
-  int cols_ = 0;
+  int    rows_  = 0;
+  int    cols_  = 0;
   Node** nodes_ = nullptr;
 
-  const float* const* prob_map_ = nullptr;
-  const float* offset_map_ = nullptr;
-  float scale_ = 0.f;
-  float objectness_threshold_ = 0.f;
+  const float* const* prob_map_             = nullptr;
+  const float*        offset_map_           = nullptr;
+  float               scale_                = 0.f;
+  float               objectness_threshold_ = 0.f;
 
   lib::ThreadWorker worker_;
-  bool first_process_ = true;
+  bool              first_process_ = true;
 
  private:
   static const size_t kDefaultReserveSize = 500;

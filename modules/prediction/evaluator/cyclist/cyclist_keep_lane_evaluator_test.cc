@@ -26,8 +26,7 @@ namespace prediction {
 class CyclistKeepLaneEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    const std::string file =
-        "modules/prediction/testdata/single_perception_cyclist_onlane.pb.txt";
+    const std::string file = "modules/prediction/testdata/single_perception_cyclist_onlane.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
@@ -36,18 +35,17 @@ class CyclistKeepLaneEvaluatorTest : public KMLMapBasedTest {
 };
 
 TEST_F(CyclistKeepLaneEvaluatorTest, OnLaneCase) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
   CyclistKeepLaneEvaluator cyclist_keep_lane_evaluator;
-  ObstaclesContainer container;
+  ObstaclesContainer       container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
   cyclist_keep_lane_evaluator.Evaluate(obstacle_ptr, &container);
-  const Feature& feature = obstacle_ptr->latest_feature();
+  const Feature&   feature    = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {
     EXPECT_TRUE(lane_sequence.has_probability());

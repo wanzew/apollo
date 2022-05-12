@@ -28,9 +28,9 @@ class Steeringreport502Test : public ::testing::Test {
 };
 
 TEST_F(Steeringreport502Test, General) {
-  uint8_t data[8] = {0x04, 0x01, 0x01, 0x14, 0x1E, 0x03, 0x04, 0x05};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t           data[8] = {0x04, 0x01, 0x01, 0x14, 0x1E, 0x03, 0x04, 0x05};
+  int32_t           length  = 8;
+  ChassisDetail     cd;
   Steeringreport502 steeringreport;
   steeringreport.Parse(data, length, &cd);
 

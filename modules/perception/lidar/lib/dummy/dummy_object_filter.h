@@ -30,8 +30,7 @@ class DummyObjectFilter : public BaseObjectFilter {
 
   virtual ~DummyObjectFilter() = default;
 
-  bool Init(const ObjectFilterInitOptions& options =
-                ObjectFilterInitOptions()) override;
+  bool Init(const ObjectFilterInitOptions& options = ObjectFilterInitOptions()) override;
 
   // @brief: filter objects
   // @param [in]: options

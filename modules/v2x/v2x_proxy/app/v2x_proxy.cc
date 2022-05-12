@@ -35,40 +35,31 @@ using ::apollo::v2x::obu::ObuRsi;
 using ::apollo::v2x::obu::ObuTrafficLight;
 
 V2xProxy::~V2xProxy() {
-  if (recv_thread_ != nullptr && recv_thread_->joinable()) {
-    recv_thread_->join();
-  }
-  if (planning_thread_ != nullptr && planning_thread_->joinable()) {
-    planning_thread_->join();
-  }
-  if (obs_thread_ != nullptr && obs_thread_->joinable()) {
-    obs_thread_->join();
-  }
+  if (recv_thread_ != nullptr && recv_thread_->joinable()) { recv_thread_->join(); }
+  if (planning_thread_ != nullptr && planning_thread_->joinable()) { planning_thread_->join(); }
+  if (obs_thread_ != nullptr && obs_thread_->joinable()) { obs_thread_->join(); }
 }
 
 V2xProxy::V2xProxy(std::shared_ptr<::apollo::hdmap::HDMap> hdmap)
-    : node_(::apollo::cyber::CreateNode("v2x_proxy")), exit_(false) {
+    : node_(::apollo::cyber::CreateNode("v2x_proxy"))
+    , exit_(false) {
   if (node_ == nullptr) {
     AFATAL << "Create v2x proxy node failed.";
     exit(1);
   }
-  internal_ = std::make_shared<InternalData>();
-  hdmap_ = std::make_shared<::apollo::hdmap::HDMap>();
+  internal_             = std::make_shared<InternalData>();
+  hdmap_                = std::make_shared<::apollo::hdmap::HDMap>();
   const auto hdmap_file = apollo::hdmap::BaseMapFile();
   if (0 != hdmap_->LoadMapFromFile(hdmap_file)) {
     AERROR << "Failed to load hadmap file: " << hdmap_file;
     return;
   }
   ::apollo::cyber::TimerOption v2x_car_status_timer_option;
-  v2x_car_status_timer_option.period =
-      static_cast<uint32_t>((1000 + FLAGS_v2x_car_status_timer_frequency - 1) /
-                            FLAGS_v2x_car_status_timer_frequency);
-  v2x_car_status_timer_option.callback = [this]() {
-    this->OnV2xCarStatusTimer();
-  };
-  v2x_car_status_timer_option.oneshot = false;
-  v2x_car_status_timer_.reset(
-      new ::apollo::cyber::Timer(v2x_car_status_timer_option));
+  v2x_car_status_timer_option.period = static_cast<uint32_t>(
+      (1000 + FLAGS_v2x_car_status_timer_frequency - 1) / FLAGS_v2x_car_status_timer_frequency);
+  v2x_car_status_timer_option.callback = [this]() { this->OnV2xCarStatusTimer(); };
+  v2x_car_status_timer_option.oneshot  = false;
+  v2x_car_status_timer_.reset(new ::apollo::cyber::Timer(v2x_car_status_timer_option));
   os_interface_.reset(new OsInterFace());
   obu_interface_.reset(new ObuInterFaceGrpcImpl());
   recv_thread_.reset(new std::thread([this]() {
@@ -96,15 +87,10 @@ V2xProxy::V2xProxy(std::shared_ptr<::apollo::hdmap::HDMap> hdmap)
   init_flag_ = true;
 }
 
-bool V2xProxy::GetRsuListFromFile(const std::string &filename,
-                                  std::set<std::string> *whitelist) {
-  if (nullptr == whitelist) {
-    return false;
-  }
+bool V2xProxy::GetRsuListFromFile(const std::string& filename, std::set<std::string>* whitelist) {
+  if (nullptr == whitelist) { return false; }
   std::ifstream input_file(filename);
-  if (!input_file) {
-    return false;
-  }
+  if (!input_file) { return false; }
   std::string line;
   while (getline(input_file, line)) {
     whitelist->insert(line);
@@ -116,8 +102,7 @@ bool V2xProxy::InitFlag() { return init_flag_; }
 
 void V2xProxy::RecvOsPlanning() {
   auto adc_trajectory = std::make_shared<::apollo::planning::ADCTrajectory>();
-  auto res_light =
-      std::make_shared<::apollo::perception::TrafficLightDetection>();
+  auto res_light      = std::make_shared<::apollo::perception::TrafficLightDetection>();
   os_interface_->GetPlanningAdcFromOs(adc_trajectory);
   // OK get planning message
   std::shared_ptr<OSLight> last_os_light = nullptr;
@@ -125,8 +110,7 @@ void V2xProxy::RecvOsPlanning() {
     std::lock_guard<std::mutex> lock(lock_last_os_light_);
 
     auto now_us = ::apollo::cyber::Time::MonoTime().ToMicrosecond();
-    if (last_os_light_ == nullptr ||
-        2000LL * 1000 * 1000 < now_us - ts_last_os_light_) {
+    if (last_os_light_ == nullptr || 2000LL * 1000 * 1000 < now_us - ts_last_os_light_) {
       AWARN << "V2X Traffic Light is too old!";
       last_os_light_ = nullptr;
     } else {
@@ -136,11 +120,9 @@ void V2xProxy::RecvOsPlanning() {
     }
   }
   // proc planning message
-  bool res_proc_planning_msg = internal_->ProcPlanningMessage(
-      adc_trajectory.get(), last_os_light.get(), &res_light);
-  if (!res_proc_planning_msg) {
-    return;
-  }
+  bool res_proc_planning_msg =
+      internal_->ProcPlanningMessage(adc_trajectory.get(), last_os_light.get(), &res_light);
+  if (!res_proc_planning_msg) { return; }
   os_interface_->SendV2xTrafficLight4Hmi2Sys(res_light);
 }
 
@@ -149,28 +131,25 @@ void V2xProxy::RecvTrafficlight() {
   std::shared_ptr<ObuLight> x2v_traffic_light = nullptr;
   obu_interface_->GetV2xTrafficLightFromObu(&x2v_traffic_light);
   os_interface_->SendV2xObuTrafficLightToOs(x2v_traffic_light);
-  auto os_light = std::make_shared<OSLight>();
+  auto        os_light    = std::make_shared<OSLight>();
   std::string junction_id = "";
   {
     std::lock_guard<std::mutex> lg(lock_hdmap_junction_id_);
     junction_id = hdmap_junction_id_;
   }
-  bool res_success_ProcTrafficlight = internal_->ProcTrafficlight(
-      hdmap_, x2v_traffic_light.get(), junction_id, u_turn_,
-      FLAGS_traffic_light_distance, FLAGS_check_time, &os_light);
-  if (!res_success_ProcTrafficlight) {
-    return;
-  }
+  bool res_success_ProcTrafficlight =
+      internal_->ProcTrafficlight(hdmap_, x2v_traffic_light.get(), junction_id, u_turn_,
+                                  FLAGS_traffic_light_distance, FLAGS_check_time, &os_light);
+  if (!res_success_ProcTrafficlight) { return; }
   utils::UniqueOslight(os_light.get());
   os_interface_->SendV2xTrafficLightToOs(os_light);
   // save for hmi
   std::lock_guard<std::mutex> lock(lock_last_os_light_);
   ts_last_os_light_ = ::apollo::cyber::Time::MonoTime().ToMicrosecond();
-  last_os_light_ = os_light;
+  last_os_light_    = os_light;
 }
 
-double cal_distance(const ::apollo::common::PointENU &p1,
-                    const ::apollo::common::PointENU &p2) {
+double cal_distance(const ::apollo::common::PointENU& p1, const ::apollo::common::PointENU& p2) {
   double x = p1.x() - p2.x();
   double y = p1.y() - p2.y();
   return std::sqrt(x * x + y * y);
@@ -178,12 +157,9 @@ double cal_distance(const ::apollo::common::PointENU &p1,
 
 void V2xProxy::OnV2xCarStatusTimer() {
   // get loc
-  auto localization =
-      std::make_shared<::apollo::localization::LocalizationEstimate>();
+  auto localization = std::make_shared<::apollo::localization::LocalizationEstimate>();
   os_interface_->GetLocalizationFromOs(localization);
-  if (nullptr == localization) {
-    return;
-  }
+  if (nullptr == localization) { return; }
   std::set<std::string> rsu_whitelist;
   {
     std::lock_guard<std::mutex> lg(rsu_list_mutex_);
@@ -192,27 +168,23 @@ void V2xProxy::OnV2xCarStatusTimer() {
   ::apollo::common::PointENU car_position;
   car_position.set_x(localization->pose().position().x());
   car_position.set_y(localization->pose().position().y());
-  std::shared_ptr<::apollo::v2x::CarStatus> v2x_car_status = nullptr;
-  double heading = 0.0;
-  std::string res_junction_id = "";
-  bool ret_get_rsu_info = utils::GetRsuInfo(
-      hdmap_, *localization, rsu_whitelist, FLAGS_traffic_light_distance,
-      FLAGS_heading_difference, &v2x_car_status, &res_junction_id, &heading);
+  std::shared_ptr<::apollo::v2x::CarStatus> v2x_car_status  = nullptr;
+  double                                    heading         = 0.0;
+  std::string                               res_junction_id = "";
+  bool                                      ret_get_rsu_info =
+      utils::GetRsuInfo(hdmap_, *localization, rsu_whitelist, FLAGS_traffic_light_distance,
+                        FLAGS_heading_difference, &v2x_car_status, &res_junction_id, &heading);
   {
     std::lock_guard<std::mutex> lg(lock_hdmap_junction_id_);
     hdmap_junction_id_ = res_junction_id;
   }
-  if (!ret_get_rsu_info) {
-    return;
-  }
+  if (!ret_get_rsu_info) { return; }
   // calc heading
   if (!init_heading_) {
-    heading_ = heading;
+    heading_      = heading;
     init_heading_ = true;
   }
-  if (std::fabs(heading_ - heading) > 1.0) {
-    u_turn_ = true;
-  }
+  if (std::fabs(heading_ - heading) > 1.0) { u_turn_ = true; }
   obu_interface_->SendCarStatusToObu(v2x_car_status);
 }
 

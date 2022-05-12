@@ -38,13 +38,13 @@ class Node;
  */
 class ParameterClient {
  public:
-  using Param = apollo::cyber::proto::Param;
-  using NodeName = apollo::cyber::proto::NodeName;
-  using ParamName = apollo::cyber::proto::ParamName;
-  using BoolResult = apollo::cyber::proto::BoolResult;
-  using Params = apollo::cyber::proto::Params;
-  using GetParameterClient = Client<ParamName, Param>;
-  using SetParameterClient = Client<Param, BoolResult>;
+  using Param                = apollo::cyber::proto::Param;
+  using NodeName             = apollo::cyber::proto::NodeName;
+  using ParamName            = apollo::cyber::proto::ParamName;
+  using BoolResult           = apollo::cyber::proto::BoolResult;
+  using Params               = apollo::cyber::proto::Params;
+  using GetParameterClient   = Client<ParamName, Param>;
+  using SetParameterClient   = Client<Param, BoolResult>;
   using ListParametersClient = Client<NodeName, Params>;
   /**
    * @brief Construct a new ParameterClient object
@@ -52,8 +52,7 @@ class ParameterClient {
    * @param node shared_ptr of the node handler
    * @param service_node_name node name which provide a param services
    */
-  ParameterClient(const std::shared_ptr<Node>& node,
-                  const std::string& service_node_name);
+  ParameterClient(const std::shared_ptr<Node>& node, const std::string& service_node_name);
 
   /**
    * @brief Get the Parameter object
@@ -86,9 +85,9 @@ class ParameterClient {
   bool ListParameters(std::vector<Parameter>* parameters);
 
  private:
-  std::shared_ptr<Node> node_;
-  std::shared_ptr<GetParameterClient> get_parameter_client_;
-  std::shared_ptr<SetParameterClient> set_parameter_client_;
+  std::shared_ptr<Node>                 node_;
+  std::shared_ptr<GetParameterClient>   get_parameter_client_;
+  std::shared_ptr<SetParameterClient>   set_parameter_client_;
   std::shared_ptr<ListParametersClient> list_parameters_client_;
 };
 

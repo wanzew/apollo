@@ -22,15 +22,14 @@
 
 #include <memory>
 
-#include "cyber/cyber.h"
+#include "modules/drivers/proto/racobit_radar.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
-#include "modules/drivers/radar/racobit_radar/protocol/radar_config_200.h"
-
 #include "modules/drivers/canbus/sensor_gflags.h"
+#include "modules/drivers/radar/racobit_radar/protocol/radar_config_200.h"
 
 namespace apollo {
 namespace drivers {
@@ -38,7 +37,7 @@ namespace racobit_radar {
 
 using ::apollo::drivers::canbus::MessageManager;
 using ::apollo::drivers::canbus::ProtocolData;
-using Time = ::apollo::cyber::Time;
+using Time   = ::apollo::cyber::Time;
 using micros = std::chrono::microseconds;
 using ::apollo::common::ErrorCode;
 using apollo::drivers::canbus::CanClient;
@@ -47,19 +46,17 @@ using apollo::drivers::racobit_radar::RadarConfig200;
 
 class RacobitRadarMessageManager : public MessageManager<RacobitRadar> {
  public:
-  RacobitRadarMessageManager(
-      std::shared_ptr<cyber::Writer<RacobitRadar>> writer);
+  RacobitRadarMessageManager(std::shared_ptr<cyber::Writer<RacobitRadar>> writer);
   virtual ~RacobitRadarMessageManager() {}
-  void set_radar_conf(RadarConf radar_conf);
-  ProtocolData<RacobitRadar> *GetMutableProtocolDataById(
-      const uint32_t message_id);
-  void Parse(const uint32_t message_id, const uint8_t *data, int32_t length);
-  void set_can_client(std::shared_ptr<CanClient> can_client);
+  void                        set_radar_conf(RadarConf radar_conf);
+  ProtocolData<RacobitRadar>* GetMutableProtocolDataById(const uint32_t message_id);
+  void                        Parse(const uint32_t message_id, const uint8_t* data, int32_t length);
+  void                        set_can_client(std::shared_ptr<CanClient> can_client);
 
  private:
-  bool is_configured_ = false;
-  RadarConfig200 radar_config_;
-  std::shared_ptr<CanClient> can_client_;
+  bool                                         is_configured_ = false;
+  RadarConfig200                               radar_config_;
+  std::shared_ptr<CanClient>                   can_client_;
   std::shared_ptr<cyber::Writer<RacobitRadar>> writer_;
 };
 

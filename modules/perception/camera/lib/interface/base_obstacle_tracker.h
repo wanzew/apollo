@@ -38,39 +38,34 @@ class BaseObstacleTracker {
 
   virtual ~BaseObstacleTracker() = default;
 
-  virtual bool Init(const ObstacleTrackerInitOptions& options =
-                        ObstacleTrackerInitOptions()) = 0;
+  virtual bool Init(const ObstacleTrackerInitOptions& options = ObstacleTrackerInitOptions()) = 0;
 
   // @brief: predict candidate obstales in the new image.
   // @param [in]: options
   // @param [in/out]: frame
   // candidate obstacle 2D boxes should be filled, required.
-  virtual bool Predict(const ObstacleTrackerOptions& options,
-                       CameraFrame* frame) = 0;
+  virtual bool Predict(const ObstacleTrackerOptions& options, CameraFrame* frame) = 0;
 
   // @brief: associate obstales by 2D information.
   // @param [in]: options
   // @param [in/out]: frame
   // associated obstacles with tracking id should be filled, required,
   // smoothed 2D&3D information can be filled, optional.
-  virtual bool Associate2D(const ObstacleTrackerOptions& options,
-                           CameraFrame* frame) = 0;
+  virtual bool Associate2D(const ObstacleTrackerOptions& options, CameraFrame* frame) = 0;
 
   // @brief: associate obstales by 3D information.
   // @param [in]: options
   // @param [in/out]: frame
   // associated obstacles with tracking id should be filled, required,
   // smoothed 3D information can be filled, optional.
-  virtual bool Associate3D(const ObstacleTrackerOptions& options,
-                           CameraFrame* frame) = 0;
+  virtual bool Associate3D(const ObstacleTrackerOptions& options, CameraFrame* frame) = 0;
 
   // @brief: track detected obstacles.
   // @param [in]: options
   // @param [in/out]: frame
   // associated obstacles with tracking id should be filled, required,
   // motion information of obstacles should be filled, required.
-  virtual bool Track(const ObstacleTrackerOptions& options,
-                     CameraFrame* frame) = 0;
+  virtual bool Track(const ObstacleTrackerOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -79,8 +74,7 @@ class BaseObstacleTracker {
 };  // class BaseObstacleTracker
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstacleTracker);
-#define REGISTER_OBSTACLE_TRACKER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseObstacleTracker, name)
+#define REGISTER_OBSTACLE_TRACKER(name) PERCEPTION_REGISTER_CLASS(BaseObstacleTracker, name)
 
 }  // namespace camera
 }  // namespace perception

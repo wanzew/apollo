@@ -19,8 +19,8 @@
 #include <string>
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
-#include "modules/perception/lidar/lib/interface/base_lidar_obstacle_tracking.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_obstacle_tracking.h"
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
 
 namespace apollo {
@@ -29,20 +29,20 @@ namespace lidar {
 
 class LidarObstacleTracking : public BaseLidarObstacleTracking {
  public:
-  LidarObstacleTracking() = default;
+  LidarObstacleTracking()          = default;
   virtual ~LidarObstacleTracking() = default;
 
   bool Init(const LidarObstacleTrackingInitOptions& options =
                 LidarObstacleTrackingInitOptions()) override;
 
   LidarProcessResult Process(const LidarObstacleTrackingOptions& options,
-                             LidarFrame* frame) override;
+                             LidarFrame*                         frame) override;
 
   std::string Name() const override { return "LidarObstacleTracking"; }
 
  private:
   std::shared_ptr<BaseMultiTargetTracker> multi_target_tracker_;
-  std::shared_ptr<BaseClassifier> fusion_classifier_;
+  std::shared_ptr<BaseClassifier>         fusion_classifier_;
 };  // class LidarObstacleTracking
 
 }  // namespace lidar

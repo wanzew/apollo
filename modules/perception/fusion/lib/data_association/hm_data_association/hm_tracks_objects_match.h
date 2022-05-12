@@ -31,72 +31,70 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
   HMTrackersObjectsAssociation() {}
   ~HMTrackersObjectsAssociation() {}
   HMTrackersObjectsAssociation(const HMTrackersObjectsAssociation&) = delete;
-  HMTrackersObjectsAssociation& operator=(const HMTrackersObjectsAssociation&) =
-      delete;
+  HMTrackersObjectsAssociation& operator=(const HMTrackersObjectsAssociation&) = delete;
 
   bool Init() override {
-    track_object_distance_.set_distance_thresh(
-        static_cast<float>(s_match_distance_thresh_));
+    track_object_distance_.set_distance_thresh(static_cast<float>(s_match_distance_thresh_));
     return true;
   }
 
   bool Associate(const AssociationOptions& options,
-                 SensorFramePtr sensor_measurements, ScenePtr scene,
-                 AssociationResult* association_result) override;
+                 SensorFramePtr            sensor_measurements,
+                 ScenePtr                  scene,
+                 AssociationResult*        association_result) override;
 
   std::string Name() const override { return "HMTrackersObjectsAssociation"; }
 
  private:
-  void ComputeAssociationDistanceMat(
-      const std::vector<TrackPtr>& fusion_tracks,
-      const std::vector<SensorObjectPtr>& sensor_objects,
-      const Eigen::Vector3d& ref_point,
-      const std::vector<size_t>& unassigned_tracks,
-      const std::vector<size_t>& unassigned_measurements,
-      std::vector<std::vector<double>>* association_mat);
+  void ComputeAssociationDistanceMat(const std::vector<TrackPtr>&        fusion_tracks,
+                                     const std::vector<SensorObjectPtr>& sensor_objects,
+                                     const Eigen::Vector3d&              ref_point,
+                                     const std::vector<size_t>&          unassigned_tracks,
+                                     const std::vector<size_t>&          unassigned_measurements,
+                                     std::vector<std::vector<double>>*   association_mat);
 
-  void IdAssign(const std::vector<TrackPtr>& fusion_tracks,
+  void IdAssign(const std::vector<TrackPtr>&        fusion_tracks,
                 const std::vector<SensorObjectPtr>& sensor_objects,
-                std::vector<TrackMeasurmentPair>* assignments,
-                std::vector<size_t>* unassigned_fusion_tracks,
-                std::vector<size_t>* unassigned_sensor_objects,
-                bool do_nothing = false, bool post = false);
+                std::vector<TrackMeasurmentPair>*   assignments,
+                std::vector<size_t>*                unassigned_fusion_tracks,
+                std::vector<size_t>*                unassigned_sensor_objects,
+                bool                                do_nothing = false,
+                bool                                post       = false);
 
-  void PostIdAssign(const std::vector<TrackPtr>& fusion_tracks,
+  void PostIdAssign(const std::vector<TrackPtr>&        fusion_tracks,
                     const std::vector<SensorObjectPtr>& sensor_objects,
-                    const std::vector<size_t>& unassigned_fusion_tracks,
-                    const std::vector<size_t>& unassigned_sensor_objects,
-                    std::vector<TrackMeasurmentPair>* post_assignments);
+                    const std::vector<size_t>&          unassigned_fusion_tracks,
+                    const std::vector<size_t>&          unassigned_sensor_objects,
+                    std::vector<TrackMeasurmentPair>*   post_assignments);
 
-  bool MinimizeAssignment(
-      const std::vector<std::vector<double>>& association_mat,
-      const std::vector<size_t>& track_ind_l2g,
-      const std::vector<size_t>& measurement_ind_l2g,
-      std::vector<TrackMeasurmentPair>* assignments,
-      std::vector<size_t>* unassigned_tracks,
-      std::vector<size_t>* unassigned_measurements);
+  bool MinimizeAssignment(const std::vector<std::vector<double>>& association_mat,
+                          const std::vector<size_t>&              track_ind_l2g,
+                          const std::vector<size_t>&              measurement_ind_l2g,
+                          std::vector<TrackMeasurmentPair>*       assignments,
+                          std::vector<size_t>*                    unassigned_tracks,
+                          std::vector<size_t>*                    unassigned_measurements);
 
-  void ComputeDistance(const std::vector<TrackPtr>& fusion_tracks,
-                       const std::vector<SensorObjectPtr>& sensor_objects,
-                       const std::vector<size_t>& unassigned_fusion_track,
-                       const std::vector<int>& track_ind_g2l,
-                       const std::vector<int>& measurement_ind_g2l,
-                       const std::vector<size_t>& measurement_ind_l2g,
+  void ComputeDistance(const std::vector<TrackPtr>&            fusion_tracks,
+                       const std::vector<SensorObjectPtr>&     sensor_objects,
+                       const std::vector<size_t>&              unassigned_fusion_track,
+                       const std::vector<int>&                 track_ind_g2l,
+                       const std::vector<int>&                 measurement_ind_g2l,
+                       const std::vector<size_t>&              measurement_ind_l2g,
                        const std::vector<std::vector<double>>& association_mat,
-                       AssociationResult* association_result);
+                       AssociationResult*                      association_result);
 
-  void GenerateUnassignedData(
-      size_t track_num, size_t objects_num,
-      const std::vector<TrackMeasurmentPair>& assignments,
-      std::vector<size_t>* unassigned_tracks,
-      std::vector<size_t>* unassigned_objects);
+  void GenerateUnassignedData(size_t                                  track_num,
+                              size_t                                  objects_num,
+                              const std::vector<TrackMeasurmentPair>& assignments,
+                              std::vector<size_t>*                    unassigned_tracks,
+                              std::vector<size_t>*                    unassigned_objects);
 
  private:
   common::GatedHungarianMatcher<float> optimizer_;
-  TrackObjectDistance track_object_distance_;
-  static double s_match_distance_thresh_;
-  static double s_match_distance_bound_;
-  static double s_association_center_dist_threshold_;
+  TrackObjectDistance                  track_object_distance_;
+  static double                        s_match_distance_thresh_;
+  static double                        s_match_distance_bound_;
+  static double                        s_association_center_dist_threshold_;
 };
 
 }  // namespace fusion

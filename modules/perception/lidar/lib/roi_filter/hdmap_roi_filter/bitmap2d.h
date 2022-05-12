@@ -19,6 +19,7 @@
 #include <vector>
 
 #include <boost/format.hpp>
+
 #include "Eigen/Core"
 
 namespace apollo {
@@ -31,22 +32,23 @@ class Bitmap2D {
   typedef Eigen::Matrix<size_t, 2, 1> Vec2ui;
   typedef Eigen::Matrix<size_t, 3, 1> Vec3ui;
 
-  Bitmap2D() = default;
+  Bitmap2D()          = default;
   virtual ~Bitmap2D() = default;
 
   inline DirectionMajor OppositeDirection(const DirectionMajor dir_major);
 
   // getter and setter
-  const Eigen::Vector2d& min_range() const { return min_range_; }
-  const Eigen::Vector2d& max_range() const { return max_range_; }
-  const Eigen::Vector2d& cell_size() const { return cell_size_; }
-  const Vec2ui& map_size() const { return map_size_; }
-  const Vec2ui& dims() const { return dims_; }
+  const Eigen::Vector2d&       min_range() const { return min_range_; }
+  const Eigen::Vector2d&       max_range() const { return max_range_; }
+  const Eigen::Vector2d&       cell_size() const { return cell_size_; }
+  const Vec2ui&                map_size() const { return map_size_; }
+  const Vec2ui&                dims() const { return dims_; }
   const std::vector<uint64_t>& bitmap() const { return bitmap_; }
-  int dir_major() const { return static_cast<int>(dir_major_); }
-  int op_dir_major() const { return static_cast<int>(op_dir_major_); }
+  int                          dir_major() const { return static_cast<int>(dir_major_); }
+  int                          op_dir_major() const { return static_cast<int>(op_dir_major_); }
 
-  void Init(const Eigen::Vector2d& min_range, const Eigen::Vector2d& max_range,
+  void Init(const Eigen::Vector2d& min_range,
+            const Eigen::Vector2d& max_range,
             const Eigen::Vector2d& cell_size);
 
   void SetUp(const DirectionMajor dir_major);
@@ -65,12 +67,10 @@ class Bitmap2D {
 
   // output some meta data
   friend std::ostream& operator<<(std::ostream& out, const Bitmap2D& bitmap) {
-    out << boost::format(
-               "min_range: %lf %lf; max_range: %lf %lf;"
-               "cell_size: %lf %lf; dims: %d %d; dir_major: %s") %
-               bitmap.min_range_.x() % bitmap.min_range_.y() %
-               bitmap.max_range_.x() % bitmap.max_range_.y() %
-               bitmap.cell_size_.x() % bitmap.cell_size_.y() %
+    out << boost::format("min_range: %lf %lf; max_range: %lf %lf;"
+                         "cell_size: %lf %lf; dims: %d %d; dir_major: %s") %
+               bitmap.min_range_.x() % bitmap.min_range_.y() % bitmap.max_range_.x() %
+               bitmap.max_range_.y() % bitmap.cell_size_.x() % bitmap.cell_size_.y() %
                bitmap.dims_.x() % bitmap.dims_.y() %
                (bitmap.dir_major_ == DirectionMajor::XMAJOR ? "x" : "y");
     return out;
@@ -88,24 +88,22 @@ class Bitmap2D {
   inline void SetHeadBits(const size_t tail_num, uint64_t* block);
   inline void ResetHeadBits(const size_t tail_num, uint64_t* block);
 
-  inline void SetRangeBits(const size_t head, const size_t tail,
-                           uint64_t* block);
+  inline void SetRangeBits(const size_t head, const size_t tail, uint64_t* block);
 
-  inline void ResetRangeBits(const size_t head, const size_t tail,
-                             uint64_t* block);
+  inline void ResetRangeBits(const size_t head, const size_t tail, uint64_t* block);
 
   inline Vec3ui RealToBitmap(const Eigen::Vector2d& p) const;
-  inline int Index(const Vec3ui& p) const;
+  inline int    Index(const Vec3ui& p) const;
 
   Eigen::Vector2d min_range_;
   Eigen::Vector2d max_range_;
   Eigen::Vector2d cell_size_;
-  Vec2ui dims_;
-  DirectionMajor dir_major_ = DirectionMajor::XMAJOR;
-  DirectionMajor op_dir_major_ = DirectionMajor::YMAJOR;
+  Vec2ui          dims_;
+  DirectionMajor  dir_major_    = DirectionMajor::XMAJOR;
+  DirectionMajor  op_dir_major_ = DirectionMajor::YMAJOR;
 
   std::vector<uint64_t> bitmap_;
-  Vec2ui map_size_;
+  Vec2ui                map_size_;
 };
 
 }  // namespace lidar

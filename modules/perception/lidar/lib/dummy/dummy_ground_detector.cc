@@ -15,27 +15,20 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/dummy/dummy_ground_detector.h"
+
 #include <numeric>
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool DummyGroundDetector::Init(const GroundDetectorInitOptions& options) {
-  return true;
-}
+bool DummyGroundDetector::Init(const GroundDetectorInitOptions& options) { return true; }
 
-bool DummyGroundDetector::Detect(const GroundDetectorOptions& options,
-                                 LidarFrame* frame) {
-  if (!frame) {
-    return false;
-  }
-  if (!frame->cloud) {
-    return false;
-  }
+bool DummyGroundDetector::Detect(const GroundDetectorOptions& options, LidarFrame* frame) {
+  if (!frame) { return false; }
+  if (!frame->cloud) { return false; }
   frame->non_ground_indices.indices.resize(frame->cloud->size());
-  std::iota(frame->non_ground_indices.indices.begin(),
-            frame->non_ground_indices.indices.end(), 0);
+  std::iota(frame->non_ground_indices.indices.begin(), frame->non_ground_indices.indices.end(), 0);
 
   return true;
 }

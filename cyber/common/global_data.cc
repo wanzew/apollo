@@ -39,12 +39,10 @@ AtomicHashMap<uint64_t, std::string, 256> GlobalData::task_id_map_;
 
 namespace {
 const std::string& kEmptyString = "";
-std::string program_path() {
+std::string        program_path() {
   char path[PATH_MAX];
   auto len = readlink("/proc/self/exe", path, sizeof(path) - 1);
-  if (len == -1) {
-    return kEmptyString;
-  }
+  if (len == -1) { return kEmptyString; }
   path[len] = '\0';
   return std::string(path);
 }
@@ -53,7 +51,7 @@ std::string program_path() {
 GlobalData::GlobalData() {
   InitHostInfo();
   ACHECK(InitConfig());
-  process_id_ = getpid();
+  process_id_    = getpid();
   auto prog_path = program_path();
   if (!prog_path.empty()) {
     process_group_ = GetFileName(prog_path) + "_" + std::to_string(process_id_);
@@ -62,8 +60,8 @@ GlobalData::GlobalData() {
   }
 
   const auto& run_mode_conf = config_.run_mode_conf();
-  run_mode_ = run_mode_conf.run_mode();
-  clock_mode_ = run_mode_conf.clock_mode();
+  run_mode_                 = run_mode_conf.run_mode();
+  clock_mode_               = run_mode_conf.clock_mode();
 }
 
 GlobalData::~GlobalData() {}
@@ -75,33 +73,23 @@ void GlobalData::SetProcessGroup(const std::string& process_group) {
 }
 const std::string& GlobalData::ProcessGroup() const { return process_group_; }
 
-void GlobalData::SetComponentNums(const int component_nums) {
-  component_nums_ = component_nums;
-}
-int GlobalData::ComponentNums() const { return component_nums_; }
+void GlobalData::SetComponentNums(const int component_nums) { component_nums_ = component_nums; }
+int  GlobalData::ComponentNums() const { return component_nums_; }
 
-void GlobalData::SetSchedName(const std::string& sched_name) {
-  sched_name_ = sched_name;
-}
+void GlobalData::SetSchedName(const std::string& sched_name) { sched_name_ = sched_name; }
 const std::string& GlobalData::SchedName() const { return sched_name_; }
 
 const std::string& GlobalData::HostIp() const { return host_ip_; }
 
 const std::string& GlobalData::HostName() const { return host_name_; }
 
-void GlobalData::EnableSimulationMode() {
-  run_mode_ = RunMode::MODE_SIMULATION;
-}
+void GlobalData::EnableSimulationMode() { run_mode_ = RunMode::MODE_SIMULATION; }
 
 void GlobalData::DisableSimulationMode() { run_mode_ = RunMode::MODE_REALITY; }
 
-bool GlobalData::IsRealityMode() const {
-  return run_mode_ == RunMode::MODE_REALITY;
-}
+bool GlobalData::IsRealityMode() const { return run_mode_ == RunMode::MODE_REALITY; }
 
-bool GlobalData::IsMockTimeMode() const {
-  return clock_mode_ == ClockMode::MODE_MOCK;
-}
+bool GlobalData::IsMockTimeMode() const { return clock_mode_ == ClockMode::MODE_MOCK; }
 
 void GlobalData::InitHostInfo() {
   char host_name[1024];
@@ -130,16 +118,12 @@ void GlobalData::InitHostInfo() {
     return;
   }
   for (ifaddrs* ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == nullptr) {
-      continue;
-    }
+    if (ifa->ifa_addr == nullptr) { continue; }
     int family = ifa->ifa_addr->sa_family;
-    if (family != AF_INET) {
-      continue;
-    }
+    if (family != AF_INET) { continue; }
     char addr[NI_MAXHOST] = {0};
-    if (getnameinfo(ifa->ifa_addr, sizeof(sockaddr_in), addr, NI_MAXHOST, NULL,
-                    0, NI_NUMERICHOST) != 0) {
+    if (getnameinfo(ifa->ifa_addr, sizeof(sockaddr_in), addr, NI_MAXHOST, NULL, 0,
+                    NI_NUMERICHOST) != 0) {
       continue;
     }
     std::string tmp_ip(addr);
@@ -170,9 +154,7 @@ uint64_t GlobalData::RegisterNode(const std::string& node_name) {
   while (node_id_map_.Has(id)) {
     std::string* name = nullptr;
     node_id_map_.Get(id, &name);
-    if (node_name == *name) {
-      break;
-    }
+    if (node_name == *name) { break; }
     ++id;
     AWARN << " Node name hash collision: " << node_name << " <=> " << *name;
   }
@@ -182,9 +164,7 @@ uint64_t GlobalData::RegisterNode(const std::string& node_name) {
 
 std::string GlobalData::GetNodeById(uint64_t id) {
   std::string* node_name = nullptr;
-  if (node_id_map_.Get(id, &node_name)) {
-    return *node_name;
-  }
+  if (node_id_map_.Get(id, &node_name)) { return *node_name; }
   return kEmptyString;
 }
 
@@ -193,9 +173,7 @@ uint64_t GlobalData::RegisterChannel(const std::string& channel) {
   while (channel_id_map_.Has(id)) {
     std::string* name = nullptr;
     channel_id_map_.Get(id, &name);
-    if (channel == *name) {
-      break;
-    }
+    if (channel == *name) { break; }
     ++id;
     AWARN << "Channel name hash collision: " << channel << " <=> " << *name;
   }
@@ -205,9 +183,7 @@ uint64_t GlobalData::RegisterChannel(const std::string& channel) {
 
 std::string GlobalData::GetChannelById(uint64_t id) {
   std::string* channel = nullptr;
-  if (channel_id_map_.Get(id, &channel)) {
-    return *channel;
-  }
+  if (channel_id_map_.Get(id, &channel)) { return *channel; }
   return kEmptyString;
 }
 
@@ -216,9 +192,7 @@ uint64_t GlobalData::RegisterService(const std::string& service) {
   while (service_id_map_.Has(id)) {
     std::string* name = nullptr;
     service_id_map_.Get(id, &name);
-    if (service == *name) {
-      break;
-    }
+    if (service == *name) { break; }
     ++id;
     AWARN << "Service name hash collision: " << service << " <=> " << *name;
   }
@@ -228,9 +202,7 @@ uint64_t GlobalData::RegisterService(const std::string& service) {
 
 std::string GlobalData::GetServiceById(uint64_t id) {
   std::string* service = nullptr;
-  if (service_id_map_.Get(id, &service)) {
-    return *service;
-  }
+  if (service_id_map_.Get(id, &service)) { return *service; }
   return kEmptyString;
 }
 
@@ -239,9 +211,7 @@ uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
   while (task_id_map_.Has(id)) {
     std::string* name = nullptr;
     task_id_map_.Get(id, &name);
-    if (task_name == *name) {
-      break;
-    }
+    if (task_name == *name) { break; }
     ++id;
     AWARN << "Task name hash collision: " << task_name << " <=> " << *name;
   }
@@ -251,9 +221,7 @@ uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
 
 std::string GlobalData::GetTaskNameById(uint64_t id) {
   std::string* task_name = nullptr;
-  if (task_id_map_.Get(id, &task_name)) {
-    return *task_name;
-  }
+  if (task_id_map_.Get(id, &task_name)) { return *task_name; }
   return kEmptyString;
 }
 

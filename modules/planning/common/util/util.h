@@ -23,9 +23,10 @@
 #include <boost/range/iterator_range.hpp>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/routing/proto/routing.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -36,21 +37,19 @@ bool IsVehicleStateValid(const apollo::common::VehicleState& vehicle_state);
 bool IsDifferentRouting(const apollo::routing::RoutingResponse& first,
                         const apollo::routing::RoutingResponse& second);
 
-double GetADCStopDeceleration(
-    apollo::common::VehicleStateProvider* vehicle_state,
-    const double adc_front_edge_s, const double stop_line_s);
+double GetADCStopDeceleration(apollo::common::VehicleStateProvider* vehicle_state,
+                              const double                          adc_front_edge_s,
+                              const double                          stop_line_s);
 
 bool CheckStopSignOnReferenceLine(const ReferenceLineInfo& reference_line_info,
-                                  const std::string& stop_sign_overlap_id);
+                                  const std::string&       stop_sign_overlap_id);
 
-bool CheckTrafficLightOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& traffic_light_overlap_id);
+bool CheckTrafficLightOnReferenceLine(const ReferenceLineInfo& reference_line_info,
+                                      const std::string&       traffic_light_overlap_id);
 
 bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
 
-void GetFilesByPath(const boost::filesystem::path& path,
-                    std::vector<std::string>* files);
+void GetFilesByPath(const boost::filesystem::path& path, std::vector<std::string>* files);
 
 }  // namespace util
 }  // namespace planning

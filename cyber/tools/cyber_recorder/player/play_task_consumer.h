@@ -30,11 +30,10 @@ namespace record {
 
 class PlayTaskConsumer {
  public:
-  using ThreadPtr = std::unique_ptr<std::thread>;
+  using ThreadPtr     = std::unique_ptr<std::thread>;
   using TaskBufferPtr = std::shared_ptr<PlayTaskBuffer>;
 
-  explicit PlayTaskConsumer(const TaskBufferPtr& task_buffer,
-                            double play_rate = 1.0);
+  explicit PlayTaskConsumer(const TaskBufferPtr& task_buffer, double play_rate = 1.0);
   virtual ~PlayTaskConsumer();
 
   void Start(uint64_t begin_time_ns);
@@ -45,23 +44,21 @@ class PlayTaskConsumer {
 
   uint64_t base_msg_play_time_ns() const { return base_msg_play_time_ns_; }
   uint64_t base_msg_real_time_ns() const { return base_msg_real_time_ns_; }
-  uint64_t last_played_msg_real_time_ns() const {
-    return last_played_msg_real_time_ns_;
-  }
+  uint64_t last_played_msg_real_time_ns() const { return last_played_msg_real_time_ns_; }
 
  private:
   void ThreadFunc();
 
-  double play_rate_;
-  ThreadPtr consume_th_;
-  TaskBufferPtr task_buffer_;
-  std::atomic<bool> is_stopped_;
-  std::atomic<bool> is_paused_;
-  std::atomic<bool> is_playonce_;
-  uint64_t begin_time_ns_;
-  uint64_t base_msg_play_time_ns_;
-  uint64_t base_msg_real_time_ns_;
-  uint64_t last_played_msg_real_time_ns_;
+  double                play_rate_;
+  ThreadPtr             consume_th_;
+  TaskBufferPtr         task_buffer_;
+  std::atomic<bool>     is_stopped_;
+  std::atomic<bool>     is_paused_;
+  std::atomic<bool>     is_playonce_;
+  uint64_t              begin_time_ns_;
+  uint64_t              base_msg_play_time_ns_;
+  uint64_t              base_msg_real_time_ns_;
+  uint64_t              last_played_msg_real_time_ns_;
   static const uint64_t kPauseSleepNanoSec;
   static const uint64_t kWaitProduceSleepNanoSec;
   static const uint64_t MIN_SLEEP_DURATION_NS;

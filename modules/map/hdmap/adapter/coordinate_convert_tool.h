@@ -34,11 +34,13 @@ class CoordinateConvertTool {
   static CoordinateConvertTool* GetInstance();
 
  public:
-  Status SetConvertParam(const std::string& source_param,
-                         const std::string& dst_param);
-  Status CoordiateConvert(const double longitude, const double latitude,
-                          const double height_ellipsoid, double* utm_x,
-                          double* utm_y, double* utm_z);
+  Status SetConvertParam(const std::string& source_param, const std::string& dst_param);
+  Status CoordiateConvert(const double longitude,
+                          const double latitude,
+                          const double height_ellipsoid,
+                          double*      utm_x,
+                          double*      utm_y,
+                          double*      utm_z);
 
  private:
   std::string source_convert_param_;

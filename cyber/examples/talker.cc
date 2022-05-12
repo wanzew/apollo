@@ -24,14 +24,14 @@ using apollo::cyber::Rate;
 using apollo::cyber::Time;
 using apollo::cyber::examples::proto::Chatter;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   // init cyber framework
   apollo::cyber::Init(argv[0]);
   // create talker node
   auto talker_node = apollo::cyber::CreateNode("talker");
   // create talker
-  auto talker = talker_node->CreateWriter<Chatter>("channel/chatter");
-  Rate rate(1.0);
+  auto     talker = talker_node->CreateWriter<Chatter>("channel/chatter");
+  Rate     rate(1.0);
   uint64_t seq = 0;
   while (apollo::cyber::OK()) {
     auto msg = std::make_shared<Chatter>();

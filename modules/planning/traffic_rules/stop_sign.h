@@ -31,17 +31,14 @@ namespace planning {
 
 class StopSign : public TrafficRule {
  public:
-  StopSign(const TrafficRuleConfig& config,
-           const std::shared_ptr<DependencyInjector>& injector);
+  StopSign(const TrafficRuleConfig& config, const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~StopSign() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
+  void MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   static constexpr char const* STOP_SIGN_VO_ID_PREFIX = "SS_";

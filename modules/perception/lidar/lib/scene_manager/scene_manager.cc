@@ -15,11 +15,12 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 
+#include "modules/perception/lidar/lib/scene_manager/proto/scene_manager_config.pb.h"
+#include "modules/perception/proto/perception_config_schema.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lidar/lib/scene_manager/proto/scene_manager_config.pb.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
-#include "modules/perception/proto/perception_config_schema.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -28,15 +29,13 @@ namespace lidar {
 using cyber::common::GetAbsolutePath;
 
 bool SceneManager::InitInternal(const SceneManagerInitOptions& options) {
-  if (initialized_) {
-    return true;
-  }
-  auto config_manager = lib::ConfigManager::Instance();
-  const lib::ModelConfig* model_config = nullptr;
+  if (initialized_) { return true; }
+  auto                    config_manager = lib::ConfigManager::Instance();
+  const lib::ModelConfig* model_config   = nullptr;
   ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
-  std::string config_file;
-  std::string root_path;
+  std::string       config_file;
+  std::string       root_path;
   ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "scene_manager.conf");
@@ -44,7 +43,7 @@ bool SceneManager::InitInternal(const SceneManagerInitOptions& options) {
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   services_.clear();
   for (int i = 0; i < config.service_name_size(); ++i) {
-    const auto& name = config.service_name(i);
+    const auto&     name = config.service_name(i);
     SceneServicePtr service(SceneServiceRegisterer::GetInstanceByName(name));
     if (service == nullptr) {
       AINFO << "Failed to find scene service: " << name << ", skipped";
@@ -63,22 +62,20 @@ bool SceneManager::InitInternal(const SceneManagerInitOptions& options) {
 
 bool SceneManager::Init(const SceneManagerInitOptions& options) {
   std::lock_guard<std::mutex> lock(mutex_);
-  bool status = InitInternal(options);
+  bool                        status = InitInternal(options);
   return status;
 }
 
 bool SceneManager::Reset(const SceneManagerInitOptions& options) {
   std::lock_guard<std::mutex> lock(mutex_);
   initialized_ = false;
-  bool status = InitInternal(options);
+  bool status  = InitInternal(options);
   return status;
 }
 
 SceneServicePtr SceneManager::Service(const std::string& name) {
   auto iter = services_.find(name);
-  if (iter == services_.end()) {
-    return nullptr;
-  }
+  if (iter == services_.end()) { return nullptr; }
   return iter->second;
 }
 

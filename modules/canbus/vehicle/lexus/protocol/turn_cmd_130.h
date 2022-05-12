@@ -17,14 +17,14 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Turncmd130 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+class Turncmd130 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -62,8 +62,7 @@ class Turncmd130 : public ::apollo::drivers::canbus::ProtocolData<
   // 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
   // 'bit': 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Turncmd130* set_turn_signal_cmd(
-      Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd);
+  Turncmd130* set_turn_signal_cmd(Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd);
 
  private:
   // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0,
@@ -92,14 +91,13 @@ class Turncmd130 : public ::apollo::drivers::canbus::ProtocolData<
   // 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
   // 'bit': 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_turn_signal_cmd(uint8_t* data,
-                             Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd);
+  void set_p_turn_signal_cmd(uint8_t* data, Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd);
 
  private:
-  bool ignore_overrides_;
-  bool enable_;
-  bool clear_override_;
-  bool clear_faults_;
+  bool                              ignore_overrides_;
+  bool                              enable_;
+  bool                              clear_override_;
+  bool                              clear_faults_;
   Turn_cmd_130::Turn_signal_cmdType turn_signal_cmd_;
 };
 

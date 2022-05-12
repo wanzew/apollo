@@ -22,7 +22,7 @@
 #include <vector>
 
 #ifndef CTRL
-#define CTRL(c) ((c)&0x1F)
+#  define CTRL(c) ((c)&0x1F)
 #endif
 
 class RenderableMessage;
@@ -32,7 +32,7 @@ class Screen final {
   static const char InteractiveCmdStr[];
 
   enum ColorPair {  // foreground color - background color
-    INVALID = 0,
+    INVALID     = 0,
     GREEN_BLACK = 1,
     YELLOW_BLACK,
     RED_BLACK,
@@ -54,16 +54,14 @@ class Screen final {
   void AddStr(int x, int y, ColorPair color, const char* str) const;
 
   ColorPair Color(void) const { return current_color_pair_; }
-  void SetCurrentColor(ColorPair color) const;
-  void AddStr(int x, int y, const char* str) const;
-  void AddStr(const char* str) const;
-  void MoveOffsetXY(int offsetX, int offsetY) const;
-  void ClearCurrentColor(void) const;
+  void      SetCurrentColor(ColorPair color) const;
+  void      AddStr(int x, int y, const char* str) const;
+  void      AddStr(const char* str) const;
+  void      MoveOffsetXY(int offsetX, int offsetY) const;
+  void      ClearCurrentColor(void) const;
 
   void SetCurrentRenderMessage(RenderableMessage* const render_obj) {
-    if (render_obj) {
-      current_render_obj_ = render_obj;
-    }
+    if (render_obj) { current_render_obj_ = render_obj; }
   }
 
  private:
@@ -71,7 +69,7 @@ class Screen final {
   Screen(const Screen&) = delete;
   Screen& operator=(const Screen&) = delete;
 
-  int SwitchState(int ch);
+  int  SwitchState(int ch);
   void HighlightLine(int line_no);
 
   void ShowInteractiveCmd(int ch);
@@ -81,10 +79,10 @@ class Screen final {
 
   enum class State { RenderMessage, RenderInterCmdInfo };
 
-  mutable ColorPair current_color_pair_;
-  bool canRun_;
-  State current_state_;
-  int highlight_direction_;
+  mutable ColorPair  current_color_pair_;
+  bool               canRun_;
+  State              current_state_;
+  int                highlight_direction_;
   RenderableMessage* current_render_obj_;
 };
 

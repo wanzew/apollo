@@ -29,12 +29,12 @@ namespace common {
 // Another 3D Plane Data structure:
 template <typename T>
 struct PlanePara {
-  PlanePara(const PlanePara<T> &pi) {
+  PlanePara(const PlanePara<T>& pi) {
     ICopy4(pi.p, p);
     ICopy3(pi.t, t);
     ICopy2(pi.data_stat, data_stat);
   }
-  PlanePara &operator=(const PlanePara<T> &pi) {
+  PlanePara& operator=(const PlanePara<T>& pi) {
     ICopy4(pi.p, this->p);
     ICopy3(pi.t, this->t);
     ICopy2(pi.data_stat, this->data_stat);
@@ -45,13 +45,13 @@ struct PlanePara {
   T t[3];  // centroid
            // mean distance and standard deviation of
            // the point to plane distance distribution
-  T data_stat[2];
+  T    data_stat[2];
   void Clear() {
     IZero4(p);
     IZero3(t);
     IZero2(data_stat);
   }
-  void Assign(const T *pi) {
+  void Assign(const T* pi) {
     ICopy4(pi, p);
     ICopy3(pi + 4, t);
     ICopy2(pi + 7, data_stat);
@@ -62,12 +62,12 @@ struct PlanePara {
 
 // Compute the projection (q) of a 3D point (p) on a plane (pi) in 3D space
 template <typename T>
-inline void IPointOnPlaneProjection(const T *pi, const T *p, T *q) {
+inline void IPointOnPlaneProjection(const T* pi, const T* p, T* q) {
   T npi[4];
   ICopy4(pi, npi);
   T sf = IRec(IL2Norm3(npi));
   IScale4(npi, sf);  // plane with unit norm
-  sf = -(IDot3(npi, p) + npi[3]);
+  sf   = -(IDot3(npi, p) + npi[3]);
   q[0] = p[0] + sf * npi[0];
   q[1] = p[1] + sf * npi[1];
   q[2] = p[2] + sf * npi[2];
@@ -76,21 +76,21 @@ inline void IPointOnPlaneProjection(const T *pi, const T *p, T *q) {
 // Measure point to plane distance in 3D space, point p is in inhomogeneous
 // coordinates
 template <typename T>
-inline T IPlaneToPointDistance(const T *pi, const T *p) {
+inline T IPlaneToPointDistance(const T* pi, const T* p) {
   return IDiv(IAbs(IDot3(pi, p) + pi[3]), IL2Norm3(pi));
 }
 
 // Measure point to plane distance in 3D space, point p is in inhomogeneous
 // coordinates
 template <typename T>
-inline T IPlaneToPointDistance(const T *pi, const T *p, T l2_norm3_pi) {
+inline T IPlaneToPointDistance(const T* pi, const T* p, T l2_norm3_pi) {
   return IDiv(IAbs(IDot3(pi, p) + pi[3]), l2_norm3_pi);
 }
 
 // Measure point to plane distance in 3D space, point p is in inhomogeneous
 // coordinates
 template <typename T>
-inline T IPlaneToPointDistanceWUnitNorm(const T *pi, const T *p) {
+inline T IPlaneToPointDistanceWUnitNorm(const T* pi, const T* p) {
   return IAbs(IDot3(pi, p) + pi[3]);
 }
 
@@ -99,31 +99,27 @@ inline T IPlaneToPointDistanceWUnitNorm(const T *pi, const T *p) {
 // distance is positive if p is on the same side of the plane pi as the normal
 // vector and negative if it is on the opposite side
 template <typename T>
-inline T IPlaneToPointSignedDistanceWUnitNorm(const T *pi, const T *p) {
+inline T IPlaneToPointSignedDistanceWUnitNorm(const T* pi, const T* p) {
   return IDot3(pi, p) + pi[3];
 }
 
 // Measure point to plane distance in 3D space, point p is in inhomogeneous
 // coordinates
 template <typename T>
-inline T IPlaneToPointDistanceWNormalizedPlaneNorm(const T *pi, const T *p) {
+inline T IPlaneToPointDistanceWNormalizedPlaneNorm(const T* pi, const T* p) {
   return IAbs(IDot3(pi, p) + pi[3]);
 }
 
 // Measure the normal angle in degree between two planes
 template <typename T>
-inline T IPlaneToPlaneNormalDeltaDegreeZUp(const T *pi_p, const T *pi_q) {
+inline T IPlaneToPlaneNormalDeltaDegreeZUp(const T* pi_p, const T* pi_q) {
   T normal_p[3], normal_q[3];
   ICopy3(pi_p, normal_p);
   ICopy3(pi_q, normal_q);
 
   // Z is up
-  if (normal_p[2] < static_cast<T>(0.0)) {
-    INeg3(normal_p);
-  }
-  if (normal_q[2] < static_cast<T>(0.0)) {
-    INeg3(normal_q);
-  }
+  if (normal_p[2] < static_cast<T>(0.0)) { INeg3(normal_p); }
+  if (normal_q[2] < static_cast<T>(0.0)) { INeg3(normal_q); }
 
   IScale3(normal_p, IRec(ISqrt(IQquaresum3(normal_p))));  // normalize
   IScale3(normal_q, IRec(ISqrt(IQquaresum3(normal_q))));  // normalize
@@ -137,13 +133,11 @@ inline T IPlaneToPlaneNormalDeltaDegreeZUp(const T *pi_p, const T *pi_q) {
 // pi is stored as 4 - vector[a, b, c, d]. x will be destroyed after calling
 // this routine.
 template <typename T>
-inline void IPlaneFitTotalLeastSquare(T *X, T *pi, int n) {
+inline void IPlaneFitTotalLeastSquare(T* X, T* pi, int n) {
   IZero4(pi);
-  if (n < 3) {
-    return;
-  }
+  if (n < 3) { return; }
   int i, j;
-  T mat_a[9], eigv[3], mat_q[9];
+  T   mat_a[9], eigv[3], mat_q[9];
   // compute the centroid of input Data points
   T xm = static_cast<T>(0.0);
   T ym = static_cast<T>(0.0);
@@ -179,7 +173,7 @@ inline void IPlaneFitTotalLeastSquare(T *X, T *pi, int n) {
 // pi is stored as 4 - vector[a, b, c, d]. x will be destroyed after calling
 // this routine.
 template <typename T>
-inline void IPlaneFitTotalLeastSquare3(T *X, T *pi) {
+inline void IPlaneFitTotalLeastSquare3(T* X, T* pi) {
   T mat_a[9];
   T eigv[3];
   T mat_q[9];
@@ -214,21 +208,14 @@ inline void IPlaneFitTotalLeastSquare3(T *X, T *pi) {
 // are stored as[x0, y0, z0, x1, y1, z1, ...].
 // The routine needs n * 3 positions of scratch space in Xp.
 template <typename T>
-inline void IPlaneFitTotalLeastSquare(const T *X, T *pi, int n, T *Xp,
-                                      T *centroid, T *err_stat) {
+inline void IPlaneFitTotalLeastSquare(const T* X, T* pi, int n, T* Xp, T* centroid, T* err_stat) {
   IZero4(pi);
-  if (centroid != nullptr) {
-    IZero3(centroid);
-  }
-  if (err_stat != nullptr) {
-    IZero2(err_stat);
-  }
-  if (n < 3) {
-    return;
-  }
+  if (centroid != nullptr) { IZero3(centroid); }
+  if (err_stat != nullptr) { IZero2(err_stat); }
+  if (n < 3) { return; }
 
   int i, j, n3 = n * 3;
-  T mat_a[9], eigv[3], mat_q[9], t[3];
+  T   mat_a[9], eigv[3], mat_q[9], t[3];
   // compute the centroid of input Data points
   T xm = static_cast<T>(0.0);
   T ym = static_cast<T>(0.0);
@@ -255,13 +242,11 @@ inline void IPlaneFitTotalLeastSquare(const T *X, T *pi, int n, T *Xp,
   // the optimal plane should pass [xm, ym, zm]:
   pi[3] = -IDot3(pi, t);
 
-  if (centroid != nullptr) {
-    ICopy3(t, centroid);
-  }
+  if (centroid != nullptr) { ICopy3(t, centroid); }
 
   // Data stat:
   if (err_stat != nullptr) {
-    const T *cptr_data = X;
+    const T* cptr_data = X;
     for (i = 0; i < n; ++i) {
       Xp[i] = IPlaneToPointDistance(pi, cptr_data);
       cptr_data += 3;
@@ -278,14 +263,12 @@ inline void IPlaneFitTotalLeastSquare(const T *X, T *pi, int n, T *Xp,
 // pi is stored as 4 - vector[a, b, c, d]. x and indices will be destroyed after
 // calling this routine.
 template <typename T>
-inline void IPlaneFitTotalLeastSquare(T *X, int *indices, T *pi, int m, int n) {
+inline void IPlaneFitTotalLeastSquare(T* X, int* indices, T* pi, int m, int n) {
   IZero4(pi);
-  if (n < 3 || n > m) {
-    return;
-  }
+  if (n < 3 || n > m) { return; }
   IIndexedShuffle(X, indices, m, 3, n);
   int i, j;
-  T mat_a[9], eigv[3], mat_q[9];
+  T   mat_a[9], eigv[3], mat_q[9];
   // compute the centroid of input Data points
   T xm = static_cast<T>(0.0);
   T ym = static_cast<T>(0.0);
@@ -321,15 +304,12 @@ inline void IPlaneFitTotalLeastSquare(T *X, int *indices, T *pi, int m, int n) {
 // pi is stored as 4 - vector[a, b, c, d]. x and indices will be destroyed after
 // calling this routine.
 template <typename T>
-inline void IPlaneFitTotalLeastSquare(T *X, int *indices, T *pi, T *centroid,
-                                      int m, int n) {
+inline void IPlaneFitTotalLeastSquare(T* X, int* indices, T* pi, T* centroid, int m, int n) {
   IZero4(pi);
-  if (n < 3 || n > m) {
-    return;
-  }
+  if (n < 3 || n > m) { return; }
   IIndexedShuffle(X, indices, m, 3, n);
   int i, j;
-  T mat_a[9], eigv[3], mat_q[9];
+  T   mat_a[9], eigv[3], mat_q[9];
   // compute the centroid of input Data points
   T xm = static_cast<T>(0.0);
   T ym = static_cast<T>(0.0);
@@ -369,14 +349,11 @@ inline void IPlaneFitTotalLeastSquare(T *X, int *indices, T *pi, T *centroid,
 // points are in inhomogeneous coordinates. Array X has Size n * 3 and points
 // are stored as[x0, y0, z0, x1, y1, z1, ...].
 template <typename T>
-inline void IPlaneFitTotalLeastSquareAdv(T *X, int *indices, T *para, int m,
-                                         int n) {
+inline void IPlaneFitTotalLeastSquareAdv(T* X, int* indices, T* para, int m, int n) {
   IZero9(para);
-  if (n < 3 || n > m) {
-    return;
-  }
+  if (n < 3 || n > m) { return; }
   int i, j;
-  T *xp = IAlloc<T>(n * 3);
+  T*  xp = IAlloc<T>(n * 3);
   for (i = 0; i < n; i++) {
     j = indices[i];
     ICopy3(X + j * 3, xp + i * 3);
@@ -415,7 +392,7 @@ inline void IPlaneFitTotalLeastSquareAdv(T *X, int *indices, T *para, int m,
   // Data stat:
 
   for (i = 0; i < n; ++i) {
-    j = indices[i];
+    j     = indices[i];
     xp[i] = IPlaneToPointDistance(para, X + j * 3);
   }
   para[7] = IMean(xp, n);
@@ -426,7 +403,7 @@ inline void IPlaneFitTotalLeastSquareAdv(T *X, int *indices, T *para, int m,
 // Fit a plane pi (ax+by+cz+d = 0) with three 3D points in inhomogeneous
 // space - minimal solution
 template <typename T>
-inline void IPlaneFit(const T *X1, const T *X2, const T *X3, T *pi) {
+inline void IPlaneFit(const T* X1, const T* X2, const T* X3, T* pi) {
   T mat_a[9] = {X1[0], X1[1], X1[2], X2[0], X2[1], X2[2], X3[0], X3[1], X3[2]};
   IPlaneFitTotalLeastSquare(mat_a, pi, 3);
 }
@@ -434,7 +411,7 @@ inline void IPlaneFit(const T *X1, const T *X2, const T *X3, T *pi) {
 // Fit a plane pi (ax+by+cz+d = 0) with three 3D points in inhomogeneous
 // space - minimal solution
 template <typename T>
-inline void IPlaneFit(const T *Xs, T *pi) {
+inline void IPlaneFit(const T* Xs, T* pi) {
   T mat_a[9];
   ICopy9(Xs, mat_a);
   IPlaneFitTotalLeastSquare(mat_a, pi, 3);
@@ -444,15 +421,15 @@ inline void IPlaneFit(const T *Xs, T *pi) {
 // space - minimal solution,
 // note that the input Xs will be destroyed
 template <typename T>
-inline void IPlaneFitDestroyed(T *Xs, T *pi) {
+inline void IPlaneFitDestroyed(T* Xs, T* pi) {
   IPlaneFitTotalLeastSquare3(Xs, pi);
 }
 
 // Fit a plane pi: {[a,b,c,d], [x,y,z]} with three 3D points in inhomogeneous
 // space - minimal solution
 template <typename T>
-inline void IPlaneFitAdv(const T *Xs, T *para) {
-  T mat_a[9], mat_ap[9];
+inline void IPlaneFitAdv(const T* Xs, T* para) {
+  T            mat_a[9], mat_ap[9];
   PlanePara<T> pi;
   ICopy9(Xs, mat_a);
   IPlaneFitTotalLeastSquare(mat_a, pi, mat_ap, 3);

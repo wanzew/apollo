@@ -16,11 +16,12 @@
 
 #include "modules/canbus/vehicle/lexus/lexus_controller.h"
 
+#include "modules/common/proto/vehicle_signal.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -34,22 +35,21 @@ using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 }  // namespace
 
-ErrorCode LexusController::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+LexusController::Init(const VehicleParameter&                                params,
+                      CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+                      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "LexusController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
   }
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -69,29 +69,29 @@ ErrorCode LexusController::Init(
   message_manager_ = message_manager;
 
   // Sender part
-  accel_cmd_100_ = dynamic_cast<Accelcmd100*>(
-      message_manager_->GetMutableProtocolDataById(Accelcmd100::ID));
+  accel_cmd_100_ =
+      dynamic_cast<Accelcmd100*>(message_manager_->GetMutableProtocolDataById(Accelcmd100::ID));
   if (accel_cmd_100_ == nullptr) {
     AERROR << "Accelcmd100 does not exist in the LexusMessalexusanager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  brake_cmd_104_ = dynamic_cast<Brakecmd104*>(
-      message_manager_->GetMutableProtocolDataById(Brakecmd104::ID));
+  brake_cmd_104_ =
+      dynamic_cast<Brakecmd104*>(message_manager_->GetMutableProtocolDataById(Brakecmd104::ID));
   if (brake_cmd_104_ == nullptr) {
     AERROR << "Brakecmd104 does not exist in the LexusMessalexusanager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  shift_cmd_128_ = dynamic_cast<Shiftcmd128*>(
-      message_manager_->GetMutableProtocolDataById(Shiftcmd128::ID));
+  shift_cmd_128_ =
+      dynamic_cast<Shiftcmd128*>(message_manager_->GetMutableProtocolDataById(Shiftcmd128::ID));
   if (shift_cmd_128_ == nullptr) {
     AERROR << "Shiftcmd128 does not exist in the LexusMessalexusanager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  turn_cmd_130_ = dynamic_cast<Turncmd130*>(
-      message_manager_->GetMutableProtocolDataById(Turncmd130::ID));
+  turn_cmd_130_ =
+      dynamic_cast<Turncmd130*>(message_manager_->GetMutableProtocolDataById(Turncmd130::ID));
   if (turn_cmd_130_ == nullptr) {
     AERROR << "Turncmd130 does not exist in the LexusMessageManager!";
     return ErrorCode::CANBUS_ERROR;
@@ -150,9 +150,7 @@ Chassis LexusController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -163,8 +161,8 @@ Chassis LexusController::chassis() {
   // 5
   if (chassis_detail.lexus().has_vehicle_speed_rpt_400() &&
       chassis_detail.lexus().vehicle_speed_rpt_400().has_vehicle_speed()) {
-    chassis_.set_speed_mps(static_cast<float>(
-        chassis_detail.lexus().vehicle_speed_rpt_400().vehicle_speed()));
+    chassis_.set_speed_mps(
+        static_cast<float>(chassis_detail.lexus().vehicle_speed_rpt_400().vehicle_speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -207,8 +205,8 @@ Chassis LexusController::chassis() {
   if (chassis_detail.lexus().has_accel_rpt_200() &&
       chassis_detail.lexus().accel_rpt_200().has_output_value()) {
     // TODO(snehagn): Temp fix until AS to fix the scaling
-    chassis_.set_throttle_percentage(static_cast<float>(
-        chassis_detail.lexus().accel_rpt_200().output_value() * 100));
+    chassis_.set_throttle_percentage(
+        static_cast<float>(chassis_detail.lexus().accel_rpt_200().output_value() * 100));
   } else {
     chassis_.set_throttle_percentage(0);
   }
@@ -216,8 +214,8 @@ Chassis LexusController::chassis() {
   if (chassis_detail.lexus().has_brake_rpt_204() &&
       chassis_detail.lexus().brake_rpt_204().has_output_value()) {
     // TODO(snehagn): Temp fix until AS to fix the scaling
-    chassis_.set_brake_percentage(static_cast<float>(
-        chassis_detail.lexus().brake_rpt_204().output_value() * 100));
+    chassis_.set_brake_percentage(
+        static_cast<float>(chassis_detail.lexus().brake_rpt_204().output_value() * 100));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -228,8 +226,7 @@ Chassis LexusController::chassis() {
     AINFO << "Start reading shift values";
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
-    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
-        Shift_rpt_228::OUTPUT_VALUE_PARK) {
+    if (chassis_detail.lexus().shift_rpt_228().output_value() == Shift_rpt_228::OUTPUT_VALUE_PARK) {
       gear_pos = Chassis::GEAR_PARKING;
     }
 
@@ -255,9 +252,9 @@ Chassis LexusController::chassis() {
   // TODO(QiL) : verify the unit here.
   if (chassis_detail.lexus().has_steering_rpt_22c() &&
       chassis_detail.lexus().steering_rpt_22c().has_output_value()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.lexus().steering_rpt_22c().output_value() * 100.0 /
-        vehicle_params_.max_steer_angle()));
+    chassis_.set_steering_percentage(
+        static_cast<float>(chassis_detail.lexus().steering_rpt_22c().output_value() * 100.0 /
+                           vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -265,38 +262,28 @@ Chassis LexusController::chassis() {
   // 16, 17
   if (chassis_detail.lexus().has_turn_rpt_230() &&
       chassis_detail.lexus().turn_rpt_230().has_output_value() &&
-      chassis_detail.lexus().turn_rpt_230().output_value() !=
-          Turn_rpt_230::OUTPUT_VALUE_NONE) {
-    if (chassis_detail.lexus().turn_rpt_230().output_value() ==
-        Turn_rpt_230::OUTPUT_VALUE_LEFT) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_LEFT);
+      chassis_detail.lexus().turn_rpt_230().output_value() != Turn_rpt_230::OUTPUT_VALUE_NONE) {
+    if (chassis_detail.lexus().turn_rpt_230().output_value() == Turn_rpt_230::OUTPUT_VALUE_LEFT) {
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_LEFT);
     } else if (chassis_detail.lexus().turn_rpt_230().output_value() ==
                Turn_rpt_230::OUTPUT_VALUE_RIGHT) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_RIGHT);
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_RIGHT);
     } else {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_NONE);
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
     }
   } else {
-    chassis_.mutable_signal()->set_turn_signal(
-        common::VehicleSignal::TURN_NONE);
+    chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
   }
 
   // TODO(all): implement the rest here/
   // 26
-  if (chassis_error_mask_) {
-    chassis_.set_chassis_error_mask(chassis_error_mask_);
-  }
+  if (chassis_error_mask_) { chassis_.set_chassis_error_mask(chassis_error_mask_); }
 
   // give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && !chassis_.parking_brake()) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "CANBUS not ready, firmware error or emergency button pressed!");
   }
@@ -325,8 +312,7 @@ ErrorCode LexusController::EnableAutoMode() {
   shift_cmd_128_->set_clear_override(true);
 
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -509,12 +495,10 @@ void LexusController::Steer(double angle, double angle_spd) {
     return;
   }
 
-  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          vehicle_params_.min_steer_angle_rate(),
-          vehicle_params_.max_steer_angle_rate(),
-          vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
+  const double real_angle     = vehicle_params_.max_steer_angle() * angle / 100.0;
+  const double real_angle_spd = ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+      vehicle_params_.min_steer_angle_rate(), vehicle_params_.max_steer_angle_rate(),
+      vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
   // TODO(Yu/QiL): double checck to decide if reverse sign needed
   steering_cmd_12c_->set_position(real_angle);
   steering_cmd_12c_->set_rotation_rate(real_angle_spd);
@@ -566,7 +550,7 @@ bool LexusController::CheckChassisError() {
 }
 
 void LexusController::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -579,16 +563,15 @@ void LexusController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -600,8 +583,7 @@ void LexusController::SecurityDogThreadFunc() {
     }
 
     // 2. vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -625,8 +607,7 @@ void LexusController::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR << "Too much time consumption in LexusController looping process:"
-             << elapsed.count();
+      AERROR << "Too much time consumption in LexusController looping process:" << elapsed.count();
     }
   }
 }
@@ -636,11 +617,11 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
   // for it.
   // TODO(Yu) : check whether the current retry_num match the assumed time
   // consumption
-  int32_t retry_num = 20;
+  int32_t       retry_num = 20;
   ChassisDetail chassis_detail;
-  bool is_accel_enabled = false;
-  bool is_brake_enabled = false;
-  bool is_steering_enabled = false;
+  bool          is_accel_enabled    = false;
+  bool          is_brake_enabled    = false;
+  bool          is_steering_enabled = false;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -649,10 +630,9 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_steering_enabled =
-          chassis_detail.lexus().has_steering_rpt_22c() &&
-          chassis_detail.lexus().steering_rpt_22c().has_enabled() &&
-          chassis_detail.lexus().steering_rpt_22c().enabled();
+      is_steering_enabled = chassis_detail.lexus().has_steering_rpt_22c() &&
+                            chassis_detail.lexus().steering_rpt_22c().has_enabled() &&
+                            chassis_detail.lexus().steering_rpt_22c().enabled();
       check_ok = check_ok && is_steering_enabled;
     }
 
@@ -665,20 +645,16 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
                          chassis_detail.lexus().accel_rpt_200().enabled();
       check_ok = check_ok && is_brake_enabled && is_accel_enabled;
     }
-    if (check_ok) {
-      return true;
-    }
+    if (check_ok) { return true; }
     if (need_wait) {
       --retry_num;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(20));
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
     }
   } while (need_wait && retry_num);
 
   // If check_response fails, then report the specific module failure online
   AERROR << "check_response fail: is_steering_enabled:" << is_steering_enabled
-         << ", is_brake_enabled:" << is_brake_enabled
-         << ", is_accel_enabled:" << is_accel_enabled;
+         << ", is_brake_enabled:" << is_brake_enabled << ", is_accel_enabled:" << is_accel_enabled;
   return false;
 }
 
@@ -697,8 +673,7 @@ Chassis::ErrorCode LexusController::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void LexusController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void LexusController::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

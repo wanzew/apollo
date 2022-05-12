@@ -27,7 +27,7 @@ namespace base {
 
 TEST(AtomicHashMapTest, int_int) {
   AtomicHashMap<int, int> map;
-  int value = 0;
+  int                     value = 0;
   for (int i = 0; i < 1000; i++) {
     map.Set(i, i);
     EXPECT_TRUE(map.Has(i));
@@ -45,7 +45,7 @@ TEST(AtomicHashMapTest, int_int) {
 
 TEST(AtomicHashMapTest, int_str) {
   AtomicHashMap<int, std::string> map;
-  std::string value("");
+  std::string                     value("");
   for (int i = 0; i < 1000; i++) {
     map.Set(i, std::to_string(i));
     EXPECT_TRUE(map.Has(i));
@@ -62,9 +62,9 @@ TEST(AtomicHashMapTest, int_str) {
 
 TEST(AtomicHashMapTest, concurrency) {
   AtomicHashMap<int, std::string, 128> map;
-  int thread_num = 32;
-  std::thread t[32];
-  volatile bool ready = false;
+  int                                  thread_num = 32;
+  std::thread                          t[32];
+  volatile bool                        ready = false;
 
   for (int i = 0; i < thread_num; i++) {
     t[i] = std::thread([&, i]() {

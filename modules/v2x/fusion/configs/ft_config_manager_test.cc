@@ -23,7 +23,7 @@ namespace ft {
 
 TEST(FTConfigManager, read_and_write) {
   FTConfigManager* ft_config_manager_ptr = FTConfigManager::Instance();
-  auto& fusion_params = ft_config_manager_ptr->fusion_params_.params;
+  auto&            fusion_params         = ft_config_manager_ptr->fusion_params_.params;
   EXPECT_FALSE(fusion_params.score_params().check_type());
   EXPECT_EQ(fusion_params.score_params().prob_scale(), 0.125);
 }

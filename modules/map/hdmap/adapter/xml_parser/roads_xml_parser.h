@@ -14,10 +14,10 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
+#include <tinyxml2.h>
+
 #include <string>
 #include <vector>
-
-#include <tinyxml2.h>
 
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
@@ -28,17 +28,13 @@ namespace adapter {
 
 class RoadsXmlParser {
  public:
-  static Status Parse(const tinyxml2::XMLElement& xml_node,
-                      std::vector<RoadInternal>* roads);
+  static Status Parse(const tinyxml2::XMLElement& xml_node, std::vector<RoadInternal>* roads);
 
  private:
-  static void Parse_road_objects(const tinyxml2::XMLElement& xml_node,
-                                 RoadInternal* road_info);
-  static void Parse_road_signals(const tinyxml2::XMLElement& xml_node,
-                                 RoadInternal* road_info);
+  static void Parse_road_objects(const tinyxml2::XMLElement& xml_node, RoadInternal* road_info);
+  static void Parse_road_signals(const tinyxml2::XMLElement& xml_node, RoadInternal* road_info);
 
-  static Status to_pb_road_type(const std::string& type,
-                                PbRoadType* pb_road_type);
+  static Status to_pb_road_type(const std::string& type, PbRoadType* pb_road_type);
 };
 
 }  // namespace adapter

@@ -32,7 +32,7 @@ namespace can {
 
 using apollo::common::ErrorCode;
 
-bool EsdCanClient::Init(const CANCardParameter &parameter) {
+bool EsdCanClient::Init(const CANCardParameter& parameter) {
   if (!parameter.has_channel_id()) {
     AERROR << "Init CAN failed: parameter does not have channel id. The "
               "parameter is "
@@ -44,8 +44,7 @@ bool EsdCanClient::Init(const CANCardParameter &parameter) {
   int num_ports = parameter.num_ports();
 
   if (port_ > num_ports || port_ < 0) {
-    AERROR << "Can port number [" << port_ << "] is out of range [0, "
-           << num_ports << ") !";
+    AERROR << "Can port number [" << port_ << "] is out of range [0, " << num_ports << ") !";
     return false;
   }
 
@@ -53,15 +52,11 @@ bool EsdCanClient::Init(const CANCardParameter &parameter) {
 }
 
 EsdCanClient::~EsdCanClient() {
-  if (dev_handler_) {
-    Stop();
-  }
+  if (dev_handler_) { Stop(); }
 }
 
 ErrorCode EsdCanClient::Start() {
-  if (is_started_) {
-    return ErrorCode::OK;
-  }
+  if (is_started_) { return ErrorCode::OK; }
 
   // open device
   // guss net is the device minor number, if one card is 0,1
@@ -70,13 +65,11 @@ ErrorCode EsdCanClient::Start() {
   // &dev_handler_);
   uint32_t mode = 0;
 
-  if (FLAGS_esd_can_extended_frame) {
-    mode = NTCAN_MODE_NO_RTR;
-  }
+  if (FLAGS_esd_can_extended_frame) { mode = NTCAN_MODE_NO_RTR; }
 
   // mode |= NTCAN_MODE_NO_RTR;
-  int32_t ret = canOpen(port_, mode, NTCAN_MAX_TX_QUEUESIZE,
-                        NTCAN_MAX_RX_QUEUESIZE, 5, 5, &dev_handler_);
+  int32_t ret =
+      canOpen(port_, mode, NTCAN_MAX_TX_QUEUESIZE, NTCAN_MAX_RX_QUEUESIZE, 5, 5, &dev_handler_);
   if (ret != NTCAN_SUCCESS) {
     AERROR << "open device error code [" << ret << "]: " << GetErrorString(ret);
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
@@ -96,16 +89,15 @@ ErrorCode EsdCanClient::Start() {
   // 1. set receive message_id filter, ie white list
 
   int32_t id_count = 0x800;
-  ret = canIdRegionAdd(dev_handler_, 0, &id_count);
+  ret              = canIdRegionAdd(dev_handler_, 0, &id_count);
 
   if (FLAGS_esd_can_extended_frame) {
     id_count = 0x1FFFFFFE;
-    ret = canIdRegionAdd(dev_handler_, 0x20000000, &id_count);
+    ret      = canIdRegionAdd(dev_handler_, 0x20000000, &id_count);
   }
 
   if (ret != NTCAN_SUCCESS) {
-    AERROR << "add receive msg id filter error code: " << ret << ", "
-           << GetErrorString(ret);
+    AERROR << "add receive msg id filter error code: " << ret << ", " << GetErrorString(ret);
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
 
@@ -133,8 +125,7 @@ void EsdCanClient::Stop() {
 }
 
 // Synchronous transmission of CAN messages
-ErrorCode EsdCanClient::Send(const std::vector<CanFrame> &frames,
-                             int32_t *const frame_num) {
+ErrorCode EsdCanClient::Send(const std::vector<CanFrame>& frames, int32_t* const frame_num) {
   CHECK_NOTNULL(frame_num);
   CHECK_EQ(frames.size(), static_cast<size_t>(*frame_num));
 
@@ -143,7 +134,7 @@ ErrorCode EsdCanClient::Send(const std::vector<CanFrame> &frames,
     return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
   }
   for (size_t i = 0; i < frames.size() && i < MAX_CAN_SEND_FRAME_LEN; ++i) {
-    send_frames_[i].id = frames[i].id;
+    send_frames_[i].id  = frames[i].id;
     send_frames_[i].len = frames[i].len;
     std::memcpy(send_frames_[i].data, frames[i].data, frames[i].len);
   }
@@ -151,16 +142,14 @@ ErrorCode EsdCanClient::Send(const std::vector<CanFrame> &frames,
   // Synchronous transmission of CAN messages
   int32_t ret = canWrite(dev_handler_, send_frames_, frame_num, nullptr);
   if (ret != NTCAN_SUCCESS) {
-    AERROR << "send message failed, error code: " << ret << ", "
-           << GetErrorString(ret);
+    AERROR << "send message failed, error code: " << ret << ", " << GetErrorString(ret);
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
   return ErrorCode::OK;
 }
 
 // buf size must be 8 bytes, every time, we receive only one frame
-ErrorCode EsdCanClient::Receive(std::vector<CanFrame> *const frames,
-                                int32_t *const frame_num) {
+ErrorCode EsdCanClient::Receive(std::vector<CanFrame>* const frames, int32_t* const frame_num) {
   if (!is_started_) {
     AERROR << "Esd can client is not init! Please init first!";
     return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
@@ -175,18 +164,15 @@ ErrorCode EsdCanClient::Receive(std::vector<CanFrame> *const frames,
 
   const int32_t ret = canRead(dev_handler_, recv_frames_, frame_num, nullptr);
   // rx timeout not log
-  if (ret == NTCAN_RX_TIMEOUT) {
-    return ErrorCode::OK;
-  }
+  if (ret == NTCAN_RX_TIMEOUT) { return ErrorCode::OK; }
   if (ret != NTCAN_SUCCESS) {
-    AERROR << "receive message failed, error code: " << ret << ", "
-           << GetErrorString(ret);
+    AERROR << "receive message failed, error code: " << ret << ", " << GetErrorString(ret);
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
 
   for (int32_t i = 0; i < *frame_num && i < MAX_CAN_RECV_FRAME_LEN; ++i) {
     CanFrame cf;
-    cf.id = recv_frames_[i].id;
+    cf.id  = recv_frames_[i].id;
     cf.len = recv_frames_[i].len;
     std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].len);
     frames->push_back(cf);
@@ -202,10 +188,10 @@ ErrorCode EsdCanClient::Receive(std::vector<CanFrame> *const frames,
 /************************************************************************/
 /************************************************************************/
 const int32_t ERROR_BUF_SIZE = 200;
-std::string EsdCanClient::GetErrorString(const NTCAN_RESULT ntstatus) {
+std::string   EsdCanClient::GetErrorString(const NTCAN_RESULT ntstatus) {
   struct ERR2STR {
     NTCAN_RESULT ntstatus;
-    const char *str;
+    const char*  str;
   };
 
   int8_t str_buf[ERROR_BUF_SIZE];
@@ -281,36 +267,31 @@ std::string EsdCanClient::GetErrorString(const NTCAN_RESULT ntstatus) {
       {(NTCAN_RESULT)0xffffffff, "NTCAN_UNKNOWN"} /* stop-mark */
   };
 
-  const struct ERR2STR *es = err2str;
+  const struct ERR2STR* es = err2str;
 
   do {
-    if (es->ntstatus == ntstatus) {
-      break;
-    }
+    if (es->ntstatus == ntstatus) { break; }
     es++;
   } while ((uint32_t)es->ntstatus != 0xffffffff);
 
 #ifdef NTCAN_ERROR_FORMAT_LONG
   {
     NTCAN_RESULT res;
-    char sz_error_text[60];
+    char         sz_error_text[60];
 
     res = canFormatError(ntstatus, NTCAN_ERROR_FORMAT_LONG, sz_error_text,
                          static_cast<uint32_t>(sizeof(sz_error_text) - 1));
     if (NTCAN_SUCCESS == res) {
-      snprintf(reinterpret_cast<char *>(str_buf), ERROR_BUF_SIZE, "%s - %s",
-               es->str, sz_error_text);
+      snprintf(reinterpret_cast<char*>(str_buf), ERROR_BUF_SIZE, "%s - %s", es->str, sz_error_text);
     } else {
-      snprintf(reinterpret_cast<char *>(str_buf), ERROR_BUF_SIZE, "%s(0x%08x)",
-               es->str, ntstatus);
+      snprintf(reinterpret_cast<char*>(str_buf), ERROR_BUF_SIZE, "%s(0x%08x)", es->str, ntstatus);
     }
   }
 #else
-  snprintf(reinterpret_cast<char *>(str_buf), ERROR_BUF_SIZE, "%s(0x%08x)",
-           es->str, ntstatus);
+  snprintf(reinterpret_cast<char*>(str_buf), ERROR_BUF_SIZE, "%s(0x%08x)", es->str, ntstatus);
 #endif /* of NTCAN_ERROR_FORMAT_LONG */
 
-  return std::string((const char *)(str_buf));
+  return std::string((const char*)(str_buf));
 }
 
 }  // namespace can

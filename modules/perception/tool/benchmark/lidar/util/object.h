@@ -29,13 +29,13 @@ namespace perception {
 namespace benchmark {
 
 enum ObjectType {
-  UNKNOWN = 0,
-  UNKNOWN_MOVABLE = 1,
+  UNKNOWN           = 0,
+  UNKNOWN_MOVABLE   = 1,
   UNKNOWN_UNMOVABLE = 2,
-  PEDESTRIAN = 3,
-  BICYCLE = 4,
-  VEHICLE = 5,
-  MAX_OBJECT_TYPE = 6,
+  PEDESTRIAN        = 3,
+  BICYCLE           = 4,
+  VEHICLE           = 5,
+  MAX_OBJECT_TYPE   = 6,
 };
 
 ObjectType translate_string_to_type(const std::string& str);
@@ -47,20 +47,20 @@ std::string translate_type_index_to_string(unsigned int index);
 std::string translate_type_to_string(ObjectType type);
 
 enum InternalObjectType {
-  INT_BACKGROUND = 0,
-  INT_SMALLMOT = 1,
-  INT_PEDESTRIAN = 2,
-  INT_NONMOT = 3,
-  INT_BIGMOT = 4,
-  INT_UNKNOWN = 5,
+  INT_BACKGROUND      = 0,
+  INT_SMALLMOT        = 1,
+  INT_PEDESTRIAN      = 2,
+  INT_NONMOT          = 3,
+  INT_BIGMOT          = 4,
+  INT_UNKNOWN         = 5,
   INT_MAX_OBJECT_TYPE = 6,
 };
 
 enum SensorType {
-  VELODYNE_64 = 0,
-  VELODYNE_16 = 1,
-  RADAR = 2,
-  CAMERA = 3,
+  VELODYNE_64         = 0,
+  VELODYNE_16         = 1,
+  RADAR               = 2,
+  CAMERA              = 3,
   UNKNOWN_SENSOR_TYPE = 4,
 };
 
@@ -76,7 +76,7 @@ struct alignas(16) Object {
   Object(const Object& rhs);
   Object& operator=(const Object& rhs);
   // deep copy
-  void clone(const Object& rhs);
+  void        clone(const Object& rhs);
   std::string to_string() const;
 
   // object id per frame
@@ -103,11 +103,11 @@ struct alignas(16) Object {
   Eigen::Vector3d center;
   // size of the oriented bbox, length is the size in the main direction
   double length = 0.0;
-  double width = 0.0;
+  double width  = 0.0;
   double height = 0.0;
   // truncated
   double truncated = 0.0;
-  double occluded = 0.0;
+  double occluded  = 0.0;
 
   // Object classification type.
   ObjectType type = UNKNOWN;
@@ -127,7 +127,7 @@ struct alignas(16) Object {
 
   Eigen::Vector3d velocity;
   // age of the tracked object
-  double tracking_time = 0.0;
+  double tracking_time       = 0.0;
   double latest_tracked_time = 0.0;
 
   // roi flag
@@ -138,7 +138,7 @@ struct alignas(16) Object {
 
   // visible related
   float visible_ratio = 1.f;
-  bool visible = true;
+  bool  visible       = true;
 
   // sensor type
   SensorType sensor_type = UNKNOWN_SENSOR_TYPE;
@@ -147,15 +147,15 @@ struct alignas(16) Object {
   std::string reserve;
 
   // sensor particular suplplements, default nullptr
-  LidarSupplementPtr lidar_supplement = nullptr;
-  RadarSupplementPtr radar_supplement = nullptr;
+  LidarSupplementPtr  lidar_supplement  = nullptr;
+  RadarSupplementPtr  radar_supplement  = nullptr;
   CameraSupplementPtr camera_supplement = nullptr;
 
   // jaccard index with ground truth when benchmark evaluation
   double ji = 0.0;
 };
 
-typedef std::shared_ptr<Object> ObjectPtr;
+typedef std::shared_ptr<Object>       ObjectPtr;
 typedef std::shared_ptr<const Object> ObjectConstPtr;
 
 using SeqId = uint32_t;
@@ -166,15 +166,15 @@ struct SensorObjects {
 
   std::string to_string() const;
 
-  SensorType type = UNKNOWN_SENSOR_TYPE;
-  std::string name;
-  double timestamp = 0.0;
-  SeqId seq_num = 0;
-  std::vector<ObjectPtr> objects;
+  SensorType                                type = UNKNOWN_SENSOR_TYPE;
+  std::string                               name;
+  double                                    timestamp = 0.0;
+  SeqId                                     seq_num   = 0;
+  std::vector<ObjectPtr>                    objects;
   std::vector<std::vector<Eigen::Vector3d>> objects_box_vertices;
-  std::vector<ObjectPtr> gt_objects;
+  std::vector<ObjectPtr>                    gt_objects;
   std::vector<std::vector<Eigen::Vector3d>> gt_objects_box_vertices;
-  Eigen::Matrix4d sensor2world_pose;
+  Eigen::Matrix4d                           sensor2world_pose;
 };
 
 }  // namespace benchmark

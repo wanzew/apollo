@@ -51,10 +51,10 @@ using apollo::cyber::service_discovery::TopologyManager;
 namespace {
 
 const std::string& kClockChannel = "/clock";
-const std::string& kClockNode = "clock";
+const std::string& kClockNode    = "clock";
 
-bool g_atexit_registered = false;
-std::mutex g_mutex;
+bool                  g_atexit_registered = false;
+std::mutex            g_mutex;
 std::unique_ptr<Node> clock_node;
 
 logger::AsyncLogger* async_logger = nullptr;
@@ -74,8 +74,8 @@ void InitLogger(const char* binary_name) {
   google::SetLogDestination(google::FATAL, "");
 
   // Init async logger
-  async_logger = new ::apollo::cyber::logger::AsyncLogger(
-      google::base::GetLogger(FLAGS_minloglevel));
+  async_logger =
+      new ::apollo::cyber::logger::AsyncLogger(google::base::GetLogger(FLAGS_minloglevel));
   google::base::SetLogger(FLAGS_minloglevel, async_logger);
   async_logger->Start();
 }
@@ -86,18 +86,14 @@ void StopLogger() { delete async_logger; }
 
 void OnShutdown(int sig) {
   (void)sig;
-  if (GetState() != STATE_SHUTDOWN) {
-    SetState(STATE_SHUTTING_DOWN);
-  }
+  if (GetState() != STATE_SHUTDOWN) { SetState(STATE_SHUTTING_DOWN); }
 }
 
 void ExitHandle() { Clear(); }
 
 bool Init(const char* binary_name) {
   std::lock_guard<std::mutex> lg(g_mutex);
-  if (GetState() != STATE_UNINITIALIZED) {
-    return false;
-  }
+  if (GetState() != STATE_UNINITIALIZED) { return false; }
 
   InitLogger(binary_name);
   auto thread = const_cast<std::thread*>(async_logger->LogThread());
@@ -118,13 +114,10 @@ bool Init(const char* binary_name) {
   auto global_data = GlobalData::Instance();
   if (global_data->IsMockTimeMode()) {
     auto node_name = kClockNode + std::to_string(getpid());
-    clock_node = std::unique_ptr<Node>(new Node(node_name));
-    auto cb =
-        [](const std::shared_ptr<const apollo::cyber::proto::Clock>& msg) {
-          if (msg->has_clock()) {
-            Clock::Instance()->SetNow(Time(msg->clock()));
-          }
-        };
+    clock_node     = std::unique_ptr<Node>(new Node(node_name));
+    auto cb        = [](const std::shared_ptr<const apollo::cyber::proto::Clock>& msg) {
+      if (msg->has_clock()) { Clock::Instance()->SetNow(Time(msg->clock())); }
+    };
     clock_node->CreateReader<apollo::cyber::proto::Clock>(kClockChannel, cb);
   }
   return true;
@@ -132,9 +125,7 @@ bool Init(const char* binary_name) {
 
 void Clear() {
   std::lock_guard<std::mutex> lg(g_mutex);
-  if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) {
-    return;
-  }
+  if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) { return; }
   SysMo::CleanUp();
   TaskManager::CleanUp();
   TimingWheel::CleanUp();

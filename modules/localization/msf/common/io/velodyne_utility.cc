@@ -27,20 +27,24 @@ namespace localization {
 namespace msf {
 namespace velodyne {
 
-void LoadPcds(const std::string& file_path, const unsigned int frame_index,
-              const Eigen::Affine3d& pose, VelodyneFrame* velodyne_frame,
-              bool is_global) {
+void LoadPcds(const std::string&     file_path,
+              const unsigned int     frame_index,
+              const Eigen::Affine3d& pose,
+              VelodyneFrame*         velodyne_frame,
+              bool                   is_global) {
   velodyne_frame->frame_index = frame_index;
-  velodyne_frame->pose = pose;
-  LoadPcds(file_path, frame_index, pose, &velodyne_frame->pt3ds,
-           &velodyne_frame->intensities, is_global);
+  velodyne_frame->pose        = pose;
+  LoadPcds(file_path, frame_index, pose, &velodyne_frame->pt3ds, &velodyne_frame->intensities,
+           is_global);
 }
 
-void LoadPcds(const std::string& file_path, const unsigned int frame_index,
-              const Eigen::Affine3d& pose,
+void LoadPcds(const std::string&                  file_path,
+              const unsigned int                  frame_index,
+              const Eigen::Affine3d&              pose,
               ::apollo::common::EigenVector3dVec* pt3ds,
-              std::vector<unsigned char>* intensities, bool is_global) {
-  Eigen::Affine3d pose_inv = pose.inverse();
+              std::vector<unsigned char>*         intensities,
+              bool                                is_global) {
+  Eigen::Affine3d                  pose_inv = pose.inverse();
   pcl::PointCloud<PointXYZIT>::Ptr cloud(new pcl::PointCloud<PointXYZIT>);
   if (pcl::io::loadPCDFile(file_path, *cloud) >= 0) {
     if (cloud->height == 1 || cloud->width == 1) {
@@ -58,8 +62,7 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
           } else {
             pt3d_local = pt3d;
           }
-          unsigned char intensity =
-              static_cast<unsigned char>((*cloud)[i].intensity);
+          unsigned char intensity = static_cast<unsigned char>((*cloud)[i].intensity);
           pt3ds->push_back(pt3d_local);
           intensities->push_back(intensity);
         }
@@ -67,9 +70,9 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
     } else {
       for (unsigned int h = 0; h < cloud->height; ++h) {
         for (unsigned int w = 0; w < cloud->width; ++w) {
-          double x = cloud->at(w, h).x;
-          double y = cloud->at(w, h).y;
-          double z = cloud->at(w, h).z;
+          double          x = cloud->at(w, h).x;
+          double          y = cloud->at(w, h).y;
+          double          z = cloud->at(w, h).z;
           Eigen::Vector3d pt3d(x, y, z);
           if (pt3d[0] == pt3d[0] && pt3d[1] == pt3d[1] && pt3d[2] == pt3d[2]) {
             Eigen::Vector3d pt3d_local;
@@ -78,8 +81,7 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
             } else {
               pt3d_local = pt3d;
             }
-            unsigned char intensity =
-                static_cast<unsigned char>(cloud->at(w, h).intensity);
+            unsigned char intensity = static_cast<unsigned char>(cloud->at(w, h).intensity);
             pt3ds->push_back(pt3d_local);
             intensities->push_back(intensity);
           }
@@ -91,32 +93,32 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
   }
 }
 
-void LoadPcdPoses(const std::string& file_path,
+void LoadPcdPoses(const std::string&                  file_path,
                   ::apollo::common::EigenAffine3dVec* poses,
-                  std::vector<double>* timestamps) {
+                  std::vector<double>*                timestamps) {
   std::vector<unsigned int> pcd_indices;
   LoadPcdPoses(file_path, poses, timestamps, &pcd_indices);
 }
 
-void LoadPcdPoses(const std::string& file_path,
+void LoadPcdPoses(const std::string&                  file_path,
                   ::apollo::common::EigenAffine3dVec* poses,
-                  std::vector<double>* timestamps,
-                  std::vector<unsigned int>* pcd_indices) {
+                  std::vector<double>*                timestamps,
+                  std::vector<unsigned int>*          pcd_indices) {
   poses->clear();
   timestamps->clear();
   pcd_indices->clear();
 
   FILE* file = fopen(file_path.c_str(), "r");
   if (file) {
-    unsigned int index;
-    double timestamp;
-    double x, y, z;
-    double qx, qy, qz, qr;
+    unsigned int         index;
+    double               timestamp;
+    double               x, y, z;
+    double               qx, qy, qz, qr;
     static constexpr int kSize = 9;
-    while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
-                  &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr) == kSize) {
+    while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index, &timestamp, &x, &y, &z, &qx,
+                  &qy, &qz, &qr) == kSize) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
-      Eigen::Quaterniond quat(qr, qx, qy, qz);
+      Eigen::Quaterniond   quat(qr, qx, qy, qz);
       poses->push_back(trans * quat);
       timestamps->push_back(timestamp);
       pcd_indices->push_back(index);
@@ -127,27 +129,26 @@ void LoadPcdPoses(const std::string& file_path,
   }
 }
 
-void LoadPosesAndStds(const std::string& file_path,
+void LoadPosesAndStds(const std::string&                  file_path,
                       ::apollo::common::EigenAffine3dVec* poses,
                       ::apollo::common::EigenVector3dVec* stds,
-                      std::vector<double>* timestamps) {
+                      std::vector<double>*                timestamps) {
   poses->clear();
   stds->clear();
   timestamps->clear();
 
   FILE* file = fopen(file_path.c_str(), "r");
   if (file) {
-    unsigned int index;
-    double timestamp;
-    double x, y, z;
-    double qx, qy, qz, qr;
-    double std_x, std_y, std_z;
+    unsigned int         index;
+    double               timestamp;
+    double               x, y, z;
+    double               qx, qy, qz, qr;
+    double               std_x, std_y, std_z;
     static constexpr int kSize = 12;
-    while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-                  &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr, &std_x,
-                  &std_y, &std_z) == kSize) {
+    while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", &index, &timestamp, &x,
+                  &y, &z, &qx, &qy, &qz, &qr, &std_x, &std_y, &std_z) == kSize) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
-      Eigen::Quaterniond quat(qr, qx, qy, qz);
+      Eigen::Quaterniond   quat(qr, qx, qy, qz);
       poses->push_back(trans * quat);
       timestamps->push_back(timestamp);
 
@@ -165,19 +166,15 @@ bool LoadExtrinsic(const std::string& file_path, Eigen::Affine3d* extrinsic) {
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["transform"]) {
     if (config["transform"]["translation"]) {
-      extrinsic->translation()(0) =
-          config["transform"]["translation"]["x"].as<double>();
-      extrinsic->translation()(1) =
-          config["transform"]["translation"]["y"].as<double>();
-      extrinsic->translation()(2) =
-          config["transform"]["translation"]["z"].as<double>();
+      extrinsic->translation()(0) = config["transform"]["translation"]["x"].as<double>();
+      extrinsic->translation()(1) = config["transform"]["translation"]["y"].as<double>();
+      extrinsic->translation()(2) = config["transform"]["translation"]["z"].as<double>();
       if (config["transform"]["rotation"]) {
-        double qx = config["transform"]["rotation"]["x"].as<double>();
-        double qy = config["transform"]["rotation"]["y"].as<double>();
-        double qz = config["transform"]["rotation"]["z"].as<double>();
-        double qw = config["transform"]["rotation"]["w"].as<double>();
-        extrinsic->linear() =
-            Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
+        double qx           = config["transform"]["rotation"]["x"].as<double>();
+        double qy           = config["transform"]["rotation"]["y"].as<double>();
+        double qz           = config["transform"]["rotation"]["z"].as<double>();
+        double qw           = config["transform"]["rotation"]["w"].as<double>();
+        extrinsic->linear() = Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
         return true;
       }
     }

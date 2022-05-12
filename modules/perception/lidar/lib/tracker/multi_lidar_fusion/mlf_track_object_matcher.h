@@ -35,11 +35,10 @@ struct MlfTrackObjectMatcherOptions {};
 
 class MlfTrackObjectMatcher {
  public:
-  MlfTrackObjectMatcher() = default;
+  MlfTrackObjectMatcher()  = default;
   ~MlfTrackObjectMatcher() = default;
 
-  bool Init(const MlfTrackObjectMatcherInitOptions &options =
-                MlfTrackObjectMatcherInitOptions());
+  bool Init(const MlfTrackObjectMatcherInitOptions& options = MlfTrackObjectMatcherInitOptions());
 
   // @brief: match detected objects to tracks
   // @params [in]: new detected objects for matching
@@ -47,12 +46,12 @@ class MlfTrackObjectMatcher {
   // @params [out]: assignment pair of object & track
   // @params [out]: tracks without matched object
   // @params [out]: objects without matched track
-  void Match(const MlfTrackObjectMatcherOptions &options,
-             const std::vector<TrackedObjectPtr> &objects,
-             const std::vector<MlfTrackDataPtr> &tracks,
-             std::vector<std::pair<size_t, size_t>> *assignments,
-             std::vector<size_t> *unassigned_tracks,
-             std::vector<size_t> *unassigned_objects);
+  void Match(const MlfTrackObjectMatcherOptions&     options,
+             const std::vector<TrackedObjectPtr>&    objects,
+             const std::vector<MlfTrackDataPtr>&     tracks,
+             std::vector<std::pair<size_t, size_t>>* assignments,
+             std::vector<size_t>*                    unassigned_tracks,
+             std::vector<size_t>*                    unassigned_objects);
 
   std::string Name() const { return "MlfTrackObjectMatcher"; }
 
@@ -61,18 +60,18 @@ class MlfTrackObjectMatcher {
   // @params [in]: maintained tracks for matching
   // @params [in]: new detected objects for matching
   // @params [out]: matrix of association distance
-  void ComputeAssociateMatrix(const std::vector<MlfTrackDataPtr> &tracks,
-                              const std::vector<TrackedObjectPtr> &new_objects,
-                              common::SecureMat<float> *association_mat);
+  void ComputeAssociateMatrix(const std::vector<MlfTrackDataPtr>&  tracks,
+                              const std::vector<TrackedObjectPtr>& new_objects,
+                              common::SecureMat<float>*            association_mat);
 
  protected:
   std::unique_ptr<MlfTrackObjectDistance> track_object_distance_;
-  BaseBipartiteGraphMatcher *foreground_matcher_;
-  BaseBipartiteGraphMatcher *background_matcher_;
+  BaseBipartiteGraphMatcher*              foreground_matcher_;
+  BaseBipartiteGraphMatcher*              background_matcher_;
 
-  float bound_value_ = 100.f;
+  float bound_value_        = 100.f;
   float max_match_distance_ = 4.0f;
-  bool use_semantic_map = false;
+  bool  use_semantic_map    = false;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(MlfTrackObjectMatcher);

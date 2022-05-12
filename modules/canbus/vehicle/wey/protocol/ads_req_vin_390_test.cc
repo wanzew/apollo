@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/protocol/ads_req_vin_390.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ class Adsreqvin390Test : public ::testing::Test {
 };
 
 TEST_F(Adsreqvin390Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t      data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Adsreqvin390 vin_req;
   EXPECT_EQ(vin_req.GetPeriod(), 20 * 1000);
   vin_req.UpdateData(data);

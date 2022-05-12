@@ -20,10 +20,11 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/planner/planner.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -44,8 +45,7 @@ class RTKReplayPlanner : public PlannerWithReferenceLine {
   /**
    * @brief Constructor
    */
-  explicit RTKReplayPlanner(
-      const std::shared_ptr<DependencyInjector>& injector);
+  explicit RTKReplayPlanner(const std::shared_ptr<DependencyInjector>& injector);
 
   /**
    * @brief Destructor
@@ -64,9 +64,9 @@ class RTKReplayPlanner : public PlannerWithReferenceLine {
    * @param frame Current planning frame.
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ADCTrajectory* ptr_computed_trajectory) override;
+  apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
+                              Frame*                         frame,
+                              ADCTrajectory*                 ptr_computed_trajectory) override;
 
   /**
    * @brief Override function Plan in parent class Planner.
@@ -75,9 +75,9 @@ class RTKReplayPlanner : public PlannerWithReferenceLine {
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status PlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+  apollo::common::Status PlanOnReferenceLine(const common::TrajectoryPoint& planning_init_point,
+                                             Frame*                         frame,
+                                             ReferenceLineInfo* reference_line_info) override;
   /**
    * @brief Read the recorded trajectory file.
    * @param filename The name of the trajectory file.
@@ -85,9 +85,9 @@ class RTKReplayPlanner : public PlannerWithReferenceLine {
   void ReadTrajectoryFile(const std::string& filename);
 
  private:
-  std::uint32_t QueryPositionMatchedPoint(
-      const common::TrajectoryPoint& start_point,
-      const std::vector<common::TrajectoryPoint>& trajectory) const;
+  std::uint32_t
+  QueryPositionMatchedPoint(const common::TrajectoryPoint&              start_point,
+                            const std::vector<common::TrajectoryPoint>& trajectory) const;
 
   std::vector<common::TrajectoryPoint> complete_rtk_trajectory_;
 };

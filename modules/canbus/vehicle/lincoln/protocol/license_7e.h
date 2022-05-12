@@ -18,6 +18,7 @@
 #include <string>
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
@@ -28,22 +29,21 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-class License7e : public ::apollo::drivers::canbus::ProtocolData<
-                      ::apollo::canbus::ChassisDetail> {
+class License7e : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  private:
   mutable std::string vin_part0_;
   mutable std::string vin_part1_;
   mutable std::string vin_part2_;
-  mutable bool vin_part0_flag_;
-  mutable bool vin_part1_flag_;
-  mutable bool vin_part2_flag_;
-  mutable bool parse_success_;
+  mutable bool        vin_part0_flag_;
+  mutable bool        vin_part1_flag_;
+  mutable bool        vin_part2_flag_;
+  mutable bool        parse_success_;
 
  public:
   static const int32_t ID;
   License7e();
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis_detail) const;
+  virtual void
+  Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const;
   // config detail: {'name': 'mux', 'offset': 0.0, 'precision': 1.0, 'len': 8,
   // 'f_type': 'value', 'is_signed_var': False, 'physical_range': '[0|0]',
   // 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '""'}

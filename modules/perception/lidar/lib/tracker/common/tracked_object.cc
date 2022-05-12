@@ -28,34 +28,33 @@ namespace lidar {
 
 using PointFCloud = apollo::perception::base::AttributePointCloud<base::PointF>;
 
-TrackedObject::TrackedObject(base::ObjectPtr obj_ptr,
-                             const Eigen::Affine3d& pose) {
+TrackedObject::TrackedObject(base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose) {
   AttachObject(obj_ptr, pose);
 }
 
-void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
-                                 const Eigen::Affine3d& pose,
-                                 const Eigen::Vector3d& global_to_local_offset,
+void TrackedObject::AttachObject(base::ObjectPtr         obj_ptr,
+                                 const Eigen::Affine3d&  pose,
+                                 const Eigen::Vector3d&  global_to_local_offset,
                                  const base::SensorInfo& sensor) {
   if (obj_ptr) {
     // all state of input obj_ptr will not change except cloud world
     object_ptr = obj_ptr;
 
     sensor_to_local_pose = pose;
-    global_local_offset = global_to_local_offset;
+    global_local_offset  = global_to_local_offset;
     // object info to tracked object
-    center = pose * object_ptr->center;
+    center                   = pose * object_ptr->center;
     const PointFCloud& cloud = (object_ptr->lidar_supplement).cloud;
-    barycenter = (common::CalculateCentroid(cloud)).cast<double>();
-    barycenter = pose * barycenter;
-    anchor_point = barycenter;
+    barycenter               = (common::CalculateCentroid(cloud)).cast<double>();
+    barycenter               = pose * barycenter;
+    anchor_point             = barycenter;
 
     Eigen::Matrix3d rotation = pose.rotation();
-    direction = rotation * object_ptr->direction.cast<double>();
-    lane_direction = direction;
-    size = object_ptr->size.cast<double>();
-    type = object_ptr->type;
-    is_background = object_ptr->lidar_supplement.is_background;
+    direction                = rotation * object_ptr->direction.cast<double>();
+    lane_direction           = direction;
+    size                     = object_ptr->size.cast<double>();
+    type                     = object_ptr->type;
+    is_background            = object_ptr->lidar_supplement.is_background;
 
     base::PointDCloud& cloud_world = (object_ptr->lidar_supplement).cloud_world;
     cloud_world.clear();
@@ -63,9 +62,9 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     for (size_t i = 0; i < cloud.size(); ++i) {
       Eigen::Vector3d pt(cloud[i].x, cloud[i].y, cloud[i].z);
       Eigen::Vector3d pt_world = pose * pt;
-      cloud_world[i].x = pt_world(0);
-      cloud_world[i].y = pt_world(1);
-      cloud_world[i].z = pt_world(2);
+      cloud_world[i].x         = pt_world(0);
+      cloud_world[i].y         = pt_world(1);
+      cloud_world[i].z         = pt_world(2);
       cloud_world[i].intensity = cloud[i].intensity;
     }
     // memcpy(&(cloud_world.points_height(0)), &(cloud.points_height(0)),
@@ -74,37 +73,36 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
       cloud_world.SetPointHeight(i, cloud.points_height(i));
     }
     // other belief information keep as Reset()
-    selected_measured_velocity = Eigen::Vector3d::Zero();
+    selected_measured_velocity     = Eigen::Vector3d::Zero();
     selected_measured_acceleration = Eigen::Vector3d::Zero();
-    belief_anchor_point = barycenter;
-    belief_velocity = Eigen::Vector3d::Zero();
-    belief_acceleration = Eigen::Vector3d::Zero();
+    belief_anchor_point            = barycenter;
+    belief_velocity                = Eigen::Vector3d::Zero();
+    belief_acceleration            = Eigen::Vector3d::Zero();
 
-    output_velocity = Eigen::Vector3d::Zero();
+    output_velocity             = Eigen::Vector3d::Zero();
     output_velocity_uncertainty = Eigen::Matrix3d::Zero();
-    output_direction = direction;
-    output_center = center;
-    output_size = size;
+    output_direction            = direction;
+    output_center               = center;
+    output_size                 = size;
 
     sensor_info = sensor;
   }
 }
 
 void TrackedObject::TransformObjectCloudToWorld() {
-  const base::PointFCloud& cloud = (object_ptr->lidar_supplement).cloud;
-  base::PointDCloud& cloud_world = (object_ptr->lidar_supplement).cloud_world;
+  const base::PointFCloud& cloud       = (object_ptr->lidar_supplement).cloud;
+  base::PointDCloud&       cloud_world = (object_ptr->lidar_supplement).cloud_world;
   cloud_world.clear();
   cloud_world.resize(cloud.size());
   for (size_t i = 0; i < cloud.size(); ++i) {
     Eigen::Vector3d pt(cloud[i].x, cloud[i].y, cloud[i].z);
     Eigen::Vector3d pt_world = sensor_to_local_pose * pt;
-    cloud_world[i].x = pt_world(0);
-    cloud_world[i].y = pt_world(1);
-    cloud_world[i].z = pt_world(2);
+    cloud_world[i].x         = pt_world(0);
+    cloud_world[i].y         = pt_world(1);
+    cloud_world[i].z         = pt_world(2);
     cloud_world[i].intensity = cloud[i].intensity;
   }
-  memcpy(&cloud_world.points_height(0), &cloud.points_height(0),
-         sizeof(float) * cloud.size());
+  memcpy(&cloud_world.points_height(0), &cloud.points_height(0), sizeof(float) * cloud.size());
 }
 
 void TrackedObject::Reset() {
@@ -113,62 +111,63 @@ void TrackedObject::Reset() {
 
   // measurement reset
   for (int i = 0; i < 4; ++i) {
-    corners[i] = Eigen::Vector3d::Zero();
+    corners[i]                   = Eigen::Vector3d::Zero();
     measured_corners_velocity[i] = Eigen::Vector3d::Zero();
   }
-  center = Eigen::Vector3d::Zero();
-  barycenter = Eigen::Vector3d::Zero();
-  anchor_point = Eigen::Vector3d::Zero();
-  measured_barycenter_velocity = Eigen::Vector3d::Zero();
-  measured_center_velocity = Eigen::Vector3d::Zero();
+  center                           = Eigen::Vector3d::Zero();
+  barycenter                       = Eigen::Vector3d::Zero();
+  anchor_point                     = Eigen::Vector3d::Zero();
+  measured_barycenter_velocity     = Eigen::Vector3d::Zero();
+  measured_center_velocity         = Eigen::Vector3d::Zero();
   measured_nearest_corner_velocity = Eigen::Vector3d::Zero();
-  direction = Eigen::Vector3d::Zero();
-  lane_direction = Eigen::Vector3d::Zero();
-  size = Eigen::Vector3d::Zero();
-  type = base::ObjectType::UNKNOWN;
-  is_background = false;
+  direction                        = Eigen::Vector3d::Zero();
+  lane_direction                   = Eigen::Vector3d::Zero();
+  size                             = Eigen::Vector3d::Zero();
+  type                             = base::ObjectType::UNKNOWN;
+  is_background                    = false;
   shape_features.clear();
   shape_features_full.clear();
   histogram_bin_size = 10;
-  association_score = 0.0;
-  is_fake = false;
-  track_id = -1;
-  tracking_time = 0.0;
+  association_score  = 0.0;
+  is_fake            = false;
+  track_id           = -1;
+  tracking_time      = 0.0;
 
   // filter reset
-  boostup_need_history_size = 0;
-  valid = false;
-  converged = true;
-  convergence_confidence = 0.0;
-  update_quality = 0.0;
-  selected_measured_velocity = measured_center_velocity;
-  selected_measured_acceleration = Eigen::Vector3d::Zero();
-  belief_anchor_point = anchor_point;
-  belief_velocity = selected_measured_velocity;
-  belief_acceleration = selected_measured_acceleration;
-  belief_velocity_gain = Eigen::Vector3d::Zero();
-  velocity_covariance = Eigen::Matrix3d::Zero();
+  boostup_need_history_size         = 0;
+  valid                             = false;
+  converged                         = true;
+  convergence_confidence            = 0.0;
+  update_quality                    = 0.0;
+  selected_measured_velocity        = measured_center_velocity;
+  selected_measured_acceleration    = Eigen::Vector3d::Zero();
+  belief_anchor_point               = anchor_point;
+  belief_velocity                   = selected_measured_velocity;
+  belief_acceleration               = selected_measured_acceleration;
+  belief_velocity_gain              = Eigen::Vector3d::Zero();
+  velocity_covariance               = Eigen::Matrix3d::Zero();
   belief_velocity_online_covariance = Eigen::Matrix3d::Zero();
 
-  state = Eigen::Vector4d::Zero();
+  state                  = Eigen::Vector4d::Zero();
   measurement_covariance = Eigen::Matrix4d::Zero();
-  state_covariance = Eigen::Matrix4d::Zero();
+  state_covariance       = Eigen::Matrix4d::Zero();
 
   motion_score = Eigen::Vector3d(1, 1, 1);
 
   // output reset
-  output_velocity = belief_velocity;
+  output_velocity             = belief_velocity;
   output_velocity_uncertainty = belief_velocity_online_covariance;
-  output_direction = direction;
-  output_center = center;
-  output_size = size;
+  output_direction            = direction;
+  output_center               = center;
+  output_size                 = size;
 
   // sensor info reset
   sensor_info.Reset();
 }
 
-void TrackedObject::Reset(base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
-                          const Eigen::Vector3d& global_to_local_offset,
+void TrackedObject::Reset(base::ObjectPtr         obj_ptr,
+                          const Eigen::Affine3d&  pose,
+                          const Eigen::Vector3d&  global_to_local_offset,
                           const base::SensorInfo& sensor) {
   Reset();
   AttachObject(obj_ptr, pose, global_to_local_offset, sensor);
@@ -177,7 +176,7 @@ void TrackedObject::Reset(base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
 void TrackedObject::CopyFrom(TrackedObjectPtr rhs, bool is_deep) {
   *this = *rhs;
   if (is_deep) {
-    object_ptr = base::ObjectPool::Instance().Get();
+    object_ptr  = base::ObjectPool::Instance().Get();
     *object_ptr = *(rhs->object_ptr);
   } else {
     object_ptr = rhs->object_ptr;
@@ -185,9 +184,7 @@ void TrackedObject::CopyFrom(TrackedObjectPtr rhs, bool is_deep) {
 }
 
 float TrackedObject::GetVelThreshold(base::ObjectPtr obj) const {
-  if (obj->type == base::ObjectType::VEHICLE) {
-    return 0.99f;
-  }
+  if (obj->type == base::ObjectType::VEHICLE) { return 0.99f; }
   return 0.0f;
 }
 
@@ -208,14 +205,14 @@ void TrackedObject::ToObject(base::ObjectPtr obj) const {
   obj->size = output_size.cast<float>();
   // obj size_varuance not calculate in tracker, keep default
   obj->anchor_point = belief_anchor_point;
-  obj->type = type;
+  obj->type         = type;
   // obj type_probs not calculate in tracker, keep default
   // obj confidence not calculate in tracker, keep default
-  obj->track_id = track_id;
-  obj->velocity = output_velocity.cast<float>();
+  obj->track_id             = track_id;
+  obj->velocity             = output_velocity.cast<float>();
   obj->velocity_uncertainty = output_velocity_uncertainty.cast<float>();
-  obj->velocity_converged = converged;
-  obj->tracking_time = tracking_time;
+  obj->velocity_converged   = converged;
+  obj->tracking_time        = tracking_time;
   if (obj->velocity.norm() > GetVelThreshold(obj)) {
     obj->theta = std::atan2(obj->velocity[1], obj->velocity[0]);
   } else {
@@ -234,10 +231,9 @@ std::string TrackedObject::ToString() const {
   // return txt;
   std::ostringstream oos;
   oos << "obj id: " << object_ptr->id << ", track_id: " << object_ptr->track_id
-      << ", bary_center: (" << barycenter[0] << "," << barycenter[1] << ","
-      << barycenter[2] << ")"
-      << ", lane_direction: (" << lane_direction[0] << "," << lane_direction[1]
-      << "," << lane_direction[2] << ")";
+      << ", bary_center: (" << barycenter[0] << "," << barycenter[1] << "," << barycenter[2] << ")"
+      << ", lane_direction: (" << lane_direction[0] << "," << lane_direction[1] << ","
+      << lane_direction[2] << ")";
   return oos.str();
 }
 
@@ -247,8 +243,7 @@ void TrackedObject::ComputeShapeFeatures() {
   // 2. compute object's shape feature
   shape_features_full.resize(histogram_bin_size * 7);
   FeatureDescriptor fd(&(object_ptr->lidar_supplement.cloud));
-  fd.ComputeHistogram(static_cast<int>(histogram_bin_size),
-                      shape_features_full.data());
+  fd.ComputeHistogram(static_cast<int>(histogram_bin_size), shape_features_full.data());
 
   size_t feature_len = histogram_bin_size * 3;
   shape_features.clear();

@@ -41,15 +41,15 @@ TEST(HMMatcherTest, hm_matcher_name_test) {
 }
 
 TEST(HMMatcherTest, hm_matcher_propterty_match_test) {
-  HMMatcher* matcher = new HMMatcher();
-  std::vector<RadarTrackPtr> radar_tracks;
-  base::Frame radar_frame;
+  HMMatcher*                   matcher = new HMMatcher();
+  std::vector<RadarTrackPtr>   radar_tracks;
+  base::Frame                  radar_frame;
   std::vector<TrackObjectPair> assignments;
-  std::vector<size_t> unassigned_tracks;
-  std::vector<size_t> unassigned_objects;
+  std::vector<size_t>          unassigned_tracks;
+  std::vector<size_t>          unassigned_objects;
   unassigned_tracks.push_back(0);
-  matcher->TrackObjectPropertyMatch(radar_tracks, radar_frame, &assignments,
-                                    &unassigned_tracks, &unassigned_objects);
+  matcher->TrackObjectPropertyMatch(radar_tracks, radar_frame, &assignments, &unassigned_tracks,
+                                    &unassigned_objects);
   EXPECT_EQ(unassigned_tracks.size(), 1);
   EXPECT_EQ(unassigned_objects.size(), 0);
   delete matcher;
@@ -64,11 +64,11 @@ TEST(HMMatcherTest, hm_matcher_test) {
   double match_distance = 2.5;
   BaseMatcher::SetMaxMatchDistance(match_distance);
 
-  std::vector<RadarTrackPtr> radar_tracks;
-  base::Frame radar_frame;
+  std::vector<RadarTrackPtr>   radar_tracks;
+  base::Frame                  radar_frame;
   std::vector<TrackObjectPair> assignments;
-  std::vector<size_t> unassigned_tracks;
-  std::vector<size_t> unassigned_objects;
+  std::vector<size_t>          unassigned_tracks;
+  std::vector<size_t>          unassigned_objects;
   matcher->IDMatch(radar_tracks, radar_frame, &assignments, &unassigned_tracks,
                    &unassigned_objects);
   EXPECT_EQ(assignments.size(), 0);
@@ -79,13 +79,13 @@ TEST(HMMatcherTest, hm_matcher_test) {
   object->track_id = 100;
   object->center << 10.0, 20.0, 0.0;
   object->velocity << 3.0, 4.0, 0.0;
-  double timestamp = 123456789.0;
-  RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
+  double          timestamp = 123456789.0;
+  RadarTrackPtr   radar_track(new RadarTrack(object, timestamp));
   base::ObjectPtr object2(new base::Object);
   object2->track_id = 101;
   object2->center << 50.0, 100.0, 0.0;
   object2->velocity << 3.0, 4.0, 0.0;
-  RadarTrackPtr radar_track2(new RadarTrack(object2, timestamp));
+  RadarTrackPtr   radar_track2(new RadarTrack(object2, timestamp));
   base::ObjectPtr object3(new base::Object);
   object3->track_id = 102;
   object3->center << 20.0, 30.0, 0.0;
@@ -110,9 +110,8 @@ TEST(HMMatcherTest, hm_matcher_test) {
   radar_frame.objects[2]->velocity << 3.0, 4.0, 0.0;
 
   TrackObjectMatcherOptions options;
-  bool match_state =
-      matcher->Match(radar_tracks, radar_frame, options, &assignments,
-                     &unassigned_tracks, &unassigned_objects);
+  bool match_state = matcher->Match(radar_tracks, radar_frame, options, &assignments,
+                                    &unassigned_tracks, &unassigned_objects);
   EXPECT_EQ(assignments.size(), 2);
   EXPECT_EQ(unassigned_tracks.size(), 1);
   EXPECT_EQ(unassigned_objects.size(), 1);

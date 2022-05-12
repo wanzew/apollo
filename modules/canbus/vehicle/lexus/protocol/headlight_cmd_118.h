@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Headlightcmd118 : public ::apollo::drivers::canbus::ProtocolData<
-                            ::apollo::canbus::ChassisDetail> {
+class Headlightcmd118
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -62,8 +63,7 @@ class Headlightcmd118 : public ::apollo::drivers::canbus::ProtocolData<
   // 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 15, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Headlightcmd118* set_headlight_cmd(
-      Headlight_cmd_118::Headlight_cmdType headlight_cmd);
+  Headlightcmd118* set_headlight_cmd(Headlight_cmd_118::Headlight_cmdType headlight_cmd);
 
  private:
   // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0,
@@ -92,14 +92,13 @@ class Headlightcmd118 : public ::apollo::drivers::canbus::ProtocolData<
   // 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 15, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  void set_p_headlight_cmd(uint8_t* data,
-                           Headlight_cmd_118::Headlight_cmdType headlight_cmd);
+  void set_p_headlight_cmd(uint8_t* data, Headlight_cmd_118::Headlight_cmdType headlight_cmd);
 
  private:
-  bool ignore_overrides_;
-  bool enable_;
-  bool clear_override_;
-  bool clear_faults_;
+  bool                                 ignore_overrides_;
+  bool                                 enable_;
+  bool                                 clear_override_;
+  bool                                 clear_faults_;
   Headlight_cmd_118::Headlight_cmdType headlight_cmd_;
 };
 

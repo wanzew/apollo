@@ -47,11 +47,11 @@ void Steeringcmd12c::UpdateData(uint8_t* data) {
 void Steeringcmd12c::Reset() {
   // TODO(QiL) : you should check this manually
   ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
-  clear_faults_ = false;
-  position_ = 0.0;
-  rotation_rate_ = 0.0;
+  enable_           = false;
+  clear_override_   = false;
+  clear_faults_     = false;
+  position_         = 0.0;
+  rotation_rate_    = 0.0;
 }
 
 Steeringcmd12c* Steeringcmd12c::set_ignore_overrides(bool ignore_overrides) {
@@ -62,8 +62,7 @@ Steeringcmd12c* Steeringcmd12c::set_ignore_overrides(bool ignore_overrides) {
 // config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-void Steeringcmd12c::set_p_ignore_overrides(uint8_t* data,
-                                            bool ignore_overrides) {
+void Steeringcmd12c::set_p_ignore_overrides(uint8_t* data, bool ignore_overrides) {
   uint8_t x = ignore_overrides;
 
   Byte to_set(data + 0);
@@ -125,8 +124,8 @@ Steeringcmd12c* Steeringcmd12c::set_position(double position) {
 // 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 15,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad'}
 void Steeringcmd12c::set_p_position(uint8_t* data, double position) {
-  position = ProtocolData::BoundedValue(-32.768, 32.767, position);
-  int x = static_cast<int>(position / -0.001000);
+  position  = ProtocolData::BoundedValue(-32.768, 32.767, position);
+  int     x = static_cast<int>(position / -0.001000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
@@ -149,8 +148,8 @@ Steeringcmd12c* Steeringcmd12c::set_rotation_rate(double rotation_rate) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
 void Steeringcmd12c::set_p_rotation_rate(uint8_t* data, double rotation_rate) {
   rotation_rate = ProtocolData::BoundedValue(0.0, 65.535, rotation_rate);
-  int x = static_cast<int>(rotation_rate / 0.001000);
-  uint8_t t = 0;
+  int     x     = static_cast<int>(rotation_rate / 0.001000);
+  uint8_t t     = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 4);

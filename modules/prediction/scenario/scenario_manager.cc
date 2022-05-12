@@ -22,8 +22,7 @@ namespace apollo {
 namespace prediction {
 
 void ScenarioManager::Run(ContainerManager* container_manager) {
-  auto environment_features =
-      FeatureExtractor::ExtractEnvironmentFeatures(container_manager);
+  auto environment_features = FeatureExtractor::ExtractEnvironmentFeatures(container_manager);
 
   auto ptr_scenario_features = ScenarioAnalyzer::Analyze(environment_features);
 

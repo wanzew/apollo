@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
@@ -28,9 +29,7 @@ namespace service_discovery {
 
 class ServiceManagerTest : public ::testing::Test {
  protected:
-  ServiceManagerTest() {
-    service_manager_ = std::make_shared<ServiceManager>();
-  }
+  ServiceManagerTest() { service_manager_ = std::make_shared<ServiceManager>(); }
   virtual ~ServiceManagerTest() { service_manager_->Shutdown(); }
 
   virtual void SetUp() {}

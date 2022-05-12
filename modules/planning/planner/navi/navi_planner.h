@@ -26,14 +26,15 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/navi/decider/navi_task.h"
 #include "modules/planning/planner/planner.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 
@@ -72,8 +73,8 @@ class NaviPlanner : public PlannerWithReferenceLine {
    * @return OK if planning succeeds; error otherwise.
    */
   common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame,
-                      ADCTrajectory* ptr_computed_trajectory) override;
+                      Frame*                         frame,
+                      ADCTrajectory*                 ptr_computed_trajectory) override;
 
   void Stop() override {}
 
@@ -84,43 +85,41 @@ class NaviPlanner : public PlannerWithReferenceLine {
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  common::Status PlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+  common::Status PlanOnReferenceLine(const common::TrajectoryPoint& planning_init_point,
+                                     Frame*                         frame,
+                                     ReferenceLineInfo*             reference_line_info) override;
 
  private:
   void RegisterTasks();
-  std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
-      const common::TrajectoryPoint& planning_init_point,
-      const ReferenceLineInfo* reference_line_info);
+  std::vector<common::SpeedPoint>
+  GenerateInitSpeedProfile(const common::TrajectoryPoint& planning_init_point,
+                           const ReferenceLineInfo*       reference_line_info);
 
-  std::vector<common::SpeedPoint> DummyHotStart(
-      const common::TrajectoryPoint& planning_init_point);
+  std::vector<common::SpeedPoint> DummyHotStart(const common::TrajectoryPoint& planning_init_point);
 
-  std::vector<common::SpeedPoint> GenerateSpeedHotStart(
-      const common::TrajectoryPoint& planning_init_point);
+  std::vector<common::SpeedPoint>
+  GenerateSpeedHotStart(const common::TrajectoryPoint& planning_init_point);
 
   void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
-                                   PathData* path_data);
+                                   PathData*                path_data);
 
   void GenerateFallbackSpeedProfile(SpeedData* speed_data);
 
-  SpeedData GenerateStopProfile(const double init_speed,
-                                const double init_acc) const;
+  SpeedData GenerateStopProfile(const double init_speed, const double init_acc) const;
 
-  SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
-                                              const double init_acc) const;
+  SpeedData GenerateStopProfileFromPolynomial(const double init_speed, const double init_acc) const;
 
   bool IsValidProfile(const QuinticPolynomialCurve1d& curve) const;
 
   void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
 
   void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
-                       const std::string& name, const double time_diff_ms);
+                       const std::string& name,
+                       const double       time_diff_ms);
 
  private:
   apollo::common::util::Factory<TaskConfig::TaskType, NaviTask> task_factory_;
-  std::vector<std::unique_ptr<NaviTask>> tasks_;
+  std::vector<std::unique_ptr<NaviTask>>                        tasks_;
 };
 
 }  // namespace planning

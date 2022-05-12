@@ -28,19 +28,15 @@ DEFINE_double(qw, 0, "quaternion w");
 int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
-  FLAGS_v = 3;
+  FLAGS_v               = 3;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  apollo::common::math::EulerAnglesZXY<double> euler(FLAGS_qw, FLAGS_qx,
-                                                     FLAGS_qy, FLAGS_qz);
-  AINFO << "roll: " << euler.roll() << " pitch:" << euler.pitch()
-        << " yaw:" << euler.yaw();
+  apollo::common::math::EulerAnglesZXY<double> euler(FLAGS_qw, FLAGS_qx, FLAGS_qy, FLAGS_qz);
+  AINFO << "roll: " << euler.roll() << " pitch:" << euler.pitch() << " yaw:" << euler.yaw();
   AINFO << "heading: "
-        << apollo::common::math::QuaternionToHeading(FLAGS_qw, FLAGS_qx,
-                                                     FLAGS_qy, FLAGS_qz)
+        << apollo::common::math::QuaternionToHeading(FLAGS_qw, FLAGS_qx, FLAGS_qy, FLAGS_qz)
         << " heading degree: "
         << 180.0 / M_PI *
-               apollo::common::math::QuaternionToHeading(FLAGS_qw, FLAGS_qx,
-                                                         FLAGS_qy, FLAGS_qz);
+               apollo::common::math::QuaternionToHeading(FLAGS_qw, FLAGS_qx, FLAGS_qy, FLAGS_qz);
 }

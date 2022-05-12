@@ -37,35 +37,35 @@ namespace ft {
 
 class KMkernal {
  public:
-  KMkernal() = default;
+  KMkernal()  = default;
   ~KMkernal() = default;
   template <typename T>
-  bool GetKMResult(const T& association_mat,
+  bool GetKMResult(const T&                          association_mat,
                    std::vector<std::pair<int, int>>* match_cps,
-                   bool need_reverse = false);
+                   bool                              need_reverse = false);
 
  private:
-  int u_size_;
-  int v_size_;
-  double* ex_u_;
-  double* ex_v_;
-  int* v_matched_;
-  double* v_slack_;
+  int           u_size_;
+  int           v_size_;
+  double*       ex_u_;
+  double*       ex_v_;
+  int*          v_matched_;
+  double*       v_slack_;
   std::set<int> used_u_;
   std::set<int> used_v_;
   template <typename T>
   bool FindCP(const T& mat, int i);
 };
 template <typename T>
-bool KMkernal::GetKMResult(const T& association_mat,
+bool KMkernal::GetKMResult(const T&                          association_mat,
                            std::vector<std::pair<int, int>>* match_cps,
-                           bool need_reverse) {
+                           bool                              need_reverse) {
   match_cps->clear();
   u_size_ = association_mat.rows();
   v_size_ = association_mat.cols();
   if (u_size_ > v_size_) return false;
-  ex_u_ = new double[u_size_];
-  ex_v_ = new double[v_size_];
+  ex_u_      = new double[u_size_];
+  ex_v_      = new double[v_size_];
   v_matched_ = new int[v_size_];
   std::fill(v_matched_, v_matched_ + v_size_, -1);
   memset(ex_v_, 0, v_size_ * sizeof(double));
@@ -137,9 +137,7 @@ template <typename T>
 bool KMkernal::FindCP(const T& mat, int i) {
   used_u_.insert(i);
   for (int j = 0; j < v_size_; ++j) {
-    if (used_v_.find(j) != used_v_.end()) {
-      continue;
-    }
+    if (used_v_.find(j) != used_v_.end()) { continue; }
     double gap = ex_u_[i] + ex_v_[j] - mat(i, j);
     if (gap <= 0) {
       // res = 0;

@@ -17,6 +17,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/perception/tool/benchmark/lidar/eval/position_metric.h"
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 
@@ -27,14 +28,13 @@ namespace benchmark {
 // similarity, precision, recall, confidence
 struct SPRCTuple {
   double similarity = 0.0;
-  double precision = 0.0;
-  double recall = 0.0;
+  double precision  = 0.0;
+  double recall     = 0.0;
   double confidence = 0.0;
 };
 
 struct OrientationSimilarityMetric {
-  void cal_orientation_similarity(const ObjectPtr& object,
-                                  const ObjectPtr& gt_object);
+  void cal_orientation_similarity(const ObjectPtr& object, const ObjectPtr& gt_object);
   // if penalizes PI
   static bool penalize_pi;
   // direction angle difference
@@ -45,19 +45,20 @@ struct OrientationSimilarityMetric {
 
 enum RangeType {
   DISTANCE = 0,
-  VIEW = 1,
-  BOX = 2,
-  ROI = 3,
+  VIEW     = 1,
+  BOX      = 2,
+  ROI      = 3,
 };
 
 void compute_ap_aos(
     const std::vector<unsigned int>& cumulated_match_num_per_conf,
     const std::vector<unsigned int>& cumulated_detection_num_per_conf,
-    const unsigned int total_gt_num, const unsigned int recall_dim, double* ap,
-    std::vector<SPRCTuple>* tuples,
-    const std::vector<double>& cumulated_orientation_similarity_per_conf =
-        std::vector<double>(),
-    double* aos = nullptr);
+    const unsigned int               total_gt_num,
+    const unsigned int               recall_dim,
+    double*                          ap,
+    std::vector<SPRCTuple>*          tuples,
+    const std::vector<double>& cumulated_orientation_similarity_per_conf = std::vector<double>(),
+    double*                    aos                                       = nullptr);
 
 class MetaStatistics {
  public:
@@ -67,26 +68,23 @@ class MetaStatistics {
   // this operator designed for online update
   MetaStatistics& operator+=(const MetaStatistics& rhs);
   // get precision and recall for each range
-  void get_2017_detection_precision_and_recall(
-      std::vector<double>* precisions, std::vector<double>* recalls) const;
+  void get_2017_detection_precision_and_recall(std::vector<double>* precisions,
+                                               std::vector<double>* recalls) const;
   void get_2017_detection_visible_recall(std::vector<double>* recalls) const;
   // get 2017 orientation aad
   void get_2017_aad(std::vector<double>* aad) const;
 
-  void get_2016_detection_precision_and_recall(
-      std::vector<double>* precisions, std::vector<double>* recalls) const;
+  void get_2016_detection_precision_and_recall(std::vector<double>* precisions,
+                                               std::vector<double>* recalls) const;
   // get ap, and pr-curve samples <precision, recall, confidence>
-  void get_2017_detection_ap_aos(double* ap, double* aos,
-                                 std::vector<SPRCTuple>* tuples) const;
-  void get_2017_detection_ap_per_type(
-      std::vector<double>* ap, std::vector<std::vector<SPRCTuple>>* tuples);
+  void get_2017_detection_ap_aos(double* ap, double* aos, std::vector<SPRCTuple>* tuples) const;
+  void get_2017_detection_ap_per_type(std::vector<double>*                 ap,
+                                      std::vector<std::vector<SPRCTuple>>* tuples);
   // get 2017 classification accuracy
-  void get_2017_classification_accuracy(
-      std::vector<std::vector<double>>* accuracys) const;
+  void get_2017_classification_accuracy(std::vector<std::vector<double>>* accuracys) const;
   // get 2016 classification accuracy
   // D1: type D2: range
-  void get_2016_classification_accuracy(
-      std::vector<std::vector<double>>* accuracys) const;
+  void get_2016_classification_accuracy(std::vector<std::vector<double>>* accuracys) const;
   // get classification confusion matrix (normalized)
   void get_classification_confusion_matrix(
       std::vector<std::vector<double>>* matrix_gt_major,
@@ -98,22 +96,22 @@ class MetaStatistics {
   friend class FrameStatistics;
 
  public:
-  static void set_range_type(RangeType type);
-  static void set_recall_dim(unsigned int prc_dim);
+  static void         set_range_type(RangeType type);
+  static void         set_recall_dim(unsigned int prc_dim);
   static unsigned int get_type_index(const ObjectType& type);
   static unsigned int get_range_index(const PositionMetric& position);
   static unsigned int get_confidence_index(double confidence);
   static unsigned int get_type_dim();
   static unsigned int get_range_dim();
   static unsigned int get_confidence_dim();
-  static std::string get_type(unsigned int index);
-  static std::string get_range(unsigned int index);
-  static double get_confidence(unsigned int index);
+  static std::string  get_type(unsigned int index);
+  static std::string  get_range(unsigned int index);
+  static double       get_confidence(unsigned int index);
   static unsigned int get_recall_dim();
 
  private:
   static std::unique_ptr<BaseRangeInterface> _s_range_interface;
-  static unsigned int _s_recall_dim;
+  static unsigned int                        _s_recall_dim;
   // record for detection precision and recall
   // D1: range
   std::vector<unsigned int> _total_detection_num;
@@ -128,7 +126,7 @@ class MetaStatistics {
   // match statisfy sum{N(o_i \cap o_gt)} / N(o_gt) > TH criteria (16 KPI)
   // thus allow many to one match
   std::vector<unsigned int> _total_hit_match_num;
-  std::vector<double> _total_ji_sum;  // (16 KPI)
+  std::vector<double>       _total_ji_sum;  // (16 KPI)
   // record for detection ap
   // D1: gt type D2: confidence (store #samples of confidence >= bin confidence)
   std::vector<std::vector<unsigned int>> _cumulated_match_num_per_conf;

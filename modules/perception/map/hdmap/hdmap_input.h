@@ -36,11 +36,12 @@ class HDMapInput {
   // thread safe
   bool Init();
   bool Reset();
-  bool GetRoiHDMapStruct(const base::PointD& pointd, const double distance,
+  bool GetRoiHDMapStruct(const base::PointD&                pointd,
+                         const double                       distance,
                          std::shared_ptr<base::HdmapStruct> hdmap_struct_prt);
-  bool GetNearestLaneDirection(const base::PointD& pointd,
-                               Eigen::Vector3d* lane_direction);
-  bool GetSignals(const Eigen::Vector3d& pointd, double forward_distance,
+  bool GetNearestLaneDirection(const base::PointD& pointd, Eigen::Vector3d* lane_direction);
+  bool GetSignals(const Eigen::Vector3d&              pointd,
+                  double                              forward_distance,
                   std::vector<apollo::hdmap::Signal>* signals);
 
  private:
@@ -48,40 +49,35 @@ class HDMapInput {
   bool InitInternal();
 
   void MergeBoundaryJunction(
-      const std::vector<apollo::hdmap::RoadRoiPtr>& boundary,
-      const std::vector<apollo::hdmap::JunctionInfoConstPtr>& junctions,
-      apollo::common::EigenVector<base::RoadBoundary>* road_boundaries_ptr,
-      apollo::common::EigenVector<base::PointCloud<base::PointD>>*
-          road_polygons_ptr,
-      apollo::common::EigenVector<base::PointCloud<base::PointD>>*
-          junction_polygons_ptr);
+      const std::vector<apollo::hdmap::RoadRoiPtr>&                boundary,
+      const std::vector<apollo::hdmap::JunctionInfoConstPtr>&      junctions,
+      apollo::common::EigenVector<base::RoadBoundary>*             road_boundaries_ptr,
+      apollo::common::EigenVector<base::PointCloud<base::PointD>>* road_polygons_ptr,
+      apollo::common::EigenVector<base::PointCloud<base::PointD>>* junction_polygons_ptr);
 
   bool GetRoadBoundaryFilteredByJunctions(
-      const apollo::common::EigenVector<base::RoadBoundary>& road_boundaries,
-      const apollo::common::EigenVector<base::PointCloud<base::PointD>>&
-          junctions,
-      apollo::common::EigenVector<base::RoadBoundary>* flt_road_boundaries_ptr);
+      const apollo::common::EigenVector<base::RoadBoundary>&             road_boundaries,
+      const apollo::common::EigenVector<base::PointCloud<base::PointD>>& junctions,
+      apollo::common::EigenVector<base::RoadBoundary>*                   flt_road_boundaries_ptr);
 
-  void DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
+  void DownsamplePoints(const base::PointDCloudPtr&     raw_cloud_ptr,
                         base::PointCloud<base::PointD>* polygon_ptr,
-                        size_t min_points_num_for_sample = 15) const;
+                        size_t                          min_points_num_for_sample = 15) const;
 
-  void SplitBoundary(
-      const base::PointCloud<base::PointD>& boundary_line,
-      const apollo::common::EigenVector<base::PointCloud<base::PointD>>&
-          junctions,
-      apollo::common::EigenVector<base::PointCloud<base::PointD>>*
-          boundary_line_vec_ptr);
+  void
+  SplitBoundary(const base::PointCloud<base::PointD>&                              boundary_line,
+                const apollo::common::EigenVector<base::PointCloud<base::PointD>>& junctions,
+                apollo::common::EigenVector<base::PointCloud<base::PointD>>* boundary_line_vec_ptr);
 
-  bool GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
-                           double forward_distance,
+  bool GetSignalsFromHDMap(const Eigen::Vector3d&              pointd,
+                           double                              forward_distance,
                            std::vector<apollo::hdmap::Signal>* signals);
 
-  bool inited_ = false;
-  lib::Mutex mutex_;
+  bool                                  inited_ = false;
+  lib::Mutex                            mutex_;
   std::unique_ptr<apollo::hdmap::HDMap> hdmap_;
-  int hdmap_sample_step_ = 5;
-  std::string hdmap_file_;
+  int                                   hdmap_sample_step_ = 5;
+  std::string                           hdmap_file_;
 
   DECLARE_SINGLETON(HDMapInput)
 };

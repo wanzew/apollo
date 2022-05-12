@@ -25,14 +25,14 @@ namespace base {
 TEST(ImageCoreTest, operator_test) {
   {
     BBox2D<int> bbox(1, 2, 3, 4);
-    Rect<int> rect = static_cast<Rect<int>>(bbox);
+    Rect<int>   rect = static_cast<Rect<int>>(bbox);
     EXPECT_EQ(rect.x, 1);
     EXPECT_EQ(rect.y, 2);
     EXPECT_EQ(rect.width, 2);
     EXPECT_EQ(rect.height, 2);
   }
   {
-    Rect<int> rect(1, 2, 3, 4);
+    Rect<int>   rect(1, 2, 3, 4);
     BBox2D<int> bbox = static_cast<BBox2D<int>>(rect);
     EXPECT_EQ(bbox.xmin, 1);
     EXPECT_EQ(bbox.ymin, 2);
@@ -73,17 +73,13 @@ TEST(ImageCoreTest, operator_test) {
     EXPECT_NE(rect1, rect2);
   }
   {
-    Rect<double> rect1(478291.0000001, 48273912.111112323, 10000000.0,
-                       20000000.0);
-    Rect<double> rect2(478291.0000001, 48273912.111112323, 10000000.0,
-                       20000000.0);
+    Rect<double> rect1(478291.0000001, 48273912.111112323, 10000000.0, 20000000.0);
+    Rect<double> rect2(478291.0000001, 48273912.111112323, 10000000.0, 20000000.0);
     EXPECT_EQ(rect1, rect2);
   }
   {
-    Rect<double> rect1(478291.0000001, 48273912.111112323, 10000000.0,
-                       20000000.0);
-    Rect<double> rect2(478291.0000002, 48273912.111112323, 10000000.0,
-                       20000000.0);
+    Rect<double> rect1(478291.0000001, 48273912.111112323, 10000000.0, 20000000.0);
+    Rect<double> rect2(478291.0000002, 48273912.111112323, 10000000.0, 20000000.0);
     EXPECT_NE(rect1, rect2);
   }
   {

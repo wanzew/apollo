@@ -17,9 +17,11 @@
 #pragma once
 
 #include <memory>
-#include "cyber/cyber.h"
+
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/drivers/video/proto/video_h265cfg.pb.h"
+
+#include "cyber/cyber.h"
 #include "modules/drivers/video/socket_input.h"
 
 namespace apollo {
@@ -31,18 +33,18 @@ using apollo::drivers::video::config::CameraH265Config;
 
 class CameraDriver {
  public:
-  explicit CameraDriver(const CameraH265Config *h265_cfg);
+  explicit CameraDriver(const CameraH265Config* h265_cfg);
   ~CameraDriver() {}
 
   bool Poll(std::shared_ptr<CompressedImage> h265);
   void Init();
-  int Port() { return config_.udp_port(); }
-  int Record() { return config_.record(); }
+  int  Port() { return config_.udp_port(); }
+  int  Record() { return config_.record(); }
 
  protected:
-  CameraH265Config config_;
+  CameraH265Config             config_;
   std::shared_ptr<SocketInput> input_;
-  bool PollByFrame(std::shared_ptr<CompressedImage> h265);
+  bool                         PollByFrame(std::shared_ptr<CompressedImage> h265);
 };
 
 }  // namespace video

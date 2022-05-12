@@ -18,8 +18,9 @@
 
 #include <cmath>
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace drivers {
@@ -30,8 +31,7 @@ using apollo::drivers::conti_radar::OutputType;
 using apollo::drivers::conti_radar::RadarConf;
 using apollo::drivers::conti_radar::RcsThreshold;
 
-class MotionInputYawRate301
-    : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
+class MotionInputYawRate301 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
   MotionInputYawRate301();

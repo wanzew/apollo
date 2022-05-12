@@ -67,12 +67,10 @@ const uint32_t DEFAULT_PENDING_QUEUE_SIZE = 1;
 template <typename MessageT>
 class Reader : public ReaderBase {
  public:
-  using BlockerPtr = std::unique_ptr<blocker::Blocker<MessageT>>;
-  using ReceiverPtr = std::shared_ptr<transport::Receiver<MessageT>>;
-  using ChangeConnection =
-      typename service_discovery::Manager::ChangeConnection;
-  using Iterator =
-      typename std::list<std::shared_ptr<MessageT>>::const_iterator;
+  using BlockerPtr       = std::unique_ptr<blocker::Blocker<MessageT>>;
+  using ReceiverPtr      = std::shared_ptr<transport::Receiver<MessageT>>;
+  using ChangeConnection = typename service_discovery::Manager::ChangeConnection;
+  using Iterator         = typename std::list<std::shared_ptr<MessageT>>::const_iterator;
 
   /**
    * Constructor a Reader object.
@@ -83,9 +81,9 @@ class Reader : public ReaderBase {
    * @warning the received messages is enqueue a queue,the queue's depth is
    * pending_queue_size
    */
-  explicit Reader(const proto::RoleAttributes& role_attr,
-                  const CallbackFunc<MessageT>& reader_func = nullptr,
-                  uint32_t pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE);
+  explicit Reader(const proto::RoleAttributes&  role_attr,
+                  const CallbackFunc<MessageT>& reader_func        = nullptr,
+                  uint32_t                      pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE);
   virtual ~Reader();
 
   /**
@@ -207,8 +205,8 @@ class Reader : public ReaderBase {
   void GetWriters(std::vector<proto::RoleAttributes>* writers) override;
 
  protected:
-  double latest_recv_time_sec_ = -1.0;
-  double second_to_lastest_recv_time_sec_ = -1.0;
+  double   latest_recv_time_sec_            = -1.0;
+  double   second_to_lastest_recv_time_sec_ = -1.0;
   uint32_t pending_queue_size_;
 
  private:
@@ -217,24 +215,24 @@ class Reader : public ReaderBase {
   void OnChannelChange(const proto::ChangeMsg& change_msg);
 
   CallbackFunc<MessageT> reader_func_;
-  ReceiverPtr receiver_ = nullptr;
-  std::string croutine_name_;
+  ReceiverPtr            receiver_ = nullptr;
+  std::string            croutine_name_;
 
   BlockerPtr blocker_ = nullptr;
 
-  ChangeConnection change_conn_;
+  ChangeConnection                     change_conn_;
   service_discovery::ChannelManagerPtr channel_manager_ = nullptr;
 };
 
 template <typename MessageT>
-Reader<MessageT>::Reader(const proto::RoleAttributes& role_attr,
+Reader<MessageT>::Reader(const proto::RoleAttributes&  role_attr,
                          const CallbackFunc<MessageT>& reader_func,
-                         uint32_t pending_queue_size)
-    : ReaderBase(role_attr),
-      pending_queue_size_(pending_queue_size),
-      reader_func_(reader_func) {
-  blocker_.reset(new blocker::Blocker<MessageT>(blocker::BlockerAttr(
-      role_attr.qos_profile().depth(), role_attr.channel_name())));
+                         uint32_t                      pending_queue_size)
+    : ReaderBase(role_attr)
+    , pending_queue_size_(pending_queue_size)
+    , reader_func_(reader_func) {
+  blocker_.reset(new blocker::Blocker<MessageT>(
+      blocker::BlockerAttr(role_attr.qos_profile().depth(), role_attr.channel_name())));
 }
 
 template <typename MessageT>
@@ -245,7 +243,7 @@ Reader<MessageT>::~Reader() {
 template <typename MessageT>
 void Reader<MessageT>::Enqueue(const std::shared_ptr<MessageT>& msg) {
   second_to_lastest_recv_time_sec_ = latest_recv_time_sec_;
-  latest_recv_time_sec_ = Time::Now().ToSecond();
+  latest_recv_time_sec_            = Time::Now().ToSecond();
   blocker_->Publish(msg);
 }
 
@@ -256,9 +254,7 @@ void Reader<MessageT>::Observe() {
 
 template <typename MessageT>
 bool Reader<MessageT>::Init() {
-  if (init_.exchange(true)) {
-    return true;
-  }
+  if (init_.exchange(true)) { return true; }
   std::function<void(const std::shared_ptr<MessageT>&)> func;
   if (reader_func_ != nullptr) {
     func = [this](const std::shared_ptr<MessageT>& msg) {
@@ -268,13 +264,12 @@ bool Reader<MessageT>::Init() {
   } else {
     func = [this](const std::shared_ptr<MessageT>& msg) { this->Enqueue(msg); };
   }
-  auto sched = scheduler::Instance();
+  auto sched     = scheduler::Instance();
   croutine_name_ = role_attr_.node_name() + "_" + role_attr_.channel_name();
-  auto dv = std::make_shared<data::DataVisitor<MessageT>>(
-      role_attr_.channel_id(), pending_queue_size_);
+  auto dv =
+      std::make_shared<data::DataVisitor<MessageT>>(role_attr_.channel_id(), pending_queue_size_);
   // Using factory to wrap templates.
-  croutine::RoutineFactory factory =
-      croutine::CreateRoutineFactory<MessageT>(std::move(func), dv);
+  croutine::RoutineFactory factory = croutine::CreateRoutineFactory<MessageT>(std::move(func), dv);
   if (!sched->CreateTask(factory, croutine_name_)) {
     AERROR << "Create Task Failed!";
     init_.store(false);
@@ -283,8 +278,7 @@ bool Reader<MessageT>::Init() {
 
   receiver_ = ReceiverManager<MessageT>::Instance()->GetReceiver(role_attr_);
   this->role_attr_.set_id(receiver_->id().HashValue());
-  channel_manager_ =
-      service_discovery::TopologyManager::Instance()->channel_manager();
+  channel_manager_ = service_discovery::TopologyManager::Instance()->channel_manager();
   JoinTheTopology();
 
   return true;
@@ -292,26 +286,22 @@ bool Reader<MessageT>::Init() {
 
 template <typename MessageT>
 void Reader<MessageT>::Shutdown() {
-  if (!init_.exchange(false)) {
-    return;
-  }
+  if (!init_.exchange(false)) { return; }
   LeaveTheTopology();
-  receiver_ = nullptr;
+  receiver_        = nullptr;
   channel_manager_ = nullptr;
 
-  if (!croutine_name_.empty()) {
-    scheduler::Instance()->RemoveTask(croutine_name_);
-  }
+  if (!croutine_name_.empty()) { scheduler::Instance()->RemoveTask(croutine_name_); }
 }
 
 template <typename MessageT>
 void Reader<MessageT>::JoinTheTopology() {
   // add listener
-  change_conn_ = channel_manager_->AddChangeListener(std::bind(
-      &Reader<MessageT>::OnChannelChange, this, std::placeholders::_1));
+  change_conn_ = channel_manager_->AddChangeListener(
+      std::bind(&Reader<MessageT>::OnChannelChange, this, std::placeholders::_1));
 
   // get peer writers
-  const std::string& channel_name = this->role_attr_.channel_name();
+  const std::string&                 channel_name = this->role_attr_.channel_name();
   std::vector<proto::RoleAttributes> writers;
   channel_manager_->GetWritersOfChannel(channel_name, &writers);
   for (auto& writer : writers) {
@@ -329,14 +319,10 @@ void Reader<MessageT>::LeaveTheTopology() {
 
 template <typename MessageT>
 void Reader<MessageT>::OnChannelChange(const proto::ChangeMsg& change_msg) {
-  if (change_msg.role_type() != proto::RoleType::ROLE_WRITER) {
-    return;
-  }
+  if (change_msg.role_type() != proto::RoleType::ROLE_WRITER) { return; }
 
   auto& writer_attr = change_msg.role_attr();
-  if (writer_attr.channel_name() != this->role_attr_.channel_name()) {
-    return;
-  }
+  if (writer_attr.channel_name() != this->role_attr_.channel_name()) { return; }
 
   auto operate_type = change_msg.operate_type();
   if (operate_type == proto::OperateType::OPT_JOIN) {
@@ -358,9 +344,7 @@ bool Reader<MessageT>::Empty() const {
 
 template <typename MessageT>
 double Reader<MessageT>::GetDelaySec() const {
-  if (latest_recv_time_sec_ < 0) {
-    return -1.0;
-  }
+  if (latest_recv_time_sec_ < 0) { return -1.0; }
   if (second_to_lastest_recv_time_sec_ < 0) {
     return Time::Now().ToSecond() - latest_recv_time_sec_;
   }
@@ -401,22 +385,16 @@ uint32_t Reader<MessageT>::GetHistoryDepth() const {
 
 template <typename MessageT>
 bool Reader<MessageT>::HasWriter() {
-  if (!init_.load()) {
-    return false;
-  }
+  if (!init_.load()) { return false; }
 
   return channel_manager_->HasWriter(role_attr_.channel_name());
 }
 
 template <typename MessageT>
 void Reader<MessageT>::GetWriters(std::vector<proto::RoleAttributes>* writers) {
-  if (writers == nullptr) {
-    return;
-  }
+  if (writers == nullptr) { return; }
 
-  if (!init_.load()) {
-    return;
-  }
+  if (!init_.load()) { return; }
 
   channel_manager_->GetWritersOfChannel(role_attr_.channel_name(), writers);
 }

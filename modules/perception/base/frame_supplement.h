@@ -34,23 +34,21 @@ struct alignas(16) LidarFrameSupplement {
   std::shared_ptr<AttributePointCloud<PointF>> cloud_ptr;
 
   void Reset() {
-    on_use = false;
+    on_use    = false;
     cloud_ptr = nullptr;
   }
 };
 
-typedef std::shared_ptr<LidarFrameSupplement> LidarFrameSupplementPtr;
-typedef std::shared_ptr<const LidarFrameSupplement>
-    LidarFrameSupplementConstPtr;
+typedef std::shared_ptr<LidarFrameSupplement>       LidarFrameSupplementPtr;
+typedef std::shared_ptr<const LidarFrameSupplement> LidarFrameSupplementConstPtr;
 
 struct alignas(16) RadarFrameSupplement {
   // @brief valid only when on_use = true
   bool on_use = false;
   void Reset() { on_use = false; }
 };
-typedef std::shared_ptr<RadarFrameSupplement> RadarFrameSupplementPtr;
-typedef std::shared_ptr<const RadarFrameSupplement>
-    RadarFrameSupplementConstPtr;
+typedef std::shared_ptr<RadarFrameSupplement>       RadarFrameSupplementPtr;
+typedef std::shared_ptr<const RadarFrameSupplement> RadarFrameSupplementConstPtr;
 
 struct alignas(16) CameraFrameSupplement {
   // @brief valid only when on_use = true
@@ -63,15 +61,14 @@ struct alignas(16) CameraFrameSupplement {
   std::shared_ptr<Blob<uint8_t>> image_blob = nullptr;
 
   void Reset() {
-    on_use = false;
-    image_ptr = nullptr;
+    on_use     = false;
+    image_ptr  = nullptr;
     image_blob = nullptr;
   }
 };
 
-typedef std::shared_ptr<CameraFrameSupplement> CameraFrameSupplementPtr;
-typedef std::shared_ptr<const CameraFrameSupplement>
-    CameraFrameSupplementConstPtr;
+typedef std::shared_ptr<CameraFrameSupplement>       CameraFrameSupplementPtr;
+typedef std::shared_ptr<const CameraFrameSupplement> CameraFrameSupplementConstPtr;
 
 struct alignas(16) UltrasonicFrameSupplement {
   // @brief valid only when on_use = true
@@ -81,14 +78,13 @@ struct alignas(16) UltrasonicFrameSupplement {
   std::shared_ptr<ImpendingCollisionEdges> impending_collision_edges_ptr;
 
   void Reset() {
-    on_use = false;
+    on_use                        = false;
     impending_collision_edges_ptr = nullptr;
   }
 };
 
-typedef std::shared_ptr<UltrasonicFrameSupplement> UltrasonicFrameSupplementPtr;
-typedef std::shared_ptr<const UltrasonicFrameSupplement>
-    UltrasonicFrameSupplementConstPtr;
+typedef std::shared_ptr<UltrasonicFrameSupplement>       UltrasonicFrameSupplementPtr;
+typedef std::shared_ptr<const UltrasonicFrameSupplement> UltrasonicFrameSupplementConstPtr;
 
 }  // namespace base
 }  // namespace perception

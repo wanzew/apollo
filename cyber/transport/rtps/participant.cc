@@ -16,54 +16,50 @@
 
 #include "cyber/transport/rtps/participant.h"
 
+#include "cyber/proto/transport_conf.pb.h"
+
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
-#include "cyber/proto/transport_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
 namespace transport {
 
-Participant::Participant(const std::string& name, int send_port,
+Participant::Participant(const std::string&                       name,
+                         int                                      send_port,
                          eprosima::fastrtps::ParticipantListener* listener)
-    : shutdown_(false),
-      name_(name),
-      send_port_(send_port),
-      listener_(listener),
-      fastrtps_participant_(nullptr) {}
+    : shutdown_(false)
+    , name_(name)
+    , send_port_(send_port)
+    , listener_(listener)
+    , fastrtps_participant_(nullptr) {}
 
 Participant::~Participant() {}
 
 void Participant::Shutdown() {
-  if (shutdown_.exchange(true)) {
-    return;
-  }
+  if (shutdown_.exchange(true)) { return; }
 
   std::lock_guard<std::mutex> lk(mutex_);
   if (fastrtps_participant_ != nullptr) {
     eprosima::fastrtps::Domain::removeParticipant(fastrtps_participant_);
     fastrtps_participant_ = nullptr;
-    listener_ = nullptr;
+    listener_             = nullptr;
   }
 }
 
 eprosima::fastrtps::Participant* Participant::fastrtps_participant() {
-  if (shutdown_.load()) {
-    return nullptr;
-  }
+  if (shutdown_.load()) { return nullptr; }
 
   std::lock_guard<std::mutex> lk(mutex_);
-  if (fastrtps_participant_ != nullptr) {
-    return fastrtps_participant_;
-  }
+  if (fastrtps_participant_ != nullptr) { return fastrtps_participant_; }
 
   CreateFastRtpsParticipant(name_, send_port_, listener_);
   return fastrtps_participant_;
 }
 
-void Participant::CreateFastRtpsParticipant(
-    const std::string& name, int send_port,
-    eprosima::fastrtps::ParticipantListener* listener) {
+void Participant::CreateFastRtpsParticipant(const std::string&                       name,
+                                            int                                      send_port,
+                                            eprosima::fastrtps::ParticipantListener* listener) {
   uint32_t domain_id = 80;
 
   const char* val = ::getenv("CYBER_DOMAIN_ID");
@@ -76,26 +72,22 @@ void Participant::CreateFastRtpsParticipant(
     }
   }
 
-  auto part_attr_conf = std::make_shared<proto::RtpsParticipantAttr>();
-  auto& global_conf = common::GlobalData::Instance()->Config();
-  if (global_conf.has_transport_conf() &&
-      global_conf.transport_conf().has_participant_attr()) {
+  auto  part_attr_conf = std::make_shared<proto::RtpsParticipantAttr>();
+  auto& global_conf    = common::GlobalData::Instance()->Config();
+  if (global_conf.has_transport_conf() && global_conf.transport_conf().has_participant_attr()) {
     part_attr_conf->CopyFrom(global_conf.transport_conf().participant_attr());
   }
 
   eprosima::fastrtps::ParticipantAttributes attr;
-  attr.rtps.defaultSendPort = send_port;
-  attr.rtps.port.domainIDGain =
-      static_cast<uint16_t>(part_attr_conf->domain_id_gain());
-  attr.rtps.port.portBase = static_cast<uint16_t>(part_attr_conf->port_base());
-  attr.rtps.use_IP6_to_send = false;
-  attr.rtps.builtin.use_SIMPLE_RTPSParticipantDiscoveryProtocol = true;
-  attr.rtps.builtin.use_SIMPLE_EndpointDiscoveryProtocol = true;
-  attr.rtps.builtin.m_simpleEDP.use_PublicationReaderANDSubscriptionWriter =
-      true;
-  attr.rtps.builtin.m_simpleEDP.use_PublicationWriterANDSubscriptionReader =
-      true;
-  attr.rtps.builtin.domainId = domain_id;
+  attr.rtps.defaultSendPort   = send_port;
+  attr.rtps.port.domainIDGain = static_cast<uint16_t>(part_attr_conf->domain_id_gain());
+  attr.rtps.port.portBase     = static_cast<uint16_t>(part_attr_conf->port_base());
+  attr.rtps.use_IP6_to_send   = false;
+  attr.rtps.builtin.use_SIMPLE_RTPSParticipantDiscoveryProtocol            = true;
+  attr.rtps.builtin.use_SIMPLE_EndpointDiscoveryProtocol                   = true;
+  attr.rtps.builtin.m_simpleEDP.use_PublicationReaderANDSubscriptionWriter = true;
+  attr.rtps.builtin.m_simpleEDP.use_PublicationWriterANDSubscriptionReader = true;
+  attr.rtps.builtin.domainId                                               = domain_id;
 
   /**
    * The user should set the lease_duration and the announcement_period with
@@ -133,8 +125,7 @@ void Participant::CreateFastRtpsParticipant(
   locator.set_IP4_address(239, 255, 0, 1);
   attr.rtps.builtin.metatrafficMulticastLocatorList.push_back(locator);
 
-  fastrtps_participant_ =
-      eprosima::fastrtps::Domain::createParticipant(attr, listener);
+  fastrtps_participant_ = eprosima::fastrtps::Domain::createParticipant(attr, listener);
   RETURN_IF_NULL(fastrtps_participant_);
   eprosima::fastrtps::Domain::registerType(fastrtps_participant_, &type_);
 }

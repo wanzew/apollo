@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class Parkingcontrola5 : public ::apollo::drivers::canbus::ProtocolData<
-                             ::apollo::canbus::ChassisDetail> {
+class Parkingcontrola5
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -41,16 +42,15 @@ class Parkingcontrola5 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 8, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  Parkingcontrola5* set_parking_target(
-      Parking_control_a5::Parking_targetType parking_target);
+  Parkingcontrola5* set_parking_target(Parking_control_a5::Parking_targetType parking_target);
 
   // config detail: {'name': 'Parking_Enable_control', 'enum': {0:
   // 'PARKING_ENABLE_CONTROL_PARKING_MANUALCONTROL', 1:
   // 'PARKING_ENABLE_CONTROL_PARKING_AUTOCONTROL'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Parkingcontrola5* set_parking_enable_control(
-      Parking_control_a5::Parking_enable_controlType parking_enable_control);
+  Parkingcontrola5*
+  set_parking_enable_control(Parking_control_a5::Parking_enable_controlType parking_enable_control);
 
  private:
   // config detail: {'name': 'Parking_target', 'enum': {0:
@@ -58,8 +58,7 @@ class Parkingcontrola5 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 8, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  void set_p_parking_target(
-      uint8_t* data, Parking_control_a5::Parking_targetType parking_target);
+  void set_p_parking_target(uint8_t* data, Parking_control_a5::Parking_targetType parking_target);
 
   // config detail: {'name': 'Parking_Enable_control', 'enum': {0:
   // 'PARKING_ENABLE_CONTROL_PARKING_MANUALCONTROL', 1:
@@ -67,11 +66,10 @@ class Parkingcontrola5 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
   void set_p_parking_enable_control(
-      uint8_t* data,
-      Parking_control_a5::Parking_enable_controlType parking_enable_control);
+      uint8_t* data, Parking_control_a5::Parking_enable_controlType parking_enable_control);
 
  private:
-  Parking_control_a5::Parking_targetType parking_target_;
+  Parking_control_a5::Parking_targetType         parking_target_;
   Parking_control_a5::Parking_enable_controlType parking_enable_control_;
 };
 

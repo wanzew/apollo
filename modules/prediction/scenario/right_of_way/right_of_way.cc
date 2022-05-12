@@ -37,48 +37,40 @@ using apollo::perception::PerceptionObstacle;
 
 void RightOfWay::Analyze(ContainerManager* container_manager) {
   ObstaclesContainer* obstacles_container =
-      container_manager->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
+      container_manager->GetContainer<ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
   if (obstacles_container == nullptr) {
     AERROR << "Null obstacles container found";
     return;
   }
 
   ADCTrajectoryContainer* adc_trajectory_container =
-      container_manager->GetContainer<ADCTrajectoryContainer>(
-          AdapterConfig::PLANNING_TRAJECTORY);
+      container_manager->GetContainer<ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
   if (adc_trajectory_container == nullptr) {
     AERROR << "adc_trajectory_container is nullptr";
     return;
   }
-  const std::vector<std::string>& lane_ids =
-      adc_trajectory_container->GetADCLaneIDSequence();
-  if (lane_ids.empty()) {
-    return;
-  }
+  const std::vector<std::string>& lane_ids = adc_trajectory_container->GetADCLaneIDSequence();
+  if (lane_ids.empty()) { return; }
 
-  auto pose_container = container_manager->GetContainer<PoseContainer>(
-      AdapterConfig::LOCALIZATION);
+  auto pose_container = container_manager->GetContainer<PoseContainer>(AdapterConfig::LOCALIZATION);
   if (pose_container == nullptr) {
     AERROR << "Pose container pointer is a null pointer.";
     return;
   }
-  const PerceptionObstacle* pose_obstacle_ptr =
-      pose_container->ToPerceptionObstacle();
+  const PerceptionObstacle* pose_obstacle_ptr = pose_container->ToPerceptionObstacle();
   if (pose_obstacle_ptr == nullptr) {
     AERROR << "Pose obstacle pointer is a null pointer.";
     return;
   }
-  double pose_x = pose_obstacle_ptr->position().x();
-  double pose_y = pose_obstacle_ptr->position().y();
-  double ego_vehicle_s = std::numeric_limits<double>::max();
-  double ego_vehicle_l = std::numeric_limits<double>::max();
-  double accumulated_s = 0.0;
-  std::string ego_lane_id = "";
+  double      pose_x        = pose_obstacle_ptr->position().x();
+  double      pose_y        = pose_obstacle_ptr->position().y();
+  double      ego_vehicle_s = std::numeric_limits<double>::max();
+  double      ego_vehicle_l = std::numeric_limits<double>::max();
+  double      accumulated_s = 0.0;
+  std::string ego_lane_id   = "";
   // loop for lane_ids to findout ego_vehicle_s and lane_id
   for (const std::string& lane_id : lane_ids) {
-    std::shared_ptr<const LaneInfo> lane_info_ptr =
-        PredictionMap::LaneById(lane_id);
+    std::shared_ptr<const LaneInfo> lane_info_ptr = PredictionMap::LaneById(lane_id);
     if (lane_info_ptr == nullptr) {
       AERROR << "Null lane info pointer found.";
       continue;
@@ -89,7 +81,7 @@ void RightOfWay::Analyze(ContainerManager* container_manager) {
       if (std::fabs(l) < std::fabs(ego_vehicle_l)) {
         ego_vehicle_s = accumulated_s + s;
         ego_vehicle_l = l;
-        ego_lane_id = lane_id;
+        ego_lane_id   = lane_id;
       }
     }
     accumulated_s += lane_info_ptr->total_length();
@@ -100,8 +92,7 @@ void RightOfWay::Analyze(ContainerManager* container_manager) {
   std::unordered_set<std::string> ego_back_lane_id_set_;
   std::unordered_set<std::string> ego_front_lane_id_set_;
   for (const std::string& lane_id : lane_ids) {
-    std::shared_ptr<const LaneInfo> lane_info_ptr =
-        PredictionMap::LaneById(lane_id);
+    std::shared_ptr<const LaneInfo> lane_info_ptr = PredictionMap::LaneById(lane_id);
     if (lane_info_ptr == nullptr) {
       AERROR << "Null lane info pointer found.";
       continue;
@@ -115,22 +106,16 @@ void RightOfWay::Analyze(ContainerManager* container_manager) {
   }
 
   // then loop through all obstacle vehicles
-  for (const int id :
-       obstacles_container->curr_frame_considered_obstacle_ids()) {
+  for (const int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(id);
-    if (obstacle_ptr == nullptr) {
-      continue;
-    }
+    if (obstacle_ptr == nullptr) { continue; }
     Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
-    if (latest_feature_ptr->type() != PerceptionObstacle::VEHICLE) {
-      continue;
-    }
+    if (latest_feature_ptr->type() != PerceptionObstacle::VEHICLE) { continue; }
     ADEBUG << "RightOfWay for obstacle [" << latest_feature_ptr->id() << "], "
            << "with lane_sequence_size: "
            << latest_feature_ptr->lane().lane_graph().lane_sequence_size();
-    for (auto& lane_sequence : *latest_feature_ptr->mutable_lane()
-                                    ->mutable_lane_graph()
-                                    ->mutable_lane_sequence()) {
+    for (auto& lane_sequence :
+         *latest_feature_ptr->mutable_lane()->mutable_lane_graph()->mutable_lane_sequence()) {
       accumulated_s = 0.0;
       for (auto lane_segment : lane_sequence.lane_segment()) {
         accumulated_s += lane_segment.end_s() - lane_segment.start_s();
@@ -140,9 +125,7 @@ void RightOfWay::Analyze(ContainerManager* container_manager) {
         } else if (lane_segment.lane_turn_type() == 3) {  // right_turn
           lane_sequence.set_right_of_way(-10);
         }
-        if (accumulated_s > 50.0) {
-          break;
-        }
+        if (accumulated_s > 50.0) { break; }
       }
     }
   }

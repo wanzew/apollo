@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Componentrpt20 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Componentrpt20
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Componentrpt20();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'COMPONENT_TYPE', 'enum': {0:
@@ -37,8 +37,8 @@ class Componentrpt20 : public ::apollo::drivers::canbus::ProtocolData<
   // 'COMPONENT_TYPE_PACMICRO'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|255]', 'bit': 7, 'type':
   // 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Component_rpt_20::Component_typeType component_type(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Component_rpt_20::Component_typeType component_type(const std::uint8_t* bytes,
+                                                      const int32_t       length) const;
 
   // config detail: {'name': 'COMPONENT_FUNC', 'enum': {0:
   // 'COMPONENT_FUNC_PACMOD', 1: 'COMPONENT_FUNC_STEERING_AND_STEERING_COLUMN',
@@ -48,8 +48,8 @@ class Componentrpt20 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|255]', 'bit': 15, 'type': 'enum', 'order':
   // 'motorola', 'physical_unit': ''}
-  Component_rpt_20::Component_funcType component_func(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Component_rpt_20::Component_funcType component_func(const std::uint8_t* bytes,
+                                                      const int32_t       length) const;
 
   // config detail: {'name': 'COUNTER', 'offset': 0.0, 'precision': 1.0, 'len':
   // 4, 'is_signed_var': False, 'physical_range': '[0|15]', 'bit': 19, 'type':

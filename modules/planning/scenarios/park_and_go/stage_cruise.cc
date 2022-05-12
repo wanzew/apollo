@@ -31,44 +31,35 @@ namespace park_and_go {
 
 using apollo::common::TrajectoryPoint;
 
-Stage::StageStatus ParkAndGoStageCruise::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus ParkAndGoStageCruise::Process(const TrajectoryPoint& planning_init_point,
+                                                 Frame*                 frame) {
   ADEBUG << "stage: Cruise";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "ParkAndGoStageCruise planning error";
-  }
+  if (!plan_ok) { AERROR << "ParkAndGoStageCruise planning error"; }
 
-  const ReferenceLineInfo& reference_line_info =
-      frame->reference_line_info().front();
+  const ReferenceLineInfo& reference_line_info = frame->reference_line_info().front();
   // check ADC status:
   // 1. At routing beginning: stage finished
-  ParkAndGoStatus status =
-      CheckADCParkAndGoCruiseCompleted(reference_line_info);
+  ParkAndGoStatus status = CheckADCParkAndGoCruiseCompleted(reference_line_info);
 
-  if (status == CRUISE_COMPLETE) {
-    return FinishStage();
-  }
+  if (status == CRUISE_COMPLETE) { return FinishStage(); }
   return Stage::RUNNING;
 }
 
-Stage::StageStatus ParkAndGoStageCruise::FinishStage() {
-  return FinishScenario();
-}
+Stage::StageStatus ParkAndGoStageCruise::FinishStage() { return FinishScenario(); }
 
-ParkAndGoStageCruise::ParkAndGoStatus
-ParkAndGoStageCruise::CheckADCParkAndGoCruiseCompleted(
+ParkAndGoStageCruise::ParkAndGoStatus ParkAndGoStageCruise::CheckADCParkAndGoCruiseCompleted(
     const ReferenceLineInfo& reference_line_info) {
   const auto& reference_line = reference_line_info.reference_line();
 
   // check l delta
   const common::math::Vec2d adc_position = {injector_->vehicle_state()->x(),
                                             injector_->vehicle_state()->y()};
-  common::SLPoint adc_position_sl;
+  common::SLPoint           adc_position_sl;
   reference_line.XYToSL(adc_position, &adc_position_sl);
 
   const double kLBuffer = 0.5;

@@ -44,16 +44,16 @@ using apollo::cyber::Clock;
 class SunnyvaleBigLoopTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
-    FLAGS_use_navigation_mode = false;
-    FLAGS_map_dir = "modules/map/data/sunnyvale_big_loop";
-    FLAGS_test_base_map_filename = "base_map.bin";
-    FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
+    FLAGS_use_navigation_mode        = false;
+    FLAGS_map_dir                    = "modules/map/data/sunnyvale_big_loop";
+    FLAGS_test_base_map_filename     = "base_map.bin";
+    FLAGS_test_data_dir              = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 20.0;
 
-    FLAGS_enable_scenario_pull_over = false;
-    FLAGS_enable_scenario_stop_sign = false;
+    FLAGS_enable_scenario_pull_over     = false;
+    FLAGS_enable_scenario_stop_sign     = false;
     FLAGS_enable_scenario_traffic_light = false;
-    FLAGS_enable_rss_info = false;
+    FLAGS_enable_rss_info               = false;
 
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
     ENABLE_RULE(TrafficRuleConfig::DESTINATION, false);
@@ -71,18 +71,17 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   FLAGS_enable_scenario_stop_sign = true;
 
-  std::string seq_num = "1";
+  std::string seq_num              = "1";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status =
-      injector_->planning_context()->planning_status().stop_sign();
+  const auto& stop_sign_status = injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -96,18 +95,17 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   FLAGS_enable_scenario_stop_sign = true;
 
-  std::string seq_num = "2";
+  std::string seq_num              = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status =
-      injector_->planning_context()->planning_status().stop_sign();
+  const auto& stop_sign_status = injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -121,19 +119,18 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   FLAGS_enable_scenario_stop_sign = true;
 
-  std::string seq_num = "2";
+  std::string seq_num              = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   // PRE-STOP stage
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status =
-      injector_->planning_context()->planning_status().stop_sign();
+  const auto& stop_sign_status = injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -144,8 +141,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningContext content
-  const auto& stop_sign_status_2 =
-      injector_->planning_context()->planning_status().stop_sign();
+  const auto& stop_sign_status_2 = injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status_2.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status_2.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status_2.wait_for_obstacle_id_size(), 0);
@@ -161,11 +157,11 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
-  std::string seq_num = "101";
+  std::string seq_num              = "101";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -181,11 +177,11 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
-  std::string seq_num = "102";
+  std::string seq_num              = "102";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -201,11 +197,11 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_03) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
-  std::string seq_num = "103";
+  std::string seq_num              = "103";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -221,11 +217,11 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
 
-  std::string seq_num = "200";
+  std::string seq_num              = "200";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -241,19 +237,18 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
 
-  std::string seq_num = "201";
+  std::string seq_num              = "201";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value
-  auto* crosswalk_status = injector_->planning_context()
-                               ->mutable_planning_status()
-                               ->mutable_crosswalk();
+  auto* crosswalk_status =
+      injector_->planning_context()->mutable_planning_status()->mutable_crosswalk();
   EXPECT_EQ("2832", crosswalk_status->crosswalk_id());
   EXPECT_EQ(1, crosswalk_status->stop_time_size());
   EXPECT_EQ("11652", crosswalk_status->stop_time(0).obstacle_id());
@@ -262,14 +257,12 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   // timeout on static pedestrian
 
   // set PlanningStatus
-  auto* crosswalk_config =
-      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::CROSSWALK);
-  double stop_timeout = crosswalk_config->crosswalk().stop_timeout();
-  double wait_time = stop_timeout + 0.5;
+  auto*  crosswalk_config = PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::CROSSWALK);
+  double stop_timeout     = crosswalk_config->crosswalk().stop_timeout();
+  double wait_time        = stop_timeout + 0.5;
   for (auto& stop_time : *crosswalk_status->mutable_stop_time()) {
     if (stop_time.obstacle_id() == "11652") {
-      stop_time.set_stop_timestamp_sec(Clock::NowInSeconds() -
-                                       wait_time);
+      stop_time.set_stop_timestamp_sec(Clock::NowInSeconds() - wait_time);
     }
   }
 
@@ -281,11 +274,11 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
 
-  std::string seq_num = "300";
+  std::string seq_num              = "300";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_traffic_light_file = seq_num + "_traffic_light.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_traffic_light_file    = seq_num + "_traffic_light.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -296,11 +289,11 @@ TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
 
-  std::string seq_num = "400";
+  std::string seq_num              = "400";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -317,11 +310,11 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
-  std::string seq_num = "600";
+  std::string seq_num              = "600";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file     = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file          = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file       = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);

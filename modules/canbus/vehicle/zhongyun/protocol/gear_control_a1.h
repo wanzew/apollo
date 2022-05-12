@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class Gearcontrola1 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+class Gearcontrola1
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -42,16 +43,15 @@ class Gearcontrola1 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[1|5]', 'bit': 8, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  Gearcontrola1* set_gear_state_target(
-      Gear_control_a1::Gear_state_targetType gear_state_target);
+  Gearcontrola1* set_gear_state_target(Gear_control_a1::Gear_state_targetType gear_state_target);
 
   // config detail: {'name': 'Gear_Enable_control', 'enum': {0:
   // 'GEAR_ENABLE_CONTROL_GEAR_MANUALCONTROL', 1:
   // 'GEAR_ENABLE_CONTROL_GEAR_AUTOCONTROL'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  Gearcontrola1* set_gear_enable_control(
-      Gear_control_a1::Gear_enable_controlType gear_enable_control);
+  Gearcontrola1*
+  set_gear_enable_control(Gear_control_a1::Gear_enable_controlType gear_enable_control);
 
  private:
   // config detail: {'name': 'Gear_state_target', 'enum': {1:
@@ -60,20 +60,19 @@ class Gearcontrola1 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[1|5]', 'bit': 8, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  void set_p_gear_state_target(
-      uint8_t* data, Gear_control_a1::Gear_state_targetType gear_state_target);
+  void set_p_gear_state_target(uint8_t*                               data,
+                               Gear_control_a1::Gear_state_targetType gear_state_target);
 
   // config detail: {'name': 'Gear_Enable_control', 'enum': {0:
   // 'GEAR_ENABLE_CONTROL_GEAR_MANUALCONTROL', 1:
   // 'GEAR_ENABLE_CONTROL_GEAR_AUTOCONTROL'}, 'precision': 1.0, 'len': 8,
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
-  void set_p_gear_enable_control(
-      uint8_t* data,
-      Gear_control_a1::Gear_enable_controlType gear_enable_control);
+  void set_p_gear_enable_control(uint8_t*                                 data,
+                                 Gear_control_a1::Gear_enable_controlType gear_enable_control);
 
  private:
-  Gear_control_a1::Gear_state_targetType gear_state_target_;
+  Gear_control_a1::Gear_state_targetType   gear_state_target_;
   Gear_control_a1::Gear_enable_controlType gear_enable_control_;
 };
 

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/protocol/status_310.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,10 +28,10 @@ class Status310Test : public ::testing::Test {
 };
 
 TEST_F(Status310Test, reset) {
-  Status310 status;
-  int32_t length = 8;
+  Status310     status;
+  int32_t       length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
+  uint8_t       bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
   status.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().longitudeaccvalid(), 0);
@@ -50,11 +51,9 @@ TEST_F(Status310Test, reset) {
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().epbsts(), 1);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().currentgearvalid(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().epstrqsnsrsts(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().eps_interferdetdvalid(),
-                   0);
+  EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().eps_interferdetdvalid(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().epshandsdetnsts(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().eps_handsdetnstsvalid(),
-                   0);
+  EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().eps_handsdetnstsvalid(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().steerwheelanglesign(), 1);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().steerwheelspdsign(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().driverdoorsts(), 0);

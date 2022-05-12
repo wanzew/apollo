@@ -16,17 +16,18 @@
 
 #include "modules/localization/msf/local_tool/data_extraction/pcd_exporter.h"
 
-#include "cyber/cyber.h"
-#include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_types.h"
+
+#include "cyber/cyber.h"
+#include "modules/localization/msf/common/io/pcl_point_types.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-PCDExporter::PCDExporter(const std::string &pcd_folder) {
-  pcd_folder_ = pcd_folder;
+PCDExporter::PCDExporter(const std::string& pcd_folder) {
+  pcd_folder_            = pcd_folder;
   std::string stamp_file = pcd_folder_ + "/pcd_timestamp.txt";
 
   if ((stamp_file_handle_ = fopen(stamp_file.c_str(), "a")) == nullptr) {
@@ -35,12 +36,10 @@ PCDExporter::PCDExporter(const std::string &pcd_folder) {
 }
 
 PCDExporter::~PCDExporter() {
-  if (stamp_file_handle_ != nullptr) {
-    fclose(stamp_file_handle_);
-  }
+  if (stamp_file_handle_ != nullptr) { fclose(stamp_file_handle_); }
 }
 
-void PCDExporter::CompensatedPcdCallback(const std::string &msg_string) {
+void PCDExporter::CompensatedPcdCallback(const std::string& msg_string) {
   AINFO << "Compensated pcd callback.";
   drivers::PointCloud msg;
   msg.ParseFromString(msg_string);
@@ -58,27 +57,24 @@ void PCDExporter::CompensatedPcdCallback(const std::string &msg_string) {
   ++index;
 }
 
-void PCDExporter::WritePcdFile(const std::string &filename,
-                               const drivers::PointCloud &msg) {
+void PCDExporter::WritePcdFile(const std::string& filename, const drivers::PointCloud& msg) {
   pcl::PointCloud<velodyne::PointXYZIT> cloud;
-  cloud.width = msg.width();
-  cloud.height = msg.height();
+  cloud.width    = msg.width();
+  cloud.height   = msg.height();
   cloud.is_dense = false;
   cloud.points.resize(cloud.width * cloud.height);
 
   if (cloud.width == 0 || cloud.height == 0) {
-    cloud.width = 1;
+    cloud.width  = 1;
     cloud.height = msg.point_size();
     cloud.points.resize(msg.point_size());
   }
 
-  for (unsigned int i = 0; i < static_cast<unsigned int>(cloud.points.size());
-       ++i) {
-    cloud.points[i].x = msg.point(i).x();
-    cloud.points[i].y = msg.point(i).y();
-    cloud.points[i].z = msg.point(i).z();
-    cloud.points[i].intensity =
-        static_cast<unsigned char>(msg.point(i).intensity());
+  for (unsigned int i = 0; i < static_cast<unsigned int>(cloud.points.size()); ++i) {
+    cloud.points[i].x         = msg.point(i).x();
+    cloud.points[i].y         = msg.point(i).y();
+    cloud.points[i].z         = msg.point(i).z();
+    cloud.points[i].intensity = static_cast<unsigned char>(msg.point(i).intensity());
   }
 
   pcl::io::savePCDFileBinaryCompressed(filename, cloud);

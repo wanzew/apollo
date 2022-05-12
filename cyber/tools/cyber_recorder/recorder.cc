@@ -22,34 +22,35 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-Recorder::Recorder(const std::string& output, bool all_channels,
+Recorder::Recorder(const std::string&              output,
+                   bool                            all_channels,
                    const std::vector<std::string>& white_channels,
                    const std::vector<std::string>& black_channels)
-    : output_(output),
-      all_channels_(all_channels),
-      white_channels_(white_channels),
-      black_channels_(black_channels) {
+    : output_(output)
+    , all_channels_(all_channels)
+    , white_channels_(white_channels)
+    , black_channels_(black_channels) {
   header_ = HeaderBuilder::GetHeader();
 }
 
-Recorder::Recorder(const std::string& output, bool all_channels,
+Recorder::Recorder(const std::string&              output,
+                   bool                            all_channels,
                    const std::vector<std::string>& white_channels,
                    const std::vector<std::string>& black_channels,
-                   const proto::Header& header)
-    : output_(output),
-      all_channels_(all_channels),
-      white_channels_(white_channels),
-      black_channels_(black_channels),
-      header_(header) {}
+                   const proto::Header&            header)
+    : output_(output)
+    , all_channels_(all_channels)
+    , white_channels_(white_channels)
+    , black_channels_(black_channels)
+    , header_(header) {}
 
 Recorder::~Recorder() { Stop(); }
 
 bool Recorder::Start() {
   for (const auto& channel_name : white_channels_) {
-    if (std::find(black_channels_.begin(), black_channels_.end(),
-                  channel_name) != black_channels_.end()) {
-      AERROR << "find channel in both of white list and black list, channel: "
-             << channel_name;
+    if (std::find(black_channels_.begin(), black_channels_.end(), channel_name) !=
+        black_channels_.end()) {
+      AERROR << "find channel in both of white list and black list, channel: " << channel_name;
       return false;
     }
   }
@@ -60,7 +61,7 @@ bool Recorder::Start() {
     return false;
   }
   std::string node_name = "cyber_recorder_record_" + std::to_string(getpid());
-  node_ = ::apollo::cyber::CreateNode(node_name);
+  node_                 = ::apollo::cyber::CreateNode(node_name);
   if (node_ == nullptr) {
     AERROR << "create node failed, node: " << node_name;
     return false;
@@ -69,11 +70,10 @@ bool Recorder::Start() {
     AERROR << " _init_readers error.";
     return false;
   }
-  message_count_ = 0;
-  message_time_ = 0;
-  is_started_ = true;
-  display_thread_ =
-      std::make_shared<std::thread>([this]() { this->ShowProgress(); });
+  message_count_  = 0;
+  message_time_   = 0;
+  is_started_     = true;
+  display_thread_ = std::make_shared<std::thread>([this]() { this->ShowProgress(); });
   if (display_thread_ == nullptr) {
     AERROR << "init display thread error.";
     return false;
@@ -82,9 +82,7 @@ bool Recorder::Start() {
 }
 
 bool Recorder::Stop() {
-  if (!is_started_ || is_stopping_) {
-    return false;
-  }
+  if (!is_started_ || is_stopping_) { return false; }
   is_stopping_ = true;
   if (!FreeReadersImpl()) {
     AERROR << " _free_readers error.";
@@ -96,14 +94,13 @@ bool Recorder::Stop() {
     display_thread_->join();
     display_thread_ = nullptr;
   }
-  is_started_ = false;
+  is_started_  = false;
   is_stopping_ = false;
   return true;
 }
 
 void Recorder::TopologyCallback(const ChangeMsg& change_message) {
-  ADEBUG << "ChangeMsg in Topology Callback:" << std::endl
-         << change_message.ShortDebugString();
+  ADEBUG << "ChangeMsg in Topology Callback:" << std::endl << change_message.ShortDebugString();
   if (change_message.role_type() != apollo::cyber::proto::ROLE_WRITER) {
     ADEBUG << "Change message role type is not ROLE_WRITER.";
     return;
@@ -124,25 +121,21 @@ void Recorder::FindNewChannel(const RoleAttributes& role_attr) {
     AWARN << "Change message not has a proto desc or has an empty one.";
     return;
   }
-  if (!all_channels_ &&
-      std::find(white_channels_.begin(), white_channels_.end(),
-                role_attr.channel_name()) == white_channels_.end()) {
-    ADEBUG << "New channel '" << role_attr.channel_name()
-           << "' was found, but not in record list.";
+  if (!all_channels_ && std::find(white_channels_.begin(), white_channels_.end(),
+                                  role_attr.channel_name()) == white_channels_.end()) {
+    ADEBUG << "New channel '" << role_attr.channel_name() << "' was found, but not in record list.";
     return;
   }
 
-  if (std::find(black_channels_.begin(), black_channels_.end(),
-      role_attr.channel_name()) != black_channels_.end()) {
+  if (std::find(black_channels_.begin(), black_channels_.end(), role_attr.channel_name()) !=
+      black_channels_.end()) {
     ADEBUG << "New channel '" << role_attr.channel_name()
            << "' was found, but it appears in the blacklist.";
     return;
   }
 
-  if (channel_reader_map_.find(role_attr.channel_name()) ==
-      channel_reader_map_.end()) {
-    if (!writer_->WriteChannel(role_attr.channel_name(),
-                               role_attr.message_type(),
+  if (channel_reader_map_.find(role_attr.channel_name()) == channel_reader_map_.end()) {
+    if (!writer_->WriteChannel(role_attr.channel_name(), role_attr.message_type(),
                                role_attr.proto_desc())) {
       AERROR << "write channel fail, channel:" << role_attr.channel_name();
     }
@@ -151,8 +144,7 @@ void Recorder::FindNewChannel(const RoleAttributes& role_attr) {
 }
 
 bool Recorder::InitReadersImpl() {
-  std::shared_ptr<ChannelManager> channel_manager =
-      TopologyManager::Instance()->channel_manager();
+  std::shared_ptr<ChannelManager> channel_manager = TopologyManager::Instance()->channel_manager();
 
   // get historical writers
   std::vector<proto::RoleAttributes> role_attr_vec;
@@ -172,32 +164,26 @@ bool Recorder::InitReadersImpl() {
 }
 
 bool Recorder::FreeReadersImpl() {
-  std::shared_ptr<ChannelManager> channel_manager =
-      TopologyManager::Instance()->channel_manager();
+  std::shared_ptr<ChannelManager> channel_manager = TopologyManager::Instance()->channel_manager();
 
   channel_manager->RemoveChangeListener(change_conn_);
 
   return true;
 }
 
-bool Recorder::InitReaderImpl(const std::string& channel_name,
-                              const std::string& message_type) {
+bool Recorder::InitReaderImpl(const std::string& channel_name, const std::string& message_type) {
   try {
-    std::weak_ptr<Recorder> weak_this = shared_from_this();
-    std::shared_ptr<ReaderBase> reader = nullptr;
-    auto callback = [weak_this, channel_name](
-                        const std::shared_ptr<RawMessage>& raw_message) {
+    std::weak_ptr<Recorder>     weak_this = shared_from_this();
+    std::shared_ptr<ReaderBase> reader    = nullptr;
+    auto callback = [weak_this, channel_name](const std::shared_ptr<RawMessage>& raw_message) {
       auto share_this = weak_this.lock();
-      if (!share_this) {
-        return;
-      }
+      if (!share_this) { return; }
       share_this->ReaderCallback(raw_message, channel_name);
     };
     ReaderConfig config;
-    config.channel_name = channel_name;
-    config.pending_queue_size =
-        gflags::Int32FromEnv("CYBER_PENDING_QUEUE_SIZE", 50);
-    reader = node_->CreateReader<RawMessage>(config, callback);
+    config.channel_name       = channel_name;
+    config.pending_queue_size = gflags::Int32FromEnv("CYBER_PENDING_QUEUE_SIZE", 50);
+    reader                    = node_->CreateReader<RawMessage>(config, callback);
     if (reader == nullptr) {
       AERROR << "Create reader failed.";
       return false;
@@ -211,7 +197,7 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
 }
 
 void Recorder::ReaderCallback(const std::shared_ptr<RawMessage>& message,
-                              const std::string& channel_name) {
+                              const std::string&                 channel_name) {
   if (!is_started_ || is_stopping_) {
     AERROR << "record procedure is not started or stopping.";
     return;
@@ -233,10 +219,9 @@ void Recorder::ReaderCallback(const std::shared_ptr<RawMessage>& message,
 
 void Recorder::ShowProgress() {
   while (is_started_ && !is_stopping_) {
-    std::cout << "\r[RUNNING]  Record Time: " << std::setprecision(3)
-              << message_time_ / 1000000000
-              << "    Progress: " << channel_reader_map_.size() << " channels, "
-              << message_count_ << " messages";
+    std::cout << "\r[RUNNING]  Record Time: " << std::setprecision(3) << message_time_ / 1000000000
+              << "    Progress: " << channel_reader_map_.size() << " channels, " << message_count_
+              << " messages";
     std::cout.flush();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }

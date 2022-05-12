@@ -25,8 +25,12 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/common/macros.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
+#include "modules/drivers/radar/ultrasonic_radar/proto/ultrasonic_radar_conf.pb.h"
 
+#include "cyber/common/macros.h"
 #include "cyber/time/time.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
@@ -35,11 +39,7 @@
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
-#include "modules/drivers/radar/ultrasonic_radar/proto/ultrasonic_radar_conf.pb.h"
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
 
 /**
@@ -82,9 +82,8 @@ class UltrasonicRadarCanbus {
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init(
-      const std::string& config_path,
-      const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>>& writer);
+  apollo::common::Status Init(const std::string& config_path,
+                              const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>>& writer);
 
   /**
    * @brief module start function
@@ -94,14 +93,14 @@ class UltrasonicRadarCanbus {
 
  private:
   Status OnError(const std::string& error_msg);
-  void RegisterCanClients();
+  void   RegisterCanClients();
 
-  UltrasonicRadarConf ultrasonic_radar_conf_;
-  std::shared_ptr<CanClient> can_client_;
-  CanReceiver<Ultrasonic> can_receiver_;
+  UltrasonicRadarConf                            ultrasonic_radar_conf_;
+  std::shared_ptr<CanClient>                     can_client_;
+  CanReceiver<Ultrasonic>                        can_receiver_;
   std::unique_ptr<UltrasonicRadarMessageManager> sensor_message_manager_;
 
-  int64_t last_timestamp_ = 0;
+  int64_t                                   last_timestamp_ = 0;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 

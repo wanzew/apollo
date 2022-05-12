@@ -24,26 +24,22 @@ namespace perception {
 namespace fusion {
 
 // SensorObject implementations
-SensorObject::SensorObject(
-    const std::shared_ptr<const base::Object>& object_ptr)
-    : object_(object_ptr), frame_header_(nullptr) {}
+SensorObject::SensorObject(const std::shared_ptr<const base::Object>& object_ptr)
+    : object_(object_ptr)
+    , frame_header_(nullptr) {}
 
-SensorObject::SensorObject(
-    const std::shared_ptr<const base::Object>& object_ptr,
-    const std::shared_ptr<const SensorFrameHeader>& frame_header)
-    : object_(object_ptr), frame_header_(frame_header) {}
+SensorObject::SensorObject(const std::shared_ptr<const base::Object>&      object_ptr,
+                           const std::shared_ptr<const SensorFrameHeader>& frame_header)
+    : object_(object_ptr)
+    , frame_header_(frame_header) {}
 
-SensorObject::SensorObject(
-    const std::shared_ptr<const base::Object>& object_ptr,
-    const std::shared_ptr<SensorFrame>& frame_ptr)
-    : object_(object_ptr),
-      frame_header_((frame_ptr == nullptr) ? nullptr : frame_ptr->GetHeader()) {
-}
+SensorObject::SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
+                           const std::shared_ptr<SensorFrame>&        frame_ptr)
+    : object_(object_ptr)
+    , frame_header_((frame_ptr == nullptr) ? nullptr : frame_ptr->GetHeader()) {}
 
 double SensorObject::GetTimestamp() const {
-  if (frame_header_ == nullptr) {
-    return 0.0;
-  }
+  if (frame_header_ == nullptr) { return 0.0; }
 
   return frame_header_->timestamp;
 }
@@ -53,26 +49,20 @@ bool SensorObject::GetRelatedFramePose(Eigen::Affine3d* pose) const {
     AERROR << "pose is not available";
     return false;
   }
-  if (frame_header_ == nullptr) {
-    return false;
-  }
+  if (frame_header_ == nullptr) { return false; }
 
   *pose = frame_header_->sensor2world_pose;
   return true;
 }
 
 std::string SensorObject::GetSensorId() const {
-  if (frame_header_ == nullptr) {
-    return std::string("");
-  }
+  if (frame_header_ == nullptr) { return std::string(""); }
 
   return frame_header_->sensor_info.name;
 }
 
 base::SensorType SensorObject::GetSensorType() const {
-  if (frame_header_ == nullptr) {
-    return base::SensorType::UNKNOWN_SENSOR_TYPE;
-  }
+  if (frame_header_ == nullptr) { return base::SensorType::UNKNOWN_SENSOR_TYPE; }
 
   return frame_header_->sensor_info.type;
 }
@@ -80,7 +70,7 @@ base::SensorType SensorObject::GetSensorType() const {
 // FusedObject implementations
 FusedObject::FusedObject() {
   base::ObjectPool& object_pool = base::ObjectPool::Instance();
-  object_ = object_pool.Get();
+  object_                       = object_pool.Get();
 }
 
 bool IsLidar(const SensorObjectConstPtr& obj) {

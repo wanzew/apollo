@@ -37,8 +37,7 @@ PiecewiseJerkTrajectory1d::PiecewiseJerkTrajectory1d(const double p,
   param_.push_back(0.0);
 }
 
-void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk,
-                                              const double param) {
+void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk, const double param) {
   CHECK_GT(param, FLAGS_numerical_epsilon);
 
   param_.push_back(param_.back() + param);
@@ -52,13 +51,10 @@ void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk,
   last_a_ = segments_.back().end_acceleration();
 }
 
-double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
-                                           const double param) const {
+double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order, const double param) const {
   auto it_lower = std::lower_bound(param_.begin(), param_.end(), param);
 
-  if (it_lower == param_.begin()) {
-    return segments_[0].Evaluate(order, param);
-  }
+  if (it_lower == param_.begin()) { return segments_[0].Evaluate(order, param); }
 
   if (it_lower == param_.end()) {
     auto index = std::max(0, static_cast<int>(param_.size() - 2));

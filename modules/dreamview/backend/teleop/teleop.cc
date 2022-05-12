@@ -16,13 +16,14 @@
 
 #include "modules/dreamview/backend/teleop/teleop.h"
 
-#include "cyber/common/log.h"
-#include "cyber/time/time.h"
-#include "google/protobuf/util/json_util.h"
-#include "modules/common/util/message_util.h"
-
 #include <iomanip>
 #include <sstream>
+
+#include "google/protobuf/util/json_util.h"
+
+#include "cyber/common/log.h"
+#include "cyber/time/time.h"
+#include "modules/common/util/message_util.h"
 
 namespace apollo {
 namespace dreamview {
@@ -49,36 +50,35 @@ static const unsigned int kEncoderCount = 3;
 static const unsigned int kWriteWaitMs = 50;
 
 const std::string start_cmd = "start";
-const std::string stop_cmd = "kill";
+const std::string stop_cmd  = "kill";
 
 // channels
-const std::string modem0_channel = "/apollo/teleop/modem/modem0";
-const std::string modem1_channel = "/apollo/teleop/modem/modem1";
-const std::string modem2_channel = "/apollo/teleop/modem/modem2";
-const std::string remote_daemon_cmd_channel =
-    "/apollo/teleop/daemon/remote/cmd";
-const std::string remote_daemon_rpt_channel =
-    "/apollo/teleop/daemon/remote/rpt";
-const std::string local_daemon_cmd_channel = "/apollo/teleop/daemon/local/cmd";
-const std::string local_daemon_rpt_channel = "/apollo/teleop/daemon/local/rpt";
-const std::string planning_channel = "/apollo/planning";
-const std::string planning_pad_channel = "/apollo/planning/pad";
+const std::string modem0_channel            = "/apollo/teleop/modem/modem0";
+const std::string modem1_channel            = "/apollo/teleop/modem/modem1";
+const std::string modem2_channel            = "/apollo/teleop/modem/modem2";
+const std::string remote_daemon_cmd_channel = "/apollo/teleop/daemon/remote/cmd";
+const std::string remote_daemon_rpt_channel = "/apollo/teleop/daemon/remote/rpt";
+const std::string local_daemon_cmd_channel  = "/apollo/teleop/daemon/local/cmd";
+const std::string local_daemon_rpt_channel  = "/apollo/teleop/daemon/local/rpt";
+const std::string planning_channel          = "/apollo/planning";
+const std::string planning_pad_channel      = "/apollo/planning/pad";
 
-TeleopService::TeleopService(WebSocketHandler *websocket)
-    : node_(cyber::CreateNode("teleop")), websocket_(websocket) {
+TeleopService::TeleopService(WebSocketHandler* websocket)
+    : node_(cyber::CreateNode("teleop"))
+    , websocket_(websocket) {
   RegisterMessageHandlers();
 
-  teleop_status_["audio"] = false;
-  teleop_status_["audio_starting"] = false;
-  teleop_status_["audio_stopping"] = false;
-  teleop_status_["mic"] = false;
-  teleop_status_["mic_starting"] = false;
-  teleop_status_["mic_stopping"] = false;
-  teleop_status_["video"] = false;
-  teleop_status_["video_starting"] = false;
-  teleop_status_["video_stopping"] = false;
-  teleop_status_["pulling_over"] = false;
-  teleop_status_["e_stopping"] = false;
+  teleop_status_["audio"]             = false;
+  teleop_status_["audio_starting"]    = false;
+  teleop_status_["audio_stopping"]    = false;
+  teleop_status_["mic"]               = false;
+  teleop_status_["mic_starting"]      = false;
+  teleop_status_["mic_stopping"]      = false;
+  teleop_status_["video"]             = false;
+  teleop_status_["video_starting"]    = false;
+  teleop_status_["video_stopping"]    = false;
+  teleop_status_["pulling_over"]      = false;
+  teleop_status_["e_stopping"]        = false;
   teleop_status_["resuming_autonomy"] = false;
 }
 
@@ -86,43 +86,35 @@ void TeleopService::Start() {
   // TODO get topic names from proto
   // TODO update proto to get all modems' info combined with rank
 
-  modem0_info_reader_ = node_->CreateReader<ModemInfo>(
-      modem0_channel, [this](const std::shared_ptr<ModemInfo> &msg) {
+  modem0_info_reader_ =
+      node_->CreateReader<ModemInfo>(modem0_channel, [this](const std::shared_ptr<ModemInfo>& msg) {
         UpdateModem(modem0_id, msg);
       });
 
-  modem1_info_reader_ = node_->CreateReader<ModemInfo>(
-      modem1_channel, [this](const std::shared_ptr<ModemInfo> &msg) {
+  modem1_info_reader_ =
+      node_->CreateReader<ModemInfo>(modem1_channel, [this](const std::shared_ptr<ModemInfo>& msg) {
         UpdateModem(modem1_id, msg);
       });
 
-  modem2_info_reader_ = node_->CreateReader<ModemInfo>(
-      modem2_channel, [this](const std::shared_ptr<ModemInfo> &msg) {
+  modem2_info_reader_ =
+      node_->CreateReader<ModemInfo>(modem2_channel, [this](const std::shared_ptr<ModemInfo>& msg) {
         UpdateModem(modem2_id, msg);
       });
 
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
-      planning_channel, [this](const std::shared_ptr<ADCTrajectory> &msg) {
-        UpdatePlanning(msg);
-      });
+      planning_channel, [this](const std::shared_ptr<ADCTrajectory>& msg) { UpdatePlanning(msg); });
 
-  remote_daemon_cmd_writer_ =
-      node_->CreateWriter<DaemonCmd>(remote_daemon_cmd_channel);
+  remote_daemon_cmd_writer_ = node_->CreateWriter<DaemonCmd>(remote_daemon_cmd_channel);
 
-  local_daemon_cmd_writer_ =
-      node_->CreateWriter<DaemonCmd>(local_daemon_cmd_channel);
+  local_daemon_cmd_writer_ = node_->CreateWriter<DaemonCmd>(local_daemon_cmd_channel);
 
   remote_daemon_rpt_reader_ = node_->CreateReader<DaemonRpt>(
       remote_daemon_rpt_channel,
-      [this](const std::shared_ptr<DaemonRpt> &msg) {
-        UpdateCarDaemonRpt(msg);
-      });
+      [this](const std::shared_ptr<DaemonRpt>& msg) { UpdateCarDaemonRpt(msg); });
 
   local_daemon_rpt_reader_ = node_->CreateReader<DaemonRpt>(
       local_daemon_rpt_channel,
-      [this](const std::shared_ptr<DaemonRpt> &msg) {
-        UpdateOperatorDaemonRpt(msg);
-      });
+      [this](const std::shared_ptr<DaemonRpt>& msg) { UpdateOperatorDaemonRpt(msg); });
 
   pad_message_writer_ = node_->CreateWriter<PadMessage>(planning_pad_channel);
 }
@@ -130,11 +122,10 @@ void TeleopService::Start() {
 void TeleopService::RegisterMessageHandlers() {
   // Send current teleop status to the new client.
   websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection *conn) { SendStatus(conn); });
+      [this](WebSocketHandler::Connection* conn) { SendStatus(conn); });
   // Start/Stop local and remote audio
   websocket_->RegisterMessageHandler(
-      "ToggleAudio",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "ToggleAudio", [this](const Json& json, WebSocketHandler::Connection* conn) {
         {
           bool start = false;  // false means stop
           // create a scope for the mutex lock
@@ -167,8 +158,7 @@ void TeleopService::RegisterMessageHandlers() {
       });
   // Mute/Unmute local microphone
   websocket_->RegisterMessageHandler(
-      "ToggleMic",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "ToggleMic", [this](const Json& json, WebSocketHandler::Connection* conn) {
         bool start = false;
         {
           boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
@@ -199,8 +189,7 @@ void TeleopService::RegisterMessageHandlers() {
   // Start/stop local decoder and viewer, start/stop remote encoder and
   // compositor
   websocket_->RegisterMessageHandler(
-      "ToggleVideo",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      "ToggleVideo", [this](const Json& json, WebSocketHandler::Connection* conn) {
         bool start = false;  // false means stop
         // create a scope for the mutex lock
         {
@@ -231,33 +220,30 @@ void TeleopService::RegisterMessageHandlers() {
         SendVideoStreamCmd(start);
       });
   // Issue pull-over command to remote
-  websocket_->RegisterMessageHandler(
-      "PullOver", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-        SendPullOverCmd();
-      });
+  websocket_->RegisterMessageHandler("PullOver",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+                                       SendPullOverCmd();
+                                     });
   // Issue emergency-stop command to remote
-  websocket_->RegisterMessageHandler(
-      "EStop", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-        SendEstopCmd();
-      });
+  websocket_->RegisterMessageHandler("EStop",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+                                       SendEstopCmd();
+                                     });
   // Issue resume-cruise command to remote
-  websocket_->RegisterMessageHandler(
-      "ResumeCruise",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-        SendResumeCruiseCmd();
-      });
+  websocket_->RegisterMessageHandler("ResumeCruise",
+                                     [this](const Json& json, WebSocketHandler::Connection* conn) {
+                                       boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+                                       SendResumeCruiseCmd();
+                                     });
   // Request to get updated modem info for client display
   websocket_->RegisterMessageHandler(
       "RequestTeleopStatus",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        SendStatus(conn);
-      });
+      [this](const Json& json, WebSocketHandler::Connection* conn) { SendStatus(conn); });
 }
 
-void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
+void TeleopService::SendStatus(WebSocketHandler::Connection* conn) {
   std::string to_send;
   {
     boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
@@ -266,22 +252,21 @@ void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
   websocket_->SendData(conn, to_send);
 }
 
-void TeleopService::UpdateModem(const std::string &modem_id,
-                                const std::shared_ptr<ModemInfo> &modem_info) {
+void TeleopService::UpdateModem(const std::string&                modem_id,
+                                const std::shared_ptr<ModemInfo>& modem_info) {
   // TODO simplify data and only send necessary info for display
   // update modem_info_
   if (modem_info->has_technology()) {
     // teleop_status_["modems"][modem_info->provider()] =
     //  modem_info->technology();
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    std::string str;
-    std::stringstream ss(str);
-    double rx = 1.0 * modem_info->rx() / (1024 * 1024);
-    double tx = 1.0 * modem_info->tx() / (1024 * 1024);
+    std::string                             str;
+    std::stringstream                       ss(str);
+    double                                  rx = 1.0 * modem_info->rx() / (1024 * 1024);
+    double                                  tx = 1.0 * modem_info->tx() / (1024 * 1024);
 
     ss << modem_info->technology();
-    ss << std::fixed << std::setw(6) << std::setprecision(2)
-       << std::setfill('0');
+    ss << std::fixed << std::setw(6) << std::setprecision(2) << std::setfill('0');
     ss << " rank: " << modem_info->rank();
     ss << " sig: " << modem_info->signal();
     ss << " q: " << modem_info->quality();
@@ -292,11 +277,10 @@ void TeleopService::UpdateModem(const std::string &modem_id,
 }
 
 // callback for messages that originate from the remote computer
-void TeleopService::UpdateCarDaemonRpt(
-    const std::shared_ptr<DaemonRpt> &daemon_rpt) {
+void TeleopService::UpdateCarDaemonRpt(const std::shared_ptr<DaemonRpt>& daemon_rpt) {
   {
-    bool videoIsRunning = false;
-    bool voipIsRunning = false;
+    bool         videoIsRunning  = false;
+    bool         voipIsRunning   = false;
     unsigned int runningEncoders = 0;
     for (int i = 0; i < daemon_rpt->services_size(); i++) {
       // look for voip_encoder or encoder0..1.2
@@ -314,10 +298,10 @@ void TeleopService::UpdateCarDaemonRpt(
 
     // we may need to write commands to start/stop the video stream
     bool sendStartVideo = false;
-    bool sendStopVideo = false;
+    bool sendStopVideo  = false;
 
     bool sendStartAudio = false;
-    bool sendStopAudio = false;
+    bool sendStopAudio  = false;
     // scope for the lock
     {
       boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
@@ -364,18 +348,13 @@ void TeleopService::UpdateCarDaemonRpt(
         }
       }
     }
-    if (sendStartVideo || sendStopVideo) {
-      SendVideoStreamCmd(sendStartVideo);
-    }
-    if (sendStartAudio || sendStopAudio) {
-      SendAudioStreamCmd(sendStartAudio);
-    }
+    if (sendStartVideo || sendStopVideo) { SendVideoStreamCmd(sendStartVideo); }
+    if (sendStartAudio || sendStopAudio) { SendAudioStreamCmd(sendStartAudio); }
   }
 }
 
 // callback for messages that originate from this computer
-void TeleopService::UpdateOperatorDaemonRpt(
-    const std::shared_ptr<DaemonRpt> &daemon_rpt) {
+void TeleopService::UpdateOperatorDaemonRpt(const std::shared_ptr<DaemonRpt>& daemon_rpt) {
   {
     bool voipIsRunning = false;
     for (int i = 0; i < daemon_rpt->services_size(); i++) {
@@ -386,7 +365,7 @@ void TeleopService::UpdateOperatorDaemonRpt(
       }
     }
     bool sendStartMic = false;
-    bool sendStopMic = false;
+    bool sendStopMic  = false;
     // scope for the lock
     {
       boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
@@ -411,9 +390,7 @@ void TeleopService::UpdateOperatorDaemonRpt(
         }
       }
     }
-    if (sendStartMic || sendStopMic) {
-      SendMicStreamCmd(sendStartMic);
-    }
+    if (sendStartMic || sendStopMic) { SendMicStreamCmd(sendStartMic); }
   }
 }
 
@@ -490,22 +467,20 @@ void TeleopService::SendPullOverCmd() {
   pad_message_writer_->Write(pad_msg);
 }
 
-void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
+void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory>& msg) {
   static int count = 0;
   ++count;
 
-  if (count % 10 == 0) {
-    AINFO << "Update Planning";
-  }
+  if (count % 10 == 0) { AINFO << "Update Planning"; }
   auto scenario_type = msg->debug().planning_data().scenario().scenario_type();
 
-  bool pulled_over = scenario_type == ScenarioConfig::PULL_OVER;
+  bool pulled_over      = scenario_type == ScenarioConfig::PULL_OVER;
   bool autonomy_resumed = scenario_type == ScenarioConfig::PARK_AND_GO;
-  bool e_stopped = scenario_type == ScenarioConfig::EMERGENCY_PULL_OVER;
+  bool e_stopped        = scenario_type == ScenarioConfig::EMERGENCY_PULL_OVER;
 
   bool sendPullOver = false;
-  bool sendStop = false;
-  bool sendResume = false;
+  bool sendStop     = false;
+  bool sendResume   = false;
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     if (pulled_over) {
@@ -516,9 +491,7 @@ void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
     }
     // not pulled over
     else {
-      if (teleop_status_["pulling_over"]) {
-        sendPullOver = true;
-      }
+      if (teleop_status_["pulling_over"]) { sendPullOver = true; }
     }
 
     if (e_stopped) {
@@ -529,31 +502,19 @@ void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
     }
     // not e stopped
     else {
-      if (teleop_status_["e_stopping"]) {
-        sendStop = true;
-      }
+      if (teleop_status_["e_stopping"]) { sendStop = true; }
     }
 
     if (autonomy_resumed) {
-      if (teleop_status_["resuming_autonomy"]) {
-        teleop_status_["resuming_autonomy"] = false;
-      }
+      if (teleop_status_["resuming_autonomy"]) { teleop_status_["resuming_autonomy"] = false; }
     } else {
-      if (teleop_status_["resuming_autonomy"]) {
-        sendResume = true;
-      }
+      if (teleop_status_["resuming_autonomy"]) { sendResume = true; }
     }
   }  // writer lock scope
 
-  if (sendResume) {
-    SendResumeCruiseCmd();
-  }
-  if (sendStop) {
-    SendEstopCmd();
-  }
-  if (sendPullOver) {
-    SendPullOverCmd();
-  }
+  if (sendResume) { SendResumeCruiseCmd(); }
+  if (sendStop) { SendEstopCmd(); }
+  if (sendPullOver) { SendPullOverCmd(); }
 }
 
 }  // namespace dreamview

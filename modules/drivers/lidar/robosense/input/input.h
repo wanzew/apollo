@@ -30,19 +30,19 @@ namespace drivers {
 namespace robosense {
 const int RSLIDAR_PKT_LEN = 1248;
 enum InputState {
-  INPUT_OK = 0,
+  INPUT_OK      = 0,
   INPUT_TIMEOUT = 1,
-  INPUT_ERROR = 2,
-  INPUT_DIFOP = 4,
-  INPUT_MSOP = 8,
-  INPUT_EXIT = 16
+  INPUT_ERROR   = 2,
+  INPUT_DIFOP   = 4,
+  INPUT_MSOP    = 8,
+  INPUT_EXIT    = 16
 };
 
 class Input {
  public:
-  Input(const uint16_t &msop_port, const uint16_t &difop_port);
+  Input(const uint16_t& msop_port, const uint16_t& difop_port);
   ~Input();
-  InputState getPacket(uint8_t *pkt, uint32_t timeout);
+  InputState getPacket(uint8_t* pkt, uint32_t timeout);
 
  private:
   int setUpSocket(uint16_t port);

@@ -28,42 +28,39 @@ MapDataCheckerAgent::MapDataCheckerAgent() {
   sp_pose_collection_agent_ = std::make_shared<PoseCollectionAgent>(sp_conf_);
   sp_channel_checker_agent_ = std::make_shared<ChannelVerifyAgent>(sp_conf_);
 
-  sp_static_align_agent_ = std::make_shared<STATIC_ALIGN_AGENT_TYPE>(
-      sp_conf_, sp_pose_collection_agent_);
-  sp_eight_route_agent_ = std::make_shared<EIGHT_ROUTE_AGENT_TYPE>(
-      sp_conf_, sp_pose_collection_agent_);
-  sp_loops_verify_agent_ =
-      std::make_shared<LoopsVerifyAgent>(sp_conf_, sp_pose_collection_agent_);
+  sp_static_align_agent_ =
+      std::make_shared<STATIC_ALIGN_AGENT_TYPE>(sp_conf_, sp_pose_collection_agent_);
+  sp_eight_route_agent_ =
+      std::make_shared<EIGHT_ROUTE_AGENT_TYPE>(sp_conf_, sp_pose_collection_agent_);
+  sp_loops_verify_agent_ = std::make_shared<LoopsVerifyAgent>(sp_conf_, sp_pose_collection_agent_);
   AINFO << "MapDataCheckerAgent create successfully";
 }
 
-std::shared_ptr<PoseCollectionAgent>
-MapDataCheckerAgent::GetSpPoseCollectionAgent() {
+std::shared_ptr<PoseCollectionAgent> MapDataCheckerAgent::GetSpPoseCollectionAgent() {
   return sp_pose_collection_agent_;
 }
 
-grpc::Status MapDataCheckerAgent::ServiceChannelVerify(
-    grpc::ServerContext *context, ChannelVerifyRequest *request,
-    ChannelVerifyResponse *response) {
-  return sp_channel_checker_agent_->ProcessGrpcRequest(context, request,
-                                                       response);
+grpc::Status MapDataCheckerAgent::ServiceChannelVerify(grpc::ServerContext*   context,
+                                                       ChannelVerifyRequest*  request,
+                                                       ChannelVerifyResponse* response) {
+  return sp_channel_checker_agent_->ProcessGrpcRequest(context, request, response);
 }
 
-grpc::Status MapDataCheckerAgent::ServiceStaticAlign(
-    grpc::ServerContext *context, StaticAlignRequest *request,
-    StaticAlignResponse *response) {
+grpc::Status MapDataCheckerAgent::ServiceStaticAlign(grpc::ServerContext* context,
+                                                     StaticAlignRequest*  request,
+                                                     StaticAlignResponse* response) {
   return sp_static_align_agent_->ProcessGrpcRequest(context, request, response);
 }
 
-grpc::Status MapDataCheckerAgent::ServiceEightRoute(
-    grpc::ServerContext *context, EightRouteRequest *request,
-    EightRouteResponse *response) {
+grpc::Status MapDataCheckerAgent::ServiceEightRoute(grpc::ServerContext* context,
+                                                    EightRouteRequest*   request,
+                                                    EightRouteResponse*  response) {
   return sp_eight_route_agent_->ProcessGrpcRequest(context, request, response);
 }
 
-grpc::Status MapDataCheckerAgent::ServiceLoopsVerify(
-    grpc::ServerContext *context, LoopsVerifyRequest *request,
-    LoopsVerifyResponse *response) {
+grpc::Status MapDataCheckerAgent::ServiceLoopsVerify(grpc::ServerContext* context,
+                                                     LoopsVerifyRequest*  request,
+                                                     LoopsVerifyResponse* response) {
   return sp_loops_verify_agent_->ProcessGrpcRequest(context, request, response);
 }
 

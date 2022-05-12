@@ -30,11 +30,10 @@
 #include <thread>
 #include <vector>
 
-#include "cyber/common/macros.h"
-#include "cyber/cyber.h"
-
 #include "modules/common/proto/error_code.pb.h"
 
+#include "cyber/common/macros.h"
+#include "cyber/cyber.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
@@ -72,9 +71,8 @@ class CanReceiver {
    * @param enable_log If log the essential information during running.
    * @return An error code indicating the status of this initialization.
    */
-  common::ErrorCode Init(CanClient *can_client,
-                         MessageManager<SensorType> *pt_manager,
-                         bool enable_log);
+  common::ErrorCode
+  Init(CanClient* can_client, MessageManager<SensorType>* pt_manager, bool enable_log);
 
   /**
    * @brief Get the working status of this CAN receiver.
@@ -102,19 +100,19 @@ class CanReceiver {
  private:
   std::atomic<bool> is_running_ = {false};
   // CanClient, MessageManager pointer life is managed by outer program
-  CanClient *can_client_ = nullptr;
-  MessageManager<SensorType> *pt_manager_ = nullptr;
-  bool enable_log_ = false;
-  bool is_init_ = false;
-  std::future<void> async_result_;
+  CanClient*                  can_client_ = nullptr;
+  MessageManager<SensorType>* pt_manager_ = nullptr;
+  bool                        enable_log_ = false;
+  bool                        is_init_    = false;
+  std::future<void>           async_result_;
 
   DISALLOW_COPY_AND_ASSIGN(CanReceiver);
 };
 
 template <typename SensorType>
-::apollo::common::ErrorCode CanReceiver<SensorType>::Init(
-    CanClient *can_client, MessageManager<SensorType> *pt_manager,
-    bool enable_log) {
+::apollo::common::ErrorCode CanReceiver<SensorType>::Init(CanClient*                  can_client,
+                                                          MessageManager<SensorType>* pt_manager,
+                                                          bool                        enable_log) {
   can_client_ = can_client;
   pt_manager_ = pt_manager;
   enable_log_ = enable_log;
@@ -136,18 +134,16 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
   CHECK_NOTNULL(can_client_);
   CHECK_NOTNULL(pt_manager_);
 
-  int32_t receive_error_count = 0;
-  int32_t receive_none_count = 0;
-  const int32_t ERROR_COUNT_MAX = 10;
-  auto default_period = 10 * 1000;
+  int32_t       receive_error_count = 0;
+  int32_t       receive_none_count  = 0;
+  const int32_t ERROR_COUNT_MAX     = 10;
+  auto          default_period      = 10 * 1000;
 
   while (IsRunning()) {
     std::vector<CanFrame> buf;
-    int32_t frame_num = MAX_CAN_RECV_FRAME_LEN;
-    if (can_client_->Receive(&buf, &frame_num) !=
-        ::apollo::common::ErrorCode::OK) {
-      LOG_IF_EVERY_N(ERROR, receive_error_count++ > ERROR_COUNT_MAX,
-                     ERROR_COUNT_MAX)
+    int32_t               frame_num = MAX_CAN_RECV_FRAME_LEN;
+    if (can_client_->Receive(&buf, &frame_num) != ::apollo::common::ErrorCode::OK) {
+      LOG_IF_EVERY_N(ERROR, receive_error_count++ > ERROR_COUNT_MAX, ERROR_COUNT_MAX)
           << "Received " << receive_error_count << " error messages.";
       cyber::USleep(default_period);
       continue;
@@ -156,27 +152,23 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
 
     if (buf.size() != static_cast<size_t>(frame_num)) {
       AERROR_EVERY(100) << "Receiver buf size [" << buf.size()
-                        << "] does not match can_client returned length["
-                        << frame_num << "].";
+                        << "] does not match can_client returned length[" << frame_num << "].";
     }
 
     if (frame_num == 0) {
-      LOG_IF_EVERY_N(ERROR, receive_none_count++ > ERROR_COUNT_MAX,
-                     ERROR_COUNT_MAX)
+      LOG_IF_EVERY_N(ERROR, receive_none_count++ > ERROR_COUNT_MAX, ERROR_COUNT_MAX)
           << "Received " << receive_none_count << " empty messages.";
       cyber::USleep(default_period);
       continue;
     }
     receive_none_count = 0;
 
-    for (const auto &frame : buf) {
-      uint8_t len = frame.len;
-      uint32_t uid = frame.id;
-      const uint8_t *data = frame.data;
+    for (const auto& frame : buf) {
+      uint8_t        len  = frame.len;
+      uint32_t       uid  = frame.id;
+      const uint8_t* data = frame.data;
       pt_manager_->Parse(uid, data, len);
-      if (enable_log_) {
-        ADEBUG << "recv_can_frame#" << frame.CanFrameString();
-      }
+      if (enable_log_) { ADEBUG << "recv_can_frame#" << frame.CanFrameString(); }
     }
     cyber::Yield();
   }
@@ -190,9 +182,7 @@ bool CanReceiver<SensorType>::IsRunning() const {
 
 template <typename SensorType>
 ::apollo::common::ErrorCode CanReceiver<SensorType>::Start() {
-  if (is_init_ == false) {
-    return ::apollo::common::ErrorCode::CANBUS_ERROR;
-  }
+  if (is_init_ == false) { return ::apollo::common::ErrorCode::CANBUS_ERROR; }
   is_running_.exchange(true);
 
   async_result_ = cyber::Async(&CanReceiver<SensorType>::RecvThreadFunc, this);

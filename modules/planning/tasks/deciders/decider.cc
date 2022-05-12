@@ -25,14 +25,13 @@
 namespace apollo {
 namespace planning {
 
-Decider::Decider(const TaskConfig& config) : Task(config) {}
+Decider::Decider(const TaskConfig& config)
+    : Task(config) {}
 
-Decider::Decider(const TaskConfig& config,
-                 const std::shared_ptr<DependencyInjector>& injector)
+Decider::Decider(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector)
     : Task(config, injector) {}
 
-apollo::common::Status Decider::Execute(
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
+apollo::common::Status Decider::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
   return Process(frame, reference_line_info);
 }

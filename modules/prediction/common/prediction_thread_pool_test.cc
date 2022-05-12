@@ -23,7 +23,7 @@ namespace prediction {
 
 TEST(PredictionThreadPoolTest, global_for_each) {
   std::vector<int> expect = {1, 2, 3, 4, 5, 6, 7, 8};
-  std::vector<int> real = {1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<int> real   = {1, 2, 3, 4, 5, 6, 7, 8};
 
   auto incr = [](int& input) { ++input; };
 

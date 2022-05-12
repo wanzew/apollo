@@ -18,13 +18,14 @@
 
 #include <string>
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/canbus/vehicle/transit/transit_message_manager.h"
 #include "modules/control/proto/control_cmd.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/canbus/vehicle/transit/transit_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
@@ -44,12 +45,12 @@ class TransitControllerTest : public ::testing::Test {
   }
 
  protected:
-  TransitController controller_;
+  TransitController                          controller_;
   CanSender<::apollo::canbus::ChassisDetail> sender_;
-  CanbusConf canbus_conf_;
-  VehicleParameter params_;
-  TransitMessageManager msg_manager_;
-  ControlCommand control_cmd_;
+  CanbusConf                                 canbus_conf_;
+  VehicleParameter                           params_;
+  TransitMessageManager                      msg_manager_;
+  ControlCommand                             control_cmd_;
 };
 
 TEST_F(TransitControllerTest, Init) {
@@ -84,8 +85,7 @@ TEST_F(TransitControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
-            ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL), ErrorCode::OK);
 }
 
 }  // namespace transit

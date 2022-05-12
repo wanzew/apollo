@@ -38,8 +38,7 @@ class FrameManager {
 
   // Cyber reader / writer creator.
   template <class T>
-  std::shared_ptr<cyber::Reader<T>> CreateOrGetReader(
-      const std::string& channel) {
+  std::shared_ptr<cyber::Reader<T>> CreateOrGetReader(const std::string& channel) {
     auto reader = node_->GetReader<T>(channel);
     return reader != nullptr ? reader : node_->CreateReader<T>(channel);
   }
@@ -51,7 +50,7 @@ class FrameManager {
 
  private:
   apollo::common::monitor::MonitorLogBuffer log_buffer_;
-  std::shared_ptr<cyber::Node> node_;
+  std::shared_ptr<cyber::Node>              node_;
 };
 
 }  // namespace storytelling

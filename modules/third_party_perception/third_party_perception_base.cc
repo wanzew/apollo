@@ -26,32 +26,23 @@ using apollo::common::Status;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
 
-ThirdPartyPerception::ThirdPartyPerception(
-    apollo::cyber::Node* const node) : node_(node) {
-
-  localization_reader_ =
-      node_->CreateReader<apollo::localization::LocalizationEstimate>(
-          FLAGS_localization_topic,
-          [this](
-              const std::shared_ptr<apollo::localization::LocalizationEstimate>
-                  &localization) {
-            OnLocalization(*localization.get());
-          });
+ThirdPartyPerception::ThirdPartyPerception(apollo::cyber::Node* const node)
+    : node_(node) {
+  localization_reader_ = node_->CreateReader<apollo::localization::LocalizationEstimate>(
+      FLAGS_localization_topic,
+      [this](const std::shared_ptr<apollo::localization::LocalizationEstimate>& localization) {
+        OnLocalization(*localization.get());
+      });
 
   chassis_reader_ = node_->CreateReader<apollo::canbus::Chassis>(
-      FLAGS_chassis_topic,
-      [this](const std::shared_ptr<apollo::canbus::Chassis> &chassis) {
-          OnChassis(*chassis.get());
+      FLAGS_chassis_topic, [this](const std::shared_ptr<apollo::canbus::Chassis>& chassis) {
+        OnChassis(*chassis.get());
       });
 }
 
-std::string ThirdPartyPerception::Name() const {
-  return FLAGS_third_party_perception_node_name;
-}
+std::string ThirdPartyPerception::Name() const { return FLAGS_third_party_perception_node_name; }
 
-Status ThirdPartyPerception::Init() {
-  return Status::OK();
-}
+Status ThirdPartyPerception::Init() { return Status::OK(); }
 
 Status ThirdPartyPerception::Start() { return Status::OK(); }
 
@@ -69,9 +60,7 @@ void ThirdPartyPerception::OnLocalization(const LocalizationEstimate& message) {
   localization_.CopyFrom(message);
 }
 
-bool ThirdPartyPerception::Process(PerceptionObstacles* const response) {
-  return true;
-}
+bool ThirdPartyPerception::Process(PerceptionObstacles* const response) { return true; }
 
 }  // namespace third_party_perception
 }  // namespace apollo

@@ -36,21 +36,20 @@ using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }  // namespace
 
-ErrorCode DevkitController::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+DevkitController::Init(const VehicleParameter&                                params,
+                       CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+                       MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "DevkitController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
   }
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
 
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
@@ -58,9 +57,7 @@ ErrorCode DevkitController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
-  if (can_sender == nullptr) {
-    return ErrorCode::CANBUS_ERROR;
-  }
+  if (can_sender == nullptr) { return ErrorCode::CANBUS_ERROR; }
   can_sender_ = can_sender;
 
   if (message_manager == nullptr) {
@@ -151,9 +148,7 @@ Chassis DevkitController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -184,8 +179,7 @@ Chassis DevkitController::chassis() {
   // 6 speed_mps
   if (chassis_detail.devkit().has_vcu_report_505() &&
       chassis_detail.devkit().vcu_report_505().has_speed()) {
-    chassis_.set_speed_mps(
-        static_cast<float>(chassis_detail.devkit().vcu_report_505().speed()));
+    chassis_.set_speed_mps(static_cast<float>(chassis_detail.devkit().vcu_report_505().speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -195,19 +189,17 @@ Chassis DevkitController::chassis() {
   // chassis_.set_fuel_range_m(0);
   // 9 throttle
   if (chassis_detail.devkit().has_throttle_report_500() &&
-      chassis_detail.devkit()
-          .throttle_report_500()
-          .has_throttle_pedal_actual()) {
-    chassis_.set_throttle_percentage(static_cast<float>(
-        chassis_detail.devkit().throttle_report_500().throttle_pedal_actual()));
+      chassis_detail.devkit().throttle_report_500().has_throttle_pedal_actual()) {
+    chassis_.set_throttle_percentage(
+        static_cast<float>(chassis_detail.devkit().throttle_report_500().throttle_pedal_actual()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 10 brake
   if (chassis_detail.devkit().has_brake_report_501() &&
       chassis_detail.devkit().brake_report_501().has_brake_pedal_actual()) {
-    chassis_.set_brake_percentage(static_cast<float>(
-        chassis_detail.devkit().brake_report_501().brake_pedal_actual()));
+    chassis_.set_brake_percentage(
+        static_cast<float>(chassis_detail.devkit().brake_report_501().brake_pedal_actual()));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -243,9 +235,9 @@ Chassis DevkitController::chassis() {
   // 12 steering
   if (chassis_detail.devkit().has_steering_report_502() &&
       chassis_detail.devkit().steering_report_502().has_steer_angle_actual()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.devkit().steering_report_502().steer_angle_actual() *
-        100.0 / vehicle_params_.max_steer_angle() * M_PI / 180));
+    chassis_.set_steering_percentage(
+        static_cast<float>(chassis_detail.devkit().steering_report_502().steer_angle_actual() *
+                           100.0 / vehicle_params_.max_steer_angle() * M_PI / 180));
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -264,8 +256,7 @@ Chassis DevkitController::chassis() {
   // 14 battery soc
   if (chassis_detail.devkit().has_bms_report_512() &&
       chassis_detail.devkit().bms_report_512().has_battery_soc()) {
-    chassis_.set_battery_soc_percentage(
-        chassis_detail.devkit().bms_report_512().battery_soc());
+    chassis_.set_battery_soc_percentage(chassis_detail.devkit().bms_report_512().battery_soc());
   } else {
     chassis_.set_battery_soc_percentage(0);
   }
@@ -284,24 +275,19 @@ ErrorCode DevkitController::EnableAutoMode() {
     return ErrorCode::OK;
   }
   // set enable
-  brake_command_101_->set_brake_en_ctrl(
-      Brake_command_101::BRAKE_EN_CTRL_ENABLE);
-  throttle_command_100_->set_throttle_en_ctrl(
-      Throttle_command_100::THROTTLE_EN_CTRL_ENABLE);
-  steering_command_102_->set_steer_en_ctrl(
-      Steering_command_102::STEER_EN_CTRL_ENABLE);
+  brake_command_101_->set_brake_en_ctrl(Brake_command_101::BRAKE_EN_CTRL_ENABLE);
+  throttle_command_100_->set_throttle_en_ctrl(Throttle_command_100::THROTTLE_EN_CTRL_ENABLE);
+  steering_command_102_->set_steer_en_ctrl(Steering_command_102::STEER_EN_CTRL_ENABLE);
   gear_command_103_->set_gear_en_ctrl(Gear_command_103::GEAR_EN_CTRL_ENABLE);
   park_command_104_->set_park_en_ctrl(Park_command_104::PARK_EN_CTRL_ENABLE);
 
   // set AEB enable
   if (FLAGS_enable_aeb) {
-    brake_command_101_->set_aeb_en_ctrl(
-        Brake_command_101::AEB_EN_CTRL_ENABLE_AEB);
+    brake_command_101_->set_aeb_en_ctrl(Brake_command_101::AEB_EN_CTRL_ENABLE_AEB);
   }
 
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -424,10 +410,8 @@ void DevkitController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
-  steering_command_102_->set_steer_angle_target(real_angle)
-      ->set_steer_angle_spd(250);
+  const double real_angle = vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  steering_command_102_->set_steer_angle_target(real_angle)->set_steer_angle_spd(250);
 }
 
 // steering with new angle speed
@@ -439,10 +423,8 @@ void DevkitController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
-  steering_command_102_->set_steer_angle_target(real_angle)
-      ->set_steer_angle_spd(250);
+  const double real_angle = vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  steering_command_102_->set_steer_angle_target(real_angle)->set_steer_angle_spd(250);
 }
 
 void DevkitController::SetEpbBreak(const ControlCommand& command) {
@@ -475,9 +457,7 @@ void DevkitController::SetTurningSignal(const ControlCommand& command) {
   // Set Turn Signal do not support on devkit
 }
 
-void DevkitController::ResetProtocol() {
-  message_manager_->ResetSendMessages();
-}
+void DevkitController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool DevkitController::CheckChassisError() {
   ChassisDetail chassis_detail;
@@ -516,7 +496,7 @@ bool DevkitController::CheckChassisError() {
 }
 
 void DevkitController::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -529,16 +509,15 @@ void DevkitController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -550,8 +529,7 @@ void DevkitController::SecurityDogThreadFunc() {
     }
 
     // 2. vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -575,18 +553,17 @@ void DevkitController::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR << "Too much time consumption in DevkitController looping process:"
-             << elapsed.count();
+      AERROR << "Too much time consumption in DevkitController looping process:" << elapsed.count();
     }
   }
 }
 
 bool DevkitController::CheckResponse(const int32_t flags, bool need_wait) {
-  int32_t retry_num = 20;
+  int32_t       retry_num = 20;
   ChassisDetail chassis_detail;
-  bool is_eps_online = false;
-  bool is_vcu_online = false;
-  bool is_esp_online = false;
+  bool          is_eps_online = false;
+  bool          is_vcu_online = false;
+  bool          is_esp_online = false;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -617,14 +594,12 @@ bool DevkitController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     if (need_wait) {
       --retry_num;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(20));
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
     }
   } while (need_wait && retry_num);
 
   AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+        << ", is_vcu_online:" << is_vcu_online << ", is_esp_online:" << is_esp_online;
 
   return false;
 }
@@ -644,8 +619,7 @@ Chassis::ErrorCode DevkitController::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void DevkitController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void DevkitController::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

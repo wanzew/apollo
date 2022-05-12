@@ -20,17 +20,18 @@
 #include <vector>
 
 #ifdef DEBUG_NCUT
-#include "pcl/visualization/pcl_visualizer.h"
+#  include "pcl/visualization/pcl_visualizer.h"
 #endif
+
+#include "modules/perception/lidar/lib/detector/ncut_segmentation/proto/ncut_param.pb.h"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/lib/thread/thread_worker.h"
 #include "modules/perception/lidar/common/pcl_util.h"
-#include "modules/perception/lidar/lib/interface/base_ground_detector.h"
-#include "modules/perception/lidar/lib/interface/base_roi_filter.h"
-#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/detector/ncut_segmentation/ncut.h"
-#include "modules/perception/lidar/lib/detector/ncut_segmentation/proto/ncut_param.pb.h"
+#include "modules/perception/lidar/lib/interface/base_ground_detector.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -40,31 +41,31 @@ using base::ObjectPtr;
 
 class NCutSegmentation : public BaseLidarDetector {
  public:
-  NCutSegmentation() = default;
+  NCutSegmentation()          = default;
   virtual ~NCutSegmentation() = default;
 
-  bool Init(const LidarDetectorInitOptions& options =
-                LidarDetectorInitOptions()) override;
+  bool Init(const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) override;
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "NCutSegmentation"; }
 
   void ByPassROIService() {
-    remove_roi_ = false;
+    remove_roi_    = false;
     remove_ground_ = false;
   }
 
  private:
   bool Configure(std::string model_name);
 
-  void PartitionConnectedComponents(
-      const base::PointFCloudPtr& in_cloud, float cell_size,
-      std::vector<base::PointFCloudPtr>* out_clouds);
+  void PartitionConnectedComponents(const base::PointFCloudPtr&        in_cloud,
+                                    float                              cell_size,
+                                    std::vector<base::PointFCloudPtr>* out_clouds);
 
-  void ObstacleFilter(const base::PointFCloudPtr& in_cloud, float cell_size,
-                      bool filter_pedestrian_only,
-                      base::PointFCloudPtr* out_cloud,
+  void ObstacleFilter(const base::PointFCloudPtr&   in_cloud,
+                      float                         cell_size,
+                      bool                          filter_pedestrian_only,
+                      base::PointFCloudPtr*         out_cloud,
                       std::vector<base::ObjectPtr>* segments);
 
   bool IsOutlier(const base::PointFCloudPtr& in_cloud);
@@ -79,10 +80,9 @@ class NCutSegmentation : public BaseLidarDetector {
   BaseROIFilter* roi_filter_;
 
   // reference pointer of lidar frame
-  LidarFrame* lidar_frame_ref_ = nullptr;
+  LidarFrame*                                              lidar_frame_ref_ = nullptr;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;
-  std::shared_ptr<base::AttributePointCloud<base::PointD>>
-      original_world_cloud_;
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> original_world_cloud_;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> roi_cloud_;
   std::shared_ptr<base::AttributePointCloud<base::PointD>> roi_world_cloud_;
   // thread worker
@@ -91,32 +91,31 @@ class NCutSegmentation : public BaseLidarDetector {
   std::vector<std::shared_ptr<NCut>> _segmentors;
   // for outliers, must be "unknown"
   std::unique_ptr<std::vector<ObjectPtr>> _outliers;
-  float grid_radius_ = 100.0f;
-  float height_threshold_ = 2.5f;
-  float partition_cell_size_ = 1.0f;
-  float vehicle_filter_cell_size_ = 1.0f;
-  float pedestrian_filter_cell_size_ = 0.05f;
-  float outlier_length_ = 0.3f;
-  float outlier_width_ = 0.3f;
-  float outlier_height_ = 0.3f;
-  int outlier_min_num_points_ = 10;
-  bool remove_ground_ = true;
-  bool remove_roi_ = true;
-  bool do_classification_ = true;
-  std::string ground_detector_str_;
-  std::string roi_filter_str_;
-  NCutParam ncut_param_;
+  float                                   grid_radius_                 = 100.0f;
+  float                                   height_threshold_            = 2.5f;
+  float                                   partition_cell_size_         = 1.0f;
+  float                                   vehicle_filter_cell_size_    = 1.0f;
+  float                                   pedestrian_filter_cell_size_ = 0.05f;
+  float                                   outlier_length_              = 0.3f;
+  float                                   outlier_width_               = 0.3f;
+  float                                   outlier_height_              = 0.3f;
+  int                                     outlier_min_num_points_      = 10;
+  bool                                    remove_ground_               = true;
+  bool                                    remove_roi_                  = true;
+  bool                                    do_classification_           = true;
+  std::string                             ground_detector_str_;
+  std::string                             roi_filter_str_;
+  NCutParam                               ncut_param_;
 
 #ifdef DEBUG_NCUT
   pcl::visualization::PCLVisualizer::Ptr _viewer;
-  CPointCloudPtr _rgb_cloud;
-  char _viewer_id[128];
-  int _viewer_count;
-  void VisualizePointCloud(const base::PointFCloudPtr& cloud);
+  CPointCloudPtr                         _rgb_cloud;
+  char                                   _viewer_id[128];
+  int                                    _viewer_count;
+  void                                   VisualizePointCloud(const base::PointFCloudPtr& cloud);
   void VisualizeSegments(const std::vector<base::ObjectPtr>& segments);
-  void VisualizeComponents(
-      const base::PointFCloudPtr& cloud,
-      const std::vector<std::vector<int>>& component_points);
+  void VisualizeComponents(const base::PointFCloudPtr&          cloud,
+                           const std::vector<std::vector<int>>& component_points);
 #endif
 };  // class NCutSegmentation
 

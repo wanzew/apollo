@@ -25,11 +25,13 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/common/macros.h"
-#include "modules/common/configs/vehicle_config_helper.h"
+#include "opencv2/opencv.hpp"
+
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_semantic_map_config.pb.h"
-#include "opencv2/opencv.hpp"
+
+#include "cyber/common/macros.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 
 namespace apollo {
 namespace planning {
@@ -52,40 +54,35 @@ class BirdviewImgFeatureRenderer {
    * @param learning_data_frame a proto message containing info for renderering
    * @param img_feature a pointer to opencv img to render on
    */
-  bool RenderMultiChannelEnv(const LearningDataFrame& learning_data_frame,
-                             cv::Mat* img_feature);
+  bool RenderMultiChannelEnv(const LearningDataFrame& learning_data_frame, cv::Mat* img_feature);
 
   /**
    * @brief generate bgr img as input feature for certain model
    * @param learning_data_frame a proto message  containing info for renderering
    * @param img_feature a pointer to opencv img to render on
    */
-  bool RenderBGREnv(const LearningDataFrame& learning_data_frame,
-                    cv::Mat* img_feature);
+  bool RenderBGREnv(const LearningDataFrame& learning_data_frame, cv::Mat* img_feature);
 
   /**
    * @brief generate a two channel img, one for cur box, one for cur point
    * @param learning_data_frame a proto message containing info for renderering
    * @param img_feature a pointer to opencv img to render on
    */
-  bool RenderCurrentEgoStatus(const LearningDataFrame& learning_data_frame,
-                              cv::Mat* img_feature);
+  bool RenderCurrentEgoStatus(const LearningDataFrame& learning_data_frame, cv::Mat* img_feature);
 
   /**
    * @brief generate a single channel img
    * @param learning_data_frame a proto message containing info for renderering
    * @param img_feature a pointer to opencv img to render on
    */
-  bool RenderCurrentEgoPoint(const LearningDataFrame& learning_data_frame,
-                             cv::Mat* img_feature);
+  bool RenderCurrentEgoPoint(const LearningDataFrame& learning_data_frame, cv::Mat* img_feature);
 
   /**
    * @brief generate a single channel img
    * @param learning_data_frame a proto message containing info for renderering
    * @param img_feature a pointer to opencv img to render on
    */
-  bool RenderCurrentEgoBox(const LearningDataFrame& learning_data_frame,
-                           cv::Mat* img_feature);
+  bool RenderCurrentEgoBox(const LearningDataFrame& learning_data_frame, cv::Mat* img_feature);
 
  private:
   /**
@@ -110,7 +107,7 @@ class BirdviewImgFeatureRenderer {
   bool RenderLocalRoadMap(const double ego_current_x,
                           const double ego_current_y,
                           const double ego_current_heading,
-                          cv::Mat* img_feature);
+                          cv::Mat*     img_feature);
 
   /**
    * @brief crop local speedlimit around ego position from base img
@@ -122,7 +119,7 @@ class BirdviewImgFeatureRenderer {
   bool RenderLocalSpeedlimitMap(const double ego_current_x,
                                 const double ego_current_y,
                                 const double ego_current_heading,
-                                cv::Mat* img_feature);
+                                cv::Mat*     img_feature);
 
   /**
    * @brief generate a single channel img, current position is highlighted
@@ -130,10 +127,9 @@ class BirdviewImgFeatureRenderer {
    * @param gray_scale color value if img_feature is 1 channel
    * @param bgr_color color value if img_feature is 3 channel bgr
    */
-  bool RenderEgoCurrentPoint(cv::Mat* img_feature,
+  bool RenderEgoCurrentPoint(cv::Mat*          img_feature,
                              const cv::Scalar& gray_scale = cv::Scalar(255),
-                             const cv::Scalar& bgr_color = cv::Scalar(255, 255,
-                                                                      255));
+                             const cv::Scalar& bgr_color  = cv::Scalar(255, 255, 255));
 
   /**
    * @brief generate a single channel img, current vehicle box is highlighted
@@ -141,10 +137,9 @@ class BirdviewImgFeatureRenderer {
    * @param gray_scale color value if img_feature is 1 channel
    * @param bgr_color color value if img_feature is 3 channel bgr
    */
-  bool RenderEgoCurrentBox(cv::Mat* img_feature,
+  bool RenderEgoCurrentBox(cv::Mat*          img_feature,
                            const cv::Scalar& gray_scale = cv::Scalar(255),
-                           const cv::Scalar& bgr_color = cv::Scalar(255, 255,
-                                                                    255));
+                           const cv::Scalar& bgr_color  = cv::Scalar(255, 255, 255));
 
   /**
    * @brief generate a single channel img, past point is highlighted
@@ -157,12 +152,14 @@ class BirdviewImgFeatureRenderer {
    * @param gray_scale color value if img_feature is 1 channel
    * @param bgr_color color value if img_feature is 3 channel bgr
    */
-  bool RenderEgoPastPoint(
-      const LearningDataFrame& learning_data_frame,
-      const double current_time_sec, const double ego_current_x,
-      const double ego_current_y, const double ego_current_heading,
-      cv::Mat* img_feature, const cv::Scalar& gray_scale = cv::Scalar(255),
-      const cv::Scalar& bgr_color = cv::Scalar(255, 255, 255));
+  bool RenderEgoPastPoint(const LearningDataFrame& learning_data_frame,
+                          const double             current_time_sec,
+                          const double             ego_current_x,
+                          const double             ego_current_y,
+                          const double             ego_current_heading,
+                          cv::Mat*                 img_feature,
+                          const cv::Scalar&        gray_scale = cv::Scalar(255),
+                          const cv::Scalar&        bgr_color  = cv::Scalar(255, 255, 255));
 
   /**
    * @brief generate a single channel img, past obstacle box is highlighted.
@@ -175,9 +172,10 @@ class BirdviewImgFeatureRenderer {
    * @param bgr_color color value if img_feature is 3 channel bgr
    */
   bool RenderObsPastBox(const LearningDataFrame& learning_data_frame,
-                        const double current_time_sec, cv::Mat* img_feature,
-                        const cv::Scalar& gray_scale = cv::Scalar(255),
-                        const cv::Scalar& bgr_color = cv::Scalar(0, 255, 0));
+                        const double             current_time_sec,
+                        cv::Mat*                 img_feature,
+                        const cv::Scalar&        gray_scale = cv::Scalar(255),
+                        const cv::Scalar&        bgr_color  = cv::Scalar(0, 255, 0));
 
   /**
    * @brief generate a single channel img, predicted obstacle box is
@@ -190,9 +188,10 @@ class BirdviewImgFeatureRenderer {
    * @param bgr_color color value if img_feature is 3 channel bgr
    */
   bool RenderObsFutureBox(const LearningDataFrame& learning_data_frame,
-                          const double current_time_sec, cv::Mat* img_feature,
-                          const cv::Scalar& gray_scale = cv::Scalar(255),
-                          const cv::Scalar& bgr_color = cv::Scalar(0, 0, 255));
+                          const double             current_time_sec,
+                          cv::Mat*                 img_feature,
+                          const cv::Scalar&        gray_scale = cv::Scalar(255),
+                          const cv::Scalar&        bgr_color  = cv::Scalar(0, 0, 255));
 
   /**
    * @brief generate a single channel img, trafficlight related lanes are
@@ -205,11 +204,13 @@ class BirdviewImgFeatureRenderer {
    * @param gray_scale color value if img_feature is 1 channel
    * @param bgr_color color value if img_feature is 3 channel bgr
    */
-  bool RenderTrafficLight(
-      const LearningDataFrame& learning_data_frame, const double ego_current_x,
-      const double ego_current_y, const double ego_current_heading,
-      cv::Mat* img_feature, const cv::Scalar& gray_scale = cv::Scalar(255),
-      const cv::Scalar& bgr_color = cv::Scalar(255, 255, 255));
+  bool RenderTrafficLight(const LearningDataFrame& learning_data_frame,
+                          const double             ego_current_x,
+                          const double             ego_current_y,
+                          const double             ego_current_heading,
+                          cv::Mat*                 img_feature,
+                          const cv::Scalar&        gray_scale = cv::Scalar(255),
+                          const cv::Scalar&        bgr_color  = cv::Scalar(255, 255, 255));
 
   /**
    * @brief generate a single channel img, close routing lanes are highlighted
@@ -222,10 +223,12 @@ class BirdviewImgFeatureRenderer {
    * @param bgr_color color value if img_feature is 3 channel bgr
    */
   bool RenderRouting(const LearningDataFrame& learning_data_frame,
-                     const double ego_current_x, const double ego_current_y,
-                     const double ego_current_heading, cv::Mat* img_feature,
-                     const cv::Scalar& gray_scale = cv::Scalar(255),
-                     const cv::Scalar& bgr_color = cv::Scalar(255, 255, 255));
+                     const double             ego_current_x,
+                     const double             ego_current_y,
+                     const double             ego_current_heading,
+                     cv::Mat*                 img_feature,
+                     const cv::Scalar&        gray_scale = cv::Scalar(255),
+                     const cv::Scalar&        bgr_color  = cv::Scalar(255, 255, 255));
 
   /**
    * @brief crop a img by ego around ego position from base img
@@ -235,9 +238,11 @@ class BirdviewImgFeatureRenderer {
    * @param base_map the large map to crop on
    * @param img_feature a pointer to opencv img to render on
    */
-  bool CropByPose(const double ego_x, const double ego_y,
-                  const double ego_heading, const cv::Mat& base_map,
-                  cv::Mat* img_feature);
+  bool CropByPose(const double   ego_x,
+                  const double   ego_y,
+                  const double   ego_heading,
+                  const cv::Mat& base_map,
+                  cv::Mat*       img_feature);
 
   /**
    * @brief transform a relative x,y double coordinates in "y axis point up"
@@ -250,8 +255,8 @@ class BirdviewImgFeatureRenderer {
    */
   cv::Point2i GetPointImgIdx(const double local_point_x,
                              const double local_point_y,
-                             const int center_point_idx_x,
-                             const int center_point_idx_y);
+                             const int    center_point_idx_x,
+                             const int    center_point_idx_y);
 
   /**
    * @brief translate a point wrt to a center and rotate around it
@@ -262,9 +267,11 @@ class BirdviewImgFeatureRenderer {
    * @param theta rotation angle wrt to center
    * @return affined local_point indexes on the image
    */
-  cv::Point2i GetAffinedPointImgIdx(const double point_x, const double point_y,
+  cv::Point2i GetAffinedPointImgIdx(const double point_x,
+                                    const double point_y,
                                     const double center_x,
-                                    const double center_y, const double theta);
+                                    const double center_y,
+                                    const double theta);
 
   /**
    * @brief translate a box wrt to a center and rotate around it
@@ -278,21 +285,24 @@ class BirdviewImgFeatureRenderer {
    * @param theta rotation angle wrt to center
    * @return affined local_box indexes on the image
    */
-  std::vector<cv::Point2i> GetAffinedBoxImgIdx(
-      const double box_center_x, const double box_center_y,
-      const double box_theta,
-      const std::vector<std::pair<double, double>>& box_corner_points,
-      const double center_x, const double center_y, const double theta);
+  std::vector<cv::Point2i>
+  GetAffinedBoxImgIdx(const double                                  box_center_x,
+                      const double                                  box_center_y,
+                      const double                                  box_theta,
+                      const std::vector<std::pair<double, double>>& box_corner_points,
+                      const double                                  center_x,
+                      const double                                  center_y,
+                      const double                                  theta);
 
   PlanningSemanticMapConfig config_;
-  common::VehicleConfig ego_vehicle_config_;
-  cv::Mat base_roadmap_img_;
-  cv::Mat base_speedlimit_img_;
-  double map_bottom_left_point_x_ = 0.0;
-  double map_bottom_left_point_y_ = 0.0;
-  cv::Mat ego_cur_point_img_;
-  cv::Mat ego_cur_box_img_;
-  cv::Mat stacked_ego_cur_status_img_;
+  common::VehicleConfig     ego_vehicle_config_;
+  cv::Mat                   base_roadmap_img_;
+  cv::Mat                   base_speedlimit_img_;
+  double                    map_bottom_left_point_x_ = 0.0;
+  double                    map_bottom_left_point_y_ = 0.0;
+  cv::Mat                   ego_cur_point_img_;
+  cv::Mat                   ego_cur_box_img_;
+  cv::Mat                   stacked_ego_cur_status_img_;
 
   DECLARE_SINGLETON(BirdviewImgFeatureRenderer)
 };

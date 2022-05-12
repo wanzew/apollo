@@ -44,21 +44,18 @@ using apollo::bridge::MAXEPOLLSIZE;
 using apollo::canbus::Chassis;
 using BPDBChassis = apollo::bridge::BridgeProtoDiserializedBuf<Chassis>;
 
-void *pthread_handle_message(void *pfd) {
+void* pthread_handle_message(void* pfd) {
   struct sockaddr_in client_addr;
-  socklen_t sock_len = static_cast<socklen_t>(sizeof(client_addr));
-  int bytes = 0;
-  int total_recv = 2 * FRAME_SIZE;
-  char total_buf[2 * FRAME_SIZE] = {0};
-  bytes =
-      static_cast<int>(recvfrom(*static_cast<int *>(pfd), total_buf, total_recv,
-                                0, (struct sockaddr *)&client_addr, &sock_len));
+  socklen_t          sock_len                  = static_cast<socklen_t>(sizeof(client_addr));
+  int                bytes                     = 0;
+  int                total_recv                = 2 * FRAME_SIZE;
+  char               total_buf[2 * FRAME_SIZE] = {0};
+  bytes = static_cast<int>(recvfrom(*static_cast<int*>(pfd), total_buf, total_recv, 0,
+                                    (struct sockaddr*)&client_addr, &sock_len));
   ADEBUG << "total recv " << bytes;
-  if (bytes <= 0 || bytes > total_recv) {
-    pthread_exit(nullptr);
-  }
-  char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
-  size_t offset = 0;
+  if (bytes <= 0 || bytes > total_recv) { pthread_exit(nullptr); }
+  char   header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
+  size_t offset                                      = 0;
   memcpy(header_flag, total_buf, HEADER_FLAG_SIZE);
   if (strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
     ADEBUG << "header flag not match!";
@@ -66,10 +63,10 @@ void *pthread_handle_message(void *pfd) {
   }
   offset += sizeof(BRIDGE_HEADER_FLAG) + 1;
 
-  char header_size_buf[sizeof(hsize) + 1] = {0};
-  const char *cursor = total_buf + offset;
+  char        header_size_buf[sizeof(hsize) + 1] = {0};
+  const char* cursor                             = total_buf + offset;
   memcpy(header_size_buf, cursor, sizeof(hsize));
-  hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
+  hsize header_size = *(reinterpret_cast<hsize*>(header_size_buf));
   if (header_size > FRAME_SIZE) {
     ADEBUG << "header size is more than FRAME_SIZE!";
     pthread_exit(nullptr);
@@ -77,8 +74,8 @@ void *pthread_handle_message(void *pfd) {
   offset += sizeof(hsize) + 1;
 
   BridgeHeader header;
-  size_t buf_size = header_size - offset;
-  cursor = total_buf + offset;
+  size_t       buf_size = header_size - offset;
+  cursor                = total_buf + offset;
   if (!header.Diserialize(cursor, buf_size)) {
     ADEBUG << "header diserialize failed!";
     pthread_exit(nullptr);
@@ -89,14 +86,12 @@ void *pthread_handle_message(void *pfd) {
   ADEBUG << "proto total frames: " << header.GetTotalFrames();
   ADEBUG << "proto frame index: " << header.GetIndex();
 
-  BPDBChassis *proto_buf = new BPDBChassis();
+  BPDBChassis* proto_buf = new BPDBChassis();
   proto_buf->Initialize(header);
-  if (!proto_buf) {
-    pthread_exit(nullptr);
-  }
+  if (!proto_buf) { pthread_exit(nullptr); }
 
-  cursor = total_buf + header_size;
-  char *buf = proto_buf->GetBuf(header.GetFramePos());
+  cursor    = total_buf + header_size;
+  char* buf = proto_buf->GetBuf(header.GetFramePos());
   memcpy(buf, cursor, header.GetFrameSize());
   proto_buf->UpdateStatus(header.GetIndex());
   if (proto_buf->IsReadyDiserialize()) {
@@ -130,25 +125,23 @@ bool receive(uint16_t port) {
   }
   int opt = SO_REUSEADDR;
   setsockopt(listener_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-  if (fcntl(listener_sock, F_SETFL,
-            fcntl(listener_sock, F_GETFD, 0) | O_NONBLOCK) == -1) {
+  if (fcntl(listener_sock, F_SETFL, fcntl(listener_sock, F_GETFD, 0) | O_NONBLOCK) == -1) {
     ADEBUG << "set nonblocking failed";
     return false;
   }
 
   struct sockaddr_in serv_addr;
-  serv_addr.sin_family = PF_INET;
-  serv_addr.sin_port = htons((uint16_t)port);
+  serv_addr.sin_family      = PF_INET;
+  serv_addr.sin_port        = htons((uint16_t)port);
   serv_addr.sin_addr.s_addr = INADDR_ANY;
-  if (bind(listener_sock, (struct sockaddr *)&serv_addr,
-           sizeof(struct sockaddr)) == -1) {
+  if (bind(listener_sock, (struct sockaddr*)&serv_addr, sizeof(struct sockaddr)) == -1) {
     close(listener_sock);
     ADEBUG << "bind socket failed";
     return false;
   }
-  int kdpfd = epoll_create(MAXEPOLLSIZE);
+  int                kdpfd = epoll_create(MAXEPOLLSIZE);
   struct epoll_event ev;
-  ev.events = EPOLLIN | EPOLLET;
+  ev.events  = EPOLLIN | EPOLLET;
   ev.data.fd = listener_sock;
   if (epoll_ctl(kdpfd, EPOLL_CTL_ADD, listener_sock, &ev) < 0) {
     ADEBUG << "set control interface for an epoll descriptor failed";
@@ -158,8 +151,8 @@ bool receive(uint16_t port) {
 
   ADEBUG << "Ready!";
 
-  int nfds = -1;
-  bool res = true;
+  int                nfds = -1;
+  bool               res  = true;
   struct epoll_event events[MAXEPOLLSIZE];
   while (true) {
     nfds = epoll_wait(kdpfd, events, 10000, -1);
@@ -171,28 +164,26 @@ bool receive(uint16_t port) {
 
     for (int i = 0; i < nfds; ++i) {
       if (events[i].data.fd == listener_sock) {
-        pthread_t thread;
+        pthread_t      thread;
         pthread_attr_t attr;
         pthread_attr_init(&attr);
         pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
         if (pthread_create(&thread, &attr, &pthread_handle_message,
-                           reinterpret_cast<void *>(&events[i].data.fd))) {
+                           reinterpret_cast<void*>(&events[i].data.fd))) {
           ADEBUG << "message handler creation failed";
           res = false;
           break;
         }
       }
     }
-    if (!res) {
-      break;
-    }
+    if (!res) { break; }
   }
   close(listener_sock);
   return res;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   receive(8900);
   return 0;
 }

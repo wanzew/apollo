@@ -37,17 +37,14 @@ struct MlfTrackDataInitializer {
 };
 
 static const size_t kTrackedObjectPoolSize = 20000;
-static const size_t kTrackDataPoolSize = 1000;
+static const size_t kTrackDataPoolSize     = 1000;
 
-typedef base::ConcurrentObjectPool<TrackedObject, kTrackedObjectPoolSize,
-                                   TrackedObjectInitializer>
+typedef base::ConcurrentObjectPool<TrackedObject, kTrackedObjectPoolSize, TrackedObjectInitializer>
     TrackedObjectPool;
 
-typedef base::ConcurrentObjectPool<TrackData, kTrackDataPoolSize,
-                                   TrackDataInitializer>
+typedef base::ConcurrentObjectPool<TrackData, kTrackDataPoolSize, TrackDataInitializer>
     TrackDataPool;
-typedef base::ConcurrentObjectPool<MlfTrackData, kTrackDataPoolSize,
-                                   MlfTrackDataInitializer>
+typedef base::ConcurrentObjectPool<MlfTrackData, kTrackDataPoolSize, MlfTrackDataInitializer>
     MlfTrackDataPool;
 
 }  // namespace lidar

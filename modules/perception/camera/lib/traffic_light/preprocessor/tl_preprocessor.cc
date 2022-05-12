@@ -24,7 +24,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool TLPreprocessor::Init(const TrafficLightPreprocessorInitOptions &options) {
+bool TLPreprocessor::Init(const TrafficLightPreprocessorInitOptions& options) {
   camera::MultiCamerasInitOption projection_init_option;
   projection_init_option.camera_names = options.camera_names;
   if (!projection_.Init(projection_init_option)) {
@@ -42,23 +42,20 @@ bool TLPreprocessor::Init(const TrafficLightPreprocessorInitOptions &options) {
   return true;
 }
 
-bool TLPreprocessor::UpdateCameraSelection(
-    const CarPose &pose, const TLPreprocessorOption &option,
-    std::vector<base::TrafficLightPtr> *lights) {
-  const double &timestamp = pose.getTimestamp();
-  selected_camera_name_.first = timestamp;
+bool TLPreprocessor::UpdateCameraSelection(const CarPose&                      pose,
+                                           const TLPreprocessorOption&         option,
+                                           std::vector<base::TrafficLightPtr>* lights) {
+  const double& timestamp      = pose.getTimestamp();
+  selected_camera_name_.first  = timestamp;
   selected_camera_name_.second = GetMaxFocalLenWorkingCameraName();
 
-  AINFO << "TLPreprocessor Got signal number: " << lights->size()
-        << ", ts: " << timestamp;
+  AINFO << "TLPreprocessor Got signal number: " << lights->size() << ", ts: " << timestamp;
   if (lights->empty()) {
-    AINFO << "No signals, select camera with max focal length: "
-          << selected_camera_name_.second;
+    AINFO << "No signals, select camera with max focal length: " << selected_camera_name_.second;
     return true;
   }
 
-  if (!ProjectLightsAndSelectCamera(pose, option,
-                                    &(selected_camera_name_.second), lights)) {
+  if (!ProjectLightsAndSelectCamera(pose, option, &(selected_camera_name_.second), lights)) {
     AERROR << "project_lights_and_select_camera failed, ts: " << timestamp;
   }
 
@@ -67,10 +64,9 @@ bool TLPreprocessor::UpdateCameraSelection(
   return true;
 }
 
-bool TLPreprocessor::SyncInformation(const double image_timestamp,
-                                     const std::string &cam_name) {
-  const double &proj_ts = selected_camera_name_.first;
-  const std::string &proj_camera_name = selected_camera_name_.second;
+bool TLPreprocessor::SyncInformation(const double image_timestamp, const std::string& cam_name) {
+  const double&      proj_ts          = selected_camera_name_.first;
+  const std::string& proj_camera_name = selected_camera_name_.second;
   AINFO << "ready to sync information";
 
   if (!projection_.HasCamera(cam_name)) {
@@ -80,8 +76,7 @@ bool TLPreprocessor::SyncInformation(const double image_timestamp,
   }
 
   AINFO << "Enter TLPreprocessor::sync_image. proj_ts: " << proj_ts
-        << " proj_camera_name: " << proj_camera_name
-        << " image_ts: " << image_timestamp
+        << " proj_camera_name: " << proj_camera_name << " image_ts: " << image_timestamp
         << " image_camera_name: " << cam_name;
   if (image_timestamp < last_pub_img_ts_) {
     AWARN << "TLPreprocessor reject the image pub ts:" << image_timestamp
@@ -100,10 +95,10 @@ bool TLPreprocessor::SyncInformation(const double image_timestamp,
   return true;
 }
 
-bool TLPreprocessor::UpdateLightsProjection(
-    const CarPose &pose, const TLPreprocessorOption &option,
-    const std::string &camera_name,
-    std::vector<base::TrafficLightPtr> *lights) {
+bool TLPreprocessor::UpdateLightsProjection(const CarPose&                      pose,
+                                            const TLPreprocessorOption&         option,
+                                            const std::string&                  camera_name,
+                                            std::vector<base::TrafficLightPtr>* lights) {
   lights_on_image_.clear();
   lights_outside_image_.clear();
 
@@ -114,10 +109,8 @@ bool TLPreprocessor::UpdateLightsProjection(
     return true;
   }
 
-  if (!ProjectLights(pose, camera_name, lights, &lights_on_image_,
-                     &lights_outside_image_)) {
-    AERROR << "update_lights_projection project lights on " << camera_name
-           << " image failed";
+  if (!ProjectLights(pose, camera_name, lights, &lights_on_image_, &lights_outside_image_)) {
+    AERROR << "update_lights_projection project lights on " << camera_name << " image failed";
     return false;
   }
 
@@ -129,12 +122,9 @@ bool TLPreprocessor::UpdateLightsProjection(
   }
 
   auto min_focal_len_working_camera = GetMinFocalLenWorkingCameraName();
-  if (camera_name == min_focal_len_working_camera) {
-    return lights_on_image_.size() > 0;
-  }
-  for (const base::TrafficLightPtr &light : lights_on_image_) {
-    if (OutOfValidRegion(light->region.projection_roi,
-                         projection_.getImageWidth(camera_name),
+  if (camera_name == min_focal_len_working_camera) { return lights_on_image_.size() > 0; }
+  for (const base::TrafficLightPtr& light : lights_on_image_) {
+    if (OutOfValidRegion(light->region.projection_roi, projection_.getImageWidth(camera_name),
                          projection_.getImageHeight(camera_name),
                          option.image_borders_size->at(camera_name))) {
       AINFO << "update_lights_projection light project out of image region. "
@@ -147,8 +137,7 @@ bool TLPreprocessor::UpdateLightsProjection(
   return true;
 }
 
-bool TLPreprocessor::SetCameraWorkingFlag(const std::string &camera_name,
-                                          bool is_working) {
+bool TLPreprocessor::SetCameraWorkingFlag(const std::string& camera_name, bool is_working) {
   if (!projection_.HasCamera(camera_name)) {
     AERROR << "SetCameraWorkingFlag failed, "
            << "get invalid camera_name: " << camera_name;
@@ -160,16 +149,14 @@ bool TLPreprocessor::SetCameraWorkingFlag(const std::string &camera_name,
   return true;
 }
 
-bool TLPreprocessor::GetCameraWorkingFlag(const std::string &camera_name,
-                                          bool *is_working) const {
+bool TLPreprocessor::GetCameraWorkingFlag(const std::string& camera_name, bool* is_working) const {
   if (!projection_.HasCamera(camera_name)) {
     AERROR << "GetCameraWorkingFlag failed, "
            << "get invalid camera_name: " << camera_name;
     return false;
   }
 
-  if (camera_is_working_flags_.find(camera_name) ==
-          camera_is_working_flags_.end() ||
+  if (camera_is_working_flags_.find(camera_name) == camera_is_working_flags_.end() ||
       !camera_is_working_flags_.at(camera_name)) {
     *is_working = false;
   } else {
@@ -178,19 +165,18 @@ bool TLPreprocessor::GetCameraWorkingFlag(const std::string &camera_name,
   return true;
 }
 
-void TLPreprocessor::SelectCamera(
-    std::vector<base::TrafficLightPtrs> *lights_on_image_array,
-    std::vector<base::TrafficLightPtrs> *lights_outside_image_array,
-    const TLPreprocessorOption &option, std::string *selected_camera_name) {
+void TLPreprocessor::SelectCamera(std::vector<base::TrafficLightPtrs>* lights_on_image_array,
+                                  std::vector<base::TrafficLightPtrs>* lights_outside_image_array,
+                                  const TLPreprocessorOption&          option,
+                                  std::string*                         selected_camera_name) {
   // do not check boundary if this is min focal camera
   auto min_focal_len_working_camera = GetMinFocalLenWorkingCameraName();
-  AINFO << "working camera with minimum focal length: "
-        << min_focal_len_working_camera;
+  AINFO << "working camera with minimum focal length: " << min_focal_len_working_camera;
 
-  const auto &camera_names = projection_.getCameraNamesByDescendingFocalLen();
+  const auto& camera_names = projection_.getCameraNamesByDescendingFocalLen();
   for (size_t cam_id = 0; cam_id < lights_on_image_array->size(); ++cam_id) {
-    const auto &camera_name = camera_names[cam_id];
-    bool is_working = false;
+    const auto& camera_name = camera_names[cam_id];
+    bool        is_working  = false;
     // camera is not working ,skip
     if (!GetCameraWorkingFlag(camera_name, &is_working) || !is_working) {
       AINFO << "camera " << camera_name << "is not working";
@@ -210,14 +196,13 @@ void TLPreprocessor::SelectCamera(
       auto lights = lights_on_image_array->at(cam_id);
       for (const auto light : lights) {
         // check boundary
-        if (OutOfValidRegion(light->region.projection_roi,
-                             projection_.getImageWidth(camera_name),
+        if (OutOfValidRegion(light->region.projection_roi, projection_.getImageWidth(camera_name),
                              projection_.getImageHeight(camera_name),
                              option.image_borders_size->at(camera_name))) {
           ok = false;
           AINFO << "light project out of image region, "
-                << "camera_name: " << camera_name << " border_size: "
-                << option.image_borders_size->at(camera_name);
+                << "camera_name: " << camera_name
+                << " border_size: " << option.image_borders_size->at(camera_name);
           break;
         }
       }
@@ -234,11 +219,11 @@ void TLPreprocessor::SelectCamera(
   AINFO << "select_camera selection: " << *selected_camera_name;
 }
 
-bool TLPreprocessor::ProjectLights(
-    const CarPose &pose, const std::string &camera_name,
-    std::vector<base::TrafficLightPtr> *lights,
-    base::TrafficLightPtrs *lights_on_image,
-    base::TrafficLightPtrs *lights_outside_image) {
+bool TLPreprocessor::ProjectLights(const CarPose&                      pose,
+                                   const std::string&                  camera_name,
+                                   std::vector<base::TrafficLightPtr>* lights,
+                                   base::TrafficLightPtrs*             lights_on_image,
+                                   base::TrafficLightPtrs*             lights_outside_image) {
   if (lights->empty()) {
     AINFO << "project_lights get empty signals.";
     return true;
@@ -258,24 +243,24 @@ bool TLPreprocessor::ProjectLights(
 
   for (size_t i = 0; i < lights->size(); ++i) {
     base::TrafficLightPtr light_proj(new base::TrafficLight);
-    auto light = lights->at(i);
+    auto                  light = lights->at(i);
     if (!projection_.Project(pose, ProjectOption(camera_name), light.get())) {
       light->region.outside_image = true;
-      *light_proj = *light;
+      *light_proj                 = *light;
       lights_outside_image->push_back(light_proj);
     } else {
       light->region.outside_image = false;
-      *light_proj = *light;
+      *light_proj                 = *light;
       lights_on_image->push_back(light_proj);
     }
   }
   return true;
 }
 
-bool TLPreprocessor::ProjectLightsAndSelectCamera(
-    const CarPose &pose, const TLPreprocessorOption &option,
-    std::string *selected_camera_name,
-    std::vector<base::TrafficLightPtr> *lights) {
+bool TLPreprocessor::ProjectLightsAndSelectCamera(const CarPose&              pose,
+                                                  const TLPreprocessorOption& option,
+                                                  std::string*                selected_camera_name,
+                                                  std::vector<base::TrafficLightPtr>* lights) {
   if (selected_camera_name == nullptr) {
     AERROR << "selected_camera_name is not available";
     return false;
@@ -285,22 +270,21 @@ bool TLPreprocessor::ProjectLightsAndSelectCamera(
     return false;
   }
 
-  for (auto &light_ptrs : lights_on_image_array_) {
+  for (auto& light_ptrs : lights_on_image_array_) {
     light_ptrs.clear();
   }
-  for (auto &light_ptrs : lights_outside_image_array_) {
+  for (auto& light_ptrs : lights_outside_image_array_) {
     light_ptrs.clear();
   }
 
   // project light region on each camera's image plane
-  const auto &camera_names = projection_.getCameraNamesByDescendingFocalLen();
+  const auto& camera_names = projection_.getCameraNamesByDescendingFocalLen();
   for (size_t cam_id = 0; cam_id < num_cameras_; ++cam_id) {
-    const std::string &camera_name = camera_names[cam_id];
-    if (!ProjectLights(pose, camera_name, lights,
-                       &(lights_on_image_array_[cam_id]),
+    const std::string& camera_name = camera_names[cam_id];
+    if (!ProjectLights(pose, camera_name, lights, &(lights_on_image_array_[cam_id]),
                        &(lights_outside_image_array_[cam_id]))) {
-      AERROR << "select_camera_by_lights_projection project lights on "
-             << camera_name << " image failed";
+      AERROR << "select_camera_by_lights_projection project lights on " << camera_name
+             << " image failed";
       return false;
     }
   }
@@ -308,45 +292,35 @@ bool TLPreprocessor::ProjectLightsAndSelectCamera(
   projections_outside_all_images_ = !lights->empty();
   for (size_t cam_id = 0; cam_id < num_cameras_; ++cam_id) {
     projections_outside_all_images_ =
-        projections_outside_all_images_ &&
-        (lights_on_image_array_[cam_id].size() < lights->size());
+        projections_outside_all_images_ && (lights_on_image_array_[cam_id].size() < lights->size());
   }
-  if (projections_outside_all_images_) {
-    AWARN << "lights projections outside all images";
-  }
+  if (projections_outside_all_images_) { AWARN << "lights projections outside all images"; }
 
   // select which camera to be used
-  SelectCamera(&lights_on_image_array_, &lights_outside_image_array_, option,
-               selected_camera_name);
+  SelectCamera(&lights_on_image_array_, &lights_outside_image_array_, option, selected_camera_name);
 
   return true;
 }
 
-bool TLPreprocessor::GetAlllightsOutsideFlag() const {
-  return projections_outside_all_images_;
-}
+bool TLPreprocessor::GetAlllightsOutsideFlag() const { return projections_outside_all_images_; }
 
 std::string TLPreprocessor::Name() const { return "TLPreprocessor"; }
 
 std::string TLPreprocessor::GetMinFocalLenWorkingCameraName() const {
-  const auto &camera_names = projection_.getCameraNamesByDescendingFocalLen();
+  const auto& camera_names = projection_.getCameraNamesByDescendingFocalLen();
   for (auto itr = camera_names.crbegin(); itr != camera_names.crend(); ++itr) {
     bool is_working = false;
-    if (GetCameraWorkingFlag(*itr, &is_working) && is_working) {
-      return *itr;
-    }
+    if (GetCameraWorkingFlag(*itr, &is_working) && is_working) { return *itr; }
   }
   AWARN << "No working camera, return empty camera_name";
   return "";
 }
 
 std::string TLPreprocessor::GetMaxFocalLenWorkingCameraName() const {
-  const auto &camera_names = projection_.getCameraNamesByDescendingFocalLen();
-  for (const auto &camera_name : camera_names) {
+  const auto& camera_names = projection_.getCameraNamesByDescendingFocalLen();
+  for (const auto& camera_name : camera_names) {
     bool is_working = false;
-    if (GetCameraWorkingFlag(camera_name, &is_working) && is_working) {
-      return camera_name;
-    }
+    if (GetCameraWorkingFlag(camera_name, &is_working) && is_working) { return camera_name; }
   }
   AWARN << "No working camera, return empty camera_name";
   return "";

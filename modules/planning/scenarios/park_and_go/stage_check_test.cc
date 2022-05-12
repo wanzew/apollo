@@ -20,6 +20,7 @@
 #include "modules/planning/scenarios/park_and_go/stage_check.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -35,7 +36,7 @@ class ParkAndGoStageCheckTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 

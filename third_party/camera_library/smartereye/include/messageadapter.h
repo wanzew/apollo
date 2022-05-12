@@ -19,31 +19,33 @@
 
 #include <QObject>
 #include <QSet>
+
+#include "blockhandler.h"
 #include "satpext_global.h"
 #include "service.h"
-#include "blockhandler.h"
 
 namespace SATP {
-    class Protocol;
+class Protocol;
 }
 
-class SATPEXTSHARED_EXPORT MessageAdapter : public QObject, public Service, public SATP::BlockHandler
-{
-    Q_OBJECT
-public:
-    explicit MessageAdapter(SATP::Protocol *protocol, QObject *parent = nullptr);
-    virtual ~MessageAdapter();
-    //override BlockHandler
-    bool handleReceiveBlock(uint32_t dataType, const char *block, int size);
-    void handleReady();
-    void registerUrgentMessage(int type);
+class SATPEXTSHARED_EXPORT MessageAdapter : public QObject,
+                                            public Service,
+                                            public SATP::BlockHandler {
+  Q_OBJECT
+ public:
+  explicit MessageAdapter(SATP::Protocol* protocol, QObject* parent = nullptr);
+  virtual ~MessageAdapter();
+  // override BlockHandler
+  bool handleReceiveBlock(uint32_t dataType, const char* block, int size);
+  void handleReady();
+  void registerUrgentMessage(int type);
 
-protected:
-    void handleMessage(int type, const char *message, int size);
+ protected:
+  void handleMessage(int type, const char* message, int size);
 
-private:
-    SATP::Protocol *mProtocol;
-    QSet<int> mUrgentMessages;
+ private:
+  SATP::Protocol* mProtocol;
+  QSet<int>       mUrgentMessages;
 };
 
-#endif // MESSAGEADAPTER_H
+#endif  // MESSAGEADAPTER_H

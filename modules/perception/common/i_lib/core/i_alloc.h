@@ -36,20 +36,16 @@ namespace perception {
 namespace common {
 
 template <typename T>
-inline T *IAlloc(int memory_size) {
-  T *mem = nullptr;
-  if (!memory_size) {
-    return mem;
-  }
+inline T* IAlloc(int memory_size) {
+  T* mem = nullptr;
+  if (!memory_size) { return mem; }
   mem = new (std::nothrow) T[memory_size];
-  if (mem == nullptr) {
-    return nullptr;
-  }
+  if (mem == nullptr) { return nullptr; }
   return mem;
 }
 
 template <typename T>
-inline void IFree(T **mem) {
+inline void IFree(T** mem) {
   if (mem != nullptr && *mem != nullptr) {
     delete[] * mem;
     *mem = nullptr;
@@ -58,14 +54,12 @@ inline void IFree(T **mem) {
 
 // Memory allocated with this function must be released with IFree2
 template <typename T>
-inline T **IAlloc2(int m, int n) {
-  T *mem = nullptr;
-  T **head = nullptr;
-  mem = new (std::nothrow) T[m * n];
-  if (mem == nullptr) {
-    return nullptr;
-  }
-  head = new (std::nothrow) T *[m];
+inline T** IAlloc2(int m, int n) {
+  T*  mem  = nullptr;
+  T** head = nullptr;
+  mem      = new (std::nothrow) T[m * n];
+  if (mem == nullptr) { return nullptr; }
+  head = new (std::nothrow) T*[m];
   if (head == nullptr) {
     delete[] mem;
     return nullptr;
@@ -76,7 +70,7 @@ inline T **IAlloc2(int m, int n) {
 
 // Free memory allocated with function IAlloc2
 template <typename T>
-inline void IFree2(T ***A) {
+inline void IFree2(T*** A) {
   if (A != nullptr && *A != nullptr) {
     delete[](*A)[0];
     delete[] * A;
@@ -86,21 +80,19 @@ inline void IFree2(T ***A) {
 
 // Allocate an (l x m x n) T tensor
 template <class T>
-inline T ***IAlloc3(int l, int m, int n) {
-  T *mem = nullptr;
-  T ***head = nullptr;
-  int i, j;
+inline T*** IAlloc3(int l, int m, int n) {
+  T*   mem  = nullptr;
+  T*** head = nullptr;
+  int  i, j;
   mem = new (std::nothrow) T[l * m * n];
-  if (mem == nullptr) {
-    return nullptr;
-  }
-  head = new (std::nothrow) T **[l];
+  if (mem == nullptr) { return nullptr; }
+  head = new (std::nothrow) T**[l];
   if (head == nullptr) {
     delete[] mem;
     return nullptr;
   }
   for (i = 0; i < l; i++) {
-    head[i] = new (std::nothrow) T *[m];
+    head[i] = new (std::nothrow) T*[m];
     if (head[i] == nullptr) {
       for (j = 0; j < i; j++) {
         delete[] head[j];
@@ -116,38 +108,31 @@ inline T ***IAlloc3(int l, int m, int n) {
 
 // Memory allocated with this function must be released with IFreeAligned
 template <typename T>
-inline T *IAllocAligned(int memory_size, int alignment_power = 4) {
-  if (memory_size <= 0) {
-    return (reinterpret_cast<T *>(NULL));
-  }
-  int actual_alignment_power = (alignment_power >= 0) ? alignment_power : 0;
-  std::size_t memory_size_in_byte =
-      static_cast<size_t>(memory_size) * sizeof(T);
-  std::size_t mask = static_cast<size_t>((1 << actual_alignment_power) - 1);
-  std::size_t pointer_size_in_byte = sizeof(char *);
-  char *mem_begin = new (
-      std::nothrow) char[memory_size_in_byte + mask + pointer_size_in_byte];
-  if (!mem_begin) {
-    return (reinterpret_cast<T *>(NULL));
-  }
-  char *mem_actual = reinterpret_cast<char *>(
-      (reinterpret_cast<size_t>(mem_begin) + mask + pointer_size_in_byte) &
-      (~mask));
-  (reinterpret_cast<char **>(mem_actual))[-1] = mem_begin;
-  return (reinterpret_cast<T *>(mem_actual));
+inline T* IAllocAligned(int memory_size, int alignment_power = 4) {
+  if (memory_size <= 0) { return (reinterpret_cast<T*>(NULL)); }
+  int         actual_alignment_power = (alignment_power >= 0) ? alignment_power : 0;
+  std::size_t memory_size_in_byte    = static_cast<size_t>(memory_size) * sizeof(T);
+  std::size_t mask                   = static_cast<size_t>((1 << actual_alignment_power) - 1);
+  std::size_t pointer_size_in_byte   = sizeof(char*);
+  char* mem_begin = new (std::nothrow) char[memory_size_in_byte + mask + pointer_size_in_byte];
+  if (!mem_begin) { return (reinterpret_cast<T*>(NULL)); }
+  char* mem_actual = reinterpret_cast<char*>(
+      (reinterpret_cast<size_t>(mem_begin) + mask + pointer_size_in_byte) & (~mask));
+  (reinterpret_cast<char**>(mem_actual))[-1] = mem_begin;
+  return (reinterpret_cast<T*>(mem_actual));
 }
 
 // Free memory allocated with function IAllocAligned
 template <typename T>
-inline void IFreeAligned(T **mem) {
+inline void IFreeAligned(T** mem) {
   if (mem != nullptr && *mem != nullptr) {
-    delete[](reinterpret_cast<char **>(*mem))[-1];
+    delete[](reinterpret_cast<char**>(*mem))[-1];
     *mem = nullptr;
   }
 }
 
 template <typename T>
-inline int IVerifyAlignment(const T *mem, int alignment_power = 4) {
+inline int IVerifyAlignment(const T* mem, int alignment_power = 4) {
   std::size_t mask = static_cast<size_t>((1 << alignment_power) - 1);
   if (((size_t)mem) & mask) {
     return 0;

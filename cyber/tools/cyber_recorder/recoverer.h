@@ -22,8 +22,9 @@
 #include <string>
 #include <vector>
 
-#include "cyber/common/log.h"
 #include "cyber/proto/record.pb.h"
+
+#include "cyber/common/log.h"
 #include "cyber/record/file/record_file_reader.h"
 #include "cyber/record/file/record_file_writer.h"
 
@@ -43,10 +44,10 @@ class Recoverer {
   bool Proc();
 
  private:
-  RecordFileReader reader_;
-  RecordFileWriter writer_;
-  std::string input_file_;
-  std::string output_file_;
+  RecordFileReader         reader_;
+  RecordFileWriter         writer_;
+  std::string              input_file_;
+  std::string              output_file_;
   std::vector<std::string> channel_vec_;
 };
 

@@ -16,8 +16,9 @@
 
 #include "modules/monitor/common/recurrent_runner.h"
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace monitor {

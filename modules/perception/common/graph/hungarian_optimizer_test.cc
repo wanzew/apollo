@@ -16,8 +16,9 @@
 
 #include "modules/perception/common/graph/hungarian_optimizer.h"
 
-#include "Eigen/Core"
 #include "gtest/gtest.h"
+
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {
@@ -25,7 +26,8 @@ namespace common {
 
 class HungarianOptimizerTest : public testing::Test {
  public:
-  HungarianOptimizerTest() : optimizer_(nullptr) {}
+  HungarianOptimizerTest()
+      : optimizer_(nullptr) {}
   ~HungarianOptimizerTest() {}
 
  protected:

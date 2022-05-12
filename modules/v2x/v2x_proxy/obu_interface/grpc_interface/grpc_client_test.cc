@@ -30,10 +30,9 @@ namespace v2x {
 
 TEST(GrpcClientImplTest, Construct) {
   apollo::cyber::Init("grpc_client_test");
-  GrpcClientImpl grpc_client(
-      grpc::CreateChannel(FLAGS_grpc_client_host + ":" + FLAGS_grpc_client_port,
-                          grpc::InsecureChannelCredentials()));
-  bool init_succ = grpc_client.InitFlag();
+  GrpcClientImpl grpc_client(grpc::CreateChannel(
+      FLAGS_grpc_client_host + ":" + FLAGS_grpc_client_port, grpc::InsecureChannelCredentials()));
+  bool           init_succ = grpc_client.InitFlag();
   EXPECT_TRUE(init_succ);
 }
 }  // namespace v2x

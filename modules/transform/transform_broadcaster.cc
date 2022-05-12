@@ -21,8 +21,7 @@
 namespace apollo {
 namespace transform {
 
-TransformBroadcaster::TransformBroadcaster(
-    const std::shared_ptr<cyber::Node>& node)
+TransformBroadcaster::TransformBroadcaster(const std::shared_ptr<cyber::Node>& node)
     : node_(node) {
   cyber::proto::RoleAttributes attr;
   attr.set_channel_name(FLAGS_tf_topic);
@@ -35,9 +34,8 @@ void TransformBroadcaster::SendTransform(const TransformStamped& transform) {
   SendTransform(transforms);
 }
 
-void TransformBroadcaster::SendTransform(
-    const std::vector<TransformStamped>& transforms) {
-  auto message = std::make_shared<TransformStampeds>();
+void TransformBroadcaster::SendTransform(const std::vector<TransformStamped>& transforms) {
+  auto message                   = std::make_shared<TransformStampeds>();
   *message->mutable_transforms() = {transforms.begin(), transforms.end()};
   writer_->Write(message);
 }

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/radar/lib/tracker/filter/adaptive_kalman_filter.h"
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
-#include "modules/perception/radar/lib/tracker/filter/adaptive_kalman_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +35,7 @@ TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   Eigen::Matrix3d temp_matrix;
   temp_matrix.setIdentity();
   temp_matrix *= 0.01;
-  object.center_uncertainty = temp_matrix.cast<float>();
+  object.center_uncertainty   = temp_matrix.cast<float>();
   object.velocity_uncertainty = temp_matrix.cast<float>();
   AdaptiveKalmanFilter::SetQMatrixRatio(0.074);
   filter->Init(object);
@@ -54,9 +55,9 @@ TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   base::Object object2;
   object2.velocity << 3.01f, 3.99f, 0.0f;
   object2.center << 0.0f, 0.0f, 0.0f;
-  object2.anchor_point = object.center;
-  object2.center_uncertainty = temp_matrix.cast<float>();
-  object2.velocity_uncertainty = temp_matrix.cast<float>();
+  object2.anchor_point          = object.center;
+  object2.center_uncertainty    = temp_matrix.cast<float>();
+  object2.velocity_uncertainty  = temp_matrix.cast<float>();
   Eigen::Vector4d update_result = filter->UpdateWithObject(object2, time_diff);
   Eigen::Vector3d anchor_point;
   Eigen::Vector3d velocity;

@@ -20,6 +20,7 @@
 #include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -29,22 +30,19 @@ namespace valet_parking {
 class StageApproachingParkingSpotTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(
-        ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT);
+    config_.set_stage_type(ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StageApproachingParkingSpotTest, Init) {
-  StageApproachingParkingSpot stage_approaching_parking_spot(config_,
-                                                             injector_);
+  StageApproachingParkingSpot stage_approaching_parking_spot(config_, injector_);
   EXPECT_EQ(stage_approaching_parking_spot.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT));
+            ScenarioConfig::StageType_Name(ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT));
 }
 
 }  // namespace valet_parking

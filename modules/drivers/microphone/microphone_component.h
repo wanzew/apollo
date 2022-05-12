@@ -23,10 +23,11 @@
 #include <string>
 #include <vector>
 
-#include "cyber/cyber.h"
-#include "modules/common/util/message_util.h"
 #include "modules/drivers/microphone/proto/audio.pb.h"
 #include "modules/drivers/microphone/proto/microphone_config.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/common/util/message_util.h"
 #include "modules/drivers/microphone/respeaker.h"
 
 namespace apollo {
@@ -51,16 +52,15 @@ class MicrophoneComponent : public Component<> {
   void fill_channel_data(int chunk_i);
 
   // Configuration
-  int n_chunks_, n_channels_, chunk_, chunk_size_, n_chunk_,
-      sample_width_;
+  int n_chunks_, n_channels_, chunk_, chunk_size_, n_chunk_, sample_width_;
 
   // class data
-  std::shared_ptr<AudioData> audio_data_ptr_;
+  std::shared_ptr<AudioData>         audio_data_ptr_;
   std::shared_ptr<Writer<AudioData>> writer_ptr_;
-  std::unique_ptr<Respeaker> microphone_device_ptr_;
-  std::vector<std::string *> channel_data_ptrs_;
-  std::shared_ptr<MicrophoneConfig> microphone_config_ptr_;
-  char *buffer_;
+  std::unique_ptr<Respeaker>         microphone_device_ptr_;
+  std::vector<std::string*>          channel_data_ptrs_;
+  std::shared_ptr<MicrophoneConfig>  microphone_config_ptr_;
+  char*                              buffer_;
 
   std::future<void> async_result_;
   std::atomic<bool> running_ = {false};

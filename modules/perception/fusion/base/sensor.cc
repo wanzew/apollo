@@ -23,8 +23,7 @@ namespace fusion {
 
 size_t Sensor::kMaxCachedFrameNum = 10;
 
-void Sensor::QueryLatestFrames(double timestamp,
-                               std::vector<SensorFramePtr>* frames) {
+void Sensor::QueryLatestFrames(double timestamp, std::vector<SensorFramePtr>* frames) {
   if (frames == nullptr) {
     AERROR << "frames are not available";
     return;
@@ -45,7 +44,7 @@ SensorFramePtr Sensor::QueryLatestFrame(double timestamp) {
   for (size_t i = 0; i < frames_.size(); ++i) {
     if (frames_[i]->GetTimestamp() > latest_query_timestamp_ &&
         frames_[i]->GetTimestamp() <= timestamp) {
-      latest_frame = frames_[i];
+      latest_frame            = frames_[i];
       latest_query_timestamp_ = frames_[i]->GetTimestamp();
     }
   }
@@ -70,9 +69,7 @@ bool Sensor::GetPose(double timestamp, Eigen::Affine3d* pose) const {
 
 void Sensor::AddFrame(const base::FrameConstPtr& frame_ptr) {
   SensorFramePtr frame(new SensorFrame(frame_ptr));
-  if (frames_.size() == kMaxCachedFrameNum) {
-    frames_.pop_front();
-  }
+  if (frames_.size() == kMaxCachedFrameNum) { frames_.pop_front(); }
   frames_.emplace_back(frame);
 }
 

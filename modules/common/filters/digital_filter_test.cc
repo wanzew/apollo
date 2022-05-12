@@ -29,13 +29,13 @@ class DigitalFilterTest : public ::testing::Test {
 };
 
 TEST_F(DigitalFilterTest, SetGet) {
-  DigitalFilter digital_filter;
-  std::vector<double> numerators = {1.0, 2.0, 3.0};
+  DigitalFilter       digital_filter;
+  std::vector<double> numerators   = {1.0, 2.0, 3.0};
   std::vector<double> denominators = {4.0, 5.0, 6.0};
   digital_filter.set_denominators(denominators);
   digital_filter.set_numerators(numerators);
   std::vector<double> denominators_got = digital_filter.denominators();
-  std::vector<double> numerators_got = digital_filter.numerators();
+  std::vector<double> numerators_got   = digital_filter.numerators();
   EXPECT_EQ(numerators_got.size(), numerators.size());
   EXPECT_EQ(denominators_got.size(), denominators.size());
   for (size_t i = 0; i < numerators.size(); ++i) {
@@ -64,12 +64,12 @@ TEST_F(DigitalFilterTest, SetGet) {
 }
 
 TEST_F(DigitalFilterTest, FilterOff) {
-  std::vector<double> numerators = {0.0, 0.0, 0.0};
+  std::vector<double> numerators   = {0.0, 0.0, 0.0};
   std::vector<double> denominators = {1.0, 0.0, 0.0};
-  DigitalFilter digital_filter(denominators, numerators);
+  DigitalFilter       digital_filter(denominators, numerators);
 
   const std::vector<double> step_input(100, 1.0);
-  std::vector<double> rand_input(100, 1.0);
+  std::vector<double>       rand_input(100, 1.0);
 
   unsigned int seed;
   for (size_t i = 0; i < rand_input.size(); ++i) {
@@ -86,9 +86,9 @@ TEST_F(DigitalFilterTest, FilterOff) {
 }
 
 TEST_F(DigitalFilterTest, MovingAverage) {
-  std::vector<double> numerators = {0.25, 0.25, 0.25, 0.25};
+  std::vector<double> numerators   = {0.25, 0.25, 0.25, 0.25};
   std::vector<double> denominators = {1.0, 0.0, 0.0};
-  DigitalFilter digital_filter;
+  DigitalFilter       digital_filter;
   digital_filter.set_numerators(numerators);
   digital_filter.set_denominators(denominators);
 
@@ -104,8 +104,7 @@ TEST_F(DigitalFilterTest, MovingAverage) {
       EXPECT_DOUBLE_EQ(digital_filter.inputs_queue()[j], input_state);
     }
     for (size_t j = 0; j < denominators.size(); ++j) {
-      double output_state =
-          (i >= j) ? static_cast<double>(i - j + 1) * 0.25 : 0.0;
+      double output_state = (i >= j) ? static_cast<double>(i - j + 1) * 0.25 : 0.0;
       EXPECT_DOUBLE_EQ(digital_filter.outputs_queue()[j], output_state);
     }
   }

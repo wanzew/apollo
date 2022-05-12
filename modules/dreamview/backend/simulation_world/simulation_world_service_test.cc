@@ -46,32 +46,29 @@ class SimulationWorldServiceTest : public ::testing::Test {
   static void SetUpTestCase() {
     cyber::GlobalData::Instance()->EnableSimulationMode();
 
-    std::unique_ptr<cyber::Node> node =
-        cyber::CreateNode("sim_world_service_test");
-    control_writer_ = node->CreateWriter<apollo::control::ControlCommand>(
-        FLAGS_control_command_topic);
+    std::unique_ptr<cyber::Node> node = cyber::CreateNode("sim_world_service_test");
+    control_writer_ =
+        node->CreateWriter<apollo::control::ControlCommand>(FLAGS_control_command_topic);
   }
 
   virtual void SetUp() {
-    FLAGS_routing_response_file =
-        "modules/dreamview/backend/testdata/routing.pb.txt";
+    FLAGS_routing_response_file = "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
     sim_world_service_.reset(new SimulationWorldService(map_service_.get()));
   }
 
  protected:
   SimulationWorldServiceTest() {
-    FLAGS_map_dir = "modules/dreamview/backend/testdata";
-    FLAGS_base_map_filename = "garage.bin";
+    FLAGS_map_dir                     = "modules/dreamview/backend/testdata";
+    FLAGS_base_map_filename           = "garage.bin";
     FLAGS_sim_world_with_routing_path = true;
     map_service_.reset(new MapService(false));
   }
 
   std::unique_ptr<SimulationWorldService> sim_world_service_;
-  std::unique_ptr<MapService> map_service_;
+  std::unique_ptr<MapService>             map_service_;
 
-  static std::shared_ptr<cyber::Writer<apollo::control::ControlCommand>>
-      control_writer_;
+  static std::shared_ptr<cyber::Writer<apollo::control::ControlCommand>> control_writer_;
 };
 
 std::shared_ptr<cyber::Writer<apollo::control::ControlCommand>>
@@ -89,14 +86,10 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
   sim_world_service_->UpdateSimulationWorld(monitor);
 
   EXPECT_EQ(2, sim_world_service_->world_.notification_size());
-  EXPECT_EQ("I am the previous message.",
-            sim_world_service_->world_.notification(0).item().msg());
-  EXPECT_EQ("I am the latest message.",
-            sim_world_service_->world_.notification(1).item().msg());
-  EXPECT_DOUBLE_EQ(1990,
-                   sim_world_service_->world_.notification(0).timestamp_sec());
-  EXPECT_DOUBLE_EQ(2000,
-                   sim_world_service_->world_.notification(1).timestamp_sec());
+  EXPECT_EQ("I am the previous message.", sim_world_service_->world_.notification(0).item().msg());
+  EXPECT_EQ("I am the latest message.", sim_world_service_->world_.notification(1).item().msg());
+  EXPECT_DOUBLE_EQ(1990, sim_world_service_->world_.notification(0).timestamp_sec());
+  EXPECT_DOUBLE_EQ(2000, sim_world_service_->world_.notification(1).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
@@ -118,44 +111,35 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
 
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
             sim_world_service_->world_.notification_size());
-  EXPECT_EQ("I am message -2",
-            sim_world_service_->world_.notification(last).item().msg());
-  EXPECT_EQ("I am message -1",
-            sim_world_service_->world_.notification(last - 1).item().msg());
+  EXPECT_EQ("I am message -2", sim_world_service_->world_.notification(last).item().msg());
+  EXPECT_EQ("I am message -1", sim_world_service_->world_.notification(last - 1).item().msg());
   EXPECT_EQ(absl::StrCat("I am message ", last),
             sim_world_service_->world_.notification(last - 2).item().msg());
-  EXPECT_DOUBLE_EQ(
-      2000, sim_world_service_->world_.notification(last).timestamp_sec());
-  EXPECT_DOUBLE_EQ(
-      2000, sim_world_service_->world_.notification(last - 1).timestamp_sec());
-  EXPECT_DOUBLE_EQ(
-      1990, sim_world_service_->world_.notification(last - 2).timestamp_sec());
+  EXPECT_DOUBLE_EQ(2000, sim_world_service_->world_.notification(last).timestamp_sec());
+  EXPECT_DOUBLE_EQ(2000, sim_world_service_->world_.notification(last - 1).timestamp_sec());
+  EXPECT_DOUBLE_EQ(1990, sim_world_service_->world_.notification(last - 2).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
   MonitorMessage monitor;
-  int large_size = SimulationWorldService::kMaxMonitorItems + 10;
+  int            large_size = SimulationWorldService::kMaxMonitorItems + 10;
   for (int i = 0; i < large_size; ++i) {
     monitor.add_item()->set_msg(absl::StrCat("I am message ", i));
   }
   monitor.mutable_header()->set_timestamp_sec(2000);
   EXPECT_EQ(large_size, monitor.item_size());
-  EXPECT_EQ(absl::StrCat("I am message ", large_size - 1),
-            monitor.item(large_size - 1).msg());
+  EXPECT_EQ(absl::StrCat("I am message ", large_size - 1), monitor.item(large_size - 1).msg());
 
   sim_world_service_->UpdateSimulationWorld(monitor);
 
   int last = SimulationWorldService::kMaxMonitorItems - 1;
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
             sim_world_service_->world_.notification_size());
-  EXPECT_EQ("I am message 0",
-            sim_world_service_->world_.notification(0).item().msg());
+  EXPECT_EQ("I am message 0", sim_world_service_->world_.notification(0).item().msg());
   EXPECT_EQ(absl::StrCat("I am message ", last),
             sim_world_service_->world_.notification(last).item().msg());
-  EXPECT_DOUBLE_EQ(2000,
-                   sim_world_service_->world_.notification(0).timestamp_sec());
-  EXPECT_DOUBLE_EQ(
-      2000, sim_world_service_->world_.notification(last).timestamp_sec());
+  EXPECT_DOUBLE_EQ(2000, sim_world_service_->world_.notification(0).timestamp_sec());
+  EXPECT_DOUBLE_EQ(2000, sim_world_service_->world_.notification(last).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
@@ -168,8 +152,7 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   chassis.set_steering_percentage(25);
   chassis.set_battery_soc_percentage(80);
   chassis.set_gear_location(Chassis::GEAR_DRIVE);
-  chassis.mutable_signal()->set_turn_signal(
-      apollo::common::VehicleSignal::TURN_RIGHT);
+  chassis.mutable_signal()->set_turn_signal(apollo::common::VehicleSignal::TURN_RIGHT);
 
   // Commit the update.
   sim_world_service_->UpdateSimulationWorld(chassis);
@@ -200,9 +183,9 @@ TEST_F(SimulationWorldServiceTest, UpdateLocalization) {
   localization.mutable_pose()->mutable_orientation()->set_qw(0.0);
 
   auto pose = localization.pose();
-  auto heading = apollo::common::math::QuaternionToHeading(
-      pose.orientation().qw(), pose.orientation().qx(), pose.orientation().qy(),
-      pose.orientation().qz());
+  auto heading =
+      apollo::common::math::QuaternionToHeading(pose.orientation().qw(), pose.orientation().qx(),
+                                                pose.orientation().qy(), pose.orientation().qz());
   localization.mutable_pose()->set_heading(heading);
 
   // Commit the update.
@@ -212,9 +195,7 @@ TEST_F(SimulationWorldServiceTest, UpdateLocalization) {
   const Object& car = sim_world_service_->world_.auto_driving_car();
   EXPECT_DOUBLE_EQ(1.0, car.position_x());
   EXPECT_DOUBLE_EQ(1.5, car.position_y());
-  EXPECT_DOUBLE_EQ(
-      apollo::common::math::QuaternionToHeading(0.0, 0.0, 0.0, 0.0),
-      car.heading());
+  EXPECT_DOUBLE_EQ(apollo::common::math::QuaternionToHeading(0.0, 0.0, 0.0, 0.0), car.heading());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
@@ -305,8 +286,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
 
   // Check last point.
   {
-    const Object point =
-        world.planning_trajectory(world.planning_trajectory_size() - 1);
+    const Object point = world.planning_trajectory(world.planning_trajectory_size() - 1);
     EXPECT_DOUBLE_EQ(290.0, point.position_x());
     EXPECT_DOUBLE_EQ(300.0, point.position_y());
     EXPECT_DOUBLE_EQ(2.9, point.heading());
@@ -316,24 +296,19 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
 TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   DecisionResult decision_res;
 
-  decision_res.mutable_vehicle_signal()->set_turn_signal(
-      apollo::common::VehicleSignal::TURN_RIGHT);
+  decision_res.mutable_vehicle_signal()->set_turn_signal(apollo::common::VehicleSignal::TURN_RIGHT);
 
-  apollo::planning::MainDecision* main_decision =
-      decision_res.mutable_main_decision();
+  apollo::planning::MainDecision* main_decision = decision_res.mutable_main_decision();
   main_decision->add_target_lane()->set_speed_limit(35);
   apollo::planning::MainStop* main_stop = main_decision->mutable_stop();
   main_stop->mutable_stop_point()->set_x(45678.9);
   main_stop->mutable_stop_point()->set_y(1234567.8);
   main_stop->set_stop_heading(1.234);
-  main_stop->set_reason_code(
-      apollo::planning::StopReasonCode::STOP_REASON_CROSSWALK);
+  main_stop->set_reason_code(apollo::planning::StopReasonCode::STOP_REASON_CROSSWALK);
 
-  apollo::planning::ObjectDecisions* obj_decisions =
-      decision_res.mutable_object_decision();
+  apollo::planning::ObjectDecisions* obj_decisions = decision_res.mutable_object_decision();
   // The 1st obstacle is from perception and has 1 decisions: nudge.
-  apollo::planning::ObjectDecision* obj_decision1 =
-      obj_decisions->add_decision();
+  apollo::planning::ObjectDecision* obj_decision1 = obj_decisions->add_decision();
   obj_decision1->set_perception_id(1);
   Object& perception1 = sim_world_service_->obj_map_["1"];
   perception1.set_type(Object_Type_UNKNOWN_UNMOVABLE);
@@ -357,12 +332,10 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   obj_decision1->add_object_decision()->mutable_nudge()->set_distance_l(1.8);
 
   // The 2nd obstacle is virtual and has only 1 decision: yield.
-  apollo::planning::ObjectDecision* obj_decision2 =
-      obj_decisions->add_decision();
+  apollo::planning::ObjectDecision* obj_decision2 = obj_decisions->add_decision();
   obj_decision2->set_perception_id(2);
-  apollo::planning::ObjectYield* yield =
-      obj_decision2->add_object_decision()->mutable_yield();
-  apollo::common::PointENU* fence_point = yield->mutable_fence_point();
+  apollo::planning::ObjectYield* yield = obj_decision2->add_object_decision()->mutable_yield();
+  apollo::common::PointENU*      fence_point = yield->mutable_fence_point();
   fence_point->set_x(-1859.98);
   fence_point->set_y(-3000.03);
   yield->set_fence_heading(1.3);
@@ -419,20 +392,19 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
 
 TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
   // Update with prediction obstacles
-  PredictionObstacles prediction_obstacles;
+  PredictionObstacles              prediction_obstacles;
   std::set<std::pair<int, double>> original_probabilities;
   for (int i = 0; i < 3; ++i) {
-    auto* obstacle = prediction_obstacles.add_prediction_obstacle();
+    auto* obstacle            = prediction_obstacles.add_prediction_obstacle();
     auto* perception_obstacle = obstacle->mutable_perception_obstacle();
     perception_obstacle->set_id(i);
     for (int j = 0; j < 5; ++j) {
       auto* traj = obstacle->add_trajectory();
       traj->set_probability(i * 0.1 + j);
-      original_probabilities.emplace(perception_obstacle->id(),
-                                     traj->probability());
+      original_probabilities.emplace(perception_obstacle->id(), traj->probability());
       for (int k = 0; k < 8; ++k) {
         auto* traj_pt = traj->add_trajectory_point()->mutable_path_point();
-        int pt = j * 10 + k;
+        int   pt      = j * 10 + k;
         traj_pt->set_x(pt);
         traj_pt->set_y(pt);
         traj_pt->set_z(pt);
@@ -454,14 +426,11 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
     EXPECT_EQ(5, obj.prediction_size());
 
     for (int j = 0; j < obj.prediction_size(); ++j) {
-      const Prediction& prediction = obj.prediction(j);
-      const std::pair<int, double> item_to_find(std::stoi(obj.id()),
-                                                prediction.probability());
-      const auto id_prob_it = original_probabilities.find(item_to_find);
+      const Prediction&            prediction = obj.prediction(j);
+      const std::pair<int, double> item_to_find(std::stoi(obj.id()), prediction.probability());
+      const auto                   id_prob_it = original_probabilities.find(item_to_find);
       EXPECT_NE(id_prob_it, original_probabilities.end());
-      if (id_prob_it != original_probabilities.end()) {
-        original_probabilities.erase(id_prob_it);
-      }
+      if (id_prob_it != original_probabilities.end()) { original_probabilities.erase(id_prob_it); }
       EXPECT_EQ(prediction.predicted_trajectory_size(), 2);  // Downsampled
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
@@ -472,26 +441,22 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
 TEST_F(SimulationWorldServiceTest, UpdateRouting) {
   // Load routing from file
   sim_world_service_.reset(nullptr);
-  sim_world_service_.reset(
-      new SimulationWorldService(map_service_.get(), true));
+  sim_world_service_.reset(new SimulationWorldService(map_service_.get(), true));
 
   BlockerManager::Instance()->Observe();
-  sim_world_service_->UpdateWithLatestObserved(
-      sim_world_service_->routing_response_reader_.get());
+  sim_world_service_->UpdateWithLatestObserved(sim_world_service_->routing_response_reader_.get());
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);
   EXPECT_EQ(1, world.route_path_size());
 
   double points[23][2] = {
-      {-1826.41, -3027.52}, {-1839.88, -3023.9},  {-1851.95, -3020.71},
-      {-1857.06, -3018.62}, {-1858.04, -3017.94}, {-1859.56, -3016.51},
-      {-1860.48, -3014.95}, {-1861.12, -3013.2},  {-1861.62, -3010.06},
-      {-1861.29, -3005.88}, {-1859.8, -2999.36},  {-1855.8, -2984.56},
-      {-1851.39, -2968.23}, {-1844.32, -2943.14}, {-1842.9, -2939.22},
-      {-1841.74, -2937.09}, {-1839.35, -2934.03}, {-1837.76, -2932.88},
-      {-1835.53, -2931.86}, {-1833.36, -2931.52}, {-1831.33, -2931.67},
-      {-1827.05, -2932.6},  {-1809.64, -2937.85}};
+      {-1826.41, -3027.52}, {-1839.88, -3023.9},  {-1851.95, -3020.71}, {-1857.06, -3018.62},
+      {-1858.04, -3017.94}, {-1859.56, -3016.51}, {-1860.48, -3014.95}, {-1861.12, -3013.2},
+      {-1861.62, -3010.06}, {-1861.29, -3005.88}, {-1859.8, -2999.36},  {-1855.8, -2984.56},
+      {-1851.39, -2968.23}, {-1844.32, -2943.14}, {-1842.9, -2939.22},  {-1841.74, -2937.09},
+      {-1839.35, -2934.03}, {-1837.76, -2932.88}, {-1835.53, -2931.86}, {-1833.36, -2931.52},
+      {-1831.33, -2931.67}, {-1827.05, -2932.6},  {-1809.64, -2937.85}};
 
   const auto& path = world.route_path(0);
   EXPECT_EQ(23, path.point_size());
@@ -505,8 +470,8 @@ TEST_F(SimulationWorldServiceTest, UpdateGps) {
   // Prepare the gps message that will be used to update the
   // SimulationWorld object.
   apollo::localization::Gps gps;
-  auto* pose = gps.mutable_localization();
-  auto* position = pose->mutable_position();
+  auto*                     pose     = gps.mutable_localization();
+  auto*                     position = pose->mutable_position();
   position->set_x(586922.10396);
   position->set_y(4141065.07993);
   position->set_z(-30.60015);
@@ -529,11 +494,11 @@ TEST_F(SimulationWorldServiceTest, UpdateControlCommandWithSimpleLonLat) {
   // Prepare the ControlCommand message that will be used to update the
   // SimulationWorld object.
   apollo::control::ControlCommand control_command;
-  const double station_error = 0.90225;
-  const double heading_error = -0.00097;
-  const double lateral_error = 0.004176;
+  const double                    station_error = 0.90225;
+  const double                    heading_error = -0.00097;
+  const double                    lateral_error = 0.004176;
   control_command.mutable_header()->set_timestamp_sec(2000);
-  auto* debug = control_command.mutable_debug();
+  auto* debug      = control_command.mutable_debug();
   auto* simple_lon = debug->mutable_simple_lon_debug();
   simple_lon->set_station_error(station_error);
 
@@ -553,11 +518,11 @@ TEST_F(SimulationWorldServiceTest, UpdateControlCommandWithSimpleMpc) {
   // Prepare the ControlCommand message that will be used to update the
   // SimulationWorld object.
   apollo::control::ControlCommand control_command;
-  const double station_error = 0.91225;
-  const double heading_error = -0.01097;
-  const double lateral_error = 0.014176;
+  const double                    station_error = 0.91225;
+  const double                    heading_error = -0.01097;
+  const double                    lateral_error = 0.014176;
   control_command.mutable_header()->set_timestamp_sec(3000);
-  auto* debug = control_command.mutable_debug();
+  auto* debug      = control_command.mutable_debug();
   auto* simple_mpc = debug->mutable_simple_mpc_debug();
   simple_mpc->set_station_error(station_error);
   simple_mpc->set_heading_error(heading_error);
@@ -573,7 +538,7 @@ TEST_F(SimulationWorldServiceTest, UpdateControlCommandWithSimpleMpc) {
 
 TEST_F(SimulationWorldServiceTest, DownsampleSpeedPointsByInterval) {
   apollo::planning_internal::STGraphDebug graph;
-  auto* speed_points = graph.mutable_speed_profile();
+  auto*                                   speed_points = graph.mutable_speed_profile();
   for (int i = 0; i < 10; ++i) {
     auto* point = speed_points->Add();
     point->set_s(i * 1.1);
@@ -582,11 +547,9 @@ TEST_F(SimulationWorldServiceTest, DownsampleSpeedPointsByInterval) {
   }
 
   size_t interval = 5;
-  auto* downsampled_points = sim_world_service_->world_.mutable_planning_data()
-                                 ->add_st_graph()
-                                 ->mutable_speed_profile();
-  sim_world_service_->DownsampleSpeedPointsByInterval(*speed_points, interval,
-                                                      downsampled_points);
+  auto*  downsampled_points =
+      sim_world_service_->world_.mutable_planning_data()->add_st_graph()->mutable_speed_profile();
+  sim_world_service_->DownsampleSpeedPointsByInterval(*speed_points, interval, downsampled_points);
 
   // Verify
   std::vector<int> kept_index = {0, 5, 9};
@@ -610,8 +573,7 @@ TEST_F(SimulationWorldServiceTest, UpdateLatency) {
   control_writer_->Write(control_command);
 
   BlockerManager::Instance()->Observe();
-  sim_world_service_->UpdateLatency(
-      "control", sim_world_service_->control_command_reader_.get());
+  sim_world_service_->UpdateLatency("control", sim_world_service_->control_command_reader_.get());
 
   EXPECT_EQ(1, sim_world_service_->world_.latency_size());
   const Latency latency = sim_world_service_->world_.latency().at("control");

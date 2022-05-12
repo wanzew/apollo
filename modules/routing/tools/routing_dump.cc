@@ -14,15 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/cyber.h"
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
 
-DEFINE_string(routing_dump_file, "/tmp/routing.pb.txt",
-              "file name to dump routing response.");
+#include "cyber/cyber.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
-void MessageCallback(
-    const std::shared_ptr<apollo::planning::ADCTrajectory>& trajectory) {
+DEFINE_string(routing_dump_file, "/tmp/routing.pb.txt", "file name to dump routing response.");
+
+void MessageCallback(const std::shared_ptr<apollo::planning::ADCTrajectory>& trajectory) {
   if (trajectory->debug().planning_data().has_routing()) {
     std::ofstream dump_file(FLAGS_routing_dump_file);
     dump_file << trajectory->debug().planning_data().routing().DebugString();
@@ -38,7 +37,7 @@ int main(int argc, char* argv[]) {
   FLAGS_alsologtostderr = true;
 
   auto listener_node = apollo::cyber::CreateNode("routing_dump");
-  auto listener = listener_node->CreateReader<apollo::planning::ADCTrajectory>(
+  auto listener      = listener_node->CreateReader<apollo::planning::ADCTrajectory>(
       FLAGS_planning_trajectory_topic, MessageCallback);
   apollo::cyber::WaitForShutdown();
   return 0;

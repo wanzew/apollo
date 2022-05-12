@@ -25,6 +25,7 @@
 #include "Eigen/Dense"
 #include "Eigen/Eigen"
 #include "Eigen/Geometry"
+
 #include "modules/perception/base/object_supplement.h"
 
 namespace apollo {
@@ -40,20 +41,19 @@ class PlaneMotion {
 
  private:
   std::list<base::VehicleStatus> raw_motion_queue_;
-  base::MotionBufferPtr mot_buffer_;
-  std::mutex mutex_;
-  int buffer_size_;
-  int time_increment_;     // the time increment units in motion input
-  float time_difference_;  // the time difference for each buffer input
-  base::MotionType mat_motion_sensor_ = base::MotionType::Identity();
+  base::MotionBufferPtr          mot_buffer_;
+  std::mutex                     mutex_;
+  int                            buffer_size_;
+  int                            time_increment_;   // the time increment units in motion input
+  float                          time_difference_;  // the time difference for each buffer input
+  base::MotionType               mat_motion_sensor_ = base::MotionType::Identity();
   // motion matrix of accumulation through high sampling CAN+IMU input sequence
   bool is_3d_motion_;
-  void generate_motion_matrix(
-      base::VehicleStatus *vehicledata);  // generate inverse motion
+  void generate_motion_matrix(base::VehicleStatus* vehicledata);  // generate inverse motion
   void accumulate_motion(double start_time, double end_time);
-  void update_motion_buffer(const base::VehicleStatus &vehicledata,
-                            const double pre_image_timestamp,
-                            const double image_timestamp);
+  void update_motion_buffer(const base::VehicleStatus& vehicledata,
+                            const double               pre_image_timestamp,
+                            const double               image_timestamp);
 
  public:
   void cleanbuffer() {
@@ -76,13 +76,14 @@ class PlaneMotion {
     }
   }
 
-  void add_new_motion(double pre_image_timestamp, double image_timestamp,
-                      int motion_operation_flag,
-                      base::VehicleStatus *vehicledata);
+  void add_new_motion(double               pre_image_timestamp,
+                      double               image_timestamp,
+                      int                  motion_operation_flag,
+                      base::VehicleStatus* vehicledata);
 
   base::MotionBuffer get_buffer();
-  bool find_motion_with_timestamp(double timestamp, base::VehicleStatus *vs);
-  bool is_3d_motion() const { return is_3d_motion_; }
+  bool               find_motion_with_timestamp(double timestamp, base::VehicleStatus* vs);
+  bool               is_3d_motion() const { return is_3d_motion_; }
 };
 
 }  // namespace camera

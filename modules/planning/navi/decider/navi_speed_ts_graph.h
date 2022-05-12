@@ -87,8 +87,7 @@ class NaviSpeedTsGraph {
    * @param start_a A of the start point.
    * @param start_da Da of the start point.
    */
-  void Reset(double s_step, double s_max, double start_v, double start_a,
-             double start_da);
+  void Reset(double s_step, double s_max, double start_v, double start_a, double start_da);
 
   /**
    * @brief Assign constraints to all points.
@@ -102,8 +101,8 @@ class NaviSpeedTsGraph {
    * @param end_s S fo the end point.
    * @param constraints constraints for points.
    */
-  void UpdateRangeConstraints(double start_s, double end_s,
-                              const NaviSpeedTsConstraints& constraints);
+  void
+  UpdateRangeConstraints(double start_s, double end_s, const NaviSpeedTsConstraints& constraints);
 
   /**
    * @brief Assign constraints for an obstacle.
@@ -115,8 +114,10 @@ class NaviSpeedTsGraph {
    * @param cruise_speed Cruise speed of vehicle.
    * @param constraints constraints for the point.
    */
-  void UpdateObstacleConstraints(double distance, double safe_distance,
-                                 double following_accel_ratio, double v,
+  void UpdateObstacleConstraints(double distance,
+                                 double safe_distance,
+                                 double following_accel_ratio,
+                                 double v,
                                  double cruise_speed);
 
   /**
@@ -128,10 +129,10 @@ class NaviSpeedTsGraph {
 
  private:
   std::vector<NaviSpeedTsConstraints> constraints_;
-  double s_step_;
-  double start_v_;
-  double start_a_;
-  double start_da_;
+  double                              s_step_;
+  double                              start_v_;
+  double                              start_a_;
+  double                              start_da_;
 };
 
 }  // namespace planning

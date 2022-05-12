@@ -17,20 +17,21 @@
 #pragma once
 
 #include "gtest/gtest_prod.h"
+
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace transit {
 
-class Llcmotionfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
-                                 ::apollo::canbus::ChassisDetail> {
+class Llcmotionfeedback120
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Llcmotionfeedback120();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
   FRIEND_TEST(Motionfeedback1_20_test, General);
 
  private:
@@ -40,36 +41,32 @@ class Llcmotionfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 3, 'name': 'LLC_FBK_Gear', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|3]', 'bit': 50, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  Llc_motionfeedback1_20::Llc_fbk_gearType llc_fbk_gear(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Llc_motionfeedback1_20::Llc_fbk_gearType llc_fbk_gear(const std::uint8_t* bytes,
+                                                        const int32_t       length) const;
 
   // config detail: {'description': 'Parking brake applied', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'LLC_FBK_ParkingBrake',
   // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 53, 'type':
   // 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-  bool llc_fbk_parkingbrake(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool llc_fbk_parkingbrake(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Throttle position feedback', 'offset': 0.0,
   // 'precision': 0.1, 'len': 10, 'name': 'LLC_FBK_ThrottlePosition',
   // 'is_signed_var': False, 'physical_range': '[0|102.3]', 'bit': 38, 'type':
   // 'double', 'order': 'intel', 'physical_unit': '%'}
-  double llc_fbk_throttleposition(const std::uint8_t* bytes,
-                                  const int32_t length) const;
+  double llc_fbk_throttleposition(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Rear brake pressure feedback', 'offset':
   // 0.0, 'precision': 0.0556, 'len': 11, 'name': 'LLC_FBK_BrakePercentRear',
   // 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 27,
   // 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
-  double llc_fbk_brakepercentrear(const std::uint8_t* bytes,
-                                  const int32_t length) const;
+  double llc_fbk_brakepercentrear(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Front brake pressure feedback', 'offset':
   // 0.0, 'precision': 0.0556, 'len': 11, 'name': 'LLC_FBK_BrakePercentFront',
   // 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 16,
   // 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
-  double llc_fbk_brakepercentfront(const std::uint8_t* bytes,
-                                   const int32_t length) const;
+  double llc_fbk_brakepercentfront(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Current steering control mode', 'enum': {0:
   // 'LLC_FBK_STEERINGCONTROLMODE_NONE', 1: 'LLC_FBK_STEERINGCONTROLMODE_ANGLE',
@@ -79,52 +76,45 @@ class Llcmotionfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   // 0.0, 'physical_range': '[0|3]', 'bit': 6, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
   Llc_motionfeedback1_20::Llc_fbk_steeringcontrolmodeType
-  llc_fbk_steeringcontrolmode(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  llc_fbk_steeringcontrolmode(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Motion feedback 1 heartbeat counter',
   // 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':
   // 'LLC_MotionFeedback1_Counter', 'is_signed_var': False, 'physical_range':
   // '[0|3]', 'bit': 54, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
-  int llc_motionfeedback1_counter(const std::uint8_t* bytes,
-                                  const int32_t length) const;
+  int llc_motionfeedback1_counter(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Motion feedback 1 checksum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'name': 'LLC_MotionFeedback1_Checksum',
   // 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type':
   // 'int', 'order': 'intel', 'physical_unit': ''}
-  int llc_motionfeedback1_checksum(const std::uint8_t* bytes,
-                                   const int32_t length) const;
+  int llc_motionfeedback1_checksum(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Autonomy command aligned with vehicle state
   // according to calibration limits', 'offset': 0.0, 'precision': 1.0, 'len':
   // 1, 'name': 'LLC_FBK_CommandAligned', 'is_signed_var': False,
   // 'physical_range': '[0|1]', 'bit': 11, 'type': 'bool', 'order': 'intel',
   // 'physical_unit': 'T/F'}
-  bool llc_fbk_commandaligned(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  bool llc_fbk_commandaligned(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Estop is pressed', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'LLC_FBK_EstopPressed',
   // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 10, 'type':
   // 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-  bool llc_fbk_estoppressed(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool llc_fbk_estoppressed(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Indicates that ADC is requesting autonomy
   // mode', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name':
   // 'LLC_FBK_AdcRequestAutonomy', 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 9, 'type': 'bool', 'order': 'intel', 'physical_unit':
   // 'T/F'}
-  bool llc_fbk_adcrequestautonomy(const std::uint8_t* bytes,
-                                  const int32_t length) const;
+  bool llc_fbk_adcrequestautonomy(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Indicates that LLC is ready to allow
   // autonomy mode', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name':
   // 'LLC_FBK_allowAutonomy', 'is_signed_var': False, 'physical_range': '[0|1]',
   // 'bit': 8, 'type': 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-  bool llc_fbk_allowautonomy(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  bool llc_fbk_allowautonomy(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Report current longitudinal control mode',
   // 'enum': {0: 'LLC_FBK_LONGITUDINALCONTROLMODE_NONE', 1:
@@ -135,8 +125,7 @@ class Llcmotionfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 4, 'type': 'enum',
   // 'order': 'intel', 'physical_unit': ''}
   Llc_motionfeedback1_20::Llc_fbk_longitudinalcontrolmodeType
-  llc_fbk_longitudinalcontrolmode(const std::uint8_t* bytes,
-                                  const int32_t length) const;
+  llc_fbk_longitudinalcontrolmode(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Current Autonomy State', 'enum': {0:
   // 'LLC_FBK_STATE_RESERVED0', 1: 'LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED', 2:
@@ -150,8 +139,8 @@ class Llcmotionfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 4, 'name': 'LLC_FBK_State', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|15]', 'bit': 0, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
-  Llc_motionfeedback1_20::Llc_fbk_stateType llc_fbk_state(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Llc_motionfeedback1_20::Llc_fbk_stateType llc_fbk_state(const std::uint8_t* bytes,
+                                                          const int32_t       length) const;
 };
 
 }  // namespace transit

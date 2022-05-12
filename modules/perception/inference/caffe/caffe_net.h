@@ -34,31 +34,33 @@ typedef std::shared_ptr<apollo::perception::base::Blob<float>> BlobPtr;
 
 class CaffeNet : public Inference {
  public:
-  CaffeNet(const std::string &net_file, const std::string &model_file,
-           const std::vector<std::string> &outputs);
+  CaffeNet(const std::string&              net_file,
+           const std::string&              model_file,
+           const std::vector<std::string>& outputs);
 
-  CaffeNet(const std::string &net_file, const std::string &model_file,
-           const std::vector<std::string> &outputs,
-           const std::vector<std::string> &inputs);
+  CaffeNet(const std::string&              net_file,
+           const std::string&              model_file,
+           const std::vector<std::string>& outputs,
+           const std::vector<std::string>& inputs);
 
   virtual ~CaffeNet() {}
 
-  bool Init(const std::map<std::string, std::vector<int>> &shapes) override;
+  bool Init(const std::map<std::string, std::vector<int>>& shapes) override;
 
-  void Infer() override;
-  BlobPtr get_blob(const std::string &name) override;
+  void    Infer() override;
+  BlobPtr get_blob(const std::string& name) override;
 
  protected:
-  bool reshape();
-  bool shape(const std::string &name, std::vector<int> *res);
+  bool                               reshape();
+  bool                               shape(const std::string& name, std::vector<int>* res);
   std::shared_ptr<caffe::Net<float>> net_ = nullptr;
 
  private:
-  std::string net_file_;
-  std::string model_file_;
+  std::string              net_file_;
+  std::string              model_file_;
   std::vector<std::string> output_names_;
   std::vector<std::string> input_names_;
-  BlobMap blobs_;
+  BlobMap                  blobs_;
 };
 
 }  // namespace inference

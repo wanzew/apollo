@@ -42,28 +42,28 @@ class TransformServer {
   TransformServer() {}
   ~TransformServer() {}
 
-  inline const std::set<std::string> &vertices() { return vertices_; }
+  inline const std::set<std::string>& vertices() { return vertices_; }
 
-  bool Init(const std::vector<std::string> &camera_names,
-            const std::string &params_path);
+  bool Init(const std::vector<std::string>& camera_names, const std::string& params_path);
 
-  bool AddTransform(const std::string &child_frame_id,
-                    const std::string &frame_id,
-                    const Eigen::Affine3d &transform);
+  bool AddTransform(const std::string&     child_frame_id,
+                    const std::string&     frame_id,
+                    const Eigen::Affine3d& transform);
 
-  bool QueryTransform(const std::string &child_frame_id,
-                      const std::string &frame_id, Eigen::Affine3d *transform);
+  bool QueryTransform(const std::string& child_frame_id,
+                      const std::string& frame_id,
+                      Eigen::Affine3d*   transform);
 
   void print();
 
-  bool LoadFromFile(const std::string &tf_input, float frequency = 200.0f);
+  bool LoadFromFile(const std::string& tf_input, float frequency = 200.0f);
 
-  bool QueryPos(double timestamp, Eigen::Affine3d *pose);
+  bool QueryPos(double timestamp, Eigen::Affine3d* pose);
 
  private:
   struct Edge {
-    std::string child_frame_id;
-    std::string frame_id;
+    std::string     child_frame_id;
+    std::string     frame_id;
     Eigen::Affine3d transform;
   };
 
@@ -76,9 +76,10 @@ class TransformServer {
   // multimap from child frame id to frame id
   std::multimap<std::string, Edge> edges_;
 
-  bool FindTransform(const std::string &child_frame_id,
-                     const std::string &frame_id, Eigen::Affine3d *transform,
-                     std::map<std::string, bool> *visited);
+  bool FindTransform(const std::string&           child_frame_id,
+                     const std::string&           frame_id,
+                     Eigen::Affine3d*             transform,
+                     std::map<std::string, bool>* visited);
 };
 
 }  // namespace camera

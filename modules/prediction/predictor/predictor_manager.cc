@@ -43,9 +43,9 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 
-void GroupObstaclesByObstacleId(const int obstacle_id,
+void GroupObstaclesByObstacleId(const int                 obstacle_id,
                                 ObstaclesContainer* const obstacles_container,
-                                IdObstacleListMap* const id_obstacle_map) {
+                                IdObstacleListMap* const  id_obstacle_map) {
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
   if (obstacle_ptr == nullptr) {
     AERROR << "Null obstacle [" << obstacle_id << "] found";
@@ -101,53 +101,42 @@ void PredictorManager::Init(const PredictionConf& config) {
         InitDefaultPredictors(conf);
         break;
       }
-      default: { break; }
+      default: {
+        break;
+      }
     }
   }
 
-  AINFO << "Defined vehicle on lane obstacle predictor ["
-        << vehicle_on_lane_predictor_ << "].";
-  AINFO << "Defined vehicle off lane obstacle predictor ["
-        << vehicle_off_lane_predictor_ << "].";
-  AINFO << "Defined bicycle on lane obstacle predictor ["
-        << cyclist_on_lane_predictor_ << "].";
-  AINFO << "Defined bicycle off lane obstacle predictor ["
-        << cyclist_off_lane_predictor_ << "].";
-  AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_
-        << "].";
-  AINFO << "Defined default on lane obstacle predictor ["
-        << default_on_lane_predictor_ << "].";
-  AINFO << "Defined default off lane obstacle predictor ["
-        << default_off_lane_predictor_ << "].";
+  AINFO << "Defined vehicle on lane obstacle predictor [" << vehicle_on_lane_predictor_ << "].";
+  AINFO << "Defined vehicle off lane obstacle predictor [" << vehicle_off_lane_predictor_ << "].";
+  AINFO << "Defined bicycle on lane obstacle predictor [" << cyclist_on_lane_predictor_ << "].";
+  AINFO << "Defined bicycle off lane obstacle predictor [" << cyclist_off_lane_predictor_ << "].";
+  AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_ << "].";
+  AINFO << "Defined default on lane obstacle predictor [" << default_on_lane_predictor_ << "].";
+  AINFO << "Defined default off lane obstacle predictor [" << default_off_lane_predictor_ << "].";
 }
 
-Predictor* PredictorManager::GetPredictor(
-    const ObstacleConf::PredictorType& type) {
+Predictor* PredictorManager::GetPredictor(const ObstacleConf::PredictorType& type) {
   auto it = predictors_.find(type);
   return it != predictors_.end() ? it->second.get() : nullptr;
 }
 
-void PredictorManager::Run(
-    const PerceptionObstacles& perception_obstacles,
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    ObstaclesContainer* obstacles_container) {
+void PredictorManager::Run(const PerceptionObstacles&    perception_obstacles,
+                           const ADCTrajectoryContainer* adc_trajectory_container,
+                           ObstaclesContainer*           obstacles_container) {
   prediction_obstacles_.Clear();
 
   if (FLAGS_enable_multi_thread) {
-    PredictObstaclesInParallel(perception_obstacles, adc_trajectory_container,
-                               obstacles_container);
+    PredictObstaclesInParallel(perception_obstacles, adc_trajectory_container, obstacles_container);
   } else {
-    PredictObstacles(perception_obstacles, adc_trajectory_container,
-                     obstacles_container);
+    PredictObstacles(perception_obstacles, adc_trajectory_container, obstacles_container);
   }
 }
 
-void PredictorManager::PredictObstacles(
-    const PerceptionObstacles& perception_obstacles,
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    ObstaclesContainer* obstacles_container) {
-  for (const PerceptionObstacle& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
+void PredictorManager::PredictObstacles(const PerceptionObstacles&    perception_obstacles,
+                                        const ADCTrajectoryContainer* adc_trajectory_container,
+                                        ObstaclesContainer*           obstacles_container) {
+  for (const PerceptionObstacle& perception_obstacle : perception_obstacles.perception_obstacle()) {
     int id = perception_obstacle.id();
     if (id < 0) {
       ADEBUG << "The obstacle has invalid id [" << id << "].";
@@ -155,7 +144,7 @@ void PredictorManager::PredictObstacles(
     }
 
     PredictionObstacle prediction_obstacle;
-    Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    Obstacle*          obstacle = obstacles_container->GetObstacle(id);
 
     // if obstacle == nullptr, that means obstacle is unmovable
     // Checkout the logic of unmovable in obstacle.cc
@@ -167,128 +156,108 @@ void PredictorManager::PredictObstacles(
       prediction_obstacle.set_is_static(true);
     }
 
-    prediction_obstacle.set_predicted_period(
-        FLAGS_prediction_trajectory_time_length);
-    prediction_obstacle.mutable_perception_obstacle()->CopyFrom(
-        perception_obstacle);
+    prediction_obstacle.set_predicted_period(FLAGS_prediction_trajectory_time_length);
+    prediction_obstacle.mutable_perception_obstacle()->CopyFrom(perception_obstacle);
 
-    prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
-        prediction_obstacle);
+    prediction_obstacles_.add_prediction_obstacle()->CopyFrom(prediction_obstacle);
   }
 }
 
 void PredictorManager::PredictObstaclesInParallel(
-    const PerceptionObstacles& perception_obstacles,
+    const PerceptionObstacles&    perception_obstacles,
     const ADCTrajectoryContainer* adc_trajectory_container,
-    ObstaclesContainer* obstacles_container) {
-  std::unordered_map<int, std::shared_ptr<PredictionObstacle>>
-      id_prediction_obstacle_map;
-  for (const PerceptionObstacle& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
-    int id = perception_obstacle.id();
+    ObstaclesContainer*           obstacles_container) {
+  std::unordered_map<int, std::shared_ptr<PredictionObstacle>> id_prediction_obstacle_map;
+  for (const PerceptionObstacle& perception_obstacle : perception_obstacles.perception_obstacle()) {
+    int id                         = perception_obstacle.id();
     id_prediction_obstacle_map[id] = std::make_shared<PredictionObstacle>();
   }
   IdObstacleListMap id_obstacle_map;
-  for (const auto& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
-    int id = perception_obstacle.id();
+  for (const auto& perception_obstacle : perception_obstacles.perception_obstacle()) {
+    int       id       = perception_obstacle.id();
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
     if (obstacle == nullptr) {
-      std::shared_ptr<PredictionObstacle> prediction_obstacle_ptr =
-          id_prediction_obstacle_map[id];
+      std::shared_ptr<PredictionObstacle> prediction_obstacle_ptr = id_prediction_obstacle_map[id];
       prediction_obstacle_ptr->set_is_static(true);
       prediction_obstacle_ptr->set_timestamp(perception_obstacle.timestamp());
     } else {
       GroupObstaclesByObstacleId(id, obstacles_container, &id_obstacle_map);
     }
   }
-  PredictionThreadPool::ForEach(
-      id_obstacle_map.begin(), id_obstacle_map.end(),
-      [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
-        for (auto obstacle_ptr : obstacles_iter.second) {
-          int id = obstacle_ptr->id();
-          PredictObstacle(adc_trajectory_container, obstacle_ptr,
-                          obstacles_container,
-                          id_prediction_obstacle_map[id].get());
-        }
-      });
-  for (const PerceptionObstacle& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
-    int id = perception_obstacle.id();
+  PredictionThreadPool::ForEach(id_obstacle_map.begin(), id_obstacle_map.end(),
+                                [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
+                                  for (auto obstacle_ptr : obstacles_iter.second) {
+                                    int id = obstacle_ptr->id();
+                                    PredictObstacle(adc_trajectory_container, obstacle_ptr,
+                                                    obstacles_container,
+                                                    id_prediction_obstacle_map[id].get());
+                                  }
+                                });
+  for (const PerceptionObstacle& perception_obstacle : perception_obstacles.perception_obstacle()) {
+    int  id                      = perception_obstacle.id();
     auto prediction_obstacle_ptr = id_prediction_obstacle_map[id];
     if (prediction_obstacle_ptr == nullptr) {
       AERROR << "Prediction obstacle [" << id << "] not found.";
       continue;
     }
-    prediction_obstacle_ptr->set_predicted_period(
-        FLAGS_prediction_trajectory_time_length);
-    prediction_obstacle_ptr->mutable_perception_obstacle()->CopyFrom(
-        perception_obstacle);
-    prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
-        *prediction_obstacle_ptr);
+    prediction_obstacle_ptr->set_predicted_period(FLAGS_prediction_trajectory_time_length);
+    prediction_obstacle_ptr->mutable_perception_obstacle()->CopyFrom(perception_obstacle);
+    prediction_obstacles_.add_prediction_obstacle()->CopyFrom(*prediction_obstacle_ptr);
   }
 }
 
-void PredictorManager::PredictObstacle(
-    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container,
-    PredictionObstacle* const prediction_obstacle) {
+void PredictorManager::PredictObstacle(const ADCTrajectoryContainer* adc_trajectory_container,
+                                       Obstacle*                     obstacle,
+                                       ObstaclesContainer*           obstacles_container,
+                                       PredictionObstacle* const     prediction_obstacle) {
   CHECK_NOTNULL(obstacle);
   prediction_obstacle->set_timestamp(obstacle->timestamp());
 
   if (obstacle->ToIgnore()) {
     ADEBUG << "Ignore obstacle [" << obstacle->id() << "]";
     RunEmptyPredictor(adc_trajectory_container, obstacle, obstacles_container);
-    prediction_obstacle->mutable_priority()->set_priority(
-        ObstaclePriority::IGNORE);
+    prediction_obstacle->mutable_priority()->set_priority(ObstaclePriority::IGNORE);
   } else if (obstacle->IsStill()) {
     ADEBUG << "Still obstacle [" << obstacle->id() << "]";
     RunEmptyPredictor(adc_trajectory_container, obstacle, obstacles_container);
   } else {
     switch (obstacle->type()) {
       case PerceptionObstacle::VEHICLE: {
-        RunVehiclePredictor(adc_trajectory_container, obstacle,
-                            obstacles_container);
+        RunVehiclePredictor(adc_trajectory_container, obstacle, obstacles_container);
         break;
       }
       case PerceptionObstacle::PEDESTRIAN: {
-        RunPedestrianPredictor(adc_trajectory_container, obstacle,
-                               obstacles_container);
+        RunPedestrianPredictor(adc_trajectory_container, obstacle, obstacles_container);
         break;
       }
       case PerceptionObstacle::BICYCLE: {
-        RunCyclistPredictor(adc_trajectory_container, obstacle,
-                            obstacles_container);
+        RunCyclistPredictor(adc_trajectory_container, obstacle, obstacles_container);
         break;
       }
       default: {
-        RunDefaultPredictor(adc_trajectory_container, obstacle,
-                            obstacles_container);
+        RunDefaultPredictor(adc_trajectory_container, obstacle, obstacles_container);
         break;
       }
     }
   }
 
-  for (const auto& trajectory :
-       obstacle->latest_feature().predicted_trajectory()) {
+  for (const auto& trajectory : obstacle->latest_feature().predicted_trajectory()) {
     prediction_obstacle->add_trajectory()->CopyFrom(trajectory);
   }
   prediction_obstacle->set_timestamp(obstacle->timestamp());
-  prediction_obstacle->mutable_priority()->CopyFrom(
-      obstacle->latest_feature().priority());
+  prediction_obstacle->mutable_priority()->CopyFrom(obstacle->latest_feature().priority());
   prediction_obstacle->mutable_interactive_tag()->CopyFrom(
       obstacle->latest_feature().interactive_tag());
   prediction_obstacle->set_is_static(obstacle->IsStill());
-  if (FLAGS_prediction_offline_mode ==
-      PredictionConstants::kDumpPredictionResult) {
+  if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpPredictionResult) {
     const Scenario& scenario = obstacles_container->curr_scenario();
-    FeatureOutput::InsertPredictionResult(obstacle, *prediction_obstacle,
-                                          obstacle->obstacle_conf(), scenario);
+    FeatureOutput::InsertPredictionResult(obstacle, *prediction_obstacle, obstacle->obstacle_conf(),
+                                          scenario);
   }
 }
 
-std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
-    const ObstacleConf::PredictorType& type) {
+std::unique_ptr<Predictor>
+PredictorManager::CreatePredictor(const ObstacleConf::PredictorType& type) {
   std::unique_ptr<Predictor> predictor_ptr(nullptr);
   switch (type) {
     case ObstacleConf::LANE_SEQUENCE_PREDICTOR: {
@@ -323,13 +292,14 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
       predictor_ptr.reset(new EmptyPredictor());
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
   return predictor_ptr;
 }
 
-void PredictorManager::RegisterPredictor(
-    const ObstacleConf::PredictorType& type) {
+void PredictorManager::RegisterPredictor(const ObstacleConf::PredictorType& type) {
   predictors_[type] = CreatePredictor(type);
   AINFO << "Predictor [" << type << "] is registered.";
 }
@@ -363,7 +333,9 @@ void PredictorManager::InitVehiclePredictors(const ObstacleConf& conf) {
       }
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
 }
 
@@ -377,7 +349,9 @@ void PredictorManager::InitCyclistPredictors(const ObstacleConf& conf) {
       cyclist_off_lane_predictor_ = conf.predictor_type();
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
 }
 
@@ -391,22 +365,22 @@ void PredictorManager::InitDefaultPredictors(const ObstacleConf& conf) {
       default_off_lane_predictor_ = conf.predictor_type();
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
 }
 
-void PredictorManager::RunVehiclePredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container) {
+void PredictorManager::RunVehiclePredictor(const ADCTrajectoryContainer* adc_trajectory_container,
+                                           Obstacle*                     obstacle,
+                                           ObstaclesContainer*           obstacles_container) {
   Predictor* predictor = nullptr;
   if (obstacle->IsInteractiveObstacle()) {
     predictor = GetPredictor(vehicle_interactive_predictor_);
-    if (predictor->Predict(adc_trajectory_container, obstacle,
-                           obstacles_container)) {
+    if (predictor->Predict(adc_trajectory_container, obstacle, obstacles_container)) {
       return;
     } else {
-      AERROR << "Obstacle: " << obstacle->id()
-             << " interactive predictor failed!";
+      AERROR << "Obstacle: " << obstacle->id() << " interactive predictor failed!";
     }
   }
   if (obstacle->IsCaution()) {
@@ -418,8 +392,7 @@ void PredictorManager::RunVehiclePredictor(
       predictor = GetPredictor(vehicle_default_caution_predictor_);
     }
     CHECK_NOTNULL(predictor);
-    if (predictor->Predict(adc_trajectory_container, obstacle,
-                           obstacles_container)) {
+    if (predictor->Predict(adc_trajectory_container, obstacle, obstacles_container)) {
       return;
     } else {
       AERROR << "Obstacle: " << obstacle->id()
@@ -429,8 +402,7 @@ void PredictorManager::RunVehiclePredictor(
 
   if (!obstacle->IsOnLane()) {
     predictor = GetPredictor(vehicle_off_lane_predictor_);
-  } else if (obstacle->HasJunctionFeatureWithExits() &&
-             !obstacle->IsCloseToJunctionExit()) {
+  } else if (obstacle->HasJunctionFeatureWithExits() && !obstacle->IsCloseToJunctionExit()) {
     predictor = GetPredictor(vehicle_in_junction_predictor_);
   } else {
     predictor = GetPredictor(vehicle_on_lane_predictor_);
@@ -448,10 +420,11 @@ void PredictorManager::RunVehiclePredictor(
 }
 
 void PredictorManager::RunPedestrianPredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container) {
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    Obstacle*                     obstacle,
+    ObstaclesContainer*           obstacles_container) {
   Predictor* predictor = nullptr;
-  predictor = GetPredictor(pedestrian_predictor_);
+  predictor            = GetPredictor(pedestrian_predictor_);
   if (predictor == nullptr) {
     AERROR << "Nullptr found for obstacle [" << obstacle->id() << "]";
     return;
@@ -459,9 +432,9 @@ void PredictorManager::RunPedestrianPredictor(
   predictor->Predict(adc_trajectory_container, obstacle, obstacles_container);
 }
 
-void PredictorManager::RunCyclistPredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container) {
+void PredictorManager::RunCyclistPredictor(const ADCTrajectoryContainer* adc_trajectory_container,
+                                           Obstacle*                     obstacle,
+                                           ObstaclesContainer*           obstacles_container) {
   Predictor* predictor = nullptr;
   if (obstacle->IsOnLane()) {
     predictor = GetPredictor(cyclist_on_lane_predictor_);
@@ -475,9 +448,9 @@ void PredictorManager::RunCyclistPredictor(
   predictor->Predict(adc_trajectory_container, obstacle, obstacles_container);
 }
 
-void PredictorManager::RunDefaultPredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container) {
+void PredictorManager::RunDefaultPredictor(const ADCTrajectoryContainer* adc_trajectory_container,
+                                           Obstacle*                     obstacle,
+                                           ObstaclesContainer*           obstacles_container) {
   Predictor* predictor = nullptr;
   if (obstacle->IsOnLane()) {
     predictor = GetPredictor(default_on_lane_predictor_);
@@ -491,9 +464,9 @@ void PredictorManager::RunDefaultPredictor(
   predictor->Predict(adc_trajectory_container, obstacle, obstacles_container);
 }
 
-void PredictorManager::RunEmptyPredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container) {
+void PredictorManager::RunEmptyPredictor(const ADCTrajectoryContainer* adc_trajectory_container,
+                                         Obstacle*                     obstacle,
+                                         ObstaclesContainer*           obstacles_container) {
   Predictor* predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
   if (predictor == nullptr) {
     AERROR << "Nullptr found for obstacle [" << obstacle->id() << "]";

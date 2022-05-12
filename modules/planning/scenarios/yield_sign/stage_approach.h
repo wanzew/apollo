@@ -35,14 +35,14 @@ struct YieldSignContext;
 
 class YieldSignStageApproach : public Stage {
  public:
-  YieldSignStageApproach(const ScenarioConfig::StageConfig& config,
+  YieldSignStageApproach(const ScenarioConfig::StageConfig&         config,
                          const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-  YieldSignContext* GetContext() { return GetContextAs<YieldSignContext>(); }
+                             Frame*                         frame) override;
+  YieldSignContext*  GetContext() { return GetContextAs<YieldSignContext>(); }
 
  private:
   Stage::StageStatus FinishStage();

@@ -39,9 +39,10 @@ namespace common {
  * @param denominators Denominator coefficients for digital filter.
  * @param numerators Numerator coefficients for digital filter.
  */
-void LpfCoefficients(const double ts, const double cutoff_freq,
-                     std::vector<double> *denominators,
-                     std::vector<double> *numerators);
+void LpfCoefficients(const double         ts,
+                     const double         cutoff_freq,
+                     std::vector<double>* denominators,
+                     std::vector<double>* numerators);
 
 /**
  * @brief Get first order low-pass coefficients for ZOH digital filter.
@@ -52,10 +53,11 @@ void LpfCoefficients(const double ts, const double cutoff_freq,
  * @param denominators Denominator coefficients for digital filter.
  * @param numerators Numerator coefficients for digital filter.
  */
-void LpFirstOrderCoefficients(const double ts, const double settling_time,
-                              const double dead_time,
-                              std::vector<double> *denominators,
-                              std::vector<double> *numerators);
+void LpFirstOrderCoefficients(const double         ts,
+                              const double         settling_time,
+                              const double         dead_time,
+                              std::vector<double>* denominators,
+                              std::vector<double>* numerators);
 
 }  // namespace common
 }  // namespace apollo

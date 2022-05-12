@@ -22,35 +22,34 @@
 
 #include <memory>
 
+#include "modules/drivers/proto/conti_radar.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
 
 namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-class ContiRadarMessageManager
-    : public apollo::drivers::canbus::MessageManager<ContiRadar> {
+class ContiRadarMessageManager : public apollo::drivers::canbus::MessageManager<ContiRadar> {
  public:
   explicit ContiRadarMessageManager(
-      const std::shared_ptr<apollo::cyber::Writer<ContiRadar>> &writer);
+      const std::shared_ptr<apollo::cyber::Writer<ContiRadar>>& writer);
   virtual ~ContiRadarMessageManager() {}
   void set_radar_conf(RadarConf radar_conf);
-  apollo::drivers::canbus::ProtocolData<ContiRadar> *GetMutableProtocolDataById(
-      const uint32_t message_id);
-  void Parse(const uint32_t message_id, const uint8_t *data, int32_t length);
-  void set_can_client(
-      std::shared_ptr<apollo::drivers::canbus::CanClient> can_client);
+  apollo::drivers::canbus::ProtocolData<ContiRadar>*
+       GetMutableProtocolDataById(const uint32_t message_id);
+  void Parse(const uint32_t message_id, const uint8_t* data, int32_t length);
+  void set_can_client(std::shared_ptr<apollo::drivers::canbus::CanClient> can_client);
 
  private:
-  bool is_configured_ = false;
-  RadarConfig200 radar_config_;
+  bool                                                is_configured_ = false;
+  RadarConfig200                                      radar_config_;
   std::shared_ptr<apollo::drivers::canbus::CanClient> can_client_;
-  std::shared_ptr<apollo::cyber::Writer<ContiRadar>> conti_radar_writer_;
+  std::shared_ptr<apollo::cyber::Writer<ContiRadar>>  conti_radar_writer_;
 };
 
 }  // namespace conti_radar

@@ -18,22 +18,23 @@
 #include <string>
 #include <vector>
 
-#include "cyber/cyber.h"
 #include "grpc++/grpc++.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace hdmap {
 #ifndef SYSTEM_OUTPUT_STREAM
-#define SYSTEM_OUTPUT_STREAM stderr
-#define SYS_STREAM SYSTEM_OUTPUT_STREAM
+#  define SYSTEM_OUTPUT_STREAM stderr
+#  define SYS_STREAM SYSTEM_OUTPUT_STREAM
 #endif
 
 #ifndef CLIENT_OUTPUT_STREAM
-#define CLIENT_OUTPUT_STREAM stdout
-#define USER_STREAM CLIENT_OUTPUT_STREAM
+#  define CLIENT_OUTPUT_STREAM stdout
+#  define USER_STREAM CLIENT_OUTPUT_STREAM
 #endif
 
 std::vector<std::string> GetFileLines(const std::string& path);
-inline double UnixNow() { return apollo::cyber::Time::Now().ToSecond(); }
+inline double            UnixNow() { return apollo::cyber::Time::Now().ToSecond(); }
 }  // namespace hdmap
 }  // namespace apollo

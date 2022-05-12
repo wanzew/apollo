@@ -16,11 +16,12 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/map/proto/map.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map.pb.h"
 
 DEFINE_double(x_offset, 587318.4866268333, "x offset");
 DEFINE_double(y_offset, 4141146.110116891, "y offset");
@@ -36,15 +37,13 @@ static void ShiftMap(Map* map_pb) {
         point.set_y(point.y() + FLAGS_y_offset);
       }
     }
-    for (auto& segment :
-         *(lane.mutable_left_boundary()->mutable_curve()->mutable_segment())) {
+    for (auto& segment : *(lane.mutable_left_boundary()->mutable_curve()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
         point.set_y(point.y() + FLAGS_y_offset);
       }
     }
-    for (auto& segment :
-         *(lane.mutable_right_boundary()->mutable_curve()->mutable_segment())) {
+    for (auto& segment : *(lane.mutable_right_boundary()->mutable_curve()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
         point.set_y(point.y() + FLAGS_y_offset);
@@ -73,14 +72,13 @@ static void OutputMap(const Map& map_pb) {
 int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
-  FLAGS_v = 3;
+  FLAGS_v               = 3;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  Map map_pb;
+  Map        map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
-  ACHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map_pb))
-      << "Fail to open:" << map_file;
+  ACHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map_pb)) << "Fail to open:" << map_file;
   ShiftMap(&map_pb);
   OutputMap(map_pb);
   AINFO << "modified map at:" << FLAGS_output_dir;

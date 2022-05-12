@@ -26,37 +26,27 @@ namespace perception {
 namespace common {
 
 namespace {
-int EasyCandidate(const base::PointF& p, void* vg,
-                  std::vector<int>* nn_indices) {
+int EasyCandidate(const base::PointF& p, void* vg, std::vector<int>* nn_indices) {
   nn_indices->push_back(1);
   return static_cast<int>(nn_indices->size());
 }
 
-int EasyCandidateAll(const base::PointF& p, void* vg,
-                     std::vector<int>* nn_indices) {
+int EasyCandidateAll(const base::PointF& p, void* vg, std::vector<int>* nn_indices) {
   for (int i = 0; i < 300; ++i) {
     nn_indices->push_back(i);
   }
   return static_cast<int>(nn_indices->size());
 }
 
-int EasyCandidateError(const base::PointF& p, void* vg,
-                       std::vector<int>* nn_indices) {
-  return -1;
-}
+int EasyCandidateError(const base::PointF& p, void* vg, std::vector<int>* nn_indices) { return -1; }
 
 bool EasyCondition(const base::PointF& p1, const base::PointF& p2, void* vg) {
   float dist = 5.0f;
-  if (CalculateEuclidenDist(p1, p2) <= dist) {
-    return true;
-  }
+  if (CalculateEuclidenDist(p1, p2) <= dist) { return true; }
   return false;
 }
 
-bool EasyConditionFalse(const base::PointF& p1, const base::PointF& p2,
-                        void* vg) {
-  return false;
-}
+bool EasyConditionFalse(const base::PointF& p1, const base::PointF& p2, void* vg) { return false; }
 }  // namespace
 
 using IndicesClusters = std::vector<base::PointIndices>;
@@ -64,27 +54,25 @@ using base::PointCloud;
 using base::PointF;
 
 TEST(ConditionalClusteringTest, conditional_clustering_test) {
-  ConditionClustering<base::PointF> condition_clustering =
-      ConditionClustering<base::PointF>(false);
+  ConditionClustering<base::PointF> condition_clustering = ConditionClustering<base::PointF>(false);
   std::shared_ptr<PointCloud<PointF>> polygon_in_ptr =
-      std::shared_ptr<PointCloud<PointF>>(
-          new PointCloud<PointF>(16, 16, base::PointF()));
+      std::shared_ptr<PointCloud<PointF>>(new PointCloud<PointF>(16, 16, base::PointF()));
   PointCloud<PointF> polygon_out;
-  base::PointF tmp_pt;
-  size_t i, j;
+  base::PointF       tmp_pt;
+  size_t             i, j;
   for (i = 0; i < 8; ++i) {
     for (j = 0; j < 8; ++j) {
-      tmp_pt.x = 0.5f * static_cast<float>(i);
-      tmp_pt.y = 0.5f * static_cast<float>(j);
-      tmp_pt.z = 0;
+      tmp_pt.x                    = 0.5f * static_cast<float>(i);
+      tmp_pt.y                    = 0.5f * static_cast<float>(j);
+      tmp_pt.z                    = 0;
       *(polygon_in_ptr->at(i, j)) = tmp_pt;
     }
   }
   for (i = 0; i < 16; ++i) {
     for (j = 0; j < 16; ++j) {
-      tmp_pt.x = 0.5f * static_cast<float>(i) + 100;
-      tmp_pt.y = 0.5f * static_cast<float>(j) + 100;
-      tmp_pt.z = 0;
+      tmp_pt.x                    = 0.5f * static_cast<float>(i) + 100;
+      tmp_pt.y                    = 0.5f * static_cast<float>(j) + 100;
+      tmp_pt.z                    = 0;
       *(polygon_in_ptr->at(i, j)) = tmp_pt;
     }
   }
@@ -125,27 +113,25 @@ TEST(ConditionalClusteringTest, conditional_clustering_test) {
 }
 
 TEST(ConditionalClusteringTest, conditional_clustering_test1) {
-  ConditionClustering<base::PointF> condition_clustering =
-      ConditionClustering<base::PointF>(true);
+  ConditionClustering<base::PointF> condition_clustering = ConditionClustering<base::PointF>(true);
   std::shared_ptr<PointCloud<PointF>> polygon_in_ptr =
-      std::shared_ptr<PointCloud<PointF>>(
-          new PointCloud<PointF>(16, 16, base::PointF()));
+      std::shared_ptr<PointCloud<PointF>>(new PointCloud<PointF>(16, 16, base::PointF()));
   PointCloud<PointF> polygon_out;
-  base::PointF tmp_pt;
-  size_t i, j;
+  base::PointF       tmp_pt;
+  size_t             i, j;
   for (i = 0; i < 8; ++i) {
     for (j = 0; j < 8; ++j) {
-      tmp_pt.x = 0.5f * static_cast<float>(i);
-      tmp_pt.y = 0.5f * static_cast<float>(j);
-      tmp_pt.z = 0;
+      tmp_pt.x                    = 0.5f * static_cast<float>(i);
+      tmp_pt.y                    = 0.5f * static_cast<float>(j);
+      tmp_pt.z                    = 0;
       *(polygon_in_ptr->at(i, j)) = tmp_pt;
     }
   }
   for (i = 0; i < 16; ++i) {
     for (j = 0; j < 16; ++j) {
-      tmp_pt.x = 0.5f * static_cast<float>(i) + 100;
-      tmp_pt.y = 0.5f * static_cast<float>(j) + 100;
-      tmp_pt.z = 0;
+      tmp_pt.x                    = 0.5f * static_cast<float>(i) + 100;
+      tmp_pt.y                    = 0.5f * static_cast<float>(j) + 100;
+      tmp_pt.z                    = 0;
       *(polygon_in_ptr->at(i, j)) = tmp_pt;
     }
   }

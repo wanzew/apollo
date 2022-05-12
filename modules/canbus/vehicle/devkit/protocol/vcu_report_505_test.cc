@@ -27,10 +27,10 @@ class Vcureport505Test : public ::testing::Test {
 };
 
 TEST_F(Vcureport505Test, General) {
-  uint8_t data[8] = {0x07, 0x01, 0x01, 0x02, 0x8A, 0x03, 0x04, 0x05};
-  int32_t length = 8;
+  uint8_t       data[8] = {0x07, 0x01, 0x01, 0x02, 0x8A, 0x03, 0x04, 0x05};
+  int32_t       length  = 8;
   ChassisDetail cd;
-  Vcureport505 vcureport;
+  Vcureport505  vcureport;
   vcureport.Parse(data, length, &cd);
 
   EXPECT_EQ(data[0], 0b00000111);

@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/camera/app/proto/perception.pb.h"
+
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
@@ -33,18 +34,19 @@ namespace camera {
 class TrafficLightCameraPerception : public BaseCameraPerception {
  public:
   TrafficLightCameraPerception()
-      : detector_(nullptr), recognizer_(nullptr), tracker_(nullptr) {}
+      : detector_(nullptr)
+      , recognizer_(nullptr)
+      , tracker_(nullptr) {}
   ~TrafficLightCameraPerception() = default;
-  bool Init(const CameraPerceptionInitOptions &options) override;
-  bool Perception(const CameraPerceptionOptions &options,
-                  CameraFrame *frame) override;
+  bool        Init(const CameraPerceptionInitOptions& options) override;
+  bool        Perception(const CameraPerceptionOptions& options, CameraFrame* frame) override;
   std::string Name() const override { return "TrafficLightCameraPerception"; }
 
  private:
   std::shared_ptr<BaseTrafficLightDetector> detector_;
   std::shared_ptr<BaseTrafficLightDetector> recognizer_;
-  std::shared_ptr<BaseTrafficLightTracker> tracker_;
-  app::TrafficLightParam tl_param_;
+  std::shared_ptr<BaseTrafficLightTracker>  tracker_;
+  app::TrafficLightParam                    tl_param_;
 };
 
 }  // namespace camera

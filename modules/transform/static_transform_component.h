@@ -20,16 +20,17 @@
 #include <string>
 #include <vector>
 
-#include "cyber/component/component.h"
 #include "modules/transform/proto/static_transform_conf.pb.h"
 #include "modules/transform/proto/transform.pb.h"
+
+#include "cyber/component/component.h"
 
 namespace apollo {
 namespace transform {
 
 class StaticTransformComponent final : public apollo::cyber::Component<> {
  public:
-  StaticTransformComponent() = default;
+  StaticTransformComponent()  = default;
   ~StaticTransformComponent() = default;
 
  public:
@@ -40,9 +41,9 @@ class StaticTransformComponent final : public apollo::cyber::Component<> {
   void SendTransform(const std::vector<TransformStamped>& msgtf);
   bool ParseFromYaml(const std::string& file_path, TransformStamped* transform);
 
-  apollo::static_transform::Conf conf_;
+  apollo::static_transform::Conf                    conf_;
   std::shared_ptr<cyber::Writer<TransformStampeds>> writer_;
-  TransformStampeds transform_stampeds_;
+  TransformStampeds                                 transform_stampeds_;
 };
 
 CYBER_REGISTER_COMPONENT(StaticTransformComponent)

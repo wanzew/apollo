@@ -32,10 +32,9 @@ DEFINE_string(lateral_controller_conf_file,
               "/apollo/modules/control/conf/lateral_controller_conf.pb.txt",
               "lateral controller conf data file");
 
-DEFINE_string(
-    longitudinal_controller_conf_file,
-    "/apollo/modules/control/conf/longitudinal_controller_conf.pb.txt",
-    "longitudinal controller conf data file");
+DEFINE_string(longitudinal_controller_conf_file,
+              "/apollo/modules/control/conf/longitudinal_controller_conf.pb.txt",
+              "longitudinal controller conf data file");
 
 DEFINE_string(calibration_table_file,
               "/apollo/modules/control/conf/calibration_table.pb.txt",
@@ -46,73 +45,71 @@ DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
 
 DEFINE_string(control_node_name, "control", "The control node name in proto");
 
-DEFINE_string(mpc_controller_submodule_name, "MPCControllerSubmodule",
+DEFINE_string(mpc_controller_submodule_name,
+              "MPCControllerSubmodule",
               "MPC controller node name in proto");
 
-DEFINE_string(lat_lon_controller_submodule_name, "LatLonControllerSubmodule",
+DEFINE_string(lat_lon_controller_submodule_name,
+              "LatLonControllerSubmodule",
               "lateral+longitudinal controller node name in proto");
 
-DEFINE_string(preprocessor_submodule_name, "PreprocessorSubmodule",
+DEFINE_string(preprocessor_submodule_name,
+              "PreprocessorSubmodule",
               "preprocessor submodule name in proto");
 
-DEFINE_string(postprocessor_submodule_name, "PostprocessorSubmodule",
+DEFINE_string(postprocessor_submodule_name,
+              "PostprocessorSubmodule",
               "postprocessor submodule name in proto");
 
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
-DEFINE_bool(use_preview_speed_for_table, false,
-            "True to use preview speed for table lookup");
+DEFINE_bool(use_preview_speed_for_table, false, "True to use preview speed for table lookup");
 
-DEFINE_double(steer_angle_rate, 100.0,
-              "Steer angle change rate in percentage.");
-DEFINE_bool(enable_gain_scheduler, false,
-            "Enable gain scheduler for higher vehicle speed");
+DEFINE_double(steer_angle_rate, 100.0, "Steer angle change rate in percentage.");
+DEFINE_bool(enable_gain_scheduler, false, "Enable gain scheduler for higher vehicle speed");
 DEFINE_bool(set_steer_limit, false, "Set steer limit");
 
 DEFINE_bool(enable_slope_offset, false, "Enable slope offset compensation");
 
-DEFINE_double(lock_steer_speed, 0.081,
-              "Minimum speed to lock the steer, in m/s");
+DEFINE_double(lock_steer_speed, 0.081, "Minimum speed to lock the steer, in m/s");
 
-DEFINE_bool(enable_navigation_mode_error_filter, false,
-            "Enable error_filter for navigation mode");
+DEFINE_bool(enable_navigation_mode_error_filter, false, "Enable error_filter for navigation mode");
 
-DEFINE_bool(enable_navigation_mode_position_update, true,
+DEFINE_bool(enable_navigation_mode_position_update,
+            true,
             "Enable position update for navigation mode");
 
 DEFINE_int32(chassis_pending_queue_size, 10, "Max chassis pending queue size");
-DEFINE_int32(planning_pending_queue_size, 10,
-             "Max planning pending queue size");
-DEFINE_int32(localization_pending_queue_size, 10,
-             "Max localization pending queue size");
-DEFINE_int32(pad_msg_pending_queue_size, 10,
-             "Max pad message pending queue size");
+DEFINE_int32(planning_pending_queue_size, 10, "Max planning pending queue size");
+DEFINE_int32(localization_pending_queue_size, 10, "Max localization pending queue size");
+DEFINE_int32(pad_msg_pending_queue_size, 10, "Max pad message pending queue size");
 
 DEFINE_bool(reverse_heading_control, false, "test vehicle reverse control");
 
-DEFINE_bool(
-    trajectory_transform_to_com_reverse, false,
-    "Enable planning trajectory coordinate transformation from center of "
-    "rear-axis to center of mass, during reverse driving");
-DEFINE_bool(
-    trajectory_transform_to_com_drive, false,
-    "Enable planning trajectory coordinate transformation from center of "
-    "rear-axis to center of mass, during forward driving");
+DEFINE_bool(trajectory_transform_to_com_reverse,
+            false,
+            "Enable planning trajectory coordinate transformation from center of "
+            "rear-axis to center of mass, during reverse driving");
+DEFINE_bool(trajectory_transform_to_com_drive,
+            false,
+            "Enable planning trajectory coordinate transformation from center of "
+            "rear-axis to center of mass, during forward driving");
 
-DEFINE_bool(enable_maximum_steer_rate_limit, false,
+DEFINE_bool(enable_maximum_steer_rate_limit,
+            false,
             "Enable steer rate limit obtained from vehicle_param.pb.txt");
 
-DEFINE_bool(query_time_nearest_point_only, false,
+DEFINE_bool(query_time_nearest_point_only,
+            false,
             "only use the trajectory point at nearest time as target point");
 
-DEFINE_bool(query_forward_time_point_only, false,
-            "only use the trajectory point in future");
+DEFINE_bool(query_forward_time_point_only, false, "only use the trajectory point in future");
 
-DEFINE_bool(enable_feedback_augment_on_high_speed, false,
+DEFINE_bool(enable_feedback_augment_on_high_speed,
+            false,
             "Enable augmented control on lateral error on high speed");
 
-DEFINE_bool(
-    enable_gear_drive_negative_speed_protection, false,
-    "Enable estop to prevent following negative speed during gear drive");
+DEFINE_bool(enable_gear_drive_negative_speed_protection,
+            false,
+            "Enable estop to prevent following negative speed during gear drive");
 
-DEFINE_bool(use_control_submodules, false,
-            "use control submodules instead of controller agent");
+DEFINE_bool(use_control_submodules, false, "use control submodules instead of controller agent");

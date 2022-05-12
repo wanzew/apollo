@@ -27,10 +27,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "modules/prediction/proto/prediction_conf.pb.h"
+
 #include "cyber/common/macros.h"
 #include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/evaluator/evaluator.h"
-#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/pipeline/vector_net.h"
 
 /**
@@ -68,19 +69,17 @@ class EvaluatorManager {
    * @brief Run evaluators
    */
   void Run(const ADCTrajectoryContainer* adc_trajectory_container,
-           ObstaclesContainer* obstacles_container);
+           ObstaclesContainer*           obstacles_container);
 
   void EvaluateObstacle(const ADCTrajectoryContainer* adc_trajectory_container,
-                        Obstacle* obstacle,
-                        ObstaclesContainer* obstacles_container,
-                        std::vector<Obstacle*> dynamic_env);
+                        Obstacle*                     obstacle,
+                        ObstaclesContainer*           obstacles_container,
+                        std::vector<Obstacle*>        dynamic_env);
 
-  void EvaluateObstacle(Obstacle* obstacle,
-                        ObstaclesContainer* obstacles_container);
+  void EvaluateObstacle(Obstacle* obstacle, ObstaclesContainer* obstacles_container);
 
  private:
-  void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container,
-                                 size_t max_num_frame);
+  void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container, size_t max_num_frame);
 
   void DumpCurrentFrameEnv(ObstaclesContainer* obstacles_container);
 
@@ -95,8 +94,7 @@ class EvaluatorManager {
    * @param Evaluator type
    * @return A unique pointer to the evaluator
    */
-  std::unique_ptr<Evaluator> CreateEvaluator(
-      const ObstacleConf::EvaluatorType& type);
+  std::unique_ptr<Evaluator> CreateEvaluator(const ObstacleConf::EvaluatorType& type);
 
   /**
    * @brief Register all evaluators
@@ -106,14 +104,12 @@ class EvaluatorManager {
  private:
   std::map<ObstacleConf::EvaluatorType, std::unique_ptr<Evaluator>> evaluators_;
 
-  ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ =
-      ObstacleConf::CRUISE_MLP_EVALUATOR;
+  ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ = ObstacleConf::CRUISE_MLP_EVALUATOR;
 
   ObstacleConf::EvaluatorType vehicle_on_lane_caution_evaluator_ =
       ObstacleConf::CRUISE_MLP_EVALUATOR;
 
-  ObstacleConf::EvaluatorType vehicle_in_junction_evaluator_ =
-      ObstacleConf::JUNCTION_MLP_EVALUATOR;
+  ObstacleConf::EvaluatorType vehicle_in_junction_evaluator_ = ObstacleConf::JUNCTION_MLP_EVALUATOR;
 
   ObstacleConf::EvaluatorType vehicle_in_junction_caution_evaluator_ =
       ObstacleConf::JUNCTION_MAP_EVALUATOR;
@@ -124,14 +120,11 @@ class EvaluatorManager {
   ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ =
       ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;
 
-  ObstacleConf::EvaluatorType pedestrian_evaluator_ =
-      ObstacleConf::SEMANTIC_LSTM_EVALUATOR;
+  ObstacleConf::EvaluatorType pedestrian_evaluator_ = ObstacleConf::SEMANTIC_LSTM_EVALUATOR;
 
-  ObstacleConf::EvaluatorType vectornet_evaluator_ =
-      ObstacleConf::VECTORNET_EVALUATOR;
+  ObstacleConf::EvaluatorType vectornet_evaluator_ = ObstacleConf::VECTORNET_EVALUATOR;
 
-  ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
-      ObstacleConf::MLP_EVALUATOR;
+  ObstacleConf::EvaluatorType default_on_lane_evaluator_ = ObstacleConf::MLP_EVALUATOR;
 
   ObstacleConf::EvaluatorType interaction_evaluator_ =
       ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR;

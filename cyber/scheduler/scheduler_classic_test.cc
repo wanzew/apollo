@@ -34,7 +34,7 @@ void func() {}
 
 TEST(SchedulerClassicTest, classic) {
   auto processor = std::make_shared<Processor>();
-  auto ctx = std::make_shared<ClassicContext>();
+  auto ctx       = std::make_shared<ClassicContext>();
   processor->BindContext(ctx);
   std::vector<std::future<void>> res;
 
@@ -63,9 +63,9 @@ TEST(SchedulerClassicTest, classic) {
 TEST(SchedulerClassicTest, sched_classic) {
   // read example_sched_classic.conf
   GlobalData::Instance()->SetProcessGroup("example_sched_classic");
-  auto sched1 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
-  std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
-  auto task_id = GlobalData::RegisterTaskName("ABC");
+  auto                      sched1  = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
+  std::shared_ptr<CRoutine> cr      = std::make_shared<CRoutine>(func);
+  auto                      task_id = GlobalData::RegisterTaskName("ABC");
   cr->set_id(task_id);
   cr->set_name("ABC");
   EXPECT_TRUE(sched1->DispatchTask(cr));
@@ -80,23 +80,21 @@ TEST(SchedulerClassicTest, sched_classic) {
 
   auto t = std::thread(func);
   sched1->SetInnerThreadAttr("shm", &t);
-  if (t.joinable()) {
-    t.join();
-  }
+  if (t.joinable()) { t.join(); }
 
   sched1->Shutdown();
 
   GlobalData::Instance()->SetProcessGroup("not_exist_sched");
-  auto sched2 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
-  std::shared_ptr<CRoutine> cr2 = std::make_shared<CRoutine>(func);
+  auto                      sched2 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
+  std::shared_ptr<CRoutine> cr2    = std::make_shared<CRoutine>(func);
   cr2->set_id(GlobalData::RegisterTaskName("sched2"));
   cr2->set_name("sched2");
   EXPECT_TRUE(sched2->DispatchTask(cr2));
   sched2->Shutdown();
 
   GlobalData::Instance()->SetProcessGroup("dreamview_sched");
-  auto sched3 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
-  std::shared_ptr<CRoutine> cr3 = std::make_shared<CRoutine>(func);
+  auto                      sched3 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
+  std::shared_ptr<CRoutine> cr3    = std::make_shared<CRoutine>(func);
   cr3->set_id(GlobalData::RegisterTaskName("sched3"));
   cr3->set_name("sched3");
   EXPECT_TRUE(sched3->DispatchTask(cr3));

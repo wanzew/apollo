@@ -19,13 +19,15 @@
  **/
 #include "modules/planning/tasks/optimizers/path_time_heuristic/gridded_path_time_graph.h"
 
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
+
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -41,17 +43,15 @@ class DpStGraphTest : public ::testing::Test {
     ScenarioConfig config;
     ACHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
 
-    PlanningConfig planning_config;
-    const std::string planning_config_file =
-        "/apollo/modules/planning/conf/planning_config.pb.txt";
+    PlanningConfig    planning_config;
+    const std::string planning_config_file = "/apollo/modules/planning/conf/planning_config.pb.txt";
     ACHECK(GetProtoFromFile(planning_config_file, &planning_config))
         << "failed to load planning config file " << planning_config_file;
 
     DpStSpeedOptimizerConfig default_dp_config;
     for (const auto& cfg : planning_config.default_task_config()) {
       if (cfg.task_type() == TaskConfig::SPEED_HEURISTIC_OPTIMIZER) {
-        default_dp_config =
-            cfg.speed_heuristic_optimizer_config().default_speed_config();
+        default_dp_config = cfg.speed_heuristic_optimizer_config().default_speed_config();
         break;
       }
     }
@@ -60,8 +60,7 @@ class DpStGraphTest : public ::testing::Test {
     for (const auto& stage : config.stage_config()) {
       for (const auto& cfg : stage.task_config()) {
         if (cfg.task_type() == TaskConfig::SPEED_HEURISTIC_OPTIMIZER) {
-          dp_config_.MergeFrom(
-              cfg.speed_heuristic_optimizer_config().default_speed_config());
+          dp_config_.MergeFrom(cfg.speed_heuristic_optimizer_config().default_speed_config());
           break;
         }
       }
@@ -81,7 +80,7 @@ class DpStGraphTest : public ::testing::Test {
   std::list<Obstacle> obstacle_list_;
 
   StGraphData st_graph_data_;
-  SpeedLimit speed_limit_;
+  SpeedLimit  speed_limit_;
 
   DpStSpeedOptimizerConfig dp_config_;
 
@@ -96,8 +95,8 @@ TEST_F(DpStGraphTest, simple) {
   std::vector<const Obstacle*> obstacles_;
   obstacles_.emplace_back(&(obstacle_list_.back()));
 
-  std::vector<STPoint> upper_points;
-  std::vector<STPoint> lower_points;
+  std::vector<STPoint>                     upper_points;
+  std::vector<STPoint>                     lower_points;
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
 
   lower_points.emplace_back(30.0, 4.0);
@@ -123,14 +122,13 @@ TEST_F(DpStGraphTest, simple) {
   planning_internal::STGraphDebug st_graph_debug;
 
   st_graph_data_ = StGraphData();
-  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_, 5.0,
-                          120.0, 7.0, &st_graph_debug);
+  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_, 5.0, 120.0, 7.0,
+                          &st_graph_debug);
 
-  GriddedPathTimeGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_,
-                                   init_point_);
+  GriddedPathTimeGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_, init_point_);
 
   SpeedData speed_data;
-  auto ret = dp_st_graph.Search(&speed_data);
+  auto      ret = dp_st_graph.Search(&speed_data);
   EXPECT_TRUE(ret.ok());
 }
 

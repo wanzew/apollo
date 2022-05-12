@@ -46,11 +46,11 @@ void Ads1111::UpdateData(uint8_t* data) {
 
 void Ads1111::Reset() {
   // TODO(ChaoMa) :you should check this manually
-  ads_dectostop_ = Ads1_111::ADS_DECTOSTOP_NO_DEMAND;
-  ads_mode_ = Ads1_111::ADS_MODE_OFF_MODE;
-  ads_taracce_ = 0.0;
-  ads_driveoff_req_ = Ads1_111::ADS_DRIVEOFF_REQ_NO_DEMAND;
-  ads_aeb_taracce_ = 0.0;
+  ads_dectostop_        = Ads1_111::ADS_DECTOSTOP_NO_DEMAND;
+  ads_mode_             = Ads1_111::ADS_MODE_OFF_MODE;
+  ads_taracce_          = 0.0;
+  ads_driveoff_req_     = Ads1_111::ADS_DRIVEOFF_REQ_NO_DEMAND;
+  ads_aeb_taracce_      = 0.0;
   ads_aeb_tgtdecel_req_ = Ads1_111::ADS_AEB_TGTDECEL_REQ_NO_DEMAND;
 }
 
@@ -64,8 +64,7 @@ Ads1111* Ads1111::set_ads_dectostop(Ads1_111::Ads_dectostopType ads_dectostop) {
 // 'ADS_DECTOSTOP_DEMAND'}, 'precision': 1.0, 'len': 1, 'name': 'ADS_DecToStop',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 17,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Ads1111::set_p_ads_dectostop(uint8_t* data,
-                                  Ads1_111::Ads_dectostopType ads_dectostop) {
+void Ads1111::set_p_ads_dectostop(uint8_t* data, Ads1_111::Ads_dectostopType ads_dectostop) {
   int x = ads_dectostop;
 
   Byte to_set(data + 2);
@@ -101,14 +100,13 @@ Ads1111* Ads1111::set_ads_taracce(double ads_taracce) {
 // 'double', 'order': 'motorola', 'physical_unit': 'm/s2'}
 void Ads1111::set_p_ads_taracce(uint8_t* data, double ads_taracce) {
   ads_taracce = ProtocolData::BoundedValue(-7.0, 5.75, ads_taracce);
-  int x = static_cast<int>((ads_taracce - -7.000000) / 0.050000);
+  int x       = static_cast<int>((ads_taracce - -7.000000) / 0.050000);
 
   Byte to_set(data + 1);
   to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
-Ads1111* Ads1111::set_ads_driveoff_req(
-    Ads1_111::Ads_driveoff_reqType ads_driveoff_req) {
+Ads1111* Ads1111::set_ads_driveoff_req(Ads1_111::Ads_driveoff_reqType ads_driveoff_req) {
   ads_driveoff_req_ = ads_driveoff_req;
   return this;
 }
@@ -118,8 +116,8 @@ Ads1111* Ads1111::set_ads_driveoff_req(
 // 'len': 1, 'name': 'ADS_Driveoff_Req', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads1111::set_p_ads_driveoff_req(
-    uint8_t* data, Ads1_111::Ads_driveoff_reqType ads_driveoff_req) {
+void Ads1111::set_p_ads_driveoff_req(uint8_t*                       data,
+                                     Ads1_111::Ads_driveoff_reqType ads_driveoff_req) {
   int x = ads_driveoff_req;
 
   Byte to_set(data + 0);
@@ -137,8 +135,8 @@ Ads1111* Ads1111::set_ads_aeb_taracce(double ads_aeb_taracce) {
 // 'double', 'order': 'motorola', 'physical_unit': 'm/s2'}
 void Ads1111::set_p_ads_aeb_taracce(uint8_t* data, double ads_aeb_taracce) {
   ads_aeb_taracce = ProtocolData::BoundedValue(-16.0, 16.0, ads_aeb_taracce);
-  int x = static_cast<int>((ads_aeb_taracce - -16.000000) / 0.000488);
-  uint8_t t = 0;
+  int     x       = static_cast<int>((ads_aeb_taracce - -16.000000) / 0.000488);
+  uint8_t t       = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 5);
@@ -150,8 +148,8 @@ void Ads1111::set_p_ads_aeb_taracce(uint8_t* data, double ads_aeb_taracce) {
   to_set1.set_value(t, 0, 8);
 }
 
-Ads1111* Ads1111::set_ads_aeb_tgtdecel_req(
-    Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req) {
+Ads1111*
+Ads1111::set_ads_aeb_tgtdecel_req(Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req) {
   ads_aeb_tgtdecel_req_ = ads_aeb_tgtdecel_req;
   return this;
 }
@@ -162,8 +160,8 @@ Ads1111* Ads1111::set_ads_aeb_tgtdecel_req(
 // 'name': 'ADS_AEB_TgtDecel_Req', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order':'motorola',
 // 'physical_unit': ''}
-void Ads1111::set_p_ads_aeb_tgtdecel_req(
-    uint8_t* data, Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req) {
+void Ads1111::set_p_ads_aeb_tgtdecel_req(uint8_t*                           data,
+                                         Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req) {
   int x = ads_aeb_tgtdecel_req;
 
   Byte to_set(data + 3);

@@ -18,11 +18,12 @@
 
 #include <memory>
 
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm3_parser.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -31,9 +32,10 @@ namespace gnss {
 using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::GnssEphemeris;
 
-RtcmParser::RtcmParser(const config::Config& config,
+RtcmParser::RtcmParser(const config::Config&                       config,
                        const std::shared_ptr<apollo::cyber::Node>& node)
-    : config_(config), node_(node) {}
+    : config_(config)
+    , node_(node) {}
 
 bool RtcmParser::Init() {
   rtcm_parser_.reset(new Rtcm3Parser(true));
@@ -43,44 +45,33 @@ bool RtcmParser::Init() {
     return false;
   }
 
-  gnssephemeris_writer_ =
-      node_->CreateWriter<GnssEphemeris>(FLAGS_gnss_rtk_eph_topic);
-  epochobservation_writer_ =
-      node_->CreateWriter<EpochObservation>(FLAGS_gnss_rtk_obs_topic);
-  init_flag_ = true;
+  gnssephemeris_writer_    = node_->CreateWriter<GnssEphemeris>(FLAGS_gnss_rtk_eph_topic);
+  epochobservation_writer_ = node_->CreateWriter<EpochObservation>(FLAGS_gnss_rtk_obs_topic);
+  init_flag_               = true;
   return true;
 }
 
 void RtcmParser::ParseRtcmData(const std::string& msg) {
-  if (!init_flag_) {
-    return;
-  }
+  if (!init_flag_) { return; }
 
   rtcm_parser_->Update(msg);
   Parser::MessageType type;
-  MessagePtr msg_ptr;
+  MessagePtr          msg_ptr;
 
   while (cyber::OK()) {
     type = rtcm_parser_->GetMessage(&msg_ptr);
-    if (type == Parser::MessageType::NONE) {
-      break;
-    }
+    if (type == Parser::MessageType::NONE) { break; }
     DispatchMessage(type, msg_ptr);
   }
 }
 
 void RtcmParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
   switch (type) {
-    case Parser::MessageType::EPHEMERIDES:
-      PublishEphemeris(message);
-      break;
+    case Parser::MessageType::EPHEMERIDES: PublishEphemeris(message); break;
 
-    case Parser::MessageType::OBSERVATION:
-      PublishObservation(message);
-      break;
+    case Parser::MessageType::OBSERVATION: PublishObservation(message); break;
 
-    default:
-      break;
+    default: break;
   }
 }
 
@@ -90,8 +81,7 @@ void RtcmParser::PublishEphemeris(const MessagePtr& message) {
 }
 
 void RtcmParser::PublishObservation(const MessagePtr& message) {
-  auto observation =
-      std::make_shared<EpochObservation>(*As<EpochObservation>(message));
+  auto observation = std::make_shared<EpochObservation>(*As<EpochObservation>(message));
   epochobservation_writer_->Write(observation);
 }
 

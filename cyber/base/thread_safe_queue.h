@@ -32,7 +32,7 @@ class ThreadSafeQueue {
  public:
   ThreadSafeQueue() {}
   ThreadSafeQueue& operator=(const ThreadSafeQueue& other) = delete;
-  ThreadSafeQueue(const ThreadSafeQueue& other) = delete;
+  ThreadSafeQueue(const ThreadSafeQueue& other)            = delete;
 
   ~ThreadSafeQueue() { BreakAllWait(); }
 
@@ -44,9 +44,7 @@ class ThreadSafeQueue {
 
   bool Dequeue(T* element) {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (queue_.empty()) {
-      return false;
-    }
+    if (queue_.empty()) { return false; }
     *element = std::move(queue_.front());
     queue_.pop();
     return true;
@@ -55,9 +53,7 @@ class ThreadSafeQueue {
   bool WaitDequeue(T* element) {
     std::unique_lock<std::mutex> lock(mutex_);
     cv_.wait(lock, [this]() { return break_all_wait_ || !queue_.empty(); });
-    if (break_all_wait_) {
-      return false;
-    }
+    if (break_all_wait_) { return false; }
     *element = std::move(queue_.front());
     queue_.pop();
     return true;
@@ -79,9 +75,9 @@ class ThreadSafeQueue {
   }
 
  private:
-  volatile bool break_all_wait_ = false;
-  std::mutex mutex_;
-  std::queue<T> queue_;
+  volatile bool           break_all_wait_ = false;
+  std::mutex              mutex_;
+  std::queue<T>           queue_;
   std::condition_variable cv_;
 };
 

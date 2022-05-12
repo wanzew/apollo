@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <vector>
-
 #include "modules/perception/radar/lib/roi_filter/hdmap_radar_roi_filter/hdmap_radar_roi_filter.h"
+
+#include <vector>
 
 namespace apollo {
 namespace perception {
 namespace radar {
 
-bool HdmapRadarRoiFilter::RoiFilter(const RoiFilterOptions& options,
-                                    base::FramePtr radar_frame) {
+bool HdmapRadarRoiFilter::RoiFilter(const RoiFilterOptions& options, base::FramePtr radar_frame) {
   std::vector<base::ObjectPtr> origin_objects = radar_frame->objects;
-  return common::ObjectInRoiCheck(options.roi, origin_objects,
-                                  &radar_frame->objects);
+  return common::ObjectInRoiCheck(options.roi, origin_objects, &radar_frame->objects);
 }
 
 std::string HdmapRadarRoiFilter::Name() const { return "HdmapRadarRoiFilter"; }

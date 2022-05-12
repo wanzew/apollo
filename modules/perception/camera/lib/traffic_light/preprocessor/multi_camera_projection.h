@@ -29,7 +29,8 @@ namespace perception {
 namespace camera {
 
 struct ProjectOption {
-  explicit ProjectOption(const std::string& name) : camera_name(name) {}
+  explicit ProjectOption(const std::string& name)
+      : camera_name(name) {}
   std::string camera_name;
 };
 
@@ -44,8 +45,7 @@ class MultiCamerasProjection {
 
   ~MultiCamerasProjection() = default;
   bool Init(const MultiCamerasInitOption& options);
-  bool Project(const CarPose& pose, const ProjectOption& option,
-               base::TrafficLight* light) const;
+  bool Project(const CarPose& pose, const ProjectOption& option, base::TrafficLight* light) const;
   bool HasCamera(const std::string& camera_name) const;
 
   int getImageWidth(const std::string& camera_name) const;
@@ -56,11 +56,10 @@ class MultiCamerasProjection {
   }
 
  private:
-  bool BoundaryBasedProject(
-      const base::BrownCameraDistortionModelPtr camera_model,
-      const Eigen::Matrix4d& c2w_pose,
-      const std::vector<base::PointXYZID>& point,
-      base::TrafficLight* light) const;
+  bool BoundaryBasedProject(const base::BrownCameraDistortionModelPtr camera_model,
+                            const Eigen::Matrix4d&                    c2w_pose,
+                            const std::vector<base::PointXYZID>&      point,
+                            base::TrafficLight*                       light) const;
 
  private:
   // sorted by focal length in descending order

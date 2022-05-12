@@ -17,28 +17,29 @@
 
 #include <string>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/impending_collision_edge.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
 enum class ProcessStage {
-  LIDAR_PREPROCESS = 0,
-  LIDAR_DETECTION = 1,
-  LIDAR_RECOGNITION = 2,
-  STEREO_CAMERA_DETECTION = 3,
-  MONOCULAR_CAMERA_DETECTION = 4,
-  LONG_RANGE_RADAR_DETECTION = 5,
+  LIDAR_PREPROCESS            = 0,
+  LIDAR_DETECTION             = 1,
+  LIDAR_RECOGNITION           = 2,
+  STEREO_CAMERA_DETECTION     = 3,
+  MONOCULAR_CAMERA_DETECTION  = 4,
+  LONG_RANGE_RADAR_DETECTION  = 5,
   SHORT_RANGE_RADAR_DETECTION = 6,
-  ULTRASONIC_DETECTION = 7,
-  SENSOR_FUSION = 8,
-  UNKNOWN_STAGE = 9,
-  PROCESSSTAGE_COUNT = 10
+  ULTRASONIC_DETECTION        = 7,
+  SENSOR_FUSION               = 8,
+  UNKNOWN_STAGE               = 9,
+  PROCESSSTAGE_COUNT          = 10
 };
 
 class Descriptor {
@@ -50,17 +51,17 @@ class SensorFrameMessage {
  public:
   SensorFrameMessage() { type_name_ = "SensorFrameMessage"; }
   ~SensorFrameMessage() = default;
-  std::string GetTypeName() { return type_name_; }
+  std::string         GetTypeName() { return type_name_; }
   SensorFrameMessage* New() const { return new SensorFrameMessage; }
 
  public:
   apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;
 
-  std::string sensor_id_;
-  double timestamp_ = 0.0;
-  uint64_t lidar_timestamp_ = 0;
-  uint32_t seq_num_ = 0;
-  std::string type_name_;
+  std::string               sensor_id_;
+  double                    timestamp_       = 0.0;
+  uint64_t                  lidar_timestamp_ = 0;
+  uint32_t                  seq_num_         = 0;
+  std::string               type_name_;
   base::HdmapStructConstPtr hdmap_;
 
   base::FramePtr frame_;

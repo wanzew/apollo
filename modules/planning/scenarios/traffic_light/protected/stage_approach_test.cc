@@ -16,9 +16,10 @@
 
 #include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -34,16 +35,14 @@ class TrafficLightProtectedStageApproachTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(TrafficLightProtectedStageApproachTest, Init) {
-  TrafficLightProtectedStageApproach traffic_light_protected_stage_approach(
-      config_, injector_);
+  TrafficLightProtectedStageApproach traffic_light_protected_stage_approach(config_, injector_);
   EXPECT_EQ(traffic_light_protected_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH));
+            ScenarioConfig::StageType_Name(ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH));
 }
 
 }  // namespace traffic_light

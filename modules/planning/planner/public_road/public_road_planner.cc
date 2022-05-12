@@ -31,16 +31,15 @@ Status PublicRoadPlanner::Init(const PlanningConfig& config) {
 }
 
 Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
-                               Frame* frame,
-                               ADCTrajectory* ptr_computed_trajectory) {
+                               Frame*                 frame,
+                               ADCTrajectory*         ptr_computed_trajectory) {
   scenario_manager_.Update(planning_start_point, *frame);
-  scenario_ = scenario_manager_.mutable_scenario();
+  scenario_   = scenario_manager_.mutable_scenario();
   auto result = scenario_->Process(planning_start_point, frame);
 
   if (FLAGS_enable_record_debug) {
-    auto scenario_debug = ptr_computed_trajectory->mutable_debug()
-                              ->mutable_planning_data()
-                              ->mutable_scenario();
+    auto scenario_debug =
+        ptr_computed_trajectory->mutable_debug()->mutable_planning_data()->mutable_scenario();
     scenario_debug->set_scenario_type(scenario_->scenario_type());
     scenario_debug->set_stage_type(scenario_->GetStage());
     scenario_debug->set_msg(scenario_->GetMsg());

@@ -24,11 +24,10 @@ TEST(ArgmaxPluginsTest, test) {
     argmax_param.set_out_max_val(true);
     nvinfer1::Dims in_dims;
     in_dims.nbDims = 3;
-    in_dims.d[0] = 8;
-    in_dims.d[1] = 10;
-    in_dims.d[2] = 20;
-    apollo::perception::inference::ArgMax1Plugin arg_plugin(argmax_param,
-                                                            in_dims);
+    in_dims.d[0]   = 8;
+    in_dims.d[1]   = 10;
+    in_dims.d[2]   = 20;
+    apollo::perception::inference::ArgMax1Plugin arg_plugin(argmax_param, in_dims);
     auto out_dims = arg_plugin.getOutputDimensions(0, &in_dims, 3);
     EXPECT_EQ(out_dims.d[0], 2);
   }
@@ -37,11 +36,10 @@ TEST(ArgmaxPluginsTest, test) {
     argmax_param.set_out_max_val(false);
     nvinfer1::Dims in_dims;
     in_dims.nbDims = 3;
-    in_dims.d[0] = 8;
-    in_dims.d[1] = 10;
-    in_dims.d[2] = 20;
-    apollo::perception::inference::ArgMax1Plugin arg_plugin(argmax_param,
-                                                            in_dims);
+    in_dims.d[0]   = 8;
+    in_dims.d[1]   = 10;
+    in_dims.d[2]   = 20;
+    apollo::perception::inference::ArgMax1Plugin arg_plugin(argmax_param, in_dims);
     auto out_dims = arg_plugin.getOutputDimensions(0, &in_dims, 3);
     EXPECT_EQ(out_dims.d[0], 1);
   }

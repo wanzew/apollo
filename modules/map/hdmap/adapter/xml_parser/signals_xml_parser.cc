@@ -20,18 +20,15 @@ namespace apollo {
 namespace hdmap {
 namespace adapter {
 
-Status SignalsXmlParser::ParseTrafficLights(
-    const tinyxml2::XMLElement& xml_node,
-    std::vector<TrafficLightInternal>* traffic_lights) {
+Status SignalsXmlParser::ParseTrafficLights(const tinyxml2::XMLElement&        xml_node,
+                                            std::vector<TrafficLightInternal>* traffic_lights) {
   CHECK_NOTNULL(traffic_lights);
   auto signal_node = xml_node.FirstChildElement("signal");
   while (signal_node) {
     std::string object_type;
     std::string object_id;
-    int checker =
-        UtilXmlParser::QueryStringAttribute(*signal_node, "type", &object_type);
-    checker +=
-        UtilXmlParser::QueryStringAttribute(*signal_node, "id", &object_id);
+    int         checker = UtilXmlParser::QueryStringAttribute(*signal_node, "type", &object_type);
+    checker += UtilXmlParser::QueryStringAttribute(*signal_node, "id", &object_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse signal type.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -41,8 +38,7 @@ Status SignalsXmlParser::ParseTrafficLights(
       PbSignal traffic_light;
       traffic_light.mutable_id()->set_id(object_id);
       std::string layout_type;
-      int checker = UtilXmlParser::QueryStringAttribute(
-          *signal_node, "layoutType", &layout_type);
+      int checker = UtilXmlParser::QueryStringAttribute(*signal_node, "layoutType", &layout_type);
       if (checker != tinyxml2::XML_SUCCESS) {
         std::string err_msg = "Error parse signal layout type.";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -56,14 +52,13 @@ Status SignalsXmlParser::ParseTrafficLights(
         auto sign_info_node = sign_infos_node->FirstChildElement("signInfo");
         while (sign_info_node != nullptr) {
           std::string sign_info_type;
-          checker = UtilXmlParser::QueryStringAttribute(*sign_info_node, "type",
-                                                        &sign_info_type);
+          checker = UtilXmlParser::QueryStringAttribute(*sign_info_node, "type", &sign_info_type);
           if (checker != tinyxml2::XML_SUCCESS) {
             std::string err_msg = "Error parse sign info type.";
             return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
           }
 
-          auto sign_info = traffic_light.add_sign_info();
+          auto           sign_info = traffic_light.add_sign_info();
           PbSignInfoType pb_sign_info_type;
           to_pb_sign_info_type(sign_info_type, &pb_sign_info_type);
           sign_info->set_type(pb_sign_info_type);
@@ -72,8 +67,8 @@ Status SignalsXmlParser::ParseTrafficLights(
         }
       }
 
-      PbPolygon* polygon = traffic_light.mutable_boundary();
-      auto outline_node = signal_node->FirstChildElement("outline");
+      PbPolygon* polygon      = traffic_light.mutable_boundary();
+      auto       outline_node = signal_node->FirstChildElement("outline");
       if (outline_node == nullptr) {
         std::string err_msg = "Error parse signal outline";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -88,16 +83,14 @@ Status SignalsXmlParser::ParseTrafficLights(
       while (sub_node) {
         std::string sub_signal_id;
         std::string sub_signal_xml_type;
-        checker = UtilXmlParser::QueryStringAttribute(*sub_node, "type",
-                                                      &sub_signal_xml_type);
-        checker += UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                       &sub_signal_id);
+        checker = UtilXmlParser::QueryStringAttribute(*sub_node, "type", &sub_signal_xml_type);
+        checker += UtilXmlParser::QueryStringAttribute(*sub_node, "id", &sub_signal_id);
         if (checker != tinyxml2::XML_SUCCESS) {
           std::string err_msg = "Error parse sub signal layout type.";
           return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
         }
 
-        PbSubSignal* sub_signal = traffic_light.add_subsignal();
+        PbSubSignal*    sub_signal = traffic_light.add_subsignal();
         PbSubSignalType sub_signal_type;
         ToPbSubSignalType(sub_signal_xml_type, &sub_signal_type);
         sub_signal->mutable_id()->set_id(sub_signal_id);
@@ -109,7 +102,7 @@ Status SignalsXmlParser::ParseTrafficLights(
       }
 
       TrafficLightInternal trafficlight_internal;
-      trafficlight_internal.id = object_id;
+      trafficlight_internal.id            = object_id;
       trafficlight_internal.traffic_light = traffic_light;
 
       sub_node = signal_node->FirstChildElement("stopline");
@@ -117,8 +110,7 @@ Status SignalsXmlParser::ParseTrafficLights(
         sub_node = sub_node->FirstChildElement("objectReference");
         while (sub_node) {
           std::string stop_line_id;
-          int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                            &stop_line_id);
+          int         checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id", &stop_line_id);
           ACHECK(checker == tinyxml2::XML_SUCCESS);
           trafficlight_internal.stop_line_ids.insert(stop_line_id);
           sub_node = sub_node->NextSiblingElement("objectReference");
@@ -131,8 +123,7 @@ Status SignalsXmlParser::ParseTrafficLights(
   return Status::OK();
 }
 
-Status SignalsXmlParser::ToPbSignalType(const std::string& xml_type,
-                                        PbSignalType* signal_type) {
+Status SignalsXmlParser::ToPbSignalType(const std::string& xml_type, PbSignalType* signal_type) {
   CHECK_NOTNULL(signal_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
@@ -158,7 +149,7 @@ Status SignalsXmlParser::ToPbSignalType(const std::string& xml_type,
 }
 
 Status SignalsXmlParser::ToPbSubSignalType(const std::string& xml_type,
-                                           PbSubSignalType* sub_signal_type) {
+                                           PbSubSignalType*   sub_signal_type) {
   CHECK_NOTNULL(sub_signal_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
@@ -187,7 +178,7 @@ Status SignalsXmlParser::ToPbSubSignalType(const std::string& xml_type,
 }
 
 Status SignalsXmlParser::to_pb_sign_info_type(const std::string& xml_type,
-                                              PbSignInfoType* sign_info_type) {
+                                              PbSignInfoType*    sign_info_type) {
   CHECK_NOTNULL(sign_info_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
@@ -201,8 +192,7 @@ Status SignalsXmlParser::to_pb_sign_info_type(const std::string& xml_type,
   return Status::OK();
 }
 
-Status SignalsXmlParser::ToPbStopSignType(const std::string& xml_type,
-                                          PbStopSignType* stop_type) {
+Status SignalsXmlParser::ToPbStopSignType(const std::string& xml_type, PbStopSignType* stop_type) {
   CHECK_NOTNULL(stop_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
@@ -226,19 +216,16 @@ Status SignalsXmlParser::ToPbStopSignType(const std::string& xml_type,
   return Status::OK();
 }
 
-Status SignalsXmlParser::ParseStopSigns(
-    const tinyxml2::XMLElement& xml_node,
-    std::vector<StopSignInternal>* stop_signs) {
+Status SignalsXmlParser::ParseStopSigns(const tinyxml2::XMLElement&    xml_node,
+                                        std::vector<StopSignInternal>* stop_signs) {
   CHECK_NOTNULL(stop_signs);
 
   auto signal_node = xml_node.FirstChildElement("signal");
   while (signal_node) {
     std::string object_type;
     std::string object_id;
-    int checker =
-        UtilXmlParser::QueryStringAttribute(*signal_node, "type", &object_type);
-    checker +=
-        UtilXmlParser::QueryStringAttribute(*signal_node, "id", &object_id);
+    int         checker = UtilXmlParser::QueryStringAttribute(*signal_node, "type", &object_type);
+    checker += UtilXmlParser::QueryStringAttribute(*signal_node, "id", &object_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse signal type.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -256,8 +243,7 @@ Status SignalsXmlParser::ParseStopSigns(
         sub_node = sub_node->FirstChildElement("objectReference");
         while (sub_node) {
           std::string stop_line_id;
-          int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                            &stop_line_id);
+          int         checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id", &stop_line_id);
           ACHECK(checker == tinyxml2::XML_SUCCESS);
           stop_sign_internal.stop_line_ids.insert(stop_line_id);
 
@@ -268,8 +254,7 @@ Status SignalsXmlParser::ParseStopSigns(
       sub_node = signal_node->FirstChildElement("attribute");
       if (sub_node) {
         std::string stop_type;
-        int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "stopType",
-                                                          &stop_type);
+        int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "stopType", &stop_type);
         if (checker != tinyxml2::XML_SUCCESS) {
           std::string err_msg = "Error parse stop type.";
           return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -288,19 +273,16 @@ Status SignalsXmlParser::ParseStopSigns(
   return Status::OK();
 }
 
-Status SignalsXmlParser::ParseYieldSigns(
-    const tinyxml2::XMLElement& xml_node,
-    std::vector<YieldSignInternal>* yield_signs) {
+Status SignalsXmlParser::ParseYieldSigns(const tinyxml2::XMLElement&     xml_node,
+                                         std::vector<YieldSignInternal>* yield_signs) {
   CHECK_NOTNULL(yield_signs);
 
   auto signal_node = xml_node.FirstChildElement("signal");
   while (signal_node) {
     std::string object_type;
     std::string object_id;
-    int checker =
-        UtilXmlParser::QueryStringAttribute(*signal_node, "type", &object_type);
-    checker +=
-        UtilXmlParser::QueryStringAttribute(*signal_node, "id", &object_id);
+    int         checker = UtilXmlParser::QueryStringAttribute(*signal_node, "type", &object_type);
+    checker += UtilXmlParser::QueryStringAttribute(*signal_node, "id", &object_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse signal type.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -310,15 +292,14 @@ Status SignalsXmlParser::ParseYieldSigns(
       PbYieldSign yield_sign;
       yield_sign.mutable_id()->set_id(object_id);
       YieldSignInternal yield_sign_internal;
-      yield_sign_internal.id = object_id;
+      yield_sign_internal.id         = object_id;
       yield_sign_internal.yield_sign = yield_sign;
-      auto sub_node = signal_node->FirstChildElement("stopline");
+      auto sub_node                  = signal_node->FirstChildElement("stopline");
       if (sub_node) {
         sub_node = sub_node->FirstChildElement("objectReference");
         while (sub_node) {
           std::string stop_line_id;
-          int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                            &stop_line_id);
+          int         checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id", &stop_line_id);
           ACHECK(checker == tinyxml2::XML_SUCCESS);
           yield_sign_internal.stop_line_ids.insert(stop_line_id);
 

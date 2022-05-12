@@ -20,6 +20,7 @@
 #include "modules/planning/scenarios/park/valet_parking/stage_parking.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -35,14 +36,14 @@ class StageParkingTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StageParkingTest, Init) {
   StageParking stage_parking(config_, injector_);
-  EXPECT_EQ(stage_parking.Name(), ScenarioConfig::StageType_Name(
-                                      ScenarioConfig::VALET_PARKING_PARKING));
+  EXPECT_EQ(stage_parking.Name(),
+            ScenarioConfig::StageType_Name(ScenarioConfig::VALET_PARKING_PARKING));
 }
 
 }  // namespace valet_parking

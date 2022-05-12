@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
+
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -29,8 +30,7 @@ namespace planning {
 
 class DiscretePointsReferenceLineSmoother : public ReferenceLineSmoother {
  public:
-  explicit DiscretePointsReferenceLineSmoother(
-      const ReferenceLineSmootherConfig& config);
+  explicit DiscretePointsReferenceLineSmoother(const ReferenceLineSmootherConfig& config);
 
   virtual ~DiscretePointsReferenceLineSmoother() = default;
 
@@ -40,24 +40,21 @@ class DiscretePointsReferenceLineSmoother : public ReferenceLineSmoother {
   void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
 
  private:
-  bool CosThetaSmooth(
-      const std::vector<std::pair<double, double>>& raw_point2d,
-      const std::vector<double>& bounds,
-      std::vector<std::pair<double, double>>* ptr_smoothed_point2d);
+  bool CosThetaSmooth(const std::vector<std::pair<double, double>>& raw_point2d,
+                      const std::vector<double>&                    bounds,
+                      std::vector<std::pair<double, double>>*       ptr_smoothed_point2d);
 
-  bool FemPosSmooth(
-      const std::vector<std::pair<double, double>>& raw_point2d,
-      const std::vector<double>& bounds,
-      std::vector<std::pair<double, double>>* ptr_smoothed_point2d);
+  bool FemPosSmooth(const std::vector<std::pair<double, double>>& raw_point2d,
+                    const std::vector<double>&                    bounds,
+                    std::vector<std::pair<double, double>>*       ptr_smoothed_point2d);
 
   void NormalizePoints(std::vector<std::pair<double, double>>* xy_points);
 
   void DeNormalizePoints(std::vector<std::pair<double, double>>* xy_points);
 
-  bool GenerateRefPointProfile(
-      const ReferenceLine& raw_reference_line,
-      const std::vector<std::pair<double, double>>& xy_points,
-      std::vector<ReferencePoint>* reference_points);
+  bool GenerateRefPointProfile(const ReferenceLine&                          raw_reference_line,
+                               const std::vector<std::pair<double, double>>& xy_points,
+                               std::vector<ReferencePoint>*                  reference_points);
 
   std::vector<AnchorPoint> anchor_points_;
 

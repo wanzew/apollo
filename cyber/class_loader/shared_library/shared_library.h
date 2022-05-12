@@ -112,8 +112,8 @@ class SharedLibrary {
   SharedLibrary& operator=(const SharedLibrary&) = delete;
 
  private:
-  void* handle_ = nullptr;
-  std::string path_;
+  void*             handle_ = nullptr;
+  std::string       path_;
   static std::mutex mutex_;
 };
 

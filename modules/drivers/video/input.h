@@ -45,10 +45,10 @@ typedef struct FrameHeader {
   uint32_t magic0; /* 0xBBAABBAA */
   uint32_t magic1; /* 0xAABBAABB */
   //  uint32_t ChanNo;
-  uint8_t PhyNo;
-  uint8_t frame_type; /* IDR: 1, other: 0 */
-  uint8_t error;      /* error:1, other: 0 */
-  uint8_t resv;
+  uint8_t  PhyNo;
+  uint8_t  frame_type; /* IDR: 1, other: 0 */
+  uint8_t  error;      /* error:1, other: 0 */
+  uint8_t  resv;
   uint32_t frame_size;
   uint32_t frame_id;
   uint32_t ts_sec;
@@ -61,7 +61,7 @@ typedef struct FrameHeader {
 } FrameHeader;
 
 typedef struct HwPduPacket {
-  RtpHeader rtp_header;
+  RtpHeader   rtp_header;
   FrameHeader header;
 } HwPduPacket;
 

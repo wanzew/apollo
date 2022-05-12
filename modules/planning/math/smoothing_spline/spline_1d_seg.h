@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "Eigen/Core"
+
 #include "modules/planning/math/polynomial_xd.h"
 
 namespace apollo {
@@ -36,7 +37,7 @@ class Spline1dSeg {
   explicit Spline1dSeg(const std::vector<double>& params);
   ~Spline1dSeg() = default;
 
-  void SetParams(const std::vector<double>& params);
+  void   SetParams(const std::vector<double>& params);
   double operator()(const double x) const;
   double Derivative(const double x) const;
   double SecondOrderDerivative(const double x) const;

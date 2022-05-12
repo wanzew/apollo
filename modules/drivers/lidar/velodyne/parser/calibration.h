@@ -49,8 +49,8 @@ struct LaserCorrection {
   float dist_correction_y;
   float vert_offset_correction;
   float horiz_offset_correction;
-  int max_intensity;
-  int min_intensity;
+  int   max_intensity;
+  int   min_intensity;
   float focal_distance;
   float focal_slope;
   float focal_offset;
@@ -68,14 +68,13 @@ struct LaserCorrection {
 class Calibration {
  public:
   std::map<int, LaserCorrection> laser_corrections_;
-  int num_lasers_;
-  bool initialized_;
+  int                            num_lasers_;
+  bool                           initialized_;
 
  public:
-  Calibration() : initialized_(false) {}
-  explicit Calibration(const std::string& calibration_file) {
-    read(calibration_file);
-  }
+  Calibration()
+      : initialized_(false) {}
+  explicit Calibration(const std::string& calibration_file) { read(calibration_file); }
 
   void read(const std::string& calibration_file);
   void write(const std::string& calibration_file);

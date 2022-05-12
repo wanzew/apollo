@@ -42,12 +42,11 @@ void Adseps113::UpdateData(uint8_t* data) {
 
 void Adseps113::Reset() {
   // TODO(ChaoMa) :you should check this manually
-  ads_epsmode_ = Ads_eps_113::ADS_EPSMODE_DISABLE;
+  ads_epsmode_           = Ads_eps_113::ADS_EPSMODE_DISABLE;
   ads_reqepstargetangle_ = 0.0;
 }
 
-Adseps113* Adseps113::set_ads_epsmode(
-    Ads_eps_113::Ads_epsmodeType ads_epsmode) {
+Adseps113* Adseps113::set_ads_epsmode(Ads_eps_113::Ads_epsmodeType ads_epsmode) {
   ads_epsmode_ = ads_epsmode;
   return this;
 }
@@ -56,8 +55,7 @@ Adseps113* Adseps113::set_ads_epsmode(
 // 2: 'ADS_EPSMODE_ACTIVE'}, 'precision': 1.0, 'len': 2, 'name': 'ADS_EPSMode',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 7,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Adseps113::set_p_ads_epsmode(uint8_t* data,
-                                  Ads_eps_113::Ads_epsmodeType ads_epsmode) {
+void Adseps113::set_p_ads_epsmode(uint8_t* data, Ads_eps_113::Ads_epsmodeType ads_epsmode) {
   int x = ads_epsmode;
 
   Byte to_set(data + 0);
@@ -73,12 +71,10 @@ Adseps113* Adseps113::set_ads_reqepstargetangle(double ads_reqepstargetangle) {
 // -800.0, 'precision': 0.1, 'len': 14, 'name': 'ADS_ReqEPSTargetAngle',
 // 'is_signed_var': False, 'physical_range': '[-800|838.3]', 'bit': 15,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
-void Adseps113::set_p_ads_reqepstargetangle(uint8_t* data,
-                                            double ads_reqepstargetangle) {
-  ads_reqepstargetangle =
-      ProtocolData::BoundedValue(-800.0, 838.3, ads_reqepstargetangle);
-  int x = static_cast<int>((ads_reqepstargetangle - -800.000000) / 0.100000);
-  uint8_t t = 0;
+void Adseps113::set_p_ads_reqepstargetangle(uint8_t* data, double ads_reqepstargetangle) {
+  ads_reqepstargetangle = ProtocolData::BoundedValue(-800.0, 838.3, ads_reqepstargetangle);
+  int     x             = static_cast<int>((ads_reqepstargetangle - -800.000000) / 0.100000);
+  uint8_t t             = 0;
 
   t = static_cast<uint8_t>(x & 0x3F);
   Byte to_set0(data + 2);

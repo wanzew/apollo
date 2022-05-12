@@ -32,18 +32,17 @@ namespace logger {
 
 static std::unordered_map<std::string, LogFileObject*> moduleLoggerMap;
 
-Logger::Logger(google::base::Logger* wrapped) : wrapped_(wrapped) {}
+Logger::Logger(google::base::Logger* wrapped)
+    : wrapped_(wrapped) {}
 
 Logger::~Logger() {
-  for (auto itr = moduleLoggerMap.begin(); itr != moduleLoggerMap.end();
-       ++itr) {
+  for (auto itr = moduleLoggerMap.begin(); itr != moduleLoggerMap.end(); ++itr) {
     delete itr->second;
   }
   moduleLoggerMap.clear();
 }
 
-void Logger::Write(bool force_flush, time_t timestamp, const char* message,
-                   int message_len) {
+void Logger::Write(bool force_flush, time_t timestamp, const char* message, int message_len) {
   std::string log_message = std::string(message, message_len);
   std::string module_name;
   // set the same bracket as the bracket in log.h
@@ -56,9 +55,7 @@ void Logger::Write(bool force_flush, time_t timestamp, const char* message,
       fileobject = moduleLoggerMap[module_name];
     } else {
       std::string file_name = module_name + ".log.INFO.";
-      if (!FLAGS_log_dir.empty()) {
-        file_name = FLAGS_log_dir + "/" + file_name;
-      }
+      if (!FLAGS_log_dir.empty()) { file_name = FLAGS_log_dir + "/" + file_name; }
       fileobject = new LogFileObject(google::INFO, file_name.c_str());
       fileobject->SetSymlinkBasename(module_name.c_str());
       moduleLoggerMap[module_name] = fileobject;

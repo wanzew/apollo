@@ -31,32 +31,29 @@ namespace lidar {
 
 class ObjectSequence {
  public:
-  typedef int TrackIdKey;
-  typedef double TimeStampKey;
-  typedef std::map<TimeStampKey,
-                   std::shared_ptr<apollo::perception::base::Object>>
-      TrackedObjects;
+  typedef int                                                                       TrackIdKey;
+  typedef double                                                                    TimeStampKey;
+  typedef std::map<TimeStampKey, std::shared_ptr<apollo::perception::base::Object>> TrackedObjects;
 
  public:
-  ObjectSequence() = default;
+  ObjectSequence()  = default;
   ~ObjectSequence() = default;
 
-  bool AddTrackedFrameObjects(
-      const std::vector<std::shared_ptr<perception::base::Object>>& objects,
-      TimeStampKey timestamp);
+  bool AddTrackedFrameObjects(const std::vector<std::shared_ptr<perception::base::Object>>& objects,
+                              TimeStampKey timestamp);
 
-  bool GetTrackInTemporalWindow(TrackIdKey track_id, TrackedObjects* track,
-                                TimeStampKey window_time);
+  bool
+  GetTrackInTemporalWindow(TrackIdKey track_id, TrackedObjects* track, TimeStampKey window_time);
 
  protected:
   FRIEND_TEST(FusedClassifierTest, test_one_sequence_fusion);
   FRIEND_TEST(FusedClassifierTest, test_one_sequence_fusion_bad_timestamp);
   void RemoveStaleTracks(TimeStampKey current_stamp);
 
-  TimeStampKey current_;
+  TimeStampKey                         current_;
   std::map<TrackIdKey, TrackedObjects> sequence_;
-  std::mutex mutex_;
-  static constexpr TimeStampKey kMaxTimeOut = 5.0;  // 5 second
+  std::mutex                           mutex_;
+  static constexpr TimeStampKey        kMaxTimeOut = 5.0;  // 5 second
 };
 
 }  // namespace lidar

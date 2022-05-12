@@ -21,16 +21,12 @@ namespace bridge {
 
 #define _1K 1024
 
-#define FREE_ARRY(arry) \
-  if (arry) {           \
-    delete[] arry;      \
-  }                     \
+#define FREE_ARRY(arry)                                                                            \
+  if (arry) { delete[] arry; }                                                                     \
   arry = nullptr
 
-#define FREE_POINTER(p) \
-  if (p) {              \
-    delete p;           \
-  }                     \
+#define FREE_POINTER(p)                                                                            \
+  if (p) { delete p; }                                                                             \
   p = nullptr
 
 constexpr uint32_t FRAME_SIZE = 1024;

@@ -49,8 +49,7 @@ TEST(MathUtilsTest, WrapAngle) {
   EXPECT_NEAR(WrapAngle(5.6), 5.6, 1e-6);
   EXPECT_NEAR(WrapAngle(7.8), 7.8 - M_PI * 2.0, 1e-6);
   EXPECT_NEAR(WrapAngle(12.4), std::fmod(12.4, M_PI * 2.0), 1e-6);
-  EXPECT_NEAR(WrapAngle(-12.4), std::fmod(-12.4, M_PI * 2.0) + M_PI * 2.0,
-              1e-6);
+  EXPECT_NEAR(WrapAngle(-12.4), std::fmod(-12.4, M_PI * 2.0) + M_PI * 2.0, 1e-6);
 }
 
 TEST(MathUtilsTest, NormalizeAngle) {
@@ -103,21 +102,21 @@ TEST(MathUtilsTest, RotateVector2d) {
 
   expected_x = -1.0;
   expected_y = 0.0;
-  result = RotateVector2d({0.0, 1.0}, M_PI / 2);
+  result     = RotateVector2d({0.0, 1.0}, M_PI / 2);
   EXPECT_NEAR(expected_x, result.x(), tol);
   EXPECT_NEAR(expected_y, result.y(), tol);
 
   expected_x = -1.0;
   expected_y = 0.0;
-  result = RotateVector2d({1.0, 0.0}, M_PI);
+  result     = RotateVector2d({1.0, 0.0}, M_PI);
   EXPECT_NEAR(expected_x, result.x(), tol);
   EXPECT_NEAR(expected_y, result.y(), tol);
 }
 
 TEST(MathUtilsTest, AlmostEqualTest) {
-  double x = 2.0;
+  double x      = 2.0;
   double x_root = std::sqrt(x);
-  double y = Square(x_root);
+  double y      = Square(x_root);
   EXPECT_TRUE(almost_equal(x, y, 2));
   EXPECT_FALSE(almost_equal(y, 2.0001, 2));
 }
@@ -130,7 +129,7 @@ TEST(MathUtilsTest, QPSTTest) {
       1.00000000000000000000,
       2.00000000000000000000,
   };
-  c_int P_nnz = 4;
+  c_int P_nnz  = 4;
   c_int P_i[4] = {
       0,
       1,
@@ -152,7 +151,7 @@ TEST(MathUtilsTest, QPSTTest) {
       1.00000000000000000000,
       1.00000000000000000000,
   };
-  c_int A_nnz = 4;
+  c_int A_nnz  = 4;
   c_int A_i[4] = {
       0,
       1,
@@ -178,15 +177,14 @@ TEST(MathUtilsTest, QPSTTest) {
   c_int m = 3;
 
   // Problem settings
-  OSQPSettings *settings =
-      reinterpret_cast<OSQPSettings *>(c_malloc(sizeof(OSQPSettings)));
+  OSQPSettings* settings = reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
 
   // Structures
-  OSQPWorkspace *work = NULL;  // Workspace
-  OSQPData *data;              // OSQPData
+  OSQPWorkspace* work = NULL;  // Workspace
+  OSQPData*      data;         // OSQPData
 
   // Populate data
-  data = reinterpret_cast<OSQPData *>(c_malloc(sizeof(OSQPData)));
+  data    = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   data->n = n;
   data->m = m;
   data->P = csc_matrix(data->n, data->n, P_nnz, P_x, P_i, P_p);

@@ -32,7 +32,7 @@ namespace common {
  * @return nothing
  * */
 void ConnectedComponentAnalysis(const std::vector<std::vector<int>>& graph,
-                                std::vector<std::vector<int>>* components);
+                                std::vector<std::vector<int>>*       components);
 
 }  // namespace common
 }  // namespace perception

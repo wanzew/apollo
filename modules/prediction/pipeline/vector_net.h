@@ -18,10 +18,11 @@
 
 #include <deque>
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "modules/prediction/proto/vector_net.pb.h"
+
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -31,7 +32,7 @@ namespace apollo {
 namespace prediction {
 
 using FeatureVector = std::vector<std::vector<std::vector<double>>>;
-using PidVector = std::vector<std::vector<double>>;
+using PidVector     = std::vector<std::vector<double>>;
 
 enum ATTRIBUTE_TYPE {
   ROAD,
@@ -59,14 +60,17 @@ class VectorNet {
 
   ~VectorNet() = default;
 
-  bool query(const common::PointENU& center_point, const double obstacle_phi,
-             FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
+  bool query(const common::PointENU& center_point,
+             const double            obstacle_phi,
+             FeatureVector* const    feature_ptr,
+             PidVector* const        p_id_ptr);
 
-  bool offline_query(const double obstacle_x, const double obstacle_y,
-                     const double obstacle_phi);
+  bool offline_query(const double obstacle_x, const double obstacle_y, const double obstacle_phi);
 
-  bool offline_query(const double obstacle_x, const double obstacle_y,
-                     const double obstacle_phi, const std::string file_name);
+  bool offline_query(const double      obstacle_x,
+                     const double      obstacle_y,
+                     const double      obstacle_phi,
+                     const std::string file_name);
 
  private:
   // TODO(Yiqun): 1.Left/Right boundary 2.Ordinal Encoding
@@ -84,7 +88,10 @@ class VectorNet {
   };
 
   const std::map<BOUNDARY_TYPE, double> boundary_map{
-      {UNKNOW, 0.0}, {NORMAL, 1.0}, {LEFT_BOUNDARY, 2.0}, {RIGHT_BOUNDARY, 3.0},
+      {UNKNOW, 0.0},
+      {NORMAL, 1.0},
+      {LEFT_BOUNDARY, 2.0},
+      {RIGHT_BOUNDARY, 3.0},
   };
 
   const std::map<hdmap::LaneBoundaryType::Type, ATTRIBUTE_TYPE> lane_attr_map{
@@ -98,30 +105,37 @@ class VectorNet {
   };
 
   template <typename Points>
-  void GetOnePolyline(const Points& points, double* start_length,
-                      const common::PointENU& center_point,
-                      const double obstacle_phi, ATTRIBUTE_TYPE attr_type,
-                      BOUNDARY_TYPE bound_type, const int count,
+  void GetOnePolyline(const Points&                           points,
+                      double*                                 start_length,
+                      const common::PointENU&                 center_point,
+                      const double                            obstacle_phi,
+                      ATTRIBUTE_TYPE                          attr_type,
+                      BOUNDARY_TYPE                           bound_type,
+                      const int                               count,
                       std::vector<std::vector<double>>* const one_polyline,
-                      std::vector<double>* const one_p_id);
+                      std::vector<double>* const              one_p_id);
 
-  void GetRoads(const common::PointENU& center_point, const double obstacle_phi,
-                FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
+  void GetRoads(const common::PointENU& center_point,
+                const double            obstacle_phi,
+                FeatureVector* const    feature_ptr,
+                PidVector* const        p_id_ptr);
 
-  void GetLaneQueue(
-      const std::vector<hdmap::LaneInfoConstPtr>& lanes,
-      std::vector<std::deque<hdmap::LaneInfoConstPtr>>* const lane_deque_ptr);
+  void GetLaneQueue(const std::vector<hdmap::LaneInfoConstPtr>&             lanes,
+                    std::vector<std::deque<hdmap::LaneInfoConstPtr>>* const lane_deque_ptr);
 
-  void GetLanes(const common::PointENU& center_point, const double obstacle_phi,
-                FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
+  void GetLanes(const common::PointENU& center_point,
+                const double            obstacle_phi,
+                FeatureVector* const    feature_ptr,
+                PidVector* const        p_id_ptr);
   void GetJunctions(const common::PointENU& center_point,
-                    const double obstacle_phi, FeatureVector* const feature_ptr,
-                    PidVector* const p_id_ptr);
+                    const double            obstacle_phi,
+                    FeatureVector* const    feature_ptr,
+                    PidVector* const        p_id_ptr);
   void GetCrosswalks(const common::PointENU& center_point,
-                     const double obstacle_phi,
-                     FeatureVector* const feature_ptr,
-                     PidVector* const p_id_ptr);
-  int count_ = 0;
+                     const double            obstacle_phi,
+                     FeatureVector* const    feature_ptr,
+                     PidVector* const        p_id_ptr);
+  int  count_ = 0;
 };
 
 }  // namespace prediction

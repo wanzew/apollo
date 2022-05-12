@@ -50,7 +50,7 @@ TEST(ImageTest, image8u_test) {
       EXPECT_EQ(image.type(), Color::RGB);
 
       Rect<int> roi(0, 1, 2, 3);
-      Image8U image_roi = image(roi);
+      Image8U   image_roi = image(roi);
       EXPECT_EQ(image_roi.cpu_ptr(0)[0], 15);
       EXPECT_EQ(image_roi.cpu_ptr(0)[1], 16);
       EXPECT_EQ(image_roi.cpu_ptr(1)[0], 30);
@@ -87,11 +87,11 @@ TEST(ImageTest, image8u_test) {
     EXPECT_EQ(blob.use_count(), 3);
     Image8U image_assigned = image;
     EXPECT_EQ(blob.use_count(), 4);
-    image_shared = Image8U();
+    image_shared   = Image8U();
     image_assigned = Image8U();
 
     Rect<int> roi(0, 1, 2, 3);
-    Image8U image_roi = image(roi);
+    Image8U   image_roi = image(roi);
     EXPECT_EQ(blob.use_count(), 3);
     EXPECT_EQ(image_roi.cpu_ptr(0)[0], 15);
     EXPECT_EQ(image_roi.cpu_ptr(0)[1], 16);
@@ -111,7 +111,7 @@ TEST(ImageTest, image8u_test) {
 
   {
     const Image8U image(5, 5, Color::RGB);
-    auto blob = image.blob();
+    auto          blob = image.blob();
     EXPECT_EQ(blob.use_count(), 2);
     // blob->gpu_data();          // GOOD
     // blob->mutable_gpu_data();  // COMPILING ERROR

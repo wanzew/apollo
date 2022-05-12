@@ -21,8 +21,9 @@
 namespace apollo {
 namespace monitor {
 
-RecurrentRunner::RecurrentRunner(const std::string &name, const double interval)
-    : name_(name), interval_(interval) {}
+RecurrentRunner::RecurrentRunner(const std::string& name, const double interval)
+    : name_(name)
+    , interval_(interval) {}
 
 void RecurrentRunner::Tick(const double current_time) {
   if (next_round_ <= current_time) {

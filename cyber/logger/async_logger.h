@@ -101,8 +101,7 @@ class AsyncLogger : public google::base::Logger {
    * @param message is the info to be written
    * @param message_len is the length of message
    */
-  void Write(bool force_flush, time_t timestamp, const char* message,
-             int message_len) override;
+  void Write(bool force_flush, time_t timestamp, const char* message, int message_len) override;
 
   /**
    * @brief Flush any buffered messages.
@@ -133,32 +132,37 @@ class AsyncLogger : public google::base::Logger {
   // Arenas and allocate both the message data and Msg struct from them, forming
   // a linked list.
   struct Msg {
-    time_t ts;
+    time_t      ts;
     std::string message;
-    int32_t level;
-    Msg() : ts(0), message(), level(google::INFO) {}
+    int32_t     level;
+    Msg()
+        : ts(0)
+        , message()
+        , level(google::INFO) {}
     Msg(time_t ts, std::string&& message, int32_t level)
-        : ts(ts), message(std::move(message)), level(level) {}
+        : ts(ts)
+        , message(std::move(message))
+        , level(level) {}
     Msg(const Msg& rsh) {
-      ts = rsh.ts;
+      ts      = rsh.ts;
       message = rsh.message;
-      level = rsh.level;
+      level   = rsh.level;
     }
     Msg(Msg&& rsh) {
-      ts = rsh.ts;
+      ts      = rsh.ts;
       message = rsh.message;
-      level = rsh.level;
+      level   = rsh.level;
     }
     Msg& operator=(Msg&& rsh) {
-      ts = rsh.ts;
+      ts      = rsh.ts;
       message = std::move(rsh.message);
-      level = rsh.level;
+      level   = rsh.level;
       return *this;
     }
     Msg& operator=(const Msg& rsh) {
-      ts = rsh.ts;
+      ts      = rsh.ts;
       message = rsh.message;
-      level = rsh.level;
+      level   = rsh.level;
       return *this;
     }
   };
@@ -167,7 +171,7 @@ class AsyncLogger : public google::base::Logger {
   void FlushBuffer(const std::unique_ptr<std::deque<Msg>>& msg);
 
   google::base::Logger* const wrapped_;
-  std::thread log_thread_;
+  std::thread                 log_thread_;
 
   // Count of how many times the writer thread has flushed the buffers.
   // 64 bits should be enough to never worry about overflow.
@@ -186,10 +190,9 @@ class AsyncLogger : public google::base::Logger {
 
   // Trigger for the logger thread to stop.
   enum State { INITTED, RUNNING, STOPPED };
-  std::atomic<State> state_ = {INITTED};
-  std::atomic_flag flag_ = ATOMIC_FLAG_INIT;
-  std::unordered_map<std::string, std::unique_ptr<LogFileObject>>
-      module_logger_map_;
+  std::atomic<State>                                              state_ = {INITTED};
+  std::atomic_flag                                                flag_  = ATOMIC_FLAG_INIT;
+  std::unordered_map<std::string, std::unique_ptr<LogFileObject>> module_logger_map_;
 
   DISALLOW_COPY_AND_ASSIGN(AsyncLogger);
 };

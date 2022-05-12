@@ -15,8 +15,9 @@ limitations under the License.
 
 #include "modules/planning/common/history.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -38,8 +39,7 @@ TEST_F(HistoryTest, Add) {
 
   ADCTrajectory adc_trajectory;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/testdata/common/history_01.pb.txt",
-      &adc_trajectory));
+      "/apollo/modules/planning/testdata/common/history_01.pb.txt", &adc_trajectory));
   int ret = history_->Add(adc_trajectory);
   EXPECT_EQ(0, ret);
 }
@@ -51,12 +51,10 @@ TEST_F(HistoryTest, GetLastFrame) {
 
   ADCTrajectory adc_trajectory_1;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/testdata/common/history_01.pb.txt",
-      &adc_trajectory_1));
+      "/apollo/modules/planning/testdata/common/history_01.pb.txt", &adc_trajectory_1));
   ADCTrajectory adc_trajectory_2;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/testdata/common/history_02.pb.txt",
-      &adc_trajectory_2));
+      "/apollo/modules/planning/testdata/common/history_02.pb.txt", &adc_trajectory_2));
 
   // seq_num: 1
   history_->Add(adc_trajectory_1);
@@ -88,8 +86,7 @@ TEST_F(HistoryTest, GetObjectDecisions) {
 
   ADCTrajectory adc_trajectory;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/testdata/common/history_01.pb.txt",
-      &adc_trajectory));
+      "/apollo/modules/planning/testdata/common/history_01.pb.txt", &adc_trajectory));
 
   history_->Add(adc_trajectory);
   EXPECT_NE(nullptr, history_->GetLastFrame());
@@ -98,11 +95,10 @@ TEST_F(HistoryTest, GetObjectDecisions) {
   EXPECT_EQ(3, object_decisions.size());
 
   // sort
-  std::sort(
-      object_decisions.begin(), object_decisions.end(),
-      [](const HistoryObjectDecision* lhs, const HistoryObjectDecision* rhs) {
-        return lhs->id() < rhs->id();
-      });
+  std::sort(object_decisions.begin(), object_decisions.end(),
+            [](const HistoryObjectDecision* lhs, const HistoryObjectDecision* rhs) {
+              return lhs->id() < rhs->id();
+            });
 
   for (const HistoryObjectDecision* object_decision : object_decisions) {
     ADEBUG << "object_decision[" << object_decision->id() << "]";
@@ -142,8 +138,7 @@ TEST_F(HistoryTest, GetStopObjectDecisions) {
 
   ADCTrajectory adc_trajectory;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/testdata/common/history_01.pb.txt",
-      &adc_trajectory));
+      "/apollo/modules/planning/testdata/common/history_01.pb.txt", &adc_trajectory));
 
   history_->Add(adc_trajectory);
   EXPECT_NE(nullptr, history_->GetLastFrame());
@@ -175,8 +170,7 @@ TEST_F(HistoryTest, GetObjectDecisionsById) {
 
   ADCTrajectory adc_trajectory;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/testdata/common/history_01.pb.txt",
-      &adc_trajectory));
+      "/apollo/modules/planning/testdata/common/history_01.pb.txt", &adc_trajectory));
   history_->Add(adc_trajectory);
   EXPECT_NE(nullptr, history_->GetLastFrame());
 

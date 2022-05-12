@@ -24,18 +24,15 @@
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
-DEFINE_string(process_monitor_name, "ProcessMonitor",
-              "Name of the process monitor.");
+DEFINE_string(process_monitor_name, "ProcessMonitor", "Name of the process monitor.");
 
-DEFINE_double(process_monitor_interval, 1.5,
-              "Process status checking interval in seconds.");
+DEFINE_double(process_monitor_interval, 1.5, "Process status checking interval in seconds.");
 
 namespace apollo {
 namespace monitor {
 
 ProcessMonitor::ProcessMonitor()
-    : RecurrentRunner(FLAGS_process_monitor_name,
-                      FLAGS_process_monitor_interval) {}
+    : RecurrentRunner(FLAGS_process_monitor_name, FLAGS_process_monitor_interval) {}
 
 void ProcessMonitor::RunOnce(const double current_time) {
   // Get running processes.
@@ -43,8 +40,7 @@ void ProcessMonitor::RunOnce(const double current_time) {
   for (const auto& cmd_file : cyber::common::Glob("/proc/*/cmdline")) {
     // Get process command string.
     std::string cmd_string;
-    if (cyber::common::GetContent(cmd_file, &cmd_string) &&
-        !cmd_string.empty()) {
+    if (cyber::common::GetContent(cmd_file, &cmd_string) && !cmd_string.empty()) {
       // In /proc/<PID>/cmdline, the parts are separated with \0, which will be
       // converted back to whitespaces here.
       std::replace(cmd_string.begin(), cmd_string.end(), '\0', ' ');
@@ -52,14 +48,14 @@ void ProcessMonitor::RunOnce(const double current_time) {
     }
   }
 
-  auto manager = MonitorManager::Instance();
-  const auto& mode = manager->GetHMIMode();
+  auto        manager = MonitorManager::Instance();
+  const auto& mode    = manager->GetHMIMode();
 
   // Check HMI modules.
   auto* hmi_modules = manager->GetStatus()->mutable_hmi_modules();
   for (const auto& iter : mode.modules()) {
     const std::string& module_name = iter.first;
-    const auto& config = iter.second.process_monitor_config();
+    const auto&        config      = iter.second.process_monitor_config();
     UpdateStatus(running_processes, config, &hmi_modules->at(module_name));
   }
 
@@ -67,10 +63,9 @@ void ProcessMonitor::RunOnce(const double current_time) {
   auto* components = manager->GetStatus()->mutable_components();
   for (const auto& iter : mode.monitored_components()) {
     const std::string& name = iter.first;
-    if (iter.second.has_process() &&
-        apollo::common::util::ContainsKey(*components, name)) {
+    if (iter.second.has_process() && apollo::common::util::ContainsKey(*components, name)) {
       const auto& config = iter.second.process();
-      auto* status = components->at(name).mutable_process_status();
+      auto*       status = components->at(name).mutable_process_status();
       UpdateStatus(running_processes, config, status);
     }
   }
@@ -78,16 +73,15 @@ void ProcessMonitor::RunOnce(const double current_time) {
   // Check other components.
   auto* other_components = manager->GetStatus()->mutable_other_components();
   for (const auto& iter : mode.other_components()) {
-    const std::string& name = iter.first;
-    const auto& config = iter.second;
+    const std::string& name   = iter.first;
+    const auto&        config = iter.second;
     UpdateStatus(running_processes, config, &other_components->at(name));
   }
 }
 
-void ProcessMonitor::UpdateStatus(
-    const std::vector<std::string>& running_processes,
-    const apollo::dreamview::ProcessMonitorConfig& config,
-    ComponentStatus* status) {
+void ProcessMonitor::UpdateStatus(const std::vector<std::string>&                running_processes,
+                                  const apollo::dreamview::ProcessMonitorConfig& config,
+                                  ComponentStatus*                               status) {
   status->clear_status();
   for (const std::string& command : running_processes) {
     bool all_keywords_matched = true;

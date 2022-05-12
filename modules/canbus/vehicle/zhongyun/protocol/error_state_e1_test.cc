@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/zhongyun/protocol/error_state_e1.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,13 +28,13 @@ class Errorstatee1Test : public ::testing::Test {
 };
 
 TEST_F(Errorstatee1Test, reset) {
-  Errorstatee1 error_state_;
-  int32_t length = 8;
+  Errorstatee1  error_state_;
+  int32_t       length = 8;
   ChassisDetail cd;
-  uint8_t bytes[8] = {0x01, 0x01, 0x01, 0x01, 0x01, 0x12, 0x13, 0x14};
+  uint8_t       bytes[8] = {0x01, 0x01, 0x01, 0x01, 0x01, 0x12, 0x13, 0x14};
 
   error_state_.Parse(bytes, length, &cd);
-  auto &error_state_info = cd.zhongyun().error_state_e1();
+  auto& error_state_info = cd.zhongyun().error_state_e1();
   EXPECT_DOUBLE_EQ(error_state_info.brake_error_code(), 1);
   EXPECT_DOUBLE_EQ(error_state_info.driven_error_code(), 1);
   EXPECT_DOUBLE_EQ(error_state_info.steering_error_code(), 1);

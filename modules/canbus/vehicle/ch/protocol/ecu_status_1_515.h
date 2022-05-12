@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Ecustatus1515 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+class Ecustatus1515
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Ecustatus1515();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Current speed (Steering status)', 'offset':
@@ -49,8 +49,7 @@ class Ecustatus1515 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 8, 'name': 'CTRL_STS', 'is_signed_var': False,
   // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 32, 'type': 'enum',
   // 'order': 'intel', 'physical_unit': ''}
-  Ecu_status_1_515::Ctrl_stsType ctrl_sts(const std::uint8_t* bytes,
-                                          const int32_t length) const;
+  Ecu_status_1_515::Ctrl_stsType ctrl_sts(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Current chassis state (Chassis status)',
   // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'CHASSIS_STS',

@@ -32,9 +32,9 @@ using croutine::CRoutine;
 
 class ProcessorContext {
  public:
-  virtual void Shutdown();
+  virtual void                      Shutdown();
   virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
-  virtual void Wait() = 0;
+  virtual void                      Wait()        = 0;
 
  protected:
   std::atomic<bool> stop_{false};

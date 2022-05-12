@@ -30,33 +30,25 @@ using ::apollo::drivers::canbus::Byte;
 Doorrpt417::Doorrpt417() {}
 const int32_t Doorrpt417::ID = 0x417;
 
-void Doorrpt417::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
+void Doorrpt417::Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const {
   chassis->mutable_lexus()->mutable_door_rpt_417()->set_fuel_door_open_is_valid(
       fuel_door_open_is_valid(bytes, length));
   chassis->mutable_lexus()->mutable_door_rpt_417()->set_trunk_open_is_valid(
       trunk_open_is_valid(bytes, length));
   chassis->mutable_lexus()->mutable_door_rpt_417()->set_hood_open_is_valid(
       hood_open_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_door_rpt_417()
-      ->set_rear_pass_door_open_is_valid(
-          rear_pass_door_open_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_door_rpt_417()
-      ->set_rear_driver_door_open_is_valid(
-          rear_driver_door_open_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_door_rpt_417()->set_rear_pass_door_open_is_valid(
+      rear_pass_door_open_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_door_rpt_417()->set_rear_driver_door_open_is_valid(
+      rear_driver_door_open_is_valid(bytes, length));
   chassis->mutable_lexus()->mutable_door_rpt_417()->set_pass_door_open_is_valid(
       pass_door_open_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_door_rpt_417()
-      ->set_driver_door_open_is_valid(driver_door_open_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_door_rpt_417()->set_driver_door_open_is_valid(
+      driver_door_open_is_valid(bytes, length));
   chassis->mutable_lexus()->mutable_door_rpt_417()->set_fuel_door_open(
       fuel_door_open(bytes, length));
-  chassis->mutable_lexus()->mutable_door_rpt_417()->set_trunk_open(
-      trunk_open(bytes, length));
-  chassis->mutable_lexus()->mutable_door_rpt_417()->set_hood_open(
-      hood_open(bytes, length));
+  chassis->mutable_lexus()->mutable_door_rpt_417()->set_trunk_open(trunk_open(bytes, length));
+  chassis->mutable_lexus()->mutable_door_rpt_417()->set_hood_open(hood_open(bytes, length));
   chassis->mutable_lexus()->mutable_door_rpt_417()->set_rear_pass_door_open(
       rear_pass_door_open(bytes, length));
   chassis->mutable_lexus()->mutable_door_rpt_417()->set_rear_driver_door_open(
@@ -70,9 +62,8 @@ void Doorrpt417::Parse(const std::uint8_t* bytes, int32_t length,
 // config detail: {'name': 'fuel_door_open_is_valid', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 14, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::fuel_door_open_is_valid(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 1);
+bool Doorrpt417::fuel_door_open_is_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(6, 1);
 
   bool ret = x;
@@ -82,9 +73,8 @@ bool Doorrpt417::fuel_door_open_is_valid(const std::uint8_t* bytes,
 // config detail: {'name': 'trunk_open_is_valid', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 13, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::trunk_open_is_valid(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte t0(bytes + 1);
+bool Doorrpt417::trunk_open_is_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(5, 1);
 
   bool ret = x;
@@ -94,9 +84,8 @@ bool Doorrpt417::trunk_open_is_valid(const std::uint8_t* bytes,
 // config detail: {'name': 'hood_open_is_valid', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 12, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::hood_open_is_valid(const std::uint8_t* bytes,
-                                    int32_t length) const {
-  Byte t0(bytes + 1);
+bool Doorrpt417::hood_open_is_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(4, 1);
 
   bool ret = x;
@@ -106,9 +95,8 @@ bool Doorrpt417::hood_open_is_valid(const std::uint8_t* bytes,
 // config detail: {'name': 'rear_pass_door_open_is_valid', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 11, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::rear_pass_door_open_is_valid(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+bool Doorrpt417::rear_pass_door_open_is_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -118,9 +106,8 @@ bool Doorrpt417::rear_pass_door_open_is_valid(const std::uint8_t* bytes,
 // config detail: {'name': 'rear_driver_door_open_is_valid', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 10, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::rear_driver_door_open_is_valid(const std::uint8_t* bytes,
-                                                int32_t length) const {
-  Byte t0(bytes + 1);
+bool Doorrpt417::rear_driver_door_open_is_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -130,9 +117,8 @@ bool Doorrpt417::rear_driver_door_open_is_valid(const std::uint8_t* bytes,
 // config detail: {'name': 'pass_door_open_is_valid', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 9, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::pass_door_open_is_valid(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 1);
+bool Doorrpt417::pass_door_open_is_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(1, 1);
 
   bool ret = x;
@@ -142,9 +128,8 @@ bool Doorrpt417::pass_door_open_is_valid(const std::uint8_t* bytes,
 // config detail: {'name': 'driver_door_open_is_valid', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 8, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::driver_door_open_is_valid(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 1);
+bool Doorrpt417::driver_door_open_is_valid(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;
@@ -154,9 +139,8 @@ bool Doorrpt417::driver_door_open_is_valid(const std::uint8_t* bytes,
 // config detail: {'name': 'fuel_door_open', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 6,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::fuel_door_open(const std::uint8_t* bytes,
-                                int32_t length) const {
-  Byte t0(bytes + 0);
+bool Doorrpt417::fuel_door_open(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(6, 1);
 
   bool ret = x;
@@ -167,7 +151,7 @@ bool Doorrpt417::fuel_door_open(const std::uint8_t* bytes,
 // 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 5, 'type':
 // 'bool', 'order': 'motorola', 'physical_unit': ''}
 bool Doorrpt417::trunk_open(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(5, 1);
 
   bool ret = x;
@@ -178,7 +162,7 @@ bool Doorrpt417::trunk_open(const std::uint8_t* bytes, int32_t length) const {
 // 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 4, 'type':
 // 'bool', 'order': 'motorola', 'physical_unit': ''}
 bool Doorrpt417::hood_open(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(4, 1);
 
   bool ret = x;
@@ -188,9 +172,8 @@ bool Doorrpt417::hood_open(const std::uint8_t* bytes, int32_t length) const {
 // config detail: {'name': 'rear_pass_door_open', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 3, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::rear_pass_door_open(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte t0(bytes + 0);
+bool Doorrpt417::rear_pass_door_open(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -200,9 +183,8 @@ bool Doorrpt417::rear_pass_door_open(const std::uint8_t* bytes,
 // config detail: {'name': 'rear_driver_door_open', 'offset': 0.0,
 // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 2, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::rear_driver_door_open(const std::uint8_t* bytes,
-                                       int32_t length) const {
-  Byte t0(bytes + 0);
+bool Doorrpt417::rear_driver_door_open(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -212,9 +194,8 @@ bool Doorrpt417::rear_driver_door_open(const std::uint8_t* bytes,
 // config detail: {'name': 'pass_door_open', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::pass_door_open(const std::uint8_t* bytes,
-                                int32_t length) const {
-  Byte t0(bytes + 0);
+bool Doorrpt417::pass_door_open(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(1, 1);
 
   bool ret = x;
@@ -224,9 +205,8 @@ bool Doorrpt417::pass_door_open(const std::uint8_t* bytes,
 // config detail: {'name': 'driver_door_open', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Doorrpt417::driver_door_open(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 0);
+bool Doorrpt417::driver_door_open(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;

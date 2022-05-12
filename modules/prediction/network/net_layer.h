@@ -76,8 +76,7 @@ class Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs,
-                   Eigen::MatrixXf* output) = 0;
+  virtual void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) = 0;
 
   /**
    * @brief Name of a layer
@@ -93,7 +92,7 @@ class Layer {
 
  private:
   std::string name_;
-  int order_number_ = -1;
+  int         order_number_ = -1;
 };
 
 /**
@@ -126,14 +125,13 @@ class Dense : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
  private:
-  int units_;
-  bool use_bias_;
-  Eigen::MatrixXf weights_;
-  Eigen::VectorXf bias_;
+  int                         units_;
+  bool                        use_bias_;
+  Eigen::MatrixXf             weights_;
+  Eigen::VectorXf             bias_;
   std::function<float(float)> kactivation_;
 };
 
@@ -167,15 +165,14 @@ class Conv1d : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
  private:
-  std::vector<int> shape_;
-  bool use_bias_;
+  std::vector<int>             shape_;
+  bool                         use_bias_;
   std::vector<Eigen::MatrixXf> kernel_;
-  Eigen::VectorXf bias_;
-  int stride_;
+  Eigen::VectorXf              bias_;
+  int                          stride_;
 };
 
 /**
@@ -203,8 +200,7 @@ class MaxPool1d : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
  private:
   int kernel_size_;
@@ -236,8 +232,7 @@ class AvgPool1d : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
  private:
   int kernel_size_;
@@ -273,8 +268,7 @@ class Activation : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
  private:
   std::function<float(float)> kactivation_;
@@ -299,19 +293,18 @@ class BatchNormalization : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
  private:
   Eigen::VectorXf mu_;
   Eigen::VectorXf sigma_;
   Eigen::VectorXf gamma_;
   Eigen::VectorXf beta_;
-  float epsilon_ = 0.0f;
-  float momentum_ = 0.0f;
-  int axis_ = 0;
-  bool center_ = false;
-  bool scale_ = false;
+  float           epsilon_  = 0.0f;
+  float           momentum_ = 0.0f;
+  int             axis_     = 0;
+  bool            center_   = false;
+  bool            scale_    = false;
 };
 
 /**
@@ -333,8 +326,7 @@ class LSTM : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
   /**
    * @brief Reset the internal state and memory cell state as zero-matrix
@@ -361,8 +353,10 @@ class LSTM : public Layer {
    * @param Hidden state of previous step and return current hidden state
    * @param Cell state of previous step and return current cell state
    */
-  void Step(const Eigen::MatrixXf& input, Eigen::MatrixXf* output,
-            Eigen::MatrixXf* ht_1, Eigen::MatrixXf* ct_1);
+  void Step(const Eigen::MatrixXf& input,
+            Eigen::MatrixXf*       output,
+            Eigen::MatrixXf*       ht_1,
+            Eigen::MatrixXf*       ct_1);
 
   Eigen::MatrixXf wi_;
   Eigen::MatrixXf wf_;
@@ -378,15 +372,15 @@ class LSTM : public Layer {
   Eigen::MatrixXf r_wc_;
   Eigen::MatrixXf r_wo_;
 
-  Eigen::MatrixXf ht_1_;
-  Eigen::MatrixXf ct_1_;
+  Eigen::MatrixXf             ht_1_;
+  Eigen::MatrixXf             ct_1_;
   std::function<float(float)> kactivation_;
   std::function<float(float)> krecurrent_activation_;
-  int units_ = 0;
-  bool return_sequences_ = false;
-  bool stateful_ = false;
-  bool use_bias_ = false;
-  bool unit_forget_bias_ = false;
+  int                         units_            = 0;
+  bool                        return_sequences_ = false;
+  bool                        stateful_         = false;
+  bool                        use_bias_         = false;
+  bool                        unit_forget_bias_ = false;
 };
 
 /**
@@ -406,8 +400,7 @@ class Flatten : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 };
 
 /**
@@ -428,13 +421,12 @@ class Input : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
  private:
   std::vector<int> input_shape_;
-  std::string dtype_;
-  bool sparse_ = false;
+  std::string      dtype_;
+  bool             sparse_ = false;
 };
 
 /**
@@ -455,8 +447,7 @@ class Concatenate : public Layer {
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
    */
-  void Run(const std::vector<Eigen::MatrixXf>& inputs,
-           Eigen::MatrixXf* output) override;
+  void Run(const std::vector<Eigen::MatrixXf>& inputs, Eigen::MatrixXf* output) override;
 
  private:
   int axis_ = 0;

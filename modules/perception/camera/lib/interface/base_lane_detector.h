@@ -29,7 +29,7 @@ namespace camera {
 
 struct LaneDetectorInitOptions : public BaseInitOptions {
   std::shared_ptr<base::BaseCameraModel> base_camera_model = nullptr;
-  int gpu_id = 0;
+  int                                    gpu_id            = 0;
 };
 
 struct LaneDetectorOptions {};
@@ -40,16 +40,14 @@ class BaseLaneDetector {
 
   virtual ~BaseLaneDetector() = default;
 
-  virtual bool Init(
-      const LaneDetectorInitOptions& options = LaneDetectorInitOptions()) = 0;
+  virtual bool Init(const LaneDetectorInitOptions& options = LaneDetectorInitOptions()) = 0;
 
   // @brief: detect lane from image.
   // @param [in]: options
   // @param [in/out]: frame
   // detected lanes should be filled, required,
   // 3D information of lane can be filled, optional.
-  virtual bool Detect(const LaneDetectorOptions& options,
-                      CameraFrame* frame) = 0;
+  virtual bool Detect(const LaneDetectorOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -58,8 +56,7 @@ class BaseLaneDetector {
 };  // class BaseLaneDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseLaneDetector);
-#define REGISTER_LANE_DETECTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseLaneDetector, name)
+#define REGISTER_LANE_DETECTOR(name) PERCEPTION_REGISTER_CLASS(BaseLaneDetector, name)
 
 }  // namespace camera
 }  // namespace perception

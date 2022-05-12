@@ -48,25 +48,23 @@ void TriggerBase::LockTrigger(const SmartRecordTrigger& trigger_conf) {
 uint64_t TriggerBase::GetValidValueInRange(const double desired_value,
                                            const double min_limit,
                                            const double max_limit) const {
-  return SecondsToNanoSeconds(desired_value < min_limit
-                                  ? min_limit
-                                  : desired_value > max_limit ? max_limit
-                                                              : desired_value);
+  return SecondsToNanoSeconds(desired_value < min_limit ?
+                                  min_limit :
+                                  desired_value > max_limit ? max_limit : desired_value);
 }
 
 void TriggerBase::TriggerIt(const uint64_t msg_time) const {
-  static constexpr float kMaxBackwardTime = 30.0;
-  static constexpr float kMaxForwardTime = 15.0;
-  static constexpr uint64_t kZero = 0.0;
-  const uint64_t backward_time = GetValidValueInRange(
-      trigger_obj_->backward_time(), kZero, kMaxBackwardTime);
-  const uint64_t forward_time = GetValidValueInRange(
-      trigger_obj_->forward_time(), kZero, kMaxForwardTime);
-  IntervalPool::Instance()->AddInterval(msg_time - backward_time,
-                                        msg_time + forward_time);
-  IntervalPool::Instance()->LogIntervalEvent(
-      trigger_obj_->trigger_name(), trigger_obj_->description(), msg_time,
-      backward_time, forward_time);
+  static constexpr float    kMaxBackwardTime = 30.0;
+  static constexpr float    kMaxForwardTime  = 15.0;
+  static constexpr uint64_t kZero            = 0.0;
+  const uint64_t            backward_time =
+      GetValidValueInRange(trigger_obj_->backward_time(), kZero, kMaxBackwardTime);
+  const uint64_t forward_time =
+      GetValidValueInRange(trigger_obj_->forward_time(), kZero, kMaxForwardTime);
+  IntervalPool::Instance()->AddInterval(msg_time - backward_time, msg_time + forward_time);
+  IntervalPool::Instance()->LogIntervalEvent(trigger_obj_->trigger_name(),
+                                             trigger_obj_->description(), msg_time, backward_time,
+                                             forward_time);
 }
 
 }  // namespace data

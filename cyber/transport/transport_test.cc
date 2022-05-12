@@ -31,7 +31,7 @@ namespace cyber {
 namespace transport {
 
 using TransmitterPtr = std::shared_ptr<Transmitter<proto::UnitTest>>;
-using ReceiverPtr = std::shared_ptr<Receiver<proto::UnitTest>>;
+using ReceiverPtr    = std::shared_ptr<Receiver<proto::UnitTest>>;
 
 TEST(TransportTest, constructor) {
   auto transport_a = Transport::Instance();
@@ -49,13 +49,11 @@ TEST(TransportTest, create_transmitter) {
   attr.set_id(id.HashValue());
 
   TransmitterPtr intra =
-      Transport::Instance()->CreateTransmitter<proto::UnitTest>(
-          attr, OptionalMode::INTRA);
+      Transport::Instance()->CreateTransmitter<proto::UnitTest>(attr, OptionalMode::INTRA);
   EXPECT_EQ(typeid(*intra), typeid(IntraTransmitter<proto::UnitTest>));
 
   TransmitterPtr shm =
-      Transport::Instance()->CreateTransmitter<proto::UnitTest>(
-          attr, OptionalMode::SHM);
+      Transport::Instance()->CreateTransmitter<proto::UnitTest>(attr, OptionalMode::SHM);
   EXPECT_EQ(typeid(*shm), typeid(ShmTransmitter<proto::UnitTest>));
 }
 
@@ -65,15 +63,15 @@ TEST(TransportTest, create_receiver) {
   Identity id;
   attr.set_id(id.HashValue());
 
-  auto listener = [](const std::shared_ptr<proto::UnitTest>&,
-                     const MessageInfo&, const RoleAttributes&) {};
+  auto listener = [](const std::shared_ptr<proto::UnitTest>&, const MessageInfo&,
+                     const RoleAttributes&) {};
 
-  ReceiverPtr intra = Transport::Instance()->CreateReceiver<proto::UnitTest>(
-      attr, listener, OptionalMode::INTRA);
+  ReceiverPtr intra =
+      Transport::Instance()->CreateReceiver<proto::UnitTest>(attr, listener, OptionalMode::INTRA);
   EXPECT_EQ(typeid(*intra), typeid(IntraReceiver<proto::UnitTest>));
 
-  ReceiverPtr shm = Transport::Instance()->CreateReceiver<proto::UnitTest>(
-      attr, listener, OptionalMode::SHM);
+  ReceiverPtr shm =
+      Transport::Instance()->CreateReceiver<proto::UnitTest>(attr, listener, OptionalMode::SHM);
   EXPECT_EQ(typeid(*shm), typeid(ShmReceiver<proto::UnitTest>));
 }
 

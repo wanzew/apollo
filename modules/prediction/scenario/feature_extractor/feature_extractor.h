@@ -41,28 +41,25 @@ class FeatureExtractor {
    * @brief Extract features for scenario analysis
    * @return Scenario features
    */
-  static EnvironmentFeatures ExtractEnvironmentFeatures(
-      ContainerManager* container_manager);
+  static EnvironmentFeatures ExtractEnvironmentFeatures(ContainerManager* container_manager);
 
   FRIEND_TEST(FeatureExtractorTest, junction);
 
  private:
-  static void ExtractEgoLaneFeatures(
-      EnvironmentFeatures* ptr_environment_features,
-      const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
-      const common::math::Vec2d& ego_position);
+  static void ExtractEgoLaneFeatures(EnvironmentFeatures* ptr_environment_features,
+                                     const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
+                                     const common::math::Vec2d&                    ego_position);
 
-  static void ExtractNeighborLaneFeatures(
-      EnvironmentFeatures* ptr_environment_features,
-      const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
-      const common::math::Vec2d& ego_position);
+  static void
+  ExtractNeighborLaneFeatures(EnvironmentFeatures* ptr_environment_features,
+                              const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
+                              const common::math::Vec2d&                    ego_position);
 
-  static void ExtractFrontJunctionFeatures(
-      EnvironmentFeatures* ptr_environment_features,
-      ContainerManager* container_manager);
+  static void ExtractFrontJunctionFeatures(EnvironmentFeatures* ptr_environment_features,
+                                           ContainerManager*    container_manager);
 
-  static std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(
-      const common::Point3D& position, const double heading);
+  static std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(const common::Point3D& position,
+                                                           const double           heading);
 };
 
 }  // namespace prediction

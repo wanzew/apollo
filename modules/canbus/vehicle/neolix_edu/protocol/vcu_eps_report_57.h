@@ -17,19 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Vcuepsreport57 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Vcuepsreport57
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vcuepsreport57();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,
@@ -46,8 +46,8 @@ class Vcuepsreport57 : public ::apollo::drivers::canbus::ProtocolData<
   // 'Control_Mode_Resp', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|7]', 'bit': 6, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Vcu_eps_report_57::Control_mode_respType control_mode_resp(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Vcu_eps_report_57::Control_mode_respType control_mode_resp(const std::uint8_t* bytes,
+                                                             const int32_t       length) const;
 
   // config detail: {'description': '0x0:not overflow;0x1:overflow', 'offset':
   // 0.0, 'precision': 1.0, 'len': 1, 'name': 'VCU_EPS_Report', 'is_signed_var':
@@ -65,35 +65,30 @@ class Vcuepsreport57 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_Real_Angle_Valid',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 32, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_real_angle_valid(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool vcu_real_angle_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': '0x0:disable;0x1:enable;', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'VCU_Target_Angle_Valid',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 33, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool vcu_target_angle_valid(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  bool vcu_target_angle_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_Target_Angle', 'offset': -512.0, 'precision':
   // 0.25, 'len': 12, 'is_signed_var': False, 'physical_range': '[-380|380]',
   // 'bit': 47, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
-  double vcu_target_angle(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  double vcu_target_angle(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_EPS_Rept_AliveCounter', 'offset': 0.0,
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_eps_rept_alivecounter(const std::uint8_t* bytes,
-                                const int32_t length) const;
+  int vcu_eps_rept_alivecounter(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'VCU_EPS_Rept_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  int vcu_eps_rept_checksum(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  int vcu_eps_rept_checksum(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace neolix_edu

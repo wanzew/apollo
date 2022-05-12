@@ -36,7 +36,7 @@ TEST(LidarDummyAlgorithmTest, lidar_dummy_algorithm_test) {
     EXPECT_EQ(classifier->Name(), name);
     EXPECT_TRUE(classifier->Init());
     ClassifierOptions options;
-    LidarFrame frame;
+    LidarFrame        frame;
     EXPECT_TRUE(classifier->Classify(options, &frame));
     delete classifier;
   }
@@ -48,7 +48,7 @@ TEST(LidarDummyAlgorithmTest, lidar_dummy_algorithm_test) {
     EXPECT_EQ(ground_detector->Name(), name);
     EXPECT_TRUE(ground_detector->Init());
     GroundDetectorOptions options;
-    LidarFrame frame;
+    LidarFrame            frame;
     EXPECT_FALSE(ground_detector->Detect(options, nullptr));
     EXPECT_FALSE(ground_detector->Detect(options, &frame));
     frame.cloud.reset(new base::PointFCloud);
@@ -64,7 +64,7 @@ TEST(LidarDummyAlgorithmTest, lidar_dummy_algorithm_test) {
     EXPECT_EQ(roi_filter->Name(), name);
     EXPECT_TRUE(roi_filter->Init());
     ROIFilterOptions options;
-    LidarFrame frame;
+    LidarFrame       frame;
     EXPECT_FALSE(roi_filter->Filter(options, nullptr));
     EXPECT_FALSE(roi_filter->Filter(options, &frame));
     frame.cloud.reset(new base::PointFCloud);
@@ -80,7 +80,7 @@ TEST(LidarDummyAlgorithmTest, lidar_dummy_algorithm_test) {
     EXPECT_EQ(object_filter->Name(), name);
     EXPECT_TRUE(object_filter->Init());
     ObjectFilterOptions options;
-    LidarFrame frame;
+    LidarFrame          frame;
     EXPECT_TRUE(object_filter->Filter(options, &frame));
     delete object_filter;
   }
@@ -92,7 +92,7 @@ TEST(LidarDummyAlgorithmTest, lidar_dummy_algorithm_test) {
     EXPECT_EQ(segmentor->Name(), name);
     EXPECT_TRUE(segmentor->Init());
     SegmentationOptions options;
-    LidarFrame frame;
+    LidarFrame          frame;
     EXPECT_TRUE(segmentor->Segment(options, &frame));
     delete segmentor;
   }
@@ -109,8 +109,7 @@ TEST(LidarDummyAlgorithmTest, lidar_dummy_algorithm_test) {
     base::ObjectPool::Instance().BatchGet(4, &frame.segmented_objects);
     for (std::size_t i = 0; i < 4; ++i) {
       frame.segmented_objects[i]->lidar_supplement.cloud.resize(1);
-      frame.segmented_objects[i]->lidar_supplement.cloud[0].x =
-          static_cast<float>(i);
+      frame.segmented_objects[i]->lidar_supplement.cloud[0].x = static_cast<float>(i);
       frame.segmented_objects[i]->lidar_supplement.cloud[0].y = 0.f;
       frame.segmented_objects[i]->lidar_supplement.cloud[0].z = 0.5f;
     }

@@ -28,28 +28,27 @@ namespace camera {
 struct CameraPerceptionInitOptions : public BaseInitOptions {
   // TODO(Xun): modified to be configurable
   std::string lane_calibration_working_sensor_name = "front_6mm";
-  std::string calibrator_method = "LaneLineCalibrator";
+  std::string calibrator_method                    = "LaneLineCalibrator";
 };
 
 struct CameraPerceptionOptions {};
 
 class BaseCameraPerception {
  public:
-  BaseCameraPerception() = default;
+  BaseCameraPerception()          = default;
   virtual ~BaseCameraPerception() = default;
 
-  virtual bool Init(const CameraPerceptionInitOptions &init_options) = 0;
-  virtual bool Perception(const CameraPerceptionOptions &options,
-                          CameraFrame *frame) = 0;
+  virtual bool Init(const CameraPerceptionInitOptions& init_options)                  = 0;
+  virtual bool Perception(const CameraPerceptionOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
-  BaseCameraPerception(const BaseCameraPerception &) = delete;
-  BaseCameraPerception &operator=(const BaseCameraPerception &) = delete;
+  BaseCameraPerception(const BaseCameraPerception&) = delete;
+  BaseCameraPerception& operator=(const BaseCameraPerception&) = delete;
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseCameraPerception);
-#define PERCEPTION_REGISTER_CAMERA_PERCEPTION(name) \
+#define PERCEPTION_REGISTER_CAMERA_PERCEPTION(name)                                                \
   PERCEPTION_REGISTER_CLASS(BaseCameraPerception, name)
 
 }  // namespace camera

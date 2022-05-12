@@ -25,22 +25,20 @@ namespace prediction {
 class ObstacleClustersTest : public KMLMapBasedTest {};
 
 TEST_F(ObstacleClustersTest, ObstacleClusters) {
-  auto lane = PredictionMap::LaneById("l9");
+  auto   lane    = PredictionMap::LaneById("l9");
   double start_s = 99.0;
-  double length = 100.0;
+  double length  = 100.0;
 
   ObstacleClusters cluster;
-  const LaneGraph &lane_graph =
-      cluster.GetLaneGraph(start_s, length, true, lane);
+  const LaneGraph& lane_graph = cluster.GetLaneGraph(start_s, length, true, lane);
   EXPECT_EQ(1, lane_graph.lane_sequence_size());
   EXPECT_EQ(3, lane_graph.lane_sequence(0).lane_segment_size());
   EXPECT_EQ("l9", lane_graph.lane_sequence(0).lane_segment(0).lane_id());
   EXPECT_EQ("l18", lane_graph.lane_sequence(0).lane_segment(1).lane_id());
   EXPECT_EQ("l21", lane_graph.lane_sequence(0).lane_segment(2).lane_id());
 
-  double length_2 = 50.0;
-  const LaneGraph &lane_graph_2 =
-      cluster.GetLaneGraph(start_s, length_2, true, lane);
+  double           length_2     = 50.0;
+  const LaneGraph& lane_graph_2 = cluster.GetLaneGraph(start_s, length_2, true, lane);
   EXPECT_EQ(1, lane_graph_2.lane_sequence_size());
   EXPECT_EQ(2, lane_graph_2.lane_sequence(0).lane_segment_size());
   EXPECT_EQ("l9", lane_graph_2.lane_sequence(0).lane_segment(0).lane_id());

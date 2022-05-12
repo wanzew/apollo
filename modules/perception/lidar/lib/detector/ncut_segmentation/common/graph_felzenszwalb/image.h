@@ -44,9 +44,9 @@ class Image {
   /* delete an image */
   ~Image();
   /* init an image */
-  void init(const T &val);
+  void init(const T& val);
   /* copy an image */
-  Image<T> *copy() const;
+  Image<T>* copy() const;
 
   /* get the width of an image. */
   int width() const { return _w; }
@@ -55,10 +55,10 @@ class Image {
   int height() const { return _h; }
 
   /* image data. */
-  T *_data;
+  T* _data;
 
   /* row pointers. */
-  T **_access;
+  T** _access;
 
  private:
   int _w;
@@ -70,19 +70,17 @@ class Image {
 #define imPtr(im, x, y) &(im->_access[y][x])
 template <class T>
 Image<T>::Image(const int width, const int height, const bool init) {
-  _w = width;
-  _h = height;
-  _data = new T[_w * _h];  // allocate space for image data
-  _access = new T *[_h];   // allocate space for row pointers
+  _w      = width;
+  _h      = height;
+  _data   = new T[_w * _h];  // allocate space for image data
+  _access = new T*[_h];      // allocate space for row pointers
 
   // initialize row pointers
   for (int i = 0; i < _h; i++) {
     _access[i] = _data + (i * _w);
   }
 
-  if (init) {
-    memset(_data, 0, _w * _h * sizeof(T));
-  }
+  if (init) { memset(_data, 0, _w * _h * sizeof(T)); }
 }
 template <class T>
 Image<T>::~Image() {
@@ -90,16 +88,16 @@ Image<T>::~Image() {
   delete[] _access;
 }
 template <class T>
-void Image<T>::init(const T &val) {
-  T *ptr = imPtr(this, 0, 0);
-  T *end = imPtr(this, _w - 1, _h - 1);
+void Image<T>::init(const T& val) {
+  T* ptr = imPtr(this, 0, 0);
+  T* end = imPtr(this, _w - 1, _h - 1);
   while (ptr <= end) {
     *ptr++ = val;
   }
 }
 template <class T>
-Image<T> *Image<T>::copy() const {
-  Image<T> *im = new Image<T>(_w, _h, false);
+Image<T>* Image<T>::copy() const {
+  Image<T>* im = new Image<T>(_w, _h, false);
   memcpy(im->_data, _data, _w * _h * sizeof(T));
   return im;
 }

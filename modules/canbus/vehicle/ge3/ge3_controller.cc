@@ -14,10 +14,12 @@ limitations under the License.
 ==============================================================================*/
 
 #include "modules/canbus/vehicle/ge3/ge3_controller.h"
+
+#include "modules/common/proto/vehicle_signal.pb.h"
+
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/ge3/ge3_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -31,22 +33,22 @@ using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 }  // namespace
 
-ErrorCode Ge3Controller::Init(
-    const VehicleParameter& params, CanSender<ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+Ge3Controller::Init(const VehicleParameter&                                params,
+                    CanSender<ChassisDetail>* const                        can_sender,
+                    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "Ge3Controller has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -66,36 +68,31 @@ ErrorCode Ge3Controller::Init(
   message_manager_ = message_manager;
 
   // sender part
-  pc_bcm_201_ = dynamic_cast<Pcbcm201*>(
-      message_manager_->GetMutableProtocolDataById(Pcbcm201::ID));
+  pc_bcm_201_ = dynamic_cast<Pcbcm201*>(message_manager_->GetMutableProtocolDataById(Pcbcm201::ID));
   if (pc_bcm_201_ == nullptr) {
     AERROR << "Pcbcm201 does not exist in the Ge3MessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  pc_bcs_202_ = dynamic_cast<Pcbcs202*>(
-      message_manager_->GetMutableProtocolDataById(Pcbcs202::ID));
+  pc_bcs_202_ = dynamic_cast<Pcbcs202*>(message_manager_->GetMutableProtocolDataById(Pcbcs202::ID));
   if (pc_bcs_202_ == nullptr) {
     AERROR << "Pcbcs202 does not exist in the Ge3MessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  pc_epb_203_ = dynamic_cast<Pcepb203*>(
-      message_manager_->GetMutableProtocolDataById(Pcepb203::ID));
+  pc_epb_203_ = dynamic_cast<Pcepb203*>(message_manager_->GetMutableProtocolDataById(Pcepb203::ID));
   if (pc_epb_203_ == nullptr) {
     AERROR << "Pcepb203 does not exist in the Ge3MessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  pc_eps_204_ = dynamic_cast<Pceps204*>(
-      message_manager_->GetMutableProtocolDataById(Pceps204::ID));
+  pc_eps_204_ = dynamic_cast<Pceps204*>(message_manager_->GetMutableProtocolDataById(Pceps204::ID));
   if (pc_eps_204_ == nullptr) {
     AERROR << "Pceps204 does not exist in the Ge3MessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  pc_vcu_205_ = dynamic_cast<Pcvcu205*>(
-      message_manager_->GetMutableProtocolDataById(Pcvcu205::ID));
+  pc_vcu_205_ = dynamic_cast<Pcvcu205*>(message_manager_->GetMutableProtocolDataById(Pcvcu205::ID));
   if (pc_vcu_205_ == nullptr) {
     AERROR << "Pcvcu205 does not exist in the Ge3MessageManager!";
     return ErrorCode::CANBUS_ERROR;
@@ -147,9 +144,7 @@ Chassis Ge3Controller::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -168,52 +163,43 @@ Chassis Ge3Controller::chassis() {
     Scu_bcs_3_308 scu_bcs_3_308 = ge3.scu_bcs_3_308();
     if (scu_bcs_3_308.has_bcs_rrwheelspd()) {
       if (chassis_.has_wheel_speed()) {
-        chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
-            scu_bcs_3_308.bcs_rrwheelspdvd());
+        chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(scu_bcs_3_308.bcs_rrwheelspdvd());
         chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
             (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_rrwheeldirection());
-        chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
-            scu_bcs_3_308.bcs_rrwheelspd());
+        chassis_.mutable_wheel_speed()->set_wheel_spd_rr(scu_bcs_3_308.bcs_rrwheelspd());
       }
     }
 
     if (scu_bcs_3_308.has_bcs_rlwheelspd()) {
       if (chassis_.has_wheel_speed()) {
-        chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
-            scu_bcs_3_308.bcs_rlwheelspdvd());
+        chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(scu_bcs_3_308.bcs_rlwheelspdvd());
         chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
             (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_rlwheeldirection());
-        chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
-            scu_bcs_3_308.bcs_rlwheelspd());
+        chassis_.mutable_wheel_speed()->set_wheel_spd_rl(scu_bcs_3_308.bcs_rlwheelspd());
       }
     }
 
     if (scu_bcs_3_308.has_bcs_frwheelspd()) {
       if (chassis_.has_wheel_speed()) {
-        chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
-            scu_bcs_3_308.bcs_frwheelspdvd());
+        chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(scu_bcs_3_308.bcs_frwheelspdvd());
         chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
             (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_frwheeldirection());
-        chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
-            scu_bcs_3_308.bcs_frwheelspd());
+        chassis_.mutable_wheel_speed()->set_wheel_spd_fr(scu_bcs_3_308.bcs_frwheelspd());
       }
     }
 
     if (scu_bcs_3_308.has_bcs_flwheelspd()) {
       if (chassis_.has_wheel_speed()) {
-        chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
-            scu_bcs_3_308.bcs_flwheelspdvd());
+        chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(scu_bcs_3_308.bcs_flwheelspdvd());
         chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
             (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_flwheeldirection());
-        chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
-            scu_bcs_3_308.bcs_flwheelspd());
+        chassis_.mutable_wheel_speed()->set_wheel_spd_fl(scu_bcs_3_308.bcs_flwheelspd());
       }
     }
   }
 
   if (ge3.has_scu_bcs_2_307() && ge3.scu_bcs_2_307().has_bcs_vehspd()) {
-    chassis_.set_speed_mps(
-        static_cast<float>(ge3.scu_bcs_2_307().bcs_vehspd()));
+    chassis_.set_speed_mps(static_cast<float>(ge3.scu_bcs_2_307().bcs_vehspd()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -224,15 +210,13 @@ Chassis Ge3Controller::chassis() {
   chassis_.set_fuel_range_m(0);
 
   if (ge3.has_scu_vcu_1_312() && ge3.scu_vcu_1_312().has_vcu_accpedact()) {
-    chassis_.set_throttle_percentage(
-        static_cast<float>(ge3.scu_vcu_1_312().vcu_accpedact()));
+    chassis_.set_throttle_percentage(static_cast<float>(ge3.scu_vcu_1_312().vcu_accpedact()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9
   if (ge3.has_scu_bcs_1_306() && ge3.scu_bcs_1_306().has_bcs_brkpedact()) {
-    chassis_.set_brake_percentage(
-        static_cast<float>(ge3.scu_bcs_1_306().bcs_brkpedact()));
+    chassis_.set_brake_percentage(static_cast<float>(ge3.scu_bcs_1_306().bcs_brkpedact()));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -254,9 +238,7 @@ Chassis Ge3Controller::chassis() {
       case Scu_vcu_1_312::VCU_GEARACT_PARK: {
         chassis_.set_gear_location(Chassis::GEAR_PARKING);
       } break;
-      default:
-        chassis_.set_gear_location(Chassis::GEAR_INVALID);
-        break;
+      default: chassis_.set_gear_location(Chassis::GEAR_INVALID); break;
     }
   } else {
     chassis_.set_gear_location(Chassis::GEAR_INVALID);
@@ -264,54 +246,41 @@ Chassis Ge3Controller::chassis() {
 
   // 11
   if (ge3.has_scu_eps_311() && ge3.scu_eps_311().has_eps_steerangle()) {
-    chassis_.set_steering_percentage(
-        static_cast<float>(ge3.scu_eps_311().eps_steerangle() /
-                           vehicle_params_.max_steer_angle() * M_PI / 1.80));
+    chassis_.set_steering_percentage(static_cast<float>(
+        ge3.scu_eps_311().eps_steerangle() / vehicle_params_.max_steer_angle() * M_PI / 1.80));
   } else {
     chassis_.set_steering_percentage(0);
   }
 
   // 13
   if (ge3.has_scu_epb_310() && ge3.scu_epb_310().has_epb_sysst()) {
-    chassis_.set_parking_brake(ge3.scu_epb_310().epb_sysst() ==
-                               Scu_epb_310::EPB_SYSST_APPLIED);
+    chassis_.set_parking_brake(ge3.scu_epb_310().epb_sysst() == Scu_epb_310::EPB_SYSST_APPLIED);
   } else {
     chassis_.set_parking_brake(false);
   }
 
   // 14, 15: ge3 light control
   if (ge3.has_scu_bcm_304() && ge3.scu_bcm_304().has_bcm_highbeamst() &&
-      Scu_bcm_304::BCM_HIGHBEAMST_ACTIVE ==
-          ge3.scu_bcm_304().bcm_highbeamst()) {
-    if (chassis_.has_signal()) {
-      chassis_.mutable_signal()->set_high_beam(true);
-    }
+      Scu_bcm_304::BCM_HIGHBEAMST_ACTIVE == ge3.scu_bcm_304().bcm_highbeamst()) {
+    if (chassis_.has_signal()) { chassis_.mutable_signal()->set_high_beam(true); }
   } else {
-    if (chassis_.has_signal()) {
-      chassis_.mutable_signal()->set_high_beam(false);
-    }
+    if (chassis_.has_signal()) { chassis_.mutable_signal()->set_high_beam(false); }
   }
 
   // 16, 17
   if (ge3.has_scu_bcm_304()) {
     Scu_bcm_304 scu_bcm_304 = ge3.scu_bcm_304();
     if (scu_bcm_304.has_bcm_leftturnlampst() &&
-        Scu_bcm_304::BCM_LEFTTURNLAMPST_ACTIVE ==
-            scu_bcm_304.bcm_leftturnlampst()) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_LEFT);
+        Scu_bcm_304::BCM_LEFTTURNLAMPST_ACTIVE == scu_bcm_304.bcm_leftturnlampst()) {
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_LEFT);
     } else if (scu_bcm_304.has_bcm_rightturnlampst() &&
-               Scu_bcm_304::BCM_RIGHTTURNLAMPST_ACTIVE ==
-                   scu_bcm_304.bcm_rightturnlampst()) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_RIGHT);
+               Scu_bcm_304::BCM_RIGHTTURNLAMPST_ACTIVE == scu_bcm_304.bcm_rightturnlampst()) {
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_RIGHT);
     } else {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_NONE);
+      chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
     }
   } else {
-    chassis_.mutable_signal()->set_turn_signal(
-        common::VehicleSignal::TURN_NONE);
+    chassis_.mutable_signal()->set_turn_signal(common::VehicleSignal::TURN_NONE);
   }
   // 18
   if (ge3.has_scu_bcm_304() && ge3.scu_bcm_304().has_bcm_hornst() &&
@@ -327,26 +296,23 @@ Chassis Ge3Controller::chassis() {
     Scu_1_301 scu_1_301 = ge3.scu_1_301();
     Scu_2_302 scu_2_302 = ge3.scu_2_302();
     Scu_3_303 scu_3_303 = ge3.scu_3_303();
-    if (scu_2_302.has_vin00() && scu_2_302.has_vin01() &&
-        scu_2_302.has_vin02() && scu_2_302.has_vin03() &&
-        scu_2_302.has_vin04() && scu_2_302.has_vin05() &&
-        scu_2_302.has_vin06() && scu_2_302.has_vin07() &&
-        scu_3_303.has_vin08() && scu_3_303.has_vin09() &&
-        scu_3_303.has_vin10() && scu_3_303.has_vin11() &&
-        scu_3_303.has_vin12() && scu_3_303.has_vin13() &&
-        scu_3_303.has_vin14() && scu_3_303.has_vin15() &&
-        scu_1_301.has_vin16()) {
+    if (scu_2_302.has_vin00() && scu_2_302.has_vin01() && scu_2_302.has_vin02() &&
+        scu_2_302.has_vin03() && scu_2_302.has_vin04() && scu_2_302.has_vin05() &&
+        scu_2_302.has_vin06() && scu_2_302.has_vin07() && scu_3_303.has_vin08() &&
+        scu_3_303.has_vin09() && scu_3_303.has_vin10() && scu_3_303.has_vin11() &&
+        scu_3_303.has_vin12() && scu_3_303.has_vin13() && scu_3_303.has_vin14() &&
+        scu_3_303.has_vin15() && scu_1_301.has_vin16()) {
       int n[17];
-      n[0] = scu_2_302.vin00();
-      n[1] = scu_2_302.vin01();
-      n[2] = scu_2_302.vin02();
-      n[3] = scu_2_302.vin03();
-      n[4] = scu_2_302.vin04();
-      n[5] = scu_2_302.vin05();
-      n[6] = scu_2_302.vin06();
-      n[7] = scu_2_302.vin07();
-      n[8] = scu_3_303.vin08();
-      n[9] = scu_3_303.vin09();
+      n[0]  = scu_2_302.vin00();
+      n[1]  = scu_2_302.vin01();
+      n[2]  = scu_2_302.vin02();
+      n[3]  = scu_2_302.vin03();
+      n[4]  = scu_2_302.vin04();
+      n[5]  = scu_2_302.vin05();
+      n[6]  = scu_2_302.vin06();
+      n[7]  = scu_2_302.vin07();
+      n[8]  = scu_3_303.vin08();
+      n[9]  = scu_3_303.vin09();
       n[10] = scu_3_303.vin10();
       n[11] = scu_3_303.vin11();
       n[12] = scu_3_303.vin12();
@@ -360,30 +326,24 @@ Chassis Ge3Controller::chassis() {
       for (int i = 0; i < 17; i++) {
         ch[i] = static_cast<char>(n[i]);
       }
-      if (chassis_.has_vehicle_id()) {
-        chassis_.mutable_vehicle_id()->set_vin(ch);
-      }
+      if (chassis_.has_vehicle_id()) { chassis_.mutable_vehicle_id()->set_vin(ch); }
     }
   }
 
   // give engage_advice based on error_code and canbus feedback
   if (chassis_error_mask_) {
     if (chassis_.has_engage_advice()) {
-      chassis_.mutable_engage_advice()->set_advice(
-          apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+      chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::DISALLOW_ENGAGE);
       chassis_.mutable_engage_advice()->set_reason("Chassis error!");
     }
   } else if (chassis_.parking_brake() || CheckSafetyError(chassis_detail)) {
     if (chassis_.has_engage_advice()) {
-      chassis_.mutable_engage_advice()->set_advice(
-          apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-      chassis_.mutable_engage_advice()->set_reason(
-          "Vehicle is not in a safe state to engage!");
+      chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+      chassis_.mutable_engage_advice()->set_reason("Vehicle is not in a safe state to engage!");
     }
   } else {
     if (chassis_.has_engage_advice()) {
-      chassis_.mutable_engage_advice()->set_advice(
-          apollo::common::EngageAdvice::READY_TO_ENGAGE);
+      chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::READY_TO_ENGAGE);
     }
   }
 
@@ -410,8 +370,7 @@ ErrorCode Ge3Controller::EnableAutoMode() {
   pc_eps_204_->set_pc_steerenable(Pc_eps_204::PC_STEERENABLE_ENABLE);
 
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -568,8 +527,7 @@ void Ge3Controller::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle = vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   pc_eps_204_->set_pc_steerangreq(real_angle)->set_pc_steerspdreq(500);
 }
 
@@ -593,16 +551,12 @@ void Ge3Controller::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
-  const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
-              100.0);
-  pc_eps_204_->set_pc_steerangreq(real_angle)
-      ->set_pc_steerspdreq(static_cast<int>(real_angle_spd));
+  const double real_angle     = vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle_spd = ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+      vehicle_params_.min_steer_angle_rate() / M_PI * 180,
+      vehicle_params_.max_steer_angle_rate() / M_PI * 180,
+      vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd / 100.0);
+  pc_eps_204_->set_pc_steerangreq(real_angle)->set_pc_steerspdreq(static_cast<int>(real_angle_spd));
 }
 
 void Ge3Controller::SetEpbBreak(const ControlCommand& command) {
@@ -655,16 +609,13 @@ bool Ge3Controller::CheckChassisError() {
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   if (!chassis_detail.has_ge3()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO ge3 vehicle info."
-                      << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has NO ge3 vehicle info." << chassis_detail.DebugString();
     return false;
   }
   Ge3 ge3 = chassis_detail.ge3();
   // check steer error
   if (ge3.has_scu_eps_311()) {
-    if (Scu_eps_311::EPS_FAULTST_FAULT == ge3.scu_eps_311().eps_faultst()) {
-      return true;
-    }
+    if (Scu_eps_311::EPS_FAULTST_FAULT == ge3.scu_eps_311().eps_faultst()) { return true; }
   }
 
   // check vcu error
@@ -675,37 +626,30 @@ bool Ge3Controller::CheckChassisError() {
 
   // check braking error
   if (ge3.has_scu_bcs_1_306()) {
-    if (Scu_bcs_1_306::BCS_FAULTST_FAULT == ge3.scu_bcs_1_306().bcs_faultst()) {
-      return true;
-    }
+    if (Scu_bcs_1_306::BCS_FAULTST_FAULT == ge3.scu_bcs_1_306().bcs_faultst()) { return true; }
   }
 
   // check gear error
   if (ge3.has_scu_vcu_1_312()) {
-    if (Scu_vcu_1_312::VCU_GEARFAULTST_FAULT ==
-        ge3.scu_vcu_1_312().vcu_gearfaultst()) {
+    if (Scu_vcu_1_312::VCU_GEARFAULTST_FAULT == ge3.scu_vcu_1_312().vcu_gearfaultst()) {
       return true;
     }
   }
 
   // check parking error
   if (ge3.has_scu_epb_310()) {
-    if (Scu_epb_310::EPB_FAULTST_FAULT == ge3.scu_epb_310().epb_faultst()) {
-      return true;
-    }
+    if (Scu_epb_310::EPB_FAULTST_FAULT == ge3.scu_epb_310().epb_faultst()) { return true; }
   }
 
   // check the whole vehicle error
   if (ge3.has_scu_1_301()) {
-    if (Scu_1_301::SCU_FAULTST_NORMAL != ge3.scu_1_301().scu_faultst()) {
-      return true;
-    }
+    if (Scu_1_301::SCU_FAULTST_NORMAL != ge3.scu_1_301().scu_faultst()) { return true; }
   }
   return false;
 }
 
 void Ge3Controller::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -718,16 +662,15 @@ void Ge3Controller::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -739,8 +682,7 @@ void Ge3Controller::SecurityDogThreadFunc() {
     }
 
     // 2. vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -764,18 +706,17 @@ void Ge3Controller::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR << "Too much time consumption in Ge3Controller looping process:"
-             << elapsed.count();
+      AERROR << "Too much time consumption in Ge3Controller looping process:" << elapsed.count();
     }
   }
 }
 
 bool Ge3Controller::CheckResponse(const int32_t flags, bool need_wait) {
-  int32_t retry_num = 20;
+  int32_t       retry_num = 20;
   ChassisDetail chassis_detail;
-  bool is_eps_online = false;
-  bool is_vcu_online = false;
-  bool is_esp_online = false;
+  bool          is_eps_online = false;
+  bool          is_vcu_online = false;
+  bool          is_esp_online = false;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -799,20 +740,16 @@ bool Ge3Controller::CheckResponse(const int32_t flags, bool need_wait) {
                       chassis_detail.check_response().is_esp_online();
       check_ok = check_ok && is_vcu_online && is_esp_online;
     }
-    if (check_ok) {
-      return true;
-    }
+    if (check_ok) { return true; }
     AINFO << "Need to check response again.";
     if (need_wait) {
       --retry_num;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(20));
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
     }
   } while (need_wait && retry_num);
 
   AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+        << ", is_vcu_online:" << is_vcu_online << ", is_esp_online:" << is_esp_online;
   return false;
 }
 
@@ -831,14 +768,12 @@ Chassis::ErrorCode Ge3Controller::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void Ge3Controller::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void Ge3Controller::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }
 
-bool Ge3Controller::CheckSafetyError(
-    const ::apollo::canbus::ChassisDetail& chassis_detail) {
+bool Ge3Controller::CheckSafetyError(const ::apollo::canbus::ChassisDetail& chassis_detail) {
   return false;
 }
 

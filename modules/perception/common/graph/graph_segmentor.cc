@@ -25,9 +25,7 @@ namespace perception {
 namespace common {
 
 namespace {
-float GetThreshold(const size_t sz, const float c) {
-  return c / static_cast<float>(sz);
-}
+float GetThreshold(const size_t sz, const float c) { return c / static_cast<float>(sz); }
 }  // namespace
 
 void GraphSegmentor::Init(const float initial_threshold) {
@@ -41,35 +39,32 @@ void GraphSegmentor::Init(const float initial_threshold) {
   }
 }
 
-void GraphSegmentor::SegmentGraph(const int num_vertices, const int num_edges,
-                                  Edge* edges, bool need_sort) {
+void GraphSegmentor::SegmentGraph(const int num_vertices,
+                                  const int num_edges,
+                                  Edge*     edges,
+                                  bool      need_sort) {
   if (edges == nullptr) {
     AERROR << "Input Null Edges.";
     return;
   }
 
-  if (need_sort) {
-    std::sort(edges, edges + num_edges);
-  }
+  if (need_sort) { std::sort(edges, edges + num_edges); }
 
   universe_.Reset(num_vertices);
 
   thresholds_.assign(num_vertices, initial_threshold_);
   for (int i = 0; i < num_edges; ++i) {
     Edge& edge = edges[i];
-    int a = universe_.Find(edge.a);
-    int b = universe_.Find(edge.b);
-    if (a == b) {
-      continue;
-    }
+    int   a    = universe_.Find(edge.a);
+    int   b    = universe_.Find(edge.b);
+    if (a == b) { continue; }
     if (edge.w <= thresholds_[a] && edge.w <= thresholds_[b]) {
       universe_.Join(a, b);
-      a = universe_.Find(a);
-      int size_a = universe_.GetSize(a);
-      thresholds_[a] =
-          edge.w + (size_a < static_cast<int>(kMaxThresholdsNum)
-                        ? thresholds_table_[size_a]
-                        : GetThreshold(size_a, initial_threshold_));
+      a              = universe_.Find(a);
+      int size_a     = universe_.GetSize(a);
+      thresholds_[a] = edge.w + (size_a < static_cast<int>(kMaxThresholdsNum) ?
+                                     thresholds_table_[size_a] :
+                                     GetThreshold(size_a, initial_threshold_));
     }
   }
 }

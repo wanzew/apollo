@@ -22,18 +22,19 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-const int32_t Block::kRWLockFree = 0;
-const int32_t Block::kWriteExclusive = -1;
+const int32_t Block::kRWLockFree      = 0;
+const int32_t Block::kWriteExclusive  = -1;
 const int32_t Block::kMaxTryLockTimes = 5;
 
-Block::Block() : msg_size_(0), msg_info_size_(0) {}
+Block::Block()
+    : msg_size_(0)
+    , msg_info_size_(0) {}
 
 Block::~Block() {}
 
 bool Block::TryLockForWrite() {
   int32_t rw_lock_free = kRWLockFree;
-  if (!lock_num_.compare_exchange_weak(rw_lock_free, kWriteExclusive,
-                                       std::memory_order_acq_rel,
+  if (!lock_num_.compare_exchange_weak(rw_lock_free, kWriteExclusive, std::memory_order_acq_rel,
                                        std::memory_order_relaxed)) {
     ADEBUG << "lock num: " << lock_num_.load();
     return false;
@@ -49,8 +50,7 @@ bool Block::TryLockForRead() {
   }
 
   int32_t try_times = 0;
-  while (!lock_num_.compare_exchange_weak(lock_num, lock_num + 1,
-                                          std::memory_order_acq_rel,
+  while (!lock_num_.compare_exchange_weak(lock_num, lock_num + 1, std::memory_order_acq_rel,
                                           std::memory_order_relaxed)) {
     ++try_times;
     if (try_times == kMaxTryLockTimes) {

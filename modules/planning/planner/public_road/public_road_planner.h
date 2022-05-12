@@ -20,13 +20,14 @@
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/planner/planner.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/tasks/task.h"
@@ -50,8 +51,7 @@ class PublicRoadPlanner : public PlannerWithReferenceLine {
    */
   PublicRoadPlanner() = delete;
 
-  explicit PublicRoadPlanner(
-      const std::shared_ptr<DependencyInjector>& injector)
+  explicit PublicRoadPlanner(const std::shared_ptr<DependencyInjector>& injector)
       : PlannerWithReferenceLine(injector) {}
 
   /**
@@ -72,8 +72,8 @@ class PublicRoadPlanner : public PlannerWithReferenceLine {
    * @return OK if planning succeeds; error otherwise.
    */
   common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame,
-                      ADCTrajectory* ptr_computed_trajectory) override;
+                      Frame*                         frame,
+                      ADCTrajectory*                 ptr_computed_trajectory) override;
 };
 
 }  // namespace planning

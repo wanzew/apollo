@@ -66,23 +66,20 @@ namespace logger {
 // Globally disable log writing (if disk is full)
 static bool stop_writing = false;
 
-const char* const LogSeverityNames[NUM_SEVERITIES] = {"INFO", "WARNING",
-                                                      "ERROR", "FATAL"};
+const char* const LogSeverityNames[NUM_SEVERITIES] = {"INFO", "WARNING", "ERROR", "FATAL"};
 
 LogFileObject::LogFileObject(LogSeverity severity, const char* base_filename)
-    : base_filename_selected_(base_filename != nullptr),
-      base_filename_((base_filename != nullptr) ? base_filename : ""),
-      symlink_basename_("UNKNOWN"),
-      filename_extension_(),
-      file_(NULL),
-      severity_(severity),
-      bytes_since_flush_(0),
-      file_length_(0),
-      rollover_attempt_(kRolloverAttemptFrequency - 1),
-      next_flush_time_(0) {
-  if (base_filename_.empty()) {
-    base_filename_ = "UNKNOWN";
-  }
+    : base_filename_selected_(base_filename != nullptr)
+    , base_filename_((base_filename != nullptr) ? base_filename : "")
+    , symlink_basename_("UNKNOWN")
+    , filename_extension_()
+    , file_(NULL)
+    , severity_(severity)
+    , bytes_since_flush_(0)
+    , file_length_(0)
+    , rollover_attempt_(kRolloverAttemptFrequency - 1)
+    , next_flush_time_(0) {
+  if (base_filename_.empty()) { base_filename_ = "UNKNOWN"; }
   assert(severity >= 0);
   assert(severity < NUM_SEVERITIES);
 }
@@ -102,7 +99,7 @@ void LogFileObject::SetBasename(const char* basename) {
     // Get rid of old log file since we are changing names
     if (file_ != nullptr) {
       fclose(file_);
-      file_ = nullptr;
+      file_             = nullptr;
       rollover_attempt_ = kRolloverAttemptFrequency - 1;
     }
     base_filename_ = basename;
@@ -115,7 +112,7 @@ void LogFileObject::SetExtension(const char* ext) {
     // Get rid of old log file since we are changing names
     if (file_ != nullptr) {
       fclose(file_);
-      file_ = nullptr;
+      file_             = nullptr;
       rollover_attempt_ = kRolloverAttemptFrequency - 1;
     }
     filename_extension_ = ext;
@@ -138,19 +135,15 @@ void LogFileObject::FlushUnlocked() {
     bytes_since_flush_ = 0;
   }
   // Figure out when we are due for another flush.
-  const int64 next =
-      (FLAGS_logbufsecs * static_cast<int64>(1000000));  // in usec
+  const int64 next = (FLAGS_logbufsecs * static_cast<int64>(1000000));  // in usec
   next_flush_time_ = CycleClock_Now() + UsecToCycles(next);
 }
 
 bool LogFileObject::CreateLogfile(const string& time_pid_string) {
-  string string_filename =
-      base_filename_ + filename_extension_ + time_pid_string;
-  const char* filename = string_filename.c_str();
-  int fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, FLAGS_logfile_mode);
-  if (fd == -1) {
-    return false;
-  }
+  string      string_filename = base_filename_ + filename_extension_ + time_pid_string;
+  const char* filename        = string_filename.c_str();
+  int         fd              = open(filename, O_WRONLY | O_CREAT | O_EXCL, FLAGS_logfile_mode);
+  if (fd == -1) { return false; }
   // Mark the file close-on-exec. We don't really care if this fails
   fcntl(fd, F_SETFD, FD_CLOEXEC);
 
@@ -168,10 +161,9 @@ bool LogFileObject::CreateLogfile(const string& time_pid_string) {
   // no error.
   if (!symlink_basename_.empty()) {
     // take directory from filename
-    const char* slash = strrchr(filename, PATH_SEPARATOR);
-    const string linkname =
-        symlink_basename_ + '.' + LogSeverityNames[severity_];
-    string linkpath;
+    const char*  slash    = strrchr(filename, PATH_SEPARATOR);
+    const string linkname = symlink_basename_ + '.' + LogSeverityNames[severity_];
+    string       linkpath;
     if (slash) {
       linkpath = string(filename, slash - filename + 1);  // get dirname
     }
@@ -201,22 +193,20 @@ bool LogFileObject::CreateLogfile(const string& time_pid_string) {
   return true;  // Everything worked
 }
 
-void LogFileObject::Write(bool force_flush, time_t timestamp,
-                          const char* message, int message_len) {
+void LogFileObject::Write(bool        force_flush,
+                          time_t      timestamp,
+                          const char* message,
+                          int         message_len) {
   std::lock_guard<std::mutex> lock(lock_);
 
   // We don't log if the base_name_ is "" (which means "don't write")
-  if (base_filename_selected_ && base_filename_.empty()) {
-    return;
-  }
+  if (base_filename_selected_ && base_filename_.empty()) { return; }
 
   if (static_cast<int>(file_length_ >> 20) >= MaxLogSize() || PidHasChanged()) {
-    if (file_ != nullptr) {
-      fclose(file_);
-    }
-    file_ = nullptr;
+    if (file_ != nullptr) { fclose(file_); }
+    file_        = nullptr;
     file_length_ = bytes_since_flush_ = 0;
-    rollover_attempt_ = kRolloverAttemptFrequency - 1;
+    rollover_attempt_                 = kRolloverAttemptFrequency - 1;
   }
 
   // If there's no destination file, make one before outputting
@@ -224,9 +214,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     // Try to rollover the log file every 32 log messages.  The only time
     // this could matter would be when we have trouble creating the log
     // file.  If that happens, we'll lose lots of log messages, of course!
-    if (++rollover_attempt_ != kRolloverAttemptFrequency) {
-      return;
-    }
+    if (++rollover_attempt_ != kRolloverAttemptFrequency) { return; }
     rollover_attempt_ = 0;
 
     struct ::tm tm_time;
@@ -235,18 +223,16 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     // The logfile's filename will have the date/time & pid in it
     ostringstream time_pid_stream;
     time_pid_stream.fill('0');
-    time_pid_stream << 1900 + tm_time.tm_year << setw(2) << 1 + tm_time.tm_mon
-                    << setw(2) << tm_time.tm_mday << '-' << setw(2)
-                    << tm_time.tm_hour << setw(2) << tm_time.tm_min << setw(2)
-                    << tm_time.tm_sec << '.' << GetMainThreadPid();
+    time_pid_stream << 1900 + tm_time.tm_year << setw(2) << 1 + tm_time.tm_mon << setw(2)
+                    << tm_time.tm_mday << '-' << setw(2) << tm_time.tm_hour << setw(2)
+                    << tm_time.tm_min << setw(2) << tm_time.tm_sec << '.' << GetMainThreadPid();
     const string& time_pid_string = time_pid_stream.str();
 
     // base filename always selected.
     if (base_filename_selected_) {
       if (!CreateLogfile(time_pid_string)) {
         perror("Could not create log file");
-        fprintf(stderr, "COULD NOT CREATE LOGFILE '%s'!\n",
-                time_pid_string.c_str());
+        fprintf(stderr, "COULD NOT CREATE LOGFILE '%s'!\n", time_pid_string.c_str());
         return;
       }
     }
@@ -254,10 +240,9 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     // Write a header message into the log file
     ostringstream file_header_stream;
     file_header_stream.fill('0');
-    file_header_stream << "Log file created at: " << 1900 + tm_time.tm_year
-                       << '/' << setw(2) << 1 + tm_time.tm_mon << '/' << setw(2)
-                       << tm_time.tm_mday << ' ' << setw(2) << tm_time.tm_hour
-                       << ':' << setw(2) << tm_time.tm_min << ':' << setw(2)
+    file_header_stream << "Log file created at: " << 1900 + tm_time.tm_year << '/' << setw(2)
+                       << 1 + tm_time.tm_mon << '/' << setw(2) << tm_time.tm_mday << ' ' << setw(2)
+                       << tm_time.tm_hour << ':' << setw(2) << tm_time.tm_min << ':' << setw(2)
                        << tm_time.tm_sec << '\n'
                        << "Running on machine: " << hostname() << '\n'
                        << "Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu "
@@ -265,9 +250,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     const string& file_header_string = file_header_stream.str();
 
     const int header_len = static_cast<int>(file_header_string.size());
-    if (file_ == nullptr) {
-      return;
-    }
+    if (file_ == nullptr) { return; }
     fwrite(file_header_string.data(), 1, header_len, file_);
     file_length_ += header_len;
     bytes_since_flush_ += header_len;
@@ -282,9 +265,8 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     // greater than 4096, thereby indicating an error.
     errno = 0;
     fwrite(message, 1, message_len, file_);
-    if (FLAGS_stop_logging_if_full_disk &&
-        errno == ENOSPC) {  // disk full, stop writing to disk
-      stop_writing = true;  // until the disk is
+    if (FLAGS_stop_logging_if_full_disk && errno == ENOSPC) {  // disk full, stop writing to disk
+      stop_writing = true;                                     // until the disk is
       return;
     } else {
       file_length_ += message_len;
@@ -299,8 +281,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
 
   // See important msgs *now*.  Also, flush logs at least every 10^6 chars,
   // or every "FLAGS_logbufsecs" seconds.
-  if (force_flush || (bytes_since_flush_ >= 1000000) ||
-      (CycleClock_Now() >= next_flush_time_)) {
+  if (force_flush || (bytes_since_flush_ >= 1000000) || (CycleClock_Now() >= next_flush_time_)) {
     FlushUnlocked();
   }
 }
@@ -309,9 +290,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
 const string& LogFileObject::hostname() {
   if (hostname_.empty()) {
     GetHostName(&hostname_);
-    if (hostname_.empty()) {
-      hostname_ = "(unknown)";
-    }
+    if (hostname_.empty()) { hostname_ = "(unknown)"; }
   }
   return hostname_;
 }

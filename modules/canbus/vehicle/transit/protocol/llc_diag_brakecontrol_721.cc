@@ -49,14 +49,13 @@ void Llcdiagbrakecontrol721::Reset() {
   llc_dbg_brakepidcontribution_p_ = 0.0;
   llc_dbg_brakepidcontribution_i_ = 0.0;
   llc_dbg_brakepidcontribution_d_ = 0.0;
-  llc_dbg_brakepid_output_ = 0.0;
-  llc_dbg_brakepid_error_ = 0;
-  llc_dbg_brakefeedforward_ = 0.0;
+  llc_dbg_brakepid_output_        = 0.0;
+  llc_dbg_brakepid_error_         = 0;
+  llc_dbg_brakefeedforward_       = 0.0;
 }
 
 Llcdiagbrakecontrol721*
-Llcdiagbrakecontrol721::set_llc_dbg_brakepidcontribution_p(
-    double llc_dbg_brakepidcontribution_p) {
+Llcdiagbrakecontrol721::set_llc_dbg_brakepidcontribution_p(double llc_dbg_brakepidcontribution_p) {
   llc_dbg_brakepidcontribution_p_ = llc_dbg_brakepidcontribution_p;
   return this;
 }
@@ -69,7 +68,7 @@ void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepidcontribution_p(
     uint8_t* data, double llc_dbg_brakepidcontribution_p) {
   llc_dbg_brakepidcontribution_p =
       ProtocolData::BoundedValue(-51.2, 51.1, llc_dbg_brakepidcontribution_p);
-  int x = static_cast<int>(llc_dbg_brakepidcontribution_p / 0.100000);
+  int     x = static_cast<int>(llc_dbg_brakepidcontribution_p / 0.100000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0x3F);
@@ -83,8 +82,7 @@ void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepidcontribution_p(
 }
 
 Llcdiagbrakecontrol721*
-Llcdiagbrakecontrol721::set_llc_dbg_brakepidcontribution_i(
-    double llc_dbg_brakepidcontribution_i) {
+Llcdiagbrakecontrol721::set_llc_dbg_brakepidcontribution_i(double llc_dbg_brakepidcontribution_i) {
   llc_dbg_brakepidcontribution_i_ = llc_dbg_brakepidcontribution_i;
   return this;
 }
@@ -97,7 +95,7 @@ void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepidcontribution_i(
     uint8_t* data, double llc_dbg_brakepidcontribution_i) {
   llc_dbg_brakepidcontribution_i =
       ProtocolData::BoundedValue(-51.2, 51.1, llc_dbg_brakepidcontribution_i);
-  int x = static_cast<int>(llc_dbg_brakepidcontribution_i / 0.100000);
+  int     x = static_cast<int>(llc_dbg_brakepidcontribution_i / 0.100000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0xF);
@@ -111,8 +109,7 @@ void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepidcontribution_i(
 }
 
 Llcdiagbrakecontrol721*
-Llcdiagbrakecontrol721::set_llc_dbg_brakepidcontribution_d(
-    double llc_dbg_brakepidcontribution_d) {
+Llcdiagbrakecontrol721::set_llc_dbg_brakepidcontribution_d(double llc_dbg_brakepidcontribution_d) {
   llc_dbg_brakepidcontribution_d_ = llc_dbg_brakepidcontribution_d;
   return this;
 }
@@ -125,7 +122,7 @@ void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepidcontribution_d(
     uint8_t* data, double llc_dbg_brakepidcontribution_d) {
   llc_dbg_brakepidcontribution_d =
       ProtocolData::BoundedValue(-51.2, 51.1, llc_dbg_brakepidcontribution_d);
-  int x = static_cast<int>(llc_dbg_brakepidcontribution_d / 0.100000);
+  int     x = static_cast<int>(llc_dbg_brakepidcontribution_d / 0.100000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0x3);
@@ -138,8 +135,8 @@ void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepidcontribution_d(
   to_set1.set_value(t, 0, 8);
 }
 
-Llcdiagbrakecontrol721* Llcdiagbrakecontrol721::set_llc_dbg_brakepid_output(
-    double llc_dbg_brakepid_output) {
+Llcdiagbrakecontrol721*
+Llcdiagbrakecontrol721::set_llc_dbg_brakepid_output(double llc_dbg_brakepid_output) {
   llc_dbg_brakepid_output_ = llc_dbg_brakepid_output;
   return this;
 }
@@ -148,12 +145,11 @@ Llcdiagbrakecontrol721* Llcdiagbrakecontrol721::set_llc_dbg_brakepid_output(
 // 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePID_Output',
 // 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 12, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepid_output(
-    uint8_t* data, double llc_dbg_brakepid_output) {
-  llc_dbg_brakepid_output =
-      ProtocolData::BoundedValue(-51.2, 51.1, llc_dbg_brakepid_output);
-  int x = static_cast<int>(llc_dbg_brakepid_output / 0.100000);
-  uint8_t t = 0;
+void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepid_output(uint8_t* data,
+                                                           double   llc_dbg_brakepid_output) {
+  llc_dbg_brakepid_output = ProtocolData::BoundedValue(-51.2, 51.1, llc_dbg_brakepid_output);
+  int     x               = static_cast<int>(llc_dbg_brakepid_output / 0.100000);
+  uint8_t t               = 0;
 
   t = static_cast<uint8_t>(x & 0xF);
   Byte to_set0(data + 1);
@@ -165,8 +161,8 @@ void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepid_output(
   to_set1.set_value(t, 0, 6);
 }
 
-Llcdiagbrakecontrol721* Llcdiagbrakecontrol721::set_llc_dbg_brakepid_error(
-    int llc_dbg_brakepid_error) {
+Llcdiagbrakecontrol721*
+Llcdiagbrakecontrol721::set_llc_dbg_brakepid_error(int llc_dbg_brakepid_error) {
   llc_dbg_brakepid_error_ = llc_dbg_brakepid_error;
   return this;
 }
@@ -175,12 +171,11 @@ Llcdiagbrakecontrol721* Llcdiagbrakecontrol721::set_llc_dbg_brakepid_error(
 // 'precision': 1.0, 'len': 12, 'name': 'LLC_DBG_BrakePID_Error',
 // 'is_signed_var': True, 'physical_range': '[-2048|2047]', 'bit': 0, 'type':
 // 'int', 'order': 'intel', 'physical_unit': 'psi'}
-void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepid_error(
-    uint8_t* data, int llc_dbg_brakepid_error) {
-  llc_dbg_brakepid_error =
-      ProtocolData::BoundedValue(-2048, 2047, llc_dbg_brakepid_error);
-  int x = llc_dbg_brakepid_error;
-  uint8_t t = 0;
+void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepid_error(uint8_t* data,
+                                                          int      llc_dbg_brakepid_error) {
+  llc_dbg_brakepid_error = ProtocolData::BoundedValue(-2048, 2047, llc_dbg_brakepid_error);
+  int     x              = llc_dbg_brakepid_error;
+  uint8_t t              = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 0);
@@ -192,8 +187,8 @@ void Llcdiagbrakecontrol721::set_p_llc_dbg_brakepid_error(
   to_set1.set_value(t, 0, 4);
 }
 
-Llcdiagbrakecontrol721* Llcdiagbrakecontrol721::set_llc_dbg_brakefeedforward(
-    double llc_dbg_brakefeedforward) {
+Llcdiagbrakecontrol721*
+Llcdiagbrakecontrol721::set_llc_dbg_brakefeedforward(double llc_dbg_brakefeedforward) {
   llc_dbg_brakefeedforward_ = llc_dbg_brakefeedforward;
   return this;
 }
@@ -203,12 +198,11 @@ Llcdiagbrakecontrol721* Llcdiagbrakecontrol721::set_llc_dbg_brakefeedforward(
 // 'LLC_DBG_BrakeFeedforward', 'is_signed_var': True, 'physical_range':
 // '[-1024|1023.5]', 'bit': 22, 'type': 'double', 'order': 'intel',
 // 'physical_unit': 'mrev'}
-void Llcdiagbrakecontrol721::set_p_llc_dbg_brakefeedforward(
-    uint8_t* data, double llc_dbg_brakefeedforward) {
-  llc_dbg_brakefeedforward =
-      ProtocolData::BoundedValue(-1024.0, 1023.5, llc_dbg_brakefeedforward);
-  int x = static_cast<int>(llc_dbg_brakefeedforward / 0.500000);
-  uint8_t t = 0;
+void Llcdiagbrakecontrol721::set_p_llc_dbg_brakefeedforward(uint8_t* data,
+                                                            double   llc_dbg_brakefeedforward) {
+  llc_dbg_brakefeedforward = ProtocolData::BoundedValue(-1024.0, 1023.5, llc_dbg_brakefeedforward);
+  int     x                = static_cast<int>(llc_dbg_brakefeedforward / 0.500000);
+  uint8_t t                = 0;
 
   t = static_cast<uint8_t>(x & 0x3);
   Byte to_set0(data + 2);

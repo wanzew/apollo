@@ -48,10 +48,10 @@ void Accelcmd100::UpdateData(uint8_t* data) {
 void Accelcmd100::Reset() {
   // TODO(QiL) you should check this manually
   ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
-  clear_faults_ = false;
-  accel_cmd_ = 0.0;
+  enable_           = false;
+  clear_override_   = false;
+  clear_faults_     = false;
+  accel_cmd_        = 0.0;
 }
 
 Accelcmd100* Accelcmd100::set_ignore_overrides(bool ignore_overrides) {
@@ -125,10 +125,10 @@ Accelcmd100* Accelcmd100::set_accel_cmd(double accel_cmd) {
 void Accelcmd100::set_p_accel_cmd(uint8_t* data, double accel_cmd) {
   const double scaling_bias = 0.0;   // estimated from the garage test data
   const double scaling_gain = 1.20;  // estimated from the garage test data
-  accel_cmd = std::max(0.0, (accel_cmd - scaling_bias) / (scaling_gain * 100));
-  accel_cmd = ProtocolData::BoundedValue(0.0, 1.0, accel_cmd);
+  accel_cmd                 = std::max(0.0, (accel_cmd - scaling_bias) / (scaling_gain * 100));
+  accel_cmd                 = ProtocolData::BoundedValue(0.0, 1.0, accel_cmd);
   // TODO(AS): fix this scaling.
-  int x = static_cast<int>(accel_cmd / 0.001000);
+  int     x = static_cast<int>(accel_cmd / 0.001000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);

@@ -26,8 +26,7 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-Stage::StageStatus
-TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
@@ -38,17 +37,14 @@ TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
            << "plan error";
   }
 
-  bool stage_done = stage_impl_.CheckDone(
-      *frame, ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN, config_,
-      injector_->planning_context(), false);
-  if (stage_done) {
-    return FinishStage();
-  }
+  bool stage_done =
+      stage_impl_.CheckDone(*frame, ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN, config_,
+                            injector_->planning_context(), false);
+  if (stage_done) { return FinishStage(); }
   return Stage::RUNNING;
 }
 
-Stage::StageStatus
-TrafficLightUnprotectedRightTurnStageIntersectionCruise::FinishStage() {
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageIntersectionCruise::FinishStage() {
   return FinishScenario();
 }
 

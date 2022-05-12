@@ -31,23 +31,19 @@ using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
 using apollo::perception::PerceptionObstacles;
 
-ThirdPartyPerceptionMobileye::ThirdPartyPerceptionMobileye(
-    apollo::cyber::Node* const node)
+ThirdPartyPerceptionMobileye::ThirdPartyPerceptionMobileye(apollo::cyber::Node* const node)
     : ThirdPartyPerception(node) {
   mobileye_reader_ = node_->CreateReader<apollo::drivers::Mobileye>(
-      FLAGS_mobileye_topic,
-      [this](const std::shared_ptr<apollo::drivers::Mobileye>& message) {
+      FLAGS_mobileye_topic, [this](const std::shared_ptr<apollo::drivers::Mobileye>& message) {
         OnMobileye(*message.get());
       });
   delphi_esr_reader_ = node_->CreateReader<apollo::drivers::DelphiESR>(
-      FLAGS_delphi_esr_topic,
-      [this](const std::shared_ptr<apollo::drivers::DelphiESR>& message) {
+      FLAGS_delphi_esr_topic, [this](const std::shared_ptr<apollo::drivers::DelphiESR>& message) {
         OnDelphiESR(*message.get());
       });
 
   conti_radar_reader_ = node_->CreateReader<apollo::drivers::ContiRadar>(
-      FLAGS_conti_radar_topic,
-      [this](const std::shared_ptr<apollo::drivers::ContiRadar>& message) {
+      FLAGS_conti_radar_topic, [this](const std::shared_ptr<apollo::drivers::ContiRadar>& message) {
         OnContiRadar(*message.get());
       });
 }
@@ -55,21 +51,20 @@ ThirdPartyPerceptionMobileye::ThirdPartyPerceptionMobileye(
 void ThirdPartyPerceptionMobileye::OnMobileye(const Mobileye& message) {
   ADEBUG << "Received mobileye data: run mobileye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
-  eye_obstacles_ = conversion_mobileye::MobileyeToPerceptionObstacles(
-      message, localization_, chassis_);
+  eye_obstacles_ =
+      conversion_mobileye::MobileyeToPerceptionObstacles(message, localization_, chassis_);
 }
 
 void ThirdPartyPerceptionMobileye::OnDelphiESR(const DelphiESR& message) {
   ADEBUG << "Received delphi esr data: run delphi esr callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
-  current_radar_obstacles_ = conversion_radar::DelphiToRadarObstacles(
-      message, localization_, last_radar_obstacles_);
-  RadarObstacles filtered_radar_obstacles =
-      filter::FilterRadarObstacles(current_radar_obstacles_);
+  current_radar_obstacles_ =
+      conversion_radar::DelphiToRadarObstacles(message, localization_, last_radar_obstacles_);
+  RadarObstacles filtered_radar_obstacles = filter::FilterRadarObstacles(current_radar_obstacles_);
   if (FLAGS_enable_radar) {
-    radar_obstacles_ = conversion_radar::RadarObstaclesToPerceptionObstacles(
-        filtered_radar_obstacles);
+    radar_obstacles_ =
+        conversion_radar::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
   }
 }
 
@@ -79,16 +74,14 @@ void ThirdPartyPerceptionMobileye::OnContiRadar(const ContiRadar& message) {
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_ = conversion_radar::ContiToRadarObstacles(
       message, localization_, last_radar_obstacles_, chassis_);
-  RadarObstacles filtered_radar_obstacles =
-      filter::FilterRadarObstacles(current_radar_obstacles_);
+  RadarObstacles filtered_radar_obstacles = filter::FilterRadarObstacles(current_radar_obstacles_);
   if (FLAGS_enable_radar) {
-    radar_obstacles_ = conversion_radar::RadarObstaclesToPerceptionObstacles(
-        filtered_radar_obstacles);
+    radar_obstacles_ =
+        conversion_radar::RadarObstaclesToPerceptionObstacles(filtered_radar_obstacles);
   }
 }
 
-bool ThirdPartyPerceptionMobileye::Process(
-    PerceptionObstacles* const response) {
+bool ThirdPartyPerceptionMobileye::Process(PerceptionObstacles* const response) {
   ADEBUG << "Timer is triggered: publish PerceptionObstacles";
   CHECK_NOTNULL(response);
 

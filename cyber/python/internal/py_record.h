@@ -27,10 +27,11 @@
 #include <string>
 #include <thread>
 
+#include "cyber/proto/record.pb.h"
+
 #include "cyber/message/protobuf_factory.h"
 #include "cyber/message/py_message.h"
 #include "cyber/message/raw_message.h"
-#include "cyber/proto/record.pb.h"
 #include "cyber/record/record_message.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
@@ -40,35 +41,31 @@ namespace cyber {
 namespace record {
 
 struct BagMessage {
-  uint64_t timestamp = 0;
+  uint64_t    timestamp    = 0;
   std::string channel_name = "";
-  std::string data = "";
-  std::string data_type = "";
-  bool end = true;
+  std::string data         = "";
+  std::string data_type    = "";
+  bool        end          = true;
 };
 
 class PyRecordReader {
  public:
-  explicit PyRecordReader(const std::string& file) {
-    record_reader_.reset(new RecordReader(file));
-  }
+  explicit PyRecordReader(const std::string& file) { record_reader_.reset(new RecordReader(file)); }
 
-  BagMessage ReadMessage(
-      uint64_t begin_time = 0,
-      uint64_t end_time = std::numeric_limits<uint64_t>::max()) {
-    BagMessage ret_msg;
+  BagMessage ReadMessage(uint64_t begin_time = 0,
+                         uint64_t end_time   = std::numeric_limits<uint64_t>::max()) {
+    BagMessage    ret_msg;
     RecordMessage record_message;
     if (!record_reader_->ReadMessage(&record_message, begin_time, end_time)) {
       ret_msg.end = true;
       return ret_msg;
     }
 
-    ret_msg.end = false;
+    ret_msg.end          = false;
     ret_msg.channel_name = record_message.channel_name;
-    ret_msg.data = record_message.content;
-    ret_msg.timestamp = record_message.time;
-    ret_msg.data_type =
-        record_reader_->GetMessageType(record_message.channel_name);
+    ret_msg.data         = record_message.content;
+    ret_msg.timestamp    = record_message.time;
+    ret_msg.data_type    = record_reader_->GetMessageType(record_message.channel_name);
     return ret_msg;
   }
 
@@ -92,9 +89,7 @@ class PyRecordReader {
 
   void Reset() { record_reader_->Reset(); }
 
-  std::set<std::string> GetChannelList() const {
-    return record_reader_->GetChannelList();
-  }
+  std::set<std::string> GetChannelList() const { return record_reader_->GetChannelList(); }
 
  private:
   std::unique_ptr<RecordReader> record_reader_;
@@ -106,17 +101,18 @@ class PyRecordWriter {
 
   void Close() { record_writer_.Close(); }
 
-  bool WriteChannel(const std::string& channel_str, const std::string& type,
+  bool WriteChannel(const std::string& channel_str,
+                    const std::string& type,
                     const std::string& proto_desc) {
     return record_writer_.WriteChannel(channel_str, type, proto_desc);
   }
 
   bool WriteMessage(const std::string& channel_name,
-                    const std::string& rawmessage, uint64_t time,
+                    const std::string& rawmessage,
+                    uint64_t           time,
                     const std::string& proto_desc = "") {
     return record_writer_.WriteMessage(
-        channel_name, std::make_shared<message::RawMessage>(rawmessage), time,
-        proto_desc);
+        channel_name, std::make_shared<message::RawMessage>(rawmessage), time, proto_desc);
   }
 
   bool SetSizeOfFileSegmentation(uint64_t size_kilobytes) {

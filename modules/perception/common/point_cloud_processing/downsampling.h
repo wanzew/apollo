@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "cyber/common/log.h"
-
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/geometry/basic.h"
 
@@ -33,18 +32,17 @@ namespace common {
 // if point's euclidean dist smaller than neighbour_dist with center_pt and
 // bigger than or equal radius with last_pt, it will be keep.
 template <typename PointT>
-void DownsamplingCircular(
-    const PointT& center_pt, float radius, float neighbour_dist,
-    typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
-    typename std::shared_ptr<base::PointCloud<PointT>> down_cloud) {
+void DownsamplingCircular(const PointT&                                            center_pt,
+                          float                                                    radius,
+                          float                                                    neighbour_dist,
+                          typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
+                          typename std::shared_ptr<base::PointCloud<PointT>>       down_cloud) {
   for (size_t c = 0; c < cloud->width(); ++c) {
     for (size_t r = 0; r < cloud->height(); ++r) {
       PointT tmp_pt;
       if (cloud->height() > 1) {
         const PointT* tmp_pt_ptr = cloud->at(c, r);
-        if (tmp_pt_ptr == nullptr) {
-          continue;
-        }
+        if (tmp_pt_ptr == nullptr) { continue; }
         tmp_pt = *(tmp_pt_ptr);
       } else {
         tmp_pt = cloud->at(c);
@@ -53,8 +51,7 @@ void DownsamplingCircular(
         if (down_cloud->size() == 0) {
           down_cloud->push_back(tmp_pt);
         } else {
-          if (CalculateEuclidenDist<PointT>(
-                  tmp_pt, down_cloud->at(down_cloud->size() - 1)) >=
+          if (CalculateEuclidenDist<PointT>(tmp_pt, down_cloud->at(down_cloud->size() - 1)) >=
               neighbour_dist) {
             down_cloud->push_back(tmp_pt);
           }
@@ -69,25 +66,22 @@ void DownsamplingCircular(
 //         if smp_ratio=1, func don't downsample, only filtering.
 //         usually set velodyne_model to 64.
 template <typename PointT>
-void DownsamplingCircularOrgAll(
-    const PointT& center_pt, int smp_ratio, float radius, int velodyne_model,
-    typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
-    typename std::shared_ptr<base::PointCloud<PointT>> down_cloud) {
+void DownsamplingCircularOrgAll(const PointT& center_pt,
+                                int           smp_ratio,
+                                float         radius,
+                                int           velodyne_model,
+                                typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
+                                typename std::shared_ptr<base::PointCloud<PointT>> down_cloud) {
   int smp_step = smp_ratio * velodyne_model;
   down_cloud->resize(cloud->size() / smp_ratio + 1);
   size_t ii = 0;
   for (size_t ori_ii = 0; ori_ii < cloud->size(); ori_ii += smp_step) {
-    for (size_t jj = ori_ii;
-         jj < cloud->size() && static_cast<int>(jj - ori_ii) < velodyne_model;
+    for (size_t jj = ori_ii; jj < cloud->size() && static_cast<int>(jj - ori_ii) < velodyne_model;
          ++jj) {
       const PointT& p = cloud->at(jj);
-      if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) {
-        continue;
-      }
+      if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) { continue; }
       float r = CalculateEuclidenDist2DXY<PointT>(center_pt, p);
-      if (r > radius) {
-        continue;
-      }
+      if (r > radius) { continue; }
       down_cloud->at(jj).x = cloud->at(jj).x;
       down_cloud->at(jj).y = cloud->at(jj).y;
       down_cloud->at(jj).z = cloud->at(jj).z;
@@ -102,13 +96,16 @@ void DownsamplingCircularOrgAll(
 //         usually set velodyne_model to 64.
 template <typename PointT>
 void DownsamplingCircularOrgPartial(
-    const PointT& center_pt, int org_num, int smp_ratio, float radius,
-    int velodyne_model,
+    const PointT&                                                  center_pt,
+    int                                                            org_num,
+    int                                                            smp_ratio,
+    float                                                          radius,
+    int                                                            velodyne_model,
     const typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
-    typename std::shared_ptr<base::PointCloud<PointT>> down_cloud,
-    std::vector<std::pair<int, int>>* all_org_idx_ptr) {
+    typename std::shared_ptr<base::PointCloud<PointT>>             down_cloud,
+    std::vector<std::pair<int, int>>*                              all_org_idx_ptr) {
   int smp_height = static_cast<int>(cloud->height()) / smp_ratio;
-  int smp_width = org_num;
+  int smp_width  = org_num;
   if (smp_width < 1 || smp_width >= velodyne_model) {
     AERROR << "org_num error!";
     return;
@@ -118,21 +115,17 @@ void DownsamplingCircularOrgPartial(
   all_org_idx_ptr->resize(smp_height * smp_width);
   for (int hh = 0; hh < smp_height; ++hh) {
     for (int ww = 0; ww < smp_width; ++ww) {
-      int ori_hh = hh * smp_ratio;
-      const PointT* p_ptr = cloud->at(ww, ori_hh);
-      if (p_ptr == nullptr) {
-        continue;
-      }
+      int           ori_hh = hh * smp_ratio;
+      const PointT* p_ptr  = cloud->at(ww, ori_hh);
+      if (p_ptr == nullptr) { continue; }
       const PointT& p = *(p_ptr);
-      if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) {
-        continue;
-      }
+      if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) { continue; }
       float r = CalculateEuclidenDist2DXY<PointT>(center_pt, p);
       if (r > radius) {
         continue;
       } else {
-        down_cloud->at(ii) = p;
-        all_org_idx_ptr->at(ii).first = hh;
+        down_cloud->at(ii)             = p;
+        all_org_idx_ptr->at(ii).first  = hh;
         all_org_idx_ptr->at(ii).second = ww;
         ++ii;
       }
@@ -145,14 +138,16 @@ void DownsamplingCircularOrgPartial(
 // @brief: This function is downsampling 2d PointCloud alternately.
 //         usually set velodyne_model to 64.
 template <typename PointT>
-void DownsamplingRectangleOrgPartial(
-    int org_num, int smp_ratio, float front_range, float side_range,
-    int velodyne_model,
-    typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
-    typename std::shared_ptr<base::PointCloud<PointT>> down_cloud,
-    std::vector<std::pair<int, int>>* all_org_idx_ptr) {
+void DownsamplingRectangleOrgPartial(int   org_num,
+                                     int   smp_ratio,
+                                     float front_range,
+                                     float side_range,
+                                     int   velodyne_model,
+                                     typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
+                                     typename std::shared_ptr<base::PointCloud<PointT>> down_cloud,
+                                     std::vector<std::pair<int, int>>* all_org_idx_ptr) {
   int smp_height = static_cast<int>(cloud->height()) / smp_ratio;
-  int smp_width = org_num;
+  int smp_width  = org_num;
   if (smp_width < 1 || smp_width >= velodyne_model) {
     AERROR << "org_num error!";
     return;
@@ -162,20 +157,16 @@ void DownsamplingRectangleOrgPartial(
   all_org_idx_ptr->resize(smp_height * smp_width);
   for (int hh = 0; hh < smp_height; ++hh) {
     for (int ww = 0; ww < smp_width; ++ww) {
-      int ori_hh = hh * smp_ratio;
-      const PointT* p_ptr = cloud->at(ww, ori_hh);
-      if (p_ptr == nullptr) {
-        continue;
-      }
+      int           ori_hh = hh * smp_ratio;
+      const PointT* p_ptr  = cloud->at(ww, ori_hh);
+      if (p_ptr == nullptr) { continue; }
       const PointT& p = *(p_ptr);
-      if (std::isnan(p.x) || std::isnan((p.y) || std::isnan(p.z))) {
-        continue;
-      }
+      if (std::isnan(p.x) || std::isnan((p.y) || std::isnan(p.z))) { continue; }
       if (fabs(p.x) > front_range || fabs(p.y) > side_range) {
         continue;
       } else {
-        down_cloud->at(ii) = p;
-        all_org_idx_ptr->at(ii).first = hh;
+        down_cloud->at(ii)             = p;
+        all_org_idx_ptr->at(ii).first  = hh;
         all_org_idx_ptr->at(ii).second = ww;
         ++ii;
       }
@@ -188,10 +179,12 @@ void DownsamplingRectangleOrgPartial(
 // @brief: a filter of neighbour rectangle.
 //         usually set velodyne_model to 64.
 template <typename PointT>
-void DownsamplingRectangleNeighbour(
-    float front_range, float side_range, double max_nei, int velo_model,
-    typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
-    typename std::shared_ptr<base::PointCloud<PointT>> down_cloud) {
+void DownsamplingRectangleNeighbour(float  front_range,
+                                    float  side_range,
+                                    double max_nei,
+                                    int    velo_model,
+                                    typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
+                                    typename std::shared_ptr<base::PointCloud<PointT>> down_cloud) {
   if (static_cast<int>(cloud->width()) != velo_model) {
     AERROR << "cloud->width (" << cloud->width() << ") does not match "
            << "velo_model (" << velo_model << ")";
@@ -206,18 +199,12 @@ void DownsamplingRectangleNeighbour(
     nei_pt.z = 0;
     for (size_t hh = 0; hh < cloud->height(); ++hh) {
       const PointT* p_ptr = cloud->at(ww, hh);
-      if (p_ptr == nullptr) {
-        continue;
-      }
+      if (p_ptr == nullptr) { continue; }
       const PointT& p = *(p_ptr);
-      if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) {
-        continue;
-      }
-      if (fabs(p.x) > front_range || fabs(p.y) > side_range) {
-        continue;
-      }
+      if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) { continue; }
+      if (fabs(p.x) > front_range || fabs(p.y) > side_range) { continue; }
       if (fabs(p.x - nei_pt.x) > max_nei || fabs(p.y - nei_pt.y) > max_nei) {
-        nei_pt = p;
+        nei_pt                   = p;
         down_cloud->at(pt_num++) = p;
       }
     }

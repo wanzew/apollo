@@ -33,63 +33,62 @@ DistanceApproachProblem::DistanceApproachProblem(
   planner_open_space_config_ = planner_open_space_config;
 }
 
-bool DistanceApproachProblem::Solve(
-    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xF,
-    const Eigen::MatrixXd& last_time_u, const size_t horizon, const double ts,
-    const Eigen::MatrixXd& ego, const Eigen::MatrixXd& xWS,
-    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
-    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& s_warm_up,
-    const std::vector<double>& XYbounds, const size_t obstacles_num,
-    const Eigen::MatrixXi& obstacles_edges_num,
-    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
-    Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
-    Eigen::MatrixXd* dual_n_result) {
+bool DistanceApproachProblem::Solve(const Eigen::MatrixXd&     x0,
+                                    const Eigen::MatrixXd&     xF,
+                                    const Eigen::MatrixXd&     last_time_u,
+                                    const size_t               horizon,
+                                    const double               ts,
+                                    const Eigen::MatrixXd&     ego,
+                                    const Eigen::MatrixXd&     xWS,
+                                    const Eigen::MatrixXd&     uWS,
+                                    const Eigen::MatrixXd&     l_warm_up,
+                                    const Eigen::MatrixXd&     n_warm_up,
+                                    const Eigen::MatrixXd&     s_warm_up,
+                                    const std::vector<double>& XYbounds,
+                                    const size_t               obstacles_num,
+                                    const Eigen::MatrixXi&     obstacles_edges_num,
+                                    const Eigen::MatrixXd&     obstacles_A,
+                                    const Eigen::MatrixXd&     obstacles_b,
+                                    Eigen::MatrixXd*           state_result,
+                                    Eigen::MatrixXd*           control_result,
+                                    Eigen::MatrixXd*           time_result,
+                                    Eigen::MatrixXd*           dual_l_result,
+                                    Eigen::MatrixXd*           dual_n_result) {
   // TODO(QiL) : evaluate whether need to new it everytime
   PERF_BLOCK_START();
 
   DistanceApproachInterface* ptop = nullptr;
 
-  if (planner_open_space_config_.distance_approach_config()
-          .distance_approach_mode() == DISTANCE_APPROACH_IPOPT) {
+  if (planner_open_space_config_.distance_approach_config().distance_approach_mode() ==
+      DISTANCE_APPROACH_IPOPT) {
     ptop = new DistanceApproachIPOPTInterface(
-        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
-        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
-        planner_open_space_config_);
-  } else if (planner_open_space_config_.distance_approach_config()
-                 .distance_approach_mode() ==
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u, XYbounds,
+        obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config().distance_approach_mode() ==
              DISTANCE_APPROACH_IPOPT_FIXED_TS) {
     ptop = new DistanceApproachIPOPTFixedTsInterface(
-        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
-        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
-        planner_open_space_config_);
-  } else if (planner_open_space_config_.distance_approach_config()
-                 .distance_approach_mode() == DISTANCE_APPROACH_IPOPT_CUDA) {
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u, XYbounds,
+        obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config().distance_approach_mode() ==
+             DISTANCE_APPROACH_IPOPT_CUDA) {
     ptop = new DistanceApproachIPOPTCUDAInterface(
-        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
-        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
-        planner_open_space_config_);
-  } else if (planner_open_space_config_.distance_approach_config()
-                 .distance_approach_mode() ==
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u, XYbounds,
+        obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config().distance_approach_mode() ==
              DISTANCE_APPROACH_IPOPT_FIXED_DUAL) {
     ptop = new DistanceApproachIPOPTFixedDualInterface(
-        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
-        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
-        planner_open_space_config_);
-  } else if (planner_open_space_config_.distance_approach_config()
-                 .distance_approach_mode() ==
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u, XYbounds,
+        obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config().distance_approach_mode() ==
              DISTANCE_APPROACH_IPOPT_RELAX_END) {
     ptop = new DistanceApproachIPOPTRelaxEndInterface(
-        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
-        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
-        planner_open_space_config_);
-  } else if (planner_open_space_config_.distance_approach_config()
-                 .distance_approach_mode() ==
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u, XYbounds,
+        obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config().distance_approach_mode() ==
              DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK) {
     ptop = new DistanceApproachIPOPTRelaxEndSlackInterface(
-        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, s_warm_up, x0, xF,
-        last_time_u, XYbounds, obstacles_edges_num, obstacles_num, obstacles_A,
-        obstacles_b, planner_open_space_config_);
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, s_warm_up, x0, xF, last_time_u, XYbounds,
+        obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, planner_open_space_config_);
   }
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
@@ -98,57 +97,44 @@ bool DistanceApproachProblem::Solve(
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
   app->Options()->SetIntegerValue(
-      "print_level", planner_open_space_config_.distance_approach_config()
-                         .ipopt_config()
-                         .ipopt_print_level());
+      "print_level",
+      planner_open_space_config_.distance_approach_config().ipopt_config().ipopt_print_level());
   app->Options()->SetIntegerValue(
-      "mumps_mem_percent", planner_open_space_config_.distance_approach_config()
-                               .ipopt_config()
-                               .mumps_mem_percent());
+      "mumps_mem_percent",
+      planner_open_space_config_.distance_approach_config().ipopt_config().mumps_mem_percent());
   app->Options()->SetNumericValue(
-      "mumps_pivtol", planner_open_space_config_.distance_approach_config()
-                          .ipopt_config()
-                          .mumps_pivtol());
+      "mumps_pivtol",
+      planner_open_space_config_.distance_approach_config().ipopt_config().mumps_pivtol());
   app->Options()->SetIntegerValue(
-      "max_iter", planner_open_space_config_.distance_approach_config()
-                      .ipopt_config()
-                      .ipopt_max_iter());
+      "max_iter",
+      planner_open_space_config_.distance_approach_config().ipopt_config().ipopt_max_iter());
   app->Options()->SetNumericValue(
-      "tol", planner_open_space_config_.distance_approach_config()
-                 .ipopt_config()
-                 .ipopt_tol());
-  app->Options()->SetNumericValue(
-      "acceptable_constr_viol_tol",
-      planner_open_space_config_.distance_approach_config()
-          .ipopt_config()
-          .ipopt_acceptable_constr_viol_tol());
-  app->Options()->SetNumericValue(
-      "min_hessian_perturbation",
-      planner_open_space_config_.distance_approach_config()
-          .ipopt_config()
-          .ipopt_min_hessian_perturbation());
-  app->Options()->SetNumericValue(
-      "jacobian_regularization_value",
-      planner_open_space_config_.distance_approach_config()
-          .ipopt_config()
-          .ipopt_jacobian_regularization_value());
+      "tol", planner_open_space_config_.distance_approach_config().ipopt_config().ipopt_tol());
+  app->Options()->SetNumericValue("acceptable_constr_viol_tol",
+                                  planner_open_space_config_.distance_approach_config()
+                                      .ipopt_config()
+                                      .ipopt_acceptable_constr_viol_tol());
+  app->Options()->SetNumericValue("min_hessian_perturbation",
+                                  planner_open_space_config_.distance_approach_config()
+                                      .ipopt_config()
+                                      .ipopt_min_hessian_perturbation());
+  app->Options()->SetNumericValue("jacobian_regularization_value",
+                                  planner_open_space_config_.distance_approach_config()
+                                      .ipopt_config()
+                                      .ipopt_jacobian_regularization_value());
+  app->Options()->SetStringValue("print_timing_statistics",
+                                 planner_open_space_config_.distance_approach_config()
+                                     .ipopt_config()
+                                     .ipopt_print_timing_statistics());
   app->Options()->SetStringValue(
-      "print_timing_statistics",
-      planner_open_space_config_.distance_approach_config()
-          .ipopt_config()
-          .ipopt_print_timing_statistics());
+      "alpha_for_y",
+      planner_open_space_config_.distance_approach_config().ipopt_config().ipopt_alpha_for_y());
   app->Options()->SetStringValue(
-      "alpha_for_y", planner_open_space_config_.distance_approach_config()
-                         .ipopt_config()
-                         .ipopt_alpha_for_y());
-  app->Options()->SetStringValue(
-      "recalc_y", planner_open_space_config_.distance_approach_config()
-                      .ipopt_config()
-                      .ipopt_recalc_y());
+      "recalc_y",
+      planner_open_space_config_.distance_approach_config().ipopt_config().ipopt_recalc_y());
   app->Options()->SetNumericValue(
-      "mu_init", planner_open_space_config_.distance_approach_config()
-                     .ipopt_config()
-                     .ipopt_mu_init());
+      "mu_init",
+      planner_open_space_config_.distance_approach_config().ipopt_config().ipopt_mu_init());
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
@@ -158,15 +144,13 @@ bool DistanceApproachProblem::Solve(
 
   status = app->OptimizeTNLP(problem);
 
-  if (status == Ipopt::Solve_Succeeded ||
-      status == Ipopt::Solved_To_Acceptable_Level) {
+  if (status == Ipopt::Solve_Succeeded || status == Ipopt::Solved_To_Acceptable_Level) {
     // Retrieve some statistics about the solve
     Ipopt::Index iter_count = app->Statistics()->IterationCount();
     ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
 
     Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-    ADEBUG << "*** The final value of the objective function is " << final_obj
-           << '.';
+    ADEBUG << "*** The final value of the objective function is " << final_obj << '.';
 
     PERF_BLOCK_END("DistanceApproachProblemSolving");
   } else {
@@ -196,19 +180,16 @@ bool DistanceApproachProblem::Solve(
         {-199, "Internal_Error"}};
 
     if (!failure_status.count(static_cast<size_t>(status))) {
-      AINFO << "Solver ends with unknown failure code: "
-            << static_cast<int>(status);
+      AINFO << "Solver ends with unknown failure code: " << static_cast<int>(status);
     } else {
-      AINFO << "Solver failure case: "
-            << failure_status[static_cast<size_t>(status)];
+      AINFO << "Solver failure case: " << failure_status[static_cast<size_t>(status)];
     }
   }
 
-  ptop->get_optimization_results(state_result, control_result, time_result,
-                                 dual_l_result, dual_n_result);
+  ptop->get_optimization_results(state_result, control_result, time_result, dual_l_result,
+                                 dual_n_result);
 
-  return status == Ipopt::Solve_Succeeded ||
-         status == Ipopt::Solved_To_Acceptable_Level;
+  return status == Ipopt::Solve_Succeeded || status == Ipopt::Solved_To_Acceptable_Level;
 }
 
 }  // namespace planning

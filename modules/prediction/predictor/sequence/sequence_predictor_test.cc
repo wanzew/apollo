@@ -28,8 +28,7 @@ namespace prediction {
 class SequencePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    const std::string file =
-        "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+    const std::string file = "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     cyber::common::GetProtoFromFile(file, &perception_obstacles_);
   }
 
@@ -38,13 +37,12 @@ class SequencePredictorTest : public KMLMapBasedTest {
 };
 
 TEST_F(SequencePredictorTest, General) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(), 1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
-  MLPEvaluator mlp_evaluator;
-  ObstaclesContainer container;
+  MLPEvaluator           mlp_evaluator;
+  ObstaclesContainer     container;
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
@@ -61,19 +59,17 @@ TEST_F(SequencePredictorTest, General) {
   std::string sequence_str = predictor.ToString(*lane_seq);
   EXPECT_GT(sequence_str.size(), 0);
   SequencePredictor::LaneChangeType lane_change_type =
-      predictor.GetLaneChangeType(lane_seq->mutable_lane_segment(0)->lane_id(),
-                                  *lane_seq);
+      predictor.GetLaneChangeType(lane_seq->mutable_lane_segment(0)->lane_id(), *lane_seq);
   EXPECT_EQ(lane_change_type, SequencePredictor::LaneChangeType::STRAIGHT);
 
   EXPECT_TRUE(predictor.LaneSequenceWithMaxProb(lane_change_type, 0.5, 0.5));
   EXPECT_FALSE(predictor.LaneChangeWithMaxProb(lane_change_type, 0.5, 0.5));
 
-  Obstacle* ego_vehicle_ptr = container.GetObstacle(FLAGS_ego_vehicle_id);
+  Obstacle*         ego_vehicle_ptr = container.GetObstacle(FLAGS_ego_vehicle_id);
   std::vector<bool> enable_lane_sequence(3, true);
   predictor.FilterLaneSequences(*obstacle_ptr->mutable_latest_feature(),
-                                lane_seq->mutable_lane_segment(0)->lane_id(),
-                                ego_vehicle_ptr, &adc_trajectory_container,
-                                &enable_lane_sequence);
+                                lane_seq->mutable_lane_segment(0)->lane_id(), ego_vehicle_ptr,
+                                &adc_trajectory_container, &enable_lane_sequence);
   EXPECT_TRUE(enable_lane_sequence[0]);
 
   predictor.Clear();

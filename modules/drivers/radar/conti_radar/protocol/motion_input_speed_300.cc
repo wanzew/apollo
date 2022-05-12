@@ -53,11 +53,10 @@ void MotionInputSpeed300::UpdateData(uint8_t* data) {
     speed_direction = 1;
   }
   uint32_t speed_value = static_cast<uint32_t>(fabs(speed_) / 0.02);
-  Byte frame_speed_direction(data);
-  frame_speed_direction.set_value(
-      static_cast<unsigned char>((speed_direction << 6) & 0x00C0) |
-          static_cast<unsigned char>((speed_value & 0x1F00) >> 8),
-      0, 8);
+  Byte     frame_speed_direction(data);
+  frame_speed_direction.set_value(static_cast<unsigned char>((speed_direction << 6) & 0x00C0) |
+                                      static_cast<unsigned char>((speed_value & 0x1F00) >> 8),
+                                  0, 8);
   Byte frame_speed(data + 1);
   frame_speed.set_value(static_cast<unsigned char>(speed_value & 0x00FF), 0, 8);
 }

@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/lidar/hesai/parser/tcp_cmd_client.h"
+
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <net/if.h>
@@ -25,22 +27,22 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <linux/sockios.h>
 
 #include <cerrno>
 #include <csignal>
 #include <cstdio>
 #include <cstring>
 
+#include <linux/sockios.h>
+
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/hesai/parser/tcp_cmd_client.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
 
 int TcpCmdClient::BuildCmdHeader(const Command& cmd, unsigned char* buffer) {
-  int index = 0;
+  int index       = 0;
   buffer[index++] = 0x47;
   buffer[index++] = 0x74;
   buffer[index++] = cmd.header.cmd;
@@ -54,14 +56,12 @@ int TcpCmdClient::BuildCmdHeader(const Command& cmd, unsigned char* buffer) {
 
 bool TcpCmdClient::GetCalibration(std::string* content) {
   std::lock_guard<std::mutex> lck(mutex_);
-  if (!Open()) {
-    return false;
-  }
+  if (!Open()) { return false; }
   Command cmd;
   memset(&cmd, 0, sizeof(Command));
   cmd.header.cmd = PTC_COMMAND_GET_LIDAR_CALIBRATION;
   cmd.header.len = 0;
-  cmd.data = NULL;
+  cmd.data       = NULL;
   if (!WriteCmd(cmd)) {
     Close();
     return false;
@@ -79,26 +79,24 @@ bool TcpCmdClient::GetCalibration(std::string* content) {
   return true;
 }
 
-void TcpCmdClient::ParseHeader(const unsigned char* buffer, const int len,
-                               CommandHeader* header) {
-  int index = 0;
-  header->cmd = buffer[index++];
+void TcpCmdClient::ParseHeader(const unsigned char* buffer, const int len, CommandHeader* header) {
+  int index        = 0;
+  header->cmd      = buffer[index++];
   header->ret_code = buffer[index++];
-  header->len =
-      ((buffer[index] & 0xff) << 24) | ((buffer[index + 1] & 0xff) << 16) |
-      ((buffer[index + 2] & 0xff) << 8) | ((buffer[index + 3] & 0xff) << 0);
+  header->len      = ((buffer[index] & 0xff) << 24) | ((buffer[index + 1] & 0xff) << 16) |
+                ((buffer[index + 2] & 0xff) << 8) | ((buffer[index + 3] & 0xff) << 0);
 }
 
 bool TcpCmdClient::WriteCmd(const Command& cmd) {
   unsigned char buffer[128];
-  int size = BuildCmdHeader(cmd, buffer);
-  int ret = write(socket_fd_, buffer, size);
+  int           size = BuildCmdHeader(cmd, buffer);
+  int           ret  = write(socket_fd_, buffer, size);
   if (ret != size) {
     AERROR << "write header error";
     return false;
   }
   if (cmd.header.len > 0 && cmd.data) {
-    ret = write(socket_fd_, cmd.data, cmd.header.len);
+    ret     = write(socket_fd_, cmd.data, cmd.header.len);
     int len = static_cast<int>(cmd.header.len);
     if (ret != len) {
       AERROR << "write data error";
@@ -112,9 +110,7 @@ bool TcpCmdClient::WriteCmd(const Command& cmd) {
 }
 
 bool TcpCmdClient::ReadCmd(Command* feedback) {
-  if (feedback == nullptr) {
-    return false;
-  }
+  if (feedback == nullptr) { return false; }
   unsigned char buffer[1500];
   memset(buffer, 0, 10 * sizeof(char));
   int ret = Read(buffer, 2);
@@ -154,9 +150,9 @@ bool TcpCmdClient::ReadCmd(Command* feedback) {
 }
 
 int TcpCmdClient::Read(unsigned char* buffer, int n) {
-  int nleft = -1, nread = -1;
+  int            nleft = -1, nread = -1;
   unsigned char* ptr = buffer;
-  nleft = n;
+  nleft              = n;
   while (nleft > 0) {
     if ((nread = read(socket_fd_, ptr, nleft)) < 0) {
       if (errno == EINTR) {
@@ -182,7 +178,7 @@ void TcpCmdClient::Close() {
 }
 
 bool TcpCmdClient::Open() {
-  int sockfd = -1;
+  int                sockfd = -1;
   struct sockaddr_in servaddr;
   bzero(&servaddr, sizeof(servaddr));
   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -190,7 +186,7 @@ bool TcpCmdClient::Open() {
     return false;
   }
   servaddr.sin_family = AF_INET;
-  servaddr.sin_port = htons(port_);
+  servaddr.sin_port   = htons(port_);
   if (inet_pton(AF_INET, ip_.c_str(), &servaddr.sin_addr) <= 0) {
     AERROR << "inet_pton() error, ip:" << ip_;
     close(sockfd);

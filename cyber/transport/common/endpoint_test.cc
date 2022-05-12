@@ -28,7 +28,7 @@ TEST(EndpointTest, construction) {
   proto::RoleAttributes role;
 
   {
-    Endpoint e0(role);
+    Endpoint                     e0(role);
     const proto::RoleAttributes& erole = e0.attributes();
     EXPECT_EQ(erole.host_name(), common::GlobalData::Instance()->HostName());
     EXPECT_EQ(erole.process_id(), common::GlobalData::Instance()->ProcessId());
@@ -39,7 +39,7 @@ TEST(EndpointTest, construction) {
     role.set_process_id(54321);
     role.set_id(123);
 
-    Endpoint e0(role);
+    Endpoint                     e0(role);
     const proto::RoleAttributes& erole = e0.attributes();
     EXPECT_EQ(erole.host_name(), "123");
     EXPECT_EQ(erole.process_id(), 54321);

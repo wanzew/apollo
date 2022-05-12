@@ -30,8 +30,7 @@ class BacksideVehicle : public TrafficRule {
   explicit BacksideVehicle(const TrafficRuleConfig& config);
   virtual ~BacksideVehicle() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   /**
@@ -39,7 +38,7 @@ class BacksideVehicle : public TrafficRule {
    * use lane keeping strategy for back side vehicles.
    */
   void MakeLaneKeepingObstacleDecision(const SLBoundary& adc_sl_boundary,
-                                       PathDecision* path_decision);
+                                       PathDecision*     path_decision);
 };
 
 }  // namespace planning

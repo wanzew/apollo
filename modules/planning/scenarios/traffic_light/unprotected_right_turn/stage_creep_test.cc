@@ -16,9 +16,10 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_creep.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -29,22 +30,21 @@ namespace traffic_light {
 class TrafficLightUnprotectedRightTurnStageCreepTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(
-        ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP);
+    config_.set_stage_type(ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageConfig         config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(TrafficLightUnprotectedRightTurnStageCreepTest, Init) {
-  TrafficLightUnprotectedRightTurnStageCreep
-      traffic_light_unprotected_right_turn_stage_creep(config_, injector_);
-  EXPECT_EQ(traffic_light_unprotected_right_turn_stage_creep.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP));
+  TrafficLightUnprotectedRightTurnStageCreep traffic_light_unprotected_right_turn_stage_creep(
+      config_, injector_);
+  EXPECT_EQ(
+      traffic_light_unprotected_right_turn_stage_creep.Name(),
+      ScenarioConfig::StageType_Name(ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP));
 }
 
 }  // namespace traffic_light

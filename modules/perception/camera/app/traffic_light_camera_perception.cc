@@ -29,14 +29,11 @@ namespace camera {
 
 using cyber::common::GetAbsolutePath;
 
-bool TrafficLightCameraPerception::Init(
-    const CameraPerceptionInitOptions &options) {
+bool TrafficLightCameraPerception::Init(const CameraPerceptionInitOptions& options) {
   std::string work_root = "";
-  if (options.use_cyber_work_root) {
-    work_root = GetCyberWorkRoot();
-  }
+  if (options.use_cyber_work_root) { work_root = GetCyberWorkRoot(); }
   std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
-  proto_path = GetAbsolutePath(work_root, proto_path);
+  proto_path             = GetAbsolutePath(work_root, proto_path);
   AINFO << "proto_path " << proto_path;
   if (!cyber::common::GetProtoFromFile(proto_path, &tl_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
@@ -44,25 +41,23 @@ bool TrafficLightCameraPerception::Init(
   }
 
   TrafficLightDetectorInitOptions init_options;
-  auto plugin_param = tl_param_.detector_param(0).plugin_param();
+  auto                            plugin_param = tl_param_.detector_param(0).plugin_param();
 
-  init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
+  init_options.root_dir  = GetAbsolutePath(work_root, plugin_param.root_dir());
   init_options.conf_file = plugin_param.config_file();
-  init_options.gpu_id = tl_param_.gpu_id();
-  detector_.reset(BaseTrafficLightDetectorRegisterer::GetInstanceByName(
-      plugin_param.name()));
+  init_options.gpu_id    = tl_param_.gpu_id();
+  detector_.reset(BaseTrafficLightDetectorRegisterer::GetInstanceByName(plugin_param.name()));
   ACHECK(detector_ != nullptr);
   if (!detector_->Init(init_options)) {
     AERROR << "tl detector init failed";
     return false;
   }
 
-  plugin_param = tl_param_.detector_param(1).plugin_param();
-  init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
+  plugin_param           = tl_param_.detector_param(1).plugin_param();
+  init_options.root_dir  = GetAbsolutePath(work_root, plugin_param.root_dir());
   init_options.conf_file = plugin_param.config_file();
-  init_options.gpu_id = tl_param_.gpu_id();
-  recognizer_.reset(BaseTrafficLightDetectorRegisterer::GetInstanceByName(
-      plugin_param.name()));
+  init_options.gpu_id    = tl_param_.gpu_id();
+  recognizer_.reset(BaseTrafficLightDetectorRegisterer::GetInstanceByName(plugin_param.name()));
   ACHECK(recognizer_ != nullptr);
   if (!recognizer_->Init(init_options)) {
     AERROR << "tl recognizer init failed";
@@ -70,15 +65,12 @@ bool TrafficLightCameraPerception::Init(
   }
 
   TrafficLightTrackerInitOptions tracker_init_options;
-  auto tracker_plugin_param = tl_param_.tracker_param().plugin_param();
-  tracker_init_options.root_dir =
-      GetAbsolutePath(work_root, tracker_plugin_param.root_dir());
+  auto                           tracker_plugin_param = tl_param_.tracker_param().plugin_param();
+  tracker_init_options.root_dir  = GetAbsolutePath(work_root, tracker_plugin_param.root_dir());
   tracker_init_options.conf_file = tracker_plugin_param.config_file();
-  tracker_.reset(BaseTrafficLightTrackerRegisterer::GetInstanceByName(
-      tracker_plugin_param.name()));
+  tracker_.reset(BaseTrafficLightTrackerRegisterer::GetInstanceByName(tracker_plugin_param.name()));
   ACHECK(tracker_ != nullptr);
-  AINFO << tracker_init_options.root_dir << " "
-        << tracker_init_options.conf_file;
+  AINFO << tracker_init_options.root_dir << " " << tracker_init_options.conf_file;
   if (!tracker_->Init(tracker_init_options)) {
     AERROR << "tl tracker init failed";
     return false;
@@ -88,8 +80,8 @@ bool TrafficLightCameraPerception::Init(
   return true;
 }
 
-bool TrafficLightCameraPerception::Perception(
-    const CameraPerceptionOptions &options, CameraFrame *frame) {
+bool TrafficLightCameraPerception::Perception(const CameraPerceptionOptions& options,
+                                              CameraFrame*                   frame) {
   PERF_FUNCTION();
   PERF_BLOCK_START();
   TrafficLightDetectorOptions detector_options;

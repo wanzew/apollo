@@ -16,13 +16,16 @@
 
 #pragma once
 
+#include <portaudio.h>
+
 #include <memory>
 #include <string>
 
 #include <google/protobuf/message.h>
-#include <portaudio.h>
-#include "cyber/cyber.h"
+
 #include "modules/drivers/microphone/proto/microphone_config.pb.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace drivers {
@@ -35,33 +38,32 @@ using apollo::drivers::microphone::config::MicrophoneConfig;
  */
 class Stream {
  private:
-  PaStream *pastream_ptr_;
-  PaStreamParameters *input_parameters_ptr_;
+  PaStream*           pastream_ptr_;
+  PaStreamParameters* input_parameters_ptr_;
 
  public:
   Stream() {}
   ~Stream();
-  void init_stream(int rate, int channels, int chunk, int input_device_index,
-                   PaSampleFormat format);
-  void read_stream(int n_frames, char *buffer) const;
+  void
+       init_stream(int rate, int channels, int chunk, int input_device_index, PaSampleFormat format);
+  void read_stream(int n_frames, char* buffer) const;
 };
 
 class Respeaker {
  private:
   std::unique_ptr<Stream> stream_ptr_;
-  const PaDeviceInfo *get_device_info(const PaDeviceIndex index) const;
-  const PaDeviceIndex host_api_device_index_to_device_index(
-      const PaHostApiIndex host_api, const int host_api_device_index) const;
-  const PaHostApiInfo *get_host_api_info(const PaHostApiIndex index) const;
-  const PaDeviceIndex get_respeaker_index() const;
-  const PaSampleFormat get_format_from_width(int width,
-                                             bool is_unsigned = true) const;
+  const PaDeviceInfo*     get_device_info(const PaDeviceIndex index) const;
+  const PaDeviceIndex     host_api_device_index_to_device_index(const PaHostApiIndex host_api,
+                                                                const int host_api_device_index) const;
+  const PaHostApiInfo*    get_host_api_info(const PaHostApiIndex index) const;
+  const PaDeviceIndex     get_respeaker_index() const;
+  const PaSampleFormat    get_format_from_width(int width, bool is_unsigned = true) const;
 
  public:
   Respeaker() {}
   ~Respeaker();
-  void init(const std::shared_ptr<const MicrophoneConfig> &microphone_config);
-  void read_stream(int n_frames, char *buffer) const;
+  void init(const std::shared_ptr<const MicrophoneConfig>& microphone_config);
+  void read_stream(int n_frames, char* buffer) const;
 };
 
 }  // namespace microphone

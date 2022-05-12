@@ -28,13 +28,13 @@ namespace perception {
 namespace lidar {
 
 enum class SppClassType {
-  OTHERS = 0,
-  SMALLMOT = 1,
-  BIGMOT = 2,
-  CYCLIST = 3,
+  OTHERS     = 0,
+  SMALLMOT   = 1,
+  BIGMOT     = 2,
+  CYCLIST    = 3,
   PEDESTRIAN = 4,
-  CONE = 5,
-  MAX_TYPE = 6,
+  CONE       = 5,
+  MAX_TYPE   = 6,
 };
 
 struct SppPoint {
@@ -61,11 +61,11 @@ struct SppCluster {
   std::vector<uint32_t> pixels;
   // class probabilities and type
   std::vector<float> class_prob;
-  SppClassType type = SppClassType::OTHERS;
-  float yaw = 0.f;
-  float confidence = 1.f;
-  float top_z = kDefaultTopZ;
-  size_t points_in_roi = 0;
+  SppClassType       type          = SppClassType::OTHERS;
+  float              yaw           = 0.f;
+  float              confidence    = 1.f;
+  float              top_z         = kDefaultTopZ;
+  size_t             points_in_roi = 0;
 
   SppCluster() {
     points.reserve(kDefaultReserveSize);
@@ -74,8 +74,7 @@ struct SppCluster {
     class_prob.reserve(static_cast<size_t>(SppClassType::MAX_TYPE));
   }
 
-  inline void AddPointSample(const base::PointF& point, float height,
-                             uint32_t point_id) {
+  inline void AddPointSample(const base::PointF& point, float height, uint32_t point_id) {
     points.push_back(SppPoint(point, height));
     point_ids.push_back(point_id);
   }
@@ -84,13 +83,11 @@ struct SppCluster {
     std::vector<int> indices(points.size(), 0);
     std::iota(indices.begin(), indices.end(), 0);
     std::sort(indices.begin(), indices.end(),
-              [&](const int lhs, const int rhs) {
-                return points[lhs].z < points[rhs].z;
-              });
+              [&](const int lhs, const int rhs) { return points[lhs].z < points[rhs].z; });
     std::vector<SppPoint> points_target(points.size());
     std::vector<uint32_t> point_ids_target(points.size());
     for (size_t i = 0; i < points.size(); ++i) {
-      points_target[i] = points[indices[i]];
+      points_target[i]    = points[indices[i]];
       point_ids_target[i] = point_ids[indices[i]];
     }
     points.swap(points_target);
@@ -102,10 +99,10 @@ struct SppCluster {
     point_ids.clear();
     pixels.clear();
     class_prob.clear();
-    type = SppClassType::OTHERS;
-    yaw = 0.f;
-    confidence = 1.f;
-    top_z = kDefaultTopZ;
+    type          = SppClassType::OTHERS;
+    yaw           = 0.f;
+    confidence    = 1.f;
+    top_z         = kDefaultTopZ;
     points_in_roi = 0;
   }
 
@@ -115,7 +112,7 @@ struct SppCluster {
       if (mask[point_ids[i]]) {
         if (valid != i) {
           point_ids[valid] = point_ids[i];
-          points[valid] = points[i];
+          points[valid]    = points[i];
         }
         ++valid;
       }
@@ -124,11 +121,11 @@ struct SppCluster {
     point_ids.resize(valid);
   }
 
-  static const size_t kDefaultReserveSize = 1000;
-  static constexpr float kDefaultTopZ = 50.f;
+  static const size_t    kDefaultReserveSize = 1000;
+  static constexpr float kDefaultTopZ        = 50.f;
 };
 
-typedef std::shared_ptr<SppCluster> SppClusterPtr;
+typedef std::shared_ptr<SppCluster>       SppClusterPtr;
 typedef std::shared_ptr<const SppCluster> SppClusterConstPtr;
 
 }  // namespace lidar

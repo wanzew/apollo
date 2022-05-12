@@ -37,8 +37,7 @@ using apollo::cyber::base::AtomicHashMap;
 template <typename T>
 class DataDispatcher {
  public:
-  using BufferVector =
-      std::vector<std::weak_ptr<CacheBuffer<std::shared_ptr<T>>>>;
+  using BufferVector = std::vector<std::weak_ptr<CacheBuffer<std::shared_ptr<T>>>>;
   ~DataDispatcher() {}
 
   void AddBuffer(const ChannelBuffer<T>& channel_buffer);
@@ -46,8 +45,8 @@ class DataDispatcher {
   bool Dispatch(const uint64_t channel_id, const std::shared_ptr<T>& msg);
 
  private:
-  DataNotifier* notifier_ = DataNotifier::Instance();
-  std::mutex buffers_map_mutex_;
+  DataNotifier*                         notifier_ = DataNotifier::Instance();
+  std::mutex                            buffers_map_mutex_;
   AtomicHashMap<uint64_t, BufferVector> buffers_map_;
 
   DECLARE_SINGLETON(DataDispatcher)
@@ -59,8 +58,8 @@ inline DataDispatcher<T>::DataDispatcher() {}
 template <typename T>
 void DataDispatcher<T>::AddBuffer(const ChannelBuffer<T>& channel_buffer) {
   std::lock_guard<std::mutex> lock(buffers_map_mutex_);
-  auto buffer = channel_buffer.Buffer();
-  BufferVector* buffers = nullptr;
+  auto                        buffer  = channel_buffer.Buffer();
+  BufferVector*               buffers = nullptr;
   if (buffers_map_.Get(channel_buffer.channel_id(), &buffers)) {
     buffers->emplace_back(buffer);
   } else {
@@ -70,12 +69,9 @@ void DataDispatcher<T>::AddBuffer(const ChannelBuffer<T>& channel_buffer) {
 }
 
 template <typename T>
-bool DataDispatcher<T>::Dispatch(const uint64_t channel_id,
-                                 const std::shared_ptr<T>& msg) {
+bool DataDispatcher<T>::Dispatch(const uint64_t channel_id, const std::shared_ptr<T>& msg) {
   BufferVector* buffers = nullptr;
-  if (apollo::cyber::IsShutdown()) {
-    return false;
-  }
+  if (apollo::cyber::IsShutdown()) { return false; }
   if (buffers_map_.Get(channel_id, &buffers)) {
     for (auto& buffer_wptr : *buffers) {
       if (auto buffer = buffer_wptr.lock()) {

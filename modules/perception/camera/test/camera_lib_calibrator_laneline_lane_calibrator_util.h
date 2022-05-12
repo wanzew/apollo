@@ -34,8 +34,7 @@ namespace camera {
 // bool get_pitch_from_vanishing_row(const float k_mat[9], int image_width,
 //                                   int image_height, float *cam_pitch);
 
-bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
-                                 cv::Mat *image);
+bool draw_vanishing_row_on_image(const cv::Scalar& color, int vanishing_row, cv::Mat* image);
 
 // bool draw_distance_line_on_image(const float k_mat[9], const cv::Scalar
 // &color,
@@ -53,8 +52,9 @@ bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
 //                   float shift_x, std::vector<Eigen::Vector2f> *left_pts,
 //                   std::vector<Eigen::Vector2f> *right_pts);
 
-void draw_lane_pts(const std::vector<Eigen::Vector2f> &lane_pts,
-                   const cv::Scalar &color, cv::Mat *image);
+void draw_lane_pts(const std::vector<Eigen::Vector2f>& lane_pts,
+                   const cv::Scalar&                   color,
+                   cv::Mat*                            image);
 
 }  // namespace camera
 }  // namespace perception

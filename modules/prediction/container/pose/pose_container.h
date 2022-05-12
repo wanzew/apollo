@@ -25,6 +25,7 @@
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/prediction/container/container.h"
 
 namespace apollo {
@@ -67,8 +68,7 @@ class PoseContainer : public Container {
   void Update(const localization::LocalizationEstimate& localization);
 
  public:
-  static const perception::PerceptionObstacle::Type type_ =
-      perception::PerceptionObstacle::VEHICLE;
+  static const perception::PerceptionObstacle::Type type_ = perception::PerceptionObstacle::VEHICLE;
 
  private:
   std::unique_ptr<perception::PerceptionObstacle> obstacle_ptr_;

@@ -22,8 +22,6 @@
 
 #include <memory>
 
-#include "cyber/cyber.h"
-
 #include "gtest/gtest_prod.h"
 
 #include "modules/localization/proto/localization.pb.h"
@@ -31,6 +29,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control_interface.h"
@@ -54,7 +53,7 @@ class SimControl : SimControlInterface {
    * @brief Constructor of SimControl.
    * @param map_service the pointer of MapService.
    */
-  explicit SimControl(const MapService *map_service);
+  explicit SimControl(const MapService* map_service);
 
   bool IsEnabled() const { return enabled_; }
 
@@ -62,8 +61,7 @@ class SimControl : SimControlInterface {
    * @brief setup callbacks and timer
    * @param set_start_point initialize localization.
    */
-  void Init(double start_velocity = 0.0,
-            double start_acceleration = 0.0) override;
+  void Init(double start_velocity = 0.0, double start_acceleration = 0.0) override;
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
@@ -84,28 +82,22 @@ class SimControl : SimControlInterface {
   void RunOnce() override;
 
  private:
-  void OnPlanning(
-      const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
-  void OnRoutingResponse(
-      const std::shared_ptr<apollo::routing::RoutingResponse> &routing);
+  void OnPlanning(const std::shared_ptr<apollo::planning::ADCTrajectory>& trajectory);
+  void OnRoutingResponse(const std::shared_ptr<apollo::routing::RoutingResponse>& routing);
   void OnReceiveNavigationInfo(
-      const std::shared_ptr<apollo::relative_map::NavigationInfo>
-          &navigation_info);
-  void OnPredictionObstacles(
-      const std::shared_ptr<apollo::prediction::PredictionObstacles>
-          &obstacles);
+      const std::shared_ptr<apollo::relative_map::NavigationInfo>& navigation_info);
+  void
+  OnPredictionObstacles(const std::shared_ptr<apollo::prediction::PredictionObstacles>& obstacles);
 
   /**
    * @brief Predict the next trajectory point using perfect control model
    */
-  bool PerfectControlModel(
-      apollo::common::TrajectoryPoint *point,
-      apollo::canbus::Chassis::GearPosition *gear_position);
+  bool PerfectControlModel(apollo::common::TrajectoryPoint*       point,
+                           apollo::canbus::Chassis::GearPosition* gear_position);
 
-  void PublishChassis(double cur_speed,
-                      apollo::canbus::Chassis::GearPosition gear_position);
+  void PublishChassis(double cur_speed, apollo::canbus::Chassis::GearPosition gear_position);
 
-  void PublishLocalization(const apollo::common::TrajectoryPoint &point);
+  void PublishLocalization(const apollo::common::TrajectoryPoint& point);
 
   void PublishDummyPrediction();
 
@@ -115,7 +107,7 @@ class SimControl : SimControlInterface {
 
   // Reset the start point, which can be a dummy point on the map, a current
   // localization pose, or a start position received from the routing module.
-  void SetStartPoint(const apollo::common::TrajectoryPoint &point);
+  void SetStartPoint(const apollo::common::TrajectoryPoint& point);
 
   void Freeze();
 
@@ -123,26 +115,19 @@ class SimControl : SimControlInterface {
 
   void InternalReset();
 
-  const MapService *map_service_ = nullptr;
+  const MapService* map_service_ = nullptr;
 
   std::unique_ptr<cyber::Node> node_;
 
-  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
-      localization_reader_;
-  std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
-      planning_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
-      routing_response_reader_;
-  std::shared_ptr<cyber::Reader<apollo::relative_map::NavigationInfo>>
-      navigation_reader_;
-  std::shared_ptr<cyber::Reader<apollo::prediction::PredictionObstacles>>
-      prediction_reader_;
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>> localization_reader_;
+  std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>            planning_reader_;
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>        routing_response_reader_;
+  std::shared_ptr<cyber::Reader<apollo::relative_map::NavigationInfo>>    navigation_reader_;
+  std::shared_ptr<cyber::Reader<apollo::prediction::PredictionObstacles>> prediction_reader_;
 
-  std::shared_ptr<cyber::Writer<apollo::localization::LocalizationEstimate>>
-      localization_writer_;
-  std::shared_ptr<cyber::Writer<apollo::canbus::Chassis>> chassis_writer_;
-  std::shared_ptr<cyber::Writer<apollo::prediction::PredictionObstacles>>
-      prediction_writer_;
+  std::shared_ptr<cyber::Writer<apollo::localization::LocalizationEstimate>> localization_writer_;
+  std::shared_ptr<cyber::Writer<apollo::canbus::Chassis>>                    chassis_writer_;
+  std::shared_ptr<cyber::Writer<apollo::prediction::PredictionObstacles>>    prediction_writer_;
 
   // The timer to publish simulated localization and chassis messages.
   std::unique_ptr<cyber::Timer> sim_control_timer_;
@@ -151,7 +136,7 @@ class SimControl : SimControlInterface {
   std::unique_ptr<cyber::Timer> sim_prediction_timer_;
 
   // Time interval of the timer, in milliseconds.
-  static constexpr double kSimControlIntervalMs = 10;
+  static constexpr double kSimControlIntervalMs    = 10;
   static constexpr double kSimPredictionIntervalMs = 100;
 
   // The latest received planning trajectory.

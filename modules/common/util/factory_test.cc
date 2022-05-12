@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/common/util/factory.h"
+
 #include <string>
 
 #include "gtest/gtest.h"
-#include "modules/common/util/factory.h"
 
 namespace apollo {
 namespace common {
@@ -34,8 +35,7 @@ class Derived : public Base {
 
 TEST(FactoryTest, Register) {
   Factory<std::string, Base> factory;
-  EXPECT_TRUE(factory.Register("derived_class",
-                               []() -> Base* { return new Derived(); }));
+  EXPECT_TRUE(factory.Register("derived_class", []() -> Base* { return new Derived(); }));
   auto derived_ptr = factory.CreateObject("derived_class");
   EXPECT_NE(nullptr, derived_ptr);
   EXPECT_EQ("derived", derived_ptr->Name());
@@ -45,8 +45,7 @@ TEST(FactoryTest, Register) {
 
 TEST(FactoryTest, Unregister) {
   Factory<std::string, Base> factory;
-  EXPECT_TRUE(factory.Register("derived_class",
-                               []() -> Base* { return new Derived(); }));
+  EXPECT_TRUE(factory.Register("derived_class", []() -> Base* { return new Derived(); }));
   EXPECT_FALSE(factory.Unregister("fake_class"));
   auto derived_ptr = factory.CreateObject("derived_class");
   EXPECT_NE(nullptr, derived_ptr);
@@ -57,22 +56,23 @@ TEST(FactoryTest, Unregister) {
 
 class ArgConstructor {
  public:
-  explicit ArgConstructor(const std::string& name) : name_(name) {}
+  explicit ArgConstructor(const std::string& name)
+      : name_(name) {}
   ArgConstructor(const std::string& name, int value)
-      : name_(name), value_(value) {}
+      : name_(name)
+      , value_(value) {}
   std::string Name() const { return name_; }
-  int Value() const { return value_; }
+  int         Value() const { return value_; }
 
  private:
   std::string name_;
-  int value_ = 0;
+  int         value_ = 0;
 };
 
 TEST(FactoryTest, OneArgConstructor) {
-  Factory<std::string, ArgConstructor, ArgConstructor* (*)(const std::string&)>
-      factory;
-  EXPECT_TRUE(factory.Register(
-      "arg_1", [](const std::string& arg) { return new ArgConstructor(arg); }));
+  Factory<std::string, ArgConstructor, ArgConstructor* (*)(const std::string&)> factory;
+  EXPECT_TRUE(
+      factory.Register("arg_1", [](const std::string& arg) { return new ArgConstructor(arg); }));
   auto ptr = factory.CreateObject("arg_1", "name_1");
   EXPECT_NE(nullptr, ptr);
   EXPECT_EQ("name_1", ptr->Name());
@@ -80,12 +80,9 @@ TEST(FactoryTest, OneArgConstructor) {
 }
 
 TEST(FactoryTest, TwoArgConstructor) {
-  Factory<std::string, ArgConstructor,
-          ArgConstructor* (*)(const std::string&, int)>
-      factory;
-  EXPECT_TRUE(factory.Register("arg_2", [](const std::string& arg, int value) {
-    return new ArgConstructor(arg, value);
-  }));
+  Factory<std::string, ArgConstructor, ArgConstructor* (*)(const std::string&, int)> factory;
+  EXPECT_TRUE(factory.Register(
+      "arg_2", [](const std::string& arg, int value) { return new ArgConstructor(arg, value); }));
   auto ptr = factory.CreateObject("arg_2", "name_2", 10);
   EXPECT_NE(nullptr, ptr);
   EXPECT_EQ("name_2", ptr->Name());

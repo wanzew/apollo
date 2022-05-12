@@ -24,11 +24,12 @@
 #include <string>
 
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/status/status.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::common
@@ -51,15 +52,14 @@ class VehicleStateProvider {
    * @param chassis Chassis information of the vehicle.
    */
   Status Update(const localization::LocalizationEstimate& localization,
-                const canbus::Chassis& chassis);
+                const canbus::Chassis&                    chassis);
 
   /**
    * @brief Update VehicleStateProvider instance by protobuf files.
    * @param localization_file the localization protobuf file.
    * @param chassis_file The chassis protobuf file
    */
-  void Update(const std::string& localization_file,
-              const std::string& chassis_file);
+  void Update(const std::string& localization_file, const std::string& chassis_file);
 
   double timestamp() const;
 
@@ -182,10 +182,9 @@ class VehicleStateProvider {
   const VehicleState& vehicle_state() const;
 
  private:
-  bool ConstructExceptLinearVelocity(
-      const localization::LocalizationEstimate& localization);
+  bool ConstructExceptLinearVelocity(const localization::LocalizationEstimate& localization);
 
-  common::VehicleState vehicle_state_;
+  common::VehicleState               vehicle_state_;
   localization::LocalizationEstimate original_localization_;
 };
 

@@ -31,39 +31,37 @@ namespace record {
 
 class CpuSchedulerLatency {
  public:
-  CpuSchedulerLatency() : periodic_thread_([this] { this->Callback(); }) {}
+  CpuSchedulerLatency()
+      : periodic_thread_([this] { this->Callback(); }) {}
 
   ~CpuSchedulerLatency() {
     running_ = false;
     periodic_thread_.join();
   }
 
-  std::chrono::nanoseconds GetMaxJitter() {
-    return std::chrono::nanoseconds(max_jitter_);
-  }
+  std::chrono::nanoseconds GetMaxJitter() { return std::chrono::nanoseconds(max_jitter_); }
 
   int64_t GetNumSamples() { return samples_; }
 
  private:
   void Callback() {
     static constexpr std::chrono::milliseconds kSleepDuration(10);
-    auto prev_time = std::chrono::steady_clock::now();
+    auto                                       prev_time = std::chrono::steady_clock::now();
     std::this_thread::sleep_for(kSleepDuration);
     while (running_) {
-      const auto current_time = std::chrono::steady_clock::now();
+      const auto current_time     = std::chrono::steady_clock::now();
       const auto time_since_sleep = current_time - prev_time;
-      const auto current_jitter =
-          std::abs((time_since_sleep - kSleepDuration).count());
-      prev_time = current_time;
-      max_jitter_ = std::max(current_jitter, max_jitter_);
+      const auto current_jitter   = std::abs((time_since_sleep - kSleepDuration).count());
+      prev_time                   = current_time;
+      max_jitter_                 = std::max(current_jitter, max_jitter_);
       ++samples_;
       std::this_thread::sleep_for(kSleepDuration);
     }
   }
 
   std::atomic<bool> running_{true};
-  int64_t max_jitter_ = 0;
-  int64_t samples_ = 0;
+  int64_t           max_jitter_ = 0;
+  int64_t           samples_    = 0;
 
   std::thread periodic_thread_;
 };
@@ -86,10 +84,9 @@ TEST(RecordFileTest, SmallMessageHighThroughputOKThreadJitter) {
   // write chunk section
   static const std::string kChannelName = "small_message";
 
-  static constexpr int kMaxIterations = 1000000000;
-  static constexpr int64_t kMaxSamples = 1000;
-  for (int i = 0;
-       i < kMaxIterations && cpu_jitter.GetNumSamples() < kMaxSamples; ++i) {
+  static constexpr int     kMaxIterations = 1000000000;
+  static constexpr int64_t kMaxSamples    = 1000;
+  for (int i = 0; i < kMaxIterations && cpu_jitter.GetNumSamples() < kMaxSamples; ++i) {
     proto::SingleMessage msg1;
     msg1.set_channel_name(kChannelName);
     msg1.set_content("0123456789");
@@ -101,10 +98,8 @@ TEST(RecordFileTest, SmallMessageHighThroughputOKThreadJitter) {
   EXPECT_GE(cpu_jitter.GetNumSamples(), kMaxSamples)
       << "This system may be to fast. Consider increasing kMaxIterations";
   static constexpr int64_t kMaxJitterMS = 20;
-  const int64_t max_cpu_jitter_ms =
-      std::chrono::duration_cast<std::chrono::milliseconds>(
-          cpu_jitter.GetMaxJitter())
-          .count();
+  const int64_t            max_cpu_jitter_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(cpu_jitter.GetMaxJitter()).count();
   EXPECT_LT(max_cpu_jitter_ms, kMaxJitterMS);
   ASSERT_FALSE(remove(kTestFile));
 }

@@ -38,7 +38,7 @@ namespace record {
  */
 class RecordReader : public RecordBase {
  public:
-  using FileReaderPtr = std::unique_ptr<RecordFileReader>;
+  using FileReaderPtr  = std::unique_ptr<RecordFileReader>;
   using ChannelInfoMap = std::unordered_map<std::string, proto::ChannelCache>;
 
   /**
@@ -69,8 +69,9 @@ class RecordReader : public RecordBase {
    *
    * @return True for success, false for not.
    */
-  bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
-                   uint64_t end_time = std::numeric_limits<uint64_t>::max());
+  bool ReadMessage(RecordMessage* message,
+                   uint64_t       begin_time = 0,
+                   uint64_t       end_time   = std::numeric_limits<uint64_t>::max());
 
   /**
    * @brief Reset the message index of record reader.
@@ -93,8 +94,7 @@ class RecordReader : public RecordBase {
    *
    * @return Message type.
    */
-  const std::string& GetMessageType(
-      const std::string& channel_name) const override;
+  const std::string& GetMessageType(const std::string& channel_name) const override;
 
   /**
    * @brief Get proto descriptor string by channel name.
@@ -103,8 +103,7 @@ class RecordReader : public RecordBase {
    *
    * @return Proto descriptor string by channel name.
    */
-  const std::string& GetProtoDesc(
-      const std::string& channel_name) const override;
+  const std::string& GetProtoDesc(const std::string& channel_name) const override;
 
   /**
    * @brief Get channel list.
@@ -116,13 +115,13 @@ class RecordReader : public RecordBase {
  private:
   bool ReadNextChunk(uint64_t begin_time, uint64_t end_time);
 
-  bool is_valid_ = false;
-  bool reach_end_ = false;
-  std::unique_ptr<proto::ChunkBody> chunk_ = nullptr;
-  proto::Index index_;
-  int message_index_ = 0;
-  ChannelInfoMap channel_info_;
-  FileReaderPtr file_reader_;
+  bool                              is_valid_  = false;
+  bool                              reach_end_ = false;
+  std::unique_ptr<proto::ChunkBody> chunk_     = nullptr;
+  proto::Index                      index_;
+  int                               message_index_ = 0;
+  ChannelInfoMap                    channel_info_;
+  FileReaderPtr                     file_reader_;
 };
 
 }  // namespace record

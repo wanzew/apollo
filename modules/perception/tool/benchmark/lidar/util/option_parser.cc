@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "absl/strings/str_split.h"
+
 #include "modules/common/util/string_util.h"
 
 namespace apollo {
@@ -39,9 +40,7 @@ bool OptionParser::parse_from_string(const std::string& input) {
       continue;
     }
     std::vector<std::string> values = absl::StrSplit(key_value[1], ',');
-    if (values.empty()) {
-      values.push_back(key_value[1]);
-    }
+    if (values.empty()) { values.push_back(key_value[1]); }
     auto iter = _options.find(key_value[0]);
     if (iter != _options.end()) {
       for (auto& value : values) {

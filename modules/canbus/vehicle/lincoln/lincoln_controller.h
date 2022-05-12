@@ -26,8 +26,6 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "cyber/common/macros.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
@@ -35,6 +33,7 @@
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
+#include "cyber/common/macros.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
 #include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
@@ -61,11 +60,10 @@ class LincolnController final : public VehicleController {
    * @brief initialize the lincoln vehicle controller.
    * @return init error_code
    */
-  common::ErrorCode Init(
-      const VehicleParameter &params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail> *const message_manager)
-      override;
+  common::ErrorCode
+  Init(const VehicleParameter&                                params,
+       CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+       MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) override;
 
   /**
    * @brief start the vehicle controller.
@@ -90,7 +88,7 @@ class LincolnController final : public VehicleController {
 
  private:
   // main logical function for operation the car enter or exit the auto driving
-  void Emergency() override;
+  void              Emergency() override;
   common::ErrorCode EnableAutoMode() override;
   common::ErrorCode DisableAutoMode() override;
   common::ErrorCode EnableSteeringOnlyMode() override;
@@ -122,40 +120,40 @@ class LincolnController final : public VehicleController {
   void Steer(double angle, double angle_spd) override;
 
   // set Electrical Park Brake
-  void SetEpbBreak(const control::ControlCommand &command) override;
-  void SetBeam(const control::ControlCommand &command) override;
-  void SetHorn(const control::ControlCommand &command) override;
-  void SetTurningSignal(const control::ControlCommand &command) override;
+  void SetEpbBreak(const control::ControlCommand& command) override;
+  void SetBeam(const control::ControlCommand& command) override;
+  void SetHorn(const control::ControlCommand& command) override;
+  void SetTurningSignal(const control::ControlCommand& command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
-  bool CheckSafetyError(const canbus::ChassisDetail &chassis);
+  bool CheckSafetyError(const canbus::ChassisDetail& chassis);
 
  private:
-  void SecurityDogThreadFunc();
-  virtual bool CheckResponse(const int32_t flags, bool need_wait);
-  void set_chassis_error_mask(const int32_t mask);
-  int32_t chassis_error_mask();
+  void               SecurityDogThreadFunc();
+  virtual bool       CheckResponse(const int32_t flags, bool need_wait);
+  void               set_chassis_error_mask(const int32_t mask);
+  int32_t            chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
-  void set_chassis_error_code(const Chassis::ErrorCode &error_code);
+  void               set_chassis_error_code(const Chassis::ErrorCode& error_code);
 
  private:
   // control protocol
-  Brake60 *brake_60_ = nullptr;
-  Throttle62 *throttle_62_ = nullptr;
-  Steering64 *steering_64_ = nullptr;
-  Gear66 *gear_66_ = nullptr;
-  Turnsignal68 *turnsignal_68_ = nullptr;
+  Brake60*      brake_60_      = nullptr;
+  Throttle62*   throttle_62_   = nullptr;
+  Steering64*   steering_64_   = nullptr;
+  Gear66*       gear_66_       = nullptr;
+  Turnsignal68* turnsignal_68_ = nullptr;
 
-  Chassis chassis_;
+  Chassis                      chassis_;
   std::unique_ptr<std::thread> thread_;
-  bool is_chassis_error_ = false;
+  bool                         is_chassis_error_ = false;
 
-  std::mutex chassis_error_code_mutex_;
+  std::mutex         chassis_error_code_mutex_;
   Chassis::ErrorCode chassis_error_code_ = Chassis::NO_ERROR;
 
   std::mutex chassis_mask_mutex_;
-  int32_t chassis_error_mask_ = 0;
+  int32_t    chassis_error_mask_ = 0;
 
   bool received_vin_ = false;
 

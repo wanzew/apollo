@@ -16,9 +16,10 @@
 
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus.h"
 
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/util/util.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
 
 /**
@@ -30,8 +31,7 @@ namespace drivers {
 namespace ultrasonic_radar {
 
 UltrasonicRadarCanbus::UltrasonicRadarCanbus()
-    : monitor_logger_buffer_(
-          common::monitor::MonitorMessageItem::ULTRASONIC_RADAR) {}
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::ULTRASONIC_RADAR) {}
 
 UltrasonicRadarCanbus::~UltrasonicRadarCanbus() {
   can_receiver_.Stop();
@@ -40,9 +40,9 @@ UltrasonicRadarCanbus::~UltrasonicRadarCanbus() {
 
 std::string UltrasonicRadarCanbus::Name() const { return "ultrasonic_radar"; }
 
-apollo::common::Status UltrasonicRadarCanbus::Init(
-    const std::string& config_path,
-    const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>>& writer) {
+apollo::common::Status
+UltrasonicRadarCanbus::Init(const std::string&                                          config_path,
+                            const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>>& writer) {
   if (!cyber::common::GetProtoFromFile(config_path, &ultrasonic_radar_conf_)) {
     return OnError("Unable to load canbus conf file: " + config_path);
   }
@@ -53,26 +53,20 @@ apollo::common::Status UltrasonicRadarCanbus::Init(
   // Init can client
   auto can_factory = CanClientFactory::Instance();
   can_factory->RegisterCanClients();
-  can_client_ = can_factory->CreateCANClient(
-      ultrasonic_radar_conf_.can_conf().can_card_parameter());
-  if (!can_client_) {
-    return OnError("Failed to create can client.");
-  }
+  can_client_ =
+      can_factory->CreateCANClient(ultrasonic_radar_conf_.can_conf().can_card_parameter());
+  if (!can_client_) { return OnError("Failed to create can client."); }
   AINFO << "Can client is successfully created.";
 
   sensor_message_manager_ = std::unique_ptr<UltrasonicRadarMessageManager>(
-      new UltrasonicRadarMessageManager(ultrasonic_radar_conf_.entrance_num(),
-                                        writer));
-  if (sensor_message_manager_ == nullptr) {
-    return OnError("Failed to create message manager.");
-  }
+      new UltrasonicRadarMessageManager(ultrasonic_radar_conf_.entrance_num(), writer));
+  if (sensor_message_manager_ == nullptr) { return OnError("Failed to create message manager."); }
   sensor_message_manager_->set_can_client(can_client_);
   AINFO << "Sensor message manager is successfully created.";
 
-  bool enable_receiver_log =
-      ultrasonic_radar_conf_.can_conf().enable_receiver_log();
-  if (can_receiver_.Init(can_client_.get(), sensor_message_manager_.get(),
-                         enable_receiver_log) != ErrorCode::OK) {
+  bool enable_receiver_log = ultrasonic_radar_conf_.can_conf().enable_receiver_log();
+  if (can_receiver_.Init(can_client_.get(), sensor_message_manager_.get(), enable_receiver_log) !=
+      ErrorCode::OK) {
     return OnError("Failed to init can receiver.");
   }
   AINFO << "The can receiver is successfully initialized.";
@@ -82,15 +76,11 @@ apollo::common::Status UltrasonicRadarCanbus::Init(
 
 apollo::common::Status UltrasonicRadarCanbus::Start() {
   // 1. init and start the can card hardware
-  if (can_client_->Start() != ErrorCode::OK) {
-    return OnError("Failed to start can client");
-  }
+  if (can_client_->Start() != ErrorCode::OK) { return OnError("Failed to start can client"); }
   AINFO << "Can client is started.";
 
   // 2. start receive first then send
-  if (can_receiver_.Start() != ErrorCode::OK) {
-    return OnError("Failed to start can receiver.");
-  }
+  if (can_receiver_.Start() != ErrorCode::OK) { return OnError("Failed to start can receiver."); }
   AINFO << "Can receiver is started.";
 
   // last step: publish monitor messages

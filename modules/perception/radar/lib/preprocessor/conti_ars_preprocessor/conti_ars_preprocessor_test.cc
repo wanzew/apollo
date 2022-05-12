@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/radar/lib/preprocessor/conti_ars_preprocessor/conti_ars_preprocessor.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/radar/lib/preprocessor/conti_ars_preprocessor/conti_ars_preprocessor.h"
 
 namespace apollo {
 namespace perception {
@@ -36,9 +37,8 @@ class ContiArsPreprocessorTest : public testing::Test {
 TEST_F(ContiArsPreprocessorTest, init) {
   float delay_time = static_cast<float>(preprocessor.GetDelayTime());
   EXPECT_FLOAT_EQ(delay_time, 0.0);
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "radar/preprocessor";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+                    "radar/preprocessor";
   bool init_result = preprocessor.Init();
   EXPECT_TRUE(init_result);
   delay_time = static_cast<float>(preprocessor.GetDelayTime());
@@ -48,7 +48,7 @@ TEST_F(ContiArsPreprocessorTest, init) {
 
 TEST_F(ContiArsPreprocessorTest, preprocess) {
   drivers::ContiRadar raw_obs;
-  Header radar_header;
+  Header              radar_header;
   radar_header.set_timestamp_sec(151237772.355345434);
   radar_header.set_radar_timestamp(151237772355345434);
   radar_header.set_module_name("radar");

@@ -16,13 +16,14 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/map/relative_map/proto/navigation.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "cyber/time/rate.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
 
 using apollo::cyber::Rate;
 
@@ -37,16 +38,13 @@ int main(int argc, char** argv) {
   FLAGS_alsologtostderr = true;
 
   apollo::relative_map::NavigationInfo navigation_info;
-  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_navigation_dummy_file,
-                                               &navigation_info)) {
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_navigation_dummy_file, &navigation_info)) {
     AERROR << "failed to load file: " << FLAGS_navigation_dummy_file;
     return -1;
   }
 
-  std::shared_ptr<apollo::cyber::Node> node(
-      apollo::cyber::CreateNode("navigation_info"));
-  auto writer = node->CreateWriter<apollo::relative_map::NavigationInfo>(
-      FLAGS_navigation_topic);
+  std::shared_ptr<apollo::cyber::Node> node(apollo::cyber::CreateNode("navigation_info"));
+  auto writer = node->CreateWriter<apollo::relative_map::NavigationInfo>(FLAGS_navigation_topic);
   Rate rate(0.3);
 
   while (apollo::cyber::OK()) {

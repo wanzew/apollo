@@ -26,8 +26,7 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-bool ReadProtoFromTextFile(const std::string &filename,
-                           google::protobuf::Message *proto) {
+bool ReadProtoFromTextFile(const std::string& filename, google::protobuf::Message* proto) {
   int fd = open(filename.c_str(), O_RDONLY);
   if (fd < 0) {
     AERROR << "cannot open file " << filename;
@@ -41,14 +40,13 @@ bool ReadProtoFromTextFile(const std::string &filename,
   return success;
 }
 
-bool ReadProtoFromBinaryFile(const std::string &filename,
-                             google::protobuf::Message *proto) {
+bool ReadProtoFromBinaryFile(const std::string& filename, google::protobuf::Message* proto) {
   int fd = open(filename.c_str(), O_RDONLY);
   if (fd < 0) {
     AERROR << "cannot open file " << filename;
     return false;
   }
-  google::protobuf::io::FileInputStream raw_input(fd);
+  google::protobuf::io::FileInputStream  raw_input(fd);
   google::protobuf::io::CodedInputStream coded_input(&raw_input);
   coded_input.SetTotalBytesLimit(std::numeric_limits<int>::max(), 536870912);
 
@@ -57,10 +55,10 @@ bool ReadProtoFromBinaryFile(const std::string &filename,
   close(fd);
   return success;
 }
-bool loadNetParams(const std::string &param_file, NetParameter *param) {
+bool loadNetParams(const std::string& param_file, NetParameter* param) {
   return ReadProtoFromTextFile(param_file, param);
 }
-std::string locateFile(const std::string &network, const std::string &input) {
+std::string locateFile(const std::string& network, const std::string& input) {
   return network + "/" + input;
 }
 }  // namespace inference

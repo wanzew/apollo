@@ -28,12 +28,13 @@ using croutine::CRoutine;
 using croutine::RoutineState;
 
 PollHandler::PollHandler(int fd)
-    : fd_(fd), is_read_(false), is_blocking_(false), routine_(nullptr) {}
+    : fd_(fd)
+    , is_read_(false)
+    , is_blocking_(false)
+    , routine_(nullptr) {}
 
 bool PollHandler::Block(int timeout_ms, bool is_read) {
-  if (!Check(timeout_ms)) {
-    return false;
-  }
+  if (!Check(timeout_ms)) { return false; }
 
   if (is_blocking_.exchange(true)) {
     AINFO << "poll handler is blocking.";
@@ -48,11 +49,9 @@ bool PollHandler::Block(int timeout_ms, bool is_read) {
 
   routine_->Yield(RoutineState::IO_WAIT);
 
-  bool result = false;
+  bool     result        = false;
   uint32_t target_events = is_read ? EPOLLIN : EPOLLOUT;
-  if (response_.events & target_events) {
-    result = true;
-  }
+  if (response_.events & target_events) { result = true; }
   is_blocking_.store(false);
 
   return result;
@@ -65,8 +64,7 @@ bool PollHandler::Unblock() {
 
 bool PollHandler::Check(int timeout_ms) {
   if (timeout_ms == 0) {
-    AINFO << "timeout[" << timeout_ms
-          << "] must be larger than zero or less than zero.";
+    AINFO << "timeout[" << timeout_ms << "] must be larger than zero or less than zero.";
     return false;
   }
 
@@ -87,7 +85,7 @@ bool PollHandler::Check(int timeout_ms) {
 void PollHandler::Fill(int timeout_ms, bool is_read) {
   is_read_.store(is_read);
 
-  request_.fd = fd_;
+  request_.fd     = fd_;
   request_.events = EPOLLET | EPOLLONESHOT;
   if (is_read) {
     request_.events |= EPOLLIN;
@@ -95,14 +93,11 @@ void PollHandler::Fill(int timeout_ms, bool is_read) {
     request_.events |= EPOLLOUT;
   }
   request_.timeout_ms = timeout_ms;
-  request_.callback =
-      std::bind(&PollHandler::ResponseCallback, this, std::placeholders::_1);
+  request_.callback   = std::bind(&PollHandler::ResponseCallback, this, std::placeholders::_1);
 }
 
 void PollHandler::ResponseCallback(const PollResponse& rsp) {
-  if (!is_blocking_.load() || routine_ == nullptr) {
-    return;
-  }
+  if (!is_blocking_.load() || routine_ == nullptr) { return; }
 
   response_ = rsp;
 

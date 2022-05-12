@@ -69,7 +69,7 @@ TEST(MessageHeaderTest, dst_id) {
 
 TEST(MessageHeaderTest, msg_type) {
   MessageHeader header;
-  std::string msg_type = header.msg_type();
+  std::string   msg_type = header.msg_type();
   EXPECT_TRUE(msg_type.empty());
   header.set_msg_type(nullptr, 1);
   msg_type = "apollo.cyber.proto.UnitTest";

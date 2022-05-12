@@ -20,12 +20,11 @@ namespace apollo {
 namespace prediction {
 
 thread_local int PredictionThreadPool::s_thread_pool_level = 0;
-std::vector<int> BaseThreadPool::THREAD_POOL_CAPACITY = {20, 20, 20};
+std::vector<int> BaseThreadPool::THREAD_POOL_CAPACITY      = {20, 20, 20};
 
 BaseThreadPool::BaseThreadPool(int thread_num, int next_thread_pool_level)
     : stopped_(false) {
-  if (!task_queue_.Init(thread_num,
-                        new apollo::cyber::base::BlockWaitStrategy())) {
+  if (!task_queue_.Init(thread_num, new apollo::cyber::base::BlockWaitStrategy())) {
     throw std::runtime_error("Task queue init failed.");
   }
   for (int i = 0; i < thread_num; ++i) {
@@ -33,9 +32,7 @@ BaseThreadPool::BaseThreadPool(int thread_num, int next_thread_pool_level)
       PredictionThreadPool::s_thread_pool_level = next_thread_pool_level;
       while (!stopped_) {
         std::function<void()> task;
-        if (task_queue_.WaitDequeue(&task)) {
-          task();
-        }
+        if (task_queue_.WaitDequeue(&task)) { task(); }
       }
     });
   }
@@ -50,9 +47,7 @@ void BaseThreadPool::Stop() {
 }
 
 BaseThreadPool::~BaseThreadPool() {
-  if (stopped_.exchange(true)) {
-    return;
-  }
+  if (stopped_.exchange(true)) { return; }
   task_queue_.BreakAllWait();
   for (std::thread& worker : workers_) {
     worker.join();
@@ -60,9 +55,8 @@ BaseThreadPool::~BaseThreadPool() {
 }
 
 BaseThreadPool* PredictionThreadPool::Instance() {
-  int pool_level = s_thread_pool_level;
-  int max_thread_pool_level =
-      static_cast<int>(BaseThreadPool::THREAD_POOL_CAPACITY.size());
+  int pool_level            = s_thread_pool_level;
+  int max_thread_pool_level = static_cast<int>(BaseThreadPool::THREAD_POOL_CAPACITY.size());
   CHECK_LT(pool_level, max_thread_pool_level);
   int index = s_thread_pool_level;
   switch (index) {

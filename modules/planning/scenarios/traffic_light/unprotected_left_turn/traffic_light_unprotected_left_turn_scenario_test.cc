@@ -20,9 +20,10 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -48,11 +49,9 @@ TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
       FLAGS_scenario_traffic_light_unprotected_left_turn_config_file, &config));
 
   ScenarioContext context;
-  auto injector = std::make_shared<DependencyInjector>();
-  scenario_.reset(
-      new TrafficLightUnprotectedLeftTurnScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(),
-            ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
+  auto            injector = std::make_shared<DependencyInjector>();
+  scenario_.reset(new TrafficLightUnprotectedLeftTurnScenario(config, &context, injector));
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
 }
 
 }  // namespace traffic_light

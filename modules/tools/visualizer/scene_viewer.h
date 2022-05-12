@@ -16,10 +16,11 @@
 
 #pragma once
 
-#include <QtWidgets/QOpenGLWidget>
 #include <map>
 #include <memory>
 #include <string>
+
+#include <QtWidgets/QOpenGLWidget>
 
 #include "modules/tools/visualizer/free_camera.h"
 #include "modules/tools/visualizer/plane.h"
@@ -43,8 +44,7 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   bool is_init(void) const { return is_init_; }
   bool IsFreeCamera(void) const { return current_cameraPtr_ == &free_camera_; }
 
-  bool AddTempRenderableObj(const std::string& tmpObjGroupName,
-                            RenderableObject* renderObj);
+  bool AddTempRenderableObj(const std::string& tmpObjGroupName, RenderableObject* renderObj);
   bool AddPermanentRenderObj(RenderableObject* obj) {
     if (obj && obj->haveShaderProgram() && is_init_) {
       permanent_renderable_obj_list_.append(obj);
@@ -56,23 +56,16 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
 
   void setTempObjGroupEnabled(const std::string& tmpObjGroupName, bool b);
 
-  const QVector3D& CameraPos(void) const {
-    return current_cameraPtr_->position();
-  }
-  const QVector3D& CamerAttitude(void) const {
-    return current_cameraPtr_->attitude();
-  }
+  const QVector3D& CameraPos(void) const { return current_cameraPtr_->position(); }
+  const QVector3D& CamerAttitude(void) const { return current_cameraPtr_->attitude(); }
 
   float sensitivity(void) const { return sensitivity_; }
 
-  void AddNewShaderProg(
-      const std::string& shaderProgName,
-      const std::shared_ptr<QOpenGLShaderProgram>& newShaderProg);
+  void AddNewShaderProg(const std::string&                           shaderProgName,
+                        const std::shared_ptr<QOpenGLShaderProgram>& newShaderProg);
 
-  std::shared_ptr<QOpenGLShaderProgram> FindShaderProg(
-      const std::string& shaderProgName) {
-    if (managed_shader_prog_.find(shaderProgName) !=
-        managed_shader_prog_.end()) {
+  std::shared_ptr<QOpenGLShaderProgram> FindShaderProg(const std::string& shaderProgName) {
+    if (managed_shader_prog_.find(shaderProgName) != managed_shader_prog_.end()) {
       return managed_shader_prog_[shaderProgName];
     } else {
       return std::shared_ptr<QOpenGLShaderProgram>();
@@ -119,23 +112,22 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   bool is_init_;
   bool right_key_is_moved_;
 
-  float sensitivity_;
+  float   sensitivity_;
   QTimer* refreshTimer_;
 
   QPoint left_key_last_pos_;
-  float right_key_last_y_;
+  float  right_key_last_y_;
 
   SceneCameraDialog* camera_dialog_;
-  AbstractCamera* current_cameraPtr_;
+  AbstractCamera*    current_cameraPtr_;
 
-  FreeCamera free_camera_;
+  FreeCamera   free_camera_;
   TargetCamera target_camera_;
 
-  std::map<const std::string, std::shared_ptr<QOpenGLShaderProgram>>
-      managed_shader_prog_;
+  std::map<const std::string, std::shared_ptr<QOpenGLShaderProgram>> managed_shader_prog_;
 
   struct TempRenderableObjGroup;
 
   std::map<const std::string, TempRenderableObjGroup*> tmp_renderable_obj_list_;
-  QList<RenderableObject*> permanent_renderable_obj_list_;
+  QList<RenderableObject*>                             permanent_renderable_obj_list_;
 };

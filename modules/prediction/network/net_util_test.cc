@@ -37,8 +37,7 @@ TEST(NetworkUtil, serialize_to_function_test) {
   EXPECT_FLOAT_EQ(sigm_func(0.0), 0.5);
   EXPECT_FLOAT_EQ(sigm_func(2.0), 0.88079707);
 
-  std::function<float(float)> hsigm_func =
-      serialize_to_function("hard_sigmoid");
+  std::function<float(float)> hsigm_func = serialize_to_function("hard_sigmoid");
   EXPECT_FLOAT_EQ(hsigm_func(-3.0), 0.0);
   EXPECT_FLOAT_EQ(hsigm_func(0.0), 0.5);
   EXPECT_FLOAT_EQ(hsigm_func(3.0), 1.0);

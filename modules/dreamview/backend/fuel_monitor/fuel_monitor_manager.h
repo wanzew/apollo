@@ -33,13 +33,11 @@
 namespace apollo {
 namespace dreamview {
 
-using FuelMonitorMap =
-    std::unordered_map<std::string, std::unique_ptr<FuelMonitor>>;
+using FuelMonitorMap = std::unordered_map<std::string, std::unique_ptr<FuelMonitor>>;
 
 class FuelMonitorManager {
  public:
-  void RegisterFuelMonitor(const std::string& mode,
-                           std::unique_ptr<FuelMonitor>&& fuel_monitor);
+  void RegisterFuelMonitor(const std::string& mode, std::unique_ptr<FuelMonitor>&& fuel_monitor);
 
   void SetCurrentMode(const std::string& mode);
 
@@ -48,8 +46,8 @@ class FuelMonitorManager {
 
  private:
   std::unordered_map<std::string, FuelMonitorMap> monitors_;
-  FuelMonitorMap* current_monitors_ = nullptr;
-  std::string current_mode_;
+  FuelMonitorMap*                                 current_monitors_ = nullptr;
+  std::string                                     current_mode_;
   // Mutex to protect concurrent access to current_progress_json_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;

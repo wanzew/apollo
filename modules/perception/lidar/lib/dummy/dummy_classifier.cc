@@ -20,14 +20,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool DummyClassifier::Init(const ClassifierInitOptions& options) {
-  return true;
-}
+bool DummyClassifier::Init(const ClassifierInitOptions& options) { return true; }
 
-bool DummyClassifier::Classify(const ClassifierOptions& options,
-                               LidarFrame* frame) {
-  return true;
-}
+bool DummyClassifier::Classify(const ClassifierOptions& options, LidarFrame* frame) { return true; }
 
 PERCEPTION_REGISTER_CLASSIFIER(DummyClassifier);
 

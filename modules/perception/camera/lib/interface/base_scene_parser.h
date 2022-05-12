@@ -18,9 +18,8 @@
 #include <string>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -36,24 +35,22 @@ class BaseSceneParser {
 
   virtual ~BaseSceneParser() = default;
 
-  virtual bool Init(
-      const SceneParserInitOptions &options = SceneParserInitOptions()) = 0;
+  virtual bool Init(const SceneParserInitOptions& options = SceneParserInitOptions()) = 0;
 
   // @brief: parse scene from image.
   // @param [in]: options
   // @param [in/out]: frame
   // semantic parsing mask should be filled, required,
-  virtual bool Parse(const SceneParserOptions &options, CameraFrame *frame) = 0;
+  virtual bool Parse(const SceneParserOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
-  BaseSceneParser(const BaseSceneParser &) = delete;
-  BaseSceneParser &operator=(const BaseSceneParser &) = delete;
+  BaseSceneParser(const BaseSceneParser&) = delete;
+  BaseSceneParser& operator=(const BaseSceneParser&) = delete;
 };  // class BaseSceneParser
 
 PERCEPTION_REGISTER_REGISTERER(BaseSceneParser);
-#define REGISTER_SCENE_PARSER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseSceneParser, name)
+#define REGISTER_SCENE_PARSER(name) PERCEPTION_REGISTER_CLASS(BaseSceneParser, name)
 
 }  // namespace camera
 }  // namespace perception

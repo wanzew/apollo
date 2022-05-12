@@ -32,12 +32,12 @@
  */
 
 DEFINE_string(output_dir, "/tmp/", "output map directory");
-DEFINE_double(angle_threshold, 1. / 180 * M_PI, /* 1 degree */
+DEFINE_double(angle_threshold,
+              1. / 180 * M_PI, /* 1 degree */
               "Points are sampled when the accumulated direction change "
               "exceeds the threshold");
 DEFINE_int32(downsample_distance, 5, "downsample rate for a normal path");
-DEFINE_int32(steep_turn_downsample_distance, 1,
-             "downsample rate for a steep turn path");
+DEFINE_int32(steep_turn_downsample_distance, 1, "downsample rate for a steep turn path");
 
 using apollo::common::PointENU;
 using apollo::common::util::DownsampleByAngle;
@@ -48,24 +48,22 @@ using apollo::hdmap::Map;
 using apollo::hdmap::adapter::OpendriveAdapter;
 
 static void DownsampleCurve(Curve* curve) {
-  auto* line_segment = curve->mutable_segment(0)->mutable_line_segment();
-  std::vector<PointENU> points(line_segment->point().begin(),
-                               line_segment->point().end());
+  auto*                 line_segment = curve->mutable_segment(0)->mutable_line_segment();
+  std::vector<PointENU> points(line_segment->point().begin(), line_segment->point().end());
   line_segment->clear_point();
 
   // NOTE: this not the most efficient implementation, but since this map tool
   // is only run once for each, we can probably live with that.
 
   // Downsample points by angle then by distance.
-  auto sampled_indices = DownsampleByAngle(points, FLAGS_angle_threshold);
+  auto                  sampled_indices = DownsampleByAngle(points, FLAGS_angle_threshold);
   std::vector<PointENU> downsampled_points;
   for (const size_t index : sampled_indices) {
     downsampled_points.push_back(points[index]);
   }
 
-  sampled_indices =
-      DownsampleByDistance(downsampled_points, FLAGS_downsample_distance,
-                           FLAGS_steep_turn_downsample_distance);
+  sampled_indices = DownsampleByDistance(downsampled_points, FLAGS_downsample_distance,
+                                         FLAGS_steep_turn_downsample_distance);
 
   for (const size_t index : sampled_indices) {
     *line_segment->add_point() = downsampled_points[index];
@@ -73,8 +71,8 @@ static void DownsampleCurve(Curve* curve) {
   size_t new_size = line_segment->point_size();
   CHECK_GT(new_size, 1U);
 
-  AINFO << "Lane curve downsampled from " << points.size() << " points to "
-        << new_size << " points.";
+  AINFO << "Lane curve downsampled from " << points.size() << " points to " << new_size
+        << " points.";
 }
 
 static void DownsampleMap(Map* map_pb) {
@@ -98,7 +96,7 @@ static void OutputMap(const Map& map_pb) {
   map_txt_file.close();
 
   std::ofstream map_bin_file(FLAGS_output_dir + "/sim_map.bin");
-  std::string map_str;
+  std::string   map_str;
   map_pb.SerializeToString(&map_str);
   map_bin_file << map_str;
   map_bin_file.close();
@@ -107,11 +105,11 @@ static void OutputMap(const Map& map_pb) {
 int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
-  FLAGS_v = 3;
+  FLAGS_v               = 3;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  Map map_pb;
+  Map        map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
   if (absl::EndsWith(map_file, ".xml")) {
     ACHECK(OpendriveAdapter::LoadData(map_file, &map_pb));

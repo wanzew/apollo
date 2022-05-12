@@ -16,8 +16,9 @@
 
 #include "modules/perception/common/graph/connected_component_analysis.h"
 
-#include "Eigen/Core"
 #include "gtest/gtest.h"
+
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {
@@ -25,7 +26,7 @@ namespace common {
 
 class ConnectedComponentAnalysisTest : public testing::Test {
  protected:
-  ConnectedComponentAnalysisTest() = default;
+  ConnectedComponentAnalysisTest()          = default;
   virtual ~ConnectedComponentAnalysisTest() = default;
   void SetUp() {}
   void TearDown() {}
@@ -33,12 +34,11 @@ class ConnectedComponentAnalysisTest : public testing::Test {
 
 TEST_F(ConnectedComponentAnalysisTest, test_ConnectedComponenetAnalysis) {
   Eigen::MatrixXf association_mat(3, 4);
-  association_mat << 0.3f, 1.2f, 4.0f, 3.0f, 0.9f, 2.0f, 3.0f, 8.0f, 4.0f, 3.0f,
-      0.3f, 0.1f;
+  association_mat << 0.3f, 1.2f, 4.0f, 3.0f, 0.9f, 2.0f, 3.0f, 8.0f, 4.0f, 3.0f, 0.3f, 0.1f;
   const float connected_threshold = 2.1f;
   // Compute connected components within given threshold
-  int no_track = static_cast<int>(association_mat.rows());
-  int no_obj = static_cast<int>(association_mat.cols());
+  int                           no_track = static_cast<int>(association_mat.rows());
+  int                           no_obj   = static_cast<int>(association_mat.cols());
   std::vector<std::vector<int>> nb_graph;
   nb_graph.resize(no_track + no_obj);
   for (int i = 0; i < no_track; i++) {

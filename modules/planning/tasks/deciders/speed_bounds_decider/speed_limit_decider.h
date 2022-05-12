@@ -24,11 +24,12 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/proto/task_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -37,26 +38,25 @@ namespace planning {
 class SpeedLimitDecider {
  public:
   SpeedLimitDecider(const SpeedBoundsDeciderConfig& config,
-                    const ReferenceLine& reference_line,
-                    const PathData& path_data);
+                    const ReferenceLine&            reference_line,
+                    const PathData&                 path_data);
 
   virtual ~SpeedLimitDecider() = default;
 
-  virtual common::Status GetSpeedLimits(
-      const IndexedList<std::string, Obstacle>& obstacles,
-      SpeedLimit* const speed_limit_data) const;
+  virtual common::Status GetSpeedLimits(const IndexedList<std::string, Obstacle>& obstacles,
+                                        SpeedLimit* const speed_limit_data) const;
 
  private:
   FRIEND_TEST(SpeedLimitDeciderTest, get_centric_acc_limit);
   double GetCentricAccLimit(const double kappa) const;
 
   void GetAvgKappa(const std::vector<common::PathPoint>& path_points,
-                   std::vector<double>* kappa) const;
+                   std::vector<double>*                  kappa) const;
 
  private:
-  const SpeedBoundsDeciderConfig& speed_bounds_config_;
-  const ReferenceLine& reference_line_;
-  const PathData& path_data_;
+  const SpeedBoundsDeciderConfig&     speed_bounds_config_;
+  const ReferenceLine&                reference_line_;
+  const PathData&                     path_data_;
   const apollo::common::VehicleParam& vehicle_param_;
 };
 

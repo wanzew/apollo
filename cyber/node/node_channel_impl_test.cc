@@ -45,7 +45,7 @@ TEST(Node_Channel_ImplTest, test1) {
 }
 
 TEST(Node_Channel_ImplTest, test2) {
-  auto globalData = common::GlobalData::Instance();
+  auto        globalData = common::GlobalData::Instance();
   std::string nodeName("TestConstructor");
   std::string nameSpace("");
   std::string channelName("/chatter1");
@@ -55,7 +55,7 @@ TEST(Node_Channel_ImplTest, test2) {
     EXPECT_EQ(n->Name(), nodeName);
 
     proto::RoleAttributes role_attr;
-    auto w = n->CreateWriter<proto::Chatter>(role_attr);
+    auto                  w = n->CreateWriter<proto::Chatter>(role_attr);
     EXPECT_EQ(w, nullptr);
 
     role_attr.set_channel_name(std::string());
@@ -73,7 +73,7 @@ TEST(Node_Channel_ImplTest, test2) {
     EXPECT_EQ(n->Name(), nodeName);
 
     proto::RoleAttributes role_attr;
-    auto w = n->CreateWriter<proto::Chatter>(role_attr);
+    auto                  w = n->CreateWriter<proto::Chatter>(role_attr);
     EXPECT_EQ(w, nullptr);
 
     role_attr.set_channel_name(std::string());
@@ -90,7 +90,7 @@ TEST(Node_Channel_ImplTest, test2) {
 }
 
 TEST(Node_Channel_ImplTest, test3) {
-  auto globalData = common::GlobalData::Instance();
+  auto        globalData = common::GlobalData::Instance();
   std::string nodeName("TestConstructor");
   std::string nameSpace("");
 

@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Adsepscommand56 : public ::apollo::drivers::canbus::ProtocolData<
-                            ::apollo::canbus::ChassisDetail> {
+class Adsepscommand56
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -52,8 +53,7 @@ class Adsepscommand56 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  Adsepscommand56* set_auto_drivercmd_alivecounter(
-      int auto_drivercmd_alivecounter);
+  Adsepscommand56* set_auto_drivercmd_alivecounter(int auto_drivercmd_alivecounter);
 
   // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
@@ -78,21 +78,19 @@ class Adsepscommand56 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  void set_p_auto_drivercmd_alivecounter(uint8_t* data,
-                                         int auto_drivercmd_alivecounter);
+  void set_p_auto_drivercmd_alivecounter(uint8_t* data, int auto_drivercmd_alivecounter);
 
   // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  void set_p_auto_drivercmd_checksum(uint8_t* data,
-                                     int auto_drivercmd_checksum);
+  void set_p_auto_drivercmd_checksum(uint8_t* data, int auto_drivercmd_checksum);
 
  private:
-  bool drive_enable_;
+  bool   drive_enable_;
   double auto_target_angle_;
-  int auto_drivercmd_alivecounter_;
-  int auto_drivercmd_checksum_;
+  int    auto_drivercmd_alivecounter_;
+  int    auto_drivercmd_checksum_;
 };
 
 }  // namespace neolix_edu

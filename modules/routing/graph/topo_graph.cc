@@ -50,14 +50,13 @@ bool TopoGraph::LoadEdges(const Graph& graph) {
   }
   for (const auto& edge : graph.edge()) {
     const std::string& from_lane_id = edge.from_lane_id();
-    const std::string& to_lane_id = edge.to_lane_id();
-    if (node_index_map_.count(from_lane_id) != 1 ||
-        node_index_map_.count(to_lane_id) != 1) {
+    const std::string& to_lane_id   = edge.to_lane_id();
+    if (node_index_map_.count(from_lane_id) != 1 || node_index_map_.count(to_lane_id) != 1) {
       return false;
     }
     std::shared_ptr<TopoEdge> topo_edge;
-    TopoNode* from_node = topo_nodes_[node_index_map_[from_lane_id]].get();
-    TopoNode* to_node = topo_nodes_[node_index_map_[to_lane_id]].get();
+    TopoNode*                 from_node = topo_nodes_[node_index_map_[from_lane_id]].get();
+    TopoNode*                 to_node   = topo_nodes_[node_index_map_[to_lane_id]].get();
     topo_edge.reset(new TopoEdge(edge, from_node, to_node));
     from_node->AddOutEdge(topo_edge.get());
     to_node->AddInEdge(topo_edge.get());
@@ -69,7 +68,7 @@ bool TopoGraph::LoadEdges(const Graph& graph) {
 bool TopoGraph::LoadGraph(const Graph& graph) {
   Clear();
 
-  map_version_ = graph.hdmap_version();
+  map_version_  = graph.hdmap_version();
   map_district_ = graph.hdmap_district();
 
   if (!LoadNodes(graph)) {
@@ -90,15 +89,12 @@ const std::string& TopoGraph::MapDistrict() const { return map_district_; }
 
 const TopoNode* TopoGraph::GetNode(const std::string& id) const {
   const auto& iter = node_index_map_.find(id);
-  if (iter == node_index_map_.end()) {
-    return nullptr;
-  }
+  if (iter == node_index_map_.end()) { return nullptr; }
   return topo_nodes_[iter->second].get();
 }
 
-void TopoGraph::GetNodesByRoadId(
-    const std::string& road_id,
-    std::unordered_set<const TopoNode*>* const node_in_road) const {
+void TopoGraph::GetNodesByRoadId(const std::string&                         road_id,
+                                 std::unordered_set<const TopoNode*>* const node_in_road) const {
   const auto& iter = road_node_map_.find(road_id);
   if (iter != road_node_map_.end()) {
     node_in_road->insert(iter->second.begin(), iter->second.end());

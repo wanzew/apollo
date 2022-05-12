@@ -28,9 +28,9 @@ namespace message {
 
 TEST(ProtobufFactory, register_and_generate) {
   // register
-  auto factory = ProtobufFactory::Instance();
+  auto                            factory = ProtobufFactory::Instance();
   apollo::cyber::proto::ProtoDesc proto_desc;
-  proto::UnitTest ut;
+  proto::UnitTest                 ut;
   EXPECT_FALSE(factory->RegisterMessage("test"));
   EXPECT_FALSE(factory->RegisterPythonMessage("test"));
 

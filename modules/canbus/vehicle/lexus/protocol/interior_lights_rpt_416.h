@@ -17,48 +17,44 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class Interiorlightsrpt416 : public ::apollo::drivers::canbus::ProtocolData<
-                                 ::apollo::canbus::ChassisDetail> {
+class Interiorlightsrpt416
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Interiorlightsrpt416();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'DIM_LEVEL_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 19, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool dim_level_is_valid(const std::uint8_t* bytes,
-                          const int32_t length) const;
+  bool dim_level_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'MOOD_LIGHTS_ON_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 18, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool mood_lights_on_is_valid(const std::uint8_t* bytes,
-                               const int32_t length) const;
+  bool mood_lights_on_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'REAR_DOME_LIGHTS_ON_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 17, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool rear_dome_lights_on_is_valid(const std::uint8_t* bytes,
-                                    const int32_t length) const;
+  bool rear_dome_lights_on_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'FRONT_DOME_LIGHTS_ON_IS_VALID', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 16, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool front_dome_lights_on_is_valid(const std::uint8_t* bytes,
-                                     const int32_t length) const;
+  bool front_dome_lights_on_is_valid(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'DIM_LEVEL', 'enum': {0: 'DIM_LEVEL_DIM_LEVEL_MIN',
   // 1: 'DIM_LEVEL_DIM_LEVEL_1', 2: 'DIM_LEVEL_DIM_LEVEL_2', 3:
@@ -71,7 +67,7 @@ class Interiorlightsrpt416 : public ::apollo::drivers::canbus::ProtocolData<
   // '[0|12]', 'bit': 15, 'type': 'enum', 'order': 'motorola', 'physical_unit':
   // ''}
   Interior_lights_rpt_416::Dim_levelType dim_level(const std::uint8_t* bytes,
-                                                   const int32_t length) const;
+                                                   const int32_t       length) const;
 
   // config detail: {'name': 'MOOD_LIGHTS_ON', 'offset': 0.0, 'precision': 1.0,
   // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 2,
@@ -82,15 +78,13 @@ class Interiorlightsrpt416 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 1, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool rear_dome_lights_on(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  bool rear_dome_lights_on(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'FRONT_DOME_LIGHTS_ON', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
   // '[0|1]', 'bit': 0, 'type': 'bool', 'order': 'motorola', 'physical_unit':
   // ''}
-  bool front_dome_lights_on(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  bool front_dome_lights_on(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace lexus

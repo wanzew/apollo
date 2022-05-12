@@ -28,8 +28,10 @@
 #include <vector>
 
 #include "gtest/gtest_prod.h"
-#include "modules/common/monitor_log/monitor_logger.h"
+
 #include "modules/common/monitor_log/proto/monitor_log.pb.h"
+
+#include "modules/common/monitor_log/monitor_logger.h"
 
 /**
  * @namespace apollo::common::monitor
@@ -39,15 +41,15 @@ namespace apollo {
 namespace common {
 namespace monitor {
 
-#define REG_MSG_TYPE(TYPE)                            \
-  MonitorLogBuffer &TYPE(const std::string &msg) {    \
-    AddMonitorMsgItem(MonitorMessageItem::TYPE, msg); \
-    Publish();                                        \
-    return *this;                                     \
-  }                                                   \
-  MonitorLogBuffer &TYPE() {                          \
-    level_ = MonitorMessageItem::TYPE;                \
-    return *this;                                     \
+#define REG_MSG_TYPE(TYPE)                                                                         \
+  MonitorLogBuffer& TYPE(const std::string& msg) {                                                 \
+    AddMonitorMsgItem(MonitorMessageItem::TYPE, msg);                                              \
+    Publish();                                                                                     \
+    return *this;                                                                                  \
+  }                                                                                                \
+  MonitorLogBuffer& TYPE() {                                                                       \
+    level_ = MonitorMessageItem::TYPE;                                                             \
+    return *this;                                                                                  \
   }
 
 /**
@@ -63,7 +65,7 @@ class MonitorLogBuffer {
    * @brief The constructor of MonitorBuffer.
    * @param a Monitor instance pointer;
    */
-  explicit MonitorLogBuffer(const MonitorMessageItem::MessageSource &source);
+  explicit MonitorLogBuffer(const MonitorMessageItem::MessageSource& source);
 
   virtual ~MonitorLogBuffer();
 
@@ -92,8 +94,7 @@ class MonitorLogBuffer {
    * @param log_level defined in modules/common/monitor/proto/monitor.proto
    * @param msg the string to send to monitor
    */
-  void AddMonitorMsgItem(const MonitorMessageItem::LogLevel log_level,
-                         const std::string &msg);
+  void AddMonitorMsgItem(const MonitorMessageItem::LogLevel log_level, const std::string& msg);
 
   /**
    * @brief publish the monitor messages
@@ -101,9 +102,9 @@ class MonitorLogBuffer {
   void Publish();
 
  private:
-  MonitorLogger *logger_ = MonitorLogger::Instance();
-  MonitorMessageItem::LogLevel level_ = MonitorMessageItem::INFO;
-  std::vector<MessageItem> monitor_msg_items_;
+  MonitorLogger*                    logger_ = MonitorLogger::Instance();
+  MonitorMessageItem::LogLevel      level_  = MonitorMessageItem::INFO;
+  std::vector<MessageItem>          monitor_msg_items_;
   MonitorMessageItem::MessageSource source_;
 
   FRIEND_TEST(MonitorBufferTest, RegisterMacro);

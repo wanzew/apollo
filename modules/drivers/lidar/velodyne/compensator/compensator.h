@@ -24,7 +24,7 @@
 // Eigen 3.3.7: #define ALIVE (0)
 // fastrtps: enum ChangeKind_t { ALIVE, ... };
 #if defined(ALIVE)
-#undef ALIVE
+#  undef ALIVE
 #endif
 
 #include "modules/drivers/lidar/proto/velodyne_config.pb.h"
@@ -40,40 +40,41 @@ using apollo::drivers::PointCloud;
 
 class Compensator {
  public:
-  explicit Compensator(const CompensatorConfig& config) : config_(config) {}
+  explicit Compensator(const CompensatorConfig& config)
+      : config_(config) {}
   virtual ~Compensator() {}
 
   bool MotionCompensation(const std::shared_ptr<const PointCloud>& msg,
-                          std::shared_ptr<PointCloud> msg_compensated);
+                          std::shared_ptr<PointCloud>              msg_compensated);
 
  private:
   /**
    * @brief get pose affine from tf2 by gps timestamp
    *   novatel-preprocess broadcast the tf2 transfrom.
    */
-  bool QueryPoseAffineFromTF2(const uint64_t& timestamp, void* pose,
-                              const std::string& child_frame_id);
+  bool
+  QueryPoseAffineFromTF2(const uint64_t& timestamp, void* pose, const std::string& child_frame_id);
 
   /**
    * @brief motion compensation for point cloud
    */
   void MotionCompensation(const std::shared_ptr<const PointCloud>& msg,
-                          std::shared_ptr<PointCloud> msg_compensated,
-                          const uint64_t timestamp_min,
-                          const uint64_t timestamp_max,
-                          const Eigen::Affine3d& pose_min_time,
-                          const Eigen::Affine3d& pose_max_time);
+                          std::shared_ptr<PointCloud>              msg_compensated,
+                          const uint64_t                           timestamp_min,
+                          const uint64_t                           timestamp_max,
+                          const Eigen::Affine3d&                   pose_min_time,
+                          const Eigen::Affine3d&                   pose_max_time);
   /**
    * @brief get min timestamp and max timestamp from points in pointcloud2
    */
   inline void GetTimestampInterval(const std::shared_ptr<const PointCloud>& msg,
-                                   uint64_t* timestamp_min,
-                                   uint64_t* timestamp_max);
+                                   uint64_t*                                timestamp_min,
+                                   uint64_t*                                timestamp_max);
 
   bool IsValid(const Eigen::Vector3d& point);
 
   transform::Buffer* tf2_buffer_ptr_ = transform::Buffer::Instance();
-  CompensatorConfig config_;
+  CompensatorConfig  config_;
 };
 
 }  // namespace velodyne

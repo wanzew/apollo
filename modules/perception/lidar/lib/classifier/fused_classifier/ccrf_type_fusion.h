@@ -32,26 +32,24 @@ class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  bool Init(const TypeFusionInitOption& option) override;
-  bool TypeFusion(const TypeFusionOption& option,
-                  std::shared_ptr<perception::base::Object> object) override;
+  bool        Init(const TypeFusionInitOption& option) override;
+  bool        TypeFusion(const TypeFusionOption&                   option,
+                         std::shared_ptr<perception::base::Object> object) override;
   std::string Name() const override { return "CCRFOneShotTypeFusion"; }
-  bool FuseOneShotTypeProbs(
-      const std::shared_ptr<perception::base::Object>& object,
-      Vectord* log_prob);
+  bool        FuseOneShotTypeProbs(const std::shared_ptr<perception::base::Object>& object,
+                                   Vectord*                                         log_prob);
 
  protected:
   apollo::common::EigenMap<std::string, Matrixd> smooth_matrices_;
-  Matrixd confidence_smooth_matrix_;
+  Matrixd                                        confidence_smooth_matrix_;
 };
 
 class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  bool Init(const TypeFusionInitOption& option) override;
-  bool TypeFusion(const TypeFusionOption& option,
-                  TrackedObjects* tracked_objects) override;
+  bool        Init(const TypeFusionInitOption& option) override;
+  bool        TypeFusion(const TypeFusionOption& option, TrackedObjects* tracked_objects) override;
   std::string Name() const override { return "CCRFSequenceTypeFusion"; }
 
  protected:
@@ -69,7 +67,8 @@ class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
   // window version of Chain-CRFs inference
   bool FuseWithConditionalProbabilityInference(TrackedObjects* tracked_objects);
   // util
-  bool RecoverFromLogProbability(Vectord* prob, std::vector<float>* dst,
+  bool RecoverFromLogProbability(Vectord*                      prob,
+                                 std::vector<float>*           dst,
                                  perception::base::ObjectType* type);
 
  protected:

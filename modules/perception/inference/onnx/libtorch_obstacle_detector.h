@@ -21,6 +21,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include <torch/script.h>
 #include <torch/torch.h>
 
@@ -34,33 +35,35 @@ using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
 
 class ObstacleDetector : public Inference {
  public:
-  ObstacleDetector(const std::string &net_file, const std::string &model_file,
-           const std::vector<std::string> &outputs);
+  ObstacleDetector(const std::string&              net_file,
+                   const std::string&              model_file,
+                   const std::vector<std::string>& outputs);
 
-  ObstacleDetector(const std::string &net_file, const std::string &model_file,
-           const std::vector<std::string> &outputs,
-           const std::vector<std::string> &inputs);
+  ObstacleDetector(const std::string&              net_file,
+                   const std::string&              model_file,
+                   const std::vector<std::string>& outputs,
+                   const std::vector<std::string>& inputs);
 
   virtual ~ObstacleDetector() {}
 
-  bool Init(const std::map<std::string, std::vector<int>> &shapes) override;
+  bool Init(const std::map<std::string, std::vector<int>>& shapes) override;
 
-  void Infer() override;
-  BlobPtr get_blob(const std::string &name) override;
+  void    Infer() override;
+  BlobPtr get_blob(const std::string& name) override;
 
  protected:
-  bool shape(const std::string &name, std::vector<int> *res);
+  bool                       shape(const std::string& name, std::vector<int>* res);
   torch::jit::script::Module net_;
 
  private:
-  std::string net_file_;
-  std::string model_file_;
+  std::string              net_file_;
+  std::string              model_file_;
   std::vector<std::string> output_names_;
   std::vector<std::string> input_names_;
-  BlobMap blobs_;
+  BlobMap                  blobs_;
 
   torch::DeviceType device_type_;
-  int device_id_ = 0;
+  int               device_id_ = 0;
 };
 
 }  // namespace inference

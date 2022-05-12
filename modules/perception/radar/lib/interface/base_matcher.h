@@ -33,12 +33,13 @@ namespace radar {
 typedef std::pair<size_t, size_t> TrackObjectPair;
 
 struct TrackObjectMatcherOptions {
-  Eigen::Vector3d *ref_point = nullptr;
+  Eigen::Vector3d* ref_point = nullptr;
 };
 
 class BaseMatcher {
  public:
-  BaseMatcher() : name_("BaseMatcher") {}
+  BaseMatcher()
+      : name_("BaseMatcher") {}
   virtual ~BaseMatcher() {}
   virtual bool Init() { return true; }
   // @brief match radar objects to tracks
@@ -49,33 +50,33 @@ class BaseMatcher {
   // @params[OUT] unassigned_tracks: unmatched tracks
   // @params[OUT] unassigned_objects: unmatched objects
   // @return nothing
-  virtual bool Match(const std::vector<RadarTrackPtr> &radar_tracks,
-                     const base::Frame &radar_frame,
-                     const TrackObjectMatcherOptions &options,
-                     std::vector<TrackObjectPair> *assignments,
-                     std::vector<size_t> *unassigned_tracks,
-                     std::vector<size_t> *unassigned_objects) {
+  virtual bool Match(const std::vector<RadarTrackPtr>& radar_tracks,
+                     const base::Frame&                radar_frame,
+                     const TrackObjectMatcherOptions&  options,
+                     std::vector<TrackObjectPair>*     assignments,
+                     std::vector<size_t>*              unassigned_tracks,
+                     std::vector<size_t>*              unassigned_objects) {
     return true;
   }
-  virtual void IDMatch(const std::vector<RadarTrackPtr> &radar_tracks,
-                       const base::Frame &radar_frame,
-                       std::vector<TrackObjectPair> *assignments,
-                       std::vector<size_t> *unassigned_tracks,
-                       std::vector<size_t> *unassigned_objects);
-  static void SetMaxMatchDistance(double dist);
-  static double GetMaxMatchDistance();
-  static void SetBoundMatchDistance(double dist);
-  static double GetBoundMatchDistance();
+  virtual void        IDMatch(const std::vector<RadarTrackPtr>& radar_tracks,
+                              const base::Frame&                radar_frame,
+                              std::vector<TrackObjectPair>*     assignments,
+                              std::vector<size_t>*              unassigned_tracks,
+                              std::vector<size_t>*              unassigned_objects);
+  static void         SetMaxMatchDistance(double dist);
+  static double       GetMaxMatchDistance();
+  static void         SetBoundMatchDistance(double dist);
+  static double       GetBoundMatchDistance();
   virtual std::string Name() { return name_; }
 
  protected:
-  std::string name_;
+  std::string   name_;
   static double s_max_match_distance_;
   static double s_bound_match_distance_;
-  virtual bool RefinedTrack(const base::ObjectPtr &track_object,
-                            double track_timestamp,
-                            const base::ObjectPtr &radar_object,
-                            double radar_timestamp);
+  virtual bool  RefinedTrack(const base::ObjectPtr& track_object,
+                             double                 track_timestamp,
+                             const base::ObjectPtr& radar_object,
+                             double                 radar_timestamp);
   FRIEND_TEST(BaseMatcherTest, base_matcher_test);
 
  private:
@@ -83,8 +84,7 @@ class BaseMatcher {
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseMatcher);
-#define PERCEPTION_REGISTER_MATCHER(name) \
-  PERCEPTION_REGISTER_CLASS(BaseMatcher, name)
+#define PERCEPTION_REGISTER_MATCHER(name) PERCEPTION_REGISTER_CLASS(BaseMatcher, name)
 
 }  // namespace radar
 }  // namespace perception

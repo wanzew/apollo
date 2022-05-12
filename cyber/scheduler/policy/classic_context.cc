@@ -36,34 +36,26 @@ alignas(CACHELINE_SIZE) NOTIFY_GRP ClassicContext::notify_grp_;
 
 ClassicContext::ClassicContext() { InitGroup(DEFAULT_GROUP_NAME); }
 
-ClassicContext::ClassicContext(const std::string& group_name) {
-  InitGroup(group_name);
-}
+ClassicContext::ClassicContext(const std::string& group_name) { InitGroup(group_name); }
 
 void ClassicContext::InitGroup(const std::string& group_name) {
-  multi_pri_rq_ = &cr_group_[group_name];
-  lq_ = &rq_locks_[group_name];
-  mtx_wrapper_ = &mtx_wq_[group_name];
-  cw_ = &cv_wq_[group_name];
+  multi_pri_rq_           = &cr_group_[group_name];
+  lq_                     = &rq_locks_[group_name];
+  mtx_wrapper_            = &mtx_wq_[group_name];
+  cw_                     = &cv_wq_[group_name];
   notify_grp_[group_name] = 0;
-  current_grp = group_name;
+  current_grp             = group_name;
 }
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
-  if (cyber_unlikely(stop_.load())) {
-    return nullptr;
-  }
+  if (cyber_unlikely(stop_.load())) { return nullptr; }
 
   for (int i = MAX_PRIO - 1; i >= 0; --i) {
     ReadLockGuard<AtomicRWLock> lk(lq_->at(i));
     for (auto& cr : multi_pri_rq_->at(i)) {
-      if (!cr->Acquire()) {
-        continue;
-      }
+      if (!cr->Acquire()) { continue; }
 
-      if (cr->UpdateState() == RoutineState::READY) {
-        return cr;
-      }
+      if (cr->UpdateState() == RoutineState::READY) { return cr; }
 
       cr->Release();
     }
@@ -76,9 +68,7 @@ void ClassicContext::Wait() {
   std::unique_lock<std::mutex> lk(mtx_wrapper_->Mutex());
   cw_->Cv().wait_for(lk, std::chrono::milliseconds(1000),
                      [&]() { return notify_grp_[current_grp] > 0; });
-  if (notify_grp_[current_grp] > 0) {
-    notify_grp_[current_grp]--;
-  }
+  if (notify_grp_[current_grp] > 0) { notify_grp_[current_grp]--; }
 }
 
 void ClassicContext::Shutdown() {
@@ -97,11 +87,11 @@ void ClassicContext::Notify(const std::string& group_name) {
 }
 
 bool ClassicContext::RemoveCRoutine(const std::shared_ptr<CRoutine>& cr) {
-  auto grp = cr->group_name();
-  auto prio = cr->priority();
-  auto crid = cr->id();
+  auto                         grp  = cr->group_name();
+  auto                         prio = cr->priority();
+  auto                         crid = cr->id();
   WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[grp].at(prio));
-  auto& croutines = ClassicContext::cr_group_[grp].at(prio);
+  auto&                        croutines = ClassicContext::cr_group_[grp].at(prio);
   for (auto it = croutines.begin(); it != croutines.end(); ++it) {
     if ((*it)->id() == crid) {
       auto cr = *it;

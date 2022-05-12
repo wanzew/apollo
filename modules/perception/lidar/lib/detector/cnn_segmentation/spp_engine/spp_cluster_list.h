@@ -43,16 +43,14 @@ class SppClusterList {
   // @param [in]: 3d point
   // @param [in]: point height above ground
   // @param [in]: point id
-  void AddPointSample(size_t cluster_id, const base::PointF& point,
-                      float height, uint32_t point_id);
+  void
+  AddPointSample(size_t cluster_id, const base::PointF& point, float height, uint32_t point_id);
   // @brief: get clusters data
   // @return: clusters
   inline std::vector<SppClusterPtr>& clusters() { return clusters_; }
   // @brief: get clusters data, const version
   // @return: clusters
-  inline const std::vector<SppClusterPtr>& clusters() const {
-    return clusters_;
-  }
+  inline const std::vector<SppClusterPtr>& clusters() const { return clusters_; }
   // @brief: get clusters size
   // @return: cluster size
   inline size_t size() const { return clusters_.size(); }
@@ -90,7 +88,7 @@ class SppClusterList {
 
  private:
   std::vector<SppClusterPtr> clusters_;
-  std::string sensor_name_;
+  std::string                sensor_name_;
   DISALLOW_COPY_AND_ASSIGN(SppClusterList);
 };
 

@@ -35,11 +35,10 @@ class SpeedData : public std::vector<common::SpeedPoint> {
 
   explicit SpeedData(std::vector<common::SpeedPoint> speed_points);
 
-  void AppendSpeedPoint(const double s, const double time, const double v,
-                        const double a, const double da);
+  void AppendSpeedPoint(
+      const double s, const double time, const double v, const double a, const double da);
 
-  bool EvaluateByTime(const double time,
-                      common::SpeedPoint* const speed_point) const;
+  bool EvaluateByTime(const double time, common::SpeedPoint* const speed_point) const;
 
   // Assuming spatial traversed distance is monotonous, which is the case for
   // current usage on city driving scenario

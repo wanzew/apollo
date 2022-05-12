@@ -49,32 +49,30 @@ class ExtrapolationPredictor : public SequencePredictor {
    * @return If predicted successfully
    */
   bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
-               Obstacle* obstacle,
-               ObstaclesContainer* obstacles_container) override;
+               Obstacle*                     obstacle,
+               ObstaclesContainer*           obstacles_container) override;
 
  private:
   struct LaneSearchResult {
-    bool found = false;
-    std::string lane_id = "";
-    int point_index = -1;
+    bool        found       = false;
+    std::string lane_id     = "";
+    int         point_index = -1;
   };
 
   void PostProcess(Trajectory* trajectory_ptr, ObstacleClusters* clusters_ptr);
 
-  LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory,
-                                           const int num_tail_point);
+  LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory, const int num_tail_point);
 
   void ExtrapolateByLane(const LaneSearchResult& lane_search_result,
-                         const double extrapolation_speed,
-                         Trajectory* trajectory_ptr,
-                         ObstacleClusters* clusters_ptr);
+                         const double            extrapolation_speed,
+                         Trajectory*             trajectory_ptr,
+                         ObstacleClusters*       clusters_ptr);
 
-  void ExtrapolateByFreeMove(const int num_tail_point,
+  void ExtrapolateByFreeMove(const int    num_tail_point,
                              const double extrapolation_speed,
-                             Trajectory* trajectory_ptr);
+                             Trajectory*  trajectory_ptr);
 
-  double ComputeExtraplationSpeed(const int num_tail_point,
-                                  const Trajectory& trajectory);
+  double ComputeExtraplationSpeed(const int num_tail_point, const Trajectory& trajectory);
 };
 
 }  // namespace prediction

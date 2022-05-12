@@ -25,12 +25,12 @@ namespace cyber {
 namespace service_discovery {
 
 TopologyManager::TopologyManager()
-    : init_(false),
-      node_manager_(nullptr),
-      channel_manager_(nullptr),
-      service_manager_(nullptr),
-      participant_(nullptr),
-      participant_listener_(nullptr) {
+    : init_(false)
+    , node_manager_(nullptr)
+    , channel_manager_(nullptr)
+    , service_manager_(nullptr)
+    , participant_(nullptr)
+    , participant_listener_(nullptr) {
   Init();
 }
 
@@ -39,9 +39,7 @@ TopologyManager::~TopologyManager() { Shutdown(); }
 void TopologyManager::Shutdown() {
   ADEBUG << "topology shutdown.";
   // avoid shutdown twice
-  if (!init_.exchange(false)) {
-    return;
-  }
+  if (!init_.exchange(false)) { return; }
 
   node_manager_->Shutdown();
   channel_manager_->Shutdown();
@@ -54,8 +52,7 @@ void TopologyManager::Shutdown() {
   change_signal_.DisconnectAllSlots();
 }
 
-TopologyManager::ChangeConnection TopologyManager::AddChangeListener(
-    const ChangeFunc& func) {
+TopologyManager::ChangeConnection TopologyManager::AddChangeListener(const ChangeFunc& func) {
   return change_signal_.Connect(func);
 }
 
@@ -65,26 +62,23 @@ void TopologyManager::RemoveChangeListener(const ChangeConnection& conn) {
 }
 
 bool TopologyManager::Init() {
-  if (init_.exchange(true)) {
-    return true;
-  }
+  if (init_.exchange(true)) { return true; }
 
-  node_manager_ = std::make_shared<NodeManager>();
+  node_manager_    = std::make_shared<NodeManager>();
   channel_manager_ = std::make_shared<ChannelManager>();
   service_manager_ = std::make_shared<ServiceManager>();
 
   CreateParticipant();
 
-  bool result =
-      InitNodeManager() && InitChannelManager() && InitServiceManager();
+  bool result = InitNodeManager() && InitChannelManager() && InitServiceManager();
   if (!result) {
     AERROR << "init manager failed.";
     participant_ = nullptr;
     delete participant_listener_;
     participant_listener_ = nullptr;
-    node_manager_ = nullptr;
-    channel_manager_ = nullptr;
-    service_manager_ = nullptr;
+    node_manager_         = nullptr;
+    channel_manager_      = nullptr;
+    service_manager_      = nullptr;
     init_.store(false);
     return false;
   }
@@ -105,29 +99,24 @@ bool TopologyManager::InitServiceManager() {
 }
 
 bool TopologyManager::CreateParticipant() {
-  std::string participant_name =
-      common::GlobalData::Instance()->HostName() + '+' +
-      std::to_string(common::GlobalData::Instance()->ProcessId());
-  participant_listener_ = new ParticipantListener(std::bind(
-      &TopologyManager::OnParticipantChange, this, std::placeholders::_1));
-  participant_ = std::make_shared<transport::Participant>(
-      participant_name, 11511, participant_listener_);
+  std::string participant_name = common::GlobalData::Instance()->HostName() + '+' +
+                                 std::to_string(common::GlobalData::Instance()->ProcessId());
+  participant_listener_ = new ParticipantListener(
+      std::bind(&TopologyManager::OnParticipantChange, this, std::placeholders::_1));
+  participant_ =
+      std::make_shared<transport::Participant>(participant_name, 11511, participant_listener_);
   return true;
 }
 
 void TopologyManager::OnParticipantChange(const PartInfo& info) {
   ChangeMsg msg;
-  if (!Convert(info, &msg)) {
-    return;
-  }
+  if (!Convert(info, &msg)) { return; }
 
-  if (!init_.load()) {
-    return;
-  }
+  if (!init_.load()) { return; }
 
   if (msg.operate_type() == OperateType::OPT_LEAVE) {
-    auto& host_name = msg.role_attr().host_name();
-    int process_id = msg.role_attr().process_id();
+    auto& host_name  = msg.role_attr().host_name();
+    int   process_id = msg.role_attr().process_id();
     node_manager_->OnTopoModuleLeave(host_name, process_id);
     channel_manager_->OnTopoModuleLeave(host_name, process_id);
     service_manager_->OnTopoModuleLeave(host_name, process_id);
@@ -136,16 +125,16 @@ void TopologyManager::OnParticipantChange(const PartInfo& info) {
 }
 
 bool TopologyManager::Convert(const PartInfo& info, ChangeMsg* msg) {
-  auto guid = info.rtps.m_guid;
-  auto status = info.rtps.m_status;
+  auto        guid   = info.rtps.m_guid;
+  auto        status = info.rtps.m_status;
   std::string participant_name("");
   OperateType opt_type = OperateType::OPT_JOIN;
 
   switch (status) {
     case eprosima::fastrtps::rtps::DISCOVERY_STATUS::DISCOVERED_RTPSPARTICIPANT:
-      participant_name = info.rtps.m_RTPSParticipantName;
+      participant_name         = info.rtps.m_RTPSParticipantName;
       participant_names_[guid] = participant_name;
-      opt_type = OperateType::OPT_JOIN;
+      opt_type                 = OperateType::OPT_JOIN;
       break;
 
     case eprosima::fastrtps::rtps::DISCOVERY_STATUS::REMOVED_RTPSPARTICIPANT:
@@ -157,15 +146,12 @@ bool TopologyManager::Convert(const PartInfo& info, ChangeMsg* msg) {
       opt_type = OperateType::OPT_LEAVE;
       break;
 
-    default:
-      break;
+    default: break;
   }
 
   std::string host_name("");
-  int process_id = 0;
-  if (!ParseParticipantName(participant_name, &host_name, &process_id)) {
-    return false;
-  }
+  int         process_id = 0;
+  if (!ParseParticipantName(participant_name, &host_name, &process_id)) { return false; }
 
   msg->set_timestamp(cyber::Time::Now().ToNanosecond());
   msg->set_change_type(ChangeType::CHANGE_PARTICIPANT);
@@ -178,15 +164,15 @@ bool TopologyManager::Convert(const PartInfo& info, ChangeMsg* msg) {
 }
 
 bool TopologyManager::ParseParticipantName(const std::string& participant_name,
-                                           std::string* host_name,
-                                           int* process_id) {
+                                           std::string*       host_name,
+                                           int*               process_id) {
   // participant_name format: host_name+process_id
   auto pos = participant_name.find('+');
   if (pos == std::string::npos) {
     ADEBUG << "participant_name [" << participant_name << "] format mismatch.";
     return false;
   }
-  *host_name = participant_name.substr(0, pos);
+  *host_name          = participant_name.substr(0, pos);
   std::string pid_str = participant_name.substr(pos + 1);
   try {
     *process_id = std::stoi(pid_str);

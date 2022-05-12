@@ -17,7 +17,6 @@
 
 #include <cmath>
 #include <ctime>
-
 #include <iostream>
 #include <memory>
 #include <set>
@@ -40,30 +39,30 @@ constexpr double kDEGRESS_TO_RADIANS = M_PI / 180.0;
 typedef unsigned char uchar;
 
 struct FramePose {
-  double time_stamp;  // unix time
-  double tx, ty, tz;
-  double qx, qy, qz, qw;
-  double latitude, longitude, altitude;
-  double velx, vely, velz;
-  double roll, pitch, azimuth;
+  double       time_stamp;  // unix time
+  double       tx, ty, tz;
+  double       qx, qy, qz, qw;
+  double       latitude, longitude, altitude;
+  double       velx, vely, velz;
+  double       roll, pitch, azimuth;
   unsigned int ins_status;
   unsigned int solution_status;
   unsigned int position_type;
-  float diff_age;
-  double local_std;
+  float        diff_age;
+  double       local_std;
 };
 
 enum class State { IDLE, RUNNING };
 
 struct JsonConf {
   std::vector<std::pair<std::string, double>> topic_list;
-  bool use_system_time;
-  double topic_rate_tolerance;
+  bool                                        use_system_time;
+  double                                      topic_rate_tolerance;
 
-  unsigned int solution_status;
-  std::set<unsigned int> position_type_range;
+  unsigned int            solution_status;
+  std::set<unsigned int>  position_type_range;
   std::pair<float, float> diff_age_range;
-  double local_std_upper_limit;
+  double                  local_std_upper_limit;
 
   /*Period of channel check trigger. The unit is seconds.*/
   int channel_check_trigger_gap;
@@ -109,12 +108,10 @@ struct JsonConf {
 std::shared_ptr<JsonConf> ParseJson(std::string conf_path);
 
 inline double GetYaw(double from_x, double from_y, double to_x, double to_y) {
-  double vecx = to_x - from_x;
-  double vecy = to_y - from_y;
+  double vecx  = to_x - from_x;
+  double vecy  = to_y - from_y;
   double alpha = acos(vecy / sqrt(vecx * vecx + vecy * vecy));
-  if (vecx < 0) {
-    alpha = 2 * M_PI - alpha;
-  }
+  if (vecx < 0) { alpha = 2 * M_PI - alpha; }
   return kRADIANS_TO_DEGREES * alpha;
 }
 

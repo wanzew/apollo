@@ -18,8 +18,10 @@ limitations under the License.
 #include <vector>
 
 #include "absl/strings/str_split.h"
-#include "cyber/common/file.h"
+
 #include "modules/map/relative_map/proto/navigation.pb.h"
+
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace hdmap {
@@ -33,9 +35,7 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
   const std::vector<std::string> candidates = absl::StrSplit(files, '|');
   for (const auto& filename : candidates) {
     const std::string file_path = absl::StrCat(FLAGS_map_dir, "/", filename);
-    if (cyber::common::PathExists(file_path)) {
-      return file_path;
-    }
+    if (cyber::common::PathExists(file_path)) { return file_path; }
   }
   AERROR << "No existing file found in " << dir << "/" << files
          << ". Fallback to first candidate as default result.";
@@ -49,9 +49,9 @@ std::string BaseMapFile() {
   if (FLAGS_use_navigation_mode) {
     AWARN << "base_map file is not used when FLAGS_use_navigation_mode is true";
   }
-  return FLAGS_test_base_map_filename.empty()
-             ? FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename)
-             : FindFirstExist(FLAGS_map_dir, FLAGS_test_base_map_filename);
+  return FLAGS_test_base_map_filename.empty() ?
+             FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename) :
+             FindFirstExist(FLAGS_map_dir, FLAGS_test_base_map_filename);
 }
 
 std::string SimMapFile() {
@@ -82,28 +82,26 @@ std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
 std::unique_ptr<HDMap> CreateMap(const MapMsg& map_msg) {
   std::unique_ptr<HDMap> hdmap(new HDMap());
   if (hdmap->LoadMapFromProto(map_msg.hdmap()) != 0) {
-    AERROR << "Failed to load RelativeMap: "
-           << map_msg.header().ShortDebugString();
+    AERROR << "Failed to load RelativeMap: " << map_msg.header().ShortDebugString();
     return nullptr;
   }
   return hdmap;
 }
 
-std::unique_ptr<HDMap> HDMapUtil::base_map_ = nullptr;
-uint64_t HDMapUtil::base_map_seq_ = 0;
-std::mutex HDMapUtil::base_map_mutex_;
+std::unique_ptr<HDMap> HDMapUtil::base_map_     = nullptr;
+uint64_t               HDMapUtil::base_map_seq_ = 0;
+std::mutex             HDMapUtil::base_map_mutex_;
 
 std::unique_ptr<HDMap> HDMapUtil::sim_map_ = nullptr;
-std::mutex HDMapUtil::sim_map_mutex_;
+std::mutex             HDMapUtil::sim_map_mutex_;
 
 const HDMap* HDMapUtil::BaseMapPtr(const MapMsg& map_msg) {
   std::lock_guard<std::mutex> lock(base_map_mutex_);
-  if (base_map_ != nullptr &&
-      base_map_seq_ == map_msg.header().sequence_num()) {
+  if (base_map_ != nullptr && base_map_seq_ == map_msg.header().sequence_num()) {
     // avoid re-create map in the same cycle.
     return base_map_.get();
   } else {
-    base_map_ = CreateMap(map_msg);
+    base_map_     = CreateMap(map_msg);
     base_map_seq_ = map_msg.header().sequence_num();
   }
   return base_map_.get();

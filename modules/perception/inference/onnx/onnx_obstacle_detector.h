@@ -24,8 +24,8 @@
 #include <vector>
 
 #include "NvInfer.h"
-#include "NvOnnxParser.h"
 #include "NvInferVersion.h"
+#include "NvOnnxParser.h"
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/inference/inference.h"
@@ -47,21 +47,11 @@ class Logger : public nvinfer1::ILogger {
     if (severity > reportable_severity) return;
 
     switch (severity) {
-      case Severity::kINTERNAL_ERROR:
-        std::cerr << "INTERNAL_ERROR: ";
-        break;
-      case Severity::kERROR:
-        std::cerr << "ERROR: ";
-        break;
-      case Severity::kWARNING:
-        std::cerr << "WARNING: ";
-        break;
-      case Severity::kINFO:
-        std::cerr << "INFO: ";
-        break;
-      default:
-        std::cerr << "UNKNOWN: ";
-        break;
+      case Severity::kINTERNAL_ERROR: std::cerr << "INTERNAL_ERROR: "; break;
+      case Severity::kERROR: std::cerr << "ERROR: "; break;
+      case Severity::kWARNING: std::cerr << "WARNING: "; break;
+      case Severity::kINFO: std::cerr << "INFO: "; break;
+      default: std::cerr << "UNKNOWN: "; break;
     }
     std::cerr << msg << std::endl;
   }
@@ -71,14 +61,14 @@ class Logger : public nvinfer1::ILogger {
 
 class OnnxObstacleDetector : public Inference {
  public:
-  OnnxObstacleDetector(const std::string &model_file,
-                       const float score_threshold,
-                       const std::vector<std::string> &outputs,
-                       const std::vector<std::string> &inputs);
+  OnnxObstacleDetector(const std::string&              model_file,
+                       const float                     score_threshold,
+                       const std::vector<std::string>& outputs,
+                       const std::vector<std::string>& inputs);
 
-  OnnxObstacleDetector(const std::string &model_file,
-                       const std::vector<std::string> &outputs,
-                       const std::vector<std::string> &inputs);
+  OnnxObstacleDetector(const std::string&              model_file,
+                       const std::vector<std::string>& outputs,
+                       const std::vector<std::string>& inputs);
 
   virtual ~OnnxObstacleDetector();
 
@@ -88,24 +78,23 @@ class OnnxObstacleDetector : public Inference {
    * @param[out] engine_ptr TensorRT model engine made out of ONNX model
    * @details Load ONNX model, and convert it to TensorRT model
    */
-  void OnnxToTRTModel(const std::string& model_file,
-                      nvinfer1::ICudaEngine** engine_ptr);
+  void OnnxToTRTModel(const std::string& model_file, nvinfer1::ICudaEngine** engine_ptr);
 
   void inference();
 
-  bool Init(const std::map<std::string, std::vector<int>> &shapes) override;
-  void Infer() override;
-  BlobPtr get_blob(const std::string &name) override;
+  bool    Init(const std::map<std::string, std::vector<int>>& shapes) override;
+  void    Infer() override;
+  BlobPtr get_blob(const std::string& name) override;
 
  private:
-  std::string model_file_;
-  float score_threshold_;
-  std::vector<std::string> output_names_;
-  std::vector<std::string> input_names_;
-  BlobMap blobs_;
-  nvinfer1::ICudaEngine* engine_;
+  std::string                  model_file_;
+  float                        score_threshold_;
+  std::vector<std::string>     output_names_;
+  std::vector<std::string>     input_names_;
+  BlobMap                      blobs_;
+  nvinfer1::ICudaEngine*       engine_;
   nvinfer1::IExecutionContext* context_;
-  Logger g_logger_;
+  Logger                       g_logger_;
 
   int num_classes_;
   int kBatchSize;

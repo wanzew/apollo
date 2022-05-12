@@ -25,9 +25,8 @@ namespace msf {
 /**@brief Test load and set methods in LosslessMapConfig. */
 TEST(LosslessMapConfigTestSuite, LoadSetTest) {
   BaseMapConfig config("lossless_map");
-  EXPECT_TRUE(
-      config.Load("/apollo/modules/localization/msf/local_map/"
-                  "test_data/lossless_single_map/config.xml"));
+  EXPECT_TRUE(config.Load("/apollo/modules/localization/msf/local_map/"
+                          "test_data/lossless_single_map/config.xml"));
   config.SetMultiResolutions();
   EXPECT_EQ(config.map_resolutions_.size(), 10);
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.03125);
@@ -43,17 +42,15 @@ TEST(LosslessMapConfigTestSuite, LoadSetTest) {
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.125);
 
   BaseMapConfig config2;
-  EXPECT_FALSE(
-      config2.Load("/apollo/modules/localization/msf/local_map/"
-                   "test_data/lossless_single_map/config.xml"));
+  EXPECT_FALSE(config2.Load("/apollo/modules/localization/msf/local_map/"
+                            "test_data/lossless_single_map/config.xml"));
 }
 
 /**@brief Test save method. */
 TEST(LosslessMapConfigTestSuite, SaveTest) {
   BaseMapConfig config("lossless_map");
-  EXPECT_TRUE(
-      config.Load("/apollo/modules/localization/msf/local_map/"
-                  "test_data/lossless_single_map/config.xml"));
+  EXPECT_TRUE(config.Load("/apollo/modules/localization/msf/local_map/"
+                          "test_data/lossless_single_map/config.xml"));
   EXPECT_TRUE(config.Save("/tmp/temp_output_file.xml"));
 }
 

@@ -45,8 +45,7 @@ class LaneScanningEvaluator : public Evaluator {
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
-                ObstaclesContainer* obstacles_container) override;
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Override Evaluate
@@ -54,7 +53,8 @@ class LaneScanningEvaluator : public Evaluator {
    * @param Obstacles container
    * @param vector of all Obstacles
    */
-  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+  bool Evaluate(Obstacle*              obstacle_ptr,
+                ObstaclesContainer*    obstacles_container,
                 std::vector<Obstacle*> dynamic_env) override;
 
   /**
@@ -63,13 +63,12 @@ class LaneScanningEvaluator : public Evaluator {
    * @param Lane Graph pointer
    * @param To be filled up with extracted features
    */
-  bool ExtractFeatures(const Obstacle* obstacle_ptr,
-                       const LaneGraph* lane_graph_ptr,
+  bool ExtractFeatures(const Obstacle*      obstacle_ptr,
+                       const LaneGraph*     lane_graph_ptr,
                        std::vector<double>* feature_values);
 
-  bool ExtractStringFeatures(
-      const LaneGraph& lane_graph,
-      std::vector<std::string>* const string_feature_values);
+  bool ExtractStringFeatures(const LaneGraph&                lane_graph,
+                             std::vector<std::string>* const string_feature_values);
 
   /**
    * @brief Get the name of evaluator.
@@ -87,34 +86,33 @@ class LaneScanningEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        A vector of doubles to be filled up with extracted features
    */
-  bool ExtractObstacleFeatures(const Obstacle* obstacle_ptr,
-                               std::vector<double>* feature_values);
+  bool ExtractObstacleFeatures(const Obstacle* obstacle_ptr, std::vector<double>* feature_values);
 
   /**
    * @brief Set lane feature vector
    * @param Obstacle pointer
    *        A vector of doubles to be filled up with extracted features
    */
-  bool ExtractStaticEnvFeatures(const Obstacle* obstacle_ptr,
-                                const LaneGraph* lane_graph_ptr,
+  bool ExtractStaticEnvFeatures(const Obstacle*      obstacle_ptr,
+                                const LaneGraph*     lane_graph_ptr,
                                 std::vector<double>* feature_values,
-                                std::vector<int>* lane_sequence_idx_to_remove);
+                                std::vector<int>*    lane_sequence_idx_to_remove);
 
   void ModelInference(const std::vector<torch::jit::IValue>& torch_inputs,
-                      torch::jit::script::Module torch_model,
-                      Feature* feature_ptr);
+                      torch::jit::script::Module             torch_model,
+                      Feature*                               feature_ptr);
 
  private:
-  static const size_t OBSTACLE_FEATURE_SIZE = 20 * (9 + 40);
-  static const size_t INTERACTION_FEATURE_SIZE = 8;
-  static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
-  static const size_t LANE_POINTS_SIZE = 100;          // 50m
-  static const size_t BACKWARD_LANE_POINTS_SIZE = 50;  // 25m
-  static const size_t MAX_NUM_LANE = 10;
+  static const size_t OBSTACLE_FEATURE_SIZE      = 20 * (9 + 40);
+  static const size_t INTERACTION_FEATURE_SIZE   = 8;
+  static const size_t SINGLE_LANE_FEATURE_SIZE   = 4;
+  static const size_t LANE_POINTS_SIZE           = 100;  // 50m
+  static const size_t BACKWARD_LANE_POINTS_SIZE  = 50;   // 25m
+  static const size_t MAX_NUM_LANE               = 10;
   static const size_t SHORT_TERM_TRAJECTORY_SIZE = 10;
 
   torch::jit::script::Module torch_lane_scanning_model_;
-  torch::Device device_;
+  torch::Device              device_;
 };
 
 }  // namespace prediction

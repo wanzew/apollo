@@ -40,13 +40,13 @@ bool IsRushHour();
 
 class V2xProxy {
  private:
-  std::shared_ptr<InternalData> internal_ = nullptr;
-  std::string hdmap_junction_id_ = kUnknownJunctionId;
-  std::mutex lock_hdmap_junction_id_;
+  std::shared_ptr<InternalData> internal_          = nullptr;
+  std::string                   hdmap_junction_id_ = kUnknownJunctionId;
+  std::mutex                    lock_hdmap_junction_id_;
   // for hmi traffic lights
-  std::shared_ptr<OSLight> last_os_light_ = nullptr;
-  uint64_t ts_last_os_light_ = 0;
-  std::mutex lock_last_os_light_;
+  std::shared_ptr<OSLight> last_os_light_    = nullptr;
+  uint64_t                 ts_last_os_light_ = 0;
+  std::mutex               lock_last_os_light_;
 
  public:
   explicit V2xProxy(std::shared_ptr<::apollo::hdmap::HDMap> hdmap = nullptr);
@@ -62,8 +62,7 @@ class V2xProxy {
     rsu_whitelist_timer_->Stop();
   }
 
-  bool GetRsuListFromFile(const std::string &filename,
-                          std::set<std::string> *whitelist);
+  bool GetRsuListFromFile(const std::string& filename, std::set<std::string>* whitelist);
 
  private:
   /* function RecvTrafficlight, get traffic light msg from grpc with timeout
@@ -79,12 +78,12 @@ class V2xProxy {
   std::unique_ptr<::apollo::cyber::Timer> rsu_whitelist_timer_;
 
   std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
-  std::unique_ptr<OsInterFace> os_interface_;
-  std::unique_ptr<ObuInterFaceGrpcImpl> obu_interface_;
-  std::unique_ptr<std::thread> recv_thread_ = nullptr;
-  std::unique_ptr<std::thread> planning_thread_ = nullptr;
-  std::unique_ptr<std::thread> rsi_thread_ = nullptr;
-  std::unique_ptr<std::thread> obs_thread_ = nullptr;
+  std::unique_ptr<OsInterFace>           os_interface_;
+  std::unique_ptr<ObuInterFaceGrpcImpl>  obu_interface_;
+  std::unique_ptr<std::thread>           recv_thread_     = nullptr;
+  std::unique_ptr<std::thread>           planning_thread_ = nullptr;
+  std::unique_ptr<std::thread>           rsi_thread_      = nullptr;
+  std::unique_ptr<std::thread>           obs_thread_      = nullptr;
 
   /* function car to obu car status timer callback
    */
@@ -92,12 +91,12 @@ class V2xProxy {
 
   std::shared_ptr<::apollo::hdmap::HDMap> hdmap_;
 
-  bool init_flag_ = false;
-  bool init_heading_ = false;
-  double heading_ = 0.0001;
-  bool u_turn_ = false;
-  std::atomic<bool> exit_;
-  std::mutex rsu_list_mutex_;
+  bool                  init_flag_    = false;
+  bool                  init_heading_ = false;
+  double                heading_      = 0.0001;
+  bool                  u_turn_       = false;
+  std::atomic<bool>     exit_;
+  std::mutex            rsu_list_mutex_;
   std::set<std::string> rsu_list_;
 };
 

@@ -31,9 +31,12 @@ namespace control {
 class HysteresisFilter {
  public:
   HysteresisFilter() = default;
-  void filter(const double input_value, const double threshold,
-              const double hysteresis_upper, const double hysteresis_lower,
-              int *state, double *output_value);
+  void filter(const double input_value,
+              const double threshold,
+              const double hysteresis_upper,
+              const double hysteresis_lower,
+              int*         state,
+              double*      output_value);
 
  private:
   int previous_state_ = 0;

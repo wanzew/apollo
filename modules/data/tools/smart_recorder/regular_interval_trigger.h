@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
+
 #include "modules/data/tools/smart_recorder/trigger_base.h"
 
 namespace apollo {
@@ -31,16 +32,14 @@ class RegularIntervalTrigger : public TriggerBase {
   RegularIntervalTrigger();
 
   void Pull(const cyber::record::RecordMessage& msg) override;
-  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override {
-    return false;
-  };
+  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override { return false; };
 
   virtual ~RegularIntervalTrigger() = default;
 
  private:
   // Trigger the recording every 300 seconds (5 minutes)
-  const double recording_interval_ = 300.0;
-  uint64_t current_recording_time_ = 0UL;
+  const double recording_interval_     = 300.0;
+  uint64_t     current_recording_time_ = 0UL;
 };
 
 }  // namespace data

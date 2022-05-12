@@ -17,19 +17,18 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace wey {
 
-class Fbs3237 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Fbs3237 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Fbs3237();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Engine speed', 'offset': 0.0,
@@ -51,15 +50,14 @@ class Fbs3237 : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 31, 'type':'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Fbs3_237::EpbswtichpositionType epbswtichposition(const std::uint8_t* bytes,
-                                                    const int32_t length) const;
+                                                    const int32_t       length) const;
 
   // config detail:{'description': 'To indicate which gear the DCT is in now ',
   // 'enum': {0: 'CURRENTGEAR_P', 1: 'CURRENTGEAR_R', 2: 'CURRENTGEAR_N',
   // 3: 'CURRENTGEAR_D'}, 'precision': 1.0, 'len': 2, 'name': 'CurrentGear',
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]','bit':39,
   // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Fbs3_237::CurrentgearType currentgear(const std::uint8_t* bytes,
-                                        const int32_t length) const;
+  Fbs3_237::CurrentgearType currentgear(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Driver Steering Interference Detected',
   // 'enum': {0:'EPS_STREEINGMODE_MANUAL',1:'EPS_STREEINGMODE_AUTOMATIC_AVAIL',
@@ -71,22 +69,20 @@ class Fbs3237 : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 34, 'type':'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Fbs3_237::Eps_streeingmodeType eps_streeingmode(const std::uint8_t* bytes,
-                                                  const int32_t length) const;
+                                                  const int32_t       length) const;
 
   // config detail: {'description': 'Value of driver input torque',
   // 'offset': -22.78, 'precision': 0.1794, 'len': 8, 'name':
   // 'EPSDrvInputTrqValue', 'is_signed_var': False,
   // 'physical_range': '[-22.78|22.96]', 'bit': 47, 'type': 'double',
   // 'order': 'motorola', 'physical_unit': 'Nm'}
-  double epsdrvinputtrqvalue(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  double epsdrvinputtrqvalue(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Value of consumed current by EPS',
   // 'offset': 0.0, 'precision': 0.5, 'len': 8, 'name': 'EPSConsumedCurrValue',
   // 'is_signed_var': False, 'physical_range': '[127|127]', 'bit': 55,
   // 'type': 'double', 'order': 'motorola', 'physical_unit': 'A'}
-  double epsconsumedcurrvalue(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  double epsconsumedcurrvalue(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'Applied steering mode currently',
   // 'enum': {0: 'EPSCURRMOD_NORMAL_MODE', 1: 'EPSCURRMOD_SPORT_MODE',
@@ -95,8 +91,7 @@ class Fbs3237 : public ::apollo::drivers::canbus::ProtocolData<
   // 6: 'EPSCURRMOD_RESERVED1'}, 'precision': 1.0,'len': 3,'name':'EPSCurrMod',
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]',
   // 'bit': 61, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Fbs3_237::EpscurrmodType epscurrmod(const std::uint8_t* bytes,
-                                      const int32_t length) const;
+  Fbs3_237::EpscurrmodType epscurrmod(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace wey

@@ -38,12 +38,12 @@ class SubscriberListener : public eprosima::fastrtps::SubscriberListener {
   virtual ~SubscriberListener();
 
   void onNewDataMessage(eprosima::fastrtps::Subscriber* sub);
-  void onSubscriptionMatched(eprosima::fastrtps::Subscriber* sub,
+  void onSubscriptionMatched(eprosima::fastrtps::Subscriber*   sub,
                              eprosima::fastrtps::MatchingInfo& info);  // NOLINT
 
  private:
   NewMsgCallback callback_;
-  std::mutex mutex_;
+  std::mutex     mutex_;
 };
 
 }  // namespace service_discovery

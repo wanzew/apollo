@@ -116,9 +116,10 @@
 #include <utility>
 #include <vector>
 
+#include "modules/perception/proto/perception_config_schema.pb.h"
+
 #include "cyber/common/macros.h"
 #include "modules/perception/lib/thread/mutex.h"
-#include "modules/perception/proto/perception_config_schema.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -136,23 +137,22 @@ class ConfigManager {
   // thread-safe interface.
   bool Reset();
 
-  bool GetModelConfig(const std::string &model_name,
-                      const ModelConfig **model_config);
+  bool GetModelConfig(const std::string& model_name, const ModelConfig** model_config);
 
   size_t NumModels() const { return model_config_map_.size(); }
 
-  const std::string &work_root() const { return work_root_; }
+  const std::string& work_root() const { return work_root_; }
 
-  void set_work_root(const std::string &work_root) { work_root_ = work_root; }
+  void set_work_root(const std::string& work_root) { work_root_ = work_root; }
 
  private:
   bool InitInternal();
 
   // key: model_name
-  std::map<std::string, ModelConfig *> model_config_map_;
-  Mutex mutex_;  // multi-thread init safe.
-  bool inited_ = false;
-  std::string work_root_;  // ConfigManager work root dir.
+  std::map<std::string, ModelConfig*> model_config_map_;
+  Mutex                               mutex_;  // multi-thread init safe.
+  bool                                inited_ = false;
+  std::string                         work_root_;  // ConfigManager work root dir.
 
   DECLARE_SINGLETON(ConfigManager)
 };
@@ -162,104 +162,93 @@ class ModelConfig {
   ModelConfig() {}
   ~ModelConfig() {}
 
-  bool Reset(const apollo::perception::ModelConfigProto &proto);
+  bool Reset(const apollo::perception::ModelConfigProto& proto);
 
   std::string name() const { return name_; }
 
-  bool get_value(const std::string &name, int *value) const {
+  bool get_value(const std::string& name, int* value) const {
     return get_value_from_map<int>(name, integer_param_map_, value);
   }
 
-  bool get_value(const std::string &name, std::string *value) const {
+  bool get_value(const std::string& name, std::string* value) const {
     return get_value_from_map<std::string>(name, string_param_map_, value);
   }
 
-  bool get_value(const std::string &name, double *value) const {
+  bool get_value(const std::string& name, double* value) const {
     return get_value_from_map<double>(name, double_param_map_, value);
   }
 
-  bool get_value(const std::string &name, float *value) const {
+  bool get_value(const std::string& name, float* value) const {
     return get_value_from_map<float>(name, float_param_map_, value);
   }
 
-  bool get_value(const std::string &name, bool *value) const {
+  bool get_value(const std::string& name, bool* value) const {
     return get_value_from_map<bool>(name, bool_param_map_, value);
   }
 
-  bool get_value(const std::string &name, std::vector<int> *values) const {
-    return get_value_from_map<std::vector<int>>(name, array_integer_param_map_,
-                                                values);
+  bool get_value(const std::string& name, std::vector<int>* values) const {
+    return get_value_from_map<std::vector<int>>(name, array_integer_param_map_, values);
   }
 
-  bool get_value(const std::string &name, std::vector<double> *values) const {
-    return get_value_from_map<std::vector<double>>(
-        name, array_double_param_map_, values);
+  bool get_value(const std::string& name, std::vector<double>* values) const {
+    return get_value_from_map<std::vector<double>>(name, array_double_param_map_, values);
   }
 
-  bool get_value(const std::string &name, std::vector<float> *values) const {
-    return get_value_from_map<std::vector<float>>(name, array_float_param_map_,
-                                                  values);
+  bool get_value(const std::string& name, std::vector<float>* values) const {
+    return get_value_from_map<std::vector<float>>(name, array_float_param_map_, values);
   }
 
-  bool get_value(const std::string &name,
-                 std::vector<std::string> *values) const {
-    return get_value_from_map<std::vector<std::string>>(
-        name, array_string_param_map_, values);
+  bool get_value(const std::string& name, std::vector<std::string>* values) const {
+    return get_value_from_map<std::vector<std::string>>(name, array_string_param_map_, values);
   }
 
-  bool get_value(const std::string &name, std::vector<bool> *values) const {
-    return get_value_from_map<std::vector<bool>>(name, array_bool_param_map_,
-                                                 values);
+  bool get_value(const std::string& name, std::vector<bool>* values) const {
+    return get_value_from_map<std::vector<bool>>(name, array_bool_param_map_, values);
   }
 
-  ModelConfig(const ModelConfig &) = delete;
-  ModelConfig operator=(const ModelConfig &) = delete;
+  ModelConfig(const ModelConfig&) = delete;
+  ModelConfig operator=(const ModelConfig&) = delete;
 
  private:
   template <typename T>
-  bool get_value_from_map(const std::string &name,
-                          const std::map<std::string, T> &container,
-                          T *value) const;
+  bool get_value_from_map(const std::string&              name,
+                          const std::map<std::string, T>& container,
+                          T*                              value) const;
 
   template <typename T>
-  void RepeatedToVector(
-      const google::protobuf::RepeatedField<T> &repeated_values,
-      std::vector<T> *vec_values);
+  void RepeatedToVector(const google::protobuf::RepeatedField<T>& repeated_values,
+                        std::vector<T>*                           vec_values);
 
   std::string name_;
   std::string version_;
 
-  std::map<std::string, int> integer_param_map_;
-  std::map<std::string, std::string> string_param_map_;
-  std::map<std::string, double> double_param_map_;
-  std::map<std::string, float> float_param_map_;
-  std::map<std::string, bool> bool_param_map_;
-  std::map<std::string, std::vector<int>> array_integer_param_map_;
+  std::map<std::string, int>                      integer_param_map_;
+  std::map<std::string, std::string>              string_param_map_;
+  std::map<std::string, double>                   double_param_map_;
+  std::map<std::string, float>                    float_param_map_;
+  std::map<std::string, bool>                     bool_param_map_;
+  std::map<std::string, std::vector<int>>         array_integer_param_map_;
   std::map<std::string, std::vector<std::string>> array_string_param_map_;
-  std::map<std::string, std::vector<double>> array_double_param_map_;
-  std::map<std::string, std::vector<float>> array_float_param_map_;
-  std::map<std::string, std::vector<bool>> array_bool_param_map_;
+  std::map<std::string, std::vector<double>>      array_double_param_map_;
+  std::map<std::string, std::vector<float>>       array_float_param_map_;
+  std::map<std::string, std::vector<bool>>        array_bool_param_map_;
 };
 
 template <typename T>
-bool ModelConfig::get_value_from_map(const std::string &name,
-                                     const std::map<std::string, T> &container,
-                                     T *value) const {
-  typename std::map<std::string, T>::const_iterator citer =
-      container.find(name);
+bool ModelConfig::get_value_from_map(const std::string&              name,
+                                     const std::map<std::string, T>& container,
+                                     T*                              value) const {
+  typename std::map<std::string, T>::const_iterator citer = container.find(name);
 
-  if (citer == container.end()) {
-    return false;
-  }
+  if (citer == container.end()) { return false; }
 
   *value = citer->second;
   return true;
 }
 
 template <typename T>
-void ModelConfig::RepeatedToVector(
-    const google::protobuf::RepeatedField<T> &repeated_values,
-    std::vector<T> *vec_list) {
+void ModelConfig::RepeatedToVector(const google::protobuf::RepeatedField<T>& repeated_values,
+                                   std::vector<T>*                           vec_list) {
   vec_list->reserve(repeated_values.size());
   for (T value : repeated_values) {
     vec_list->push_back(value);
@@ -268,7 +257,7 @@ void ModelConfig::RepeatedToVector(
 
 class ConfigManagerError {
  public:
-  explicit ConfigManagerError(const std::string &error_info)
+  explicit ConfigManagerError(const std::string& error_info)
       : error_info_(error_info) {}
   std::string What() const { return error_info_; }
 
@@ -279,7 +268,7 @@ class ConfigManagerError {
 template <typename T>
 class ConfigRead {
  public:
-  static T Read(const ModelConfig &config, const std::string &name) {
+  static T Read(const ModelConfig& config, const std::string& name) {
     T ret;
     if (!config.get_value(name, &ret)) {
       std::stringstream ss;
@@ -294,8 +283,7 @@ class ConfigRead {
 template <typename T>
 class ConfigRead<std::vector<T>> {
  public:
-  static std::vector<T> Read(const ModelConfig &config,
-                             const std::string &name) {
+  static std::vector<T> Read(const ModelConfig& config, const std::string& name) {
     std::vector<T> ret;
     if (!config.get_value(name, &ret)) {
       std::stringstream ss;

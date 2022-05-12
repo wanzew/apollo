@@ -21,9 +21,9 @@ namespace lidar {
 
 enum class LidarPointLabel {
   UNKNOWN = 0,
-  ROI = 1,
-  GROUND = 2,
-  OBJECT = 3,
+  ROI     = 1,
+  GROUND  = 2,
+  OBJECT  = 3,
   MAX_LABEL,
 };  // enum class LidarPointLabel
 

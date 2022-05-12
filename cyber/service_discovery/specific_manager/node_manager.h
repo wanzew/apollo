@@ -39,7 +39,7 @@ class NodeManager : public Manager {
   friend class TopologyManager;
 
  public:
-  using RoleAttrVec = std::vector<RoleAttributes>;
+  using RoleAttrVec   = std::vector<RoleAttributes>;
   using NodeWarehouse = SingleValueWarehouse;
 
   /**

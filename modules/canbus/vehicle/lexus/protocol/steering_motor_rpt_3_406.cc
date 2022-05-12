@@ -30,26 +30,24 @@ using ::apollo::drivers::canbus::Byte;
 Steeringmotorrpt3406::Steeringmotorrpt3406() {}
 const int32_t Steeringmotorrpt3406::ID = 0x406;
 
-void Steeringmotorrpt3406::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_3_406()
-      ->set_torque_output(torque_output(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_3_406()
-      ->set_torque_input(torque_input(bytes, length));
+void Steeringmotorrpt3406::Parse(const std::uint8_t* bytes,
+                                 int32_t             length,
+                                 ChassisDetail*      chassis) const {
+  chassis->mutable_lexus()->mutable_steering_motor_rpt_3_406()->set_torque_output(
+      torque_output(bytes, length));
+  chassis->mutable_lexus()->mutable_steering_motor_rpt_3_406()->set_torque_input(
+      torque_input(bytes, length));
 }
 
 // config detail: {'name': 'torque_output', 'offset': 0.0, 'precision': 0.001,
 // 'len': 32, 'is_signed_var': True, 'physical_range':
 // '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'N-m'}
-double Steeringmotorrpt3406::torque_output(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 0);
+double Steeringmotorrpt3406::torque_output(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
+  Byte    t1(bytes + 1);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -75,12 +73,11 @@ double Steeringmotorrpt3406::torque_output(const std::uint8_t* bytes,
 // 'len': 32, 'is_signed_var': True, 'physical_range':
 // '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order':
 // 'motorola', 'physical_unit': 'N-m'}
-double Steeringmotorrpt3406::torque_input(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 4);
+double Steeringmotorrpt3406::torque_input(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

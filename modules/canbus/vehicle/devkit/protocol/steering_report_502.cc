@@ -17,6 +17,7 @@
 #include "modules/canbus/vehicle/devkit/protocol/steering_report_502.h"
 
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -29,31 +30,28 @@ using ::apollo::drivers::canbus::Byte;
 Steeringreport502::Steeringreport502() {}
 const int32_t Steeringreport502::ID = 0x502;
 
-void Steeringreport502::Parse(const std::uint8_t* bytes, int32_t length,
-                              ChassisDetail* chassis) const {
-  chassis->mutable_devkit()
-      ->mutable_steering_report_502()
-      ->set_steer_angle_spd_actual(steer_angle_spd_actual(bytes, length));
+void Steeringreport502::Parse(const std::uint8_t* bytes,
+                              int32_t             length,
+                              ChassisDetail*      chassis) const {
+  chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_angle_spd_actual(
+      steer_angle_spd_actual(bytes, length));
   chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_flt2(
       steer_flt2(bytes, length));
   chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_flt1(
       steer_flt1(bytes, length));
   chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_en_state(
       steer_en_state(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_steering_report_502()
-      ->set_steer_angle_actual(steer_angle_actual(bytes, length));
-  chassis->mutable_check_response()->set_is_eps_online(
-      steer_en_state(bytes, length) == 1);
+  chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_angle_actual(
+      steer_angle_actual(bytes, length));
+  chassis->mutable_check_response()->set_is_eps_online(steer_en_state(bytes, length) == 1);
 }
 
 // config detail: {'bit': 55, 'is_signed_var': False, 'len': 8, 'name':
 // 'steer_angle_spd_actual', 'offset': 0.0, 'order': 'motorola',
 // 'physical_range': '[0|0]', 'physical_unit': 'deg/s', 'precision': 1.0,
 // 'type': 'int'}
-int Steeringreport502::steer_angle_spd_actual(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 6);
+int Steeringreport502::steer_angle_spd_actual(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
@@ -66,13 +64,12 @@ int Steeringreport502::steer_angle_spd_actual(const std::uint8_t* bytes,
 // 8, 'name': 'steer_flt2', 'offset': 0.0, 'order': 'motorola',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'enum'}
-Steering_report_502::Steer_flt2Type Steeringreport502::steer_flt2(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
+Steering_report_502::Steer_flt2Type Steeringreport502::steer_flt2(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Steering_report_502::Steer_flt2Type ret =
-      static_cast<Steering_report_502::Steer_flt2Type>(x);
+  Steering_report_502::Steer_flt2Type ret = static_cast<Steering_report_502::Steer_flt2Type>(x);
   return ret;
 }
 
@@ -81,13 +78,12 @@ Steering_report_502::Steer_flt2Type Steeringreport502::steer_flt2(
 // 'STEER_FLT1_STEER_SYSTEM_HARDWARE_FAULT'}, 'is_signed_var': False, 'len': 8,
 // 'name': 'steer_flt1', 'offset': 0.0, 'order': 'motorola', 'physical_range':
 // '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-Steering_report_502::Steer_flt1Type Steeringreport502::steer_flt1(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
+Steering_report_502::Steer_flt1Type Steeringreport502::steer_flt1(const std::uint8_t* bytes,
+                                                                  int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Steering_report_502::Steer_flt1Type ret =
-      static_cast<Steering_report_502::Steer_flt1Type>(x);
+  Steering_report_502::Steer_flt1Type ret = static_cast<Steering_report_502::Steer_flt1Type>(x);
   return ret;
 }
 
@@ -96,9 +92,9 @@ Steering_report_502::Steer_flt1Type Steeringreport502::steer_flt1(
 // 'STEER_EN_STATE_STANDBY'}, 'is_signed_var': False, 'len': 2, 'name':
 // 'steer_en_state', 'offset': 0.0, 'order': 'motorola', 'physical_range':
 // '[0|2]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-Steering_report_502::Steer_en_stateType Steeringreport502::steer_en_state(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Steering_report_502::Steer_en_stateType Steeringreport502::steer_en_state(const std::uint8_t* bytes,
+                                                                          int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 2);
 
   Steering_report_502::Steer_en_stateType ret =
@@ -110,12 +106,11 @@ Steering_report_502::Steer_en_stateType Steeringreport502::steer_en_state(
 // 'steer_angle_actual', 'offset': -500.0, 'order': 'motorola',
 // 'physical_range': '[-500|500]', 'physical_unit': 'deg', 'precision': 1.0,
 // 'type': 'int'}
-int Steeringreport502::steer_angle_actual(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 3);
+int Steeringreport502::steer_angle_actual(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 4);
+  Byte    t1(bytes + 4);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

@@ -18,10 +18,11 @@
 #include <memory>
 #include <string>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -29,7 +30,8 @@ namespace onboard {
 
 class LidarFrameMessage {
  public:
-  LidarFrameMessage() : lidar_frame_(nullptr) {
+  LidarFrameMessage()
+      : lidar_frame_(nullptr) {
     type_name_ = "LidarFrameMessage";
   }
 
@@ -40,12 +42,12 @@ class LidarFrameMessage {
   LidarFrameMessage* New() const { return new LidarFrameMessage; }
 
  public:
-  double timestamp_ = 0.0;
-  uint64_t lidar_timestamp_ = 0;
-  uint32_t seq_num_ = 0;
-  std::string type_name_;
-  ProcessStage process_stage_ = ProcessStage::UNKNOWN_STAGE;
-  apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;
+  double                             timestamp_       = 0.0;
+  uint64_t                           lidar_timestamp_ = 0;
+  uint32_t                           seq_num_         = 0;
+  std::string                        type_name_;
+  ProcessStage                       process_stage_ = ProcessStage::UNKNOWN_STAGE;
+  apollo::common::ErrorCode          error_code_    = apollo::common::ErrorCode::OK;
   std::shared_ptr<lidar::LidarFrame> lidar_frame_;
 };
 

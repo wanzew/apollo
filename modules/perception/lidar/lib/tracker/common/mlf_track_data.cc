@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/tracker/common/mlf_track_data.h"
+
 #include "cyber/common/log.h"
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
 
@@ -26,16 +27,16 @@ const double MlfTrackData::kMaxHistoryTime = 2.0;
 
 void MlfTrackData::Reset() {
   TrackData::Reset();
-  duration_ = 0.0;
+  duration_                   = 0.0;
   consecutive_invisible_time_ = 0.0;
-  latest_visible_time_ = 0.0;
-  latest_cached_time_ = 0.0;
-  first_tracked_time_ = 0.0;
+  latest_visible_time_        = 0.0;
+  latest_cached_time_         = 0.0;
+  first_tracked_time_         = 0.0;
   is_current_state_predicted_ = true;
   sensor_history_objects_.clear();
   cached_objects_.clear();
   predict_.Reset();
-//  feature_.reset();
+  //  feature_.reset();
 }
 
 void MlfTrackData::Reset(TrackedObjectPtr obj, int track_id) {
@@ -57,24 +58,24 @@ void MlfTrackData::PushTrackedObjectToTrack(TrackedObjectPtr obj) {
         return;
       }
       latest_visible_time_ = timestamp;
-      first_tracked_time_ = timestamp;
+      first_tracked_time_  = timestamp;
     }
-    obj->track_id = track_id_;
+    obj->track_id      = track_id_;
     obj->tracking_time = timestamp - first_tracked_time_;
-    duration_ = obj->tracking_time;
+    duration_          = obj->tracking_time;
     if (obj->is_fake) {
       ++consecutive_invisible_count_;
       consecutive_invisible_time_ = timestamp - latest_visible_time_;
     } else {
       consecutive_invisible_count_ = 0;
-      consecutive_invisible_time_ = 0.0;
+      consecutive_invisible_time_  = 0.0;
       ++total_visible_count_;
       latest_visible_time_ = timestamp;
     }
     RemoveStaleHistory(timestamp - kMaxHistoryTime);
   } else {
-    AINFO << "Push object timestamp " << timestamp << " from sensor "
-          << obj->sensor_info.name << " already exist in track, ignore push.";
+    AINFO << "Push object timestamp " << timestamp << " from sensor " << obj->sensor_info.name
+          << " already exist in track, ignore push.";
   }
 }
 
@@ -84,25 +85,24 @@ void MlfTrackData::PushTrackedObjectToCache(TrackedObjectPtr obj) {
     cached_objects_.insert(std::make_pair(timestamp, obj));
     latest_cached_time_ = timestamp;
   } else {
-    AINFO << "Push object timestamp " << timestamp << " from sensor "
-          << obj->sensor_info.name << " already exist in cache, ignore push.";
+    AINFO << "Push object timestamp " << timestamp << " from sensor " << obj->sensor_info.name
+          << " already exist in cache, ignore push.";
   }
 }
 
 bool MlfTrackData::ToObject(const Eigen::Vector3d& local_to_global_offset,
-                            double timestamp, base::ObjectPtr object) const {
-  if (history_objects_.empty()) {
-    return false;
-  }
-  auto latest_iter = history_objects_.rbegin();
-  const double latest_time = latest_iter->first;
-  const auto& latest_object = latest_iter->second;
+                            double                 timestamp,
+                            base::ObjectPtr        object) const {
+  if (history_objects_.empty()) { return false; }
+  auto         latest_iter   = history_objects_.rbegin();
+  const double latest_time   = latest_iter->first;
+  const auto&  latest_object = latest_iter->second;
   latest_object->ToObject(object);
   // predict object
   double time_diff = timestamp - latest_time;
-  double offset_x = time_diff * object->velocity(0) + local_to_global_offset(0);
-  double offset_y = time_diff * object->velocity(1) + local_to_global_offset(1);
-  double offset_z = time_diff * object->velocity(2) + local_to_global_offset(2);
+  double offset_x  = time_diff * object->velocity(0) + local_to_global_offset(0);
+  double offset_y  = time_diff * object->velocity(1) + local_to_global_offset(1);
+  double offset_z  = time_diff * object->velocity(2) + local_to_global_offset(2);
   // a). update polygon
   for (auto& pt : object->polygon) {
     pt.x += offset_x;
@@ -132,25 +132,19 @@ bool MlfTrackData::ToObject(const Eigen::Vector3d& local_to_global_offset,
 }
 
 void MlfTrackData::PredictState(double timestamp) const {
-  if (history_objects_.empty()) {
-    return;
-  }
-  auto latest_iter = history_objects_.rbegin();
-  const double latest_time = latest_iter->first;
-  const auto& latest_object = latest_iter->second;
-  double time_diff = timestamp - latest_time;
+  if (history_objects_.empty()) { return; }
+  auto         latest_iter   = history_objects_.rbegin();
+  const double latest_time   = latest_iter->first;
+  const auto&  latest_object = latest_iter->second;
+  double       time_diff     = timestamp - latest_time;
 
-  const Eigen::Vector3d& latest_anchor_point =
-      latest_object->belief_anchor_point;
-  const Eigen::Vector3d& latest_velocity = latest_object->output_velocity;
+  const Eigen::Vector3d& latest_anchor_point = latest_object->belief_anchor_point;
+  const Eigen::Vector3d& latest_velocity     = latest_object->output_velocity;
 
   predict_.state.resize(6);
-  predict_.state(0) = static_cast<float>(latest_anchor_point(0) +
-                                         latest_velocity(0) * time_diff);
-  predict_.state(1) = static_cast<float>(latest_anchor_point(1) +
-                                         latest_velocity(1) * time_diff);
-  predict_.state(2) = static_cast<float>(latest_anchor_point(2) +
-                                         latest_velocity(2) * time_diff);
+  predict_.state(0) = static_cast<float>(latest_anchor_point(0) + latest_velocity(0) * time_diff);
+  predict_.state(1) = static_cast<float>(latest_anchor_point(1) + latest_velocity(1) * time_diff);
+  predict_.state(2) = static_cast<float>(latest_anchor_point(2) + latest_velocity(2) * time_diff);
   predict_.state(3) = static_cast<float>(latest_velocity(0));
   predict_.state(4) = static_cast<float>(latest_velocity(1));
   predict_.state(5) = static_cast<float>(latest_velocity(2));
@@ -159,8 +153,7 @@ void MlfTrackData::PredictState(double timestamp) const {
   // TODO(.): predict cloud and polygon if needed in future.
 }
 
-void MlfTrackData::GetAndCleanCachedObjectsInTimeInterval(
-    std::vector<TrackedObjectPtr>* objects) {
+void MlfTrackData::GetAndCleanCachedObjectsInTimeInterval(std::vector<TrackedObjectPtr>* objects) {
   objects->clear();
   auto iter = cached_objects_.begin();
   while (iter != cached_objects_.end()) {
@@ -176,8 +169,7 @@ void MlfTrackData::GetAndCleanCachedObjectsInTimeInterval(
   }
 }
 
-void RemoveStaleDataFromMap(double timestamp,
-                            std::map<double, TrackedObjectPtr>* data) {
+void RemoveStaleDataFromMap(double timestamp, std::map<double, TrackedObjectPtr>* data) {
   auto iter = data->begin();
   while (iter != data->end()) {
     if (iter->first < timestamp) {

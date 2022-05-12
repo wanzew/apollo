@@ -25,17 +25,13 @@ bool DummyFusionSystem::Init(const FusionInitOptions& options) {
   return true;
 }
 
-bool DummyFusionSystem::Fuse(const FusionOptions& options,
-                             const base::FrameConstPtr& sensor_frame,
+bool DummyFusionSystem::Fuse(const FusionOptions&          options,
+                             const base::FrameConstPtr&    sensor_frame,
                              std::vector<base::ObjectPtr>* fused_objects) {
-  if (fused_objects == nullptr) {
-    return false;
-  }
+  if (fused_objects == nullptr) { return false; }
 
   fused_objects->clear();
-  if (sensor_frame->sensor_info.name != main_sensor_) {
-    return true;
-  }
+  if (sensor_frame->sensor_info.name != main_sensor_) { return true; }
 
   fused_objects->resize(sensor_frame->objects.size());
   for (size_t i = 0; i < sensor_frame->objects.size(); i++) {
@@ -48,25 +44,23 @@ bool DummyFusionSystem::Fuse(const FusionOptions& options,
 bool DummyDataAssociation::Init() { return true; }
 
 bool DummyDataAssociation::Associate(const AssociationOptions& options,
-                                     SensorFramePtr sensor_measurements,
-                                     ScenePtr scene,
-                                     AssociationResult* association_result) {
+                                     SensorFramePtr            sensor_measurements,
+                                     ScenePtr                  scene,
+                                     AssociationResult*        association_result) {
   return true;
 }
 
 // class DummyTracker implementation
-bool DummyTracker::Init(TrackPtr track, SensorObjectPtr measurement) {
-  return true;
-}
+bool DummyTracker::Init(TrackPtr track, SensorObjectPtr measurement) { return true; }
 
 void DummyTracker::UpdateWithMeasurement(const TrackerOptions& options,
                                          const SensorObjectPtr measurement,
-                                         double target_timestamp) {}
+                                         double                target_timestamp) {}
 
 void DummyTracker::UpdateWithoutMeasurement(const TrackerOptions& options,
-                                            const std::string& sensor_id,
-                                            double measurement_timestamp,
-                                            double target_timestamp) {}
+                                            const std::string&    sensor_id,
+                                            double                measurement_timestamp,
+                                            double                target_timestamp) {}
 
 FUSION_REGISTER_FUSIONSYSTEM(DummyFusionSystem);
 

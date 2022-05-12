@@ -19,11 +19,13 @@
 #include <string>
 #include <vector>
 
+#include "gflags/gflags.h"
+
+#include "modules/perception/camera/common/proto/object_template_meta_schema.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-#include "gflags/gflags.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/camera/common/proto/object_template_meta_schema.pb.h"
 #include "modules/perception/lib/thread/mutex.h"
 
 namespace apollo {
@@ -42,75 +44,73 @@ typedef std::map<base::ObjectSubType, std::vector<float>> TemplateMap;
 struct ObjectTemplateManagerInitOptions {
   std::string root_dir;
   std::string conf_file;
-  int gpu_id = 0;
-  bool use_cyber_work_root = false;
+  int         gpu_id              = 0;
+  bool        use_cyber_work_root = false;
 };
 
 class ObjectTemplateManager {
  public:
-  bool Init(const ObjectTemplateManagerInitOptions &options);
+  bool Init(const ObjectTemplateManagerInitOptions& options);
   // for general visual obj typed as vehicle
-  float VehObjHwlBySearchTemplates(float *hwl, int *index = nullptr,
-                                   bool *is_flip = nullptr);
+  float     VehObjHwlBySearchTemplates(float* hwl, int* index = nullptr, bool* is_flip = nullptr);
   const int NrDimPerTmplt() {
     ACHECK(inited_);
     return nr_dim_per_tmplt_;
   }
-  const std::vector<float> &VehHwl() {
+  const std::vector<float>& VehHwl() {
     ACHECK(inited_);
     return veh_hwl_;
   }
-  const std::map<TemplateIndex, int> &LookUpTableMinVolumeIndex() {
+  const std::map<TemplateIndex, int>& LookUpTableMinVolumeIndex() {
     ACHECK(inited_);
     return look_up_table_min_volume_index_;
   }
-  const std::map<base::ObjectSubType, float> &TypeSpeedLimit() {
+  const std::map<base::ObjectSubType, float>& TypeSpeedLimit() {
     ACHECK(inited_);
     return type_speed_limit_;
   }
-  const std::vector<base::ObjectSubType> &TypeRefinedByTemplate() {
+  const std::vector<base::ObjectSubType>& TypeRefinedByTemplate() {
     ACHECK(inited_);
     return type_refined_by_template_;
   }
-  const std::vector<base::ObjectSubType> &TypeRefinedByRef() {
+  const std::vector<base::ObjectSubType>& TypeRefinedByRef() {
     ACHECK(inited_);
     return type_refined_by_ref_;
   }
-  const std::vector<base::ObjectSubType> &TypeCanBeRef() {
+  const std::vector<base::ObjectSubType>& TypeCanBeRef() {
     ACHECK(inited_);
     return type_can_be_ref_;
   }
-  const TemplateMap &MinTemplateHWL() {
+  const TemplateMap& MinTemplateHWL() {
     ACHECK(inited_);
     return min_template_hwl_;
   }
-  const TemplateMap &MidTemplateHWL() {
+  const TemplateMap& MidTemplateHWL() {
     ACHECK(inited_);
     return mid_template_hwl_;
   }
-  const TemplateMap &MaxTemplateHWL() {
+  const TemplateMap& MaxTemplateHWL() {
     ACHECK(inited_);
     return max_template_hwl_;
   }
-  const std::vector<TemplateMap> &TemplateHWL() {
+  const std::vector<TemplateMap>& TemplateHWL() {
     ACHECK(inited_);
     return template_hwl_;
   }
 
  private:
-  void LoadVehTemplates(const ObjectTemplate &tmplt);
-  void LoadVehMinMidMaxTemplates(const base::ObjectSubType &type,
-                                 const ObjectTemplate &tmplt);
+  void LoadVehTemplates(const ObjectTemplate& tmplt);
+  void LoadVehMinMidMaxTemplates(const base::ObjectSubType& type, const ObjectTemplate& tmplt);
 
   // util for tmplt search
-  float Get3dDimensionSimilarity(const float *hwl1, const float *hwl2);
+  float Get3dDimensionSimilarity(const float* hwl1, const float* hwl2);
 
  private:
-  bool inited_ = false;
+  bool       inited_ = false;
   lib::Mutex mutex_;
 
-  int nr_dim_per_tmplt_ = 0;
-  int total_nr_tmplts_veh_ = 0;
+  int   nr_dim_per_tmplt_     = 0;
+  int   total_nr_tmplts_veh_  = 0;
   float max_dim_change_ratio_ = 0.0f;
   // tmplt
   std::vector<float> veh_hwl_;
@@ -123,9 +123,9 @@ class ObjectTemplateManager {
   std::vector<base::ObjectSubType> type_refined_by_ref_;
   std::vector<base::ObjectSubType> type_can_be_ref_;
 
-  TemplateMap min_template_hwl_;
-  TemplateMap mid_template_hwl_;
-  TemplateMap max_template_hwl_;
+  TemplateMap              min_template_hwl_;
+  TemplateMap              mid_template_hwl_;
+  TemplateMap              max_template_hwl_;
   std::vector<TemplateMap> template_hwl_;
 
   DECLARE_SINGLETON(ObjectTemplateManager)

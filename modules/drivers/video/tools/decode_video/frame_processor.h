@@ -30,8 +30,7 @@ namespace video {
 class FrameProcessor {
  public:
   // Constructor
-  FrameProcessor(const std::string& input_video_file,
-                 const std::string& output_jpg_dir);
+  FrameProcessor(const std::string& input_video_file, const std::string& output_jpg_dir);
 
   // Process frames according to input data, and output converted data
   bool ProcessStream() const;
@@ -40,12 +39,12 @@ class FrameProcessor {
   ~FrameProcessor() = default;
 
  private:
-  void WriteOutputJpgFile(const std::vector<uint8_t>& jpeg_buffer,
-                          const std::string& output_jpg_file) const;
+  void        WriteOutputJpgFile(const std::vector<uint8_t>& jpeg_buffer,
+                                 const std::string&          output_jpg_file) const;
   std::string GetOutputFile(const int frame_num) const;
 
   std::vector<uint8_t> input_video_buffer_;
-  const std::string output_jpg_dir_;
+  const std::string    output_jpg_dir_;
 };
 
 }  // namespace video

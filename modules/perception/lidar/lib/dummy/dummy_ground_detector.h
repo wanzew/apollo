@@ -30,8 +30,7 @@ class DummyGroundDetector : public BaseGroundDetector {
 
   virtual ~DummyGroundDetector() = default;
 
-  bool Init(const GroundDetectorInitOptions& options =
-                GroundDetectorInitOptions()) override;
+  bool Init(const GroundDetectorInitOptions& options = GroundDetectorInitOptions()) override;
 
   // @brief: detect ground points from point cloud.
   // @param [in]: options

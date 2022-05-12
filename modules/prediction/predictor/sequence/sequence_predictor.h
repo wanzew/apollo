@@ -61,20 +61,20 @@ class SequencePredictor : public Predictor {
    * @return If predicted successfully
    */
   bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
-               Obstacle* obstacle,
-               ObstaclesContainer* obstacles_container) override;
+               Obstacle*                     obstacle,
+               ObstaclesContainer*           obstacles_container) override;
 
   FRIEND_TEST(SequencePredictorTest, General);
 
  protected:
-  bool GetLongitudinalPolynomial(const Obstacle& obstacle,
-                                 const LaneSequence& lane_sequence,
+  bool GetLongitudinalPolynomial(const Obstacle&                  obstacle,
+                                 const LaneSequence&              lane_sequence,
                                  const std::pair<double, double>& lon_end_state,
-                                 std::array<double, 5>* coefficients);
+                                 std::array<double, 5>*           coefficients);
 
-  bool GetLateralPolynomial(const Obstacle& obstacle,
-                            const LaneSequence& lane_sequence,
-                            const double time_to_end_state,
+  bool GetLateralPolynomial(const Obstacle&        obstacle,
+                            const LaneSequence&    lane_sequence,
+                            const double           time_to_end_state,
                             std::array<double, 4>* coefficients);
   /**
    * @brief Filter lane sequences
@@ -84,11 +84,11 @@ class SequencePredictor : public Predictor {
    * @param ADC trajectory container
    * @param Vector of boolean indicating if a lane sequence is disqualified
    */
-  void FilterLaneSequences(
-      const Feature& feature, const std::string& lane_id,
-      const Obstacle* ego_vehicle_ptr,
-      const ADCTrajectoryContainer* adc_trajectory_container,
-      std::vector<bool>* enable_lane_sequence);
+  void FilterLaneSequences(const Feature&                feature,
+                           const std::string&            lane_id,
+                           const Obstacle*               ego_vehicle_ptr,
+                           const ADCTrajectoryContainer* adc_trajectory_container,
+                           std::vector<bool>*            enable_lane_sequence);
 
   /**
    * @brief Get lane change type
@@ -96,8 +96,7 @@ class SequencePredictor : public Predictor {
    * @param Lane sequence
    * @return Integer indicating lane change type:
    */
-  LaneChangeType GetLaneChangeType(const std::string& lane_id,
-                                   const LaneSequence& lane_sequence);
+  LaneChangeType GetLaneChangeType(const std::string& lane_id, const LaneSequence& lane_sequence);
 
   /**
    * @brief Get lane change distance with ADC
@@ -106,9 +105,9 @@ class SequencePredictor : public Predictor {
    * @param ADC trajectory container
    * @return Lane change distance with ADC
    */
-  double GetLaneChangeDistanceWithADC(
-      const LaneSequence& lane_sequence, const Obstacle* ego_vehicle_ptr,
-      const ADCTrajectoryContainer* adc_trajectory_container);
+  double GetLaneChangeDistanceWithADC(const LaneSequence&           lane_sequence,
+                                      const Obstacle*               ego_vehicle_ptr,
+                                      const ADCTrajectoryContainer* adc_trajectory_container);
 
   /**
    * @brief Draw constant acceleration trajectory points
@@ -119,10 +118,12 @@ class SequencePredictor : public Predictor {
    * @param acceleration
    * @param A vector of generated trajectory points
    */
-  void DrawConstantAccelerationTrajectory(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double period, const double acceleration,
-      std::vector<apollo::common::TrajectoryPoint>* points);
+  void DrawConstantAccelerationTrajectory(const Obstacle&     obstacle,
+                                          const LaneSequence& lane_sequence,
+                                          const double        total_time,
+                                          const double        period,
+                                          const double        acceleration,
+                                          std::vector<apollo::common::TrajectoryPoint>* points);
 
   /**
    * @brief Get lane sequence curvature by s
@@ -130,8 +131,7 @@ class SequencePredictor : public Predictor {
    * @param s
    * @return the curvature
    */
-  double GetLaneSequenceCurvatureByS(const LaneSequence& lane_sequence,
-                                     const double s);
+  double GetLaneSequenceCurvatureByS(const LaneSequence& lane_sequence, const double s);
 
   /**
    * @brief Clear private members
@@ -155,7 +155,8 @@ class SequencePredictor : public Predictor {
    * @return Boolean if the lane sequence is enabled
    */
   bool LaneSequenceWithMaxProb(const LaneChangeType& type,
-                               const double probability, const double max_prob);
+                               const double          probability,
+                               const double          max_prob);
 
   /**
    * @brief Pick the lane change sequence with highest probability
@@ -166,7 +167,8 @@ class SequencePredictor : public Predictor {
    * @return Boolean if the lane sequence is enabled
    */
   bool LaneChangeWithMaxProb(const LaneChangeType& type,
-                             const double probability, const double max_prob);
+                             const double          probability,
+                             const double          max_prob);
 };
 
 }  // namespace prediction

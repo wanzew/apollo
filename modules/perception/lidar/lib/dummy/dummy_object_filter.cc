@@ -20,12 +20,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool DummyObjectFilter::Init(const ObjectFilterInitOptions& options) {
-  return true;
-}
+bool DummyObjectFilter::Init(const ObjectFilterInitOptions& options) { return true; }
 
-bool DummyObjectFilter::Filter(const ObjectFilterOptions& options,
-                               LidarFrame* frame) {
+bool DummyObjectFilter::Filter(const ObjectFilterOptions& options, LidarFrame* frame) {
   return true;
 }
 

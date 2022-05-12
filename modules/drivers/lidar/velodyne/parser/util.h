@@ -53,8 +53,10 @@ void load_msg(const std::string& file_path, T* msg) {
   // ifs.close();
 }
 
-void init_sin_cos_rot_table(float* sin_rot_table, float* cos_rot_table,
-                            uint16_t rotation, float rotation_resolution);
+void init_sin_cos_rot_table(float*   sin_rot_table,
+                            float*   cos_rot_table,
+                            uint16_t rotation,
+                            float    rotation_resolution);
 
 }  // namespace velodyne
 }  // namespace drivers

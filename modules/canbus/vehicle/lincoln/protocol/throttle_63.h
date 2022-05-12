@@ -22,6 +22,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
@@ -37,8 +38,7 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -48,8 +48,8 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the input bytes
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const;
+  virtual void
+  Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis_detail) const;
 
   /**
    * @brief calculate pedal input based on byte array.
@@ -61,7 +61,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of byte input
    */
-  double pedal_input(const std::uint8_t *bytes, int32_t length) const;
+  double pedal_input(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief calculate pedal command based on byte array.
@@ -73,7 +73,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of pedal command
    */
-  double pedal_cmd(const std::uint8_t *bytes, int32_t length) const;
+  double pedal_cmd(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief calculate pedal output based on byte array.
@@ -85,7 +85,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of pedal output
    */
-  double pedal_output(const std::uint8_t *bytes, int32_t length) const;
+  double pedal_output(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief calculate watchdog counter source based on byte array.
@@ -96,8 +96,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the value of watchdog counter source
    */
-  int32_t watchdog_counter_source(const std::uint8_t *bytes,
-                                  int32_t length) const;
+  int32_t watchdog_counter_source(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief check enabled bit based on byte array.
@@ -108,7 +107,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the boolean value of enabled bit
    */
-  bool is_enabled(const std::uint8_t *bytes, int32_t length) const;
+  bool is_enabled(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief check driver override bit based on byte array.
@@ -119,7 +118,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the boolean value of driver override
    */
-  bool is_driver_override(const std::uint8_t *bytes, int32_t length) const;
+  bool is_driver_override(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief check driver activity bit based on byte array.
@@ -130,7 +129,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the boolean value of driver activity
    */
-  bool is_driver_activity(const std::uint8_t *bytes, int32_t length) const;
+  bool is_driver_activity(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief check watchdog counter fault bit based on byte array.
@@ -141,8 +140,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the boolean value of watchdog counter fault bit
    */
-  bool is_watchdog_counter_fault(const std::uint8_t *bytes,
-                                 int32_t length) const;
+  bool is_watchdog_counter_fault(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief check channel 1 fault bit based on byte array.
@@ -153,7 +151,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the boolean value of channel 1 fault bit
    */
-  bool is_channel_1_fault(const std::uint8_t *bytes, int32_t length) const;
+  bool is_channel_1_fault(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief check channel 2 fault bit based on byte array.
@@ -164,7 +162,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the boolean value of channel 2 fault bit
    */
-  bool is_channel_2_fault(const std::uint8_t *bytes, int32_t length) const;
+  bool is_channel_2_fault(const std::uint8_t* bytes, int32_t length) const;
 
   /**
    * @brief check connector fault bit based on byte array.
@@ -175,7 +173,7 @@ class Throttle63 : public ::apollo::drivers::canbus::ProtocolData<
    * @param length the length of the byte array
    * @return the boolean value of connector fault bit
    */
-  bool is_connector_fault(const std::uint8_t *bytes, int32_t length) const;
+  bool is_connector_fault(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

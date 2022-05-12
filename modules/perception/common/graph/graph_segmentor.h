@@ -28,15 +28,15 @@ namespace common {
 // @brief: graph edge definition
 struct Edge {
   float w = 0.0f;
-  int a = 0;
-  int b = 0;
+  int   a = 0;
+  int   b = 0;
   // @brief: edge comparison
   bool operator<(const Edge& other) const { return this->w < other.w; }
 };
 
 class GraphSegmentor {
  public:
-  GraphSegmentor() = default;
+  GraphSegmentor()  = default;
   ~GraphSegmentor() = default;
 
   // @brief: initialize thresholds
@@ -48,8 +48,8 @@ class GraphSegmentor {
   // @params[IN] num_edges: number of edges in graph.
   // @params[IN] edges: array of Edges.
   // @params[OUT] need_sort: whether input edges needs to be sorted
-  void SegmentGraph(const int num_vertices, const int num_edges, Edge* edges,
-                    bool need_sort = true);
+  void
+  SegmentGraph(const int num_vertices, const int num_edges, Edge* edges, bool need_sort = true);
 
   // @brief: return the disjoint-set forest as the segmentation result.
   Universe* mutable_universe() { return &universe_; }
@@ -57,12 +57,12 @@ class GraphSegmentor {
   const Universe& universe() { return universe_; }
 
  private:
-  static const size_t kMaxVerticesNum = 10000;
-  static const size_t kMaxThresholdsNum = 50000;
-  float initial_threshold_ = 0.f;
-  std::vector<float> thresholds_;
-  std::vector<float> thresholds_table_;
-  Universe universe_;
+  static const size_t kMaxVerticesNum    = 10000;
+  static const size_t kMaxThresholdsNum  = 50000;
+  float               initial_threshold_ = 0.f;
+  std::vector<float>  thresholds_;
+  std::vector<float>  thresholds_table_;
+  Universe            universe_;
 };  // class GraphSegmentor
 
 }  // namespace common

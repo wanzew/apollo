@@ -20,6 +20,7 @@
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
+
 #include "modules/data/tools/smart_recorder/trigger_base.h"
 
 namespace apollo {
@@ -34,9 +35,7 @@ class HardBrakeTrigger : public TriggerBase {
   HardBrakeTrigger();
 
   void Pull(const cyber::record::RecordMessage& msg) override;
-  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override {
-    return false;
-  };
+  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override { return false; };
 
   virtual ~HardBrakeTrigger() = default;
 
@@ -46,13 +45,13 @@ class HardBrakeTrigger : public TriggerBase {
   void EnqueueMessage(const float speed);
 
  private:
-  const size_t queue_size_ = 10;
-  const float max_delta_ = 10.0f;
-  const float noisy_diff_ = 20.0f;
+  const size_t      queue_size_ = 10;
+  const float       max_delta_  = 10.0f;
+  const float       noisy_diff_ = 20.0f;
   std::deque<float> history_speed_queue_;
   std::deque<float> current_speed_queue_;
-  float history_total_;
-  float current_total_;
+  float             history_total_;
+  float             current_total_;
 };
 
 }  // namespace data

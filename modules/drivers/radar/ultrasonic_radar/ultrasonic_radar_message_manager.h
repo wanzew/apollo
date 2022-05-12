@@ -22,13 +22,12 @@
 
 #include <memory>
 
-#include "cyber/cyber.h"
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
-
 #include "modules/drivers/canbus/sensor_gflags.h"
 
 namespace apollo {
@@ -37,7 +36,7 @@ namespace ultrasonic_radar {
 
 using ::apollo::drivers::canbus::MessageManager;
 using ::apollo::drivers::canbus::ProtocolData;
-using Time = ::apollo::cyber::Time;
+using Time   = ::apollo::cyber::Time;
 using micros = std::chrono::microseconds;
 using ::apollo::common::ErrorCode;
 using apollo::drivers::canbus::CanClient;
@@ -45,17 +44,16 @@ using apollo::drivers::canbus::SenderMessage;
 
 class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
  public:
-  UltrasonicRadarMessageManager(
-      const int entrance_num,
-      const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>> &writer);
+  UltrasonicRadarMessageManager(const int entrance_num,
+                                const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>>& writer);
   virtual ~UltrasonicRadarMessageManager() = default;
-  void Parse(const uint32_t message_id, const uint8_t *data, int32_t length);
+  void Parse(const uint32_t message_id, const uint8_t* data, int32_t length);
   void set_can_client(std::shared_ptr<CanClient> can_client);
 
  private:
-  int entrance_num_ = 0;
+  int                                        entrance_num_ = 0;
   std::shared_ptr<cyber::Writer<Ultrasonic>> ultrasonic_radar_writer_;
-  std::shared_ptr<CanClient> can_client_;
+  std::shared_ptr<CanClient>                 can_client_;
 };
 
 }  // namespace ultrasonic_radar

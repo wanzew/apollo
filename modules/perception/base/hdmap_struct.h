@@ -36,13 +36,13 @@ struct alignas(16) LaneBoundary {
 };
 
 struct alignas(16) HdmapStruct {
-  apollo::common::EigenVector<RoadBoundary> road_boundary;
+  apollo::common::EigenVector<RoadBoundary>       road_boundary;
   apollo::common::EigenVector<PointCloud<PointD>> road_polygons;
   apollo::common::EigenVector<PointCloud<PointD>> hole_polygons;
   apollo::common::EigenVector<PointCloud<PointD>> junction_polygons;
 };
 
-using HdmapStructPtr = std::shared_ptr<HdmapStruct>;
+using HdmapStructPtr      = std::shared_ptr<HdmapStruct>;
 using HdmapStructConstPtr = std::shared_ptr<const HdmapStruct>;
 
 }  // namespace base

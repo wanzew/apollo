@@ -20,12 +20,14 @@
 
 #include "modules/planning/common/obstacle.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
-#include "modules/common/util/util.h"
+
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/common/util/util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -134,8 +136,8 @@ TEST_F(ObstacleTest, PerceptionBoundingBox) {
 TEST_F(ObstacleTest, GetBoundingBox) {
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
   ASSERT_TRUE(obstacle);
-  const auto& point = obstacle->Trajectory().trajectory_point(2);
-  const auto& box = obstacle->GetBoundingBox(point);
+  const auto&                      point = obstacle->Trajectory().trajectory_point(2);
+  const auto&                      box   = obstacle->GetBoundingBox(point);
   std::vector<common::math::Vec2d> corners;
   box.GetAllCorners(&corners);
   EXPECT_EQ(4, corners.size());
@@ -176,9 +178,8 @@ TEST_F(ObstacleTest, Perception) {
 }
 
 TEST(Obstacle, CreateStaticVirtualObstacle) {
-  common::math::Box2d box({0, 0}, 0.0, 4.0, 2.0);
-  std::unique_ptr<Obstacle> obstacle =
-      Obstacle::CreateStaticVirtualObstacles("abc", box);
+  common::math::Box2d       box({0, 0}, 0.0, 4.0, 2.0);
+  std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles("abc", box);
   EXPECT_EQ("abc", obstacle->Id());
   EXPECT_EQ(-314721735, obstacle->PerceptionId());
   EXPECT_TRUE(obstacle->IsVirtual());
@@ -262,82 +263,43 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
   decision_nudge.mutable_nudge();
 
   // vertical decision comparison
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_stop, decision_ignore)
-          .has_stop());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_stop, decision_overtake)
-          .has_stop());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_stop, decision_follow)
-          .has_stop());
-  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_stop, decision_yield)
-                  .has_stop());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_stop, decision_ignore).has_stop());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_stop, decision_overtake).has_stop());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_stop, decision_follow).has_stop());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_stop, decision_yield).has_stop());
+
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_yield, decision_ignore).has_yield());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_yield, decision_overtake).has_yield());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_yield, decision_follow).has_yield());
+
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_follow, decision_ignore).has_follow());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_follow, decision_overtake).has_follow());
 
   EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_yield, decision_ignore)
-          .has_yield());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_yield, decision_overtake)
-          .has_yield());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_yield, decision_follow)
-          .has_yield());
+      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_ignore).has_overtake());
 
   EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_follow, decision_ignore)
-          .has_follow());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_follow, decision_overtake)
-          .has_follow());
+      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_overtake).has_overtake());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_ignore, decision_follow).has_follow());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_ignore, decision_yield).has_yield());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_ignore, decision_stop).has_stop());
 
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_ignore)
-          .has_overtake());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_overtake, decision_follow).has_follow());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_overtake, decision_yield).has_yield());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_overtake, decision_stop).has_stop());
 
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_overtake)
-          .has_overtake());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_follow)
-          .has_follow());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_yield)
-          .has_yield());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_stop)
-          .has_stop());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_follow, decision_yield).has_yield());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_follow, decision_stop).has_stop());
 
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_follow)
-          .has_follow());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_yield)
-          .has_yield());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_stop)
-          .has_stop());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_yield, decision_stop).has_stop());
 
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_follow, decision_yield)
-          .has_yield());
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_follow, decision_stop)
-          .has_stop());
-
-  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_yield, decision_stop)
-                  .has_stop());
-
-  EXPECT_TRUE(
-      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_ignore)
-          .has_ignore());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_ignore, decision_ignore).has_ignore());
 
   ObjectDecisionType decision_overtake1;
   decision_overtake1.mutable_overtake()->set_distance_s(1);
   ObjectDecisionType decision_overtake2;
   decision_overtake2.mutable_overtake()->set_distance_s(2);
-  EXPECT_EQ(2, Obstacle::MergeLongitudinalDecision(decision_overtake1,
-                                                   decision_overtake2)
+  EXPECT_EQ(2, Obstacle::MergeLongitudinalDecision(decision_overtake1, decision_overtake2)
                    .overtake()
                    .distance_s());
 
@@ -345,8 +307,7 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
   decision_follow1.mutable_follow()->set_distance_s(-1);
   ObjectDecisionType decision_follow2;
   decision_follow2.mutable_follow()->set_distance_s(-2);
-  EXPECT_EQ(-2, Obstacle::MergeLongitudinalDecision(decision_follow1,
-                                                    decision_follow2)
+  EXPECT_EQ(-2, Obstacle::MergeLongitudinalDecision(decision_follow1, decision_follow2)
                     .follow()
                     .distance_s());
 
@@ -355,18 +316,15 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
   ObjectDecisionType decision_yield2;
   decision_yield2.mutable_yield()->set_distance_s(-2);
   EXPECT_EQ(
-      -2, Obstacle::MergeLongitudinalDecision(decision_yield1, decision_yield2)
-              .yield()
-              .distance_s());
+      -2,
+      Obstacle::MergeLongitudinalDecision(decision_yield1, decision_yield2).yield().distance_s());
 
   ObjectDecisionType decision_stop1;
   decision_stop1.mutable_stop()->set_distance_s(-1);
   ObjectDecisionType decision_stop2;
   decision_stop2.mutable_stop()->set_distance_s(-2);
-  EXPECT_EQ(-2,
-            Obstacle::MergeLongitudinalDecision(decision_stop1, decision_stop2)
-                .stop()
-                .distance_s());
+  EXPECT_EQ(
+      -2, Obstacle::MergeLongitudinalDecision(decision_stop1, decision_stop2).stop().distance_s());
 }
 
 TEST(MergeLateralDecision, AllDecisions) {
@@ -388,16 +346,13 @@ TEST(MergeLateralDecision, AllDecisions) {
   ObjectDecisionType decision_nudge;
   decision_nudge.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
 
-  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_nudge, decision_ignore)
-                  .has_nudge());
+  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_nudge, decision_ignore).has_nudge());
 
-  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_ignore, decision_nudge)
-                  .has_nudge());
+  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_ignore, decision_nudge).has_nudge());
 
   ObjectDecisionType decision_nudge2;
   decision_nudge2.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
-  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_nudge, decision_nudge2)
-                  .has_nudge());
+  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_nudge, decision_nudge2).has_nudge());
   decision_nudge2.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
 }
 
@@ -411,7 +366,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // Ignore
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
     decision.mutable_ignore();
     obstacle.AddLongitudinalDecision("test_ignore", decision);
@@ -423,7 +378,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // stop and ignore
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_stop();
@@ -443,7 +398,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // left nudge and ignore
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
@@ -463,7 +418,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // right nudge and ignore
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
@@ -483,7 +438,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // left nudge and right nudge
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
@@ -496,7 +451,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // overtake and ignore
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_overtake();
@@ -516,7 +471,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // follow and ignore
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_follow();
@@ -536,7 +491,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // yield and ignore
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_yield();
@@ -556,7 +511,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // stop and nudge
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_stop();
@@ -576,7 +531,7 @@ TEST(ObstacleMergeTest, add_decision_test) {
 
   // stop and yield
   {
-    Obstacle obstacle;
+    Obstacle           obstacle;
     ObjectDecisionType decision;
 
     decision.mutable_stop();

@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Adsbrakecommand46 : public ::apollo::drivers::canbus::ProtocolData<
-                              ::apollo::canbus::ChassisDetail> {
+class Adsbrakecommand46
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -58,15 +59,13 @@ class Adsbrakecommand46 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'name': 'EPB_RampAuxiliaryCommand',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 25, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  Adsbrakecommand46* set_epb_rampauxiliarycommand(
-      bool epb_rampauxiliarycommand);
+  Adsbrakecommand46* set_epb_rampauxiliarycommand(bool epb_rampauxiliarycommand);
 
   // config detail: {'name': 'AUTO_DriverCmd_AliveCounter', 'offset': 0.0,
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  Adsbrakecommand46* set_auto_drivercmd_alivecounter(
-      int auto_drivercmd_alivecounter);
+  Adsbrakecommand46* set_auto_drivercmd_alivecounter(int auto_drivercmd_alivecounter);
 
   // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
@@ -97,30 +96,27 @@ class Adsbrakecommand46 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 1, 'name': 'EPB_RampAuxiliaryCommand',
   // 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 25, 'type':
   // 'bool', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_epb_rampauxiliarycommand(uint8_t* data,
-                                      bool epb_rampauxiliarycommand);
+  void set_p_epb_rampauxiliarycommand(uint8_t* data, bool epb_rampauxiliarycommand);
 
   // config detail: {'name': 'AUTO_DriverCmd_AliveCounter', 'offset': 0.0,
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  void set_p_auto_drivercmd_alivecounter(uint8_t* data,
-                                         int auto_drivercmd_alivecounter);
+  void set_p_auto_drivercmd_alivecounter(uint8_t* data, int auto_drivercmd_alivecounter);
 
   // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  void set_p_auto_drivercmd_checksum(uint8_t* data,
-                                     int auto_drivercmd_checksum);
+  void set_p_auto_drivercmd_checksum(uint8_t* data, int auto_drivercmd_checksum);
 
  private:
   bool drive_enable_;
-  int auto_brake_command_;
+  int  auto_brake_command_;
   bool auto_parking_command_;
   bool epb_rampauxiliarycommand_;
-  int auto_drivercmd_alivecounter_;
-  int auto_drivercmd_checksum_;
+  int  auto_drivercmd_alivecounter_;
+  int  auto_drivercmd_checksum_;
 };
 
 }  // namespace neolix_edu

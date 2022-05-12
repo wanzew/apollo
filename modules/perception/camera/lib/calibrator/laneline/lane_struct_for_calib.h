@@ -24,18 +24,18 @@ namespace perception {
 namespace camera {
 
 struct VanishingPoint {
-  float pixel_pos[2] = {0};
+  float pixel_pos[2]      = {0};
   float distance_traveled = 0.0f;  // in meters
 };
 
 struct LaneLine {
-  int type = 0;
-  int color = 0;
+  int                          type       = 0;
+  int                          color      = 0;
   std::vector<Eigen::Vector2f> lane_point = {};
 };
 
 struct CmpLanePointY {
-  bool operator()(const Eigen::Vector2f &pt1, const Eigen::Vector2f &pt2) {
+  bool operator()(const Eigen::Vector2f& pt1, const Eigen::Vector2f& pt2) {
     return pt1(1) > pt2(1);
   }
 };

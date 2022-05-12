@@ -19,9 +19,10 @@
 #include <cmath>
 #include <memory>
 
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/control/proto/control_cmd.pb.h"
 
 namespace apollo {
 namespace data {
@@ -31,42 +32,34 @@ using apollo::canbus::Chassis;
 HardBrakeTrigger::HardBrakeTrigger() { trigger_name_ = "HardBrakeTrigger"; }
 
 void HardBrakeTrigger::Pull(const cyber::record::RecordMessage& msg) {
-  if (!trigger_obj_->enabled()) {
-    return;
-  }
+  if (!trigger_obj_->enabled()) { return; }
 
   if (msg.channel_name == FLAGS_chassis_topic) {
     Chassis chassis_msg;
     chassis_msg.ParseFromString(msg.content);
     const float speed = chassis_msg.speed_mps();
 
-    if (IsNoisy(speed)) {
-      return;
-    }
+    if (IsNoisy(speed)) { return; }
 
     EnqueueMessage(speed);
 
     if (IsHardBrake()) {
-      AINFO << "hard break trigger is pulled: " << msg.time << " - "
-            << msg.channel_name;
+      AINFO << "hard break trigger is pulled: " << msg.time << " - " << msg.channel_name;
       TriggerIt(msg.time);
     }
   }
 }
 
 bool HardBrakeTrigger::IsNoisy(const float speed) const {
-  const float pre_speed_mps =
-      (current_speed_queue_.empty() ? 0.0f : current_speed_queue_.back());
+  const float pre_speed_mps = (current_speed_queue_.empty() ? 0.0f : current_speed_queue_.back());
   return fabs(pre_speed_mps - speed) > noisy_diff_;
 }
 
 bool HardBrakeTrigger::IsHardBrake() const {
-  if (current_speed_queue_.size() < queue_size_ ||
-      history_speed_queue_.size() < queue_size_) {
+  if (current_speed_queue_.size() < queue_size_ || history_speed_queue_.size() < queue_size_) {
     return false;
   }
-  const float delta =
-      (history_total_ - current_total_) / static_cast<float>(queue_size_);
+  const float delta = (history_total_ - current_total_) / static_cast<float>(queue_size_);
   return delta > max_delta_;
 }
 

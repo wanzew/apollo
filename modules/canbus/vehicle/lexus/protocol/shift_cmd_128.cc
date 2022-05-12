@@ -46,10 +46,10 @@ void Shiftcmd128::UpdateData(uint8_t* data) {
 void Shiftcmd128::Reset() {
   // TODO(QiL) you should check this manually
   ignore_overrides_ = false;
-  enable_ = false;
-  clear_override_ = false;
-  clear_faults_ = false;
-  shift_cmd_ = Shift_cmd_128::SHIFT_CMD_PARK;
+  enable_           = false;
+  clear_override_   = false;
+  clear_faults_     = false;
+  shift_cmd_        = Shift_cmd_128::SHIFT_CMD_PARK;
 }
 
 Shiftcmd128* Shiftcmd128::set_ignore_overrides(bool ignore_overrides) {
@@ -112,8 +112,7 @@ void Shiftcmd128::set_p_clear_faults(uint8_t* data, bool clear_faults) {
   to_set.set_value(static_cast<uint8_t>(x), 3, 1);
 }
 
-Shiftcmd128* Shiftcmd128::set_shift_cmd(
-    Shift_cmd_128::Shift_cmdType shift_cmd) {
+Shiftcmd128* Shiftcmd128::set_shift_cmd(Shift_cmd_128::Shift_cmdType shift_cmd) {
   shift_cmd_ = shift_cmd;
   return this;
 }
@@ -125,8 +124,7 @@ Shiftcmd128* Shiftcmd128::set_shift_cmd(
 // 'precision': 1.0, 'len': 8, 'name': 'SHIFT_CMD', 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 15, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
-void Shiftcmd128::set_p_shift_cmd(uint8_t* data,
-                                  Shift_cmd_128::Shift_cmdType shift_cmd) {
+void Shiftcmd128::set_p_shift_cmd(uint8_t* data, Shift_cmd_128::Shift_cmdType shift_cmd) {
   uint8_t x = shift_cmd;
 
   Byte to_set(data + 1);

@@ -28,10 +28,10 @@ struct alignas(16) LidarSupplement {
   ~LidarSupplement();
   LidarSupplement(const LidarSupplement& rhs);
   LidarSupplement& operator=(const LidarSupplement& rhs);
-  void clone(const LidarSupplement& rhs);
+  void             clone(const LidarSupplement& rhs);
 };
 
-typedef std::shared_ptr<LidarSupplement> LidarSupplementPtr;
+typedef std::shared_ptr<LidarSupplement>       LidarSupplementPtr;
 typedef std::shared_ptr<const LidarSupplement> LidarSupplementConstPtr;
 
 struct alignas(16) RadarSupplement {
@@ -39,17 +39,17 @@ struct alignas(16) RadarSupplement {
   ~RadarSupplement();
   RadarSupplement(const RadarSupplement& rhs);
   RadarSupplement& operator=(const RadarSupplement& rhs);
-  void clone(const RadarSupplement& rhs);
+  void             clone(const RadarSupplement& rhs);
 
   // distance
   float range = 0.0f;
   // x -> forward, y -> left
-  float angle = 0.0f;
-  float relative_radial_velocity = 0.0f;
+  float angle                        = 0.0f;
+  float relative_radial_velocity     = 0.0f;
   float relative_tangential_velocity = 0.0f;
 };
 
-typedef std::shared_ptr<RadarSupplement> RadarSupplementPtr;
+typedef std::shared_ptr<RadarSupplement>       RadarSupplementPtr;
 typedef std::shared_ptr<const RadarSupplement> RadarSupplementConstPtr;
 
 struct alignas(16) CameraSupplement {
@@ -57,7 +57,7 @@ struct alignas(16) CameraSupplement {
   ~CameraSupplement();
   CameraSupplement(const CameraSupplement& rhs);
   CameraSupplement& operator=(const CameraSupplement& rhs);
-  void clone(const CameraSupplement& rhs);
+  void              clone(const CameraSupplement& rhs);
 
   // upper-left corner: x1, y1
   Eigen::Vector2d upper_left;
@@ -65,7 +65,7 @@ struct alignas(16) CameraSupplement {
   Eigen::Vector2d lower_right;
 };
 
-typedef std::shared_ptr<CameraSupplement> CameraSupplementPtr;
+typedef std::shared_ptr<CameraSupplement>       CameraSupplementPtr;
 typedef std::shared_ptr<const CameraSupplement> CameraSupplementConstPtr;
 
 }  // namespace benchmark

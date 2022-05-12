@@ -16,22 +16,23 @@
 
 #pragma once
 
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace planning {
 
 enum class VirtualObjectType {
-  DESTINATION = 0,
-  CROSSWALK = 1,
+  DESTINATION   = 0,
+  CROSSWALK     = 1,
   TRAFFIC_LIGHT = 2,
-  CLEAR_ZONE = 3,
-  REROUTE = 4,
+  CLEAR_ZONE    = 3,
+  REROUTE       = 4,
   DECISION_JUMP = 5,
-  PRIORITY = 6
+  PRIORITY      = 6
 };
 
 struct EnumClassHash {
@@ -44,34 +45,32 @@ struct EnumClassHash {
 class DecisionData {
  public:
   DecisionData(const prediction::PredictionObstacles& prediction_obstacles,
-               const ReferenceLine& reference_line);
+               const ReferenceLine&                   reference_line);
   ~DecisionData() = default;
 
  public:
-  Obstacle* GetObstacleById(const std::string& id);
-  std::vector<Obstacle*> GetObstacleByType(const VirtualObjectType& type);
-  std::unordered_set<std::string> GetObstacleIdByType(
-      const VirtualObjectType& type);
-  const std::vector<Obstacle*>& GetStaticObstacle() const;
-  const std::vector<Obstacle*>& GetDynamicObstacle() const;
-  const std::vector<Obstacle*>& GetVirtualObstacle() const;
-  const std::vector<Obstacle*>& GetPracticalObstacle() const;
-  const std::vector<Obstacle*>& GetAllObstacle() const;
+  Obstacle*                       GetObstacleById(const std::string& id);
+  std::vector<Obstacle*>          GetObstacleByType(const VirtualObjectType& type);
+  std::unordered_set<std::string> GetObstacleIdByType(const VirtualObjectType& type);
+  const std::vector<Obstacle*>&   GetStaticObstacle() const;
+  const std::vector<Obstacle*>&   GetDynamicObstacle() const;
+  const std::vector<Obstacle*>&   GetVirtualObstacle() const;
+  const std::vector<Obstacle*>&   GetPracticalObstacle() const;
+  const std::vector<Obstacle*>&   GetAllObstacle() const;
 
  public:
-  bool CreateVirtualObstacle(const ReferencePoint& point,
+  bool CreateVirtualObstacle(const ReferencePoint&    point,
                              const VirtualObjectType& type,
-                             std::string* const id);
-  bool CreateVirtualObstacle(const double point_s,
-                             const VirtualObjectType& type,
-                             std::string* const id);
+                             std::string* const       id);
+  bool
+  CreateVirtualObstacle(const double point_s, const VirtualObjectType& type, std::string* const id);
 
  private:
   bool IsValidTrajectory(const prediction::Trajectory& trajectory);
   bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
   bool CreateVirtualObstacle(const common::math::Box2d& obstacle_box,
-                             const VirtualObjectType& type,
-                             std::string* const id);
+                             const VirtualObjectType&   type,
+                             std::string* const         id);
 
  private:
   std::vector<Obstacle*> static_obstacle_;
@@ -81,12 +80,11 @@ class DecisionData {
   std::vector<Obstacle*> all_obstacle_;
 
  private:
-  const ReferenceLine& reference_line_;
-  std::list<std::unique_ptr<Obstacle>> obstacles_;
+  const ReferenceLine&                       reference_line_;
+  std::list<std::unique_ptr<Obstacle>>       obstacles_;
   std::unordered_map<std::string, Obstacle*> obstacle_map_;
-  std::unordered_map<VirtualObjectType, std::unordered_set<std::string>,
-                     EnumClassHash>
-      virtual_obstacle_id_map_;
+  std::unordered_map<VirtualObjectType, std::unordered_set<std::string>, EnumClassHash>
+             virtual_obstacle_id_map_;
   std::mutex mutex_;
   std::mutex transaction_mutex_;
 };

@@ -27,18 +27,21 @@ namespace cyber {
 namespace base {
 
 struct TestNode {
-  TestNode() : inited(true) {}
+  TestNode()
+      : inited(true) {}
   ~TestNode() {
     inited = false;
-    value = 1;
+    value  = 1;
   }
-  explicit TestNode(int data) : value(data), inited(true) {}
-  int value = 0;
+  explicit TestNode(int data)
+      : value(data)
+      , inited(true) {}
+  int  value  = 0;
   bool inited = false;
 };
 
 TEST(CCObjectPoolTest, base) {
-  const uint32_t capacity = 1024;
+  const uint32_t                         capacity = 1024;
   std::vector<std::shared_ptr<TestNode>> vec;
   vec.reserve(capacity);
   auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
@@ -58,9 +61,9 @@ TEST(CCObjectPoolTest, base) {
 }
 
 TEST(CCObjectPoolTest, multi_thread) {
-  const uint32_t capacity = 1024;
+  const uint32_t                         capacity = 1024;
   std::vector<std::shared_ptr<TestNode>> vec;
-  std::vector<std::thread> thread_pool;
+  std::vector<std::thread>               thread_pool;
   vec.reserve(capacity);
 
   auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
@@ -84,8 +87,8 @@ TEST(CCObjectPoolTest, multi_thread) {
 }
 
 TEST(CCObjectPoolTest, construct_object) {
-  const uint32_t capacity = 1024;
-  auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
+  const uint32_t                         capacity = 1024;
+  auto                                   pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
   std::vector<std::shared_ptr<TestNode>> vec;
 
   FOR_EACH(i, 0, capacity) {
@@ -98,9 +101,9 @@ TEST(CCObjectPoolTest, construct_object) {
 }
 
 TEST(CCObjectPoolTest, construct_all) {
-  const uint32_t capacity = 1024;
+  const uint32_t                         capacity = 1024;
   std::vector<std::shared_ptr<TestNode>> vec;
-  auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
+  auto                                   pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
   pool->ConstructAll();
 
   FOR_EACH(i, 0, capacity) {

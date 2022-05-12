@@ -21,6 +21,7 @@
 #include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -37,14 +38,13 @@ class CreepDeciderTest : public ::testing::Test {
   virtual void TearDown() {}
 
  protected:
-  TaskConfig config_;
+  TaskConfig                          config_;
   std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(CreepDeciderTest, Init) {
   CreepDecider creep_decider(config_, injector_);
-  EXPECT_EQ(creep_decider.Name(),
-            TaskConfig::TaskType_Name(config_.task_type()));
+  EXPECT_EQ(creep_decider.Name(), TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 }  // namespace planning

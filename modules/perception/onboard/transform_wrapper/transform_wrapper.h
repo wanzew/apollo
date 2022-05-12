@@ -37,26 +37,25 @@ DECLARE_string(obs_novatel2world_tf2_child_frame_id);
 DECLARE_double(obs_tf2_buff_size);
 
 struct StampedTransform {
-  double timestamp = 0.0;  // in second
+  double               timestamp = 0.0;  // in second
   Eigen::Translation3d translation;
-  Eigen::Quaterniond rotation;
+  Eigen::Quaterniond   rotation;
 };
 
 class TransformCache {
  public:
-  TransformCache() = default;
+  TransformCache()  = default;
   ~TransformCache() = default;
 
   void AddTransform(const StampedTransform& transform);
-  bool QueryTransform(double timestamp, StampedTransform* transform,
-                      double max_duration = 0.0);
+  bool QueryTransform(double timestamp, StampedTransform* transform, double max_duration = 0.0);
 
   inline void SetCacheDuration(double duration) { cache_duration_ = duration; }
 
  protected:
   // in ascending order of time
   std::deque<StampedTransform> transforms_;
-  double cache_duration_ = 1.0;
+  double                       cache_duration_ = 1.0;
 };
 
 class TransformWrapper {
@@ -71,22 +70,25 @@ class TransformWrapper {
             const std::string& novatel2world_tf2_child_frame_id);
 
   // Attention: must initialize TransformWrapper first
-  bool GetSensor2worldTrans(double timestamp,
+  bool GetSensor2worldTrans(double           timestamp,
                             Eigen::Affine3d* sensor2world_trans,
                             Eigen::Affine3d* novatel2world_trans = nullptr);
 
   bool GetExtrinsics(Eigen::Affine3d* trans);
 
   // Attention: can be called without initlization
-  bool GetTrans(double timestamp, Eigen::Affine3d* trans,
-                const std::string& frame_id, const std::string& child_frame_id);
+  bool GetTrans(double             timestamp,
+                Eigen::Affine3d*   trans,
+                const std::string& frame_id,
+                const std::string& child_frame_id);
 
   bool GetExtrinsicsBySensorId(const std::string& from_sensor_id,
                                const std::string& to_sensor_id,
-                               Eigen::Affine3d* trans);
+                               Eigen::Affine3d*   trans);
 
  protected:
-  bool QueryTrans(double timestamp, StampedTransform* trans,
+  bool QueryTrans(double             timestamp,
+                  StampedTransform*  trans,
                   const std::string& frame_id,
                   const std::string& child_frame_id);
 

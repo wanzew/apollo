@@ -48,7 +48,8 @@ namespace planning {
 
 class PiecewiseJerkProblem {
  public:
-  PiecewiseJerkProblem(const size_t num_of_knots, const double delta_s,
+  PiecewiseJerkProblem(const size_t                 num_of_knots,
+                       const double                 delta_s,
                        const std::array<double, 3>& x_init);
 
   virtual ~PiecewiseJerkProblem() = default;
@@ -63,16 +64,12 @@ class PiecewiseJerkProblem {
 
   void set_ddx_bounds(std::vector<std::pair<double, double>> ddx_bounds);
 
-  void set_ddx_bounds(const double ddx_lower_bound,
-                      const double ddx_upper_bound);
+  void set_ddx_bounds(const double ddx_lower_bound, const double ddx_upper_bound);
 
-  void set_dddx_bound(const double dddx_bound) {
-    set_dddx_bound(-dddx_bound, dddx_bound);
-  }
+  void set_dddx_bound(const double dddx_bound) { set_dddx_bound(-dddx_bound, dddx_bound); }
 
-  void set_dddx_bound(const double dddx_lower_bound,
-                      const double dddx_upper_bound) {
-    dddx_bound_.first = dddx_lower_bound;
+  void set_dddx_bound(const double dddx_lower_bound, const double dddx_upper_bound) {
+    dddx_bound_.first  = dddx_lower_bound;
     dddx_bound_.second = dddx_upper_bound;
   }
 
@@ -84,9 +81,7 @@ class PiecewiseJerkProblem {
 
   void set_weight_dddx(const double weight_dddx) { weight_dddx_ = weight_dddx; }
 
-  void set_scale_factor(const std::array<double, 3>& scale_factor) {
-    scale_factor_ = scale_factor;
-  }
+  void set_scale_factor(const std::array<double, 3>& scale_factor) { scale_factor_ = scale_factor; }
 
   /**
    * @brief Set the x ref object and the uniform x_ref weighting
@@ -102,8 +97,7 @@ class PiecewiseJerkProblem {
    * @param weight_x_ref_vec: piecewised x_ref weightings
    * @param x_ref: objective value of x
    */
-  void set_x_ref(std::vector<double> weight_x_ref_vec,
-                 std::vector<double> x_ref);
+  void set_x_ref(std::vector<double> weight_x_ref_vec, std::vector<double> x_ref);
 
   void set_end_state_ref(const std::array<double, 3>& weight_end_state,
                          const std::array<double, 3>& end_state_ref);
@@ -119,14 +113,14 @@ class PiecewiseJerkProblem {
  protected:
   // naming convention follows osqp solver.
   virtual void CalculateKernel(std::vector<c_float>* P_data,
-                               std::vector<c_int>* P_indices,
-                               std::vector<c_int>* P_indptr) = 0;
+                               std::vector<c_int>*   P_indices,
+                               std::vector<c_int>*   P_indptr) = 0;
 
   virtual void CalculateOffset(std::vector<c_float>* q) = 0;
 
   virtual void CalculateAffineConstraint(std::vector<c_float>* A_data,
-                                         std::vector<c_int>* A_indices,
-                                         std::vector<c_int>* A_indptr,
+                                         std::vector<c_int>*   A_indices,
+                                         std::vector<c_int>*   A_indptr,
                                          std::vector<c_float>* lower_bounds,
                                          std::vector<c_float>* upper_bounds);
 
@@ -157,23 +151,23 @@ class PiecewiseJerkProblem {
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
   std::vector<std::pair<double, double>> ddx_bounds_;
-  std::pair<double, double> dddx_bound_;
+  std::pair<double, double>              dddx_bound_;
 
-  double weight_x_ = 0.0;
-  double weight_dx_ = 0.0;
-  double weight_ddx_ = 0.0;
+  double weight_x_    = 0.0;
+  double weight_dx_   = 0.0;
+  double weight_ddx_  = 0.0;
   double weight_dddx_ = 0.0;
 
   double delta_s_ = 1.0;
 
-  bool has_x_ref_ = false;
-  double weight_x_ref_ = 0.0;
+  bool                has_x_ref_    = false;
+  double              weight_x_ref_ = 0.0;
   std::vector<double> x_ref_;
   // un-uniformed weighting
   std::vector<double> weight_x_ref_vec_;
 
-  bool has_end_state_ref_ = false;
-  std::array<double, 3> weight_end_state_ = {{0.0, 0.0, 0.0}};
+  bool                  has_end_state_ref_ = false;
+  std::array<double, 3> weight_end_state_  = {{0.0, 0.0, 0.0}};
   std::array<double, 3> end_state_ref_;
 };
 

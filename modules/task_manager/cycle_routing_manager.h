@@ -44,8 +44,7 @@ class CycleRoutingManager {
    * @brief Get new routing if the vehicle reaches the begin/end point
    * @return false/true
    */
-  bool GetNewRouting(const localization::Pose& pose,
-                     routing::RoutingRequest* routing_request_);
+  bool GetNewRouting(const localization::Pose& pose, routing::RoutingRequest* routing_request_);
 
   /**
    * @brief get remaining cycle number
@@ -59,13 +58,13 @@ class CycleRoutingManager {
   virtual ~CycleRoutingManager() = default;
 
  private:
-  int cycle_ = 0;
-  int waypoint_num_ = 0;
-  bool is_allowed_to_route_ = false;
-  routing::LaneWaypoint begin_point_;
-  routing::LaneWaypoint end_point_;
+  int                                            cycle_               = 0;
+  int                                            waypoint_num_        = 0;
+  bool                                           is_allowed_to_route_ = false;
+  routing::LaneWaypoint                          begin_point_;
+  routing::LaneWaypoint                          end_point_;
   std::unique_ptr<apollo::dreamview::MapService> map_service_;
-  routing::RoutingRequest original_routing_request_;
+  routing::RoutingRequest                        original_routing_request_;
 };
 
 }  // namespace task_manager

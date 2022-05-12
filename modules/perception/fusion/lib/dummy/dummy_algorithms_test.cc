@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/fusion/lib/dummy/dummy_algorithms.h"
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/frame.h"
@@ -21,7 +23,6 @@
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 #include "modules/perception/fusion/base/track.h"
-#include "modules/perception/fusion/lib/dummy/dummy_algorithms.h"
 
 namespace apollo {
 namespace perception {
@@ -33,7 +34,7 @@ TEST(DummyFusionSystemTest, test) {
   DummyFusionSystem system;
   EXPECT_TRUE(system.Init(init_options));
 
-  FusionOptions options;
+  FusionOptions  options;
   base::FramePtr frame(new base::Frame());
   frame->sensor_info.name = "velodyne64";
   frame->objects.resize(2);

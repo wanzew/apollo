@@ -26,105 +26,69 @@ namespace v2x {
 
 OSLightype ProtoAdapter::LightTypeObu2Sys(int32_t type) {
   switch (type) {
-    case 2:
-      return OSLightype::SingleTrafficLight_Type_LEFT;
-    case 3:
-      return OSLightype::SingleTrafficLight_Type_RIGHT;
-    case 4:
-      return OSLightype::SingleTrafficLight_Type_U_TURN;
+    case 2: return OSLightype::SingleTrafficLight_Type_LEFT;
+    case 3: return OSLightype::SingleTrafficLight_Type_RIGHT;
+    case 4: return OSLightype::SingleTrafficLight_Type_U_TURN;
     case 1:
-    default:
-      return OSLightype::SingleTrafficLight_Type_STRAIGHT;
+    default: return OSLightype::SingleTrafficLight_Type_STRAIGHT;
   }
 }
 
-bool ProtoAdapter::LightObu2Sys(const ObuLight &obu_light,
-                                std::shared_ptr<OSLight> *os_light) {
-  if (nullptr == os_light) {
-    return false;
-  }
+bool ProtoAdapter::LightObu2Sys(const ObuLight& obu_light, std::shared_ptr<OSLight>* os_light) {
+  if (nullptr == os_light) { return false; }
   auto res = std::make_shared<OSLight>();
-  if (nullptr == res) {
-    return false;
-  }
-  if (!obu_light.has_header()) {
-    return false;
-  }
+  if (nullptr == res) { return false; }
+  if (!obu_light.has_header()) { return false; }
   if (obu_light.header().has_timestamp_sec()) {
-    res->mutable_header()->set_timestamp_sec(
-        obu_light.header().timestamp_sec());
+    res->mutable_header()->set_timestamp_sec(obu_light.header().timestamp_sec());
   }
   if (obu_light.header().has_module_name()) {
     res->mutable_header()->set_module_name(obu_light.header().module_name());
   }
-  if (0 == obu_light.road_traffic_light_size()) {
-    return false;
-  }
+  if (0 == obu_light.road_traffic_light_size()) { return false; }
   bool flag_has_data = false;
-  for (int idx_road = 0; idx_road < obu_light.road_traffic_light_size();
-       idx_road++) {
-    const auto &obu_road_light1 = obu_light.road_traffic_light(idx_road);
+  for (int idx_road = 0; idx_road < obu_light.road_traffic_light_size(); idx_road++) {
+    const auto& obu_road_light1 = obu_light.road_traffic_light(idx_road);
     // Set the road index for lane
     apollo::common::Direction tl_attr = apollo::common::Direction::EAST;
     switch (obu_road_light1.road_direction()) {
-      case 1:
-        tl_attr = apollo::common::Direction::EAST;
-        break;
-      case 2:
-        tl_attr = apollo::common::Direction::WEST;
-        break;
-      case 3:
-        tl_attr = apollo::common::Direction::SOUTH;
-        break;
-      case 4:
-        tl_attr = apollo::common::Direction::NORTH;
-        break;
-      default:
-        AINFO << "Road direction=" << obu_road_light1.road_direction()
-              << " is invalid.";
+      case 1: tl_attr = apollo::common::Direction::EAST; break;
+      case 2: tl_attr = apollo::common::Direction::WEST; break;
+      case 3: tl_attr = apollo::common::Direction::SOUTH; break;
+      case 4: tl_attr = apollo::common::Direction::NORTH; break;
+      default: AINFO << "Road direction=" << obu_road_light1.road_direction() << " is invalid.";
     }
     // FOR-EACH LANE
-    for (int idx_lane = 0; idx_lane < obu_road_light1.lane_traffic_light_size();
-         idx_lane++) {
-      const auto &obu_lane_light1 =
-          obu_road_light1.lane_traffic_light(idx_lane);
+    for (int idx_lane = 0; idx_lane < obu_road_light1.lane_traffic_light_size(); idx_lane++) {
+      const auto& obu_lane_light1 = obu_road_light1.lane_traffic_light(idx_lane);
       if (!obu_lane_light1.has_gps_x_m() || !obu_lane_light1.has_gps_y_m()) {
         AWARN << "Invalid lane_traffic_light: [" << idx_road << "][" << idx_lane
               << "]: no gps info here.";
         continue;
       }
-      flag_has_data = true;
-      auto *res_light1 = res->add_road_traffic_light();
+      flag_has_data    = true;
+      auto* res_light1 = res->add_road_traffic_light();
       res_light1->set_gps_x_m(obu_lane_light1.gps_x_m());
       res_light1->set_gps_y_m(obu_lane_light1.gps_y_m());
       res_light1->set_road_attribute(tl_attr);
       // single traffic light
       for (int j = 0; j < obu_lane_light1.single_traffic_light_size(); j++) {
-        auto *res_single1 = res_light1->add_single_traffic_light();
-        const auto &obu_single1 = obu_lane_light1.single_traffic_light(j);
-        if (obu_single1.has_id()) {
-          res_single1->set_id(obu_single1.id());
-        }
+        auto*       res_single1 = res_light1->add_single_traffic_light();
+        const auto& obu_single1 = obu_lane_light1.single_traffic_light(j);
+        if (obu_single1.has_id()) { res_single1->set_id(obu_single1.id()); }
         if (obu_single1.has_color_remaining_time_s()) {
-          res_single1->set_color_remaining_time_s(
-              obu_single1.color_remaining_time_s());
+          res_single1->set_color_remaining_time_s(obu_single1.color_remaining_time_s());
         }
         if (obu_single1.has_next_remaining_time()) {
-          res_single1->set_next_remaining_time_s(
-              obu_single1.next_remaining_time());
+          res_single1->set_next_remaining_time_s(obu_single1.next_remaining_time());
         }
         if (obu_single1.has_right_turn_light()) {
           res_single1->set_right_turn_light(obu_single1.right_turn_light());
         }
-        if (obu_single1.has_color()) {
-          res_single1->set_color(obu_single1.color());
-        }
-        if (obu_single1.has_next_color()) {
-          res_single1->set_next_color(obu_single1.next_color());
-        }
+        if (obu_single1.has_color()) { res_single1->set_color(obu_single1.color()); }
+        if (obu_single1.has_next_color()) { res_single1->set_next_color(obu_single1.next_color()); }
         if (obu_single1.has_traffic_light_type()) {
-          res_single1->add_traffic_light_type(
-              LightTypeObu2Sys(obu_single1.traffic_light_type()));
+          res_single1->add_traffic_light_type(LightTypeObu2Sys(obu_single1.traffic_light_type()));
         }
       }
     }
@@ -133,21 +97,12 @@ bool ProtoAdapter::LightObu2Sys(const ObuLight &obu_light,
   return flag_has_data;
 }
 
-bool ProtoAdapter::RsiObu2Sys(const ObuRsi *obu_rsi,
-                              std::shared_ptr<OSRsi> *os_rsi) {
-  if (nullptr == obu_rsi) {
-    return false;
-  }
-  if (nullptr == os_rsi) {
-    return false;
-  }
+bool ProtoAdapter::RsiObu2Sys(const ObuRsi* obu_rsi, std::shared_ptr<OSRsi>* os_rsi) {
+  if (nullptr == obu_rsi) { return false; }
+  if (nullptr == os_rsi) { return false; }
   auto res = std::make_shared<OSRsi>();
-  if (nullptr == res) {
-    return false;
-  }
-  if (!obu_rsi->has_alter_type()) {
-    return false;
-  }
+  if (nullptr == res) { return false; }
+  if (!obu_rsi->has_alter_type()) { return false; }
   res->set_radius(obu_rsi->radius());
   res->set_rsi_type(obu_rsi->alter_type());
   if (obu_rsi->has_header()) {
@@ -198,25 +153,19 @@ bool ProtoAdapter::RsiObu2Sys(const ObuRsi *obu_rsi,
       res->set_speed(std::atof(obu_rsi->description().c_str()));
       break;
     }
-    default:
-      AINFO << "RSI type:" << obu_rsi->alter_type();
-      break;
+    default: AINFO << "RSI type:" << obu_rsi->alter_type(); break;
   }
   *os_rsi = res;
   return true;
 }
 
-bool ProtoAdapter::JunctionHd2obu(const HDJunction &hd_junction,
-                                  std::shared_ptr<ObuJunction> *obu_junction) {
-  if (nullptr == obu_junction) {
-    return false;
-  }
+bool ProtoAdapter::JunctionHd2obu(const HDJunction&             hd_junction,
+                                  std::shared_ptr<ObuJunction>* obu_junction) {
+  if (nullptr == obu_junction) { return false; }
   auto res = std::make_shared<ObuJunction>();
-  if (nullptr == res) {
-    return false;
-  }
+  if (nullptr == res) { return false; }
   res->mutable_id()->set_id(hd_junction->id().id());
-  for (const auto &point : hd_junction->polygon().points()) {
+  for (const auto& point : hd_junction->polygon().points()) {
     auto res_point = res->mutable_polygon()->add_point();
     res_point->set_x(point.x());
     res_point->set_y(point.y());

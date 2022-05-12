@@ -18,11 +18,12 @@
  * @file
  */
 
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -38,8 +39,7 @@ namespace prediction {
 class FakePredictionComponent : public apollo::cyber::TimerComponent {
  public:
   bool Init() override {
-    prediction_writer_ =
-        node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+    prediction_writer_ = node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
     return true;
   }
   bool Proc() override {
@@ -50,8 +50,7 @@ class FakePredictionComponent : public apollo::cyber::TimerComponent {
   }
 
  private:
-  std::shared_ptr<apollo::cyber::Writer<PredictionObstacles>>
-      prediction_writer_;
+  std::shared_ptr<apollo::cyber::Writer<PredictionObstacles>> prediction_writer_;
 };
 CYBER_REGISTER_COMPONENT(FakePredictionComponent);
 

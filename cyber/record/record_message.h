@@ -44,9 +44,10 @@ struct RecordMessage {
    * @param message
    * @param msg_time
    */
-  RecordMessage(const std::string& name, const std::string& message,
-                uint64_t msg_time)
-      : channel_name(name), content(message), time(msg_time) {}
+  RecordMessage(const std::string& name, const std::string& message, uint64_t msg_time)
+      : channel_name(name)
+      , content(message)
+      , time(msg_time) {}
 
   /**
    * @brief The channel name of the message.

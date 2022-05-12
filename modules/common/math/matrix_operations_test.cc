@@ -91,15 +91,15 @@ TEST(ContinuousToDiscreteTest, c2d_fixed_size) {
 
   Eigen::Matrix<float, 1, 1> prt_d_d;
 
-  bool res = ContinuousToDiscrete<float, 2, 1, 1>(
-      m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
+  bool res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
+                                                  &prt_c_d, &prt_d_d);
 
   EXPECT_FALSE(res);
 
   ts = 1;
 
-  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
-                                             &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d,
+                                             &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -118,8 +118,8 @@ TEST(ContinuousToDiscreteTest, c2d_fixed_size) {
 
   ts = 0.1;
 
-  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
-                                             &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d,
+                                             &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -138,8 +138,8 @@ TEST(ContinuousToDiscreteTest, c2d_fixed_size) {
 
   ts = 0.01;
 
-  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
-                                             &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d,
+                                             &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -176,15 +176,13 @@ TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
 
   Eigen::MatrixXd prt_d_d;
 
-  bool res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
-                                  &prt_c_d, &prt_d_d);
+  bool res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_FALSE(res);
 
   ts = 1;
 
-  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
-                             &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -203,8 +201,7 @@ TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
 
   ts = 0.1;
 
-  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
-                             &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -223,8 +220,7 @@ TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
 
   ts = 0.01;
 
-  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
-                             &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -245,15 +241,15 @@ TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
 TEST(DENSE_TO_CSC_MATRIX, dense_to_csc_matrix_test) {
   {
     std::vector<double> data;
-    std::vector<int> indices;
-    std::vector<int> indptr;
-    Eigen::MatrixXd dense_matrix(3, 3);
+    std::vector<int>    indices;
+    std::vector<int>    indptr;
+    Eigen::MatrixXd     dense_matrix(3, 3);
     dense_matrix << 1.2, 0, 2.2, 0, 0, 3.1, 4.8, 5.4, 6.01;
     DenseToCSCMatrix(dense_matrix, &data, &indices, &indptr);
 
-    std::vector<double> data_golden = {1.2, 4.8, 5.4, 2.2, 3.1, 6.01};
-    std::vector<int> indices_golden = {0, 2, 2, 0, 1, 2};
-    std::vector<int> indptr_golden = {0, 2, 3, 6};
+    std::vector<double> data_golden    = {1.2, 4.8, 5.4, 2.2, 3.1, 6.01};
+    std::vector<int>    indices_golden = {0, 2, 2, 0, 1, 2};
+    std::vector<int>    indptr_golden  = {0, 2, 3, 6};
 
     EXPECT_EQ(data.size(), data_golden.size());
     EXPECT_EQ(indices.size(), indices_golden.size());
@@ -272,15 +268,15 @@ TEST(DENSE_TO_CSC_MATRIX, dense_to_csc_matrix_test) {
 
   {
     std::vector<double> data;
-    std::vector<int> indices;
-    std::vector<int> indptr;
-    Eigen::MatrixXd dense_matrix(2, 2);
+    std::vector<int>    indices;
+    std::vector<int>    indptr;
+    Eigen::MatrixXd     dense_matrix(2, 2);
     dense_matrix << 4.0, 1.0, 1.0, 2.0;
     DenseToCSCMatrix(dense_matrix, &data, &indices, &indptr);
 
-    std::vector<double> data_golden = {4.0, 1.0, 1.0, 2.0};
-    std::vector<int> indices_golden = {0, 1, 0, 1};
-    std::vector<int> indptr_golden = {0, 2, 4};
+    std::vector<double> data_golden    = {4.0, 1.0, 1.0, 2.0};
+    std::vector<int>    indices_golden = {0, 1, 0, 1};
+    std::vector<int>    indptr_golden  = {0, 2, 4};
 
     EXPECT_EQ(data.size(), data_golden.size());
     EXPECT_EQ(indices.size(), indices_golden.size());
@@ -298,18 +294,18 @@ TEST(DENSE_TO_CSC_MATRIX, dense_to_csc_matrix_test) {
   }
   {
     std::vector<double> data;
-    std::vector<int> indices;
-    std::vector<int> indptr;
-    Eigen::MatrixXd dense_matrix(4, 6);
-    dense_matrix << 11, 0, 0, 14, 0, 16, 0, 22, 0, 0, 25, 26, 0, 0, 33, 34, 0,
-        36, 41, 0, 43, 44, 0, 46;
+    std::vector<int>    indices;
+    std::vector<int>    indptr;
+    Eigen::MatrixXd     dense_matrix(4, 6);
+    dense_matrix << 11, 0, 0, 14, 0, 16, 0, 22, 0, 0, 25, 26, 0, 0, 33, 34, 0, 36, 41, 0, 43, 44, 0,
+        46;
 
     DenseToCSCMatrix(dense_matrix, &data, &indices, &indptr);
 
-    std::vector<double> data_golden = {11.0, 41.0, 22.0, 33.0, 43.0, 14.0, 34.0,
+    std::vector<double> data_golden    = {11.0, 41.0, 22.0, 33.0, 43.0, 14.0, 34.0,
                                        44.0, 25.0, 16.0, 26.0, 36.0, 46.0};
-    std::vector<int> indices_golden = {0, 3, 1, 2, 3, 0, 2, 3, 1, 0, 1, 2, 3};
-    std::vector<int> indptr_golden = {0, 2, 3, 5, 8, 9, 13};
+    std::vector<int>    indices_golden = {0, 3, 1, 2, 3, 0, 2, 3, 1, 0, 1, 2, 3};
+    std::vector<int>    indptr_golden  = {0, 2, 3, 5, 8, 9, 13};
 
     EXPECT_EQ(data.size(), data_golden.size());
     EXPECT_EQ(indices.size(), indices_golden.size());
@@ -328,16 +324,12 @@ TEST(DENSE_TO_CSC_MATRIX, dense_to_csc_matrix_test) {
 }
 
 TEST(DENSE_TO_CSC_MATRIX, patterned_dense_to_csc_matrix_test) {
-  int N = 5;
+  int             N            = 5;
   Eigen::MatrixXd dense_matrix = Eigen::MatrixXd::Zero(N * 3, N * 3);
   for (int i = 0; i < N; ++i) {
     dense_matrix(i, i) = 1.0;
-    if (i + 1 < N) {
-      dense_matrix(i, i + 1) = 1.0;
-    }
-    if (i > 0) {
-      dense_matrix(i, i - 1) = 1.0;
-    }
+    if (i + 1 < N) { dense_matrix(i, i + 1) = 1.0; }
+    if (i > 0) { dense_matrix(i, i - 1) = 1.0; }
   }
 
   for (int i = 0; i < N; ++i) {
@@ -346,12 +338,8 @@ TEST(DENSE_TO_CSC_MATRIX, patterned_dense_to_csc_matrix_test) {
 
   for (int i = 0; i < N; ++i) {
     dense_matrix(i + 2 * N, i + 2 * N) = 1.0;
-    if (i + 1 < N) {
-      dense_matrix(i + 2 * N, i + 2 * N + 1) = 1.0;
-    }
-    if (i > 0) {
-      dense_matrix(i + 2 * N, i + 2 * N - 1) = 1.0;
-    }
+    if (i + 1 < N) { dense_matrix(i + 2 * N, i + 2 * N + 1) = 1.0; }
+    if (i > 0) { dense_matrix(i + 2 * N, i + 2 * N - 1) = 1.0; }
   }
 
   for (int i = 0; i < dense_matrix.rows(); ++i) {
@@ -363,8 +351,8 @@ TEST(DENSE_TO_CSC_MATRIX, patterned_dense_to_csc_matrix_test) {
   std::cout << std::endl;
 
   std::vector<double> data;
-  std::vector<int> indices;
-  std::vector<int> indptr;
+  std::vector<int>    indices;
+  std::vector<int>    indptr;
 
   DenseToCSCMatrix(dense_matrix, &data, &indices, &indptr);
   EXPECT_EQ(data.size(), indices.size());

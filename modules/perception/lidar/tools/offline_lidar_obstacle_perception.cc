@@ -15,13 +15,13 @@
  *****************************************************************************/
 
 #include "Eigen/Dense"
+#include "absl/strings/str_cat.h"
 #include "gflags/gflags.h"
 #include "pcl/io/pcd_io.h"
 #include "pcl/kdtree/impl/kdtree_flann.hpp"
 #include "pcl/kdtree/kdtree.h"
 #include "pcl/kdtree/kdtree_flann.h"
 
-#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
@@ -71,7 +71,7 @@ class OfflineLidarObstaclePerception {
       return false;
     }
     segment_init_options_.enable_hdmap_input = FLAGS_use_hdmap;
-    segment_init_options_.sensor_name = FLAGS_sensor_name;
+    segment_init_options_.sensor_name        = FLAGS_sensor_name;
     if (!lidar_segmentation_->Init(segment_init_options_)) {
       AINFO << "Failed to init LidarObstacleSegmentation.";
       return false;
@@ -87,8 +87,7 @@ class OfflineLidarObstaclePerception {
       return false;
     }
 
-    if (!common::SensorManager::Instance()->GetSensorInfo(FLAGS_sensor_name,
-                                                          &sensor_info_)) {
+    if (!common::SensorManager::Instance()->GetSensorInfo(FLAGS_sensor_name, &sensor_info_)) {
       AERROR << "Failed to get sensor info, sensor name: " << FLAGS_sensor_name;
       return false;
     }
@@ -98,10 +97,10 @@ class OfflineLidarObstaclePerception {
   }
 
   bool run() {
-    double timestamp = 0.f;
-    std::string pcd_folder = FLAGS_pcd_path;
-    std::string pose_folder = FLAGS_pose_path;
-    std::string output_path = FLAGS_output_path;
+    double                   timestamp   = 0.f;
+    std::string              pcd_folder  = FLAGS_pcd_path;
+    std::string              pose_folder = FLAGS_pose_path;
+    std::string              output_path = FLAGS_output_path;
     std::vector<std::string> pcd_file_names;
     if (!common::GetFileList(pcd_folder, ".pcd", &pcd_file_names)) {
       AERROR << "pcd_folder: " << pcd_folder << " get file list error.";
@@ -109,21 +108,17 @@ class OfflineLidarObstaclePerception {
     }
     std::sort(pcd_file_names.begin(), pcd_file_names.end(),
               [](const std::string& lhs, const std::string& rhs) {
-                if (lhs.length() != rhs.length()) {
-                  return lhs.length() < rhs.length();
-                }
+                if (lhs.length() != rhs.length()) { return lhs.length() < rhs.length(); }
                 return lhs <= rhs;
               });
     for (size_t i = 0; i < pcd_file_names.size(); ++i) {
       AINFO << "***************** Frame " << i << " ******************";
       AINFO << pcd_file_names[i];
       const std::string file_name = GetFileName(pcd_file_names[i]);
-      frame_ = LidarFramePool::Instance().Get();
-      frame_->sensor_info = sensor_info_;
-      frame_->reserve = file_name;
-      if (frame_->cloud == nullptr) {
-        frame_->cloud = base::PointFCloudPool::Instance().Get();
-      }
+      frame_                      = LidarFramePool::Instance().Get();
+      frame_->sensor_info         = sensor_info_;
+      frame_->reserve             = file_name;
+      if (frame_->cloud == nullptr) { frame_->cloud = base::PointFCloudPool::Instance().Get(); }
       LoadPCLPCD(pcd_folder + "/" + file_name + ".pcd", frame_->cloud.get());
       AINFO << "Read point cloud from " << pcd_file_names[i]
             << " with cloud size: " << frame_->cloud->size();
@@ -134,8 +129,7 @@ class OfflineLidarObstaclePerception {
           pose_file_name = pose_folder + "/" + file_name + ".pcd.pose";
         }
         int idt = 0;
-        if (common::ReadPoseFile(pose_file_name, &frame_->lidar2world_pose,
-                                 &idt, &timestamp)) {
+        if (common::ReadPoseFile(pose_file_name, &frame_->lidar2world_pose, &idt, &timestamp)) {
           AINFO << "[timestamp]: " << std::setprecision(16) << timestamp;
           frame_->timestamp = timestamp;
         } else {
@@ -159,7 +153,7 @@ class OfflineLidarObstaclePerception {
           return false;
         }
         if (FLAGS_use_tracking_info) {
-          auto& objects = frame_->segmented_objects;
+          auto& objects        = frame_->segmented_objects;
           auto& result_objects = frame_->tracked_objects;
           std::sort(objects.begin(), objects.end(),
                     [](const base::ObjectPtr& lhs, const base::ObjectPtr& rhs) {
@@ -171,40 +165,33 @@ class OfflineLidarObstaclePerception {
                     });
           for (std::size_t j = 0; j < objects.size(); ++j) {
             ACHECK(objects[j]->id == result_objects[j]->id);
-            objects[j]->track_id = result_objects[j]->track_id;
+            objects[j]->track_id      = result_objects[j]->track_id;
             objects[j]->tracking_time = result_objects[j]->tracking_time;
-            objects[j]->center =
-                frame_->lidar2world_pose.inverse() * result_objects[j]->center;
-            Eigen::Vector3d direction =
-                result_objects[j]->direction.cast<double>();
-            direction =
-                frame_->lidar2world_pose.linear().transpose() * direction;
-            objects[j]->direction = direction.cast<float>();
-            objects[j]->size = result_objects[j]->size;
-            auto velocity = frame_->lidar2world_pose.linear().transpose() *
+            objects[j]->center = frame_->lidar2world_pose.inverse() * result_objects[j]->center;
+            Eigen::Vector3d direction = result_objects[j]->direction.cast<double>();
+            direction                 = frame_->lidar2world_pose.linear().transpose() * direction;
+            objects[j]->direction     = direction.cast<float>();
+            objects[j]->size          = result_objects[j]->size;
+            auto velocity             = frame_->lidar2world_pose.linear().transpose() *
                             result_objects[j]->velocity.cast<double>();
             objects[j]->velocity = velocity.cast<float>();
 
-            objects[j]->type = result_objects[j]->type;
+            objects[j]->type       = result_objects[j]->type;
             objects[j]->type_probs = result_objects[j]->type_probs;
-            objects[j]->polygon = result_objects[j]->polygon;
+            objects[j]->polygon    = result_objects[j]->polygon;
             common::TransformPointCloud(result_objects[j]->polygon,
-                                        frame_->lidar2world_pose.inverse(),
-                                        &objects[j]->polygon);
+                                        frame_->lidar2world_pose.inverse(), &objects[j]->polygon);
           }
         }
       }
 
       std::vector<base::ObjectPtr>& result_objects = frame_->segmented_objects;
-      std::vector<base::ObjectPtr> filtered_objects;
+      std::vector<base::ObjectPtr>  filtered_objects;
       for (auto& object : result_objects) {
-        if (object->tracking_time >= FLAGS_min_life_time) {
-          filtered_objects.push_back(object);
-        }
+        if (object->tracking_time >= FLAGS_min_life_time) { filtered_objects.push_back(object); }
       }
-      if (!WriteObjectsForNewBenchmark(
-              i, filtered_objects,
-              absl::StrCat(output_path, "/", file_name, ".txt"))) {
+      if (!WriteObjectsForNewBenchmark(i, filtered_objects,
+                                       absl::StrCat(output_path, "/", file_name, ".txt"))) {
         return false;
       }
     }
@@ -212,9 +199,9 @@ class OfflineLidarObstaclePerception {
     return true;
   }
 
-  bool WriteObjectsForNewBenchmark(size_t frame_id,
+  bool WriteObjectsForNewBenchmark(size_t                              frame_id,
                                    const std::vector<base::ObjectPtr>& objects,
-                                   const std::string& path) {
+                                   const std::string&                  path) {
     std::ofstream fout(path);
     if (!fout.is_open()) {
       AERROR << "Failed to open: " << path;
@@ -224,8 +211,8 @@ class OfflineLidarObstaclePerception {
     for (auto& object : objects) {
       fout << "velodyne_64"
            << " " << object->id << " " << object->track_id << " "
-           << object->lidar_supplement.is_background << " "
-           << std::setprecision(8) << object->confidence << " ";
+           << object->lidar_supplement.is_background << " " << std::setprecision(8)
+           << object->confidence << " ";
 
       std::string type = "unknow";
       if (object->type == base::ObjectType::UNKNOWN ||
@@ -240,21 +227,20 @@ class OfflineLidarObstaclePerception {
         type = "nonMot";
       }
 
-      double yaw = atan2(object->direction(1), object->direction(0));
-      auto& object_cloud = object->lidar_supplement.cloud;
+      double yaw          = atan2(object->direction(1), object->direction(0));
+      auto&  object_cloud = object->lidar_supplement.cloud;
 
-      fout << type << " " << object->center(0) << " " << object->center(1)
-           << " " << object->center(2) << " " << object->size(0) << " "
-           << object->size(1) << " " << object->size(2) << " "
-           << yaw /*yaw*/ << " " << 0 /*roll*/ << " " << 0 /*pitch*/ << " "
-           << 0 /*truncated*/ << " " << 0 /*occluded*/ << " "
-           << object->velocity(0) << " " << object->velocity(1) << " "
-           << object->velocity(2) << " ";
+      fout << type << " " << object->center(0) << " " << object->center(1) << " "
+           << object->center(2) << " " << object->size(0) << " " << object->size(1) << " "
+           << object->size(2) << " " << yaw /*yaw*/ << " " << 0 /*roll*/ << " "
+           << 0 /*pitch*/ << " " << 0 /*truncated*/ << " " << 0 /*occluded*/ << " "
+           << object->velocity(0) << " " << object->velocity(1) << " " << object->velocity(2)
+           << " ";
       fout << object_cloud.size() << " ";
       for (size_t i = 0; i < object_cloud.size(); ++i) {
         auto& pt = object_cloud.at(i);
-        fout << std::setprecision(8) << pt.x << " " << pt.y << " " << pt.z
-             << " " << pt.intensity << " ";
+        fout << std::setprecision(8) << pt.x << " " << pt.y << " " << pt.z << " " << pt.intensity
+             << " ";
       }
       // fout << 0/*#indices*/ << " ";
       // we save polygon here for debug
@@ -262,8 +248,7 @@ class OfflineLidarObstaclePerception {
       fout << polygon_size /*negative polygon size*/ << " ";
       for (size_t i = 0; i < object->polygon.size(); ++i) {
         const auto& pt = object->polygon[i];
-        fout << std::setprecision(8) << pt.x << " " << pt.y << " " << pt.z
-             << " ";
+        fout << std::setprecision(8) << pt.x << " " << pt.y << " " << pt.z << " ";
       }
       fout << std::endl;
     }
@@ -271,17 +256,16 @@ class OfflineLidarObstaclePerception {
     if (frame_->hdmap_struct != nullptr) {
       // Transform to local frame, note since missing valid z value, the local
       // coordinates may not be accurate, only for visualization purpose
-      double z = frame_->lidar2world_pose(2, 3) - 1.7;
-      Eigen::Affine3d world2lidar_pose = frame_->lidar2world_pose.inverse();
-      auto write_transformed_polygon = [&](const base::PolygonDType& poly) {
+      double          z                         = frame_->lidar2world_pose(2, 3) - 1.7;
+      Eigen::Affine3d world2lidar_pose          = frame_->lidar2world_pose.inverse();
+      auto            write_transformed_polygon = [&](const base::PolygonDType& poly) {
         Eigen::Vector3d point;
         fout << poly.size() << " ";
         for (size_t i = 0; i < poly.size(); ++i) {
           const auto& pt = poly[i];
           point << pt.x, pt.y, z;
           point = world2lidar_pose * point;
-          fout << std::setprecision(8) << point(0) << " " << point(1) << " "
-               << point(2) << " ";
+          fout << std::setprecision(8) << point(0) << " " << point(1) << " " << point(2) << " ";
         }
         fout << std::endl;
       };
@@ -314,15 +298,15 @@ class OfflineLidarObstaclePerception {
   }
 
  protected:
-  std::string output_dir_;
-  std::shared_ptr<LidarFrame> frame_;
-  LidarObstacleSegmentationInitOptions segment_init_options_;
-  LidarObstacleSegmentationOptions segment_options_;
-  LidarObstacleTrackingInitOptions tracking_init_options_;
-  LidarObstacleTrackingOptions tracking_options_;
+  std::string                                output_dir_;
+  std::shared_ptr<LidarFrame>                frame_;
+  LidarObstacleSegmentationInitOptions       segment_init_options_;
+  LidarObstacleSegmentationOptions           segment_options_;
+  LidarObstacleTrackingInitOptions           tracking_init_options_;
+  LidarObstacleTrackingOptions               tracking_options_;
   std::unique_ptr<LidarObstacleSegmentation> lidar_segmentation_;
-  std::unique_ptr<LidarObstacleTracking> lidar_tracking_;
-  base::SensorInfo sensor_info_;
+  std::unique_ptr<LidarObstacleTracking>     lidar_tracking_;
+  base::SensorInfo                           sensor_info_;
 };
 
 }  // namespace lidar

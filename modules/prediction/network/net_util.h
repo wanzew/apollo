@@ -106,8 +106,7 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector);
  * @param vector of Eigen::MatrixXf will be returned
  * @return True if load data successively, otherwise False
  */
-bool LoadTensor(const TensorParameter& tensor_pb,
-                std::vector<Eigen::MatrixXf>* const tensor3d);
+bool LoadTensor(const TensorParameter& tensor_pb, std::vector<Eigen::MatrixXf>* const tensor3d);
 
 }  // namespace network
 }  // namespace prediction

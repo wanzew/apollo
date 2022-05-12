@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_calibrator_util.h"  // NOLINT
+
 #include "modules/perception/common/i_lib/core/i_basic.h"
 
 namespace apollo {
@@ -40,17 +41,14 @@ namespace camera {
 //   *cam_pitch = atan2(y - cy, fy);
 // }
 
-bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
-                                 cv::Mat *image) {
+bool draw_vanishing_row_on_image(const cv::Scalar& color, int vanishing_row, cv::Mat* image) {
   assert(image != nullptr);
   int h = image->rows;
   int w = image->cols;
   assert(h > 0);
   assert(w > 0);
 
-  if (vanishing_row <= 0 || vanishing_row > h - 1) {
-    return false;
-  }
+  if (vanishing_row <= 0 || vanishing_row > h - 1) { return false; }
 
   int xl = 0;
   int yl = vanishing_row;
@@ -147,12 +145,11 @@ bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
 //                          image_height, right_pts);
 // }
 
-void draw_lane_pts(const std::vector<Eigen::Vector2f> &lane_pts,
-                   const cv::Scalar &color, cv::Mat *image) {
-  if (image->rows <= 0 || image->cols <= 0) {
-    return;
-  }
-  for (auto &pt : lane_pts) {
+void draw_lane_pts(const std::vector<Eigen::Vector2f>& lane_pts,
+                   const cv::Scalar&                   color,
+                   cv::Mat*                            image) {
+  if (image->rows <= 0 || image->cols <= 0) { return; }
+  for (auto& pt : lane_pts) {
     int xc = common::IRound(pt(0));
     int yc = common::IRound(pt(1));
     cv::circle(*image, cvPoint(xc, yc), 3, color);

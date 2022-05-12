@@ -41,17 +41,16 @@ void Adsepscommand56::UpdateData(uint8_t* data) {
   ++auto_drivercmd_alivecounter_;
   auto_drivercmd_alivecounter_ = (auto_drivercmd_alivecounter_) % 16;
   set_p_auto_drivercmd_alivecounter(data, auto_drivercmd_alivecounter_);
-  auto_drivercmd_checksum_ =
-      data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
+  auto_drivercmd_checksum_ = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
   set_p_auto_drivercmd_checksum(data, auto_drivercmd_checksum_);
 }
 
 void Adsepscommand56::Reset() {
   // TODO(All) :  you should check this manually
-  drive_enable_ = false;
-  auto_target_angle_ = 0.0;
+  drive_enable_                = false;
+  auto_target_angle_           = 0.0;
   auto_drivercmd_alivecounter_ = 0;
-  auto_drivercmd_checksum_ = 0;
+  auto_drivercmd_checksum_     = 0;
 }
 
 Adsepscommand56* Adsepscommand56::set_drive_enable(bool drive_enable) {
@@ -70,8 +69,7 @@ void Adsepscommand56::set_p_drive_enable(uint8_t* data, bool drive_enable) {
   to_set.set_value(x, 0, 1);
 }
 
-Adsepscommand56* Adsepscommand56::set_auto_target_angle(
-    double auto_target_angle) {
+Adsepscommand56* Adsepscommand56::set_auto_target_angle(double auto_target_angle) {
   auto_target_angle_ = -auto_target_angle;
   return this;
 }
@@ -79,12 +77,10 @@ Adsepscommand56* Adsepscommand56::set_auto_target_angle(
 // config detail: {'name': 'AUTO_Target_Angle', 'offset': -2048.0, 'precision':
 // 0.0625, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
 // 23, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-void Adsepscommand56::set_p_auto_target_angle(uint8_t* data,
-                                              double auto_target_angle) {
-  auto_target_angle =
-      ProtocolData::BoundedValue(-380.0, 380.0, auto_target_angle);
-  int x = (auto_target_angle - -2048.000000) / 0.062500;
-  uint8_t t = 0;
+void Adsepscommand56::set_p_auto_target_angle(uint8_t* data, double auto_target_angle) {
+  auto_target_angle = ProtocolData::BoundedValue(-380.0, 380.0, auto_target_angle);
+  int     x         = (auto_target_angle - -2048.000000) / 0.062500;
+  uint8_t t         = 0;
 
   t = x & 0xFF;
   Byte to_set0(data + 3);
@@ -96,8 +92,7 @@ void Adsepscommand56::set_p_auto_target_angle(uint8_t* data,
   to_set1.set_value(t, 0, 8);
 }
 
-Adsepscommand56* Adsepscommand56::set_auto_drivercmd_alivecounter(
-    int auto_drivercmd_alivecounter) {
+Adsepscommand56* Adsepscommand56::set_auto_drivercmd_alivecounter(int auto_drivercmd_alivecounter) {
   auto_drivercmd_alivecounter_ = auto_drivercmd_alivecounter;
   return this;
 }
@@ -105,18 +100,16 @@ Adsepscommand56* Adsepscommand56::set_auto_drivercmd_alivecounter(
 // config detail: {'name': 'AUTO_DriverCmd_AliveCounter', 'offset': 0.0,
 // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adsepscommand56::set_p_auto_drivercmd_alivecounter(
-    uint8_t* data, int auto_drivercmd_alivecounter) {
-  auto_drivercmd_alivecounter =
-      ProtocolData::BoundedValue(0, 15, auto_drivercmd_alivecounter);
-  int x = auto_drivercmd_alivecounter;
+void Adsepscommand56::set_p_auto_drivercmd_alivecounter(uint8_t* data,
+                                                        int      auto_drivercmd_alivecounter) {
+  auto_drivercmd_alivecounter = ProtocolData::BoundedValue(0, 15, auto_drivercmd_alivecounter);
+  int x                       = auto_drivercmd_alivecounter;
 
   Byte to_set(data + 6);
   to_set.set_value(x, 0, 4);
 }
 
-Adsepscommand56* Adsepscommand56::set_auto_drivercmd_checksum(
-    int auto_drivercmd_checksum) {
+Adsepscommand56* Adsepscommand56::set_auto_drivercmd_checksum(int auto_drivercmd_checksum) {
   auto_drivercmd_checksum_ = auto_drivercmd_checksum;
   return this;
 }
@@ -124,11 +117,9 @@ Adsepscommand56* Adsepscommand56::set_auto_drivercmd_checksum(
 // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
 // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Adsepscommand56::set_p_auto_drivercmd_checksum(
-    uint8_t* data, int auto_drivercmd_checksum) {
-  auto_drivercmd_checksum =
-      ProtocolData::BoundedValue(0, 255, auto_drivercmd_checksum);
-  int x = auto_drivercmd_checksum;
+void Adsepscommand56::set_p_auto_drivercmd_checksum(uint8_t* data, int auto_drivercmd_checksum) {
+  auto_drivercmd_checksum = ProtocolData::BoundedValue(0, 255, auto_drivercmd_checksum);
+  int x                   = auto_drivercmd_checksum;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);

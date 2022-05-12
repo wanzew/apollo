@@ -20,6 +20,7 @@
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/proto/error_code.pb.h"
+
 #include "modules/drivers/canbus/can_client/fake/fake_can_client.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -29,10 +30,10 @@ namespace canbus {
 
 TEST(CanSenderTest, OneRunCase) {
   CanSender<::apollo::canbus::ChassisDetail> sender;
-  can::FakeCanClient can_client;
+  can::FakeCanClient                         can_client;
   sender.Init(&can_client, true);
 
-  ProtocolData<::apollo::canbus::ChassisDetail> mpd;
+  ProtocolData<::apollo::canbus::ChassisDetail>  mpd;
   SenderMessage<::apollo::canbus::ChassisDetail> msg(1, &mpd);
   EXPECT_FALSE(sender.NeedSend(msg, 1));
   EXPECT_EQ(msg.message_id(), 1);

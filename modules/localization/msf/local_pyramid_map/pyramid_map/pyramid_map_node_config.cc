@@ -27,14 +27,13 @@ PyramidMapNodeConfig::PyramidMapNodeConfig() {}
 PyramidMapNodeConfig::~PyramidMapNodeConfig() {}
 
 std::shared_ptr<BaseMapNodeConfig> PyramidMapNodeConfig::Clone() {
-  std::shared_ptr<PyramidMapNodeConfig> map_node_config(
-      new PyramidMapNodeConfig());
-  map_node_config->node_index_ = node_index_;
+  std::shared_ptr<PyramidMapNodeConfig> map_node_config(new PyramidMapNodeConfig());
+  map_node_config->node_index_  = node_index_;
   map_node_config->map_version_ = map_version_;
   memcpy(map_node_config->body_md5_, body_md5_, sizeof(body_md5_));
-  map_node_config->body_size_ = body_size_;
+  map_node_config->body_size_       = body_size_;
   map_node_config->has_map_version_ = has_map_version_;
-  map_node_config->has_body_md5_ = has_body_md5_;
+  map_node_config->has_body_md5_    = has_body_md5_;
 
   return std::dynamic_pointer_cast<BaseMapNodeConfig>(map_node_config);
 }

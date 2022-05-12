@@ -22,19 +22,19 @@ namespace perception {
 namespace lidar {
 
 struct SppData {
-  float* obs_prob_data = nullptr;
-  float* offset_data = nullptr;
+  float* obs_prob_data   = nullptr;
+  float* offset_data     = nullptr;
   float* confidence_data = nullptr;
-  float* z_data = nullptr;
+  float* z_data          = nullptr;
   float* class_prob_data = nullptr;
-  float* heading_data = nullptr;
+  float* heading_data    = nullptr;
 
-  base::Blob<float>* instance_pt_blob = nullptr;
-  base::Blob<float>* category_pt_blob = nullptr;
+  base::Blob<float>* instance_pt_blob   = nullptr;
+  base::Blob<float>* category_pt_blob   = nullptr;
   base::Blob<float>* confidence_pt_blob = nullptr;
-  base::Blob<float>* classify_pt_blob = nullptr;
-  base::Blob<float>* heading_pt_blob = nullptr;
-  base::Blob<float>* height_pt_blob = nullptr;
+  base::Blob<float>* classify_pt_blob   = nullptr;
+  base::Blob<float>* heading_pt_blob    = nullptr;
+  base::Blob<float>* height_pt_blob     = nullptr;
 
   float** obs_prob_data_ref = nullptr;
 
@@ -42,13 +42,13 @@ struct SppData {
 
   float objectness_threshold = 0.f;
   float confidence_threshold = 0.f;
-  float top_z_threshold = 0.f;
+  float top_z_threshold      = 0.f;
 
-  size_t class_num = 0;
-  size_t data_width = 0;
+  size_t class_num   = 0;
+  size_t data_width  = 0;
   size_t data_height = 0;
-  size_t data_size = 0;
-  float data_range = 0.0f;
+  size_t data_size   = 0;
+  float  data_range  = 0.0f;
 
   void MakeReference(size_t width, size_t height, float range);
 
@@ -56,7 +56,7 @@ struct SppData {
 };
 
 struct SppParams {
-  float height_gap = 0.5f;
+  float height_gap       = 0.5f;
   float confidence_range = 58.f;
 };
 

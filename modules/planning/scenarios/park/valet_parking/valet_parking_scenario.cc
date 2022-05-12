@@ -34,16 +34,14 @@ using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 using apollo::hdmap::PathOverlap;
 
-apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
-               const std::shared_ptr<DependencyInjector>& injector)>
+apollo::common::util::Factory<ScenarioConfig::StageType,
+                              Stage,
+                              Stage* (*)(const ScenarioConfig::StageConfig&         stage_config,
+                                         const std::shared_ptr<DependencyInjector>& injector)>
     ValetParkingScenario::s_stage_factory_;
 
 void ValetParkingScenario::Init() {
-  if (init_) {
-    return;
-  }
+  if (init_) { return; }
 
   Scenario::Init();
 
@@ -57,34 +55,25 @@ void ValetParkingScenario::Init() {
 }
 
 void ValetParkingScenario::RegisterStages() {
-  if (s_stage_factory_.Empty()) {
-    s_stage_factory_.Clear();
-  }
-  s_stage_factory_.Register(
-      ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new StageApproachingParkingSpot(config, injector);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::VALET_PARKING_PARKING,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new StageParking(config, injector);
-      });
+  if (s_stage_factory_.Empty()) { s_stage_factory_.Clear(); }
+  s_stage_factory_.Register(ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new StageApproachingParkingSpot(config, injector);
+                            });
+  s_stage_factory_.Register(ScenarioConfig::VALET_PARKING_PARKING,
+                            [](const ScenarioConfig::StageConfig&         config,
+                               const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+                              return new StageParking(config, injector);
+                            });
 }
 
-std::unique_ptr<Stage> ValetParkingScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
-  if (s_stage_factory_.Empty()) {
-    RegisterStages();
-  }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config, injector);
-  if (ptr) {
-    ptr->SetContext(&context_);
-  }
+std::unique_ptr<Stage>
+ValetParkingScenario::CreateStage(const ScenarioConfig::StageConfig&         stage_config,
+                                  const std::shared_ptr<DependencyInjector>& injector) {
+  if (s_stage_factory_.Empty()) { RegisterStages(); }
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(), stage_config, injector);
+  if (ptr) { ptr->SetContext(&context_); }
   return ptr;
 }
 
@@ -97,43 +86,33 @@ bool ValetParkingScenario::GetScenarioConfig() {
   return true;
 }
 
-bool ValetParkingScenario::IsTransferable(const Frame& frame,
-                                          const double parking_start_range) {
+bool ValetParkingScenario::IsTransferable(const Frame& frame, const double parking_start_range) {
   // TODO(all) Implement available parking spot detection by preception results
   std::string target_parking_spot_id;
   if (frame.local_view().routing->routing_request().has_parking_info() &&
-      frame.local_view()
-          .routing->routing_request()
-          .parking_info()
-          .has_parking_space_id()) {
-    target_parking_spot_id = frame.local_view()
-                                 .routing->routing_request()
-                                 .parking_info()
-                                 .parking_space_id();
+      frame.local_view().routing->routing_request().parking_info().has_parking_space_id()) {
+    target_parking_spot_id =
+        frame.local_view().routing->routing_request().parking_info().parking_space_id();
   } else {
     ADEBUG << "No parking space id from routing";
     return false;
   }
 
-  if (target_parking_spot_id.empty()) {
-    return false;
-  }
+  if (target_parking_spot_id.empty()) { return false; }
 
-  const auto& nearby_path =
-      frame.reference_line_info().front().reference_line().map_path();
+  const auto& nearby_path = frame.reference_line_info().front().reference_line().map_path();
   PathOverlap parking_space_overlap;
   const auto& vehicle_state = frame.vehicle_state();
 
-  if (!SearchTargetParkingSpotOnPath(nearby_path, target_parking_spot_id,
-                                     &parking_space_overlap)) {
+  if (!SearchTargetParkingSpotOnPath(nearby_path, target_parking_spot_id, &parking_space_overlap)) {
     ADEBUG << "No such parking spot found after searching all path forward "
               "possible"
            << target_parking_spot_id;
     return false;
   }
 
-  if (!CheckDistanceToParkingSpot(frame, vehicle_state, nearby_path,
-                                  parking_start_range, parking_space_overlap)) {
+  if (!CheckDistanceToParkingSpot(frame, vehicle_state, nearby_path, parking_start_range,
+                                  parking_space_overlap)) {
     ADEBUG << "target parking spot found, but too far, distance larger than "
               "pre-defined distance"
            << target_parking_spot_id;
@@ -143,9 +122,9 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
   return true;
 }
 
-bool ValetParkingScenario::SearchTargetParkingSpotOnPath(
-    const Path& nearby_path, const std::string& target_parking_id,
-    PathOverlap* parking_space_overlap) {
+bool ValetParkingScenario::SearchTargetParkingSpotOnPath(const Path&        nearby_path,
+                                                         const std::string& target_parking_id,
+                                                         PathOverlap*       parking_space_overlap) {
   const auto& parking_space_overlaps = nearby_path.parking_space_overlaps();
   for (const auto& parking_overlap : parking_space_overlaps) {
     if (parking_overlap.object_id == target_parking_id) {
@@ -156,45 +135,38 @@ bool ValetParkingScenario::SearchTargetParkingSpotOnPath(
   return false;
 }
 
-bool ValetParkingScenario::CheckDistanceToParkingSpot(
-    const Frame& frame,
-    const VehicleState& vehicle_state, const Path& nearby_path,
-    const double parking_start_range,
-    const PathOverlap& parking_space_overlap) {
+bool ValetParkingScenario::CheckDistanceToParkingSpot(const Frame&        frame,
+                                                      const VehicleState& vehicle_state,
+                                                      const Path&         nearby_path,
+                                                      const double        parking_start_range,
+                                                      const PathOverlap&  parking_space_overlap) {
   // TODO(Jinyun) parking overlap s are wrong on map, not usable
   // double parking_space_center_s =
   //     (parking_space_overlap.start_s + parking_space_overlap.end_s) / 2.0;
   const hdmap::HDMap* hdmap = hdmap::HDMapUtil::BaseMapPtr();
-  hdmap::Id id;
+  hdmap::Id           id;
   id.set_id(parking_space_overlap.object_id);
-  ParkingSpaceInfoConstPtr target_parking_spot_ptr =
-      hdmap->GetParkingSpaceById(id);
-  Vec2d left_bottom_point = target_parking_spot_ptr->polygon().points().at(0);
-  Vec2d right_bottom_point = target_parking_spot_ptr->polygon().points().at(1);
-  const auto &routing_request =
-      frame.local_view().routing->routing_request();
-  auto corner_point =
-      routing_request.parking_info().corner_point();
+  ParkingSpaceInfoConstPtr target_parking_spot_ptr = hdmap->GetParkingSpaceById(id);
+  Vec2d                    left_bottom_point  = target_parking_spot_ptr->polygon().points().at(0);
+  Vec2d                    right_bottom_point = target_parking_spot_ptr->polygon().points().at(1);
+  const auto&              routing_request    = frame.local_view().routing->routing_request();
+  auto                     corner_point       = routing_request.parking_info().corner_point();
   left_bottom_point.set_x(corner_point.point().at(0).x());
   left_bottom_point.set_y(corner_point.point().at(0).y());
   right_bottom_point.set_x(corner_point.point().at(1).x());
   right_bottom_point.set_y(corner_point.point().at(1).y());
-  double left_bottom_point_s = 0.0;
-  double left_bottom_point_l = 0.0;
+  double left_bottom_point_s  = 0.0;
+  double left_bottom_point_l  = 0.0;
   double right_bottom_point_s = 0.0;
   double right_bottom_point_l = 0.0;
-  nearby_path.GetNearestPoint(left_bottom_point, &left_bottom_point_s,
-                              &left_bottom_point_l);
-  nearby_path.GetNearestPoint(right_bottom_point, &right_bottom_point_s,
-                              &right_bottom_point_l);
-  double parking_space_center_s =
-      (left_bottom_point_s + right_bottom_point_s) / 2.0;
-  double vehicle_point_s = 0.0;
-  double vehicle_point_l = 0.0;
-  Vec2d vehicle_vec(vehicle_state.x(), vehicle_state.y());
+  nearby_path.GetNearestPoint(left_bottom_point, &left_bottom_point_s, &left_bottom_point_l);
+  nearby_path.GetNearestPoint(right_bottom_point, &right_bottom_point_s, &right_bottom_point_l);
+  double parking_space_center_s = (left_bottom_point_s + right_bottom_point_s) / 2.0;
+  double vehicle_point_s        = 0.0;
+  double vehicle_point_l        = 0.0;
+  Vec2d  vehicle_vec(vehicle_state.x(), vehicle_state.y());
   nearby_path.GetNearestPoint(vehicle_vec, &vehicle_point_s, &vehicle_point_l);
-  if (std::abs(parking_space_center_s - vehicle_point_s) <
-      parking_start_range) {
+  if (std::abs(parking_space_center_s - vehicle_point_s) < parking_start_range) {
     return true;
   } else {
     return false;

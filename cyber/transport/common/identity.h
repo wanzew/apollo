@@ -34,18 +34,16 @@ class Identity {
   virtual ~Identity();
 
   Identity& operator=(const Identity& another);
-  bool operator==(const Identity& another) const;
-  bool operator!=(const Identity& another) const;
+  bool      operator==(const Identity& another) const;
+  bool      operator!=(const Identity& another) const;
 
   std::string ToString() const;
-  size_t Length() const;
-  uint64_t HashValue() const;
+  size_t      Length() const;
+  uint64_t    HashValue() const;
 
   const char* data() const { return data_; }
-  void set_data(const char* data) {
-    if (data == nullptr) {
-      return;
-    }
+  void        set_data(const char* data) {
+    if (data == nullptr) { return; }
     std::memcpy(data_, data, sizeof(data_));
     Update();
   }
@@ -53,7 +51,7 @@ class Identity {
  private:
   void Update();
 
-  char data_[ID_SIZE];
+  char     data_[ID_SIZE];
   uint64_t hash_value_;
 };
 

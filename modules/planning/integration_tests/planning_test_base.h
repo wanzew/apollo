@@ -29,32 +29,30 @@
 namespace apollo {
 namespace planning {
 
-#define RUN_GOLDEN_TEST(sub_case_num)                                      \
-  {                                                                        \
-    const ::testing::TestInfo* const test_info =                           \
-        ::testing::UnitTest::GetInstance()->current_test_info();           \
-    bool no_trajectory_point = false;                                      \
-    bool run_planning_success =                                            \
-        RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
-    EXPECT_TRUE(run_planning_success);                                     \
+#define RUN_GOLDEN_TEST(sub_case_num)                                                              \
+  {                                                                                                \
+    const ::testing::TestInfo* const test_info =                                                   \
+        ::testing::UnitTest::GetInstance()->current_test_info();                                   \
+    bool no_trajectory_point  = false;                                                             \
+    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
+    EXPECT_TRUE(run_planning_success);                                                             \
   }
 
-#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                             \
-  {                                                                        \
-    const ::testing::TestInfo* const test_info =                           \
-        ::testing::UnitTest::GetInstance()->current_test_info();           \
-    bool no_trajectory_point = true;                                       \
-    bool run_planning_success =                                            \
-        RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
-    EXPECT_TRUE(run_planning_success);                                     \
+#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                                                     \
+  {                                                                                                \
+    const ::testing::TestInfo* const test_info =                                                   \
+        ::testing::UnitTest::GetInstance()->current_test_info();                                   \
+    bool no_trajectory_point  = true;                                                              \
+    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
+    EXPECT_TRUE(run_planning_success);                                                             \
   }
 
-#define TMAIN                                            \
-  int main(int argc, char** argv) {                      \
-    ::apollo::cyber::Init("planning_test");              \
-    ::testing::InitGoogleTest(&argc, argv);              \
-    ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    return RUN_ALL_TESTS();                              \
+#define TMAIN                                                                                      \
+  int main(int argc, char** argv) {                                                                \
+    ::apollo::cyber::Init("planning_test");                                                        \
+    ::testing::InitGoogleTest(&argc, argv);                                                        \
+    ::google::ParseCommandLineFlags(&argc, &argv, true);                                           \
+    return RUN_ALL_TESTS();                                                                        \
   }
 
 #define ENABLE_RULE(RULE_ID, ENABLED) this->rule_enabled_[RULE_ID] = ENABLED
@@ -72,20 +70,18 @@ class PlanningTestBase : public ::testing::Test {
  public:
   virtual ~PlanningTestBase() = default;
 
-  static void SetUpTestCase();
+  static void  SetUpTestCase();
   virtual void SetUp();
-  void UpdateData();
+  void         UpdateData();
 
   /**
    * Execute the planning code.
    * @return true if planning is success. The ADCTrajectory will be used to
    * store the planing results.  Otherwise false.
    */
-  bool RunPlanning(const std::string& test_case_name, int case_num,
-                   bool no_trajectory_point);
+  bool RunPlanning(const std::string& test_case_name, int case_num, bool no_trajectory_point);
 
-  TrafficRuleConfig* GetTrafficRuleConfig(
-      const TrafficRuleConfig::RuleId& rule_id);
+  TrafficRuleConfig* GetTrafficRuleConfig(const TrafficRuleConfig::RuleId& rule_id);
 
  protected:
   void TrimPlanning(ADCTrajectory* origin, bool no_trajectory_point);
@@ -93,12 +89,12 @@ class PlanningTestBase : public ::testing::Test {
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
  protected:
-  std::unique_ptr<PlanningBase> planning_ = nullptr;
+  std::unique_ptr<PlanningBase>             planning_ = nullptr;
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
-  ADCTrajectory adc_trajectory_;
-  LocalView local_view_;
-  PlanningConfig config_;
-  std::shared_ptr<DependencyInjector> injector_;
+  ADCTrajectory                             adc_trajectory_;
+  LocalView                                 local_view_;
+  PlanningConfig                            config_;
+  std::shared_ptr<DependencyInjector>       injector_;
 };
 
 }  // namespace planning

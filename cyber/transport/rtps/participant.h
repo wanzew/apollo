@@ -22,12 +22,13 @@
 #include <mutex>
 #include <string>
 
-#include "cyber/transport/rtps/underlay_message_type.h"
 #include "fastrtps/Domain.h"
 #include "fastrtps/attributes/ParticipantAttributes.h"
 #include "fastrtps/participant/Participant.h"
 #include "fastrtps/participant/ParticipantListener.h"
 #include "fastrtps/rtps/common/Locator.h"
+
+#include "cyber/transport/rtps/underlay_message_type.h"
 
 namespace apollo {
 namespace cyber {
@@ -38,27 +39,28 @@ using ParticipantPtr = std::shared_ptr<Participant>;
 
 class Participant {
  public:
-  Participant(const std::string& name, int send_port,
+  Participant(const std::string&                       name,
+              int                                      send_port,
               eprosima::fastrtps::ParticipantListener* listener = nullptr);
   virtual ~Participant();
 
   void Shutdown();
 
   eprosima::fastrtps::Participant* fastrtps_participant();
-  bool is_shutdown() const { return shutdown_.load(); }
+  bool                             is_shutdown() const { return shutdown_.load(); }
 
  private:
-  void CreateFastRtpsParticipant(
-      const std::string& name, int send_port,
-      eprosima::fastrtps::ParticipantListener* listener);
+  void CreateFastRtpsParticipant(const std::string&                       name,
+                                 int                                      send_port,
+                                 eprosima::fastrtps::ParticipantListener* listener);
 
-  std::atomic<bool> shutdown_;
-  std::string name_;
-  int send_port_;
+  std::atomic<bool>                        shutdown_;
+  std::string                              name_;
+  int                                      send_port_;
   eprosima::fastrtps::ParticipantListener* listener_;
-  UnderlayMessageType type_;
-  eprosima::fastrtps::Participant* fastrtps_participant_;
-  std::mutex mutex_;
+  UnderlayMessageType                      type_;
+  eprosima::fastrtps::Participant*         fastrtps_participant_;
+  std::mutex                               mutex_;
 };
 
 }  // namespace transport

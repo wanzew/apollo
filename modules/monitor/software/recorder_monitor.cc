@@ -16,19 +16,19 @@
 
 #include "modules/monitor/software/recorder_monitor.h"
 
+#include "modules/data/tools/smart_recorder/proto/smart_recorder_status.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/map_util.h"
-#include "modules/data/tools/smart_recorder/proto/smart_recorder_status.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
-DEFINE_string(smart_recorder_monitor_name, "SmartRecorderMonitor",
+DEFINE_string(smart_recorder_monitor_name,
+              "SmartRecorderMonitor",
               "Name of the smart recorder monitor.");
-DEFINE_double(smart_recorder_monitor_interval, 5,
-              "Smart recorder status checking interval (s).");
-DEFINE_string(smart_recorder_component_name, "SmartRecorder",
-              "Smart recorder component name.");
+DEFINE_double(smart_recorder_monitor_interval, 5, "Smart recorder status checking interval (s).");
+DEFINE_string(smart_recorder_component_name, "SmartRecorder", "Smart recorder component name.");
 
 namespace apollo {
 namespace monitor {
@@ -37,29 +37,25 @@ using apollo::data::RecordingState;
 using apollo::data::SmartRecorderStatus;
 
 RecorderMonitor::RecorderMonitor()
-    : RecurrentRunner(FLAGS_smart_recorder_monitor_name,
-                      FLAGS_smart_recorder_monitor_interval) {}
+    : RecurrentRunner(FLAGS_smart_recorder_monitor_name, FLAGS_smart_recorder_monitor_interval) {}
 
 void RecorderMonitor::RunOnce(const double current_time) {
-  auto manager = MonitorManager::Instance();
-  auto* component = apollo::common::util::FindOrNull(
-      *manager->GetStatus()->mutable_components(),
-      FLAGS_smart_recorder_component_name);
+  auto  manager   = MonitorManager::Instance();
+  auto* component = apollo::common::util::FindOrNull(*manager->GetStatus()->mutable_components(),
+                                                     FLAGS_smart_recorder_component_name);
   if (component == nullptr) {
     // SmartRecorder is not monitored in current mode, skip.
     return;
   }
 
-  static auto reader =
-      manager->CreateReader<SmartRecorderStatus>(FLAGS_recorder_status_topic);
+  static auto reader = manager->CreateReader<SmartRecorderStatus>(FLAGS_recorder_status_topic);
   reader->Observe();
   const auto status = reader->GetLatestObserved();
 
   ComponentStatus* component_status = component->mutable_other_status();
   component_status->clear_status();
   if (status == nullptr) {
-    SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
-                                   "No SmartRecorderStatus received",
+    SummaryMonitor::EscalateStatus(ComponentStatus::ERROR, "No SmartRecorderStatus received",
                                    component_status);
     return;
   }
@@ -71,19 +67,16 @@ void RecorderMonitor::RunOnce(const double current_time) {
       SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", component_status);
       break;
     case RecordingState::TERMINATING:
-      SummaryMonitor::EscalateStatus(
-          ComponentStatus::WARN,
-          absl::StrCat("WARNNING: ", status->state_message()),
-          component_status);
+      SummaryMonitor::EscalateStatus(ComponentStatus::WARN,
+                                     absl::StrCat("WARNNING: ", status->state_message()),
+                                     component_status);
       break;
     case RecordingState::STOPPED:
-      SummaryMonitor::EscalateStatus(
-          ComponentStatus::OK,
-          absl::StrCat("STOPPED: ", status->state_message()), component_status);
+      SummaryMonitor::EscalateStatus(ComponentStatus::OK,
+                                     absl::StrCat("STOPPED: ", status->state_message()),
+                                     component_status);
       break;
-    default:
-      AFATAL << "Unknown recording status: " << status->recording_state();
-      break;
+    default: AFATAL << "Unknown recording status: " << status->recording_state(); break;
   }
 }
 

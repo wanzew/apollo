@@ -30,25 +30,23 @@ using ::apollo::drivers::canbus::Byte;
 Vehiclestatefeedback2c4::Vehiclestatefeedback2c4() {}
 const int32_t Vehiclestatefeedback2c4::ID = 0xC4;
 
-void Vehiclestatefeedback2c4::Parse(const std::uint8_t* bytes, int32_t length,
-                                    ChassisDetail* chassis) const {
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_2_c4()
-      ->set_motor_speed(motor_speed(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_2_c4()
-      ->set_driven_torque_feedback(driven_torque_feedback(bytes, length));
+void Vehiclestatefeedback2c4::Parse(const std::uint8_t* bytes,
+                                    int32_t             length,
+                                    ChassisDetail*      chassis) const {
+  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_2_c4()->set_motor_speed(
+      motor_speed(bytes, length));
+  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_2_c4()->set_driven_torque_feedback(
+      driven_torque_feedback(bytes, length));
 }
 
 // config detail: {'name': 'motor_speed', 'offset': 0.0, 'precision': 1.0,
 // 'len': 16, 'is_signed_var': True, 'physical_range': '[-3000|3000]', 'bit': 0,
 // 'type': 'int', 'order': 'intel', 'physical_unit': 'rpm'}
-int Vehiclestatefeedback2c4::motor_speed(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 1);
+int Vehiclestatefeedback2c4::motor_speed(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 0);
+  Byte    t1(bytes + 0);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -63,12 +61,12 @@ int Vehiclestatefeedback2c4::motor_speed(const std::uint8_t* bytes,
 // config detail: {'name': 'driven_torque_feedback', 'offset': 0.0, 'precision':
 // 0.05, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
 // 16, 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
-double Vehiclestatefeedback2c4::driven_torque_feedback(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+double Vehiclestatefeedback2c4::driven_torque_feedback(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

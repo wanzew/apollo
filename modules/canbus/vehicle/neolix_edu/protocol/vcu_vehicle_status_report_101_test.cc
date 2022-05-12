@@ -16,9 +16,10 @@
 
 #include "modules/canbus/vehicle/neolix_edu/protocol/vcu_vehicle_status_report_101.h"
 
+#include "gtest/gtest.h"
+
 #include "glog/logging.h"
 
-#include "gtest/gtest.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
@@ -31,9 +32,9 @@ class Vcuvehiclestatusreport101Test : public ::testing::Test {
 };
 
 TEST_F(Vcuvehiclestatusreport101Test, reset) {
-  uint8_t data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  int32_t length = 8;
-  ChassisDetail cd;
+  uint8_t                   data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  int32_t                   length  = 8;
+  ChassisDetail             cd;
   Vcuvehiclestatusreport101 accel_cmd;
   accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b00000000);
@@ -45,33 +46,16 @@ TEST_F(Vcuvehiclestatusreport101Test, reset) {
   EXPECT_EQ(data[6], 0b00000000);
   EXPECT_EQ(data[7], 0b00000000);
 
-  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().drive_enable_resp(),
-            false);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_status_report_101()
-                .vcu_highvoltagecircuitstate(),
-            false);
-  EXPECT_EQ(
-      cd.neolix_edu().vcu_vehicle_status_report_101().vcu_dcdc_enabledstates(),
-      false);
-  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().control_mode_resp(),
-            0);
-  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_vehicle_speed(),
-            0);
-  EXPECT_EQ(cd.neolix_edu()
-                .vcu_vehicle_status_report_101()
-                .vcu_lowbatterychargingfunctionst(),
-            0);
-  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_display_soc(),
-            0);
-  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_motor_speed(),
-            0);
-  EXPECT_EQ(
-      cd.neolix_edu().vcu_vehicle_status_report_101().vcu_motor_direction(),
-      0);
-  EXPECT_EQ(
-      cd.neolix_edu().vcu_vehicle_status_report_101().vcu_motor_speed_valid(),
-      false);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().drive_enable_resp(), false);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_highvoltagecircuitstate(), false);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_dcdc_enabledstates(), false);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().control_mode_resp(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_vehicle_speed(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_lowbatterychargingfunctionst(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_display_soc(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_motor_speed(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_motor_direction(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_vehicle_status_report_101().vcu_motor_speed_valid(), false);
 }
 
 }  // namespace neolix_edu

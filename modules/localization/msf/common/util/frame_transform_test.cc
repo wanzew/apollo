@@ -23,8 +23,8 @@ namespace localization {
 namespace msf {
 
 TEST(FrameTransformTestSuite, LatlonToUtmXYTest) {
-  double lon_rad = -2.129343746458001;
-  double lat_rad = 0.6530018835651807;
+  double  lon_rad = -2.129343746458001;
+  double  lat_rad = 0.6530018835651807;
   UTMCoor utm_xy;
   EXPECT_TRUE(FrameTransform::LatlonToUtmXY(lon_rad, lat_rad, &utm_xy));
   EXPECT_LT(std::fabs(utm_xy.x - 588278.9834174265), 1e-5);
@@ -32,10 +32,10 @@ TEST(FrameTransformTestSuite, LatlonToUtmXYTest) {
 }
 
 TEST(FrameTransformTestSuite, UtmXYToLatlonTest) {
-  double x = 588278.9834174265;
-  double y = 4141295.255870659;
-  int zone = 10;
-  bool southhemi = false;
+  double    x         = 588278.9834174265;
+  double    y         = 4141295.255870659;
+  int       zone      = 10;
+  bool      southhemi = false;
   WGS84Corr latlon;
   EXPECT_TRUE(FrameTransform::UtmXYToLatlon(x, y, zone, southhemi, &latlon));
   EXPECT_LT(std::fabs(latlon.log + 2.129343746458001), 1e-5);

@@ -21,6 +21,7 @@
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/math/curve1d/cubic_polynomial_curve1d.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
@@ -29,11 +30,11 @@ namespace planning {
 
 TEST(QuarticPolynomialCurve1dTest, Evaluate) {
   {
-    double x0 = 0.0;
-    double dx0 = 0.0;
-    double ddx0 = 0.0;
-    double dx1 = 10.0;
-    double ddx1 = 1.0;
+    double x0    = 0.0;
+    double dx0   = 0.0;
+    double ddx0  = 0.0;
+    double dx1   = 10.0;
+    double ddx1  = 1.0;
     double param = 8.0;
 
     QuarticPolynomialCurve1d curve(x0, dx0, ddx0, dx1, ddx1, param);
@@ -44,11 +45,11 @@ TEST(QuarticPolynomialCurve1dTest, Evaluate) {
     EXPECT_NEAR(0, curve.Evaluate(2, 0.0), 1e-8);
   }
   {
-    double x0 = 0.0;
-    double dx0 = 0.0;
-    double ddx0 = 0.0;
-    double dx1 = 5.0;
-    double ddx1 = 1.0;
+    double x0    = 0.0;
+    double dx0   = 0.0;
+    double ddx0  = 0.0;
+    double dx1   = 5.0;
+    double ddx1  = 1.0;
     double param = 3.0;
 
     QuarticPolynomialCurve1d curve(x0, dx0, ddx0, dx1, ddx1, param);
@@ -60,11 +61,11 @@ TEST(QuarticPolynomialCurve1dTest, Evaluate) {
   }
 
   {
-    double x0 = 1.0;
-    double dx0 = 2.0;
-    double ddx0 = 3.0;
-    double dx1 = 5.0;
-    double ddx1 = 1.0;
+    double x0    = 1.0;
+    double dx0   = 2.0;
+    double ddx0  = 3.0;
+    double dx1   = 5.0;
+    double ddx1  = 1.0;
     double param = 3.0;
 
     QuarticPolynomialCurve1d curve(x0, dx0, ddx0, dx1, ddx1, param);
@@ -77,18 +78,14 @@ TEST(QuarticPolynomialCurve1dTest, Evaluate) {
 }
 
 TEST(QuarticPolynomialCurve1dTest, IntegratedFromCubicCurve) {
-  CubicPolynomialCurve1d cubic_curve(1, 2, 3, 2, 5);
+  CubicPolynomialCurve1d   cubic_curve(1, 2, 3, 2, 5);
   QuarticPolynomialCurve1d quartic_curve;
   quartic_curve.IntegratedFromCubicCurve(cubic_curve, 0.0);
   for (double value = 0.0; value < 5.1; value += 1) {
-    EXPECT_NEAR(quartic_curve.Evaluate(1, value),
-                cubic_curve.Evaluate(0, value), 1e-8);
-    EXPECT_NEAR(quartic_curve.Evaluate(2, value),
-                cubic_curve.Evaluate(1, value), 1e-8);
-    EXPECT_NEAR(quartic_curve.Evaluate(3, value),
-                cubic_curve.Evaluate(2, value), 1e-8);
-    EXPECT_NEAR(quartic_curve.Evaluate(4, value),
-                cubic_curve.Evaluate(3, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(1, value), cubic_curve.Evaluate(0, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(2, value), cubic_curve.Evaluate(1, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(3, value), cubic_curve.Evaluate(2, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(4, value), cubic_curve.Evaluate(3, value), 1e-8);
   }
 }
 
@@ -97,16 +94,11 @@ TEST(QuarticPolynomialCurve1dTest, DerivedFromQuinticCurve) {
   QuarticPolynomialCurve1d quartic_curve;
   quartic_curve.DerivedFromQuinticCurve(quintic_curve);
   for (double value = 0.0; value < 5.1; value += 1) {
-    EXPECT_NEAR(quartic_curve.Evaluate(0, value),
-                quintic_curve.Evaluate(1, value), 1e-8);
-    EXPECT_NEAR(quartic_curve.Evaluate(1, value),
-                quintic_curve.Evaluate(2, value), 1e-8);
-    EXPECT_NEAR(quartic_curve.Evaluate(2, value),
-                quintic_curve.Evaluate(3, value), 1e-8);
-    EXPECT_NEAR(quartic_curve.Evaluate(3, value),
-                quintic_curve.Evaluate(4, value), 1e-8);
-    EXPECT_NEAR(quartic_curve.Evaluate(4, value),
-                quintic_curve.Evaluate(5, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(0, value), quintic_curve.Evaluate(1, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(1, value), quintic_curve.Evaluate(2, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(2, value), quintic_curve.Evaluate(3, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(3, value), quintic_curve.Evaluate(4, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(4, value), quintic_curve.Evaluate(5, value), 1e-8);
   }
 }
 

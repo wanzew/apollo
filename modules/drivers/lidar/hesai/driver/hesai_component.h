@@ -36,7 +36,7 @@ class HesaiComponent : public ::apollo::cyber::Component<> {
 
  private:
   std::shared_ptr<HesaiDriver> driver_;
-  Config hesai_conf_;
+  Config                       hesai_conf_;
 };
 
 CYBER_REGISTER_COMPONENT(HesaiComponent)

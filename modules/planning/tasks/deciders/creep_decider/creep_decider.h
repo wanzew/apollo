@@ -33,24 +33,22 @@ namespace planning {
 
 class CreepDecider : public Decider {
  public:
-  CreepDecider(const TaskConfig& config,
-               const std::shared_ptr<DependencyInjector>& injector);
+  CreepDecider(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector);
 
-  apollo::common::Status Process(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  apollo::common::Status Process(Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-  bool CheckCreepDone(const Frame& frame,
+  bool CheckCreepDone(const Frame&             frame,
                       const ReferenceLineInfo& reference_line_info,
-                      const double stop_sign_overlap_end_s,
-                      const double wait_time_sec, const double timeout_sec);
+                      const double             stop_sign_overlap_end_s,
+                      const double             wait_time_sec,
+                      const double             timeout_sec);
 
-  double FindCreepDistance(const Frame& frame,
-                           const ReferenceLineInfo& reference_line_info);
+  double FindCreepDistance(const Frame& frame, const ReferenceLineInfo& reference_line_info);
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
-  common::TrajectoryPoint adc_planning_start_point_;
-  hdmap::Lane curr_lane_;
+  common::TrajectoryPoint      adc_planning_start_point_;
+  hdmap::Lane                  curr_lane_;
 };
 
 }  // namespace planning

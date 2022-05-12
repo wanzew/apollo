@@ -52,7 +52,7 @@ class Spline1d {
   bool SetSplineSegs(const Eigen::MatrixXd& param_matrix, const uint32_t order);
 
   const std::vector<double>& x_knots() const;
-  uint32_t spline_order() const;
+  uint32_t                   spline_order() const;
 
   const std::vector<Spline1dSeg>& splines() const;
 
@@ -61,8 +61,8 @@ class Spline1d {
 
  private:
   std::vector<Spline1dSeg> splines_;
-  std::vector<double> x_knots_;
-  uint32_t spline_order_;
+  std::vector<double>      x_knots_;
+  uint32_t                 spline_order_;
 };
 
 }  // namespace planning

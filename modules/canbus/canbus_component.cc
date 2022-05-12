@@ -35,8 +35,7 @@ namespace canbus {
 std::string CanbusComponent::Name() const { return FLAGS_canbus_module_name; }
 
 CanbusComponent::CanbusComponent()
-    : monitor_logger_buffer_(
-          apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+    : monitor_logger_buffer_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
 bool CanbusComponent::Init() {
   if (!GetProtoConfig(&canbus_conf_)) {
@@ -59,8 +58,7 @@ bool CanbusComponent::Init() {
 
   VehicleFactory vehicle_factory;
   vehicle_factory.RegisterVehicleFactory();
-  auto vehicle_object =
-      vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
+  auto vehicle_object = vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
   if (!vehicle_object) {
     AERROR << "Failed to create vehicle:";
     return false;
@@ -80,8 +78,7 @@ bool CanbusComponent::Init() {
   }
   AINFO << "The can receiver is successfully initialized.";
 
-  if (can_sender_.Init(can_client_.get(), canbus_conf_.enable_sender_log()) !=
-      ErrorCode::OK) {
+  if (can_sender_.Init(can_client_.get(), canbus_conf_.enable_sender_log()) != ErrorCode::OK) {
     AERROR << "Failed to init can sender.";
     return false;
   }
@@ -105,26 +102,22 @@ bool CanbusComponent::Init() {
         << canbus_conf_.vehicle_parameter().ShortDebugString();
 
   cyber::ReaderConfig guardian_cmd_reader_config;
-  guardian_cmd_reader_config.channel_name = FLAGS_guardian_topic;
-  guardian_cmd_reader_config.pending_queue_size =
-      FLAGS_guardian_cmd_pending_queue_size;
+  guardian_cmd_reader_config.channel_name       = FLAGS_guardian_topic;
+  guardian_cmd_reader_config.pending_queue_size = FLAGS_guardian_cmd_pending_queue_size;
 
   cyber::ReaderConfig control_cmd_reader_config;
-  control_cmd_reader_config.channel_name = FLAGS_control_command_topic;
-  control_cmd_reader_config.pending_queue_size =
-      FLAGS_control_cmd_pending_queue_size;
+  control_cmd_reader_config.channel_name       = FLAGS_control_command_topic;
+  control_cmd_reader_config.pending_queue_size = FLAGS_control_cmd_pending_queue_size;
 
   if (FLAGS_receive_guardian) {
     guardian_cmd_reader_ = node_->CreateReader<GuardianCommand>(
-        guardian_cmd_reader_config,
-        [this](const std::shared_ptr<GuardianCommand> &cmd) {
+        guardian_cmd_reader_config, [this](const std::shared_ptr<GuardianCommand>& cmd) {
           ADEBUG << "Received guardian data: run canbus callback.";
           OnGuardianCommand(*cmd);
         });
   } else {
     control_command_reader_ = node_->CreateReader<ControlCommand>(
-        control_cmd_reader_config,
-        [this](const std::shared_ptr<ControlCommand> &cmd) {
+        control_cmd_reader_config, [this](const std::shared_ptr<ControlCommand>& cmd) {
           ADEBUG << "Received control data: run canbus callback.";
           OnControlCommand(*cmd);
         });
@@ -132,8 +125,7 @@ bool CanbusComponent::Init() {
 
   chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
 
-  chassis_detail_writer_ =
-      node_->CreateWriter<ChassisDetail>(FLAGS_chassis_detail_topic);
+  chassis_detail_writer_ = node_->CreateWriter<ChassisDetail>(FLAGS_chassis_detail_topic);
 
   // 1. init and start the can card hardware
   if (can_client_->Start() != ErrorCode::OK) {
@@ -190,13 +182,11 @@ void CanbusComponent::PublishChassisDetail() {
 
 bool CanbusComponent::Proc() {
   PublishChassis();
-  if (FLAGS_enable_chassis_detail_pub) {
-    PublishChassisDetail();
-  }
+  if (FLAGS_enable_chassis_detail_pub) { PublishChassisDetail(); }
   return true;
 }
 
-void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
+void CanbusComponent::OnControlCommand(const ControlCommand& control_command) {
   int64_t current_timestamp = Time::Now().ToMicrosecond();
   // if command coming too soon, just ignore it.
   if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
@@ -208,11 +198,9 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
   }
 
   last_timestamp_ = current_timestamp;
-  ADEBUG << "Control_sequence_number:"
-         << control_command.header().sequence_num() << ", Time_of_delay:"
-         << current_timestamp -
-                static_cast<int64_t>(control_command.header().timestamp_sec() *
-                                     1e6)
+  ADEBUG << "Control_sequence_number:" << control_command.header().sequence_num()
+         << ", Time_of_delay:"
+         << current_timestamp - static_cast<int64_t>(control_command.header().timestamp_sec() * 1e6)
          << " micro seconds";
 
   if (vehicle_controller_->Update(control_command) != ErrorCode::OK) {
@@ -223,12 +211,11 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
   can_sender_.Update();
 }
 
-void CanbusComponent::OnGuardianCommand(
-    const GuardianCommand &guardian_command) {
+void CanbusComponent::OnGuardianCommand(const GuardianCommand& guardian_command) {
   OnControlCommand(guardian_command.control_command());
 }
 
-common::Status CanbusComponent::OnError(const std::string &error_msg) {
+common::Status CanbusComponent::OnError(const std::string& error_msg) {
   monitor_logger_buffer_.ERROR(error_msg);
   return ::apollo::common::Status(ErrorCode::CANBUS_ERROR, error_msg);
 }

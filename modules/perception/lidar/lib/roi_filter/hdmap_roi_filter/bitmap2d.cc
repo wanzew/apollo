@@ -25,8 +25,8 @@ namespace lidar {
 static constexpr uint64_t kZeroLast = static_cast<uint64_t>(-1) - 1;
 
 // static
-inline Bitmap2D::DirectionMajor Bitmap2D::OppositeDirection(
-    const Bitmap2D::DirectionMajor dir_major) {
+inline Bitmap2D::DirectionMajor
+Bitmap2D::OppositeDirection(const Bitmap2D::DirectionMajor dir_major) {
   return static_cast<DirectionMajor>(static_cast<int>(dir_major) ^ 1);
 }
 
@@ -58,14 +58,12 @@ inline void Bitmap2D::ResetHeadBits(const size_t tail_num, uint64_t* block) {
   (*block) &= ~(static_cast<uint64_t>(-1) << tail_num);
 }
 
-inline void Bitmap2D::SetRangeBits(const size_t head, const size_t tail,
-                                   uint64_t* block) {
+inline void Bitmap2D::SetRangeBits(const size_t head, const size_t tail, uint64_t* block) {
   // note: it not work when head = 64
   (*block) |= ((static_cast<uint64_t>(-1) << tail) & (~(kZeroLast << head)));
 }
 
-inline void Bitmap2D::ResetRangeBits(const size_t head, const size_t tail,
-                                     uint64_t* block) {
+inline void Bitmap2D::ResetRangeBits(const size_t head, const size_t tail, uint64_t* block) {
   (*block) &= ((~(static_cast<uint64_t>(-1) << tail)) | (kZeroLast << head));
 }
 
@@ -81,8 +79,7 @@ void Bitmap2D::Init(const Eigen::Vector2d& min_range,
   max_range_ = max_range;
   cell_size_ = cell_size;
 
-  dims_ =
-      ((max_range_ - min_range_).array() / cell_size_.array()).cast<size_t>();
+  dims_ = ((max_range_ - min_range_).array() / cell_size_.array()).cast<size_t>();
   dims_ += Vec2ui(1, 1);
   map_size_[0] = dims_[0];
   map_size_[1] = (dims_[1] >> 6) + 1;
@@ -90,7 +87,7 @@ void Bitmap2D::Init(const Eigen::Vector2d& min_range,
 }
 
 void Bitmap2D::SetUp(const DirectionMajor dir_major) {
-  dir_major_ = dir_major;
+  dir_major_    = dir_major;
   op_dir_major_ = OppositeDirection(dir_major);
   memset(bitmap_.data(), 0, sizeof(bitmap_[0]) * bitmap_.size());
 }
@@ -113,43 +110,43 @@ inline int Bitmap2D::Index(const Bitmap2D::Vec3ui& p) const {
 
 // range check
 bool Bitmap2D::IsExists(const Eigen::Vector2d& p) const {
-  return p.x() >= min_range_.x() && p.x() < max_range_.x() &&
-         p.y() >= min_range_.y() && p.y() < max_range_.y();
+  return p.x() >= min_range_.x() && p.x() < max_range_.x() && p.y() >= min_range_.y() &&
+         p.y() < max_range_.y();
 }
 
 // check
 bool Bitmap2D::Check(const Eigen::Vector2d& p) const {
   const Vec3ui bit_p = RealToBitmap(p);
-  const int idx = Index(bit_p);
+  const int    idx   = Index(bit_p);
   return CheckBit(bit_p.z(), bitmap_[idx]);
 }
 
 // set and reset
 void Bitmap2D::Set(const Eigen::Vector2d& p) {
   const Vec3ui bit_p = RealToBitmap(p);
-  const int idx = Index(bit_p);
+  const int    idx   = Index(bit_p);
   return SetBit(bit_p.z(), &bitmap_[idx]);
 }
 
 void Bitmap2D::Reset(const Eigen::Vector2d& p) {
   const Vec3ui bit_p = RealToBitmap(p);
-  const int idx = Index(bit_p);
+  const int    idx   = Index(bit_p);
   return ResetBit(bit_p.z(), &bitmap_[idx]);
 }
 
 void Bitmap2D::Set(const double x, const double min_y, const double max_y) {
   Eigen::Vector2d real_left, real_right;
-  real_left[op_dir_major()] = min_y;
+  real_left[op_dir_major()]  = min_y;
   real_right[op_dir_major()] = max_y;
   real_left[dir_major()] = real_right[dir_major()] = x;
-  const Vec3ui left_bit_p = RealToBitmap(real_left);
-  const Vec3ui right_bit_p = RealToBitmap(real_right);
+  const Vec3ui left_bit_p                          = RealToBitmap(real_left);
+  const Vec3ui right_bit_p                         = RealToBitmap(real_right);
   if (left_bit_p.y() == right_bit_p.y()) {
     const int idx = Index(left_bit_p);
     SetRangeBits(right_bit_p.z(), left_bit_p.z(), &bitmap_[idx]);
     return;
   }
-  const size_t left_idx = Index(left_bit_p);
+  const size_t left_idx  = Index(left_bit_p);
   const size_t right_idx = Index(right_bit_p);
   SetHeadBits(left_bit_p.z(), &bitmap_[left_idx]);
   SetTailBits(right_bit_p.z(), &bitmap_[right_idx]);
@@ -160,18 +157,18 @@ void Bitmap2D::Set(const double x, const double min_y, const double max_y) {
 
 void Bitmap2D::Reset(const double x, const double min_y, const double max_y) {
   Eigen::Vector2d real_left, real_right;
-  real_left[op_dir_major()] = min_y;
+  real_left[op_dir_major()]  = min_y;
   real_right[op_dir_major()] = max_y;
   real_left[dir_major()] = real_right[dir_major()] = x;
-  const Vec3ui left_bit_p = RealToBitmap(real_left);
-  const Vec3ui right_bit_p = RealToBitmap(real_right);
+  const Vec3ui left_bit_p                          = RealToBitmap(real_left);
+  const Vec3ui right_bit_p                         = RealToBitmap(real_right);
   if (left_bit_p.y() == right_bit_p.y()) {
     const int idx = Index(left_bit_p);
     ResetRangeBits(right_bit_p.z() + 1, left_bit_p.z(), &bitmap_[idx]);
     return;
   }
   // set first block and last block
-  const size_t left_idx = Index(left_bit_p);
+  const size_t left_idx  = Index(left_bit_p);
   const size_t right_idx = Index(right_bit_p);
   ResetHeadBits(left_bit_p.z(), &bitmap_[left_idx]);
   ResetTailBits(right_bit_p.z(), &bitmap_[right_idx]);

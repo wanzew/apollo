@@ -27,13 +27,13 @@ limitations under the License.
 
 DEFINE_string(output_dir, "/tmp", "output map directory");
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  const auto map_filename = FLAGS_map_dir + "/base_map.txt";
+  const auto         map_filename = FLAGS_map_dir + "/base_map.txt";
   apollo::hdmap::Map pb_map;
   if (!apollo::cyber::common::GetProtoFromFile(map_filename, &pb_map)) {
     AERROR << "Failed to load txt map from " << map_filename;

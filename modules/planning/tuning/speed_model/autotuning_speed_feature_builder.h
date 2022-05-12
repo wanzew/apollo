@@ -27,24 +27,22 @@ namespace planning {
  */
 class AutotuningSpeedFeatureBuilder : public AutotuningFeatureBuilder {
  public:
-  AutotuningSpeedFeatureBuilder() = default;
+  AutotuningSpeedFeatureBuilder()          = default;
   virtual ~AutotuningSpeedFeatureBuilder() = default;
   /**
    * @param: raw feature function input
    * @param: generated model input feature from raw feature, function output
    */
-  common::Status BuildFeature(
-      const autotuning::TrajectoryRawFeature& raw_feature,
-      autotuning::TrajectoryFeature* const input_feature) const override;
+  common::Status BuildFeature(const autotuning::TrajectoryRawFeature& raw_feature,
+                              autotuning::TrajectoryFeature* const    input_feature) const override;
 
   /**
    * @param: pointwise raw feature, function input
    * @param: generated model input feature, function output
    */
-  common::Status BuildPointFeature(
-      const autotuning::TrajectoryPointRawFeature& raw_point_feature,
-      autotuning::TrajectoryPointwiseFeature* const point_feature)
-      const override;
+  common::Status
+  BuildPointFeature(const autotuning::TrajectoryPointRawFeature&  raw_point_feature,
+                    autotuning::TrajectoryPointwiseFeature* const point_feature) const override;
 
  private:
   /**
@@ -53,28 +51,22 @@ class AutotuningSpeedFeatureBuilder : public AutotuningFeatureBuilder {
    * @param: input feature
    */
   void map_obstacle_feature(
-      const autotuning::SpeedPointRawFeature_ObjectDecisionFeature&
-          obj_raw_feature,
-      autotuning::SpeedPointwiseFeature_ObstacleFeature* const input_feature)
-      const;
+      const autotuning::SpeedPointRawFeature_ObjectDecisionFeature& obj_raw_feature,
+      autotuning::SpeedPointwiseFeature_ObstacleFeature* const      input_feature) const;
 
   /**
    * @brief: map nudge obstacle to model input feature
    */
   void map_nudge_obs_feature(
-      const autotuning::SpeedPointRawFeature_ObjectDecisionFeature&
-          obj_raw_feature,
-      autotuning::SpeedPointwiseFeature_ObstacleFeature* const input_feature)
-      const;
+      const autotuning::SpeedPointRawFeature_ObjectDecisionFeature& obj_raw_feature,
+      autotuning::SpeedPointwiseFeature_ObstacleFeature* const      input_feature) const;
 
   /**
    * @brief: map sidepass obstacle to model input feature
    */
   void map_sidepass_obs_feature(
-      const autotuning::SpeedPointRawFeature_ObjectDecisionFeature&
-          obj_raw_feature,
-      autotuning::SpeedPointwiseFeature_ObstacleFeature* const input_feature)
-      const;
+      const autotuning::SpeedPointRawFeature_ObjectDecisionFeature& obj_raw_feature,
+      autotuning::SpeedPointwiseFeature_ObstacleFeature* const      input_feature) const;
 };
 
 }  // namespace planning

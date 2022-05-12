@@ -25,24 +25,18 @@ using base::PointF;
 size_t CloudMask::ValidIndicesCount() const {
   size_t count = 0;
   for (auto& i : mask_) {
-    if (i > 0) {
-      ++count;
-    }
+    if (i > 0) { ++count; }
   }
   return count;
 }
 
 void CloudMask::GetValidCloud(const AttributePointCloud<PointF>& source_cloud,
-                              AttributePointCloud<PointF>* target_cloud) const {
-  if (target_cloud == nullptr) {
-    return;
-  }
+                              AttributePointCloud<PointF>*       target_cloud) const {
+  if (target_cloud == nullptr) { return; }
   indices_.clear();
   indices_.reserve(mask_.size());
   for (size_t i = 0; i < mask_.size(); ++i) {
-    if (mask_[i] > 0) {
-      indices_.push_back(static_cast<int>(i));
-    }
+    if (mask_[i] > 0) { indices_.push_back(static_cast<int>(i)); }
   }
   target_cloud->CopyPointCloud(source_cloud, indices_);
 }
@@ -51,9 +45,7 @@ void CloudMask::GetValidIndices(base::PointIndices* indices) {
   indices->indices.clear();
   indices->indices.reserve(mask_.size());
   for (size_t i = 0; i < mask_.size(); ++i) {
-    if (mask_[i] > 0) {
-      indices->indices.push_back(static_cast<int>(i));
-    }
+    if (mask_[i] > 0) { indices->indices.push_back(static_cast<int>(i)); }
   }
 }
 
@@ -67,43 +59,34 @@ void CloudMask::AddIndices(const base::PointIndices& indices, int value) {
   AddIndices(indices.indices, value);
 }
 
-void CloudMask::AddIndicesOfIndices(
-    const base::PointIndices& indices,
-    const base::PointIndices& indices_of_indices, int value) {
+void CloudMask::AddIndicesOfIndices(const base::PointIndices& indices,
+                                    const base::PointIndices& indices_of_indices,
+                                    int                       value) {
   for (auto& id : indices_of_indices.indices) {
     mask_[indices.indices[id]] = value;
   }
 }
 
-void CloudMask::RemoveIndices(const base::PointIndices& indices) {
-  RemoveIndices(indices.indices);
-}
+void CloudMask::RemoveIndices(const base::PointIndices& indices) { RemoveIndices(indices.indices); }
 
-void CloudMask::RemoveIndicesOfIndices(
-    const base::PointIndices& indices,
-    const base::PointIndices& indices_of_indices) {
+void CloudMask::RemoveIndicesOfIndices(const base::PointIndices& indices,
+                                       const base::PointIndices& indices_of_indices) {
   for (auto& id : indices_of_indices.indices) {
     mask_[indices.indices[id]] = 0;
   }
 }
 
 void CloudMask::GetValidMask(CloudMask* rhs) const {
-  if (rhs == nullptr) {
-    return;
-  }
+  if (rhs == nullptr) { return; }
   rhs->clear();
   for (const auto& i : mask_) {
-    if (i > 0) {
-      rhs->mask_.push_back(i);
-    }
+    if (i > 0) { rhs->mask_.push_back(i); }
   }
 }
 
 void CloudMask::ResetValue(int source_value, int target_value) {
   for (auto& i : mask_) {
-    if (i == source_value) {
-      i = target_value;
-    }
+    if (i == source_value) { i = target_value; }
   }
 }
 

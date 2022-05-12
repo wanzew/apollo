@@ -36,21 +36,19 @@ namespace benchmark {
 template <class DataType>
 class SequenceDataLoader {
  public:
-  SequenceDataLoader() = default;
+  SequenceDataLoader()          = default;
   virtual ~SequenceDataLoader() = default;
-  bool init_loader_with_list(const std::vector<std::string>& file_lists);
-  bool init_loader_with_folder(const std::vector<std::string>& folders);
-  virtual bool query_next(std::shared_ptr<DataType>& data);  // NOLINT
-  virtual bool query_last(std::shared_ptr<DataType>& data);  // NOLINT
+  bool               init_loader_with_list(const std::vector<std::string>& file_lists);
+  bool               init_loader_with_folder(const std::vector<std::string>& folders);
+  virtual bool       query_next(std::shared_ptr<DataType>& data);  // NOLINT
+  virtual bool       query_last(std::shared_ptr<DataType>& data);  // NOLINT
   inline std::size_t size() { return _initialized ? _filenames[0].size() : 0; }
-  inline const std::vector<std::vector<std::string>>& get_filenames() const {
-    return _filenames;
-  }
+  inline const std::vector<std::vector<std::string>>& get_filenames() const { return _filenames; }
 
  protected:
   std::vector<std::vector<std::string>> _filenames;
-  int _idx = -1;
-  bool _initialized = false;
+  int                                   _idx         = -1;
+  bool                                  _initialized = false;
 };
 
 template <class DataType>
@@ -59,8 +57,8 @@ bool SequenceDataLoader<DataType>::init_loader_with_list(
   _filenames.clear();
   _filenames.resize(file_lists.size());
 
-  std::ifstream fin;
-  std::string name = "";
+  std::ifstream            fin;
+  std::string              name = "";
   std::vector<std::size_t> sorted_indices;
   for (std::size_t i = 0; i < file_lists.size(); ++i) {
     fin.open(file_lists[i].c_str());
@@ -85,7 +83,7 @@ bool SequenceDataLoader<DataType>::init_loader_with_list(
     }
     shuffle_by_indices(&_filenames[i], sorted_indices);
   }
-  _idx = -1;
+  _idx         = -1;
   _initialized = true;
   return true;
 }
@@ -107,8 +105,7 @@ bool SequenceDataLoader<DataType>::init_loader_with_folder(
       _filenames[i].push_back(it->path().string());
       ++it;
     }
-    std::sort(_filenames[i].begin(), _filenames[i].end(),
-              string_compare_by_length);
+    std::sort(_filenames[i].begin(), _filenames[i].end(), string_compare_by_length);
   }
   for (std::size_t i = 1; i < folders.size(); ++i) {
     if (_filenames[i].size() != _filenames[0].size()) {
@@ -116,20 +113,15 @@ bool SequenceDataLoader<DataType>::init_loader_with_folder(
       return false;
     }
   }
-  _idx = -1;
+  _idx         = -1;
   _initialized = true;
   return true;
 }
 
 template <class DataType>
-bool SequenceDataLoader<DataType>::query_next(
-    std::shared_ptr<DataType>& data) {  // NOLINT
-  if (!_initialized) {
-    return false;
-  }
-  if (data == nullptr) {
-    data.reset(new DataType);
-  }
+bool SequenceDataLoader<DataType>::query_next(std::shared_ptr<DataType>& data) {  // NOLINT
+  if (!_initialized) { return false; }
+  if (data == nullptr) { data.reset(new DataType); }
   ++_idx;
   if (_idx >= static_cast<int>(_filenames[0].size())) {
     return false;
@@ -144,14 +136,9 @@ bool SequenceDataLoader<DataType>::query_next(
 }
 
 template <class DataType>
-bool SequenceDataLoader<DataType>::query_last(
-    std::shared_ptr<DataType>& data) {  // NOLINT
-  if (!_initialized) {
-    return false;
-  }
-  if (data == nullptr) {
-    data.reset(new DataType);
-  }
+bool SequenceDataLoader<DataType>::query_last(std::shared_ptr<DataType>& data) {  // NOLINT
+  if (!_initialized) { return false; }
+  if (data == nullptr) { data.reset(new DataType); }
   --_idx;
   if (_idx < 0) {
     return false;

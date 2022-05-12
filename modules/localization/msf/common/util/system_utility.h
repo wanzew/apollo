@@ -34,21 +34,19 @@ class system {
   /**@brief Get the size of a file. */
   static bool GetFileSize(const std::string& path, unsigned int* size);
   /**@brief Copy the file. */
-  static bool CopyFile(const std::string& src, const std::string& dst,
-                       bool is_overwrite = true);
+  static bool CopyFile(const std::string& src, const std::string& dst, bool is_overwrite = true);
   /**@brief get list of files end with ext in folder.
    * @param <ext> should be .jpg instead of jpg. **/
-  static void GetFilesInFolderRecursive(const std::string& folder,
-                                        const std::string& ext,
+  static void GetFilesInFolderRecursive(const std::string&        folder,
+                                        const std::string&        ext,
                                         std::vector<std::string>* ret);
   /**@brief get list of files end with ext in folder.
    * @param <ext> should be .jpg instead of jpg. **/
-  static void GetFilesInFolder(const std::string& folder,
-                               const std::string& ext,
+  static void GetFilesInFolder(const std::string&        folder,
+                               const std::string&        ext,
                                std::vector<std::string>* ret);
   /**@brief Get list of folders in folder. */
-  static void GetFoldersInFolder(const std::string& folder,
-                                 std::vector<std::string>* ret);
+  static void GetFoldersInFolder(const std::string& folder, std::vector<std::string>* ret);
 };
 
 }  // namespace msf

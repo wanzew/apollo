@@ -32,33 +32,28 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
  public:
   SpatioTemporalGroundDetector() = default;
   ~SpatioTemporalGroundDetector() {
-    if (pfdetector_ != nullptr) {
-      delete pfdetector_;
-    }
-    if (param_ != nullptr) {
-      delete param_;
-    }
+    if (pfdetector_ != nullptr) { delete pfdetector_; }
+    if (param_ != nullptr) { delete param_; }
   }
 
-  bool Init(const GroundDetectorInitOptions& options =
-                GroundDetectorInitOptions()) override;
+  bool Init(const GroundDetectorInitOptions& options = GroundDetectorInitOptions()) override;
 
   bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "SpatioTemporalGroundDetector"; }
 
  private:
-  common::PlaneFitGroundDetectorParam* param_ = nullptr;
-  common::PlaneFitGroundDetector* pfdetector_ = nullptr;
-  std::vector<float> data_;
-  std::vector<float> ground_height_signed_;
-  std::vector<int> point_indices_temp_;
+  common::PlaneFitGroundDetectorParam* param_      = nullptr;
+  common::PlaneFitGroundDetector*      pfdetector_ = nullptr;
+  std::vector<float>                   data_;
+  std::vector<float>                   ground_height_signed_;
+  std::vector<int>                     point_indices_temp_;
 
-  bool use_roi_ = true;
-  bool use_ground_service_ = false;
-  float ground_thres_ = 0.25f;
-  size_t default_point_size_ = 320000;
-  Eigen::Vector3d cloud_center_ = Eigen::Vector3d(0.0, 0.0, 0.0);
+  bool                 use_roi_            = true;
+  bool                 use_ground_service_ = false;
+  float                ground_thres_       = 0.25f;
+  size_t               default_point_size_ = 320000;
+  Eigen::Vector3d      cloud_center_       = Eigen::Vector3d(0.0, 0.0, 0.0);
   GroundServiceContent ground_service_content_;
 };  // class SpatioTemporalGroundDetector
 

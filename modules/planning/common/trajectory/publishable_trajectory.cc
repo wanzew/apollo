@@ -25,20 +25,18 @@
 namespace apollo {
 namespace planning {
 
-PublishableTrajectory::PublishableTrajectory(
-    const double header_time,
-    const DiscretizedTrajectory& discretized_trajectory)
-    : DiscretizedTrajectory(discretized_trajectory),
-      header_time_(header_time) {}
+PublishableTrajectory::PublishableTrajectory(const double                 header_time,
+                                             const DiscretizedTrajectory& discretized_trajectory)
+    : DiscretizedTrajectory(discretized_trajectory)
+    , header_time_(header_time) {}
 
 PublishableTrajectory::PublishableTrajectory(const ADCTrajectory& trajectory_pb)
-    : DiscretizedTrajectory(trajectory_pb),
-      header_time_(trajectory_pb.header().timestamp_sec()) {}
+    : DiscretizedTrajectory(trajectory_pb)
+    , header_time_(trajectory_pb.header().timestamp_sec()) {}
 
 double PublishableTrajectory::header_time() const { return header_time_; }
 
-void PublishableTrajectory::PopulateTrajectoryProtobuf(
-    ADCTrajectory* trajectory_pb) const {
+void PublishableTrajectory::PopulateTrajectoryProtobuf(ADCTrajectory* trajectory_pb) const {
   CHECK_NOTNULL(trajectory_pb);
   trajectory_pb->mutable_header()->set_timestamp_sec(header_time_);
   trajectory_pb->mutable_trajectory_point()->CopyFrom({begin(), end()});

@@ -32,29 +32,29 @@ namespace lidar {
 
 class SppEngine {
  public:
-  SppEngine() = default;
+  SppEngine()  = default;
   ~SppEngine() = default;
   // @brief: initialize spp engine
   // @param [in]: feature map width
   // @param [in]: feature map height
   // @param [in]: feature map range
   // @param [in]: sensor name
-  void Init(size_t width, size_t height, float range,
-            const SppParams& param = SppParams(),
+  void Init(size_t             width,
+            size_t             height,
+            float              range,
+            const SppParams&   param       = SppParams(),
             const std::string& sensor_name = "velodyne64");
   // @brief: process foreground segmentation
   // @param [in]: point cloud
   // @return: size of foreground clusters
-  size_t ProcessForegroundSegmentation(
-      const base::PointFCloudConstPtr point_cloud);
+  size_t ProcessForegroundSegmentation(const base::PointFCloudConstPtr point_cloud);
   // @brief: remove ground points in foreground cluster
   // @param [in]: point cloud
   // @param [in]: roi indices of point cloud
   // @param [in]: non ground indices in roi of point cloud
-  size_t RemoveGroundPointsInForegroundCluster(
-      const base::PointFCloudConstPtr full_point_cloud,
-      const base::PointIndices& roi_indices,
-      const base::PointIndices& roi_non_ground_indices);
+  size_t RemoveGroundPointsInForegroundCluster(const base::PointFCloudConstPtr full_point_cloud,
+                                               const base::PointIndices&       roi_indices,
+                                               const base::PointIndices& roi_non_ground_indices);
   // @brief: get cluster list, const version
   // @return: cluster list
   inline const SppClusterList& clusters() const { return clusters_; }
@@ -70,14 +70,14 @@ class SppEngine {
   // @brief: process clustering on input feature map
   // @param [in]: point cloud
   // @param [in]: point cloud mask
-  size_t ProcessConnectedComponentCluster(
-      const base::PointFCloudConstPtr point_cloud, const CloudMask& mask);
+  size_t ProcessConnectedComponentCluster(const base::PointFCloudConstPtr point_cloud,
+                                          const CloudMask&                mask);
 
  private:
   // feature size
-  size_t width_ = 0;
+  size_t width_  = 0;
   size_t height_ = 0;
-  float range_ = 0.f;
+  float  range_  = 0.f;
   // label image
   SppLabelImage labels_2d_;
   // clusters

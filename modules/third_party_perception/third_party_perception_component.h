@@ -20,9 +20,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/drivers/proto/sensor_image.pb.h"
+
 #include "cyber/component/component.h"
 #include "cyber/component/timer_component.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/third_party_perception/third_party_perception_base.h"
 #include "modules/third_party_perception/third_party_perception_mobileye.h"
 #include "modules/third_party_perception/third_party_perception_smartereye.h"
@@ -30,10 +31,9 @@
 namespace apollo {
 namespace third_party_perception {
 
-class ThirdPartyPerceptionComponent final
-    : public apollo::cyber::TimerComponent {
+class ThirdPartyPerceptionComponent final : public apollo::cyber::TimerComponent {
  public:
-  ThirdPartyPerceptionComponent() = default;
+  ThirdPartyPerceptionComponent()  = default;
   ~ThirdPartyPerceptionComponent() = default;
 
  public:
@@ -41,10 +41,8 @@ class ThirdPartyPerceptionComponent final
   bool Proc() override;
 
  private:
-  std::shared_ptr<
-      apollo::cyber::Writer<apollo::perception::PerceptionObstacles>>
-      writer_ = nullptr;
-  std::shared_ptr<ThirdPartyPerception> perception_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<apollo::perception::PerceptionObstacles>> writer_ = nullptr;
+  std::shared_ptr<ThirdPartyPerception> perception_                                       = nullptr;
 };
 
 CYBER_REGISTER_COMPONENT(ThirdPartyPerceptionComponent)

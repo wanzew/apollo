@@ -33,8 +33,8 @@ class ValidationCheckerTest : public ::testing::Test {
 TEST_F(ValidationCheckerTest, valid_centripedal_acc) {
   FLAGS_centripedal_acc_threshold = 2.0;
   std::vector<TrajectoryPoint> trajectory_points(0);
-  double theta = 0.0;
-  double relative_time = 0.1;
+  double                       theta         = 0.0;
+  double                       relative_time = 0.1;
   for (int i = 0; i < 3; ++i) {
     TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->set_theta(theta);
@@ -44,15 +44,14 @@ TEST_F(ValidationCheckerTest, valid_centripedal_acc) {
     trajectory_points.emplace_back(std::move(trajectory_point));
   }
   EXPECT_EQ(trajectory_points.size(), 3);
-  EXPECT_TRUE(
-      ValidationChecker::ValidCentripetalAcceleration(trajectory_points));
+  EXPECT_TRUE(ValidationChecker::ValidCentripetalAcceleration(trajectory_points));
 }
 
 TEST_F(ValidationCheckerTest, invalid_centripedal_acc) {
   FLAGS_centripedal_acc_threshold = 2.0;
   std::vector<TrajectoryPoint> trajectory_points(0);
-  double theta = 0.0;
-  double relative_time = 0.1;
+  double                       theta         = 0.0;
+  double                       relative_time = 0.1;
   for (int i = 0; i < 3; ++i) {
     TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->set_theta(theta);
@@ -62,8 +61,7 @@ TEST_F(ValidationCheckerTest, invalid_centripedal_acc) {
     trajectory_points.emplace_back(std::move(trajectory_point));
   }
   EXPECT_EQ(trajectory_points.size(), 3);
-  EXPECT_TRUE(
-      !ValidationChecker::ValidCentripetalAcceleration(trajectory_points));
+  EXPECT_TRUE(!ValidationChecker::ValidCentripetalAcceleration(trajectory_points));
 }
 
 TEST_F(ValidationCheckerTest, valid_trajectory_point) {
@@ -81,8 +79,7 @@ TEST_F(ValidationCheckerTest, invalid_trajectory_point) {
   TrajectoryPoint trajectory_point;
   EXPECT_FALSE(ValidationChecker::ValidTrajectoryPoint(trajectory_point));
 
-  trajectory_point.mutable_path_point()->set_x(
-      std::numeric_limits<double>::quiet_NaN());
+  trajectory_point.mutable_path_point()->set_x(std::numeric_limits<double>::quiet_NaN());
   trajectory_point.mutable_path_point()->set_y(0.0);
   trajectory_point.mutable_path_point()->set_theta(0.0);
   trajectory_point.set_v(0.0);

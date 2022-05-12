@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
-                            ::apollo::canbus::ChassisDetail> {
+class Brakecommand101
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -40,8 +41,7 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
   // 'AEB_EN_CTRL_ENABLE_AEB'}, 'is_signed_var': False, 'len': 1, 'name':
   // 'AEB_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  Brakecommand101* set_aeb_en_ctrl(
-      Brake_command_101::Aeb_en_ctrlType aeb_en_ctrl);
+  Brakecommand101* set_aeb_en_ctrl(Brake_command_101::Aeb_en_ctrlType aeb_en_ctrl);
 
   // config detail: {'bit': 15, 'is_signed_var': False, 'len': 10, 'name':
   // 'Brake_Dec', 'offset': 0.0, 'order': 'motorola', 'physical_range':
@@ -62,16 +62,14 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
   // 'BRAKE_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
   // 'Brake_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  Brakecommand101* set_brake_en_ctrl(
-      Brake_command_101::Brake_en_ctrlType brake_en_ctrl);
+  Brakecommand101* set_brake_en_ctrl(Brake_command_101::Brake_en_ctrlType brake_en_ctrl);
 
  private:
   // config detail: {'bit': 1, 'enum': {0: 'AEB_EN_CTRL_DISABLE_AEB', 1:
   // 'AEB_EN_CTRL_ENABLE_AEB'}, 'is_signed_var': False, 'len': 1, 'name':
   // 'AEB_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  void set_p_aeb_en_ctrl(uint8_t* data,
-                         Brake_command_101::Aeb_en_ctrlType aeb_en_ctrl);
+  void set_p_aeb_en_ctrl(uint8_t* data, Brake_command_101::Aeb_en_ctrlType aeb_en_ctrl);
 
   // config detail: {'bit': 15, 'is_signed_var': False, 'len': 10, 'name':
   // 'Brake_Dec', 'offset': 0.0, 'order': 'motorola', 'physical_range':
@@ -92,14 +90,13 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
   // 'BRAKE_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
   // 'Brake_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  void set_p_brake_en_ctrl(uint8_t* data,
-                           Brake_command_101::Brake_en_ctrlType brake_en_ctrl);
+  void set_p_brake_en_ctrl(uint8_t* data, Brake_command_101::Brake_en_ctrlType brake_en_ctrl);
 
  private:
-  Brake_command_101::Aeb_en_ctrlType aeb_en_ctrl_;
-  double brake_dec_;
-  int checksum_101_;
-  double brake_pedal_target_;
+  Brake_command_101::Aeb_en_ctrlType   aeb_en_ctrl_;
+  double                               brake_dec_;
+  int                                  checksum_101_;
+  double                               brake_pedal_target_;
   Brake_command_101::Brake_en_ctrlType brake_en_ctrl_;
 };
 

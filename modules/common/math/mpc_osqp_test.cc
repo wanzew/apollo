@@ -22,20 +22,21 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace common {
 namespace math {
 
 TEST(MPCOSQPSolverTest, ComputationTimeTest) {
-  const int states = 4;
-  const int controls = 2;
-  const int horizon = 3;
-  const int max_iter = 100;
-  const double eps = 0.001;
-  const double max = std::numeric_limits<double>::max();
+  const int    states   = 4;
+  const int    controls = 2;
+  const int    horizon  = 3;
+  const int    max_iter = 100;
+  const double eps      = 0.001;
+  const double max      = std::numeric_limits<double>::max();
 
   Eigen::MatrixXd A(states, states);
   A << 5., 6., 7., 8., 7., 8., 7., 8., 9., 10., 7., 8., 11., 4., 7., 8.;
@@ -70,24 +71,23 @@ TEST(MPCOSQPSolverTest, ComputationTimeTest) {
   std::vector<Eigen::MatrixXd> reference(horizon, reference_state);
 
   // OSQP
-  MpcOsqp mpc_osqp_solver(A, B, Q, R, initial_state, lower_control_bound,
-                          upper_control_bound, lower_state_bound,
-                          upper_state_bound, reference_state, max_iter, horizon,
+  MpcOsqp mpc_osqp_solver(A, B, Q, R, initial_state, lower_control_bound, upper_control_bound,
+                          lower_state_bound, upper_state_bound, reference_state, max_iter, horizon,
                           eps);
-  auto start_time_osqp = std::chrono::system_clock::now();
+  auto    start_time_osqp = std::chrono::system_clock::now();
   mpc_osqp_solver.Solve(&control_cmd);
-  auto end_time_osqp = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff_OSQP = end_time_osqp - start_time_osqp;
+  auto                          end_time_osqp = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff_OSQP     = end_time_osqp - start_time_osqp;
   AINFO << "OSQP used time: " << diff_OSQP.count() * 1000 << " ms.";
 }
 
 TEST(MPCOSQPSolverTest, NonFullRankMatrix) {
-  const int states = 2;
-  const int controls = 1;
-  const int horizon = 10;
-  const int max_iter = 100;
-  const double eps = 0.01;
-  const double max = std::numeric_limits<double>::max();
+  const int    states   = 2;
+  const int    controls = 1;
+  const int    horizon  = 10;
+  const int    max_iter = 100;
+  const double eps      = 0.01;
+  const double max      = std::numeric_limits<double>::max();
 
   Eigen::MatrixXd A(states, states);
   A << 0, 1, 0, 0;
@@ -121,19 +121,18 @@ TEST(MPCOSQPSolverTest, NonFullRankMatrix) {
 
   std::vector<double> control_cmd(controls, 0);
 
-  MpcOsqp mpc_osqp_solver(A, B, Q, R, initial_state, lower_bound, upper_bound,
-                          state_lower_bound, state_upper_bound, reference_state,
-                          max_iter, horizon, eps);
+  MpcOsqp mpc_osqp_solver(A, B, Q, R, initial_state, lower_bound, upper_bound, state_lower_bound,
+                          state_upper_bound, reference_state, max_iter, horizon, eps);
   mpc_osqp_solver.Solve(&control_cmd);
   EXPECT_FLOAT_EQ(upper_bound(0), control_cmd[0]);
 }
 
 TEST(MPCOSQPSolverTest, NullMatrix) {
-  const int states = 2;
-  const int controls = 1;
-  const int horizon = 10;
-  const int max_iter = 100;
-  const double eps = 0.01;
+  const int    states   = 2;
+  const int    controls = 1;
+  const int    horizon  = 10;
+  const int    max_iter = 100;
+  const double eps      = 0.01;
 
   Eigen::MatrixXd A(states, states);
   A << 0, 0, 0, 0;
@@ -167,9 +166,8 @@ TEST(MPCOSQPSolverTest, NullMatrix) {
 
   std::vector<double> control_cmd(controls, 0);
 
-  MpcOsqp mpc_osqp_solver(A, B, Q, R, initial_state, lower_bound, upper_bound,
-                          state_lower_bound, state_upper_bound, reference_state,
-                          max_iter, horizon, eps);
+  MpcOsqp mpc_osqp_solver(A, B, Q, R, initial_state, lower_bound, upper_bound, state_lower_bound,
+                          state_upper_bound, reference_state, max_iter, horizon, eps);
   mpc_osqp_solver.Solve(&control_cmd);
   EXPECT_NEAR(0.0, control_cmd[0], 1e-7);
 }

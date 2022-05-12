@@ -18,13 +18,14 @@
 
 #include <string>
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/canbus/vehicle/wey/wey_message_manager.h"
 #include "modules/control/proto/control_cmd.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/canbus/vehicle/wey/wey_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
@@ -37,19 +38,18 @@ using ::apollo::control::ControlCommand;
 class WeyControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string canbus_conf_file =
-        "modules/canbus/testdata/conf/wey_canbus_conf_test.pb.txt";
+    std::string canbus_conf_file = "modules/canbus/testdata/conf/wey_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
   }
 
  protected:
-  WeyController controller_;
+  WeyController                              controller_;
   CanSender<::apollo::canbus::ChassisDetail> sender_;
-  CanbusConf canbus_conf_;
-  VehicleParameter params_;
-  WeyMessageManager msg_manager_;
-  ControlCommand control_cmd_;
+  CanbusConf                                 canbus_conf_;
+  VehicleParameter                           params_;
+  WeyMessageManager                          msg_manager_;
+  ControlCommand                             control_cmd_;
 };
 
 TEST_F(WeyControllerTest, Init) {
@@ -84,8 +84,7 @@ TEST_F(WeyControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
-            ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL), ErrorCode::OK);
 }
 
 }  // namespace wey

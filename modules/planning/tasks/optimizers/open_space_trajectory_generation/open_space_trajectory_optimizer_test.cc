@@ -21,15 +21,14 @@
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_optimizer.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/open_space_task_config.pb.h"
 
 namespace apollo {
 namespace planning {
 class OpenSpaceTrajectoryOptimizerTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    OpenSpaceTrajectoryOptimizer open_space_trajectory_optimizer(config);
-  }
+  virtual void SetUp() { OpenSpaceTrajectoryOptimizer open_space_trajectory_optimizer(config); }
 
  protected:
   OpenSpaceTrajectoryOptimizerConfig config;

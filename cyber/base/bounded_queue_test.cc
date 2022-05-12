@@ -52,40 +52,32 @@ TEST(BoundedQueueTest, concurrency) {
   BoundedQueue<int> queue;
   queue.Init(10);
   std::atomic_int count = {0};
-  std::thread threads[48];
+  std::thread     threads[48];
   for (int i = 0; i < 48; ++i) {
     if (i % 4 == 0) {
       threads[i] = std::thread([&]() {
         for (int j = 0; j < 10000; ++j) {
-          if (queue.Enqueue(j)) {
-            count++;
-          }
+          if (queue.Enqueue(j)) { count++; }
         }
       });
     } else if (i % 4 == 1) {
       threads[i] = std::thread([&]() {
         for (int j = 0; j < 10000; ++j) {
-          if (queue.WaitEnqueue(j)) {
-            count++;
-          }
+          if (queue.WaitEnqueue(j)) { count++; }
         }
       });
     } else if (i % 4 == 2) {
       threads[i] = std::thread([&]() {
         for (int j = 0; j < 10000; ++j) {
           int value = 0;
-          if (queue.Dequeue(&value)) {
-            count--;
-          }
+          if (queue.Dequeue(&value)) { count--; }
         }
       });
     } else {
       threads[i] = std::thread([&]() {
         for (int j = 0; j < 10000; ++j) {
           int value = 0;
-          if (queue.WaitDequeue(&value)) {
-            count--;
-          }
+          if (queue.WaitDequeue(&value)) { count--; }
         }
       });
     }

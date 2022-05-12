@@ -20,8 +20,8 @@ namespace apollo {
 namespace storytelling {
 
 FrameManager::FrameManager(const std::shared_ptr<cyber::Node>& node)
-    : log_buffer_(apollo::common::monitor::MonitorMessageItem::STORYTELLING),
-      node_(node) {}
+    : log_buffer_(apollo::common::monitor::MonitorMessageItem::STORYTELLING)
+    , node_(node) {}
 
 void FrameManager::StartFrame() { node_->Observe(); }
 

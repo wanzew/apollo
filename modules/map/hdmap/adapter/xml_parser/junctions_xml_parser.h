@@ -14,9 +14,9 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-#include <vector>
-
 #include <tinyxml2.h>
+
+#include <vector>
 
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
@@ -27,7 +27,7 @@ namespace adapter {
 
 class JunctionsXmlParser {
  public:
-  static Status Parse(const tinyxml2::XMLElement& xml_node,
+  static Status Parse(const tinyxml2::XMLElement&    xml_node,
                       std::vector<JunctionInternal>* junctions);
 };
 

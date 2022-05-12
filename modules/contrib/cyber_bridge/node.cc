@@ -19,7 +19,8 @@
 
 using apollo::cyber::message::PyMessageWrap;
 
-Node::Node() : node(apollo::cyber::CreateNode("bridge")) {}
+Node::Node()
+    : node(apollo::cyber::CreateNode("bridge")) {}
 
 Node::~Node() {}
 
@@ -57,7 +58,8 @@ void Node::remove(std::shared_ptr<Client> client) {
   }
 }
 
-void Node::add_reader(const std::string& channel, const std::string& type,
+void Node::add_reader(const std::string&      channel,
+                      const std::string&      type,
                       std::shared_ptr<Client> client) {
   auto rit = readers.find(channel);
   if (rit != readers.end()) {
@@ -90,7 +92,8 @@ void Node::add_reader(const std::string& channel, const std::string& type,
   readers.insert(std::make_pair(channel, reader));
 }
 
-void Node::add_writer(const std::string& channel, const std::string& type,
+void Node::add_writer(const std::string&      channel,
+                      const std::string&      type,
                       std::shared_ptr<Client> client) {
   auto wit = writers.find(channel);
   if (wit != writers.end()) {
@@ -101,8 +104,7 @@ void Node::add_writer(const std::string& channel, const std::string& type,
   Writer writer;
   writer.type = type;
 
-  apollo::cyber::message::ProtobufFactory::Instance()->GetDescriptorString(
-      type, &writer.desc);
+  apollo::cyber::message::ProtobufFactory::Instance()->GetDescriptorString(type, &writer.desc);
   if (writer.desc.empty()) {
     AWARN << "Cannot find proto descriptor for message type " << type;
     return;

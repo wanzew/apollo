@@ -27,9 +27,9 @@ using apollo::cyber::proto::Channel;
 using apollo::cyber::proto::ChunkHeader;
 using apollo::cyber::proto::SectionType;
 
-Recoverer::Recoverer(const std::string& input_file,
-                     const std::string& output_file)
-    : input_file_(input_file), output_file_(output_file) {}
+Recoverer::Recoverer(const std::string& input_file, const std::string& output_file)
+    : input_file_(input_file)
+    , output_file_(output_file) {}
 
 Recoverer::~Recoverer() {}
 
@@ -55,12 +55,10 @@ bool Recoverer::Proc() {
     proto::Index index = reader_.GetIndex();
     FOR_EACH(i, 0, index.indexes_size()) {
       proto::SingleIndex* single_index = index.mutable_indexes(i);
-      if (single_index->type() != SectionType::SECTION_CHANNEL) {
-        continue;
-      }
+      if (single_index->type() != SectionType::SECTION_CHANNEL) { continue; }
       ChannelCache* chan_cache = single_index->mutable_channel_cache();
-      if (std::find(channel_vec_.begin(), channel_vec_.end(),
-                    chan_cache->name()) == channel_vec_.end()) {
+      if (std::find(channel_vec_.begin(), channel_vec_.end(), chan_cache->name()) ==
+          channel_vec_.end()) {
         channel_vec_.push_back(chan_cache->name());
         Channel chan;
         chan.set_name(chan_cache->name());
@@ -79,9 +77,7 @@ bool Recoverer::Proc() {
       AINFO << "read section failed, try next.";
       continue;
     }
-    if (section.type == SectionType::SECTION_INDEX) {
-      break;
-    }
+    if (section.type == SectionType::SECTION_INDEX) { break; }
     switch (section.type) {
       case SectionType::SECTION_CHANNEL: {
         Channel chan;
@@ -118,8 +114,7 @@ bool Recoverer::Proc() {
         break;
       }
       default: {
-        AERROR << "this section should not be here, section type: "
-               << section.type;
+        AERROR << "this section should not be here, section type: " << section.type;
         return false;
       }
     }  // end for switch

@@ -17,14 +17,15 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace neolix_edu {
 
-class Adsdrivecommand50 : public ::apollo::drivers::canbus::ProtocolData<
-                              ::apollo::canbus::ChassisDetail> {
+class Adsdrivecommand50
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -48,8 +49,8 @@ class Adsdrivecommand50 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 2, 'name': 'AUTO_Shift_Command', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 9, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  Adsdrivecommand50* set_auto_shift_command(
-      Ads_drive_command_50::Auto_shift_commandType auto_shift_command);
+  Adsdrivecommand50*
+  set_auto_shift_command(Ads_drive_command_50::Auto_shift_commandType auto_shift_command);
 
   // config detail: {'name': 'AUTO_Drive_Torque', 'offset': -665.0, 'precision':
   // 0.02, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
@@ -60,8 +61,7 @@ class Adsdrivecommand50 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  Adsdrivecommand50* set_auto_drivercmd_alivecounter(
-      int auto_drivercmd_alivecounter);
+  Adsdrivecommand50* set_auto_drivercmd_alivecounter(int auto_drivercmd_alivecounter);
 
   // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
@@ -82,9 +82,8 @@ class Adsdrivecommand50 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 2, 'name': 'AUTO_Shift_Command', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 9, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
-  void set_p_auto_shift_command(
-      uint8_t* data,
-      Ads_drive_command_50::Auto_shift_commandType auto_shift_command);
+  void set_p_auto_shift_command(uint8_t*                                     data,
+                                Ads_drive_command_50::Auto_shift_commandType auto_shift_command);
 
   // config detail: {'name': 'AUTO_Drive_Torque', 'offset': -665.0, 'precision':
   // 0.02, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit':
@@ -95,22 +94,20 @@ class Adsdrivecommand50 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 51, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  void set_p_auto_drivercmd_alivecounter(uint8_t* data,
-                                         int auto_drivercmd_alivecounter);
+  void set_p_auto_drivercmd_alivecounter(uint8_t* data, int auto_drivercmd_alivecounter);
 
   // config detail: {'name': 'AUTO_DriverCmd_CheckSum', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit':
   // ''}
-  void set_p_auto_drivercmd_checksum(uint8_t* data,
-                                     int auto_drivercmd_checksum);
+  void set_p_auto_drivercmd_checksum(uint8_t* data, int auto_drivercmd_checksum);
 
  private:
-  bool drive_enable_;
+  bool                                         drive_enable_;
   Ads_drive_command_50::Auto_shift_commandType auto_shift_command_;
-  double auto_drive_torque_;
-  int auto_drivercmd_alivecounter_;
-  int auto_drivercmd_checksum_;
+  double                                       auto_drive_torque_;
+  int                                          auto_drivercmd_alivecounter_;
+  int                                          auto_drivercmd_checksum_;
 };
 
 }  // namespace neolix_edu

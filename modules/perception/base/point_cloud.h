@@ -26,8 +26,8 @@
 #include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point.h"
 
-using apollo::common::EigenVector;
 using apollo::common::EigenMap;
+using apollo::common::EigenVector;
 
 namespace apollo {
 namespace perception {
@@ -52,7 +52,8 @@ class PointCloud {
   }
   // @brief construct given width and height for organized point cloud
   PointCloud(size_t width, size_t height, PointT point = PointT())
-      : width_(width), height_(height) {
+      : width_(width)
+      , height_(height) {
     points_.assign(width_ * height_, point);
   }
 
@@ -89,25 +90,25 @@ class PointCloud {
   inline virtual void resize(size_t size) {
     points_.resize(size);
     if (size != width_ * height_) {
-      width_ = size;
+      width_  = size;
       height_ = 1;
     }
   }
   // @brief accessor of point via 1d index
   inline const PointT& operator[](size_t n) const { return points_[n]; }
-  inline PointT& operator[](size_t n) { return points_[n]; }
+  inline PointT&       operator[](size_t n) { return points_[n]; }
   inline const PointT& at(size_t n) const { return points_[n]; }
-  inline PointT& at(size_t n) { return points_[n]; }
+  inline PointT&       at(size_t n) { return points_[n]; }
   // @brief front accessor wrapper of vector
   inline const PointT& front() const { return points_.front(); }
-  inline PointT& front() { return points_.front(); }
+  inline PointT&       front() { return points_.front(); }
   // @brief back accessor wrapper of vector
   inline const PointT& back() const { return points_.back(); }
-  inline PointT& back() { return points_.back(); }
+  inline PointT&       back() { return points_.back(); }
   // @brief push_back function wrapper of vector
   inline virtual void push_back(const PointT& point) {
     points_.push_back(point);
-    width_ = points_.size();
+    width_  = points_.size();
     height_ = 1;
   }
   // @brief clear function wrapper of vector
@@ -119,15 +120,14 @@ class PointCloud {
   inline virtual bool SwapPoint(size_t source_id, size_t target_id) {
     if (source_id < points_.size() && target_id < points_.size()) {
       std::swap(points_[source_id], points_[target_id]);
-      width_ = points_.size();
+      width_  = points_.size();
       height_ = 1;
       return true;
     }
     return false;
   }
   // @brief copy point from another point cloud
-  inline bool CopyPoint(size_t id, size_t rhs_id,
-                        const PointCloud<PointT>& rhs) {
+  inline bool CopyPoint(size_t id, size_t rhs_id, const PointCloud<PointT>& rhs) {
     if (id < points_.size() && rhs_id < rhs.points_.size()) {
       points_[id] = rhs.points_[rhs_id];
       return true;
@@ -135,14 +135,12 @@ class PointCloud {
     return false;
   }
   // @brief copy point cloud
-  inline void CopyPointCloud(const PointCloud<PointT>& rhs,
-                             const PointIndices& indices) {
+  inline void CopyPointCloud(const PointCloud<PointT>& rhs, const PointIndices& indices) {
     CopyPointCloud(rhs, indices.indices);
   }
   template <typename IndexType>
-  inline void CopyPointCloud(const PointCloud<PointT>& rhs,
-                             const std::vector<IndexType>& indices) {
-    width_ = indices.size();
+  inline void CopyPointCloud(const PointCloud<PointT>& rhs, const std::vector<IndexType>& indices) {
+    width_  = indices.size();
     height_ = 1;
     points_.resize(indices.size());
     for (size_t i = 0; i < indices.size(); ++i) {
@@ -150,9 +148,9 @@ class PointCloud {
     }
   }
   template <typename IndexType>
-  inline void CopyPointCloudExclude(const PointCloud<PointT>& rhs,
+  inline void CopyPointCloudExclude(const PointCloud<PointT>&     rhs,
                                     const std::vector<IndexType>& indices) {
-    width_ = indices.size();
+    width_  = indices.size();
     height_ = 1;
     points_.resize(rhs.size() - indices.size());
     std::vector<bool> mask(false, rhs.size());
@@ -160,9 +158,7 @@ class PointCloud {
       mask[indices[i]] = true;
     }
     for (size_t i = 0; i < rhs.size(); ++i) {
-      if (!mask[i]) {
-        points_.push_back(rhs.points_[i]);
-      }
+      if (!mask[i]) { points_.push_back(rhs.points_[i]); }
     }
   }
 
@@ -174,14 +170,14 @@ class PointCloud {
     std::swap(sensor_to_world_pose_, rhs->sensor_to_world_pose_);
     std::swap(timestamp_, rhs->timestamp_);
   }
-  typedef typename std::vector<PointT>::iterator iterator;
+  typedef typename std::vector<PointT>::iterator       iterator;
   typedef typename std::vector<PointT>::const_iterator const_iterator;
   // @brief vector iterator
-  inline iterator begin() { return points_.begin(); }
-  inline iterator end() { return points_.end(); }
-  inline const_iterator begin() const { return points_.begin(); }
-  inline const_iterator end() const { return points_.end(); }
-  typename std::vector<PointT>* mutable_points() { return &points_; }
+  inline iterator                     begin() { return points_.begin(); }
+  inline iterator                     end() { return points_.end(); }
+  inline const_iterator               begin() const { return points_.begin(); }
+  inline const_iterator               end() const { return points_.end(); }
+  typename std::vector<PointT>*       mutable_points() { return &points_; }
   const typename std::vector<PointT>& points() const { return points_; }
 
   // @brief cloud timestamp setter
@@ -193,16 +189,13 @@ class PointCloud {
     sensor_to_world_pose_ = sensor_to_world_pose;
   }
   // @brief sensor to world pose getter
-  const Eigen::Affine3d& sensor_to_world_pose() {
-    return sensor_to_world_pose_;
-  }
+  const Eigen::Affine3d& sensor_to_world_pose() { return sensor_to_world_pose_; }
   // @brief rotate the point cloud and set rotation part of pose to identity
   void RotatePointCloud(bool check_nan = false) {
     Eigen::Vector3d point3d;
     Eigen::Matrix3d rotation = sensor_to_world_pose_.linear();
     for (auto& point : points_) {
-      if (!check_nan || (!std::isnan(point.x) && !std::isnan(point.y) &&
-                         !std::isnan(point.z))) {
+      if (!check_nan || (!std::isnan(point.x) && !std::isnan(point.y) && !std::isnan(point.z))) {
         point3d << point.x, point.y, point.z;
         point3d = rotation * point3d;
         point.x = static_cast<typename PointT::Type>(point3d(0));
@@ -216,8 +209,7 @@ class PointCloud {
   void TransformPointCloud(bool check_nan = false) {
     Eigen::Vector3d point3d;
     for (auto& point : points_) {
-      if (!check_nan || (!std::isnan(point.x) && !std::isnan(point.y) &&
-                         !std::isnan(point.z))) {
+      if (!check_nan || (!std::isnan(point.x) && !std::isnan(point.y) && !std::isnan(point.z))) {
         point3d << point.x, point.y, point.z;
         point3d = sensor_to_world_pose_ * point3d;
         point.x = static_cast<typename PointT::Type>(point3d(0));
@@ -230,18 +222,17 @@ class PointCloud {
 
   // @brief transform the point cloud and save to another pc
   void TransformPointCloud(const Eigen::Affine3f& transform,
-                           PointCloud<PointT>* out,
-                           bool check_nan = false) const {
+                           PointCloud<PointT>*    out,
+                           bool                   check_nan = false) const {
     Eigen::Vector3f point3f;
-    PointT pt;
+    PointT          pt;
     for (auto& point : points_) {
-      if (!check_nan || (!std::isnan(point.x) && !std::isnan(point.y) &&
-                         !std::isnan(point.z))) {
+      if (!check_nan || (!std::isnan(point.x) && !std::isnan(point.y) && !std::isnan(point.z))) {
         point3f << point.x, point.y, point.z;
         point3f = transform * point3f;
-        pt.x = static_cast<typename PointT::Type>(point3f(0));
-        pt.y = static_cast<typename PointT::Type>(point3f(1));
-        pt.z = static_cast<typename PointT::Type>(point3f(2));
+        pt.x    = static_cast<typename PointT::Type>(point3f(0));
+        pt.y    = static_cast<typename PointT::Type>(point3f(1));
+        pt.z    = static_cast<typename PointT::Type>(point3f(2));
         out->push_back(pt);
       }
     }
@@ -251,11 +242,11 @@ class PointCloud {
 
  protected:
   std::vector<PointT> points_;
-  size_t width_ = 0;
-  size_t height_ = 0;
+  size_t              width_  = 0;
+  size_t              height_ = 0;
 
   Eigen::Affine3d sensor_to_world_pose_ = Eigen::Affine3d::Identity();
-  double timestamp_ = 0.0;
+  double          timestamp_            = 0.0;
 };
 
 // @brief Point cloud class split points and attributes storage
@@ -273,19 +264,16 @@ class AttributePointCloud : public PointCloud<PointT> {
   AttributePointCloud() = default;
 
   // @brief construct from input point cloud and specified indices
-  AttributePointCloud(const AttributePointCloud<PointT>& pc,
-                      const PointIndices& indices) {
+  AttributePointCloud(const AttributePointCloud<PointT>& pc, const PointIndices& indices) {
     CopyPointCloud(pc, indices);
   }
-  AttributePointCloud(const AttributePointCloud<PointT>& pc,
-                      const std::vector<int>& indices) {
+  AttributePointCloud(const AttributePointCloud<PointT>& pc, const std::vector<int>& indices) {
     CopyPointCloud(pc, indices);
   }
   // @brief construct given width and height for organized point cloud
-  AttributePointCloud(const size_t width, const size_t height,
-                      const PointT point = PointT()) {
-    width_ = width;
-    height_ = height;
+  AttributePointCloud(const size_t width, const size_t height, const PointT point = PointT()) {
+    width_      = width;
+    height_     = height;
     size_t size = width_ * height_;
     points_.assign(size, point);
     points_timestamp_.assign(size, 0.0);
@@ -296,19 +284,16 @@ class AttributePointCloud : public PointCloud<PointT> {
   // @brief destructor
   virtual ~AttributePointCloud() = default;
   // @brief add points of input cloud, return the self cloud
-  inline AttributePointCloud& operator+=(
-      const AttributePointCloud<PointT>& rhs) {
+  inline AttributePointCloud& operator+=(const AttributePointCloud<PointT>& rhs) {
     points_.insert(points_.end(), rhs.points_.begin(), rhs.points_.end());
-    points_timestamp_.insert(points_timestamp_.end(),
-                             rhs.points_timestamp_.begin(),
+    points_timestamp_.insert(points_timestamp_.end(), rhs.points_timestamp_.begin(),
                              rhs.points_timestamp_.end());
     points_height_.insert(points_height_.end(), rhs.points_height_.begin(),
                           rhs.points_height_.end());
     points_beam_id_.insert(points_beam_id_.end(), rhs.points_beam_id_.begin(),
                            rhs.points_beam_id_.end());
-    points_label_.insert(points_label_.end(), rhs.points_label_.begin(),
-                         rhs.points_label_.end());
-    width_ = width_ * height_ + rhs.width_ * rhs.height_;
+    points_label_.insert(points_label_.end(), rhs.points_label_.begin(), rhs.points_label_.end());
+    width_  = width_ * height_ + rhs.width_ * rhs.height_;
     height_ = 1;
     return *this;
   }
@@ -328,7 +313,7 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_beam_id_.resize(size, -1);
     points_label_.resize(size, 0);
     if (size != width_ * height_) {
-      width_ = size;
+      width_  = size;
       height_ = 1;
     }
   }
@@ -339,18 +324,20 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_height_.push_back(std::numeric_limits<float>::max());
     points_beam_id_.push_back(-1);
     points_label_.push_back(0);
-    width_ = points_.size();
+    width_  = points_.size();
     height_ = 1;
   }
-  inline void push_back(const PointT& point, double timestamp,
-                        float height = std::numeric_limits<float>::max(),
-                        int32_t beam_id = -1, uint8_t label = 0) {
+  inline void push_back(const PointT& point,
+                        double        timestamp,
+                        float         height  = std::numeric_limits<float>::max(),
+                        int32_t       beam_id = -1,
+                        uint8_t       label   = 0) {
     points_.push_back(point);
     points_timestamp_.push_back(timestamp);
     points_height_.push_back(height);
     points_beam_id_.push_back(beam_id);
     points_label_.push_back(label);
-    width_ = points_.size();
+    width_  = points_.size();
     height_ = 1;
   }
   // @brief overrided clear function wrapper of vector
@@ -363,42 +350,40 @@ class AttributePointCloud : public PointCloud<PointT> {
     width_ = height_ = 0;
   }
   // @brief overrided swap point given source and target id
-  inline bool SwapPoint(const size_t source_id,
-                        const size_t target_id) override {
+  inline bool SwapPoint(const size_t source_id, const size_t target_id) override {
     if (source_id < points_.size() && target_id < points_.size()) {
       std::swap(points_[source_id], points_[target_id]);
       std::swap(points_timestamp_[source_id], points_timestamp_[target_id]);
       std::swap(points_height_[source_id], points_height_[target_id]);
       std::swap(points_beam_id_[source_id], points_beam_id_[target_id]);
       std::swap(points_label_[source_id], points_label_[target_id]);
-      width_ = points_.size();
+      width_  = points_.size();
       height_ = 1;
       return true;
     }
     return false;
   }
   // @brief copy point from another point cloud
-  inline bool CopyPoint(const size_t id, const size_t rhs_id,
-                        const AttributePointCloud<PointT>& rhs) {
+  inline bool
+  CopyPoint(const size_t id, const size_t rhs_id, const AttributePointCloud<PointT>& rhs) {
     if (id < points_.size() && rhs_id < rhs.points_.size()) {
-      points_[id] = rhs.points_[rhs_id];
+      points_[id]           = rhs.points_[rhs_id];
       points_timestamp_[id] = rhs.points_timestamp_[rhs_id];
-      points_height_[id] = rhs.points_height_[rhs_id];
-      points_beam_id_[id] = rhs.points_beam_id_[rhs_id];
-      points_label_[id] = rhs.points_label_[rhs_id];
+      points_height_[id]    = rhs.points_height_[rhs_id];
+      points_beam_id_[id]   = rhs.points_beam_id_[rhs_id];
+      points_label_[id]     = rhs.points_label_[rhs_id];
       return true;
     }
     return false;
   }
   // @brief copy point cloud
-  inline void CopyPointCloud(const AttributePointCloud<PointT>& rhs,
-                             const PointIndices& indices) {
+  inline void CopyPointCloud(const AttributePointCloud<PointT>& rhs, const PointIndices& indices) {
     CopyPointCloud(rhs, indices.indices);
   }
   template <typename IndexType>
   inline void CopyPointCloud(const AttributePointCloud<PointT>& rhs,
-                             const std::vector<IndexType>& indices) {
-    width_ = indices.size();
+                             const std::vector<IndexType>&      indices) {
+    width_  = indices.size();
     height_ = 1;
     points_.resize(indices.size());
     points_timestamp_.resize(indices.size());
@@ -406,11 +391,11 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_beam_id_.resize(indices.size());
     points_label_.resize(indices.size());
     for (size_t i = 0; i < indices.size(); ++i) {
-      points_[i] = rhs.points_[indices[i]];
+      points_[i]           = rhs.points_[indices[i]];
       points_timestamp_[i] = rhs.points_timestamp_[indices[i]];
-      points_height_[i] = rhs.points_height_[indices[i]];
-      points_beam_id_[i] = rhs.points_beam_id_[indices[i]];
-      points_label_[i] = rhs.points_label_[indices[i]];
+      points_height_[i]    = rhs.points_height_[indices[i]];
+      points_beam_id_[i]   = rhs.points_beam_id_[indices[i]];
+      points_label_[i]     = rhs.points_label_[indices[i]];
     }
   }
 
@@ -430,69 +415,62 @@ class AttributePointCloud : public PointCloud<PointT> {
   bool CheckConsistency() const override {
     return ((points_.size() == points_timestamp_.size()) &&
             (points_.size() == points_height_.size()) &&
-            (points_.size() == points_beam_id_.size()) &&
-            (points_.size() == points_label_.size()));
+            (points_.size() == points_beam_id_.size()) && (points_.size() == points_label_.size()));
   }
 
-  size_t TransferToIndex(const size_t col, const size_t row) const {
-    return row * width_ + col;
-  }
+  size_t TransferToIndex(const size_t col, const size_t row) const { return row * width_ + col; }
 
-  const std::vector<double>& points_timestamp() const {
-    return points_timestamp_;
-  }
-  double points_timestamp(size_t i) const { return points_timestamp_[i]; }
-  std::vector<double>* mutable_points_timestamp() { return &points_timestamp_; }
+  const std::vector<double>& points_timestamp() const { return points_timestamp_; }
+  double                     points_timestamp(size_t i) const { return points_timestamp_[i]; }
+  std::vector<double>*       mutable_points_timestamp() { return &points_timestamp_; }
 
   const std::vector<float>& points_height() const { return points_height_; }
-  float& points_height(size_t i) { return points_height_[i]; }
-  const float& points_height(size_t i) const { return points_height_[i]; }
-  void SetPointHeight(size_t i, size_t j, float height) {
-    points_height_[i * width_ + j] = height;
-  }
+  float&                    points_height(size_t i) { return points_height_[i]; }
+  const float&              points_height(size_t i) const { return points_height_[i]; }
+  void SetPointHeight(size_t i, size_t j, float height) { points_height_[i * width_ + j] = height; }
   void SetPointHeight(size_t i, float height) { points_height_[i] = height; }
   std::vector<float>* mutable_points_height() { return &points_height_; }
 
   const std::vector<int32_t>& points_beam_id() const { return points_beam_id_; }
-  std::vector<int32_t>* mutable_points_beam_id() { return &points_beam_id_; }
-  int32_t& points_beam_id(size_t i) { return points_beam_id_[i]; }
-  const int32_t& points_beam_id(size_t i) const { return points_beam_id_[i]; }
+  std::vector<int32_t>*       mutable_points_beam_id() { return &points_beam_id_; }
+  int32_t&                    points_beam_id(size_t i) { return points_beam_id_[i]; }
+  const int32_t&              points_beam_id(size_t i) const { return points_beam_id_[i]; }
 
   const std::vector<uint8_t>& points_label() const { return points_label_; }
-  std::vector<uint8_t>* mutable_points_label() { return &points_label_; }
+  std::vector<uint8_t>*       mutable_points_label() { return &points_label_; }
 
-  uint8_t& points_label(size_t i) { return points_label_[i]; }
+  uint8_t&       points_label(size_t i) { return points_label_[i]; }
   const uint8_t& points_label(size_t i) const { return points_label_[i]; }
 
  protected:
-  std::vector<double> points_timestamp_;
-  std::vector<float> points_height_;
+  std::vector<double>  points_timestamp_;
+  std::vector<float>   points_height_;
   std::vector<int32_t> points_beam_id_;
   std::vector<uint8_t> points_label_;
 };
 
 // typedef of point cloud indices
-typedef std::shared_ptr<PointIndices> PointIndicesPtr;
+typedef std::shared_ptr<PointIndices>       PointIndicesPtr;
 typedef std::shared_ptr<const PointIndices> PointIndicesConstPtr;
 
 // typedef of point cloud
 typedef AttributePointCloud<PointF> PointFCloud;
 typedef AttributePointCloud<PointD> PointDCloud;
 
-typedef std::shared_ptr<PointFCloud> PointFCloudPtr;
+typedef std::shared_ptr<PointFCloud>       PointFCloudPtr;
 typedef std::shared_ptr<const PointFCloud> PointFCloudConstPtr;
 
-typedef std::shared_ptr<PointDCloud> PointDCloudPtr;
+typedef std::shared_ptr<PointDCloud>       PointDCloudPtr;
 typedef std::shared_ptr<const PointDCloud> PointDCloudConstPtr;
 
 // typedef of polygon
 typedef PointCloud<PointF> PolygonFType;
 typedef PointCloud<PointD> PolygonDType;
 
-typedef std::shared_ptr<PolygonFType> PolygonFTypePtr;
+typedef std::shared_ptr<PolygonFType>       PolygonFTypePtr;
 typedef std::shared_ptr<const PolygonFType> PolygonFTypeConstPtr;
 
-typedef std::shared_ptr<PolygonDType> PolygonDTypePtr;
+typedef std::shared_ptr<PolygonDType>       PolygonDTypePtr;
 typedef std::shared_ptr<const PolygonDType> PolygonDTypeConstPtr;
 
 }  // namespace base

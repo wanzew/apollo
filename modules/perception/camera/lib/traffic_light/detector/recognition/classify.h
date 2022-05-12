@@ -19,11 +19,12 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/camera/lib/traffic_light/detector/recognition/proto/recognition.pb.h"
+
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image_8u.h"
 #include "modules/perception/base/traffic_light.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
-#include "modules/perception/camera/lib/traffic_light/detector/recognition/proto/recognition.pb.h"
 #include "modules/perception/inference/inference.h"
 
 namespace apollo {
@@ -32,30 +33,29 @@ namespace camera {
 
 class ClassifyBySimple {
  public:
-  ClassifyBySimple() = default;
+  ClassifyBySimple()  = default;
   ~ClassifyBySimple() = default;
 
   void Init(const traffic_light::recognition::ClassifyParam& model_config,
-            const int gpu_id, const std::string work_root);
+            const int                                        gpu_id,
+            const std::string                                work_root);
 
-  void Perform(const CameraFrame* frame,
-               std::vector<base::TrafficLightPtr>* lights);
+  void Perform(const CameraFrame* frame, std::vector<base::TrafficLightPtr>* lights);
 
  private:
-  void Prob2Color(const float* out_put_data, float threshold,
-                  base::TrafficLightPtr light);
+  void Prob2Color(const float* out_put_data, float threshold, base::TrafficLightPtr light);
   std::shared_ptr<inference::Inference> rt_net_ = nullptr;
-  DataProvider::ImageOptions data_provider_image_option_;
-  std::shared_ptr<base::Image8U> image_ = nullptr;
-  std::shared_ptr<base::Blob<float>> mean_buffer_;
-  std::shared_ptr<base::Blob<float>> mean_;
-  std::vector<std::string> net_inputs_;
-  std::vector<std::string> net_outputs_;
-  int resize_width_;
-  int resize_height_;
-  float unknown_threshold_;
-  float scale_;
-  int gpu_id_ = 0;
+  DataProvider::ImageOptions            data_provider_image_option_;
+  std::shared_ptr<base::Image8U>        image_ = nullptr;
+  std::shared_ptr<base::Blob<float>>    mean_buffer_;
+  std::shared_ptr<base::Blob<float>>    mean_;
+  std::vector<std::string>              net_inputs_;
+  std::vector<std::string>              net_outputs_;
+  int                                   resize_width_;
+  int                                   resize_height_;
+  float                                 unknown_threshold_;
+  float                                 scale_;
+  int                                   gpu_id_ = 0;
 };
 
 }  // namespace camera

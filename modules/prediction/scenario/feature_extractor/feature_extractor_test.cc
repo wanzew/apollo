@@ -32,11 +32,9 @@ TEST_F(FeatureExtractorTest, junction) {
       container_manager->CreateContainer(AdapterConfig::PLANNING_TRAJECTORY);
 
   EnvironmentFeatures environment_features;
-  FeatureExtractor::ExtractFrontJunctionFeatures(&environment_features,
-                                                 container_manager.get());
+  FeatureExtractor::ExtractFrontJunctionFeatures(&environment_features, container_manager.get());
 
-  environment_features =
-      FeatureExtractor::ExtractEnvironmentFeatures(container_manager.get());
+  environment_features = FeatureExtractor::ExtractEnvironmentFeatures(container_manager.get());
   EXPECT_FALSE(environment_features.has_front_junction());
 }
 

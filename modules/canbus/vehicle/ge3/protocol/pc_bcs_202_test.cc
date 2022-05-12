@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_bcs_202.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ class Pcbcs202Test : public ::testing::Test {
 };
 
 TEST_F(Pcbcs202Test, reset) {
-  uint8_t data[8] = {0x01, 0x02, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t  data[8] = {0x01, 0x02, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Pcbcs202 pcbcs202;
   EXPECT_EQ(pcbcs202.GetPeriod(), 20 * 1000);
   pcbcs202.UpdateData(data);

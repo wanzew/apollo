@@ -17,6 +17,7 @@
 #pragma once
 
 #include <unistd.h>
+
 #include <cstdio>
 
 #include "modules/drivers/lidar/velodyne/driver/input.h"
@@ -37,12 +38,12 @@ class SocketInput : public Input {
   SocketInput();
   virtual ~SocketInput();
   void init(const int& port) override;
-  int get_firing_data_packet(VelodynePacket* pkt);
-  int get_positioning_data_packet(NMEATimePtr nmea_time);
+  int  get_firing_data_packet(VelodynePacket* pkt);
+  int  get_positioning_data_packet(NMEATimePtr nmea_time);
 
  private:
-  int sockfd_;
-  int port_;
+  int  sockfd_;
+  int  port_;
   bool input_available(int timeout);
 };
 

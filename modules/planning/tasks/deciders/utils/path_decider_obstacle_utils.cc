@@ -27,17 +27,13 @@ namespace planning {
 
 bool IsWithinPathDeciderScopeObstacle(const Obstacle& obstacle) {
   // Obstacle should be non-virtual.
-  if (obstacle.IsVirtual()) {
-    return false;
-  }
+  if (obstacle.IsVirtual()) { return false; }
   // Obstacle should not have ignore decision.
-  if (obstacle.HasLongitudinalDecision() && obstacle.HasLateralDecision() &&
-      obstacle.IsIgnore()) {
+  if (obstacle.HasLongitudinalDecision() && obstacle.HasLateralDecision() && obstacle.IsIgnore()) {
     return false;
   }
   // Obstacle should not be moving obstacle.
-  if (!obstacle.IsStatic() ||
-      obstacle.speed() > FLAGS_static_obstacle_speed_threshold) {
+  if (!obstacle.IsStatic() || obstacle.speed() > FLAGS_static_obstacle_speed_threshold) {
     return false;
   }
   // TODO(jiacheng):
@@ -50,32 +46,27 @@ bool IsWithinPathDeciderScopeObstacle(const Obstacle& obstacle) {
 }
 
 bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary,
-                                   const double s, double* ptr_l_min,
-                                   double* ptr_l_max) {
+                                   const double      s,
+                                   double*           ptr_l_min,
+                                   double*           ptr_l_max) {
   *ptr_l_min = std::numeric_limits<double>::max();
   *ptr_l_max = -std::numeric_limits<double>::max();
 
   // invalid polygon
-  if (sl_boundary.boundary_point_size() < 3) {
-    return false;
-  }
+  if (sl_boundary.boundary_point_size() < 3) { return false; }
 
   bool has_intersection = false;
   for (auto i = 0; i < sl_boundary.boundary_point_size(); ++i) {
-    auto j = (i + 1) % sl_boundary.boundary_point_size();
+    auto        j  = (i + 1) % sl_boundary.boundary_point_size();
     const auto& p0 = sl_boundary.boundary_point(i);
     const auto& p1 = sl_boundary.boundary_point(j);
 
-    if (common::util::WithinBound<double>(std::fmin(p0.s(), p1.s()),
-                                          std::fmax(p0.s(), p1.s()), s)) {
+    if (common::util::WithinBound<double>(std::fmin(p0.s(), p1.s()), std::fmax(p0.s(), p1.s()),
+                                          s)) {
       has_intersection = true;
-      auto l = common::math::lerp<double>(p0.l(), p0.s(), p1.l(), p1.s(), s);
-      if (l < *ptr_l_min) {
-        *ptr_l_min = l;
-      }
-      if (l > *ptr_l_max) {
-        *ptr_l_max = l;
-      }
+      auto l           = common::math::lerp<double>(p0.l(), p0.s(), p1.l(), p1.s(), s);
+      if (l < *ptr_l_min) { *ptr_l_min = l; }
+      if (l > *ptr_l_max) { *ptr_l_max = l; }
     }
   }
   return has_intersection;

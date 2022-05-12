@@ -79,21 +79,11 @@ class Logger : public nvinfer1::ILogger {
     if (severity > reportable_severity) return;
 
     switch (severity) {
-      case Severity::kINTERNAL_ERROR:
-        std::cerr << "INTERNAL_ERROR: ";
-        break;
-      case Severity::kERROR:
-        std::cerr << "ERROR: ";
-        break;
-      case Severity::kWARNING:
-        std::cerr << "WARNING: ";
-        break;
-      case Severity::kINFO:
-        std::cerr << "INFO: ";
-        break;
-      default:
-        std::cerr << "UNKNOWN: ";
-        break;
+      case Severity::kINTERNAL_ERROR: std::cerr << "INTERNAL_ERROR: "; break;
+      case Severity::kERROR: std::cerr << "ERROR: "; break;
+      case Severity::kWARNING: std::cerr << "WARNING: "; break;
+      case Severity::kINFO: std::cerr << "INFO: "; break;
+      default: std::cerr << "UNKNOWN: "; break;
     }
     std::cerr << msg << std::endl;
   }
@@ -113,39 +103,39 @@ class PointPillars {
   static const float kMaxXRange;
   static const float kMaxYRange;
   static const float kMaxZRange;
-  static const int kNumClass;
-  static const int kMaxNumPillars;
-  static const int kMaxNumPointsPerPillar;
-  static const int kNumPointFeature;
-  static const int kGridXSize;
-  static const int kGridYSize;
-  static const int kGridZSize;
-  static const int kRpnInputSize;
-  static const int kNumAnchor;
-  static const int kNumOutputBoxFeature;
-  static const int kRpnBoxOutputSize;
-  static const int kRpnClsOutputSize;
-  static const int kRpnDirOutputSize;
-  static const int kBatchSize;
-  static const int kNumIndsForScan;
-  static const int kNumThreads;
+  static const int   kNumClass;
+  static const int   kMaxNumPillars;
+  static const int   kMaxNumPointsPerPillar;
+  static const int   kNumPointFeature;
+  static const int   kGridXSize;
+  static const int   kGridYSize;
+  static const int   kGridZSize;
+  static const int   kRpnInputSize;
+  static const int   kNumAnchor;
+  static const int   kNumOutputBoxFeature;
+  static const int   kRpnBoxOutputSize;
+  static const int   kRpnClsOutputSize;
+  static const int   kRpnDirOutputSize;
+  static const int   kBatchSize;
+  static const int   kNumIndsForScan;
+  static const int   kNumThreads;
   // if you change kNumThreads, need to modify NUM_THREADS_MACRO in
   // common.h
-  static const int kNumBoxCorners;
-  static const std::vector<int> kAnchorStrides;
-  static const std::vector<int> kAnchorRanges;
-  static const std::vector<int> kNumAnchorSets;
+  static const int                             kNumBoxCorners;
+  static const std::vector<int>                kAnchorStrides;
+  static const std::vector<int>                kAnchorRanges;
+  static const std::vector<int>                kNumAnchorSets;
   static const std::vector<std::vector<float>> kAnchorDxSizes;
   static const std::vector<std::vector<float>> kAnchorDySizes;
   static const std::vector<std::vector<float>> kAnchorDzSizes;
   static const std::vector<std::vector<float>> kAnchorZCoors;
-  static const std::vector<std::vector<int>> kNumAnchorRo;
+  static const std::vector<std::vector<int>>   kNumAnchorRo;
   static const std::vector<std::vector<float>> kAnchorRo;
 
   // initialize in initializer list
-  const bool reproduce_result_mode_;
-  const float score_threshold_;
-  const float nms_overlap_threshold_;
+  const bool        reproduce_result_mode_;
+  const float       score_threshold_;
+  const float       nms_overlap_threshold_;
   const std::string pfe_onnx_file_;
   const std::string rpn_onnx_file_;
   const std::string pfe_torch_file_;
@@ -170,12 +160,12 @@ class PointPillars {
   float* box_anchors_max_x_;
   float* box_anchors_max_y_;
 
-  int* dev_x_coors_;
-  int* dev_y_coors_;
+  int*   dev_x_coors_;
+  int*   dev_y_coors_;
   float* dev_num_points_per_pillar_;
-  int* dev_sparse_pillar_map_;
-  int* dev_cumsum_along_x_;
-  int* dev_cumsum_along_y_;
+  int*   dev_sparse_pillar_map_;
+  int*   dev_cumsum_along_x_;
+  int*   dev_cumsum_along_y_;
 
   float* dev_pillar_point_feature_;
   float* dev_pillar_coors_;
@@ -184,7 +174,7 @@ class PointPillars {
   float* dev_box_anchors_min_y_;
   float* dev_box_anchors_max_x_;
   float* dev_box_anchors_max_y_;
-  int* dev_anchor_mask_;
+  int*   dev_anchor_mask_;
 
   void* pfe_buffers_[3];
   void* rpn_buffers_[4];
@@ -200,25 +190,25 @@ class PointPillars {
   float* dev_anchors_ro_;
   float* dev_filtered_box_;
   float* dev_filtered_score_;
-  int* dev_filtered_label_;
-  int* dev_filtered_dir_;
+  int*   dev_filtered_label_;
+  int*   dev_filtered_dir_;
   float* dev_box_for_nms_;
-  int* dev_filter_count_;
+  int*   dev_filter_count_;
 
-  std::unique_ptr<PreprocessPoints> preprocess_points_ptr_;
+  std::unique_ptr<PreprocessPoints>     preprocess_points_ptr_;
   std::unique_ptr<PreprocessPointsCuda> preprocess_points_cuda_ptr_;
-  std::unique_ptr<AnchorMaskCuda> anchor_mask_cuda_ptr_;
-  std::unique_ptr<PostprocessCuda> postprocess_cuda_ptr_;
+  std::unique_ptr<AnchorMaskCuda>       anchor_mask_cuda_ptr_;
+  std::unique_ptr<PostprocessCuda>      postprocess_cuda_ptr_;
 
-  Logger g_logger_;
-  nvinfer1::ICudaEngine* pfe_engine_;
-  nvinfer1::ICudaEngine* rpn_engine_;
+  Logger                       g_logger_;
+  nvinfer1::ICudaEngine*       pfe_engine_;
+  nvinfer1::ICudaEngine*       rpn_engine_;
   nvinfer1::IExecutionContext* pfe_context_;
   nvinfer1::IExecutionContext* rpn_context_;
 
-  int device_id_ = -1;
-  int gpu_id_ = 0;
-  torch::DeviceType device_type_;
+  int                        device_id_ = -1;
+  int                        gpu_id_    = 0;
+  torch::DeviceType          device_type_;
   torch::jit::script::Module pfe_net_;
   torch::jit::script::Module scattered_net_;
   torch::jit::script::Module backbone_net_;
@@ -267,9 +257,12 @@ class PointPillars {
    * anchor
    * @details Generate anchors for each grid
    */
-  void GenerateAnchors(float* anchors_px_, float* anchors_py_,
-                       float* anchors_pz_, float* anchors_dx_,
-                       float* anchors_dy_, float* anchors_dz_,
+  void GenerateAnchors(float* anchors_px_,
+                       float* anchors_py_,
+                       float* anchors_pz_,
+                       float* anchors_dx_,
+                       float* anchors_dy_,
+                       float* anchors_dz_,
                        float* anchors_ro_);
 
   /**
@@ -278,8 +271,7 @@ class PointPillars {
    * @param[out] engine_ptr TensorRT model engine made out of ONNX model
    * @details Load ONNX model, and convert it to TensorRT model
    */
-  void OnnxToTRTModel(const std::string& model_file,
-                      nvinfer1::ICudaEngine** engine_ptr);
+  void OnnxToTRTModel(const std::string& model_file, nvinfer1::ICudaEngine** engine_ptr);
 
   /**
    * @brief Preproces points
@@ -322,7 +314,8 @@ class PointPillars {
    *   Represents maximum y value for a corresponding anchor
    * @details Make box anchors for nms
    */
-  void ConvertAnchors2BoxAnchors(float* anchors_px_, float* anchors_py_,
+  void ConvertAnchors2BoxAnchors(float* anchors_px_,
+                                 float* anchors_py_,
                                  float* box_anchors_min_x_,
                                  float* box_anchors_min_y_,
                                  float* box_anchors_max_x_,
@@ -348,8 +341,9 @@ class PointPillars {
    * @param[in] bbox_head_torch_file Pillar Bbox Head Torch file path
    * @details Variables could be changed through point_pillars_detection
    */
-  PointPillars(const bool reproduce_result_mode, const float score_threshold,
-               const float nms_overlap_threshold,
+  PointPillars(const bool         reproduce_result_mode,
+               const float        score_threshold,
+               const float        nms_overlap_threshold,
                const std::string& pfe_torch_file,
                const std::string& scattered_torch_file,
                const std::string& backbone_torch_file,
@@ -365,9 +359,10 @@ class PointPillars {
    * @param[out] out_labels Network output object's label
    * @details This is an interface for the algorithm
    */
-  void DoInference(const float* in_points_array, const int in_num_points,
+  void DoInference(const float*        in_points_array,
+                   const int           in_num_points,
                    std::vector<float>* out_detections,
-                   std::vector<int>* out_labels);
+                   std::vector<int>*   out_labels);
 };
 
 }  // namespace lidar

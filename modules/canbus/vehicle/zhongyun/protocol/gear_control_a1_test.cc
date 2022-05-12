@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/zhongyun/protocol/gear_control_a1.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ class Gearcontrola1Test : public ::testing::Test {
 };
 
 TEST_F(Gearcontrola1Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t       data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Gearcontrola1 gear;
   EXPECT_EQ(gear.GetPeriod(), 20 * 1000);
   gear.UpdateData(data);

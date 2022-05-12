@@ -68,24 +68,23 @@ class LRClassifier {
     float z_min = std::numeric_limits<float>::max();
     for (size_t i = 0; i < cloud->size(); ++i) {
       auto pt = (*cloud)[i];
-      x_min = std::min(x_min, pt.x);
-      x_max = std::max(x_max, pt.x);
-      y_min = std::min(y_min, pt.y);
-      y_max = std::max(y_max, pt.y);
-      z_min = std::min(z_min, pt.z);
-      z_max = std::max(z_max, pt.z);
+      x_min   = std::min(x_min, pt.x);
+      x_max   = std::max(x_max, pt.x);
+      y_min   = std::min(y_min, pt.y);
+      y_max   = std::max(y_max, pt.y);
+      z_min   = std::min(z_min, pt.z);
+      z_max   = std::max(z_max, pt.z);
     }
-    Eigen::Vector3f fea = {x_max - x_min, y_max - y_min, z_max - z_min};
+    Eigen::Vector3f fea      = {x_max - x_min, y_max - y_min, z_max - z_min};
     Eigen::VectorXf response = fea.transpose() * _lr_parameters;
-    int type = 0;
+    int             type     = 0;
     // float max_score = response.maxCoeff(&type);
     return _labels[type];
   }
 
  private:
-  Eigen::MatrixXf _lr_parameters;
-  std::vector<std::string> _labels = {"unknown", "nonMot", "pedestrian",
-                                      "smallMot"};
+  Eigen::MatrixXf          _lr_parameters;
+  std::vector<std::string> _labels = {"unknown", "nonMot", "pedestrian", "smallMot"};
 };
 
 }  // namespace lidar

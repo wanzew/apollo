@@ -59,34 +59,37 @@ DEFINE_string(bbox_head_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
               "models/detection/point_pillars/pts_bbox_head.zip",
               "The path of pillars bbox head torch file.");
-DEFINE_double(normalizing_factor, 255,
-              "Normalize intensity range to [0, 1] by this factor.");
-DEFINE_int32(num_point_feature, 5,
+DEFINE_double(normalizing_factor, 255, "Normalize intensity range to [0, 1] by this factor.");
+DEFINE_int32(num_point_feature,
+             5,
              "Length of raw point feature. Features include x, y, z,"
              "intensity and delta of time.");
 DEFINE_bool(enable_ground_removal, false, "Enable ground removal.");
 DEFINE_double(ground_removal_height, -1.5, "Height for ground removal.");
-DEFINE_bool(enable_downsample_beams, false,
+DEFINE_bool(enable_downsample_beams,
+            false,
             "Enable down sampling point cloud beams with a factor.");
-DEFINE_int32(downsample_beams_factor, 4,
-             "Down sample point cloud beams with this factor.");
-DEFINE_bool(enable_downsample_pointcloud, false,
+DEFINE_int32(downsample_beams_factor, 4, "Down sample point cloud beams with this factor.");
+DEFINE_bool(enable_downsample_pointcloud,
+            false,
             "Enable down sampling point cloud into centroids of voxel grid.");
-DEFINE_double(downsample_voxel_size_x, 0.01,
+DEFINE_double(downsample_voxel_size_x,
+              0.01,
               "X-axis size of voxels used for down sampling point cloud.");
-DEFINE_double(downsample_voxel_size_y, 0.01,
+DEFINE_double(downsample_voxel_size_y,
+              0.01,
               "Y-axis size of voxels used for down sampling point cloud.");
-DEFINE_double(downsample_voxel_size_z, 0.01,
+DEFINE_double(downsample_voxel_size_z,
+              0.01,
               "Z-axis size of voxels used for down sampling point cloud.");
-DEFINE_bool(enable_fuse_frames, false,
+DEFINE_bool(enable_fuse_frames,
+            false,
             "Enable fusing preceding frames' point cloud into current frame.");
-DEFINE_int32(num_fuse_frames, 5,
-             "Number of frames to fuse, including current frame.");
-DEFINE_double(fuse_time_interval, 0.5,
-              "Time interval in seconds of frames to fuse.");
-DEFINE_bool(enable_shuffle_points, false,
-            "Enable shuffling points before preprocessing.");
-DEFINE_int32(max_num_points, std::numeric_limits<int>::max(),
+DEFINE_int32(num_fuse_frames, 5, "Number of frames to fuse, including current frame.");
+DEFINE_double(fuse_time_interval, 0.5, "Time interval in seconds of frames to fuse.");
+DEFINE_bool(enable_shuffle_points, false, "Enable shuffling points before preprocessing.");
+DEFINE_int32(max_num_points,
+             std::numeric_limits<int>::max(),
              "Max number of points to preprocess.");
 DEFINE_bool(reproduce_result_mode, false, "True if preprocess in CPU mode.");
 DEFINE_double(score_threshold, 0.5, "Classification score threshold.");
@@ -141,7 +144,6 @@ DEFINE_string(torch_detector_model,
               "The torch model file for emergency detection");
 
 // lidar sensor name
-DEFINE_string(lidar_sensor_name, "velodyne128",
-              "lidar sensor name");
+DEFINE_string(lidar_sensor_name, "velodyne128", "lidar sensor name");
 }  // namespace perception
 }  // namespace apollo

@@ -26,13 +26,13 @@ namespace prediction {
 
 class PredictionConstants {
  public:
-  static const int kOnlineMode = 0;
-  static const int kDumpFeatureProto = 1;
-  static const int kDumpDataForLearning = 2;
+  static const int kOnlineMode           = 0;
+  static const int kDumpFeatureProto     = 1;
+  static const int kDumpDataForLearning  = 2;
   static const int kDumpPredictionResult = 3;
-  static const int kDumpFrameEnv = 4;
-  static const int kDumpDataForTuning = 5;
-  static const int kDumpRecord = 6;
+  static const int kDumpFrameEnv         = 4;
+  static const int kDumpDataForTuning    = 5;
+  static const int kDumpRecord           = 6;
 };
 
 }  // namespace prediction

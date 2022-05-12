@@ -31,13 +31,14 @@ namespace fusion {
 
 struct SensorFrameHeader {
   base::SensorInfo sensor_info;
-  double timestamp = 0.0;
-  Eigen::Affine3d sensor2world_pose;
+  double           timestamp = 0.0;
+  Eigen::Affine3d  sensor2world_pose;
 
   SensorFrameHeader() = default;
-  SensorFrameHeader(const base::SensorInfo& info, double ts,
-                    const Eigen::Affine3d& pose)
-      : sensor_info(info), timestamp(ts), sensor2world_pose(pose) {}
+  SensorFrameHeader(const base::SensorInfo& info, double ts, const Eigen::Affine3d& pose)
+      : sensor_info(info)
+      , timestamp(ts)
+      , sensor2world_pose(pose) {}
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
@@ -50,8 +51,7 @@ class SensorFrame {
 
   void Initialize(const base::FrameConstPtr& base_frame_ptr);
 
-  void Initialize(const base::FrameConstPtr& base_frame_ptr,
-                  const SensorPtr& sensor);
+  void Initialize(const base::FrameConstPtr& base_frame_ptr, const SensorPtr& sensor);
 
   // Getter
   inline double GetTimestamp() const { return header_->timestamp; }
@@ -65,17 +65,13 @@ class SensorFrame {
     return true;
   }
 
-  inline std::vector<SensorObjectPtr>& GetForegroundObjects() {
-    return foreground_objects_;
-  }
+  inline std::vector<SensorObjectPtr>& GetForegroundObjects() { return foreground_objects_; }
 
   inline const std::vector<SensorObjectPtr>& GetForegroundObjects() const {
     return foreground_objects_;
   }
 
-  inline std::vector<SensorObjectPtr>& GetBackgroundObjects() {
-    return background_objects_;
-  }
+  inline std::vector<SensorObjectPtr>& GetBackgroundObjects() { return background_objects_; }
 
   inline const std::vector<SensorObjectPtr>& GetBackgroundObjects() const {
     return background_objects_;
@@ -92,8 +88,8 @@ class SensorFrame {
   std::vector<SensorObjectPtr> background_objects_;
 
   // sensor-specific frame supplements
-  base::LidarFrameSupplement lidar_frame_supplement_;
-  base::RadarFrameSupplement radar_frame_supplement_;
+  base::LidarFrameSupplement  lidar_frame_supplement_;
+  base::RadarFrameSupplement  radar_frame_supplement_;
   base::CameraFrameSupplement camera_frame_supplement_;
 
   SensorFrameHeaderPtr header_ = nullptr;

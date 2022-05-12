@@ -31,8 +31,8 @@ namespace park_and_go {
 
 using apollo::common::TrajectoryPoint;
 
-Stage::StageStatus ParkAndGoStagePreCruise::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus ParkAndGoStagePreCruise::Process(const TrajectoryPoint& planning_init_point,
+                                                    Frame*                 frame) {
   ADEBUG << "stage: Pre Cruise";
   CHECK_NOTNULL(frame);
 
@@ -51,8 +51,7 @@ Stage::StageStatus ParkAndGoStagePreCruise::Process(
 
   if ((std::fabs(vehicle_status->steering_percentage()) <
        scenario_config_.max_steering_percentage_when_cruise()) &&
-      scenario::util::CheckADCReadyToCruise(injector_->vehicle_state(), frame,
-                                            scenario_config_)) {
+      scenario::util::CheckADCReadyToCruise(injector_->vehicle_state(), frame, scenario_config_)) {
     return FinishStage();
   }
   return StageStatus::RUNNING;

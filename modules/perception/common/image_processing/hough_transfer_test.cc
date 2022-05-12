@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
-
 #include "modules/perception/common/image_processing/hough_transfer.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
 namespace common {
 
 TEST(HoughTransferTest, image_no_line_test) {
-  int iarray[] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
-  std::vector<int> image(iarray, iarray + 16);
+  int                    iarray[] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+  std::vector<int>       image(iarray, iarray + 16);
   std::vector<HoughLine> lines;
   lines.reserve(10);
   HoughTransfer transfer;
-  bool flag = transfer.Init(4, 4, 1.0, 1.0);
+  bool          flag = transfer.Init(4, 4, 1.0, 1.0);
   EXPECT_TRUE(flag);
   transfer.ImageVote(image, true);
   transfer.GetLines(4, 1, 1, true, &lines);
@@ -64,12 +64,12 @@ TEST(HoughTransferTest, image_no_line_test) {
 }
 
 TEST(HoughTransferTest, image_one_line_test) {
-  int iarray[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0};
-  std::vector<int> image(iarray, iarray + 16);
+  int                    iarray[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0};
+  std::vector<int>       image(iarray, iarray + 16);
   std::vector<HoughLine> lines;
   lines.reserve(10);
   HoughTransfer transfer;
-  bool flag = transfer.Init(4, 4, 1.0, 1.0);
+  bool          flag = transfer.Init(4, 4, 1.0, 1.0);
   EXPECT_TRUE(flag);
   EXPECT_NEAR(transfer.get_d_r(), 1.0, 1e-6);
   EXPECT_NEAR(transfer.get_d_theta(), 1.0 * M_PI / 180, 1e-6);

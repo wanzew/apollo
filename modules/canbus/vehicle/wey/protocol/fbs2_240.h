@@ -17,19 +17,18 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace wey {
 
-class Fbs2240 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Fbs2240 : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Fbs2240();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Front left wheel Moving direction',
@@ -39,7 +38,7 @@ class Fbs2240 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
   // 'bit': 57, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Fbs2_240::FlwheeldirectionType flwheeldirection(const std::uint8_t* bytes,
-                                                  const int32_t length) const;
+                                                  const int32_t       length) const;
 
   // config detail: {'description': 'Front right wheel speed', 'offset': 0.0,
   // 'precision': 0.05625, 'len': 13, 'name': 'FRWheelSpd',
@@ -54,8 +53,8 @@ class Fbs2240 : public ::apollo::drivers::canbus::ProtocolData<
   // 'RLWheelDriveDirection', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|3]', 'bit': 9, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Fbs2_240::RlwheeldrivedirectionType rlwheeldrivedirection(
-      const std::uint8_t* bytes, const int32_t length) const;
+  Fbs2_240::RlwheeldrivedirectionType rlwheeldrivedirection(const std::uint8_t* bytes,
+                                                            const int32_t       length) const;
 
   // config detail: {'description': 'Rear left wheel speed', 'offset': 0.0,
   // 'precision': 0.05625, 'len': 13, 'name': 'RLWheelSpd',
@@ -70,7 +69,7 @@ class Fbs2240 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]'
   // 'bit': 25, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Fbs2_240::RrwheeldirectionType rrwheeldirection(const std::uint8_t* bytes,
-                                                  const int32_t length) const;
+                                                  const int32_t       length) const;
 
   // config detail: {'description': 'Rear right wheel speed', 'offset': 0.0,
   // 'precision': 0.05625, 'len': 13, 'name': 'RRWheelSpd',

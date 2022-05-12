@@ -30,55 +30,37 @@ using ::apollo::drivers::canbus::Byte;
 Llcmotionfeedback120::Llcmotionfeedback120() {}
 const int32_t Llcmotionfeedback120::ID = 0x20;
 
-void Llcmotionfeedback120::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ChassisDetail* chassis) const {
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_gear(llc_fbk_gear(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_parkingbrake(llc_fbk_parkingbrake(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_throttleposition(llc_fbk_throttleposition(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_brakepercentrear(llc_fbk_brakepercentrear(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_brakepercentfront(llc_fbk_brakepercentfront(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_steeringcontrolmode(
-          llc_fbk_steeringcontrolmode(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_motionfeedback1_counter(
-          llc_motionfeedback1_counter(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_motionfeedback1_checksum(
-          llc_motionfeedback1_checksum(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_commandaligned(llc_fbk_commandaligned(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_estoppressed(llc_fbk_estoppressed(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_adcrequestautonomy(
-          llc_fbk_adcrequestautonomy(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_allowautonomy(llc_fbk_allowautonomy(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_longitudinalcontrolmode(
-          llc_fbk_longitudinalcontrolmode(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_state(llc_fbk_state(bytes, length));
+void Llcmotionfeedback120::Parse(const std::uint8_t* bytes,
+                                 int32_t             length,
+                                 ChassisDetail*      chassis) const {
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_gear(
+      llc_fbk_gear(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_parkingbrake(
+      llc_fbk_parkingbrake(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_throttleposition(
+      llc_fbk_throttleposition(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_brakepercentrear(
+      llc_fbk_brakepercentrear(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_brakepercentfront(
+      llc_fbk_brakepercentfront(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_steeringcontrolmode(
+      llc_fbk_steeringcontrolmode(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_motionfeedback1_counter(
+      llc_motionfeedback1_counter(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_motionfeedback1_checksum(
+      llc_motionfeedback1_checksum(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_commandaligned(
+      llc_fbk_commandaligned(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_estoppressed(
+      llc_fbk_estoppressed(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_adcrequestautonomy(
+      llc_fbk_adcrequestautonomy(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_allowautonomy(
+      llc_fbk_allowautonomy(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_longitudinalcontrolmode(
+      llc_fbk_longitudinalcontrolmode(bytes, length));
+  chassis->mutable_transit()->mutable_llc_motionfeedback1_20()->set_llc_fbk_state(
+      llc_fbk_state(bytes, length));
 }
 
 // config detail: {'description': 'Current gear', 'enum': {0:
@@ -87,9 +69,9 @@ void Llcmotionfeedback120::Parse(const std::uint8_t* bytes, int32_t length,
 // 'len': 3, 'name': 'llc_fbk_gear', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|3]', 'bit': 50, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
-Llc_motionfeedback1_20::Llc_fbk_gearType Llcmotionfeedback120::llc_fbk_gear(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 6);
+Llc_motionfeedback1_20::Llc_fbk_gearType
+Llcmotionfeedback120::llc_fbk_gear(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(2, 3);
 
   Llc_motionfeedback1_20::Llc_fbk_gearType ret =
@@ -101,9 +83,8 @@ Llc_motionfeedback1_20::Llc_fbk_gearType Llcmotionfeedback120::llc_fbk_gear(
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_parkingbrake', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 53, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcmotionfeedback120::llc_fbk_parkingbrake(const std::uint8_t* bytes,
-                                                int32_t length) const {
-  Byte t0(bytes + 6);
+bool Llcmotionfeedback120::llc_fbk_parkingbrake(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(5, 1);
 
   bool ret = x;
@@ -115,11 +96,11 @@ bool Llcmotionfeedback120::llc_fbk_parkingbrake(const std::uint8_t* bytes,
 // 'is_signed_var': False, 'physical_range': '[0|102.3]', 'bit': 38, 'type':
 // 'double', 'order': 'intel', 'physical_unit': '%'}
 double Llcmotionfeedback120::llc_fbk_throttleposition(const std::uint8_t* bytes,
-                                                      int32_t length) const {
-  Byte t0(bytes + 5);
+                                                      int32_t             length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 4);
+  Byte    t1(bytes + 4);
   int32_t t = t1.get_byte(6, 2);
   x <<= 2;
   x |= t;
@@ -133,11 +114,11 @@ double Llcmotionfeedback120::llc_fbk_throttleposition(const std::uint8_t* bytes,
 // 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 27, 'type':
 // 'double', 'order': 'intel', 'physical_unit': '%'}
 double Llcmotionfeedback120::llc_fbk_brakepercentrear(const std::uint8_t* bytes,
-                                                      int32_t length) const {
-  Byte t0(bytes + 4);
+                                                      int32_t             length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 6);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(3, 5);
   x <<= 5;
   x |= t;
@@ -150,12 +131,12 @@ double Llcmotionfeedback120::llc_fbk_brakepercentrear(const std::uint8_t* bytes,
 // 0.0, 'precision': 0.0556, 'len': 11, 'name': 'llc_fbk_brakepercentfront',
 // 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 16, 'type':
 // 'double', 'order': 'intel', 'physical_unit': '%'}
-double Llcmotionfeedback120::llc_fbk_brakepercentfront(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
+double Llcmotionfeedback120::llc_fbk_brakepercentfront(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 3);
   int32_t x = t0.get_byte(0, 3);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
@@ -172,9 +153,8 @@ double Llcmotionfeedback120::llc_fbk_brakepercentfront(
 // 'physical_range': '[0|3]', 'bit': 6, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
 Llc_motionfeedback1_20::Llc_fbk_steeringcontrolmodeType
-Llcmotionfeedback120::llc_fbk_steeringcontrolmode(const std::uint8_t* bytes,
-                                                  int32_t length) const {
-  Byte t0(bytes + 0);
+Llcmotionfeedback120::llc_fbk_steeringcontrolmode(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(6, 2);
 
   Llc_motionfeedback1_20::Llc_fbk_steeringcontrolmodeType ret =
@@ -187,8 +167,8 @@ Llcmotionfeedback120::llc_fbk_steeringcontrolmode(const std::uint8_t* bytes,
 // 'llc_motionfeedback1_counter', 'is_signed_var': False, 'physical_range':
 // '[0|3]', 'bit': 54, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
 int Llcmotionfeedback120::llc_motionfeedback1_counter(const std::uint8_t* bytes,
-                                                      int32_t length) const {
-  Byte t0(bytes + 6);
+                                                      int32_t             length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(6, 2);
 
   int ret = x;
@@ -199,9 +179,9 @@ int Llcmotionfeedback120::llc_motionfeedback1_counter(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 8, 'name': 'llc_motionfeedback1_checksum',
 // 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type':
 // 'int', 'order': 'intel', 'physical_unit': ''}
-int Llcmotionfeedback120::llc_motionfeedback1_checksum(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 7);
+int Llcmotionfeedback120::llc_motionfeedback1_checksum(const std::uint8_t* bytes,
+                                                       int32_t             length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
@@ -212,9 +192,8 @@ int Llcmotionfeedback120::llc_motionfeedback1_checksum(
 // according to calibration limits', 'offset': 0.0, 'precision': 1.0, 'len': 1,
 // 'name': 'llc_fbk_commandaligned', 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 11, 'type': 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-bool Llcmotionfeedback120::llc_fbk_commandaligned(const std::uint8_t* bytes,
-                                                  int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcmotionfeedback120::llc_fbk_commandaligned(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(3, 1);
 
   bool ret = x;
@@ -225,9 +204,8 @@ bool Llcmotionfeedback120::llc_fbk_commandaligned(const std::uint8_t* bytes,
 // 'precision': 1.0, 'len': 1, 'name': 'llc_fbk_estoppressed', 'is_signed_var':
 // False, 'physical_range': '[0|1]', 'bit': 10, 'type': 'bool', 'order':
 // 'intel', 'physical_unit': 'T/F'}
-bool Llcmotionfeedback120::llc_fbk_estoppressed(const std::uint8_t* bytes,
-                                                int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcmotionfeedback120::llc_fbk_estoppressed(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(2, 1);
 
   bool ret = x;
@@ -239,8 +217,8 @@ bool Llcmotionfeedback120::llc_fbk_estoppressed(const std::uint8_t* bytes,
 // 'llc_fbk_adcrequestautonomy', 'is_signed_var': False, 'physical_range':
 // '[0|1]', 'bit': 9, 'type': 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
 bool Llcmotionfeedback120::llc_fbk_adcrequestautonomy(const std::uint8_t* bytes,
-                                                      int32_t length) const {
-  Byte t0(bytes + 1);
+                                                      int32_t             length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(1, 1);
 
   bool ret = x;
@@ -251,9 +229,8 @@ bool Llcmotionfeedback120::llc_fbk_adcrequestautonomy(const std::uint8_t* bytes,
 // mode', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'name':
 // 'llc_fbk_allowautonomy', 'is_signed_var': False, 'physical_range': '[0|1]',
 // 'bit': 8, 'type': 'bool', 'order': 'intel', 'physical_unit': 'T/F'}
-bool Llcmotionfeedback120::llc_fbk_allowautonomy(const std::uint8_t* bytes,
-                                                 int32_t length) const {
-  Byte t0(bytes + 1);
+bool Llcmotionfeedback120::llc_fbk_allowautonomy(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 1);
 
   bool ret = x;
@@ -270,13 +247,12 @@ bool Llcmotionfeedback120::llc_fbk_allowautonomy(const std::uint8_t* bytes,
 // 'intel', 'physical_unit': ''}
 Llc_motionfeedback1_20::Llc_fbk_longitudinalcontrolmodeType
 Llcmotionfeedback120::llc_fbk_longitudinalcontrolmode(const std::uint8_t* bytes,
-                                                      int32_t length) const {
-  Byte t0(bytes + 0);
+                                                      int32_t             length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(4, 2);
 
   Llc_motionfeedback1_20::Llc_fbk_longitudinalcontrolmodeType ret =
-      static_cast<Llc_motionfeedback1_20::Llc_fbk_longitudinalcontrolmodeType>(
-          x);
+      static_cast<Llc_motionfeedback1_20::Llc_fbk_longitudinalcontrolmodeType>(x);
   return ret;
 }
 
@@ -292,9 +268,9 @@ Llcmotionfeedback120::llc_fbk_longitudinalcontrolmode(const std::uint8_t* bytes,
 // 'len': 4, 'name': 'llc_fbk_state', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|15]', 'bit': 0, 'type': 'enum', 'order': 'intel',
 // 'physical_unit': ''}
-Llc_motionfeedback1_20::Llc_fbk_stateType Llcmotionfeedback120::llc_fbk_state(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
+Llc_motionfeedback1_20::Llc_fbk_stateType
+Llcmotionfeedback120::llc_fbk_state(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 0);
   int32_t x = t0.get_byte(0, 4);
 
   Llc_motionfeedback1_20::Llc_fbk_stateType ret =

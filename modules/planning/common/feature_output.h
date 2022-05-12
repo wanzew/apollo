@@ -50,9 +50,8 @@ class FeatureOutput {
    * @brief Insert a a frame of learning data
    * @param A feature in proto
    */
-  static void InsertLearningDataFrame(
-      const std::string& record_filename,
-      const LearningDataFrame& learning_data_frame);
+  static void InsertLearningDataFrame(const std::string&       record_filename,
+                                      const LearningDataFrame& learning_data_frame);
 
   static void InsertPlanningResult();
 
@@ -72,7 +71,7 @@ class FeatureOutput {
 
  private:
   static LearningData learning_data_;
-  static int learning_data_file_index_;
+  static int          learning_data_file_index_;
 };
 
 }  // namespace planning

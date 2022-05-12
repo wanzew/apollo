@@ -29,8 +29,9 @@
 #include "fastrtps/publisher/Publisher.h"
 #include "fastrtps/subscriber/Subscriber.h"
 
-#include "cyber/base/signal.h"
 #include "cyber/proto/topology_change.pb.h"
+
+#include "cyber/base/signal.h"
 #include "cyber/service_discovery/communication/subscriber_listener.h"
 
 namespace apollo {
@@ -50,12 +51,12 @@ using proto::RoleType;
  */
 class Manager {
  public:
-  using ChangeSignal = base::Signal<const ChangeMsg&>;
-  using ChangeFunc = std::function<void(const ChangeMsg&)>;
+  using ChangeSignal     = base::Signal<const ChangeMsg&>;
+  using ChangeFunc       = std::function<void(const ChangeMsg&)>;
   using ChangeConnection = base::Connection<const ChangeMsg&>;
 
-  using RtpsParticipant = eprosima::fastrtps::Participant;
-  using RtpsPublisherAttr = eprosima::fastrtps::PublisherAttributes;
+  using RtpsParticipant    = eprosima::fastrtps::Participant;
+  using RtpsPublisherAttr  = eprosima::fastrtps::PublisherAttributes;
   using RtpsSubscriberAttr = eprosima::fastrtps::SubscriberAttributes;
 
   /**
@@ -96,8 +97,7 @@ class Manager {
    * @return true if Join topology successfully
    * @return false if Join topology failed
    */
-  bool Join(const RoleAttributes& attr, RoleType role,
-            bool need_publish = true);
+  bool Join(const RoleAttributes& attr, RoleType role, bool need_publish = true);
 
   /**
    * @brief Leave the topology
@@ -132,36 +132,34 @@ class Manager {
    * @param host_name is the process's host's name
    * @param process_id is the process' id
    */
-  virtual void OnTopoModuleLeave(const std::string& host_name,
-                                 int process_id) = 0;
+  virtual void OnTopoModuleLeave(const std::string& host_name, int process_id) = 0;
 
  protected:
   bool CreatePublisher(RtpsParticipant* participant);
   bool CreateSubscriber(RtpsParticipant* participant);
 
   virtual bool Check(const RoleAttributes& attr) = 0;
-  virtual void Dispose(const ChangeMsg& msg) = 0;
+  virtual void Dispose(const ChangeMsg& msg)     = 0;
   virtual bool NeedPublish(const ChangeMsg& msg) const;
 
-  void Convert(const RoleAttributes& attr, RoleType role, OperateType opt,
-               ChangeMsg* msg);
+  void Convert(const RoleAttributes& attr, RoleType role, OperateType opt, ChangeMsg* msg);
 
   void Notify(const ChangeMsg& msg);
   bool Publish(const ChangeMsg& msg);
   void OnRemoteChange(const std::string& msg_str);
   bool IsFromSameProcess(const ChangeMsg& msg);
 
-  std::atomic<bool> is_shutdown_;
-  std::atomic<bool> is_discovery_started_;
-  int allowed_role_;
-  ChangeType change_type_;
-  std::string host_name_;
-  int process_id_;
-  std::string channel_name_;
-  eprosima::fastrtps::Publisher* publisher_;
-  std::mutex lock_;
+  std::atomic<bool>               is_shutdown_;
+  std::atomic<bool>               is_discovery_started_;
+  int                             allowed_role_;
+  ChangeType                      change_type_;
+  std::string                     host_name_;
+  int                             process_id_;
+  std::string                     channel_name_;
+  eprosima::fastrtps::Publisher*  publisher_;
+  std::mutex                      lock_;
   eprosima::fastrtps::Subscriber* subscriber_;
-  SubscriberListener* listener_;
+  SubscriberListener*             listener_;
 
   ChangeSignal signal_;
 };

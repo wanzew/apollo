@@ -34,14 +34,11 @@ class VehicleModelTest : public ::testing::Test {
   virtual void SetUp() {
     std::string localization_pre_file =
         "modules/common/vehicle_model/testdata/localization_pre.pb.txt";
-    ACHECK(cyber::common::GetProtoFromFile(localization_pre_file,
-                                           &localization_pre_));
+    ACHECK(cyber::common::GetProtoFromFile(localization_pre_file, &localization_pre_));
     std::string localization_post_file =
         "modules/common/vehicle_model/testdata/localization_post.pb.txt";
-    ACHECK(cyber::common::GetProtoFromFile(localization_post_file,
-                                           &localization_post_));
-    const std::string chassis_pre_file =
-        "modules/common/vehicle_model/testdata/chassis_pre.pb.txt";
+    ACHECK(cyber::common::GetProtoFromFile(localization_post_file, &localization_post_));
+    const std::string chassis_pre_file = "modules/common/vehicle_model/testdata/chassis_pre.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(chassis_pre_file, &chassis_pre_));
     const std::string chassis_post_file =
         "modules/common/vehicle_model/testdata/chassis_post.pb.txt";
@@ -51,19 +48,18 @@ class VehicleModelTest : public ::testing::Test {
  protected:
   LocalizationEstimate localization_pre_;
   LocalizationEstimate localization_post_;
-  Chassis chassis_pre_;
-  Chassis chassis_post_;
-  VehicleState cur_vehicle_state_;
-  VehicleState predicted_vehicle_state_;
-  VehicleState expected_vehicle_state_;
+  Chassis              chassis_pre_;
+  Chassis              chassis_post_;
+  VehicleState         cur_vehicle_state_;
+  VehicleState         predicted_vehicle_state_;
+  VehicleState         expected_vehicle_state_;
 };
 
 TEST_F(VehicleModelTest, RearCenteredKinematicBicycleModel) {
-  double predicted_time_horizon = localization_post_.measurement_time() -
-                                  localization_pre_.measurement_time();
+  double predicted_time_horizon =
+      localization_post_.measurement_time() - localization_pre_.measurement_time();
 
-  auto vehicle_state_provider =
-      std::make_shared<common::VehicleStateProvider>();
+  auto vehicle_state_provider = std::make_shared<common::VehicleStateProvider>();
 
   vehicle_state_provider->Update(localization_pre_, chassis_pre_);
   cur_vehicle_state_ = vehicle_state_provider->vehicle_state();
@@ -75,10 +71,9 @@ TEST_F(VehicleModelTest, RearCenteredKinematicBicycleModel) {
       VehicleModel::Predict(predicted_time_horizon, cur_vehicle_state_);
   EXPECT_NEAR(expected_vehicle_state_.x(), predicted_vehicle_state_.x(), 2e-2);
   EXPECT_NEAR(expected_vehicle_state_.y(), predicted_vehicle_state_.y(), 2e-2);
-  EXPECT_NEAR(expected_vehicle_state_.heading(),
-              predicted_vehicle_state_.heading(), 1e-3);
-  EXPECT_NEAR(expected_vehicle_state_.linear_velocity(),
-              predicted_vehicle_state_.linear_velocity(), 2e-2);
+  EXPECT_NEAR(expected_vehicle_state_.heading(), predicted_vehicle_state_.heading(), 1e-3);
+  EXPECT_NEAR(expected_vehicle_state_.linear_velocity(), predicted_vehicle_state_.linear_velocity(),
+              2e-2);
 }
 }  // namespace common
 }  // namespace apollo

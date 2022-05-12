@@ -28,9 +28,7 @@ bool CompCameraH265Compressed::Init() {
   AINFO << "Initialize video driver component.";
 
   CameraH265Config video_config;
-  if (!GetProtoConfig(&video_config)) {
-    return false;
-  }
+  if (!GetProtoConfig(&video_config)) { return false; }
 
   AINFO << "Velodyne config: " << video_config.DebugString();
 
@@ -52,10 +50,9 @@ bool CompCameraH265Compressed::Init() {
   pb_image_.reset(new CompressedImage);
   pb_image_->mutable_data()->reserve(1920 * 1080 * 4);
 
-  writer_ = node_->CreateWriter<CompressedImage>(
-      video_config.compress_conf().output_channel());
+  writer_ = node_->CreateWriter<CompressedImage>(video_config.compress_conf().output_channel());
 
-  runing_ = true;
+  runing_       = true;
   video_thread_ = std::shared_ptr<std::thread>(
       new std::thread(std::bind(&CompCameraH265Compressed::VideoPoll, this)));
   video_thread_->detach();
@@ -71,9 +68,7 @@ void CompCameraH265Compressed::VideoPoll() {
              camera_deivce_->Port());
     AINFO << "Output file: " << name;
     fout.open(name, std::ios::binary);
-    if (!fout.good()) {
-      AERROR << "Failed to open output file: " << name;
-    }
+    if (!fout.good()) { AERROR << "Failed to open output file: " << name; }
   }
   int poll_failure_number = 0;
   while (!apollo::cyber::IsShutdown()) {
@@ -87,8 +82,7 @@ void CompCameraH265Compressed::VideoPoll() {
       continue;
     }
     poll_failure_number = 0;
-    pb_image_->mutable_header()->set_timestamp_sec(
-        cyber::Time::Now().ToSecond());
+    pb_image_->mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
     AINFO << "Send compressed image.";
     writer_->Write(pb_image_);
 
@@ -97,9 +91,7 @@ void CompCameraH265Compressed::VideoPoll() {
     }
   }
 
-  if (camera_deivce_->Record()) {
-    fout.close();
-  }
+  if (camera_deivce_->Record()) { fout.close(); }
 }
 
 }  // namespace video

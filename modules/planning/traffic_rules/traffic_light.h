@@ -29,17 +29,15 @@ namespace planning {
 
 class TrafficLight : public TrafficRule {
  public:
-  TrafficLight(const TrafficRuleConfig& config,
+  TrafficLight(const TrafficRuleConfig&                   config,
                const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~TrafficLight() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
+  void MakeDecisions(Frame* const frame, ReferenceLineInfo* const reference_line_info);
 
  private:
   static constexpr char const* TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_";

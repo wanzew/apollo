@@ -21,13 +21,7 @@
 #include <memory>
 #include <string>
 
-#include "cyber/class_loader/class_loader.h"
-#include "cyber/component/component.h"
-#include "cyber/component/timer_component.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/util/util.h"
-#include "modules/control/controller/controller.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_common_conf.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
@@ -35,6 +29,13 @@
 #include "modules/control/proto/preprocessor.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/component.h"
+#include "cyber/component/timer_component.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/util/util.h"
+#include "modules/control/controller/controller.h"
 
 namespace apollo {
 namespace control {
@@ -63,7 +64,7 @@ class PostprocessorSubmodule final : public cyber::Component<ControlCommand> {
 
  private:
   std::shared_ptr<cyber::Writer<ControlCommand>> postprocessor_writer_;
-  ControlCommonConf control_common_conf_;
+  ControlCommonConf                              control_common_conf_;
 };
 
 CYBER_REGISTER_COMPONENT(PostprocessorSubmodule)

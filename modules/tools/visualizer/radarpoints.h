@@ -16,11 +16,13 @@
 
 #pragma once
 
-#include <QtGui/QColor>
 #include <memory>
 #include <string>
 
+#include <QtGui/QColor>
+
 #include "modules/drivers/proto/radar.pb.h"
+
 #include "modules/tools/visualizer/renderable_object.h"
 
 class QOpenGLShaderProgram;
@@ -34,8 +36,7 @@ class RadarPoints : public RenderableObject {
    */
 
  public:
-  explicit RadarPoints(
-      const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram = nullptr);
+  explicit RadarPoints(const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram = nullptr);
   ~RadarPoints(void) {
     if (buffer_) {
       delete[] buffer_;
@@ -45,9 +46,7 @@ class RadarPoints : public RenderableObject {
 
   virtual GLenum GetPrimitiveType(void) const { return GL_POINTS; }
 
-  void SetupExtraUniforms(void) {
-    shader_program_->setUniformValue("color", color_);
-  }
+  void SetupExtraUniforms(void) { shader_program_->setUniformValue("color", color_); }
 
   GLfloat red(void) const { return color_.x(); }
   GLfloat green(void) const { return color_.y(); }
@@ -63,13 +62,12 @@ class RadarPoints : public RenderableObject {
     color_.setZ(static_cast<float>(color.blueF()));
   }
 
-  bool FillData(
-      const std::shared_ptr<const apollo::drivers::RadarObstacles>& pData);
+  bool FillData(const std::shared_ptr<const apollo::drivers::RadarObstacles>& pData);
 
  protected:
   bool FillVertexBuffer(GLfloat* pBuffer) override;
 
  private:
   QVector3D color_;  // r, g, b
-  GLfloat* buffer_;
+  GLfloat*  buffer_;
 };

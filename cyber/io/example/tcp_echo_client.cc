@@ -17,6 +17,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -42,50 +43,39 @@ int main(int argc, char* argv[]) {
       [&server_port]() {
         struct sockaddr_in server_addr;
         server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons((uint16_t)server_port);
+        server_addr.sin_family      = AF_INET;
+        server_addr.sin_port        = htons((uint16_t)server_port);
 
-        std::string user_input;
+        std::string       user_input;
         std::vector<char> server_reply(2049);
-        ssize_t nbytes = 0;
-        uint32_t count = 0;
+        ssize_t           nbytes = 0;
+        uint32_t          count  = 0;
 
         Session session;
         session.Socket(AF_INET, SOCK_STREAM, 0);
-        if (session.Connect((struct sockaddr*)&server_addr,
-                            sizeof(server_addr)) < 0) {
-          std::cout << "connect to server failed, " << strerror(errno)
-                    << std::endl;
+        if (session.Connect((struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+          std::cout << "connect to server failed, " << strerror(errno) << std::endl;
           return;
         }
 
         while (true) {
           count = 0;
-          std::cout << "please enter a message (enter Ctrl+C to exit):"
-                    << std::endl;
+          std::cout << "please enter a message (enter Ctrl+C to exit):" << std::endl;
           std::getline(std::cin, user_input);
-          if (!apollo::cyber::OK()) {
-            break;
-          }
-          if (user_input.empty()) {
-            continue;
-          }
+          if (!apollo::cyber::OK()) { break; }
+          if (user_input.empty()) { continue; }
 
           if (session.Send(user_input.c_str(), user_input.length(), 0) < 0) {
             std::cout << "send message failed." << std::endl;
             return;
           }
 
-          while ((nbytes = session.Recv(server_reply.data(),
-                                        server_reply.size(), 0)) > 0) {
-            for (auto itr = server_reply.begin();
-                 itr < server_reply.begin() + nbytes; ++itr) {
+          while ((nbytes = session.Recv(server_reply.data(), server_reply.size(), 0)) > 0) {
+            for (auto itr = server_reply.begin(); itr < server_reply.begin() + nbytes; ++itr) {
               std::cout << *itr;
             }
             count += (uint32_t)nbytes;
-            if (count >= user_input.length()) {
-              break;
-            }
+            if (count >= user_input.length()) { break; }
           }
 
           if (nbytes == 0) {

@@ -34,15 +34,14 @@ class BaseMultiTargetTracker {
 
   virtual ~BaseMultiTargetTracker() = default;
 
-  virtual bool Init(const MultiTargetTrackerInitOptions& options =
-                        MultiTargetTrackerInitOptions()) = 0;
+  virtual bool
+  Init(const MultiTargetTrackerInitOptions& options = MultiTargetTrackerInitOptions()) = 0;
 
   // @brief: track segmented objects, and estimate motion
   // @param [in]: options
   // @param [in/out]: tracked object
   // tracked objects should be filled, required,
-  virtual bool Track(const MultiTargetTrackerOptions& options,
-                     LidarFrame* frame) = 0;
+  virtual bool Track(const MultiTargetTrackerOptions& options, LidarFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -51,7 +50,7 @@ class BaseMultiTargetTracker {
 };  // class BaseMultiTargetTracker
 
 PERCEPTION_REGISTER_REGISTERER(BaseMultiTargetTracker);
-#define PERCEPTION_REGISTER_MULTITARGET_TRACKER(name) \
+#define PERCEPTION_REGISTER_MULTITARGET_TRACKER(name)                                              \
   PERCEPTION_REGISTER_CLASS(BaseMultiTargetTracker, name)
 
 }  // namespace lidar

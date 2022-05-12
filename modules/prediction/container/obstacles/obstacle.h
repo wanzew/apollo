@@ -28,15 +28,16 @@
 #include <unordered_set>
 #include <vector>
 
+#include "modules/prediction/proto/feature.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
-#include "modules/prediction/proto/feature.pb.h"
-#include "modules/prediction/proto/prediction_conf.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -54,13 +55,12 @@ class Obstacle {
   /**
    * @brief Constructor
    */
-  static std::unique_ptr<Obstacle> Create(
-      const perception::PerceptionObstacle& perception_obstacle,
-      const double timestamp, const int prediction_id,
-      ObstacleClusters* clusters_ptr);
+  static std::unique_ptr<Obstacle> Create(const perception::PerceptionObstacle& perception_obstacle,
+                                          const double                          timestamp,
+                                          const int                             prediction_id,
+                                          ObstacleClusters*                     clusters_ptr);
 
-  static std::unique_ptr<Obstacle> Create(const Feature& feature,
-                                          ObstacleClusters* clusters_ptr);
+  static std::unique_ptr<Obstacle> Create(const Feature& feature, ObstacleClusters* clusters_ptr);
 
   Obstacle() = default;
 
@@ -79,7 +79,8 @@ class Obstacle {
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
   bool Insert(const perception::PerceptionObstacle& perception_obstacle,
-              const double timestamp, const int prediction_id);
+              const double                          timestamp,
+              const int                             prediction_id);
 
   /**
    * @brief Insert a feature proto message.
@@ -249,45 +250,43 @@ class Obstacle {
 
  private:
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
-                 double timestamp, Feature* feature);
+                 double                                timestamp,
+                 Feature*                              feature);
 
   bool SetId(const perception::PerceptionObstacle& perception_obstacle,
-             Feature* feature, const int prediction_id = -1);
+             Feature*                              feature,
+             const int                             prediction_id = -1);
 
-  void SetType(const perception::PerceptionObstacle& perception_obstacle,
-               Feature* feature);
+  void SetType(const perception::PerceptionObstacle& perception_obstacle, Feature* feature);
 
-  void SetIsNearJunction(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  void SetIsNearJunction(const perception::PerceptionObstacle& perception_obstacle,
+                         Feature*                              feature);
 
   void SetTimestamp(const perception::PerceptionObstacle& perception_obstacle,
-                    const double timestamp, Feature* feature);
+                    const double                          timestamp,
+                    Feature*                              feature);
 
-  void SetPolygonPoints(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  void SetPolygonPoints(const perception::PerceptionObstacle& perception_obstacle,
+                        Feature*                              feature);
 
-  void SetPosition(const perception::PerceptionObstacle& perception_obstacle,
-                   Feature* feature);
+  void SetPosition(const perception::PerceptionObstacle& perception_obstacle, Feature* feature);
 
-  void SetVelocity(const perception::PerceptionObstacle& perception_obstacle,
-                   Feature* feature);
+  void SetVelocity(const perception::PerceptionObstacle& perception_obstacle, Feature* feature);
 
   void AdjustHeadingByLane(Feature* feature);
 
-  void UpdateVelocity(const double theta, double* velocity_x,
-                      double* velocity_y, double* velocity_heading,
-                      double* speed);
+  void UpdateVelocity(const double theta,
+                      double*      velocity_x,
+                      double*      velocity_y,
+                      double*      velocity_heading,
+                      double*      speed);
 
   void SetAcceleration(Feature* feature);
 
-  void SetTheta(const perception::PerceptionObstacle& perception_obstacle,
-                Feature* feature);
+  void SetTheta(const perception::PerceptionObstacle& perception_obstacle, Feature* feature);
 
-  void SetLengthWidthHeight(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  void SetLengthWidthHeight(const perception::PerceptionObstacle& perception_obstacle,
+                            Feature*                              feature);
 
   void UpdateLaneBelief(Feature* feature);
 
@@ -303,9 +302,11 @@ class Obstacle {
    *        based on the given lane_point_spacing.
    */
   void SetLanePoints(Feature* feature);
-  void SetLanePoints(const Feature* feature, const double lane_point_spacing,
-                     const uint64_t max_num_lane_point,
-                     const bool is_bidirection, LaneGraph* const lane_graph);
+  void SetLanePoints(const Feature*   feature,
+                     const double     lane_point_spacing,
+                     const uint64_t   max_num_lane_point,
+                     const bool       is_bidirection,
+                     LaneGraph* const lane_graph);
 
   /** @brief This functions is mainly for lane-sequence kappa calculation.
    */
@@ -318,29 +319,27 @@ class Obstacle {
   void InsertFeatureToHistory(const Feature& feature);
 
   void SetJunctionFeatureWithEnterLane(const std::string& enter_lane_id,
-                                       Feature* const feature_ptr);
+                                       Feature* const     feature_ptr);
 
   void SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr);
 
   void DiscardOutdatedHistory();
 
-  void GetNeighborLaneSegments(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> center_lane_info,
-      bool is_left, int recursion_depth,
-      std::list<std::string>* const lane_ids_ordered,
-      std::unordered_set<std::string>* const existing_lane_ids);
+  void GetNeighborLaneSegments(std::shared_ptr<const apollo::hdmap::LaneInfo> center_lane_info,
+                               bool                                           is_left,
+                               int                                            recursion_depth,
+                               std::list<std::string>* const                  lane_ids_ordered,
+                               std::unordered_set<std::string>* const         existing_lane_ids);
 
-  bool HasJunctionExitLane(
-      const LaneSequence& lane_sequence,
-      const std::unordered_set<std::string>& exit_lane_id_set);
+  bool HasJunctionExitLane(const LaneSequence&                    lane_sequence,
+                           const std::unordered_set<std::string>& exit_lane_id_set);
 
   void SetClusters(ObstacleClusters* clusters_ptr);
 
  private:
   int id_ = FLAGS_ego_vehicle_id;
 
-  perception::PerceptionObstacle::Type type_ =
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
+  perception::PerceptionObstacle::Type type_ = perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
 
   std::deque<Feature> feature_history_;
 
@@ -348,7 +347,7 @@ class Obstacle {
 
   ObstacleConf obstacle_conf_;
 
-  ObstacleClusters* clusters_ptr_ = nullptr;
+  ObstacleClusters* clusters_ptr_      = nullptr;
   JunctionAnalyzer* junction_analyzer_ = nullptr;
 };
 

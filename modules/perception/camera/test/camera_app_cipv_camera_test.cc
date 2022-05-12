@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include <opencv2/opencv.hpp>
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
@@ -31,33 +32,32 @@ TEST(CIPV, cipv_ground_test) {
   {
     // Two lane test
     Eigen::Matrix3d homography_im2car_;
-    homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375, -0.00050384,
-        2.48862e-05, 0.48999, 2.7712e-06, 0.000317091, -0.191827;
+    homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375, -0.00050384, 2.48862e-05, 0.48999,
+        2.7712e-06, 0.000317091, -0.191827;
 
     float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
-    float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
-    float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
-    float average_frame_rate_ = kAverageFrameRate;
-    bool image_based_cipv_ = false;
-    int debug_level = 3;
+    float average_lane_width_in_meter_  = kAverageLaneWidthInMeter;
+    float max_vehicle_width_in_meter_   = kMaxVehicleWidthInMeter;
+    float average_frame_rate_           = kAverageFrameRate;
+    bool  image_based_cipv_             = false;
+    int   debug_level                   = 3;
 
     Cipv cipv_;
-    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-               average_frame_rate_, image_based_cipv_, debug_level);
+    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_, average_lane_width_in_meter_,
+               max_vehicle_width_in_meter_, average_frame_rate_, image_based_cipv_, debug_level);
 
     CipvOptions cipv_options;
     cipv_options.velocity = 5.0f;
     cipv_options.yaw_rate = 0.0f;
     std::vector<base::LaneLine> lane_objects;
-    base::LaneLine left_lane_instance;
-    base::LaneLine right_lane_instance;
+    base::LaneLine              left_lane_instance;
+    base::LaneLine              right_lane_instance;
 
     left_lane_instance.track_id = 0;
 
     std::vector<base::Point2DF> image_points;
-    base::Point2DF ground_point;
-    base::Point2DF image_point;
+    base::Point2DF              ground_point;
+    base::Point2DF              image_point;
 
     image_point.x = 696.0f;
     image_point.y = 963.0f;
@@ -257,61 +257,59 @@ TEST(CIPV, cipv_ground_test) {
     Eigen::Affine3d world2camera = Eigen::Affine3d::Identity();
 
     std::vector<std::shared_ptr<base::Object>> objects;
-    base::ObjectPtr object1(new base::Object);
-    object1->track_id = 0;
-    object1->camera_supplement.box = base::RectF(83.0f, 486.73f, 15.0f, 39.6f);
-    object1->center(0) = 12.0;
-    object1->center(1) = 0.0;
-    object1->center(2) = 6.0;
-    object1->anchor_point(0) = 559664;
-    object1->anchor_point(1) = 4.15741e+06;
-    object1->anchor_point(2) = -14.9444;
-    object1->direction(0) = 0.744489f;
-    object1->direction(1) = 0.667634f;
-    object1->direction(2) = 0.0f;
-    object1->size(0) = 1.4886f;
-    object1->size(1) = 0.4825f;
-    object1->size(2) = 1.6182f;
+    base::ObjectPtr                            object1(new base::Object);
+    object1->track_id                = 0;
+    object1->camera_supplement.box   = base::RectF(83.0f, 486.73f, 15.0f, 39.6f);
+    object1->center(0)               = 12.0;
+    object1->center(1)               = 0.0;
+    object1->center(2)               = 6.0;
+    object1->anchor_point(0)         = 559664;
+    object1->anchor_point(1)         = 4.15741e+06;
+    object1->anchor_point(2)         = -14.9444;
+    object1->direction(0)            = 0.744489f;
+    object1->direction(1)            = 0.667634f;
+    object1->direction(2)            = 0.0f;
+    object1->size(0)                 = 1.4886f;
+    object1->size(1)                 = 0.4825f;
+    object1->size(2)                 = 1.6182f;
     object1->camera_supplement.alpha = 1.48424;
 
     objects.push_back(object1);
 
     base::ObjectPtr object2(new base::Object);
-    object2->track_id = 2;
-    object2->camera_supplement.box =
-        base::RectF(852.067f, 537.943f, 345.337f, 267.294f);
-    object2->center(0) = -0.9;
-    object2->center(1) = 0.9;
-    object2->center(2) = 13.0;
-    object2->anchor_point(0) = 559712;
-    object2->anchor_point(1) = 4.15745e+06;
-    object2->anchor_point(2) = -19.9879;
-    object2->direction(0) = 0.783255f;
-    object2->direction(1) = 0.621701f;
-    object2->direction(2) = 0.0f;
-    object2->size(0) = 4.12469f;
-    object2->size(1) = 1.49074f;
-    object2->size(2) = 1.38566f;
+    object2->track_id                = 2;
+    object2->camera_supplement.box   = base::RectF(852.067f, 537.943f, 345.337f, 267.294f);
+    object2->center(0)               = -0.9;
+    object2->center(1)               = 0.9;
+    object2->center(2)               = 13.0;
+    object2->anchor_point(0)         = 559712;
+    object2->anchor_point(1)         = 4.15745e+06;
+    object2->anchor_point(2)         = -19.9879;
+    object2->direction(0)            = 0.783255f;
+    object2->direction(1)            = 0.621701f;
+    object2->direction(2)            = 0.0f;
+    object2->size(0)                 = 4.12469f;
+    object2->size(1)                 = 1.49074f;
+    object2->size(2)                 = 1.38566f;
     object2->camera_supplement.alpha = 1.39487;
 
     objects.push_back(object2);
 
     base::ObjectPtr object3(new base::Object);
-    object3->track_id = 3;
-    object3->camera_supplement.box =
-        base::RectF(1343.66f, 563.465f, 341.659f, 272.38f);
-    object3->center(0) = -4.5;
-    object3->center(1) = 0.0;
-    object3->center(2) = 5.0;
-    object3->anchor_point(0) = 559711;
-    object3->anchor_point(1) = 4.15745e+06;
-    object3->anchor_point(2) = -19.7986;
-    object3->direction(0) = 0.74477f;
-    object3->direction(1) = 0.667321f;
-    object3->direction(2) = 0.0f;
-    object3->size(0) = 4.12469f;
-    object3->size(1) = 1.49074f;
-    object3->size(2) = 1.38566f;
+    object3->track_id                = 3;
+    object3->camera_supplement.box   = base::RectF(1343.66f, 563.465f, 341.659f, 272.38f);
+    object3->center(0)               = -4.5;
+    object3->center(1)               = 0.0;
+    object3->center(2)               = 5.0;
+    object3->anchor_point(0)         = 559711;
+    object3->anchor_point(1)         = 4.15745e+06;
+    object3->anchor_point(2)         = -19.7986;
+    object3->direction(0)            = 0.74477f;
+    object3->direction(1)            = 0.667321f;
+    object3->direction(2)            = 0.0f;
+    object3->size(0)                 = 4.12469f;
+    object3->size(1)                 = 1.49074f;
+    object3->size(2)                 = 1.38566f;
     object3->camera_supplement.alpha = 1.42243;
 
     objects.push_back(object3);
@@ -328,34 +326,33 @@ TEST(CIPV, cipv_image_test) {
   {
     // Two lane test
     Eigen::Matrix3d homography_im2car_;
-    homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375, -0.00050384,
-        2.48862e-05, 0.48999, 2.7712e-06, 0.000317091, -0.191827;
+    homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375, -0.00050384, 2.48862e-05, 0.48999,
+        2.7712e-06, 0.000317091, -0.191827;
 
     float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
-    float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
-    float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
-    float average_frame_rate_ = kAverageFrameRate;
-    bool image_based_cipv_ = true;
-    int debug_level = 3;
+    float average_lane_width_in_meter_  = kAverageLaneWidthInMeter;
+    float max_vehicle_width_in_meter_   = kMaxVehicleWidthInMeter;
+    float average_frame_rate_           = kAverageFrameRate;
+    bool  image_based_cipv_             = true;
+    int   debug_level                   = 3;
 
     Cipv cipv_;
-    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-               average_frame_rate_, image_based_cipv_, debug_level);
+    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_, average_lane_width_in_meter_,
+               max_vehicle_width_in_meter_, average_frame_rate_, image_based_cipv_, debug_level);
 
     CipvOptions cipv_options;
     cipv_options.velocity = 5.0f;
     cipv_options.yaw_rate = 0.0f;
 
     std::vector<base::LaneLine> lane_objects;
-    base::LaneLine left_lane_instance;
-    base::LaneLine right_lane_instance;
+    base::LaneLine              left_lane_instance;
+    base::LaneLine              right_lane_instance;
 
     left_lane_instance.track_id = 0;
 
     std::vector<base::Point2DF> image_points;
-    base::Point2DF ground_point;
-    base::Point2DF image_point;
+    base::Point2DF              ground_point;
+    base::Point2DF              image_point;
 
     image_point.x = 0.0f;
     image_point.y = 1000.0f;
@@ -426,64 +423,62 @@ TEST(CIPV, cipv_image_test) {
     Eigen::Affine3d world2camera = Eigen::Affine3d::Identity();
 
     std::vector<std::shared_ptr<base::Object>> objects;
-    base::ObjectPtr object1(new base::Object);
-    object1->track_id = 0;
-    object1->camera_supplement.box = base::RectF(50.0f, 200.0f, 15.0f, 39.6f);
-    object1->center(0) = 6.0;
-    object1->center(1) = 12.0;
-    object1->center(2) = 0.0;
-    object1->anchor_point(0) = 559664;
-    object1->anchor_point(1) = 4.15741e+06;
-    object1->anchor_point(2) = -14.9444;
-    object1->direction(0) = 0.744489f;
-    object1->direction(1) = 0.667634f;
-    object1->direction(2) = 0.0f;
-    object1->size(0) = 1.4886f;
-    object1->size(1) = 0.4825f;
-    object1->size(2) = 1.6182f;
-    object1->camera_supplement.alpha = 1.48424;
+    base::ObjectPtr                            object1(new base::Object);
+    object1->track_id                          = 0;
+    object1->camera_supplement.box             = base::RectF(50.0f, 200.0f, 15.0f, 39.6f);
+    object1->center(0)                         = 6.0;
+    object1->center(1)                         = 12.0;
+    object1->center(2)                         = 0.0;
+    object1->anchor_point(0)                   = 559664;
+    object1->anchor_point(1)                   = 4.15741e+06;
+    object1->anchor_point(2)                   = -14.9444;
+    object1->direction(0)                      = 0.744489f;
+    object1->direction(1)                      = 0.667634f;
+    object1->direction(2)                      = 0.0f;
+    object1->size(0)                           = 1.4886f;
+    object1->size(1)                           = 0.4825f;
+    object1->size(2)                           = 1.6182f;
+    object1->camera_supplement.alpha           = 1.48424;
     object1->camera_supplement.local_center(0) = 1170.0f;
     object1->camera_supplement.local_center(1) = 526.33f;
     objects.push_back(object1);
 
     base::ObjectPtr object2(new base::Object);
-    object2->track_id = 2;
-    object2->camera_supplement.box =
-        base::RectF(1000.0f, 700.0f, 400.0f, 200.0f);
-    object2->center(0) = 10.0;
-    object2->center(1) = 0.1;
-    object2->center(2) = 0.0;
-    object2->anchor_point(0) = 559712;
-    object2->anchor_point(1) = 4.15745e+06;
-    object2->anchor_point(2) = -19.9879;
-    object2->direction(0) = 0.783255f;
-    object2->direction(1) = 0.621701f;
-    object2->direction(2) = 0.0f;
-    object2->size(0) = 4.12469f;
-    object2->size(1) = 1.49074f;
-    object2->size(2) = 1.38566f;
-    object2->camera_supplement.alpha = 1.39487;
+    object2->track_id                          = 2;
+    object2->camera_supplement.box             = base::RectF(1000.0f, 700.0f, 400.0f, 200.0f);
+    object2->center(0)                         = 10.0;
+    object2->center(1)                         = 0.1;
+    object2->center(2)                         = 0.0;
+    object2->anchor_point(0)                   = 559712;
+    object2->anchor_point(1)                   = 4.15745e+06;
+    object2->anchor_point(2)                   = -19.9879;
+    object2->direction(0)                      = 0.783255f;
+    object2->direction(1)                      = 0.621701f;
+    object2->direction(2)                      = 0.0f;
+    object2->size(0)                           = 4.12469f;
+    object2->size(1)                           = 1.49074f;
+    object2->size(2)                           = 1.38566f;
+    object2->camera_supplement.alpha           = 1.39487;
     object2->camera_supplement.local_center(0) = 1024.73550f;
     object2->camera_supplement.local_center(1) = 805.237f;
     objects.push_back(object2);
 
     base::ObjectPtr object3(new base::Object);
-    object3->track_id = 3;
-    object3->camera_supplement.box =
-        base::RectF(1300.0f, 500.0f, 300.0f, 150.00f);
-    object3->center(0) = 5.0;
-    object3->center(1) = -4.5;
-    object3->center(2) = 0.0;
-    object3->anchor_point(0) = 559711;
-    object3->anchor_point(1) = 4.15745e+06;
-    object3->anchor_point(2) = -19.7986;
-    object3->direction(0) = 0.74477f;
-    object3->direction(1) = 0.667321f;
-    object3->direction(2) = 0.0f;
-    object3->size(0) = 4.12469f;
-    object3->size(1) = 1.49074f;
-    object3->size(2) = 1.38566f;
-    object3->camera_supplement.alpha = 1.42243;
+    object3->track_id                          = 3;
+    object3->camera_supplement.box             = base::RectF(1300.0f, 500.0f, 300.0f, 150.00f);
+    object3->center(0)                         = 5.0;
+    object3->center(1)                         = -4.5;
+    object3->center(2)                         = 0.0;
+    object3->anchor_point(0)                   = 559711;
+    object3->anchor_point(1)                   = 4.15745e+06;
+    object3->anchor_point(2)                   = -19.7986;
+    object3->direction(0)                      = 0.74477f;
+    object3->direction(1)                      = 0.667321f;
+    object3->direction(2)                      = 0.0f;
+    object3->size(0)                           = 4.12469f;
+    object3->size(1)                           = 1.49074f;
+    object3->size(2)                           = 1.38566f;
+    object3->camera_supplement.alpha           = 1.42243;
     object3->camera_supplement.local_center(0) = 1514.4895f;
     object3->camera_supplement.local_center(1) = 835.845f;
     objects.push_back(object3);

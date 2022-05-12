@@ -33,23 +33,22 @@ using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
-const int32_t kMaxFailAttempt = 10;
+const int32_t kMaxFailAttempt                = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 }  // namespace
 
-ErrorCode ChController::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+ErrorCode
+ChController::Init(const VehicleParameter&                                params,
+                   CanSender<::apollo::canbus::ChassisDetail>* const      can_sender,
+                   MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "ChController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+  vehicle_params_.CopyFrom(common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -108,8 +107,7 @@ ErrorCode ChController::Init(
   can_sender_->AddMessage(Gearcommand114::ID, gear_command_114_, false);
   can_sender_->AddMessage(Steercommand112::ID, steer_command_112_, false);
   can_sender_->AddMessage(Throttlecommand110::ID, throttle_command_110_, false);
-  can_sender_->AddMessage(Turnsignalcommand113::ID, turnsignal_command_113_,
-                          false);
+  can_sender_->AddMessage(Turnsignalcommand113::ID, turnsignal_command_113_, false);
 
   // need sleep to ensure all messages received
   AINFO << "ChController is initialized.";
@@ -151,9 +149,7 @@ Chassis ChController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  if (driving_mode() == Chassis::EMERGENCY_MODE) { set_chassis_error_code(Chassis::NO_ERROR); }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -165,8 +161,7 @@ Chassis ChController::chassis() {
   // 5 ch has no wheel spd.
   if (chassis_detail.ch().has_ecu_status_1_515() &&
       chassis_detail.ch().ecu_status_1_515().has_speed()) {
-    chassis_.set_speed_mps(
-        static_cast<float>(chassis_detail.ch().ecu_status_1_515().speed()));
+    chassis_.set_speed_mps(static_cast<float>(chassis_detail.ch().ecu_status_1_515().speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -178,16 +173,16 @@ Chassis ChController::chassis() {
   // 8 throttle
   if (chassis_detail.ch().has_throttle_status__510() &&
       chassis_detail.ch().throttle_status__510().has_throttle_pedal_sts()) {
-    chassis_.set_throttle_percentage(static_cast<float>(
-        chassis_detail.ch().throttle_status__510().throttle_pedal_sts()));
+    chassis_.set_throttle_percentage(
+        static_cast<float>(chassis_detail.ch().throttle_status__510().throttle_pedal_sts()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9 brake
   if (chassis_detail.ch().has_brake_status__511() &&
       chassis_detail.ch().brake_status__511().has_brake_pedal_sts()) {
-    chassis_.set_brake_percentage(static_cast<float>(
-        chassis_detail.ch().brake_status__511().brake_pedal_sts()));
+    chassis_.set_brake_percentage(
+        static_cast<float>(chassis_detail.ch().brake_status__511().brake_pedal_sts()));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -197,20 +192,16 @@ Chassis ChController::chassis() {
       chassis_detail.ch().gear_status_514().has_gear_sts()) {
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
-    if (chassis_detail.ch().gear_status_514().gear_sts() ==
-        Gear_status_514::GEAR_STS_NEUTRAL) {
+    if (chassis_detail.ch().gear_status_514().gear_sts() == Gear_status_514::GEAR_STS_NEUTRAL) {
       gear_pos = Chassis::GEAR_NEUTRAL;
     }
-    if (chassis_detail.ch().gear_status_514().gear_sts() ==
-        Gear_status_514::GEAR_STS_REVERSE) {
+    if (chassis_detail.ch().gear_status_514().gear_sts() == Gear_status_514::GEAR_STS_REVERSE) {
       gear_pos = Chassis::GEAR_REVERSE;
     }
-    if (chassis_detail.ch().gear_status_514().gear_sts() ==
-        Gear_status_514::GEAR_STS_DRIVE) {
+    if (chassis_detail.ch().gear_status_514().gear_sts() == Gear_status_514::GEAR_STS_DRIVE) {
       gear_pos = Chassis::GEAR_DRIVE;
     }
-    if (chassis_detail.ch().gear_status_514().gear_sts() ==
-        Gear_status_514::GEAR_STS_PARK) {
+    if (chassis_detail.ch().gear_status_514().gear_sts() == Gear_status_514::GEAR_STS_PARK) {
       gear_pos = Chassis::GEAR_PARKING;
     }
 
@@ -221,17 +212,15 @@ Chassis ChController::chassis() {
   // 11 steering
   if (chassis_detail.ch().has_steer_status__512() &&
       chassis_detail.ch().steer_status__512().has_steer_angle_sts()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.ch().steer_status__512().steer_angle_sts() * 100.0 /
-        vehicle_params_.max_steer_angle()));
+    chassis_.set_steering_percentage(
+        static_cast<float>(chassis_detail.ch().steer_status__512().steer_angle_sts() * 100.0 /
+                           vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
 
   // 26
-  if (chassis_error_mask_) {
-    chassis_.set_chassis_error_mask(chassis_error_mask_);
-  }
+  if (chassis_error_mask_) { chassis_.set_chassis_error_mask(chassis_error_mask_); }
 
   if (chassis_detail.has_surround()) {
     chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
@@ -239,11 +228,9 @@ Chassis ChController::chassis() {
 
   // give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && (chassis_.throttle_percentage() == 0.0)) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_advice(apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "CANBUS not ready, throttle percentage is not zero!");
   }
@@ -251,8 +238,7 @@ Chassis ChController::chassis() {
   // 27 battery soc
   if (chassis_detail.ch().has_ecu_status_2_516() &&
       chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
-    chassis_.set_battery_soc_percentage(
-        chassis_detail.ch().ecu_status_2_516().battery_soc());
+    chassis_.set_battery_soc_percentage(chassis_detail.ch().ecu_status_2_516().battery_soc());
   }
 
   return chassis_;
@@ -269,16 +255,13 @@ ErrorCode ChController::EnableAutoMode() {
     return ErrorCode::OK;
   }
 
-  brake_command_111_->set_brake_pedal_en_ctrl(
-      Brake_command_111::BRAKE_PEDAL_EN_CTRL_ENABLE);
+  brake_command_111_->set_brake_pedal_en_ctrl(Brake_command_111::BRAKE_PEDAL_EN_CTRL_ENABLE);
   throttle_command_110_->set_throttle_pedal_en_ctrl(
       Throttle_command_110::THROTTLE_PEDAL_EN_CTRL_ENABLE);
-  steer_command_112_->set_steer_angle_en_ctrl(
-      Steer_command_112::STEER_ANGLE_EN_CTRL_ENABLE);
+  steer_command_112_->set_steer_angle_en_ctrl(Steer_command_112::STEER_ANGLE_EN_CTRL_ENABLE);
   AINFO << "\n\n\n set enable \n\n\n";
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
+  const int32_t flag = CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
     Emergency();
@@ -421,19 +404,16 @@ bool ChController::CheckChassisError() {
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   if (!chassis_detail.has_ch()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO ch vehicle info."
-                      << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has NO ch vehicle info." << chassis_detail.DebugString();
     return false;
   }
   Ch ch = chassis_detail.ch();
   // steer motor fault
   if (ch.has_steer_status__512()) {
-    if (Steer_status__512::STEER_ERR_STEER_MOTOR_ERR ==
-        ch.steer_status__512().steer_err()) {
+    if (Steer_status__512::STEER_ERR_STEER_MOTOR_ERR == ch.steer_status__512().steer_err()) {
       return true;
     }
-    if (Steer_status__512::SENSOR_ERR_STEER_SENSOR_ERR ==
-        ch.steer_status__512().sensor_err()) {
+    if (Steer_status__512::SENSOR_ERR_STEER_SENSOR_ERR == ch.steer_status__512().sensor_err()) {
       return true;
     }
   }
@@ -450,8 +430,7 @@ bool ChController::CheckChassisError() {
   }
   // brake error
   if (ch.has_brake_status__511()) {
-    if (Brake_status__511::BRAKE_ERR_BRAKE_SYSTEM_ERR ==
-        ch.brake_status__511().brake_err()) {
+    if (Brake_status__511::BRAKE_ERR_BRAKE_SYSTEM_ERR == ch.brake_status__511().brake_err()) {
       return true;
     }
   }
@@ -459,7 +438,7 @@ bool ChController::CheckChassisError() {
 }
 
 void ChController::SecurityDogThreadFunc() {
-  int32_t vertical_ctrl_fail = 0;
+  int32_t vertical_ctrl_fail   = 0;
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
@@ -472,16 +451,15 @@ void ChController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = 0;
-  int64_t end = 0;
+  int64_t                                   start = 0;
+  int64_t                                   end   = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::cyber::Time::Now().ToMicrosecond();
-    const Chassis::DrivingMode mode = driving_mode();
-    bool emergency_mode = false;
+    start                                     = ::apollo::cyber::Time::Now().ToMicrosecond();
+    const Chassis::DrivingMode mode           = driving_mode();
+    bool                       emergency_mode = false;
 
     // 1. horizontal control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_STEER_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_STEER_ONLY) &&
         CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
@@ -493,8 +471,7 @@ void ChController::SecurityDogThreadFunc() {
     }
 
     // 2. vertical control check
-    if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
-         mode == Chassis::AUTO_SPEED_ONLY) &&
+    if ((mode == Chassis::COMPLETE_AUTO_DRIVE || mode == Chassis::AUTO_SPEED_ONLY) &&
         CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
@@ -518,17 +495,16 @@ void ChController::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR << "Too much time consumption in ChController looping process:"
-             << elapsed.count();
+      AERROR << "Too much time consumption in ChController looping process:" << elapsed.count();
     }
   }
 }
 bool ChController::CheckResponse(const int32_t flags, bool need_wait) {
-  int32_t retry_num = 20;
+  int32_t       retry_num = 20;
   ChassisDetail chassis_detail;
-  bool is_eps_online = false;
-  bool is_vcu_online = false;
-  bool is_esp_online = false;
+  bool          is_eps_online = false;
+  bool          is_vcu_online = false;
+  bool          is_esp_online = false;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -559,14 +535,12 @@ bool ChController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     if (need_wait) {
       --retry_num;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(20));
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
     }
   } while (need_wait && retry_num);
 
   AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+        << ", is_vcu_online:" << is_vcu_online << ", is_esp_online:" << is_esp_online;
 
   return false;
 }
@@ -586,8 +560,7 @@ Chassis::ErrorCode ChController::chassis_error_code() {
   return chassis_error_code_;
 }
 
-void ChController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+void ChController::set_chassis_error_code(const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

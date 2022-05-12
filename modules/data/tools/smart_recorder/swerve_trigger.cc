@@ -19,9 +19,10 @@
 #include <cmath>
 #include <memory>
 
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/control/proto/control_cmd.pb.h"
 
 namespace apollo {
 namespace data {
@@ -33,45 +34,35 @@ constexpr float MIN_STEER_PER = -100.0;
 SwerveTrigger::SwerveTrigger() { trigger_name_ = "SwerveTrigger"; }
 
 void SwerveTrigger::Pull(const cyber::record::RecordMessage& msg) {
-  if (!trigger_obj_->enabled()) {
-    return;
-  }
+  if (!trigger_obj_->enabled()) { return; }
 
   if (msg.channel_name == FLAGS_chassis_topic) {
     Chassis chassis_msg;
     chassis_msg.ParseFromString(msg.content);
     const float steer_per = chassis_msg.steering_percentage();
 
-    if (IsNoisy(steer_per)) {
-      return;
-    }
+    if (IsNoisy(steer_per)) { return; }
 
     EnqueueMessage(steer_per);
 
     if (IsSwerve()) {
-      AINFO << "swerve trigger is pulled: " << msg.time << " - "
-            << msg.channel_name;
+      AINFO << "swerve trigger is pulled: " << msg.time << " - " << msg.channel_name;
       TriggerIt(msg.time);
     }
   }
 }
 
 bool SwerveTrigger::IsNoisy(const float steer) const {
-  if (steer > MAX_STEER_PER || steer < MIN_STEER_PER) {
-    return true;
-  }
-  const float pre_steer_mps =
-      (current_steer_queue_.empty() ? 0.0f : current_steer_queue_.back());
+  if (steer > MAX_STEER_PER || steer < MIN_STEER_PER) { return true; }
+  const float pre_steer_mps = (current_steer_queue_.empty() ? 0.0f : current_steer_queue_.back());
   return fabs(pre_steer_mps - steer) > noisy_diff_;
 }
 
 bool SwerveTrigger::IsSwerve() const {
-  if (current_steer_queue_.size() < queue_size_ ||
-      history_steer_queue_.size() < queue_size_) {
+  if (current_steer_queue_.size() < queue_size_ || history_steer_queue_.size() < queue_size_) {
     return false;
   }
-  const float delta =
-      (history_total_ - current_total_) / static_cast<float>(queue_size_);
+  const float delta = (history_total_ - current_total_) / static_cast<float>(queue_size_);
   return delta > max_delta_;
 }
 

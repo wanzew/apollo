@@ -80,21 +80,15 @@ TEST_F(GemMessageManagerTest, GetRecvProtocols) {
   EXPECT_NE(manager_.GetMutableProtocolDataById(Globalrpt6a::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Headlightrpt77::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Hornrpt79::ID), nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Latlonheadingrpt82::ID),
-            nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Parkingbrakestatusrpt80::ID),
-            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Latlonheadingrpt82::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Parkingbrakestatusrpt80::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Shiftrpt66::ID), nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt173::ID),
-            nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt274::ID),
-            nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt375::ID),
-            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt173::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt274::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt375::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringrpt16e::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Turnrpt64::ID), nullptr);
-  EXPECT_NE(manager_.GetMutableProtocolDataById(Vehiclespeedrpt6f::ID),
-            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Vehiclespeedrpt6f::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Wheelspeedrpt7a::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Wiperrpt91::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Yawraterpt81::ID), nullptr);

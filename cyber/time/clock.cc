@@ -25,16 +25,15 @@ namespace cyber {
 
 using GlobalData = ::apollo::cyber::common::GlobalData;
 
-using AtomicRWLock = ::apollo::cyber::base::AtomicRWLock;
-using AtomicWriteLockGuard =
-    ::apollo::cyber::base::WriteLockGuard<AtomicRWLock>;
-using AtomicReadLockGuard = ::apollo::cyber::base::ReadLockGuard<AtomicRWLock>;
+using AtomicRWLock         = ::apollo::cyber::base::AtomicRWLock;
+using AtomicWriteLockGuard = ::apollo::cyber::base::WriteLockGuard<AtomicRWLock>;
+using AtomicReadLockGuard  = ::apollo::cyber::base::ReadLockGuard<AtomicRWLock>;
 
 Clock::Clock() {
   const auto& cyber_config = GlobalData::Instance()->Config();
-  const auto& clock_mode = cyber_config.run_mode_conf().clock_mode();
-  mode_ = clock_mode;
-  mock_now_ = Time(0);
+  const auto& clock_mode   = cyber_config.run_mode_conf().clock_mode();
+  mode_                    = clock_mode;
+  mock_now_                = Time(0);
 }
 
 Time Clock::Now() {
@@ -42,13 +41,9 @@ Time Clock::Now() {
 
   AtomicReadLockGuard lg(clock->rwlock_);
   switch (clock->mode_) {
-    case ClockMode::MODE_CYBER:
-      return Time::Now();
-    case ClockMode::MODE_MOCK:
-      return clock->mock_now_;
-    default:
-      AFATAL << "Unsupported clock mode: "
-             << apollo::cyber::common::ToInt(clock->mode_);
+    case ClockMode::MODE_CYBER: return Time::Now();
+    case ClockMode::MODE_MOCK: return clock->mock_now_;
+    default: AFATAL << "Unsupported clock mode: " << apollo::cyber::common::ToInt(clock->mode_);
   }
   return Time::Now();
 }
@@ -56,7 +51,7 @@ Time Clock::Now() {
 double Clock::NowInSeconds() { return Now().ToSecond(); }
 
 void Clock::SetMode(ClockMode mode) {
-  auto clock = Instance();
+  auto                 clock = Instance();
   AtomicWriteLockGuard lg(clock->rwlock_);
   switch (mode) {
     case ClockMode::MODE_MOCK: {
@@ -67,20 +62,19 @@ void Clock::SetMode(ClockMode mode) {
       clock->mode_ = mode;
       break;
     }
-    default:
-      AERROR << "Unknown ClockMode: " << mode;
+    default: AERROR << "Unknown ClockMode: " << mode;
   }
   clock->mock_now_ = Time(0);
 }
 
 ClockMode Clock::mode() {
-  auto clock = Instance();
+  auto                clock = Instance();
   AtomicReadLockGuard lg(clock->rwlock_);
   return clock->mode_;
 }
 
 void Clock::SetNow(const Time& now) {
-  auto clock = Instance();
+  auto                 clock = Instance();
   AtomicWriteLockGuard lg(clock->rwlock_);
   if (clock->mode_ != ClockMode::MODE_MOCK) {
     AERROR << "SetSimNow only works for ClockMode::MOCK";

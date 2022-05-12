@@ -25,25 +25,26 @@ namespace cyber {
 
 namespace {
 std::atomic<uint64_t> global_timer_id = {0};
-uint64_t GenerateTimerId() { return global_timer_id.fetch_add(1); }
+uint64_t              GenerateTimerId() { return global_timer_id.fetch_add(1); }
 }  // namespace
 
 Timer::Timer() {
   timing_wheel_ = TimingWheel::Instance();
-  timer_id_ = GenerateTimerId();
+  timer_id_     = GenerateTimerId();
 }
 
-Timer::Timer(TimerOption opt) : timer_opt_(opt) {
+Timer::Timer(TimerOption opt)
+    : timer_opt_(opt) {
   timing_wheel_ = TimingWheel::Instance();
-  timer_id_ = GenerateTimerId();
+  timer_id_     = GenerateTimerId();
 }
 
 Timer::Timer(uint32_t period, std::function<void()> callback, bool oneshot) {
-  timing_wheel_ = TimingWheel::Instance();
-  timer_id_ = GenerateTimerId();
-  timer_opt_.period = period;
+  timing_wheel_       = TimingWheel::Instance();
+  timer_id_           = GenerateTimerId();
+  timer_opt_.period   = period;
   timer_opt_.callback = callback;
-  timer_opt_.oneshot = oneshot;
+  timer_opt_.oneshot  = oneshot;
 }
 
 void Timer::SetTimerOption(TimerOption opt) { timer_opt_ = opt; }
@@ -60,7 +61,7 @@ bool Timer::InitTimerTask() {
   }
 
   task_.reset(new TimerTask(timer_id_));
-  task_->interval_ms = timer_opt_.period;
+  task_->interval_ms           = timer_opt_.period;
   task_->next_fire_duration_ms = task_->interval_ms;
   if (timer_opt_.oneshot) {
     std::weak_ptr<TimerTask> task_weak_ptr = task_;
@@ -75,13 +76,11 @@ bool Timer::InitTimerTask() {
     std::weak_ptr<TimerTask> task_weak_ptr = task_;
     task_->callback = [callback = this->timer_opt_.callback, task_weak_ptr]() {
       auto task = task_weak_ptr.lock();
-      if (!task) {
-        return;
-      }
+      if (!task) { return; }
       std::lock_guard<std::mutex> lg(task->mutex);
-      auto start = Time::MonoTime().ToNanosecond();
+      auto                        start = Time::MonoTime().ToNanosecond();
       callback();
-      auto end = Time::MonoTime().ToNanosecond();
+      auto     end             = Time::MonoTime().ToNanosecond();
       uint64_t execute_time_ns = end - start;
       uint64_t execute_time_ms =
 #if defined(__aarch64__)
@@ -108,15 +107,13 @@ bool Timer::InitTimerTask() {
         int64_t accumulated_error_ms = std::llround(
 #endif
             static_cast<double>(task->accumulated_error_ns) / 1e6);
-        if (static_cast<int64_t>(task->interval_ms - execute_time_ms -
-                                 TIMER_RESOLUTION_MS) >= accumulated_error_ms) {
-          task->next_fire_duration_ms =
-              task->interval_ms - execute_time_ms - accumulated_error_ms;
+        if (static_cast<int64_t>(task->interval_ms - execute_time_ms - TIMER_RESOLUTION_MS) >=
+            accumulated_error_ms) {
+          task->next_fire_duration_ms = task->interval_ms - execute_time_ms - accumulated_error_ms;
         } else {
           task->next_fire_duration_ms = TIMER_RESOLUTION_MS;
         }
-        ADEBUG << "error ms: " << accumulated_error_ms
-               << "  execute time: " << execute_time_ms
+        ADEBUG << "error ms: " << accumulated_error_ms << "  execute time: " << execute_time_ms
                << " next fire: " << task->next_fire_duration_ms
                << " error ns: " << task->accumulated_error_ns;
       }
@@ -127,9 +124,7 @@ bool Timer::InitTimerTask() {
 }
 
 void Timer::Start() {
-  if (!common::GlobalData::Instance()->IsRealityMode()) {
-    return;
-  }
+  if (!common::GlobalData::Instance()->IsRealityMode()) { return; }
 
   if (!started_.exchange(true)) {
     if (InitTimerTask()) {
@@ -152,9 +147,7 @@ void Timer::Stop() {
 }
 
 Timer::~Timer() {
-  if (task_) {
-    Stop();
-  }
+  if (task_) { Stop(); }
 }
 
 }  // namespace cyber

@@ -56,10 +56,10 @@ void GetRangeVec(std::vector<NodeSRange>* range_vec) {
 
 TEST(NodeSRangeTestSuit, basic_test) {
   FLAGS_min_length_for_lane_change = 10.0;
-  double start_s_1 = 0.0;
-  double start_s_2 = 5.0;
-  double end_s_1 = 10.1;
-  double end_s_2 = 15.0;
+  double start_s_1                 = 0.0;
+  double start_s_2                 = 5.0;
+  double end_s_1                   = 10.1;
+  double end_s_2                   = 15.0;
   ASSERT_TRUE(NodeSRange::IsEnoughForChangeLane(start_s_1, end_s_1));
   ASSERT_FALSE(NodeSRange::IsEnoughForChangeLane(start_s_2, end_s_1));
 
@@ -96,19 +96,19 @@ TEST(NodeWithRangeTestSuit, basic_test) {
   node_1.set_length(20);
   Node node_2;
   node_2.set_length(20);
-  TopoNode topo_node_1(node_1);
-  TopoNode topo_node_2(node_2);
-  double start_s_1 = 0.0;
-  double start_s_2 = 5.0;
-  double end_s_1 = 10.1;
-  double end_s_2 = 15.0;
+  TopoNode   topo_node_1(node_1);
+  TopoNode   topo_node_2(node_2);
+  double     start_s_1 = 0.0;
+  double     start_s_2 = 5.0;
+  double     end_s_1   = 10.1;
+  double     end_s_2   = 15.0;
   NodeSRange range_from(start_s_1, start_s_2);
   NodeSRange range_to(end_s_1, end_s_2);
 
   const TopoNode* tn_1 = &topo_node_1;
   const TopoNode* tn_2 = &topo_node_2;
-  NodeWithRange node_range_from(tn_1, range_from);
-  NodeWithRange node_range_to(tn_2, range_to);
+  NodeWithRange   node_range_from(tn_1, range_from);
+  NodeWithRange   node_range_to(tn_2, range_to);
 
   ASSERT_FALSE(node_range_from < node_range_to);
 }

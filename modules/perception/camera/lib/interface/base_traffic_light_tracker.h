@@ -18,9 +18,8 @@
 #include <string>
 
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -38,15 +37,14 @@ class BaseTrafficLightTracker {
 
   virtual ~BaseTrafficLightTracker() = default;
 
-  virtual bool Init(const TrafficLightTrackerInitOptions& options =
-                        TrafficLightTrackerInitOptions()) = 0;
+  virtual bool
+  Init(const TrafficLightTrackerInitOptions& options = TrafficLightTrackerInitOptions()) = 0;
 
   // @brief: track detected traffic_light.
   // @param [in]: options
   // @param [in/out]: frame
   // traffic_light type and 2D bbox should be filled, required,
-  virtual bool Track(const TrafficLightTrackerOptions& options,
-                     CameraFrame* frame) = 0;
+  virtual bool Track(const TrafficLightTrackerOptions& options, CameraFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
@@ -55,7 +53,7 @@ class BaseTrafficLightTracker {
 };  // class BaseTrafficLightTracker
 
 PERCEPTION_REGISTER_REGISTERER(BaseTrafficLightTracker);
-#define REGISTER_TRAFFIC_LIGHT_TRACKER(name) \
+#define REGISTER_TRAFFIC_LIGHT_TRACKER(name)                                                       \
   PERCEPTION_REGISTER_CLASS(BaseTrafficLightTracker, name)
 
 }  // namespace camera

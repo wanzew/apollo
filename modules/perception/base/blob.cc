@@ -62,6 +62,7 @@ license and copyright terms herein.
  *****************************************************************************/
 
 #include "modules/perception/base/blob.h"
+
 #include <limits>
 
 namespace apollo {
@@ -69,8 +70,7 @@ namespace perception {
 namespace base {
 
 template <typename Dtype>
-void Blob<Dtype>::Reshape(const int num, const int channels, const int height,
-                          const int width) {
+void Blob<Dtype>::Reshape(const int num, const int channels, const int height, const int width) {
   std::vector<int> shape(4);
   shape[0] = num;
   shape[1] = channels;
@@ -85,8 +85,7 @@ void Blob<Dtype>::Reshape(const std::vector<int>& shape) {
   count_ = 1;
   shape_.resize(shape.size());
   if (!shape_data_ || shape_data_->size() < shape.size() * sizeof(int)) {
-    shape_data_.reset(
-        new SyncedMemory(shape.size() * sizeof(int), use_cuda_host_malloc_));
+    shape_data_.reset(new SyncedMemory(shape.size() * sizeof(int), use_cuda_host_malloc_));
   }
   int* shape_data = static_cast<int*>(shape_data_->mutable_cpu_data());
   for (size_t i = 0; i < shape.size(); ++i) {
@@ -96,13 +95,12 @@ void Blob<Dtype>::Reshape(const std::vector<int>& shape) {
           << "blob size exceeds std::numeric_limits<int>::max()";
     }
     count_ *= shape[i];
-    shape_[i] = shape[i];
+    shape_[i]     = shape[i];
     shape_data[i] = shape[i];
   }
   if (count_ > capacity_) {
     capacity_ = count_;
-    data_.reset(
-        new SyncedMemory(capacity_ * sizeof(Dtype), use_cuda_host_malloc_));
+    data_.reset(new SyncedMemory(capacity_ * sizeof(Dtype), use_cuda_host_malloc_));
   }
 }
 
@@ -112,18 +110,22 @@ void Blob<Dtype>::ReshapeLike(const Blob<Dtype>& other) {
 }
 
 template <typename Dtype>
-Blob<Dtype>::Blob(const int num, const int channels, const int height,
-                  const int width, const bool use_cuda_host_malloc)
+Blob<Dtype>::Blob(const int  num,
+                  const int  channels,
+                  const int  height,
+                  const int  width,
+                  const bool use_cuda_host_malloc)
     // capacity_ must be initialized before calling Reshape
-    : capacity_(0), use_cuda_host_malloc_(use_cuda_host_malloc) {
+    : capacity_(0)
+    , use_cuda_host_malloc_(use_cuda_host_malloc) {
   Reshape(num, channels, height, width);
 }
 
 template <typename Dtype>
-Blob<Dtype>::Blob(const std::vector<int>& shape,
-                  const bool use_cuda_host_malloc)
+Blob<Dtype>::Blob(const std::vector<int>& shape, const bool use_cuda_host_malloc)
     // capacity_ must be initialized before calling Reshape
-    : capacity_(0), use_cuda_host_malloc_(use_cuda_host_malloc) {
+    : capacity_(0)
+    , use_cuda_host_malloc_(use_cuda_host_malloc) {
   Reshape(shape);
 }
 
@@ -144,9 +146,7 @@ void Blob<Dtype>::set_cpu_data(Dtype* data) {
   ACHECK(data);
   // Make sure CPU and GPU sizes remain equal
   size_t size = count_ * sizeof(Dtype);
-  if (data_->size() != size) {
-    data_.reset(new SyncedMemory(size, use_cuda_host_malloc_));
-  }
+  if (data_->size() != size) { data_.reset(new SyncedMemory(size, use_cuda_host_malloc_)); }
   data_->set_cpu_data(data);
 }
 
@@ -161,9 +161,7 @@ void Blob<Dtype>::set_gpu_data(Dtype* data) {
   ACHECK(data);
   // Make sure CPU and GPU sizes remain equal
   size_t size = count_ * sizeof(Dtype);
-  if (data_->size() != size) {
-    data_.reset(new SyncedMemory(size, use_cuda_host_malloc_));
-  }
+  if (data_->size() != size) { data_.reset(new SyncedMemory(size, use_cuda_host_malloc_)); }
   data_->set_gpu_data(data);
 }
 

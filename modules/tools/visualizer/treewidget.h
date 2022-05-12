@@ -22,13 +22,13 @@ class TreeWidget : public QTreeWidget {
   Q_OBJECT
 
  public:
-  explicit TreeWidget(QWidget *parent = nullptr);
+  explicit TreeWidget(QWidget* parent = nullptr);
   ~TreeWidget() {}
 
  signals:
   void visibilityChanged(bool);
 
  protected:
-  void resizeEvent(QResizeEvent *);
-  bool event(QEvent *e);
+  void resizeEvent(QResizeEvent*);
+  bool event(QEvent* e);
 };

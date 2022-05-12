@@ -16,12 +16,11 @@
 
 #include <memory>
 
+#include "absl/strings/str_cat.h"
 #include "gflags/gflags.h"
 
-#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
 #include "modules/data/tools/smart_recorder/post_record_processor.h"
 #include "modules/data/tools/smart_recorder/realtime_record_processor.h"
 #include "modules/data/tools/smart_recorder/smart_recorder_gflags.h"
@@ -35,8 +34,7 @@ using apollo::data::SmartRecordTrigger;
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   if (FLAGS_restored_output_dir.empty()) {
-    FLAGS_restored_output_dir =
-        absl::StrCat(FLAGS_source_records_dir, "_restored");
+    FLAGS_restored_output_dir = absl::StrCat(FLAGS_source_records_dir, "_restored");
   }
   AINFO << "input dir: " << FLAGS_source_records_dir
         << ". output dir: " << FLAGS_restored_output_dir
@@ -44,13 +42,12 @@ int main(int argc, char** argv) {
         << ". program name: " << argv[0];
   SmartRecordTrigger trigger_conf;
   ACHECK(GetProtoFromFile(FLAGS_smart_recorder_config_filename, &trigger_conf))
-      << "Failed to load triggers config file "
-      << FLAGS_smart_recorder_config_filename;
-  auto processor = std::unique_ptr<RecordProcessor>(new RealtimeRecordProcessor(
-      FLAGS_source_records_dir, FLAGS_restored_output_dir));
+      << "Failed to load triggers config file " << FLAGS_smart_recorder_config_filename;
+  auto processor = std::unique_ptr<RecordProcessor>(
+      new RealtimeRecordProcessor(FLAGS_source_records_dir, FLAGS_restored_output_dir));
   if (!FLAGS_real_time_trigger) {
-    processor = std::unique_ptr<RecordProcessor>(new PostRecordProcessor(
-        FLAGS_source_records_dir, FLAGS_restored_output_dir));
+    processor = std::unique_ptr<RecordProcessor>(
+        new PostRecordProcessor(FLAGS_source_records_dir, FLAGS_restored_output_dir));
   }
   if (!processor->Init(trigger_conf)) {
     AERROR << "failed to init record processor";

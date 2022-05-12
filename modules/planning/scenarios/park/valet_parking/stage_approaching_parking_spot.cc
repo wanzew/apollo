@@ -28,28 +28,22 @@ namespace planning {
 namespace scenario {
 namespace valet_parking {
 
-Stage::StageStatus StageApproachingParkingSpot::Process(
-    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+Stage::StageStatus
+StageApproachingParkingSpot::Process(const common::TrajectoryPoint& planning_init_point,
+                                     Frame*                         frame) {
   ADEBUG << "stage: StageApproachingParkingSpot";
   CHECK_NOTNULL(frame);
   GetContext()->target_parking_spot_id.clear();
   if (frame->local_view().routing->routing_request().has_parking_info() &&
-      frame->local_view()
-          .routing->routing_request()
-          .parking_info()
-          .has_parking_space_id()) {
-    GetContext()->target_parking_spot_id = frame->local_view()
-                                               .routing->routing_request()
-                                               .parking_info()
-                                               .parking_space_id();
+      frame->local_view().routing->routing_request().parking_info().has_parking_space_id()) {
+    GetContext()->target_parking_spot_id =
+        frame->local_view().routing->routing_request().parking_info().parking_space_id();
   } else {
     AERROR << "No parking space id from routing";
     return StageStatus::ERROR;
   }
 
-  if (GetContext()->target_parking_spot_id.empty()) {
-    return StageStatus::ERROR;
-  }
+  if (GetContext()->target_parking_spot_id.empty()) { return StageStatus::ERROR; }
 
   *(frame->mutable_open_space_info()->mutable_target_parking_spot_id()) =
       GetContext()->target_parking_spot_id;
@@ -64,10 +58,8 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
     return StageStatus::ERROR;
   }
 
-  GetContext()->pre_stop_rightaway_flag =
-      frame->open_space_info().pre_stop_rightaway_flag();
-  GetContext()->pre_stop_rightaway_point =
-      frame->open_space_info().pre_stop_rightaway_point();
+  GetContext()->pre_stop_rightaway_flag  = frame->open_space_info().pre_stop_rightaway_flag();
+  GetContext()->pre_stop_rightaway_point = frame->open_space_info().pre_stop_rightaway_point();
 
   if (CheckADCStop(*frame)) {
     next_stage_ = ScenarioConfig::VALET_PARKING_PARKING;
@@ -78,9 +70,9 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
 }
 
 bool StageApproachingParkingSpot::CheckADCStop(const Frame& frame) {
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_speed = injector_->vehicle_state()->linear_velocity();
-  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+  const auto&  reference_line_info = frame.reference_line_info().front();
+  const double adc_speed           = injector_->vehicle_state()->linear_velocity();
+  const double max_adc_stop_speed  = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
                                         .max_abs_speed_when_stopped();
@@ -90,14 +82,11 @@ bool StageApproachingParkingSpot::CheckADCStop(const Frame& frame) {
   }
 
   // check stop close enough to stop line of the stop_sign
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double stop_fence_start_s =
-      frame.open_space_info().open_space_pre_stop_fence_s();
-  const double distance_stop_line_to_adc_front_edge =
-      stop_fence_start_s - adc_front_edge_s;
+  const double adc_front_edge_s   = reference_line_info.AdcSlBoundary().end_s();
+  const double stop_fence_start_s = frame.open_space_info().open_space_pre_stop_fence_s();
+  const double distance_stop_line_to_adc_front_edge = stop_fence_start_s - adc_front_edge_s;
 
-  if (distance_stop_line_to_adc_front_edge >
-      scenario_config_.max_valid_stop_distance()) {
+  if (distance_stop_line_to_adc_front_edge > scenario_config_.max_valid_stop_distance()) {
     ADEBUG << "not a valid stop. too far from stop line.";
     return false;
   }

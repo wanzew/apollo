@@ -23,7 +23,6 @@
 #include <string>
 
 #include "cyber/time/clock.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
 #include "modules/control/common/control_gflags.h"
@@ -36,25 +35,19 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::cyber::Clock;
 
-std::string PostprocessorSubmodule::Name() const {
-  return FLAGS_postprocessor_submodule_name;
-}
+std::string PostprocessorSubmodule::Name() const { return FLAGS_postprocessor_submodule_name; }
 
 bool PostprocessorSubmodule::Init() {
-  ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
-                                         &control_common_conf_))
-      << "Unable to load control common conf file: "
-      << FLAGS_control_common_conf_file;
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file, &control_common_conf_))
+      << "Unable to load control common conf file: " << FLAGS_control_common_conf_file;
 
-  postprocessor_writer_ =
-      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+  postprocessor_writer_ = node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
   ACHECK(postprocessor_writer_ != nullptr);
   return true;
 }
 
-bool PostprocessorSubmodule::Proc(
-    const std::shared_ptr<ControlCommand>& control_core_command) {
-  const auto start_time = Clock::Instance()->Now();
+bool PostprocessorSubmodule::Proc(const std::shared_ptr<ControlCommand>& control_core_command) {
+  const auto     start_time = Clock::Instance()->Now();
   ControlCommand control_command;
   // get all fields from control_core_command for now
   control_command = *control_core_command;
@@ -80,10 +73,9 @@ bool PostprocessorSubmodule::Proc(
   const auto end_time = Clock::Instance()->Now();
 
   // measure latency
-  static apollo::common::LatencyRecorder latency_recorder(
-      FLAGS_control_command_topic);
-  latency_recorder.AppendLatencyRecord(
-      control_command.header().lidar_timestamp(), start_time, end_time);
+  static apollo::common::LatencyRecorder latency_recorder(FLAGS_control_command_topic);
+  latency_recorder.AppendLatencyRecord(control_command.header().lidar_timestamp(), start_time,
+                                       end_time);
 
   postprocessor_writer_->Write(control_command);
 

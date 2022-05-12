@@ -37,18 +37,18 @@ struct TrackedObject {
 
   void Reset();
 
-  void Reset(
-      base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
-      const Eigen::Vector3d& global_to_local_offset = Eigen::Vector3d::Zero(),
-      const base::SensorInfo& sensor = base::SensorInfo());
+  void Reset(base::ObjectPtr         obj_ptr,
+             const Eigen::Affine3d&  pose,
+             const Eigen::Vector3d&  global_to_local_offset = Eigen::Vector3d::Zero(),
+             const base::SensorInfo& sensor                 = base::SensorInfo());
 
   std::string ToString() const;
-  void ComputeShapeFeatures();
+  void        ComputeShapeFeatures();
 
-  void AttachObject(
-      base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
-      const Eigen::Vector3d& global_to_local_offset = Eigen::Vector3d::Zero(),
-      const base::SensorInfo& sensor = base::SensorInfo());
+  void AttachObject(base::ObjectPtr         obj_ptr,
+                    const Eigen::Affine3d&  pose,
+                    const Eigen::Vector3d&  global_to_local_offset = Eigen::Vector3d::Zero(),
+                    const base::SensorInfo& sensor                 = base::SensorInfo());
 
   void TransformObjectCloudToWorld();
 
@@ -62,7 +62,7 @@ struct TrackedObject {
   // ***************************************************
   std::vector<float> shape_features;
   std::vector<float> shape_features_full;
-  size_t histogram_bin_size = 10;
+  size_t             histogram_bin_size = 10;
   // association distance
   // range from 0 to max_match_distance
   float association_score = 0.0f;
@@ -70,8 +70,8 @@ struct TrackedObject {
   // ***************************************************
   // self information from track
   // ***************************************************
-  bool is_fake = false;
-  int track_id = -1;
+  bool   is_fake       = false;
+  int    track_id      = -1;
   double tracking_time = 0.0;
 
   // ***************************************************
@@ -94,8 +94,8 @@ struct TrackedObject {
   Eigen::Vector3d lane_direction;
   Eigen::Vector3d size;
 
-  base::ObjectType type = base::ObjectType::UNKNOWN;
-  bool is_background = false;
+  base::ObjectType type          = base::ObjectType::UNKNOWN;
+  bool             is_background = false;
 
   // ***************************************************
   // measurement correlative information from measurement computer
@@ -109,11 +109,11 @@ struct TrackedObject {
   // filter correlative information
   // ***************************************************
   // states
-  int boostup_need_history_size = 0;
-  bool valid = false;
-  bool converged = true;
-  float convergence_confidence = 0.0f;
-  double update_quality = 0.0;
+  int             boostup_need_history_size = 0;
+  bool            valid                     = false;
+  bool            converged                 = true;
+  float           convergence_confidence    = 0.0f;
+  double          update_quality            = 0.0;
   Eigen::Vector3d selected_measured_velocity;
   Eigen::Vector3d selected_measured_acceleration;
   Eigen::Vector3d belief_anchor_point;
@@ -141,11 +141,11 @@ struct TrackedObject {
   // ***************************************************
   // postprocess correlative information
   // ***************************************************
-  Eigen::Vector3d output_velocity;
-  Eigen::Matrix3d output_velocity_uncertainty;
-  Eigen::Vector3d output_direction;
-  Eigen::Vector3d output_center;
-  Eigen::Vector3d output_size;
+  Eigen::Vector3d  output_velocity;
+  Eigen::Matrix3d  output_velocity_uncertainty;
+  Eigen::Vector3d  output_direction;
+  Eigen::Vector3d  output_center;
+  Eigen::Vector3d  output_size;
   base::SensorInfo sensor_info;
 
   Eigen::Vector3d global_local_offset;
@@ -153,7 +153,7 @@ struct TrackedObject {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;  // struct TrackedObject
 
-typedef std::shared_ptr<TrackedObject> TrackedObjectPtr;
+typedef std::shared_ptr<TrackedObject>       TrackedObjectPtr;
 typedef std::shared_ptr<const TrackedObject> TrackedObjectConstPtr;
 
 }  // namespace lidar

@@ -42,44 +42,34 @@ class MessageHeader {
   }
 
   bool is_magic_num_match(const char* other, size_t other_len) const {
-    if (other == nullptr || other_len != sizeof(magic_num_)) {
-      return false;
-    }
+    if (other == nullptr || other_len != sizeof(magic_num_)) { return false; }
     return memcmp(magic_num_, other, sizeof(magic_num_)) == 0;
   }
   void reset_magic_num() { memcpy(magic_num_, "BDACBDAC", sizeof(magic_num_)); }
 
   uint64_t seq() const { return ConvertArrayTo64(seq_); }
-  void set_seq(uint64_t seq) { Convert64ToArray(seq, const_cast<char*>(seq_)); }
-  void reset_seq() { memset(seq_, 0, sizeof(seq_)); }
+  void     set_seq(uint64_t seq) { Convert64ToArray(seq, const_cast<char*>(seq_)); }
+  void     reset_seq() { memset(seq_, 0, sizeof(seq_)); }
 
   uint64_t timestamp_ns() const { return ConvertArrayTo64(timestamp_ns_); }
-  void set_timestamp_ns(uint64_t timestamp_ns) {
+  void     set_timestamp_ns(uint64_t timestamp_ns) {
     Convert64ToArray(timestamp_ns, const_cast<char*>(timestamp_ns_));
   }
   void reset_timestamp_ns() { memset(timestamp_ns_, 0, sizeof(timestamp_ns_)); }
 
   uint64_t src_id() const { return ConvertArrayTo64(src_id_); }
-  void set_src_id(uint64_t src_id) {
-    Convert64ToArray(src_id, const_cast<char*>(src_id_));
-  }
-  void reset_src_id() { memset(src_id_, 0, sizeof(src_id_)); }
+  void     set_src_id(uint64_t src_id) { Convert64ToArray(src_id, const_cast<char*>(src_id_)); }
+  void     reset_src_id() { memset(src_id_, 0, sizeof(src_id_)); }
 
   uint64_t dst_id() const { return ConvertArrayTo64(dst_id_); }
-  void set_dst_id(uint64_t dst_id) {
-    Convert64ToArray(dst_id, const_cast<char*>(dst_id_));
-  }
-  void reset_dst_id() { memset(dst_id_, 0, sizeof(dst_id_)); }
+  void     set_dst_id(uint64_t dst_id) { Convert64ToArray(dst_id, const_cast<char*>(dst_id_)); }
+  void     reset_dst_id() { memset(dst_id_, 0, sizeof(dst_id_)); }
 
   const char* msg_type() const { return msg_type_; }
-  void set_msg_type(const char* msg_type, size_t msg_type_len) {
-    if (msg_type == nullptr || msg_type_len == 0) {
-      return;
-    }
+  void        set_msg_type(const char* msg_type, size_t msg_type_len) {
+    if (msg_type == nullptr || msg_type_len == 0) { return; }
     size_t real_len = msg_type_len;
-    if (msg_type_len >= sizeof(msg_type_)) {
-      real_len = sizeof(msg_type_) - 1;
-    }
+    if (msg_type_len >= sizeof(msg_type_)) { real_len = sizeof(msg_type_) - 1; }
     reset_msg_type();
     memcpy(msg_type_, msg_type, real_len);
   }
@@ -88,7 +78,7 @@ class MessageHeader {
   void reset_res() { memset(res_, 0, sizeof(res_)); }
 
   uint32_t content_size() const { return ConvertArrayTo32(content_size_); }
-  void set_content_size(uint32_t content_size) {
+  void     set_content_size(uint32_t content_size) {
     Convert32ToArray(content_size, const_cast<char*>(content_size_));
   }
   void reset_content_size() { memset(content_size_, 0, sizeof(content_size_)); }
@@ -100,9 +90,8 @@ class MessageHeader {
   }
 
   void Convert64ToArray(uint64_t input, char* output) {
-    uint32_t h_high =
-        static_cast<uint32_t>((input & 0xffffffff00000000UL) >> 32);
-    uint32_t h_low = static_cast<uint32_t>(input & 0x00000000ffffffffUL);
+    uint32_t h_high = static_cast<uint32_t>((input & 0xffffffff00000000UL) >> 32);
+    uint32_t h_low  = static_cast<uint32_t>(input & 0x00000000ffffffffUL);
     Convert32ToArray(h_high, output);
     Convert32ToArray(h_low, output + 4);
   }
@@ -115,7 +104,7 @@ class MessageHeader {
 
   uint64_t ConvertArrayTo64(const char* input) const {
     uint64_t high = ConvertArrayTo32(input);
-    uint64_t low = ConvertArrayTo32(input + 4);
+    uint64_t low  = ConvertArrayTo32(input + 4);
     return (high << 32) | low;
   }
 

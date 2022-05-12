@@ -17,44 +17,40 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class Ultrsensor2508 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Ultrsensor2508
+    : public ::apollo::drivers::canbus::ProtocolData<::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Ultrsensor2508();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+  void Parse(const std::uint8_t* bytes, int32_t length, ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'uiUSS9_ToF_Indirect', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
   // 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-  double uiuss9_tof_indirect(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  double uiuss9_tof_indirect(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'uiUSS8_ToF_Indirect', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
   // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-  double uiuss8_tof_indirect(const std::uint8_t* bytes,
-                             const int32_t length) const;
+  double uiuss8_tof_indirect(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'uiUSS11_ToF_Indirect', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
   // 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-  double uiuss11_tof_indirect(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  double uiuss11_tof_indirect(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'name': 'uiUSS10_ToF_Indirect', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
   // 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
-  double uiuss10_tof_indirect(const std::uint8_t* bytes,
-                              const int32_t length) const;
+  double uiuss10_tof_indirect(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace devkit

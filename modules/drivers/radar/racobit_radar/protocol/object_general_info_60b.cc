@@ -32,9 +32,10 @@ using apollo::drivers::canbus::Byte;
 ObjectGeneralInfo60B::ObjectGeneralInfo60B() {}
 const uint32_t ObjectGeneralInfo60B::ID = 0x60B;
 
-void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
-                                 RacobitRadar* racobit_radar) const {
-  int obj_id = object_id(bytes, length);
+void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes,
+                                 int32_t             length,
+                                 RacobitRadar*       racobit_radar) const {
+  int  obj_id      = object_id(bytes, length);
   auto racobit_obs = racobit_radar->add_contiobs();
   racobit_obs->set_clusterortrack(false);
   racobit_obs->set_obstacle_id(obj_id);
@@ -45,26 +46,24 @@ void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
   racobit_obs->set_rcs(rcs(bytes, length));
   racobit_obs->set_dynprop(dynprop(bytes, length));
   double timestamp = apollo::cyber::Time::Now().ToSecond();
-  auto header = racobit_obs->mutable_header();
+  auto   header    = racobit_obs->mutable_header();
   header->CopyFrom(racobit_radar->header());
   header->set_timestamp_sec(timestamp);
 }
 
-int ObjectGeneralInfo60B::object_id(const std::uint8_t* bytes,
-                                    int32_t length) const {
-  Byte t0(bytes);
+int ObjectGeneralInfo60B::object_id(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
   return ret;
 }
 
-double ObjectGeneralInfo60B::longitude_dist(const std::uint8_t* bytes,
-                                            int32_t length) const {
-  Byte t0(bytes + 1);
+double ObjectGeneralInfo60B::longitude_dist(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte    t1(bytes + 2);
   int32_t t = t1.get_byte(3, 5);
 
   x <<= 5;
@@ -74,12 +73,11 @@ double ObjectGeneralInfo60B::longitude_dist(const std::uint8_t* bytes,
   return ret;
 }
 
-double ObjectGeneralInfo60B::lateral_dist(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte t0(bytes + 2);
+double ObjectGeneralInfo60B::lateral_dist(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 2);
   int32_t x = t0.get_byte(0, 3);
 
-  Byte t1(bytes + 3);
+  Byte    t1(bytes + 3);
   int32_t t = t1.get_byte(0, 8);
 
   x <<= 8;
@@ -89,11 +87,10 @@ double ObjectGeneralInfo60B::lateral_dist(const std::uint8_t* bytes,
   return ret;
 }
 
-double ObjectGeneralInfo60B::longitude_vel(const std::uint8_t* bytes,
-                                           int32_t length) const {
-  Byte t0(bytes + 4);
+double ObjectGeneralInfo60B::longitude_vel(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
-  Byte t1(bytes + 5);
+  Byte    t1(bytes + 5);
   int32_t t = t1.get_byte(6, 2);
 
   x <<= 2;
@@ -102,12 +99,11 @@ double ObjectGeneralInfo60B::longitude_vel(const std::uint8_t* bytes,
   return ret;
 }
 
-double ObjectGeneralInfo60B::lateral_vel(const std::uint8_t* bytes,
-                                         int32_t length) const {
-  Byte t0(bytes + 5);
+double ObjectGeneralInfo60B::lateral_vel(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 5);
   int32_t x = t0.get_byte(0, 6);
 
-  Byte t1(bytes + 6);
+  Byte    t1(bytes + 6);
   int32_t t = t1.get_byte(5, 3);
 
   x <<= 3;
@@ -117,18 +113,16 @@ double ObjectGeneralInfo60B::lateral_vel(const std::uint8_t* bytes,
   return ret;
 }
 
-double ObjectGeneralInfo60B::rcs(const std::uint8_t* bytes,
-                                 int32_t length) const {
-  Byte t0(bytes + 7);
+double ObjectGeneralInfo60B::rcs(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   double ret = x * OBJECT_RCS_RES + OBJECT_RCS_MIN;
   return ret;
 }
 
-int ObjectGeneralInfo60B::dynprop(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 6);
+int ObjectGeneralInfo60B::dynprop(const std::uint8_t* bytes, int32_t length) const {
+  Byte    t0(bytes + 6);
   int32_t x = t0.get_byte(0, 3);
 
   int ret = x;

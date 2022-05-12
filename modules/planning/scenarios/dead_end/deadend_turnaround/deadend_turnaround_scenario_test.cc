@@ -20,9 +20,10 @@
 
 #include "modules/planning/scenarios/dead_end/deadend_turnaround/deadend_turnaround_scenario.h"
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -43,10 +44,10 @@ TEST_F(DeadEndTurnAroundScenarioTest, Init) {
       "/apollo/modules/planning/conf/scenario/deadend_turnaround_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_deadend_turnaround_config_file, &config));
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(FLAGS_scenario_deadend_turnaround_config_file,
+                                                      &config));
   ScenarioContext context;
-  auto injector = std::make_shared<DependencyInjector>();
+  auto            injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new DeadEndTurnAroundScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::DEADEND_TURNAROUND);
 }

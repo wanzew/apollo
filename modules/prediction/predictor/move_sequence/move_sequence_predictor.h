@@ -50,27 +50,29 @@ class MoveSequencePredictor : public SequencePredictor {
    * @return If predicted successfully
    */
   bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
-               Obstacle* obstacle,
-               ObstaclesContainer* obstacles_container) override;
+               Obstacle*                     obstacle,
+               ObstaclesContainer*           obstacles_container) override;
 
   FRIEND_TEST(MoveSequencePredictorTest, Polynomial);
   FRIEND_TEST(MoveSequencePredictorTest, Utils);
 
  private:
-  bool DrawMoveSequenceTrajectoryPoints(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* points);
+  bool DrawMoveSequenceTrajectoryPoints(const Obstacle&                               obstacle,
+                                        const LaneSequence&                           lane_sequence,
+                                        const double                                  total_time,
+                                        const double                                  period,
+                                        std::vector<apollo::common::TrajectoryPoint>* points);
 
-  std::pair<double, double> ComputeLonEndState(
-      const std::array<double, 3>& init_s, const LaneSequence& lane_sequence);
+  std::pair<double, double> ComputeLonEndState(const std::array<double, 3>& init_s,
+                                               const LaneSequence&          lane_sequence);
 
-  double ComputeTimeToLatEndConditionByVelocity(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence);
+  double ComputeTimeToLatEndConditionByVelocity(const Obstacle&     obstacle,
+                                                const LaneSequence& lane_sequence);
 
   std::vector<double> GenerateCandidateTimes();
 
-  double CostFunction(const double max_lat_acc, const double time_to_end_state,
+  double CostFunction(const double max_lat_acc,
+                      const double time_to_end_state,
                       const double time_to_lane_edge,
                       const double bell_curve_mu);
 };

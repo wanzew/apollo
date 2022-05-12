@@ -22,12 +22,12 @@
 #include <iostream>
 #include <memory>
 
+#include "modules/drivers/gnss/proto/config.pb.h"
+
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/record/record_reader.h"
-
 #include "modules/drivers/gnss/parser/data_parser.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/stream/stream.h"
 
 namespace apollo {
@@ -39,7 +39,7 @@ constexpr size_t BUFFER_SIZE = 128;
 void ParseBin(const char* filename, DataParser* parser) {
   std::ios::sync_with_stdio(false);
   std::ifstream f(filename, std::ifstream::binary);
-  char b[BUFFER_SIZE];
+  char          b[BUFFER_SIZE];
   while (f) {
     f.read(b, BUFFER_SIZE);
     std::string msg(reinterpret_cast<const char*>(b), f.gcount());
@@ -48,7 +48,7 @@ void ParseBin(const char* filename, DataParser* parser) {
 }
 
 void ParseRecord(const char* filename, DataParser* parser) {
-  cyber::record::RecordReader reader(filename);
+  cyber::record::RecordReader  reader(filename);
   cyber::record::RecordMessage message;
   while (reader.ReadMessage(&message)) {
     if (message.channel_name == "/apollo/sensor/gnss/raw_data") {
@@ -60,13 +60,13 @@ void ParseRecord(const char* filename, DataParser* parser) {
   }
 }
 
-void Parse(const char* filename, const char* file_type,
+void Parse(const char*                                   filename,
+           const char*                                   file_type,
            const std::shared_ptr<::apollo::cyber::Node>& node) {
-  std::string type = std::string(file_type);
+  std::string    type = std::string(file_type);
   config::Config config;
   if (!apollo::cyber::common::GetProtoFromFile(
-          std::string("/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"),
-          &config)) {
+          std::string("/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"), &config)) {
     std::cout << "Unable to load gnss conf file";
   }
   DataParser* parser = new DataParser(config, node);
@@ -91,8 +91,7 @@ int main(int argc, char** argv) {
     return 0;
   }
   ::apollo::cyber::Init("parser_cli");
-  std::shared_ptr<::apollo::cyber::Node> parser_node(
-      ::apollo::cyber::CreateNode("parser_cli"));
+  std::shared_ptr<::apollo::cyber::Node> parser_node(::apollo::cyber::CreateNode("parser_cli"));
   ::apollo::drivers::gnss::Parse(argv[1], argv[2], parser_node);
   return 0;
 }

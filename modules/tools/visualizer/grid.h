@@ -26,7 +26,7 @@ class Grid : public RenderableObject {
   ~Grid() {}
 
   GLenum GetPrimitiveType(void) const { return GL_LINES; }
-  void SetupExtraUniforms(void) {
+  void   SetupExtraUniforms(void) {
     QVector3D color;
     color.setX(static_cast<float>(grid_color_.redF()));
     color.setY(static_cast<float>(grid_color_.greenF()));
@@ -39,15 +39,13 @@ class Grid : public RenderableObject {
   int blue(void) const { return grid_color_.blue(); }
 
   const QColor& grid_color(void) const { return grid_color_; }
-  void set_grid_color(const QColor& color) { grid_color_ = color; }
+  void          set_grid_color(const QColor& color) { grid_color_ = color; }
 
   void SetCellCount(int cellCount) {
     set_vertex_count(((cellCount << 1) + 2) * vertex_element_count());
   }
 
-  int CellCount(void) const {
-    return (vertex_count() / vertex_element_count() - 2) >> 1;
-  }
+  int CellCount(void) const { return (vertex_count() / vertex_element_count() - 2) >> 1; }
 
  protected:
   virtual bool FillVertexBuffer(GLfloat* pBuffer);

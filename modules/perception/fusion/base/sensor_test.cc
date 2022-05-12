@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
-
 #include "modules/perception/fusion/base/sensor.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -29,19 +29,19 @@ TEST(SensorTest, test) {
 
   Sensor::SetMaxCachedFrameNumber(2);
 
-  double timestamp = 7012;
+  double          timestamp         = 7012;
   Eigen::Affine3d sensor2world_pose = Eigen::Affine3d::Identity();
   base::ObjectPtr base_object(new base::Object());
-  base::FramePtr base_frame(new base::Frame());
-  base_frame->timestamp = timestamp;
+  base::FramePtr  base_frame(new base::Frame());
+  base_frame->timestamp         = timestamp;
   base_frame->sensor2world_pose = sensor2world_pose;
   base_frame->objects.emplace_back(base_object);
 
-  double timestamp_2 = 9012;
+  double          timestamp_2         = 9012;
   Eigen::Affine3d sensor2world_pose_2 = Eigen::Affine3d::Identity();
   base::ObjectPtr base_object_2(new base::Object());
-  base::FramePtr base_frame_2(new base::Frame());
-  base_frame_2->timestamp = timestamp_2;
+  base::FramePtr  base_frame_2(new base::Frame());
+  base_frame_2->timestamp         = timestamp_2;
   base_frame_2->sensor2world_pose = sensor2world_pose_2;
   base_frame_2->objects.emplace_back(base_object_2);
 
@@ -53,7 +53,7 @@ TEST(SensorTest, test) {
   EXPECT_EQ(sensor_ptr->frames_.size(), 2);
 
   std::vector<SensorFramePtr> frame_vec;
-  double query_timestamp = 7013;
+  double                      query_timestamp = 7013;
   sensor_ptr->QueryLatestFrames(query_timestamp, &frame_vec);
   EXPECT_EQ(frame_vec.size(), 1);
   query_timestamp = 9013;
@@ -65,7 +65,7 @@ TEST(SensorTest, test) {
   EXPECT_EQ(frame_vec.size(), 2);
 
   sensor_ptr->latest_query_timestamp_ = 0;
-  query_timestamp = 7013;
+  query_timestamp                     = 7013;
   EXPECT_NE(sensor_ptr->QueryLatestFrame(query_timestamp), nullptr);
   query_timestamp = 9013;
   EXPECT_NE(sensor_ptr->QueryLatestFrame(query_timestamp), nullptr);

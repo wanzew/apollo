@@ -23,16 +23,14 @@ namespace routing {
 
 template <typename T>
 int BinarySearchForSLarger(const std::vector<T>& sorted_vec, double value_s) {
-  if (sorted_vec.empty()) {
-    return -1;
-  }
-  int start_index = 0;
-  int end_index = static_cast<int>(sorted_vec.size()) - 1;
-  double internal_s = 0.0;
-  int middle_index = 0;
+  if (sorted_vec.empty()) { return -1; }
+  int    start_index  = 0;
+  int    end_index    = static_cast<int>(sorted_vec.size()) - 1;
+  double internal_s   = 0.0;
+  int    middle_index = 0;
   while (end_index - start_index > 1) {
     middle_index = (start_index + end_index) / 2;
-    internal_s = sorted_vec[middle_index].StartS();
+    internal_s   = sorted_vec[middle_index].StartS();
     if (internal_s > value_s) {
       end_index = middle_index;
     } else {
@@ -40,24 +38,20 @@ int BinarySearchForSLarger(const std::vector<T>& sorted_vec, double value_s) {
     }
   }
   double end_s = sorted_vec[start_index].EndS();
-  if (value_s <= end_s) {
-    return start_index;
-  }
+  if (value_s <= end_s) { return start_index; }
   return end_index;
 }
 
 template <typename T>
 int BinarySearchForSSmaller(const std::vector<T>& sorted_vec, double value_s) {
-  if (sorted_vec.empty()) {
-    return -1;
-  }
-  int start_index = 0;
-  int end_index = static_cast<int>(sorted_vec.size()) - 1;
-  double internal_s = 0.0;
-  int middle_index = 0;
+  if (sorted_vec.empty()) { return -1; }
+  int    start_index  = 0;
+  int    end_index    = static_cast<int>(sorted_vec.size()) - 1;
+  double internal_s   = 0.0;
+  int    middle_index = 0;
   while (end_index - start_index > 1) {
     middle_index = (start_index + end_index) / 2;
-    internal_s = sorted_vec[middle_index].EndS();
+    internal_s   = sorted_vec[middle_index].EndS();
     if (internal_s > value_s) {
       end_index = middle_index;
     } else {
@@ -65,24 +59,17 @@ int BinarySearchForSSmaller(const std::vector<T>& sorted_vec, double value_s) {
     }
   }
   double start_s = sorted_vec[end_index].StartS();
-  if (value_s > start_s) {
-    return end_index;
-  }
+  if (value_s > start_s) { return end_index; }
   return start_index;
 }
 
 template <typename T>
-int BinarySearchCheckValidSIndex(const std::vector<T>& sorted_vec, int index,
-                                 double value_s) {
-  if (index == -1) {
-    return -1;
-  }
+int BinarySearchCheckValidSIndex(const std::vector<T>& sorted_vec, int index, double value_s) {
+  if (index == -1) { return -1; }
   double start_s = sorted_vec[index].StartS();
-  double end_s = sorted_vec[index].EndS();
+  double end_s   = sorted_vec[index].EndS();
 
-  if (start_s <= value_s && end_s >= value_s) {
-    return index;
-  }
+  if (start_s <= value_s && end_s >= value_s) { return index; }
   return -1;
 }
 
