@@ -99,10 +99,7 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper&  boundary_mapper,
 
   // step 2 perform graph search
   SpeedLimit speed_limit;
-  if (!speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(), &speed_limit).ok()) {
-    AERROR << "Getting speed limits for dp st speed optimizer failed!";
-    return false;
-  }
+  speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(), &speed_limit);
 
   // DP Path data result
   const float path_length = path_data.discretized_path().Length();

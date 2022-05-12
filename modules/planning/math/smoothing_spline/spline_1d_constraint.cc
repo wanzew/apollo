@@ -69,8 +69,13 @@ bool Spline1dConstraint::AddBoundary(const std::vector<double>& x_coord,
   std::vector<double> filtered_lower_bound_x;
   std::vector<double> filtered_upper_bound_x;
 
-  FilterConstraints(x_coord, lower_bound, upper_bound, &filtered_lower_bound_x,
-                    &filtered_lower_bound, &filtered_upper_bound_x, &filtered_upper_bound);
+  FilterConstraints(x_coord,                  //
+                    lower_bound,              //
+                    upper_bound,              //
+                    &filtered_lower_bound_x,  //
+                    &filtered_lower_bound,    //
+                    &filtered_upper_bound_x,  //
+                    &filtered_upper_bound);   //
 
   // emplace affine constraints
   const uint32_t num_params = spline_order_ + 1;
@@ -82,9 +87,9 @@ bool Spline1dConstraint::AddBoundary(const std::vector<double>& x_coord,
                             (x_knots_.size() - 1) * num_params);
 
   /*
-   * std::vector<double> x_coord     = {0,   5,   10,  20};
-   * std::vector<double> lower_bound = {0,   0,   0,   0};
-   * std::vector<double> upper_bound = {3.5, 3.5, 3.5, 3.5};
+   * std::vector<double> x_coord     = { 0,     5,    10,   20 };
+   * std::vector<double> lower_bound = {-1.75,-1.75,-1.75,-1.75};
+   * std::vector<double> upper_bound = { 1.75, 1.75, 1.75, 1.75};
    *
    *    ^ d
    *    |
@@ -567,11 +572,11 @@ bool Spline1dConstraint::AddSecondDerivativeSmoothConstraint() {
 bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
   if (x_knots_.size() < 3) { return false; }
 
+  // clang-format off
   const uint32_t  n_constraint = (x_knots_.size() - 2) * 4;
   const uint32_t  num_params   = spline_order_ + 1;
-  Eigen::MatrixXd equality_constraint =
-      Eigen::MatrixXd::Zero(n_constraint, (x_knots_.size() - 1) * num_params);
-  Eigen::MatrixXd equality_boundary = Eigen::MatrixXd::Zero(n_constraint, 1);
+  Eigen::MatrixXd equality_constraint = Eigen::MatrixXd::Zero(n_constraint, (x_knots_.size() - 1) * num_params);
+  Eigen::MatrixXd equality_boundary   = Eigen::MatrixXd::Zero(n_constraint, 1);
   // 这里的2层for循环很不直观，其实是把不同阶导数、不同的joint point、不同的系数
   // 杂糅在一起计算了。虽高效，但太复杂抽象了，最终计算后应该是下面的形式
   // 每行左边6项是joint point左侧的curve参数，右边6项是joint point右侧的curve参数
@@ -589,6 +594,15 @@ bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
   //                                                                         | er | = | 0 |
   //                                                                         | fr | = | 0 |
 
+/** 
+ * 
+ * 0~3行是1个joint point的0~3阶导，每4行表示一个点
+ * |   0   0   0 |
+ * |  0  n*n  0   0 |
+ * |  0  0   n*n  0 |
+ * |  0  0    0  n*n|
+ **/
+
   // i循环x_knots_.size())-2次
   for (uint32_t i = 0; i < n_constraint; i += 4) {
     double left_coef     = 1.0;
@@ -599,7 +613,6 @@ bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
     double right_ddcoef  = -1.0;
     double left_dddcoef  = 1.0;
     double right_dddcoef = -1.0;
-
     //第n段的最后一个点相对于第n段的第一点的坐标
     const double x_left = x_knots_[i / 4 + 1] - x_knots_[i / 4];
     //第n段的最后一个点相对于第n+1段的第一点的坐标
@@ -611,8 +624,7 @@ bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
 
       if (j >= 3) {
         equality_constraint(i + 3, num_params * i / 4 + j) = left_dddcoef * j * (j - 1) * (j - 2);
-        equality_constraint(i + 3, num_params * (i / 4 + 1) + j) =
-            right_dddcoef * j * (j - 1) * (j - 2);
+        equality_constraint(i + 3, num_params * (i / 4 + 1) + j) = right_dddcoef * j * (j - 1) * (j - 2);
         left_dddcoef  = left_ddcoef;
         right_dddcoef = right_ddcoef;
       }
@@ -647,8 +659,7 @@ bool Spline1dConstraint::AddMonotoneInequalityConstraint(const std::vector<doubl
 
   const uint32_t num_params = spline_order_ + 1;
   //注意维度，有N个x，就有N-1个不等式f(xn-1) <= f(xn)
-  Eigen::MatrixXd inequality_constraint =
-      Eigen::MatrixXd::Zero(x_coord.size() - 1, (x_knots_.size() - 1) * num_params);
+  Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(x_coord.size() - 1, (x_knots_.size() - 1) * num_params);
 
   // size()-1 行 1 列 个 0， 表示连续两个点的 s 差值大于0 (cur_coef[j] - prev_coef[j] >= 0)
   Eigen::MatrixXd inequality_boundary = Eigen::MatrixXd::Zero(x_coord.size() - 1, 1);
@@ -670,8 +681,7 @@ bool Spline1dConstraint::AddMonotoneInequalityConstraint(const std::vector<doubl
         //在同一段spline，则多项式系数是相同的。
         //记cur_rel_x-prev_rel_x=d, inequality_constraint对应该spline seg是
         //[1-1, d, d^2, d^3, d^4, d^5] * [a, b, c, d, e, f].T >= 0
-        inequality_constraint(i - 1, cur_spline_index * num_params + j) =
-            cur_coef[j] - prev_coef[j];
+        inequality_constraint(i - 1, cur_spline_index * num_params + j) = cur_coef[j] - prev_coef[j];
       }
     } else {
       //[-1, -px, -px^2, -px^3, -px^4, -px^5, 1, cx, cx^2, cx^3, cx^4, cx^5]
@@ -686,6 +696,7 @@ bool Spline1dConstraint::AddMonotoneInequalityConstraint(const std::vector<doubl
     prev_spline_index = cur_spline_index;
   }
 
+  // clang-format on
   return inequality_constraint_.AddConstraint(inequality_constraint, inequality_boundary);
 }
 

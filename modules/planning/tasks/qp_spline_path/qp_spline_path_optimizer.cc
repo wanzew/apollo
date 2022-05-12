@@ -53,6 +53,7 @@ Status QpSplinePathOptimizer::Process(const SpeedData&               speed_data,
                                        reference_line,           //
                                        qp_spline_path_config_,   //
                                        reference_line_info_->AdcSlBoundary());
+
   path_generator.SetDebugLogger(reference_line_info_->mutable_debug());
   path_generator.SetChangeLane(reference_line_info_->IsChangeLanePath());
 
@@ -60,13 +61,13 @@ Status QpSplinePathOptimizer::Process(const SpeedData&               speed_data,
   bool   is_final_attempt   = false;
 
   //第一次调用Generate()时，boundary_extension=0.0。
-  bool ret =
-      path_generator.Generate(reference_line_info_->path_decision()->path_obstacles().Items(),  //
-                              speed_data,                                                       //
-                              init_point,                                                       //
-                              boundary_extension,                                               //
-                              is_final_attempt,                                                 //
-                              path_data);                                                       //
+  bool ret = path_generator.Generate(                                   //
+      reference_line_info_->path_decision()->path_obstacles().Items(),  //
+      speed_data,                                                       //
+      init_point,                                                       //
+      boundary_extension,                                               //
+      is_final_attempt,                                                 //
+      path_data);                                                       //
   if (!ret) {
     AERROR << "failed to generate spline path with boundary_extension = 0.";
 
@@ -75,9 +76,13 @@ Status QpSplinePathOptimizer::Process(const SpeedData&               speed_data,
 
     //若生成轨迹失败，则将boundary_extension增大为cross_lane_lateral_extension()
     //（默认值0.5m)。以放松优化过程中的限制条件，使得更易求解，第二次调用Generate()
-    ret = path_generator.Generate(reference_line_info_->path_decision()->path_obstacles().Items(),
-                                  speed_data, init_point, boundary_extension, is_final_attempt,
-                                  path_data);
+    ret = path_generator.Generate(                                        //
+        reference_line_info_->path_decision()->path_obstacles().Items(),  //
+        speed_data,                                                       //
+        init_point,                                                       //
+        boundary_extension,                                               //
+        is_final_attempt,                                                 //
+        path_data);
     if (!ret) {
       const std::string msg = "failed to generate spline path at final attempt.";
       AERROR << msg;

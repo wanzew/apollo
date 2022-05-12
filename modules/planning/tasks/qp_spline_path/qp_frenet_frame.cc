@@ -66,7 +66,7 @@ QpFrenetFrame::QpFrenetFrame(const ReferenceLine&            reference_line,
 }
 
 bool QpFrenetFrame::Init(const std::vector<const PathObstacle*>& path_obstacles) {
-  // 根据SpeedData，计算自车纵向行经轨迹，存入vector<SpeedPoint>
+  // 根据SpeedData，计算自车纵向行驶轨迹，存入vector<SpeedPoint>
   // 即discretized_vehicle_location_
   // calculate discretized vehicle location
   CalculateDiscretizedVehicleLocation();
@@ -152,11 +152,7 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(const PathObstacle& path_obst
 
     for (const auto& corner_xy : corners) {
       common::SLPoint cur_point;
-      if (!reference_line_.XYToSL(corner_xy, &cur_point)) {
-        AERROR << "Fail to map xy point " << corner_xy.DebugString() << " to "
-               << cur_point.ShortDebugString();
-        return false;
-      }
+      reference_line_.XYToSL(corner_xy, &cur_point);
       // shift box base on buffer
       cur_point.set_l(cur_point.l() + nudge.distance_l());
       sl_corners.push_back(std::move(cur_point));
@@ -169,28 +165,30 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(const PathObstacle& path_obst
 
       // MapLateralConstraint()被调用4次，因为sl_corners由bounding box而来，有4个端点
       //因为是考虑横向约束，bounding box的上下2条横向线段端点对于求bound没有影响
-      std::pair<double, double> bound = MapLateralConstraint(
-          sl_first, sl_second, nudge.type(), veh_point.s() - vehicle_param_.back_edge_to_center(),
-          veh_point.s() + vehicle_param_.front_edge_to_center());
+      std::pair<double, double> bound = MapLateralConstraint(      //
+          sl_first,                                                //
+          sl_second,                                               //
+          nudge.type(),                                            //
+          veh_point.s() - vehicle_param_.back_edge_to_center(),    //
+          veh_point.s() + vehicle_param_.front_edge_to_center());  //
 
       // update bound map
       double s_resolution    = std::fabs(veh_point.v() * time_resolution_);
       double updated_start_s = init_frenet_point_.s() + veh_point.s() - s_resolution;
       double updated_end_s   = init_frenet_point_.s() + veh_point.s() + s_resolution;
-      //纵向s超出考察范围
+      // 纵向s超出考察范围
       if (updated_end_s > evaluated_s_.back() || updated_start_s < evaluated_s_.front()) {
         continue;
       }
-      std::pair<uint32_t, uint32_t> update_index_range =
-          FindInterval(updated_start_s, updated_end_s);
-
+      // clang-format off
+      std::pair<uint32_t, uint32_t> update_index_range = FindInterval(updated_start_s, updated_end_s);
       for (uint32_t j = update_index_range.first; j <= update_index_range.second; ++j) {
         //可行驶区域的右边界bound，取max
         dynamic_obstacle_bound_[j].first = std::max(bound.first, dynamic_obstacle_bound_[j].first);
         //可行驶区域的左边界bound，取min
-        dynamic_obstacle_bound_[j].second =
-            std::min(bound.second, dynamic_obstacle_bound_[j].second);
+        dynamic_obstacle_bound_[j].second = std::min(bound.second, dynamic_obstacle_bound_[j].second);
       }
+      // clang-format on
     }
   }
   return true;
@@ -311,12 +309,13 @@ bool QpFrenetFrame::MapNudgeLine(const common::SLPoint&                        s
 }
 
 // 用来计算障碍物bounding box的一条边对自车横向轨迹的约束。
-//返回值pair.first表示可行驶区域的右边界限定，second表示左边界限定，first<second
-std::pair<double, double> QpFrenetFrame::MapLateralConstraint(const common::SLPoint&  start,
-                                                              const common::SLPoint&  end,
-                                                              const ObjectNudge::Type nudge_type,
-                                                              const double            s_start,
-                                                              const double            s_end) {
+//返回值pair.first表示可行驶区域的右边界限定，second表示左边界限定，second > first
+std::pair<double, double> QpFrenetFrame::MapLateralConstraint(  //
+    const common::SLPoint&  start,
+    const common::SLPoint&  end,
+    const ObjectNudge::Type nudge_type,
+    const double            s_start,
+    const double            s_end) {
   constexpr double          inf    = std::numeric_limits<double>::infinity();
   std::pair<double, double> result = std::make_pair(-inf, inf);
 
@@ -336,9 +335,10 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(const common::SLPo
   //将自车首尾点向障碍物车做映射，找对应点，以确定横向偏移
   //我觉得只简单的利用障碍物车的bounding box就够了
   // nudge的横向距离已经在调用该函数之前纳入障碍物车的start和end两点的l坐标了
-  common::SLPoint front =
-      common::math::InterpolateUsingLinearApproximation(start, end, weight_front);
+  // clang-format off
+  common::SLPoint front =common::math::InterpolateUsingLinearApproximation(start, end, weight_front);
   common::SLPoint back = common::math::InterpolateUsingLinearApproximation(start, end, weight_back);
+  // clang-format on
 
   if (nudge_type == ObjectNudge::RIGHT_NUDGE) {
     //确认自车横向左方限定，取min使可行驶范围偏右，故nudge right

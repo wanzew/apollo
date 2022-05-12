@@ -101,8 +101,8 @@ bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& pat
   CalculateFrenetPoint(init_point, &init_frenet_point_);
 
   if (is_change_lane_path_) { ref_l_ = init_frenet_point_.l(); }
-  double start_s = init_frenet_point_.s();
 
+  double           start_s            = init_frenet_point_.s();
   constexpr double kDefaultPathLength = 50.0;
 
   // clang-format off
@@ -121,8 +121,11 @@ bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& pat
   // InitSpline()主要完成对spline segment和纵向s采样点的初始化。
   InitSpline(start_s, end_s);
 
-  QpFrenetFrame qp_frenet_frame(reference_line_, speed_data, init_frenet_point_,
-                                qp_spline_path_config_.time_resolution(), evaluated_s_);
+  QpFrenetFrame qp_frenet_frame(reference_line_,                           //
+                                speed_data,                                //
+                                init_frenet_point_,                        //
+                                qp_spline_path_config_.time_resolution(),  //
+                                evaluated_s_);                             //
 
   // QpFrenetFrame::Init() 根据已知条件，计算对自车横向轨迹的约束。
   // 1. HDMap和道路参考线对自车横向轨迹的约束
@@ -154,8 +157,11 @@ bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& pat
   std::vector<common::PathPoint> path_points;
 
   ReferencePoint ref_point = reference_line_.GetReferencePoint(start_s);
-  Vec2d          xy_point  = CartesianFrenetConverter::CalculateCartesianPoint(
-      ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), init_frenet_point_.l());
+
+  Vec2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(  //
+      ref_point.heading(),                                             //
+      Vec2d(ref_point.x(), ref_point.y()),                             //
+      init_frenet_point_.l());
 
   const auto xy_diff = xy_point - Vec2d(init_point.path_point().x(), init_point.path_point().y());
 
@@ -176,17 +182,25 @@ bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& pat
       dl  = spline.Derivative(s);
       ddl = spline.SecondOrderDerivative(s);
     }
-    ReferencePoint ref_point     = reference_line_.GetReferencePoint(s);
-    Vec2d          curr_xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
-                              ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), l) -
-                          xy_diff;
-    double theta =
-        CartesianFrenetConverter::CalculateTheta(ref_point.heading(), ref_point.kappa(), l, dl);
-    double kappa =
-        CartesianFrenetConverter::CalculateKappa(ref_point.kappa(), ref_point.dkappa(), l, dl, ddl);
+    ReferencePoint ref_point = reference_line_.GetReferencePoint(s);
 
-    common::PathPoint path_point = common::util::MakePathPoint(curr_xy_point.x(), curr_xy_point.y(),
-                                                               0.0, theta, kappa, 0.0, 0.0);
+    Vec2d curr_xy_point = CartesianFrenetConverter::CalculateCartesianPoint(  //
+                              ref_point.heading(),                            //
+                              Vec2d(ref_point.x(), ref_point.y()),            //
+                              l) -
+                          xy_diff;
+    // clang-format off
+    double theta = CartesianFrenetConverter::CalculateTheta(ref_point.heading(), ref_point.kappa(), l, dl);
+    double kappa = CartesianFrenetConverter::CalculateKappa(ref_point.kappa(), ref_point.dkappa(), l, dl, ddl);
+    // clang-format on
+
+    common::PathPoint path_point = common::util::MakePathPoint(curr_xy_point.x(),  //
+                                                               curr_xy_point.y(),  //
+                                                               0.0,                //
+                                                               theta,              //
+                                                               kappa,              //
+                                                               0.0,                //
+                                                               0.0);
     if (!path_points.empty()) {
       double distance = common::util::DistanceXY(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
@@ -281,10 +295,12 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   // add init status constraint, equality constraint
   //这里3个函数其实是添加了0，1，2阶导不等式约束 sample points for boundary
   const double kBoundaryEpsilon = 1e-4;
-  spline_constraint->AddPointConstraintInRange(init_frenet_point_.s(),
-                                               init_frenet_point_.l() - ref_l_, kBoundaryEpsilon);
-  spline_constraint->AddPointDerivativeConstraintInRange(init_frenet_point_.s(),
-                                                         init_frenet_point_.dl(), kBoundaryEpsilon);
+  spline_constraint->AddPointConstraintInRange(init_frenet_point_.s(),             //
+                                               init_frenet_point_.l() - ref_l_,    //
+                                               kBoundaryEpsilon);                  //
+  spline_constraint->AddPointDerivativeConstraintInRange(init_frenet_point_.s(),   //
+                                                         init_frenet_point_.dl(),  //
+                                                         kBoundaryEpsilon);
 
   // path二阶导其实是曲线的曲率kappa，U形急转弯不对kappa添加约束
   if (init_trajectory_point_.v() > qp_spline_path_config_.uturn_speed_limit()) {
@@ -331,7 +347,8 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   // add second derivative boundary
   std::vector<double> kappa_lower_bound(evaluated_s_.size(), -FLAGS_kappa_bound);
   std::vector<double> kappa_upper_bound(evaluated_s_.size(), FLAGS_kappa_bound);
-  spline_constraint->AddSecondDerivativeBoundary(evaluated_s_, kappa_lower_bound,
+  spline_constraint->AddSecondDerivativeBoundary(evaluated_s_,       //
+                                                 kappa_lower_bound,  //
                                                  kappa_upper_bound);
 
   // dkappa = d(kappa) / ds <= d3y/dx3
@@ -339,7 +356,8 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   std::vector<double> dkappa_upper_bound(evaluated_s_.size(), FLAGS_dkappa_bound);
 
   // add third derivative boundary
-  spline_constraint->AddThirdDerivativeBoundary(evaluated_s_, dkappa_lower_bound,
+  spline_constraint->AddThirdDerivativeBoundary(evaluated_s_,        //
+                                                dkappa_lower_bound,  //
                                                 dkappa_upper_bound);
 
   // add map bound constraint
@@ -361,10 +379,16 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
       //左边界
       road_boundary.second = std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
     }
-    boundary_low.emplace_back(common::util::MaxElement(std::vector<double>{
-        road_boundary.first, static_obs_boundary.first, dynamic_obs_boundary.first}));
-    boundary_high.emplace_back(common::util::MinElement(std::vector<double>{
-        road_boundary.second, static_obs_boundary.second, dynamic_obs_boundary.second}));
+    boundary_low.emplace_back(
+        common::util::MaxElement(std::vector<double>{road_boundary.first,          //
+                                                     static_obs_boundary.first,    //
+                                                     dynamic_obs_boundary.first})  //
+    );
+    boundary_high.emplace_back(
+        common::util::MinElement(std::vector<double>{road_boundary.second,          //
+                                                     static_obs_boundary.second,    //
+                                                     dynamic_obs_boundary.second})  //
+    );
   }
 
   //不等式约束
@@ -400,15 +424,18 @@ void QpSplinePathGenerator::AddHistoryPathKernel() {
   }
 
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
-  spline_kernel->AddReferenceLineKernelMatrix(history_s, histroy_l,
+  spline_kernel->AddReferenceLineKernelMatrix(history_s,  //
+                                              histroy_l,  //
                                               qp_spline_path_config_.history_path_weight());
 }
 
-// AddKernel()中，如果处在变道的过程中，则添加一项额外的cost，并且只作用于第一段spline。
-// AddDerivativeKernelMatrixForSplineK()与AddDerivativeKernelMatrix()如出一辙，
-// 唯一的区别是因为针对特定段的spline，没有对knots的循环。
-// 最底层同样都是调用SplineSegKernel::Instance()->NthDerivativeKernel()实现的。
 void QpSplinePathGenerator::AddKernel() {
+  //
+  // AddKernel()中，如果处在变道的过程中，则添加一项额外的cost，并且只作用于第一段spline。
+  // AddDerivativeKernelMatrixForSplineK()与AddDerivativeKernelMatrix()如出一辙，
+  // 唯一的区别是因为针对特定段的spline，没有对knots的循环。
+  // 最底层同样都是调用SplineSegKernel::Instance()->NthDerivativeKernel()实现的。
+
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   //只有在!is_change_lane_path_时才会进入，而!is_change_lane_path_会导致ref_l_=0
@@ -435,6 +462,7 @@ void QpSplinePathGenerator::AddKernel() {
   if (qp_spline_path_config_.derivative_weight() > 0.0) {
     // 添加1阶导kernel，(f'(x))^2积分
     spline_kernel->AddDerivativeKernelMatrix(qp_spline_path_config_.derivative_weight());
+    // AddKernel()中，如果处在变道的过程中，则添加一项额外的cost，并且只作用于第一段spline。
     if (std::fabs(init_frenet_point_.l()) > qp_spline_path_config_.lane_change_mid_l()) {
       spline_kernel->AddDerivativeKernelMatrixForSplineK(
           0, qp_spline_path_config_.first_spline_weight_factor() *
@@ -446,6 +474,7 @@ void QpSplinePathGenerator::AddKernel() {
     // 添加2阶导kernel，(f''(x))^2积分
     spline_kernel->AddSecondOrderDerivativeMatrix(
         qp_spline_path_config_.second_derivative_weight());
+    // AddKernel()中，如果处在变道的过程中，则添加一项额外的cost，并且只作用于第一段spline。
     if (std::fabs(init_frenet_point_.l()) > qp_spline_path_config_.lane_change_mid_l()) {
       spline_kernel->AddSecondOrderDerivativeMatrixForSplineK(
           0, qp_spline_path_config_.first_spline_weight_factor() *
@@ -456,6 +485,7 @@ void QpSplinePathGenerator::AddKernel() {
   if (qp_spline_path_config_.third_derivative_weight() > 0.0) {
     // 添加3阶导kernel，(f'''(x))^2积分
     spline_kernel->AddThirdOrderDerivativeMatrix(qp_spline_path_config_.third_derivative_weight());
+    // AddKernel()中，如果处在变道的过程中，则添加一项额外的cost，并且只作用于第一段spline。
     if (std::fabs(init_frenet_point_.l()) > qp_spline_path_config_.lane_change_mid_l()) {
       spline_kernel->AddThirdOrderDerivativeMatrixForSplineK(
           0, qp_spline_path_config_.first_spline_weight_factor() *

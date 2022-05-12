@@ -62,20 +62,14 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
                                          PathDecision* const    path_decision,
                                          SpeedData* const       speed_data) {
   if (reference_line_info_->ReachedDestination()) { return Status::OK(); }
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
-  }
 
-  if (path_data.discretized_path().NumOfPoints() == 0) {
-    std::string msg("Empty path data");
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  if (path_data.discretized_path().NumOfPoints() == 0) { std::string msg("Empty path data"); }
 
-  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_, reference_line, path_data,
-                                   qp_st_speed_config_.total_path_length(),
-                                   qp_st_speed_config_.total_time(),
+  StBoundaryMapper boundary_mapper(adc_sl_boundary,                          //
+                                   st_boundary_config_,                      //
+                                   reference_line, path_data,                //
+                                   qp_st_speed_config_.total_path_length(),  //
+                                   qp_st_speed_config_.total_time(),         //
                                    reference_line_info_->IsChangeLanePath());
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
@@ -83,18 +77,19 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
   }
   // step 1 get boundaries
   path_decision->EraseStBoundaries();
-  if (boundary_mapper.CreateStBoundary(path_decision).code() == ErrorCode::PLANNING_ERROR) {
-    return Status(ErrorCode::PLANNING_ERROR, "Mapping obstacle for qp st speed optimizer failed!");
-  }
+  boundary_mapper.CreateStBoundary(path_decision);
 
   std::vector<const StBoundary*> boundaries;
   for (auto* obstacle : path_decision->path_obstacles().Items()) {
     auto id = obstacle->Id();
+    // 障碍物 st_boundary 非空
     if (!obstacle->st_boundary().IsEmpty()) {
       path_decision->Find(id)->SetBlockingObstacle(true);
       boundaries.push_back(&obstacle->st_boundary());
-    } else if (FLAGS_enable_side_vehicle_st_boundary &&
-               (adc_sl_boundary.start_l() > 2.0 || adc_sl_boundary.end_l() < -2.0)) {
+    }
+    //障碍物 st_boundary 为空， enable_side_vehicle_st_boundary 为false，下面逻辑默认不使用
+    else if (FLAGS_enable_side_vehicle_st_boundary &&
+             (adc_sl_boundary.start_l() > 2.0 || adc_sl_boundary.end_l() < -2.0)) {
       if (obstacle->obstacle()->IsVirtual()) { continue; }
       if (path_decision->Find(id)->reference_line_st_boundary().IsEmpty()) { continue; }
       auto st_boundary_copy = path_decision->Find(id)->reference_line_st_boundary();
@@ -124,13 +119,13 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
     }
   }
 
-  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_, reference_line,
+  SpeedLimitDecider speed_limit_decider(adc_sl_boundary,      //
+                                        st_boundary_config_,  //
+                                        reference_line,       //
                                         path_data);
-  SpeedLimit        speed_limits;
-  if (speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(), &speed_limits) !=
-      Status::OK()) {
-    return Status(ErrorCode::PLANNING_ERROR, "GetSpeedLimits for qp st speed optimizer failed!");
-  }
+
+  SpeedLimit speed_limits;
+  speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(), &speed_limits);
 
   // step 2 perform graph search
   const auto& veh_param = common::VehicleConfigHelper::GetConfig().vehicle_param();
@@ -192,7 +187,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary&      adc_sl_boundary,
   // record debug info
   RecordSTGraphDebug(st_graph_data, st_graph_debug);
   return Status::OK();
-}
+}  // namespace planning
 
 }  // namespace planning
 }  // namespace apollo

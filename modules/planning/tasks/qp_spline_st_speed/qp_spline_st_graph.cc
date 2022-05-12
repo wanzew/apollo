@@ -104,11 +104,14 @@ Status QpSplineStGraph::Search(const StGraphData&               st_graph_data,
 
   cruise_.clear();
   reference_dp_speed_points_ = speed_data->speed_vector();  // DP 输出的结果
-  init_point_                = st_graph_data.init_point() spline_generator_->Reset(
-      t_knots_, qp_st_speed_config_.qp_spline_config().spline_order());
+  init_point_                = st_graph_data.init_point();
+  spline_generator_->Reset(t_knots_,  //
+                           qp_st_speed_config_.qp_spline_config().spline_order());
 
-  AddConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
-                st_graph_data.st_boundaries(), accel_bound);
+  AddConstraint(st_graph_data.init_point(),     //
+                st_graph_data.speed_limit(),    //
+                st_graph_data.st_boundaries(),  //
+                accel_bound);
   AddKernel(st_graph_data.st_boundaries(), st_graph_data.speed_limit());
   Solve();
   // extract output
@@ -270,23 +273,14 @@ Status QpSplineStGraph::AddConstraint(const common::TrajectoryPoint&        init
 
 Status QpSplineStGraph::AddKernel(const std::vector<const StBoundary*>& boundaries,
                                   const SpeedLimit&                     speed_limit) {
+  // clang-format off
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
-  if (qp_st_speed_config_.qp_spline_config().accel_kernel_weight() > 0) {
-    spline_kernel->AddSecondOrderDerivativeMatrix(
-        qp_st_speed_config_.qp_spline_config().accel_kernel_weight());
-  }
-
-  if (qp_st_speed_config_.qp_spline_config().jerk_kernel_weight() > 0) {
-    spline_kernel->AddThirdOrderDerivativeMatrix(
-        qp_st_speed_config_.qp_spline_config().jerk_kernel_weight());
-  }
-
-  AddCruiseReferenceLineKernel(qp_st_speed_config_.qp_spline_config().cruise_weight();
-  AddFollowReferenceLineKernel(boundaries,
-                                    qp_st_speed_config_.qp_spline_config().follow_weight());
-  AddYieldReferenceLineKernel(boundaries,
-                                   qp_st_speed_config_.qp_spline_config().yield_weight());
+  spline_kernel->AddSecondOrderDerivativeMatrix(qp_st_speed_config_.qp_spline_config().accel_kernel_weight());
+  spline_kernel->AddThirdOrderDerivativeMatrix(qp_st_speed_config_.qp_spline_config().jerk_kernel_weight());
+  AddCruiseReferenceLineKernel(qp_st_speed_config_.qp_spline_config().cruise_weight());
+  AddFollowReferenceLineKernel(boundaries, qp_st_speed_config_.qp_spline_config().follow_weight());
+  AddYieldReferenceLineKernel(boundaries, qp_st_speed_config_.qp_spline_config().yield_weight());
   AddDpStReferenceKernel(qp_st_speed_config_.qp_spline_config().dp_st_reference_weight());
 
   // init point jerk continuous kernel
@@ -299,6 +293,7 @@ Status QpSplineStGraph::AddKernel(const std::vector<const StBoundary*>& boundari
 
   return Status::OK();
 }
+// clang-format on
 
 Status QpSplineStGraph::Solve() {
   return spline_generator_->Solve() ? Status::OK() :
