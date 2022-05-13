@@ -43,8 +43,7 @@ class ConstantJerkTrajectory1d : public Curve1d {
   double      end_position() const;
   double      end_velocity() const;
   double      end_acceleration() const;
-
-  double jerk() const;
+  double      jerk() const;
 
  private:
   double p0_;

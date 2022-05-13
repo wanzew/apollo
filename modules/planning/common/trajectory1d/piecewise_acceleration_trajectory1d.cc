@@ -32,6 +32,8 @@
 namespace apollo {
 namespace planning {
 
+// 分段加速度曲线类PiecewiseAccelerationTrajectory1d在每一段中加速度是恒定的
+// 通过起始位置s0和起始速度v0构造
 PiecewiseAccelerationTrajectory1d::PiecewiseAccelerationTrajectory1d(const double start_s,
                                                                      const double start_v) {
   s_.push_back(start_s);
@@ -40,6 +42,7 @@ PiecewiseAccelerationTrajectory1d::PiecewiseAccelerationTrajectory1d(const doubl
   t_.push_back(0.0);
 }
 
+// 通过加速度和每段持续时间扩展曲线
 void PiecewiseAccelerationTrajectory1d::AppendSegment(const double a, const double t_duration) {
   double s0 = s_.back();
   double v0 = v_.back();

@@ -120,9 +120,10 @@ class PiecewiseJerkProblem {
   size_t num_of_knots_ = 0;
 
   // output
-  std::vector<double>                    x_;
-  std::vector<double>                    dx_;
-  std::vector<double>                    ddx_;
+  std::vector<double> x_;
+  std::vector<double> dx_;
+  std::vector<double> ddx_;
+
   std::array<double, 3>                  x_init_;
   std::array<double, 3>                  scale_factor_ = {{1.0, 1.0, 1.0}};
   std::vector<std::pair<double, double>> x_bounds_;

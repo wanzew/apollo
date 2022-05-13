@@ -123,39 +123,23 @@ class PiecewiseJerkPathIpoptSolver : public Ipopt::TNLP {
                              std::vector<double>* ptr_opt_d_pprime) const;
 
  private:
-  int num_of_points_;
-
-  int num_of_variables_;
-
-  int num_of_constraints_;
-
-  double x_init_ = 0.0;
-
-  double dx_init_ = 0.0;
-
-  double ddx_init_ = 0.0;
-
-  double delta_s_ = 0.0;
-
-  double dddx_max_ = 0.0;
-
+  int                                    num_of_points_;
+  int                                    num_of_variables_;
+  int                                    num_of_constraints_;
+  double                                 x_init_   = 0.0;
+  double                                 dx_init_  = 0.0;
+  double                                 ddx_init_ = 0.0;
+  double                                 delta_s_  = 0.0;
+  double                                 dddx_max_ = 0.0;
   std::vector<std::pair<double, double>> d_bounds_;
-
-  double w_x_ = 1.0;
-
-  double w_dx_ = 1.0;
-
-  double w_ddx_ = 1.0;
-
-  double w_dddx_ = 1.0;
-
-  double w_obs_ = 1.0;
-
-  std::vector<double> opt_x_;
-
-  std::vector<double> opt_dx_;
-
-  std::vector<double> opt_ddx_;
+  double                                 w_x_    = 1.0;
+  double                                 w_dx_   = 1.0;
+  double                                 w_ddx_  = 1.0;
+  double                                 w_dddx_ = 1.0;
+  double                                 w_obs_  = 1.0;
+  std::vector<double>                    opt_x_;
+  std::vector<double>                    opt_dx_;
+  std::vector<double>                    opt_ddx_;
 };
 
 }  // namespace planning

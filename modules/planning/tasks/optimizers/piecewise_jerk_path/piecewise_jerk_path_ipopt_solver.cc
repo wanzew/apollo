@@ -34,25 +34,18 @@ PiecewiseJerkPathIpoptSolver::PiecewiseJerkPathIpoptSolver(
     std::vector<std::pair<double, double>> d_bounds) {
   CHECK_GT(d_bounds.size(), 1U);
 
-  x_init_ = x_init;
-
-  dx_init_ = dx_init;
-
-  ddx_init_ = ddx_init;
-
   CHECK_GT(delta_s, 0.0);
-  delta_s_ = delta_s;
-
   CHECK_GT(dddx_max, 0.0);
-  dddx_max_ = dddx_max;
 
-  num_of_points_ = static_cast<int>(d_bounds.size());
-
-  num_of_variables_ = 3 * num_of_points_;
-
+  x_init_             = x_init;
+  dx_init_            = dx_init;
+  ddx_init_           = ddx_init;
+  delta_s_            = delta_s;
+  dddx_max_           = dddx_max;
+  num_of_points_      = static_cast<int>(d_bounds.size());
+  num_of_variables_   = 3 * num_of_points_;
   num_of_constraints_ = 3 * (num_of_points_ - 1);
-
-  d_bounds_ = std::move(d_bounds);
+  d_bounds_           = std::move(d_bounds);
 }
 
 void PiecewiseJerkPathIpoptSolver::set_objective_weights(const double w_x,
@@ -60,30 +53,19 @@ void PiecewiseJerkPathIpoptSolver::set_objective_weights(const double w_x,
                                                          const double w_ddx,
                                                          const double w_dddx,
                                                          const double w_obs) {
-  w_x_ = w_x;
-
-  w_dx_ = w_dx;
-
-  w_ddx_ = w_ddx;
-
+  w_x_    = w_x;
+  w_dx_   = w_dx;
+  w_ddx_  = w_ddx;
   w_dddx_ = w_dddx;
-
-  w_obs_ = w_obs;
+  w_obs_  = w_obs;
 }
 
 bool PiecewiseJerkPathIpoptSolver::get_nlp_info(
     int& n, int& m, int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) {
-  // variables
-  n = num_of_variables_;
-
-  // constraints
-  m = num_of_constraints_;
-
-  nnz_jac_g = 11 * (num_of_points_ - 1);
-
-  // none zero hessian and lagrange
-  nnz_h_lag = num_of_variables_ + num_of_points_ - 1;
-
+  n           = num_of_variables_;    // variables
+  m           = num_of_constraints_;  // constraints
+  nnz_jac_g   = 11 * (num_of_points_ - 1);
+  nnz_h_lag   = num_of_variables_ + num_of_points_ - 1;  // none zero hessian and lagrange
   index_style = IndexStyleEnum::C_STYLE;
 
   return true;

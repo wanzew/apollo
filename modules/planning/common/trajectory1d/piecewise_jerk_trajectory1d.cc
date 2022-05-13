@@ -37,6 +37,7 @@ PiecewiseJerkTrajectory1d::PiecewiseJerkTrajectory1d(const double p,
   param_.push_back(0.0);
 }
 
+// param: 时间 t
 void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk, const double param) {
   CHECK_GT(param, FLAGS_numerical_epsilon);
 

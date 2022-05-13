@@ -33,10 +33,11 @@ class PiecewiseJerkTrajectory1d : public Curve1d {
  public:
   PiecewiseJerkTrajectory1d(const double p, const double v, const double a);
   virtual ~PiecewiseJerkTrajectory1d() = default;
-  double      Evaluate(const std::uint32_t order, const double param) const;
-  double      ParamLength() const;
+  double Evaluate(const std::uint32_t order, const double param) const;
+  double ParamLength() const;
+  void   AppendSegment(const double jerk, const double param);
+
   std::string ToString() const;
-  void        AppendSegment(const double jerk, const double param);
 
  private:
   std::vector<ConstantJerkTrajectory1d> segments_;

@@ -31,7 +31,9 @@ class ConstantDecelerationTrajectory1d : public Curve1d {
  public:
   ConstantDecelerationTrajectory1d(const double init_s, const double init_v, const double a);
   virtual ~ConstantDecelerationTrajectory1d() = default;
-  double      ParamLength() const override;
+
+  double ParamLength() const override;
+
   std::string ToString() const override;
 
   // handles extrapolation internally

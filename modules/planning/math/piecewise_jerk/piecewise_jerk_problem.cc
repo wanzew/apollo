@@ -39,11 +39,22 @@ PiecewiseJerkProblem::PiecewiseJerkProblem(const size_t                 num_of_k
   weight_x_ref_vec_ = std::vector<double>(num_of_knots_, 0.0);
 }
 
+// FormulateProblem 这个函数用于构造最优化问题具体矩阵。首先构造出P矩阵即代价函数，
+// 然后构造A矩阵即约束矩阵以及上下边界lower_bounds和upper_bounds，最后构建一次项q向量。
+// 构造完后将矩阵都存储进OSQPData这个结构体里，以便后续直接调用osqp库进行求解。
+// 以下详细解读这些矩阵的具体形式。
 OSQPData* PiecewiseJerkProblem::FormulateProblem() {
   // calculate kernel
   std::vector<c_float> P_data;
   std::vector<c_int>   P_indices;
   std::vector<c_int>   P_indptr;
+
+  // CalculateKnernel
+  // 用于构造代价函数即P矩阵，由于代码过长就不全部贴出来了。我在初次看这块代码的时候，
+  // 就被csc_matrix这奇葩的矩阵构造方式折磨了好久，并且我看网上许多讲解Apollo
+  // 二次规划的文章也都没有具体到矩阵的实际形式的。我这里把代价函数P矩阵实际解构了出来，
+  // 我觉得对于第一次接触这块代码的朋友，能够直观的看到这个矩阵还是会对理解Apollo的算法思想有很大帮助的。
+  // 可以注意到每个元素前都乘以了2，这是为了和二次优化问题的一般形式中的1/2进行抵消的。
   CalculateKernel(&P_data, &P_indices, &P_indptr);
 
   // calculate affine constraints
@@ -77,6 +88,11 @@ OSQPData* PiecewiseJerkProblem::FormulateProblem() {
 }
 
 bool PiecewiseJerkProblem::Optimize(const int max_iter) {
+  // 该函数中会调用FormulateProblem来构造出二次规划问题的框架，再调用osqp库进行求解，从而求出最优path
+  // 需要注意的是，二次规划问题的求解方式有许多种，包括拉格朗日法，梯度下降等等，Apollo
+  // 采用的osqp这个第三方库个人感觉实际用时求解效率还是比较高的，也比较好用。
+  // 唯一不太舒服的地方在于其矩阵的构造形式为csc_matrix，该种方法构造矩阵不够直观，比较复杂，
+  // 后面我会把矩阵用LaTex打出来，让读者可以更直观理解。
   OSQPData* data = FormulateProblem();
 
   OSQPSettings* settings = SolverDefaultSettings();
@@ -121,6 +137,10 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   return true;
 }
 
+// 该函数是用于构造最优化问题的限制条件，即A矩阵的。需要注意的是，该方法为基类中实现，因此对于path优化和speed优化来说，
+// 两者在Apollo 的算法思想里，所收到的约束是一样的。Apollo
+// 该算法的精妙之处就在于，将path和speed分别在SL和ST空间中进行考虑，使得两者的优化思想非常类似，
+// 很巧妙地完成两个维度的求解。但与此同时，我感觉这也限制了speed优化，对于动态障碍物的处理就不够完备，后面我会单独再写文章详细讲这一块。
 void PiecewiseJerkProblem::CalculateAffineConstraint(std::vector<c_float>* A_data,
                                                      std::vector<c_int>*   A_indices,
                                                      std::vector<c_int>*   A_indptr,

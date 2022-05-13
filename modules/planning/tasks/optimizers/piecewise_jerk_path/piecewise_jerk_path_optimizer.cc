@@ -52,9 +52,6 @@ common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData&             
                                                    PathData* const                final_path_data) {
   // skip piecewise_jerk_path_optimizer if reused path
   if (FLAGS_enable_skip_path_tasks && path_reusable) { return Status::OK(); }
-  ADEBUG << "Plan at the starting point: x = " << init_point.path_point().x()
-         << ", y = " << init_point.path_point().y()
-         << ", and angle = " << init_point.path_point().theta();
   common::TrajectoryPoint planning_start_point = init_point;
   if (FLAGS_use_front_axe_center_in_path_planning) {
     planning_start_point = InferFrontAxeCenterFromRearAxeCenter(planning_start_point);
@@ -70,8 +67,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData&             
 
   std::array<double, 5> w = {
       config.l_weight(),
-      config.dl_weight() * std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1], 5.0),
-      config.ddl_weight(), config.dddl_weight(), 0.0};
+      config.dl_weight() * std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],  //
+                                     5.0),
+      config.ddl_weight(),   //
+      config.dddl_weight(),  //
+      0.0};
 
   const auto& path_boundaries = reference_line_info_->GetCandidatePathBoundaries();
   ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
@@ -148,10 +148,19 @@ common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData&             
       ddl_bounds.emplace_back(-lat_acc_bound - kappa, lat_acc_bound - kappa);
     }
 
-    bool res_opt =
-        OptimizePath(init_frenet_state.second, end_state, std::move(path_reference_l),
-                     path_reference_size, path_boundary.delta_s(), is_valid_path_reference,
-                     path_boundary.boundary(), ddl_bounds, w, max_iter, &opt_l, &opt_dl, &opt_ddl);
+    bool res_opt = OptimizePath(init_frenet_state.second,     //
+                                end_state,                    //
+                                std::move(path_reference_l),  //
+                                path_reference_size,          //
+                                path_boundary.delta_s(),      //
+                                is_valid_path_reference,      //
+                                path_boundary.boundary(),     //
+                                ddl_bounds,                   //
+                                w,                            //
+                                max_iter,                     //
+                                &opt_l,                       //
+                                &opt_dl,                      //
+                                &opt_ddl);
 
     if (res_opt) {
       for (size_t i = 0; i < path_boundary_size; i += 4) {
@@ -263,7 +272,6 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   piecewise_jerk_problem.set_weight_dx(w[1]);
   piecewise_jerk_problem.set_weight_ddx(w[2]);
   piecewise_jerk_problem.set_weight_dddx(w[3]);
-
   piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
 
   auto start_time = std::chrono::system_clock::now();
