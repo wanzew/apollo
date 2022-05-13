@@ -145,6 +145,7 @@ function _check_command() {
     local commands="$(echo ${AVAILABLE_COMMANDS} | xargs)"
     local help_msg="Run './apollo.sh --help' for usage."
     local cmd="$@"
+    
 
     python scripts/command_checker.py --name "${name}" --command "${cmd}" --available "${commands}" --helpmsg "${help_msg}"
 }

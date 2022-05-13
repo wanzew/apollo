@@ -1,0 +1,383 @@
+From 66b600f0493fb7edd47383662f5497709c6efac8 Mon Sep 17 00:00:00 2001
+From: wangzhenwei <wangzhenwei@trunk.tech>
+Date: Fri, 13 May 2022 13:13:35 +0800
+Subject: [PATCH] change clang-format
+
+---
+ .../constant_deceleration_trajectory1d.h      |  4 +-
+ .../constant_deceleration_trajectory1d.md     |  7 +++
+ .../trajectory1d/constant_jerk_trajectory1d.h |  3 +-
+ .../piecewise_acceleration_trajectory1d.cc    |  3 ++
+ .../piecewise_jerk_trajectory1d.cc            |  1 +
+ .../piecewise_jerk_trajectory1d.h             |  7 +--
+ .../piecewise_jerk/piecewise_jerk_problem.cc  | 20 ++++++++
+ .../piecewise_jerk/piecewise_jerk_problem.h   |  7 +--
+ .../piecewise_jerk_path_ipopt_solver.cc       | 50 ++++++-------------
+ .../piecewise_jerk_path_ipopt_solver.h        | 48 ++++++------------
+ .../piecewise_jerk_path_optimizer.cc          | 28 +++++++----
+ 11 files changed, 93 insertions(+), 85 deletions(-)
+ create mode 100644 modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.md
+
+diff --git a/modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.h b/modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.h
+index f55ebf91c1..ab3c77359f 100644
+--- a/modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.h
++++ b/modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.h
+@@ -31,7 +31,9 @@ class ConstantDecelerationTrajectory1d : public Curve1d {
+  public:
+   ConstantDecelerationTrajectory1d(const double init_s, const double init_v, const double a);
+   virtual ~ConstantDecelerationTrajectory1d() = default;
+-  double      ParamLength() const override;
++
++  double ParamLength() const override;
++
+   std::string ToString() const override;
+ 
+   // handles extrapolation internally
+diff --git a/modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.md b/modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.md
+new file mode 100644
+index 0000000000..13d9f420e3
+--- /dev/null
++++ b/modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.md
+@@ -0,0 +1,7 @@
++## 恒定减速度曲线类
++
++恒定减速度曲线类ConstantDecelerationTrajectory1d，顾名思义在整个时间范围内减速度是恒定的。初始化仅需给出起始的位置s，速度v，减速度a，可以计算任意时刻的s,v,a
++
++![[公式]](https://www.zhihu.com/equation?tex=a%28t%29%3Da_0%5C%5C+v%28t%29%3Dv_0%2Ba_0t%5C%5C+s%28t%29%3Dv_0t%2B0.5a_0t%5E2)
++
++[速度曲线类](https://zhuanlan.zhihu.com/p/457212143)
+\ No newline at end of file
+diff --git a/modules/planning/common/trajectory1d/constant_jerk_trajectory1d.h b/modules/planning/common/trajectory1d/constant_jerk_trajectory1d.h
+index 8aa32867af..6bf9e68270 100644
+--- a/modules/planning/common/trajectory1d/constant_jerk_trajectory1d.h
++++ b/modules/planning/common/trajectory1d/constant_jerk_trajectory1d.h
+@@ -43,8 +43,7 @@ class ConstantJerkTrajectory1d : public Curve1d {
+   double      end_position() const;
+   double      end_velocity() const;
+   double      end_acceleration() const;
+-
+-  double jerk() const;
++  double      jerk() const;
+ 
+  private:
+   double p0_;
+diff --git a/modules/planning/common/trajectory1d/piecewise_acceleration_trajectory1d.cc b/modules/planning/common/trajectory1d/piecewise_acceleration_trajectory1d.cc
+index 85db7f26b9..1b5df7466d 100644
+--- a/modules/planning/common/trajectory1d/piecewise_acceleration_trajectory1d.cc
++++ b/modules/planning/common/trajectory1d/piecewise_acceleration_trajectory1d.cc
+@@ -32,6 +32,8 @@
+ namespace apollo {
+ namespace planning {
+ 
++// 分段加速度曲线类PiecewiseAccelerationTrajectory1d在每一段中加速度是恒定的
++// 通过起始位置s0和起始速度v0构造
+ PiecewiseAccelerationTrajectory1d::PiecewiseAccelerationTrajectory1d(const double start_s,
+                                                                      const double start_v) {
+   s_.push_back(start_s);
+@@ -40,6 +42,7 @@ PiecewiseAccelerationTrajectory1d::PiecewiseAccelerationTrajectory1d(const doubl
+   t_.push_back(0.0);
+ }
+ 
++// 通过加速度和每段持续时间扩展曲线
+ void PiecewiseAccelerationTrajectory1d::AppendSegment(const double a, const double t_duration) {
+   double s0 = s_.back();
+   double v0 = v_.back();
+diff --git a/modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.cc b/modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.cc
+index f403e64990..1d607d01c3 100644
+--- a/modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.cc
++++ b/modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.cc
+@@ -37,6 +37,7 @@ PiecewiseJerkTrajectory1d::PiecewiseJerkTrajectory1d(const double p,
+   param_.push_back(0.0);
+ }
+ 
++// param: 时间 t
+ void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk, const double param) {
+   CHECK_GT(param, FLAGS_numerical_epsilon);
+ 
+diff --git a/modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h b/modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h
+index 21885e1c37..9050f586e2 100644
+--- a/modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h
++++ b/modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h
+@@ -33,10 +33,11 @@ class PiecewiseJerkTrajectory1d : public Curve1d {
+  public:
+   PiecewiseJerkTrajectory1d(const double p, const double v, const double a);
+   virtual ~PiecewiseJerkTrajectory1d() = default;
+-  double      Evaluate(const std::uint32_t order, const double param) const;
+-  double      ParamLength() const;
++  double Evaluate(const std::uint32_t order, const double param) const;
++  double ParamLength() const;
++  void   AppendSegment(const double jerk, const double param);
++
+   std::string ToString() const;
+-  void        AppendSegment(const double jerk, const double param);
+ 
+  private:
+   std::vector<ConstantJerkTrajectory1d> segments_;
+diff --git a/modules/planning/math/piecewise_jerk/piecewise_jerk_problem.cc b/modules/planning/math/piecewise_jerk/piecewise_jerk_problem.cc
+index 0c0b2e59ca..d32fa0ac60 100644
+--- a/modules/planning/math/piecewise_jerk/piecewise_jerk_problem.cc
++++ b/modules/planning/math/piecewise_jerk/piecewise_jerk_problem.cc
+@@ -39,11 +39,22 @@ PiecewiseJerkProblem::PiecewiseJerkProblem(const size_t                 num_of_k
+   weight_x_ref_vec_ = std::vector<double>(num_of_knots_, 0.0);
+ }
+ 
++// FormulateProblem 这个函数用于构造最优化问题具体矩阵。首先构造出P矩阵即代价函数，
++// 然后构造A矩阵即约束矩阵以及上下边界lower_bounds和upper_bounds，最后构建一次项q向量。
++// 构造完后将矩阵都存储进OSQPData这个结构体里，以便后续直接调用osqp库进行求解。
++// 以下详细解读这些矩阵的具体形式。
+ OSQPData* PiecewiseJerkProblem::FormulateProblem() {
+   // calculate kernel
+   std::vector<c_float> P_data;
+   std::vector<c_int>   P_indices;
+   std::vector<c_int>   P_indptr;
++
++  // CalculateKnernel
++  // 用于构造代价函数即P矩阵，由于代码过长就不全部贴出来了。我在初次看这块代码的时候，
++  // 就被csc_matrix这奇葩的矩阵构造方式折磨了好久，并且我看网上许多讲解Apollo
++  // 二次规划的文章也都没有具体到矩阵的实际形式的。我这里把代价函数P矩阵实际解构了出来，
++  // 我觉得对于第一次接触这块代码的朋友，能够直观的看到这个矩阵还是会对理解Apollo的算法思想有很大帮助的。
++  // 可以注意到每个元素前都乘以了2，这是为了和二次优化问题的一般形式中的1/2进行抵消的。
+   CalculateKernel(&P_data, &P_indices, &P_indptr);
+ 
+   // calculate affine constraints
+@@ -77,6 +88,11 @@ OSQPData* PiecewiseJerkProblem::FormulateProblem() {
+ }
+ 
+ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
++  // 该函数中会调用FormulateProblem来构造出二次规划问题的框架，再调用osqp库进行求解，从而求出最优path
++  // 需要注意的是，二次规划问题的求解方式有许多种，包括拉格朗日法，梯度下降等等，Apollo
++  // 采用的osqp这个第三方库个人感觉实际用时求解效率还是比较高的，也比较好用。
++  // 唯一不太舒服的地方在于其矩阵的构造形式为csc_matrix，该种方法构造矩阵不够直观，比较复杂，
++  // 后面我会把矩阵用LaTex打出来，让读者可以更直观理解。
+   OSQPData* data = FormulateProblem();
+ 
+   OSQPSettings* settings = SolverDefaultSettings();
+@@ -121,6 +137,10 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
+   return true;
+ }
+ 
++// 该函数是用于构造最优化问题的限制条件，即A矩阵的。需要注意的是，该方法为基类中实现，因此对于path优化和speed优化来说，
++// 两者在Apollo 的算法思想里，所收到的约束是一样的。Apollo
++// 该算法的精妙之处就在于，将path和speed分别在SL和ST空间中进行考虑，使得两者的优化思想非常类似，
++// 很巧妙地完成两个维度的求解。但与此同时，我感觉这也限制了speed优化，对于动态障碍物的处理就不够完备，后面我会单独再写文章详细讲这一块。
+ void PiecewiseJerkProblem::CalculateAffineConstraint(std::vector<c_float>* A_data,
+                                                      std::vector<c_int>*   A_indices,
+                                                      std::vector<c_int>*   A_indptr,
+diff --git a/modules/planning/math/piecewise_jerk/piecewise_jerk_problem.h b/modules/planning/math/piecewise_jerk/piecewise_jerk_problem.h
+index 8255e2e278..934b8aeac5 100644
+--- a/modules/planning/math/piecewise_jerk/piecewise_jerk_problem.h
++++ b/modules/planning/math/piecewise_jerk/piecewise_jerk_problem.h
+@@ -120,9 +120,10 @@ class PiecewiseJerkProblem {
+   size_t num_of_knots_ = 0;
+ 
+   // output
+-  std::vector<double>                    x_;
+-  std::vector<double>                    dx_;
+-  std::vector<double>                    ddx_;
++  std::vector<double> x_;
++  std::vector<double> dx_;
++  std::vector<double> ddx_;
++
+   std::array<double, 3>                  x_init_;
+   std::array<double, 3>                  scale_factor_ = {{1.0, 1.0, 1.0}};
+   std::vector<std::pair<double, double>> x_bounds_;
+diff --git a/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_ipopt_solver.cc b/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_ipopt_solver.cc
+index 49d8147405..e53ad97de0 100644
+--- a/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_ipopt_solver.cc
++++ b/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_ipopt_solver.cc
+@@ -34,25 +34,18 @@ PiecewiseJerkPathIpoptSolver::PiecewiseJerkPathIpoptSolver(
+     std::vector<std::pair<double, double>> d_bounds) {
+   CHECK_GT(d_bounds.size(), 1U);
+ 
+-  x_init_ = x_init;
+-
+-  dx_init_ = dx_init;
+-
+-  ddx_init_ = ddx_init;
+-
+   CHECK_GT(delta_s, 0.0);
+-  delta_s_ = delta_s;
+-
+   CHECK_GT(dddx_max, 0.0);
+-  dddx_max_ = dddx_max;
+-
+-  num_of_points_ = static_cast<int>(d_bounds.size());
+-
+-  num_of_variables_ = 3 * num_of_points_;
+ 
++  x_init_             = x_init;
++  dx_init_            = dx_init;
++  ddx_init_           = ddx_init;
++  delta_s_            = delta_s;
++  dddx_max_           = dddx_max;
++  num_of_points_      = static_cast<int>(d_bounds.size());
++  num_of_variables_   = 3 * num_of_points_;
+   num_of_constraints_ = 3 * (num_of_points_ - 1);
+-
+-  d_bounds_ = std::move(d_bounds);
++  d_bounds_           = std::move(d_bounds);
+ }
+ 
+ void PiecewiseJerkPathIpoptSolver::set_objective_weights(const double w_x,
+@@ -60,30 +53,19 @@ void PiecewiseJerkPathIpoptSolver::set_objective_weights(const double w_x,
+                                                          const double w_ddx,
+                                                          const double w_dddx,
+                                                          const double w_obs) {
+-  w_x_ = w_x;
+-
+-  w_dx_ = w_dx;
+-
+-  w_ddx_ = w_ddx;
+-
++  w_x_    = w_x;
++  w_dx_   = w_dx;
++  w_ddx_  = w_ddx;
+   w_dddx_ = w_dddx;
+-
+-  w_obs_ = w_obs;
++  w_obs_  = w_obs;
+ }
+ 
+ bool PiecewiseJerkPathIpoptSolver::get_nlp_info(
+     int& n, int& m, int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) {
+-  // variables
+-  n = num_of_variables_;
+-
+-  // constraints
+-  m = num_of_constraints_;
+-
+-  nnz_jac_g = 11 * (num_of_points_ - 1);
+-
+-  // none zero hessian and lagrange
+-  nnz_h_lag = num_of_variables_ + num_of_points_ - 1;
+-
++  n           = num_of_variables_;    // variables
++  m           = num_of_constraints_;  // constraints
++  nnz_jac_g   = 11 * (num_of_points_ - 1);
++  nnz_h_lag   = num_of_variables_ + num_of_points_ - 1;  // none zero hessian and lagrange
+   index_style = IndexStyleEnum::C_STYLE;
+ 
+   return true;
+diff --git a/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_ipopt_solver.h b/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_ipopt_solver.h
+index 805458c7f6..9e561233e8 100644
+--- a/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_ipopt_solver.h
++++ b/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_ipopt_solver.h
+@@ -123,39 +123,23 @@ class PiecewiseJerkPathIpoptSolver : public Ipopt::TNLP {
+                              std::vector<double>* ptr_opt_d_pprime) const;
+ 
+  private:
+-  int num_of_points_;
+-
+-  int num_of_variables_;
+-
+-  int num_of_constraints_;
+-
+-  double x_init_ = 0.0;
+-
+-  double dx_init_ = 0.0;
+-
+-  double ddx_init_ = 0.0;
+-
+-  double delta_s_ = 0.0;
+-
+-  double dddx_max_ = 0.0;
+-
++  int                                    num_of_points_;
++  int                                    num_of_variables_;
++  int                                    num_of_constraints_;
++  double                                 x_init_   = 0.0;
++  double                                 dx_init_  = 0.0;
++  double                                 ddx_init_ = 0.0;
++  double                                 delta_s_  = 0.0;
++  double                                 dddx_max_ = 0.0;
+   std::vector<std::pair<double, double>> d_bounds_;
+-
+-  double w_x_ = 1.0;
+-
+-  double w_dx_ = 1.0;
+-
+-  double w_ddx_ = 1.0;
+-
+-  double w_dddx_ = 1.0;
+-
+-  double w_obs_ = 1.0;
+-
+-  std::vector<double> opt_x_;
+-
+-  std::vector<double> opt_dx_;
+-
+-  std::vector<double> opt_ddx_;
++  double                                 w_x_    = 1.0;
++  double                                 w_dx_   = 1.0;
++  double                                 w_ddx_  = 1.0;
++  double                                 w_dddx_ = 1.0;
++  double                                 w_obs_  = 1.0;
++  std::vector<double>                    opt_x_;
++  std::vector<double>                    opt_dx_;
++  std::vector<double>                    opt_ddx_;
+ };
+ 
+ }  // namespace planning
+diff --git a/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.cc b/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.cc
+index c52bb68ee0..dbd1ea18cc 100644
+--- a/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.cc
++++ b/modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.cc
+@@ -52,9 +52,6 @@ common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData&
+                                                    PathData* const                final_path_data) {
+   // skip piecewise_jerk_path_optimizer if reused path
+   if (FLAGS_enable_skip_path_tasks && path_reusable) { return Status::OK(); }
+-  ADEBUG << "Plan at the starting point: x = " << init_point.path_point().x()
+-         << ", y = " << init_point.path_point().y()
+-         << ", and angle = " << init_point.path_point().theta();
+   common::TrajectoryPoint planning_start_point = init_point;
+   if (FLAGS_use_front_axe_center_in_path_planning) {
+     planning_start_point = InferFrontAxeCenterFromRearAxeCenter(planning_start_point);
+@@ -70,8 +67,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData&
+ 
+   std::array<double, 5> w = {
+       config.l_weight(),
+-      config.dl_weight() * std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1], 5.0),
+-      config.ddl_weight(), config.dddl_weight(), 0.0};
++      config.dl_weight() * std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],  //
++                                     5.0),
++      config.ddl_weight(),   //
++      config.dddl_weight(),  //
++      0.0};
+ 
+   const auto& path_boundaries = reference_line_info_->GetCandidatePathBoundaries();
+   ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
+@@ -148,10 +148,19 @@ common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData&
+       ddl_bounds.emplace_back(-lat_acc_bound - kappa, lat_acc_bound - kappa);
+     }
+ 
+-    bool res_opt =
+-        OptimizePath(init_frenet_state.second, end_state, std::move(path_reference_l),
+-                     path_reference_size, path_boundary.delta_s(), is_valid_path_reference,
+-                     path_boundary.boundary(), ddl_bounds, w, max_iter, &opt_l, &opt_dl, &opt_ddl);
++    bool res_opt = OptimizePath(init_frenet_state.second,     //
++                                end_state,                    //
++                                std::move(path_reference_l),  //
++                                path_reference_size,          //
++                                path_boundary.delta_s(),      //
++                                is_valid_path_reference,      //
++                                path_boundary.boundary(),     //
++                                ddl_bounds,                   //
++                                w,                            //
++                                max_iter,                     //
++                                &opt_l,                       //
++                                &opt_dl,                      //
++                                &opt_ddl);
+ 
+     if (res_opt) {
+       for (size_t i = 0; i < path_boundary_size; i += 4) {
+@@ -263,7 +272,6 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
+   piecewise_jerk_problem.set_weight_dx(w[1]);
+   piecewise_jerk_problem.set_weight_ddx(w[2]);
+   piecewise_jerk_problem.set_weight_dddx(w[3]);
+-
+   piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
+ 
+   auto start_time = std::chrono::system_clock::now();
+-- 
+2.25.1
+
