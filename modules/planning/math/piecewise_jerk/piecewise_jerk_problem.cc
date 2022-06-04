@@ -112,7 +112,8 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
     FreeData(data);
     c_free(settings);
     return false;
-  } else if (osqp_work->solution == nullptr) {
+  }  //
+  else if (osqp_work->solution == nullptr) {
     AERROR << "The solution from OSQP is nullptr";
     osqp_cleanup(osqp_work);
     FreeData(data);
@@ -157,7 +158,8 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(std::vector<c_float>* A_dat
 
   std::vector<std::vector<std::pair<c_int, c_float>>> variables(num_of_variables);
 
-  int constraint_index = 0;
+  int constraint_index = 0;  // 表示行
+  //  variables[i]           // 其中的i表示列
   // set x, x', x'' bounds
   for (int i = 0; i < num_of_variables; ++i) {
     if (i < n) {
@@ -198,18 +200,16 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(std::vector<c_float>* A_dat
     ++constraint_index;
   }
 
-  // x(i+1) - x(i) - delta_s * x(i)'
-  // - 1/3 * delta_s^2 * x(i)'' - 1/6 * delta_s^2 * x(i+1)''
+  // x(i+1) - x(i) - delta_s * x(i)' - 1/3 * delta_s^2 * x(i)'' - 1/6 * delta_s^2 * x(i+1)''
   auto delta_s_sq_ = delta_s_ * delta_s_;
   for (int i = 0; i + 1 < n; ++i) {
-    variables[i].emplace_back(constraint_index, -1.0 * scale_factor_[1] * scale_factor_[2]);
-    variables[i + 1].emplace_back(constraint_index, 1.0 * scale_factor_[1] * scale_factor_[2]);
-    variables[n + i].emplace_back(constraint_index,
-                                  -delta_s_ * scale_factor_[0] * scale_factor_[2]);
-    variables[2 * n + i].emplace_back(constraint_index,
-                                      -delta_s_sq_ / 3.0 * scale_factor_[0] * scale_factor_[1]);
-    variables[2 * n + i + 1].emplace_back(constraint_index,
-                                          -delta_s_sq_ / 6.0 * scale_factor_[0] * scale_factor_[1]);
+    // clang-format off
+    variables[i].emplace_back(            constraint_index,               -1.0 * scale_factor_[1] * scale_factor_[2]);
+    variables[i + 1].emplace_back(        constraint_index,                1.0 * scale_factor_[1] * scale_factor_[2]);
+    variables[n + i].emplace_back(        constraint_index,  delta_s_          * scale_factor_[0] * scale_factor_[2]);
+    variables[2 * n + i].emplace_back(    constraint_index, -delta_s_sq_ / 3.0 * scale_factor_[0] * scale_factor_[1]);
+    variables[2 * n + i + 1].emplace_back(constraint_index, -delta_s_sq_ / 6.0 * scale_factor_[0] * scale_factor_[1]);
+    // clang-format on
 
     lower_bounds->at(constraint_index) = 0.0;
     upper_bounds->at(constraint_index) = 0.0;

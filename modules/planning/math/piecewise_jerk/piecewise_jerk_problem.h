@@ -124,8 +124,9 @@ class PiecewiseJerkProblem {
   std::vector<double> dx_;
   std::vector<double> ddx_;
 
-  std::array<double, 3>                  x_init_;
-  std::array<double, 3>                  scale_factor_ = {{1.0, 1.0, 1.0}};
+  std::array<double, 3> x_init_;
+  std::array<double, 3> scale_factor_ = {{1.0, 1.0, 1.0}};
+  // piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
   std::vector<std::pair<double, double>> ddx_bounds_;

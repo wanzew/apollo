@@ -71,16 +71,7 @@ Status PathBoundsDecider::Process(Frame* const             frame,
 
   // Generate the fallback path boundary.
   PathBound fallback_path_bound;
-  Status    ret = GenerateFallbackPathBound(*reference_line_info, &fallback_path_bound);
-  if (!ret.ok()) {
-    ADEBUG << "Cannot generate a fallback path bound.";
-    return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
-  }
-  if (fallback_path_bound.empty()) {
-    const std::string msg = "Failed to get a valid fallback path boundary";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  GenerateFallbackPathBound(*reference_line_info, &fallback_path_bound);
   if (!fallback_path_bound.empty()) {
     CHECK_LE(adc_frenet_l_, std::get<2>(fallback_path_bound[0]));
     CHECK_GE(adc_frenet_l_, std::get<1>(fallback_path_bound[0]));
@@ -91,8 +82,9 @@ Status PathBoundsDecider::Process(Frame* const             frame,
     fallback_path_bound_pair.emplace_back(std::get<1>(fallback_path_bound[i]),
                                           std::get<2>(fallback_path_bound[i]));
   }
-  candidate_path_boundaries.emplace_back(std::get<0>(fallback_path_bound[0]),
-                                         kPathBoundsDeciderResolution, fallback_path_bound_pair);
+  candidate_path_boundaries.emplace_back(std::get<0>(fallback_path_bound[0]),  //
+                                         kPathBoundsDeciderResolution,         //
+                                         fallback_path_bound_pair);
   candidate_path_boundaries.back().set_label("fallback");
 
   // If pull-over is requested, generate pull-over path boundary.
@@ -140,16 +132,7 @@ Status PathBoundsDecider::Process(Frame* const             frame,
   // If it's a lane-change reference-line, generate lane-change path boundary.
   if (FLAGS_enable_smarter_lane_change && reference_line_info->IsChangeLanePath()) {
     PathBound lanechange_path_bound;
-    Status    ret = GenerateLaneChangePathBound(*reference_line_info, &lanechange_path_bound);
-    if (!ret.ok()) {
-      ADEBUG << "Cannot generate a lane-change path bound.";
-      return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
-    }
-    if (lanechange_path_bound.empty()) {
-      const std::string msg = "Failed to get a valid fallback path boundary";
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
-    }
+    GenerateLaneChangePathBound(*reference_line_info, &lanechange_path_bound);
 
     // disable this change when not extending lane bounds to include adc
     if (config_.path_bounds_decider_config().is_extend_lane_bounds_to_include_adc()) {
@@ -299,7 +282,10 @@ Status PathBoundsDecider::GenerateRegularPathBound(const ReferenceLineInfo& refe
   // PathBoundsDebugString(*path_bound);
 
   // 2. Decide a rough boundary based on lane info and ADC's position
-  if (!GetBoundaryFromLanesAndADC(reference_line_info, lane_borrow_info, 0.1, path_bound,
+  if (!GetBoundaryFromLanesAndADC(reference_line_info,  //
+                                  lane_borrow_info,     //
+                                  0.1,                  //
+                                  path_bound,           //
                                   borrow_lane_type)) {
     const std::string msg = "Failed to decide a rough boundary based on "
                             "road information.";
@@ -491,8 +477,12 @@ Status PathBoundsDecider::GenerateFallbackPathBound(const ReferenceLineInfo& ref
 
   // 2. Decide a rough boundary based on lane info and ADC's position
   std::string dummy_borrow_lane_type;
-  if (!GetBoundaryFromLanesAndADC(reference_line_info, LaneBorrowInfo::NO_BORROW, 0.5, path_bound,
-                                  &dummy_borrow_lane_type, true)) {
+  if (!GetBoundaryFromLanesAndADC(reference_line_info,        //
+                                  LaneBorrowInfo::NO_BORROW,  //
+                                  0.5,                        //
+                                  path_bound,                 //
+                                  &dummy_borrow_lane_type,    //
+                                  true)) {
     const std::string msg = "Failed to decide a rough fallback boundary based on "
                             "road information.";
     AERROR << msg;
@@ -584,6 +574,11 @@ bool PathBoundsDecider::FindEmergencyPullOverS(const ReferenceLineInfo& referenc
   return true;
 }
 
+/**
+ * SearchPullOverPosition()应该是这个文件中最绕的函数了。它的目的是搜索停车点，为了能够容纳车的尺寸，
+ * 因为要先搜索可以停车的区域，然后在该区域内取一点作为停车点。搜索区域时，要先确定一个端点，
+ * 然后向前或向后考察另一个端点，以及考察两端点之间的区域是否符合要求。
+ */
 bool PathBoundsDecider::SearchPullOverPosition(
     const Frame&                                           frame,
     const ReferenceLineInfo&                               reference_line_info,

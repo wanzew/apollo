@@ -45,6 +45,10 @@ constexpr int    kNumExtraTailBoundPoint = 20;
 constexpr double kPulloverLonSearchCoeff = 1.5;
 constexpr double kPulloverLatSearchCoeff = 1.25;
 
+// PathBoundsDecider是负责计算道路上可行区域边界的类，其产生的结果如下面代码所示，
+// 是对纵向s等间隔采样、横向d对应的左右边界。这样，即限定了s的范围，又限定了d的范围。
+// （注：代码中大多用小写L代表横向，我为了容易辨别，使用d）PathBoundsDecider类继承自Decider类，
+// 而Decider类继承自Task类，所以PathBoundsDecider也是Apollo中众多任务的其中之一
 class PathBoundsDecider : public Decider {
  public:
   enum class LaneBorrowInfo {
@@ -61,7 +65,13 @@ class PathBoundsDecider : public Decider {
    *   3. Generate Regular Path Bound(s).
    */
   common::Status Process(Frame* frame, ReferenceLineInfo* reference_line_info) override;
-
+  /**
+   * PathBoundsDecider类的主要工作在Process()中完成，在该函数中，分4种场景对PathBound进行计算，按处理的顺序分别是fallback、pull
+   * over、lane change、regular，regular场景根据是否lane borrow又分为no borrow、left borrow、right
+   * borrow，这3种子场景是在一个函数内处理的。之所以要不同场景对应不同的处理方式，我认为是在不同的场景下，自车会有不同的决策和行为，
+   * 因此要考察的纵向和横向的范围就不一样，在计算时也要考虑不同的环境模型上下文。要注意的是，fallback对应的PathBound一定会生成，
+   * 其余3个场景只有1个被激活，成功生成PathBound后退出函数。
+   */
   /////////////////////////////////////////////////////////////////////////////
   // Below are functions called every frame when executing PathBoundsDecider.
 

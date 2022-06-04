@@ -56,18 +56,6 @@ PiecewiseJerkSpeedNonlinearOptimizer::PiecewiseJerkSpeedNonlinearOptimizer(const
 Status PiecewiseJerkSpeedNonlinearOptimizer::Process(const PathData&        path_data,
                                                      const TrajectoryPoint& init_point,
                                                      SpeedData* const       speed_data) {
-  if (speed_data == nullptr) {
-    const std::string msg = "Null speed_data pointer";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
-  if (path_data.discretized_path().empty()) {
-    const std::string msg = "Speed Optimizer receives empty path data";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
   if (reference_line_info_->ReachedDestination()) { return Status::OK(); }
 
   const auto problem_setups_status = SetUpStatesAndBounds(path_data, *speed_data);

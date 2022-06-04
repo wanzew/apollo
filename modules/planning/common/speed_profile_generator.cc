@@ -52,18 +52,18 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(const EgoInfo* ego_info,
 
   std::array<double, 3> init_s = {0.0, init_v, init_a};
 
-  // TODO(all): dt is too small;
+  // TODO:(all): dt is too small;
   double       delta_t      = FLAGS_fallback_time_unit;
   double       total_time   = FLAGS_fallback_total_time;
   const size_t num_of_knots = static_cast<size_t>(total_time / delta_t) + 1;
 
-  PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t, init_s);
+  PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots,  //
+                                                   delta_t,       //
+                                                   init_s);
 
   std::vector<double> end_state_ref(num_of_knots, stop_distance);
   piecewise_jerk_problem.set_x_ref(1.0, std::move(end_state_ref));
-
   piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
-
   piecewise_jerk_problem.set_x_bounds(0.0, std::fmax(stop_distance, 100.0));
   piecewise_jerk_problem.set_dx_bounds(0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_v));
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(), veh_param.max_acceleration());
@@ -91,8 +91,10 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(const EgoInfo* ego_info,
   for (size_t i = 1; i < num_of_knots; ++i) {
     // Avoid the very last points when already stopped
     if (s[i] - s[i - 1] <= 0.0 || ds[i] <= 0.0) { break; }
-    speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i), ds[i], dds[i],
-                                (dds[i] - dds[i - 1]) / delta_t);
+    speed_data.AppendSpeedPoint(s[i],                              //
+                                delta_t * static_cast<double>(i),  //
+                                ds[i],                             //
+                                dds[i], (dds[i] - dds[i - 1]) / delta_t);
   }
   FillEnoughSpeedPoints(&speed_data);
   return speed_data;
