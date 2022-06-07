@@ -36,6 +36,9 @@ QpSplinePathOptimizer::QpSplinePathOptimizer()
 bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
   qp_spline_path_config_ = config.em_planner_config().qp_spline_path_config();
   std::vector<double> init_knots;
+  // Init函数里是 init_knots 是空的，只是实例化一个 Spline1DGenerator
+  // 在QpSplinePathGenerator::Generate() 调用的 QpSplinePathGenerator::InitSpline() 函数里 通过
+  // start_s - end_s 来计算节点 knots_
   spline_generator_.reset(new Spline1dGenerator(init_knots, qp_spline_path_config_.spline_order()));
   is_init_ = true;
   return true;

@@ -124,10 +124,32 @@ bool func(bool* arr, int len) {
   return ret;
 }
 
+void func11(int x) {
+  // int                 x          = 2;
+  int                 num_params = 6;
+  std::vector<double> x_pow(2 * num_params + 1, 1.0);
+  x_pow.reserve(2 * num_params + 1);
+  for (uint32_t i = 1; i < 2 * num_params + 1; ++i) {
+    x_pow[i] = x_pow[i - 1] * x;
+    cout << " " << x_pow[i];
+  }
+  cout << endl;
+
+  for (uint32_t r = 1; r < num_params; ++r) {
+    for (uint32_t c = 1; c < num_params; ++c) {
+      cout << " " << x_pow[r + c - 1];
+    }
+    cout << endl;
+  }
+}
+
 int main() {
   // CalculateFx(6);
   // CalculateDerivative(6);
   // CalculateSecondOrderDerivative(6);
   // CalculateThirdOrderDerivative(6);
+  func11(1);
+  func11(2);
+  // func11(3);
   return 0;
 }

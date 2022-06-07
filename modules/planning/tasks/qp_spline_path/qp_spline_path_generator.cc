@@ -106,6 +106,7 @@ bool QpSplinePathGenerator::Generate(const std::vector<const PathObstacle*>& pat
   constexpr double kDefaultPathLength = 50.0;
 
   // clang-format off
+  // 终端距离end_s 一般8s车速
   double end_s = std::fmin(init_frenet_point_.s()  //
                            + std::fmax(kDefaultPathLength, //
                                        init_trajectory_point_.v() * FLAGS_look_forward_time_sec),
@@ -267,8 +268,6 @@ bool QpSplinePathGenerator::InitSpline(const double start_s, const double end_s)
       (end_s - start_s) / qp_spline_path_config_.max_constraint_interval() + 1;
   common::util::uniform_slice(start_s, end_s, constraint_num - 1, &evaluated_s_);
   return (knots_.size() > 1) && !evaluated_s_.empty();
-  //难道 max_spline_length 和 max_constraint_interval 可以不相等吗？
-  //难道 constraint_num 和 number_of_spline 可以不相等吗？
 }
 
 bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
