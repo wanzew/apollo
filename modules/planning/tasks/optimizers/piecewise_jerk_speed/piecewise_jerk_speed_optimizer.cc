@@ -72,17 +72,17 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData&        path_data,
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t, init_s);
 
-  const auto& config = config_.piecewise_jerk_speed_optimizer_config();
-  piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
-  piecewise_jerk_problem.set_weight_dddx(config.jerk_weight());
+  const auto&           config = config_.piecewise_jerk_speed_optimizer_config();
+  std::array<double, 2> w      = {config.acc_weight(), config.jerk_weight()};
+  auto speed_limited = std::fmax(FLAGS_planning_upper_speed_limit, st_graph_data.init_point().v());
+
+  piecewise_jerk_problem.set_weight_ddx(w[0]);
+  piecewise_jerk_problem.set_weight_dddx(w[1]);
 
   piecewise_jerk_problem.set_x_bounds(0.0, total_length);
-  piecewise_jerk_problem.set_dx_bounds(
-      0.0, std::fmax(FLAGS_planning_upper_speed_limit, st_graph_data.init_point().v()));
+  piecewise_jerk_problem.set_dx_bounds(0.0, speed_limited);
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(), veh_param.max_acceleration());
-  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
-                                        FLAGS_longitudinal_jerk_upper_bound);
-
+  piecewise_jerk_problem.set_dddx_bound(-4.0, 2.0);
   piecewise_jerk_problem.set_dx_ref(config.ref_v_weight(), reference_line_info_->GetCruiseSpeed());
 
   // Update STBoundary
@@ -101,7 +101,6 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData&        path_data,
           s_upper_bound = std::fmin(s_upper_bound, s_upper);
           break;
         case STBoundary::BoundaryType::FOLLOW:
-          // TODO(Hongyi): unify follow buffer on decision side
           s_upper_bound = std::fmin(s_upper_bound, s_upper - 8.0);
           break;
         case STBoundary::BoundaryType::OVERTAKE:
@@ -109,12 +108,6 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData&        path_data,
           break;
         default: break;
       }
-    }
-    if (s_lower_bound > s_upper_bound) {
-      const std::string msg = "s_lower_bound larger than s_upper_bound on STGraph";
-      AERROR << msg;
-      speed_data->clear();
-      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     s_bounds.emplace_back(s_lower_bound, s_upper_bound);
   }
@@ -146,12 +139,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData&        path_data,
   piecewise_jerk_problem.set_dx_bounds(std::move(s_dot_bounds));
 
   // Solve the problem
-  if (!piecewise_jerk_problem.Optimize()) {
-    const std::string msg = "Piecewise jerk speed optimizer failed!";
-    AERROR << msg;
-    speed_data->clear();
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  piecewise_jerk_problem.Optimize();
 
   // Extract output
   const std::vector<double>& s   = piecewise_jerk_problem.opt_x();
