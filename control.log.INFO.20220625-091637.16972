@@ -1,0 +1,19 @@
+Log file created at: 2022/06/25 09:16:37
+Running on machine: in-dev-docker
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0625 09:16:37.862391 16972 control_component.cc:45] Control init, starting ...
+I0625 09:16:37.884898 16972 control_component.cc:51] Conf file: /apollo/modules/control/testdata/conf/control_conf.pb.txt is loaded.
+I0625 09:16:37.884917 16972 control_component.cc:53] Conf file:  is loaded.
+I0625 09:16:37.884923 16972 controller_agent.cc:36] Only support MPC controller or Lat + Lon controllers as of now
+I0625 09:16:37.885385 16972 lat_controller.cc:87] Using LQR-based Lateral Controller
+I0625 09:16:37.885455 16972 lon_controller.cc:78] LON_CONTROLLER used.
+I0625 09:16:37.908783 16972 lat_controller.cc:293] Lateral control gain scheduler loaded
+I0625 09:16:37.935617 16972 lat_controller.cc:169] LQR-based Lateral Controller begin.
+I0625 09:16:37.935639 16972 lat_controller.cc:170] [LatController parameters] mass_: 2080, iz_: 4208.3, lf_: 1.4224, lr_: 1.4224
+I0625 09:16:37.936156 16972 controller_agent.cc:94] Controller <LQR-based Lateral Controller> init done!
+I0625 09:16:37.936193 16972 lon_controller.cc:142] Control calibration table loaded
+I0625 09:16:37.936197 16972 lon_controller.cc:143] Control calibration table size is 2694
+I0625 09:16:37.938778 16972 controller_agent.cc:94] Controller <LON_CONTROLLER> init done!
+I0625 09:16:37.956975 16972 control_component.cc:111] Control resetting vehicle state, sleeping for 1000 ms ...
+I0625 09:16:38.957063 16972 control_component.cc:117] Control default driving action is STOP
+E0625 09:16:42.128607 17168 control_component.cc:285] Chassis msg is not ready!

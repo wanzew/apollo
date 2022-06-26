@@ -1,0 +1,53 @@
+Log file created at: 2022/06/25 09:16:22
+Running on machine: in-dev-docker
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0625 09:16:22.849475 16972 global_data.cc:153] host ip: 192.168.1.6
+W0625 09:16:22.849498 16972 environment.h:33] Environment variable [CYBER_PATH] not set, fallback to 
+W0625 09:16:22.863998 16972 environment.h:33] Environment variable [CYBER_PATH] not set, fallback to 
+W0625 09:16:22.864029 16972 scheduler_factory.cc:63] No sched conf found, use default conf.
+W0625 09:16:22.864055 16972 environment.h:33] Environment variable [CYBER_PATH] not set, fallback to 
+I0625 09:16:22.864466 17168 processor.cc:42] processor_tid: 17168
+I0625 09:16:22.864740 17169 processor.cc:42] processor_tid: 17169
+I0625 09:16:22.865103 17170 processor.cc:42] processor_tid: 17170
+I0625 09:16:22.865245 17171 processor.cc:42] processor_tid: 17171
+I0625 09:16:22.865428 17172 processor.cc:42] processor_tid: 17172
+I0625 09:16:22.865638 17173 processor.cc:42] processor_tid: 17173
+I0625 09:16:22.865820 17174 processor.cc:42] processor_tid: 17174
+I0625 09:16:22.865991 17175 processor.cc:42] processor_tid: 17175
+I0625 09:16:22.866199 17176 processor.cc:42] processor_tid: 17176
+I0625 09:16:22.866305 17177 processor.cc:42] processor_tid: 17177
+I0625 09:16:22.866420 17178 processor.cc:42] processor_tid: 17178
+I0625 09:16:22.866519 17179 processor.cc:42] processor_tid: 17179
+I0625 09:16:22.866676 17180 processor.cc:42] processor_tid: 17180
+I0625 09:16:22.866789 17181 processor.cc:42] processor_tid: 17181
+I0625 09:16:22.866900 17182 processor.cc:42] processor_tid: 17182
+I0625 09:16:22.867002 17183 processor.cc:42] processor_tid: 17183
+W0625 09:16:22.905715 16972 environment.h:33] Environment variable [sysmo_start] not set, fallback to 
+I0625 09:16:22.905742 16972 init.cc:113] Register exit handle succ.
+I0625 09:16:22.985497 16972 scheduler.cc:55] create croutine: control_test_/apollo/control
+I0625 09:16:23.015952 16972 control_component_test.cc:178] Successfully feed proto files.
+I0625 09:16:37.940011 16972 scheduler.cc:55] create croutine: control_test_/apollo/canbus/chassis
+I0625 09:16:37.948937 16972 scheduler.cc:55] create croutine: control_test_/apollo/planning
+I0625 09:16:37.950489 16972 scheduler.cc:55] create croutine: control_test_/apollo/localization/pose
+I0625 09:16:37.951398 16972 scheduler.cc:55] create croutine: control_test_/apollo/control/pad
+I0625 09:16:38.957607 16972 timer.cc:137] start timer [0]
+W0625 09:16:40.115743 17499 rate.cc:96] Detect forward jumps in time
+W0625 09:16:42.127938 17499 rate.cc:96] Detect forward jumps in time
+I0625 09:16:42.128124 17499 scheduler.cc:55] create croutine: /internal/task0
+I0625 09:16:42.128170 17499 scheduler.cc:55] create croutine: /internal/task1
+I0625 09:16:42.128199 17499 scheduler.cc:55] create croutine: /internal/task2
+I0625 09:16:42.128223 17499 scheduler.cc:55] create croutine: /internal/task3
+I0625 09:16:42.128242 17499 scheduler.cc:55] create croutine: /internal/task4
+I0625 09:16:42.128268 17499 scheduler.cc:55] create croutine: /internal/task5
+I0625 09:16:42.128288 17499 scheduler.cc:55] create croutine: /internal/task6
+I0625 09:16:42.128310 17499 scheduler.cc:55] create croutine: /internal/task7
+I0625 09:16:42.128330 17499 scheduler.cc:55] create croutine: /internal/task8
+I0625 09:16:42.128345 17499 scheduler.cc:55] create croutine: /internal/task9
+I0625 09:16:42.128357 17499 scheduler.cc:55] create croutine: /internal/task10
+I0625 09:16:42.128407 17499 scheduler.cc:55] create croutine: /internal/task11
+I0625 09:16:42.128459 17499 scheduler.cc:55] create croutine: /internal/task12
+I0625 09:16:42.128484 17499 scheduler.cc:55] create croutine: /internal/task13
+I0625 09:16:42.128504 17499 scheduler.cc:55] create croutine: /internal/task14
+I0625 09:16:42.128523 17499 scheduler.cc:55] create croutine: /internal/task15
+W0625 09:16:43.245106 17499 rate.cc:96] Detect forward jumps in time
+W0625 09:16:44.483407 17499 rate.cc:96] Detect forward jumps in time
