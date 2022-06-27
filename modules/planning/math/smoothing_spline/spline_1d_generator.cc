@@ -174,7 +174,7 @@ bool Spline1dGenerator::Solve() {
     }
   }
   DCHECK_EQ(index, equality_constraint_matrix.rows() * num_param +
-                       inequality_constraint_boundary.rows() * num_param);
+                inequality_constraint_boundary.rows() * num_param);
 
   // initialize problem
   int max_iteration_ = 1000;

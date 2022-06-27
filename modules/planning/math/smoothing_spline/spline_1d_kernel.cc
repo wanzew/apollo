@@ -60,7 +60,8 @@ bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel,
   return true;
 }
 
-bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel, const double weight) {
+bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel,  //
+                               const double           weight) {
   Eigen::MatrixXd offset = Eigen::MatrixXd::Zero(kernel.rows(), 1);
   return AddKernel(kernel, offset, weight);
 }

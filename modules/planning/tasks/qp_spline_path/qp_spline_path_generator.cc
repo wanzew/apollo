@@ -249,7 +249,7 @@ bool QpSplinePathGenerator::CalculateFrenetPoint(
 }
 
 // 将纵向区间[start_s, end_s] 按照qp_spline_path_config_.max_spline_length()和
-// qp_spline_path_config_.max_constraint_interval()的设置，均匀分割后存入knots_和evaluated_s_，
+// qp_spline_path_config_.max_constraint_interval()的设置，均匀分割后存入 knots_ 和 evaluated_s_，
 // 每一段都会对应一条qp_spline_path_config_.spline_order()次多项式曲线。
 // 在这里，我认为knots_和evaluated_s_
 // 这2个记录s轴采样点的vector是应该完全相同的。不明白代码中为何有2种定义？
@@ -260,7 +260,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s, const double end_s)
   common::util::uniform_slice(start_s, end_s, number_of_spline, &knots_);
 
   // spawn a new spline generator
-  // 产生number_of_spline条order阶spline
+  // 产生 number_of_spline 条 order 阶 spline
   spline_generator_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
@@ -279,7 +279,8 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   constexpr double param_range = 1e-4;
 
   //循环（curve个数）次，这是添加什么约束？待后面看看发挥什么作用？
-  for (int i = qp_spline_path_config_.spline_order(); i < dim;
+  for (int i = qp_spline_path_config_.spline_order();  //
+       i < dim;                                        //
        i += qp_spline_path_config_.spline_order() + 1) {
     Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(1, dim);
     Eigen::MatrixXd bd  = Eigen::MatrixXd::Zero(1, 1);
