@@ -138,9 +138,9 @@ Status LatticePlanner::PlanOnReferenceLine(const TrajectoryPoint& planning_init_
 
   // 2. compute the matched point of the init planning point on the reference
   // line.
-  PathPoint matched_point =
-      PathMatcher::MatchToPath(*ptr_reference_line, planning_init_point.path_point().x(),
-                               planning_init_point.path_point().y());
+  PathPoint matched_point = PathMatcher::MatchToPath(*ptr_reference_line,  //
+                                                     planning_init_point.path_point().x(),
+                                                     planning_init_point.path_point().y());
 
   // 3. according to the matched point, compute the init state in Frenet frame.
   std::array<double, 3> init_s;
@@ -176,7 +176,8 @@ Status LatticePlanner::PlanOnReferenceLine(const TrajectoryPoint& planning_init_
                                                ptr_prediction_querier);
   std::vector<std::shared_ptr<Curve1d>> lon_trajectory1d_bundle;
   std::vector<std::shared_ptr<Curve1d>> lat_trajectory1d_bundle;
-  trajectory1d_generator.GenerateTrajectoryBundles(planning_target, &lon_trajectory1d_bundle,
+  trajectory1d_generator.GenerateTrajectoryBundles(planning_target,  //
+                                                   &lon_trajectory1d_bundle,
                                                    &lat_trajectory1d_bundle);
 
   ADEBUG << "Trajectory_Generation_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
@@ -186,8 +187,11 @@ Status LatticePlanner::PlanOnReferenceLine(const TrajectoryPoint& planning_init_
   // dynamic constraints.
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
-  TrajectoryEvaluator trajectory_evaluator(init_s, planning_target, lon_trajectory1d_bundle,
-                                           lat_trajectory1d_bundle, ptr_path_time_graph,
+  TrajectoryEvaluator trajectory_evaluator(init_s,                   //
+                                           planning_target,          //
+                                           lon_trajectory1d_bundle,  //
+                                           lat_trajectory1d_bundle,  //
+                                           ptr_path_time_graph,      //
                                            ptr_reference_line);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
@@ -222,9 +226,10 @@ Status LatticePlanner::PlanOnReferenceLine(const TrajectoryPoint& planning_init_
     auto   trajectory_pair      = trajectory_evaluator.next_top_trajectory_pair();
 
     // combine two 1d trajectories to one 2d trajectory
-    auto combined_trajectory =
-        TrajectoryCombiner::Combine(*ptr_reference_line, *trajectory_pair.first,
-                                    *trajectory_pair.second, planning_init_point.relative_time());
+    auto combined_trajectory = TrajectoryCombiner::Combine(*ptr_reference_line,      //
+                                                           *trajectory_pair.first,   //
+                                                           *trajectory_pair.second,  //
+                                                           planning_init_point.relative_time());
 
     // check longitudinal and lateral acceleration
     // considering trajectory curvatures

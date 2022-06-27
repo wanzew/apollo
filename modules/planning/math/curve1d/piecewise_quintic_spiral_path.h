@@ -35,28 +35,20 @@ class PiecewiseQuinticSpiralPath : public Curve1d {
 
   virtual ~PiecewiseQuinticSpiralPath() = default;
 
-  void Append(const double theta, const double kappa, const double dkappa, const double delta_s);
-
+  void   Append(const double theta, const double kappa, const double dkappa, const double delta_s);
   double Evaluate(const std::uint32_t order, const double param) const override;
-
   double DeriveKappaS(const double s) const;
-
   double ParamLength() const override;
-
   std::string ToString() const override { return "PiecewiseQuinticSpiralPath"; }
 
  private:
   size_t LocatePiece(const double param) const;
 
   std::vector<QuinticSpiralPath> pieces_;
-
-  std::vector<double> accumulated_s_;
-
-  double last_theta_ = 0.0;
-
-  double last_kappa_ = 0.0;
-
-  double last_dkappa_ = 0.0;
+  std::vector<double>            accumulated_s_;
+  double                         last_theta_  = 0.0;
+  double                         last_kappa_  = 0.0;
+  double                         last_dkappa_ = 0.0;
 };
 
 }  // namespace planning

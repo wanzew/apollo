@@ -55,7 +55,9 @@ bool SpiralReferenceLineSmoother::Smooth(const ReferenceLine& raw_reference_line
     double       s       = 0.0;
 
     std::vector<Eigen::Vector2d> raw_point2d;
-    for (std::uint32_t i = 0; i <= num_of_pieces; ++i, s = std::fmin(s + delta_s, length)) {
+    for (std::uint32_t i = 0;  //
+         i <= num_of_pieces;   //
+         ++i, s = std::fmin(s + delta_s, length)) {
       ReferencePoint rlp = raw_reference_line.GetReferencePoint(s);
       raw_point2d.emplace_back(rlp.x(), rlp.y());
     }
@@ -286,8 +288,10 @@ SpiralReferenceLineSmoother::Interpolate(const std::vector<double>& theta,
     double start_x = x[i];
     double start_y = y[i];
 
-    auto path_point_seg = Interpolate(start_x, start_y, start_s, theta[i], kappa[i], dkappa[i],
-                                      theta[i + 1], kappa[i + 1], dkappa[i + 1], s[i], resolution);
+    auto path_point_seg = Interpolate(start_x, start_y, start_s,                  //
+                                      theta[i], kappa[i], dkappa[i],              //
+                                      theta[i + 1], kappa[i + 1], dkappa[i + 1],  //
+                                      s[i], resolution);
 
     smoothed_point2d.insert(smoothed_point2d.end(), path_point_seg.begin(), path_point_seg.end());
 
@@ -312,7 +316,8 @@ SpiralReferenceLineSmoother::Interpolate(const double start_x,
 
   const auto angle_diff = common::math::AngleDiff(theta0, theta1);
 
-  QuinticSpiralPath spiral_curve(theta0, kappa0, dkappa0, theta0 + angle_diff, kappa1, dkappa1,
+  QuinticSpiralPath spiral_curve(theta0, kappa0, dkappa0,               //
+                                 theta0 + angle_diff, kappa1, dkappa1,  //
                                  delta_s);
   size_t            num_of_points = static_cast<size_t>(std::ceil(delta_s / resolution) + 1);
   for (size_t i = 1; i <= num_of_points; ++i) {
