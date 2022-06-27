@@ -142,67 +142,37 @@ class SpiralProblemInterface : public Ipopt::TNLP {
  private:
   void update_piecewise_spiral_paths(const double* x, const int n);
 
-  std::vector<Eigen::Vector2d> init_points_;
-
-  std::vector<double> opt_theta_;
-
-  std::vector<double> opt_kappa_;
-
-  std::vector<double> opt_dkappa_;
-
-  std::vector<double> opt_s_;
-
-  std::vector<double> opt_x_;
-
-  std::vector<double> opt_y_;
-
-  std::vector<double> point_distances_;
-
-  int num_of_variables_ = 0;
-
-  int num_of_constraints_ = 0;
-
-  int num_of_points_ = 0;
-
-  double default_max_point_deviation_ = 0.0;
-
-  const int num_of_internal_points_ = 5;
-
-  std::vector<double> relative_theta_;
-
+  std::vector<Eigen::Vector2d>                    init_points_;
+  std::vector<double>                             opt_theta_;
+  std::vector<double>                             opt_kappa_;
+  std::vector<double>                             opt_dkappa_;
+  std::vector<double>                             opt_s_;
+  std::vector<double>                             opt_x_;
+  std::vector<double>                             opt_y_;
+  std::vector<double>                             point_distances_;
+  int                                             num_of_variables_            = 0;
+  int                                             num_of_constraints_          = 0;
+  int                                             num_of_points_               = 0;
+  double                                          default_max_point_deviation_ = 0.0;
+  const int                                       num_of_internal_points_      = 5;
+  std::vector<double>                             relative_theta_;
   std::vector<QuinticSpiralPathWithDerivation<N>> piecewise_paths_;
-
-  bool has_fixed_start_point_ = false;
-
-  double start_x_ = 0.0;
-
-  double start_y_ = 0.0;
-
-  double start_theta_ = 0.0;
-
-  double start_kappa_ = 0.0;
-
-  double start_dkappa_ = 0.0;
-
-  bool has_fixed_end_point_ = false;
-
-  double end_x_ = 0.0;
-
-  double end_y_ = 0.0;
-
-  double end_theta_ = 0.0;
-
-  double end_kappa_ = 0.0;
-
-  double end_dkappa_ = 0.0;
-
-  bool has_fixed_end_point_position_ = false;
-
-  double weight_curve_length_ = 1.0;
-
-  double weight_kappa_ = 1.0;
-
-  double weight_dkappa_ = 1.0;
+  bool                                            has_fixed_start_point_        = false;
+  double                                          start_x_                      = 0.0;
+  double                                          start_y_                      = 0.0;
+  double                                          start_theta_                  = 0.0;
+  double                                          start_kappa_                  = 0.0;
+  double                                          start_dkappa_                 = 0.0;
+  bool                                            has_fixed_end_point_          = false;
+  double                                          end_x_                        = 0.0;
+  double                                          end_y_                        = 0.0;
+  double                                          end_theta_                    = 0.0;
+  double                                          end_kappa_                    = 0.0;
+  double                                          end_dkappa_                   = 0.0;
+  bool                                            has_fixed_end_point_position_ = false;
+  double                                          weight_curve_length_          = 1.0;
+  double                                          weight_kappa_                 = 1.0;
+  double                                          weight_dkappa_                = 1.0;
 };
 
 }  // namespace planning

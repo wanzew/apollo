@@ -116,6 +116,13 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
  private:
   double DeriveTheta(const size_t param_index, const double delta_s_ratio) const;
 
+  // 螺旋曲线
+  // θ = as⁵+ bs⁴ + cs³ + ds² + es + f
+  // 由于这种曲线的曲率是弧长的多项式函数，可以在路径规划中很好地控制曲率变化，螺旋曲线的曲率函数为：
+  // k = dθ/ds = 5as⁴+ 4bs³ + 3cs² + 2ds + e
+  // 其继承了五阶多项式曲线，我们在Planning
+  // 基础库——多项式曲线类中讲了仅需要曲线起点0点和终点p的函数值，二阶导函数值和三阶导函数值即可求得系数：
+
   std::array<std::array<double, 7>, 6> coef_deriv_;
 };
 
