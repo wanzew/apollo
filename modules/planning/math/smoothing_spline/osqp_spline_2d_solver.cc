@@ -19,7 +19,6 @@
  **/
 
 #include "modules/planning/math/smoothing_spline/osqp_spline_2d_solver.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/math/matrix_operations.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -44,10 +43,8 @@ void OsqpSpline2dSolver::Reset(const std::vector<double>& t_knots, const uint32_
 
 // customize setup
 Spline2dConstraint* OsqpSpline2dSolver::mutable_constraint() { return &constraint_; }
-
-Spline2dKernel* OsqpSpline2dSolver::mutable_kernel() { return &kernel_; }
-
-Spline2d* OsqpSpline2dSolver::mutable_spline() { return &spline_; }
+Spline2dKernel*     OsqpSpline2dSolver::mutable_kernel() { return &kernel_; }
+Spline2d*           OsqpSpline2dSolver::mutable_spline() { return &spline_; }
 
 bool OsqpSpline2dSolver::Solve() {
   // Namings here are following osqp convention.

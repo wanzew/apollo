@@ -51,9 +51,8 @@ class Spline1d {
   // @brief: set spline segments
   bool SetSplineSegs(const Eigen::MatrixXd& param_matrix, const uint32_t order);
 
-  const std::vector<double>& x_knots() const;
-  uint32_t                   spline_order() const;
-
+  const std::vector<double>&      x_knots() const;
+  uint32_t                        spline_order() const;
   const std::vector<Spline1dSeg>& splines() const;
 
  private:

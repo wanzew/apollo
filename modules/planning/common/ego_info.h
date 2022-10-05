@@ -73,15 +73,10 @@ class EgoInfo {
   // stitched point (at stitching mode)
   // or real vehicle point (at non-stitching mode)
   common::TrajectoryPoint start_point_;
-
-  // ego vehicle state
-  common::VehicleState vehicle_state_;
-
-  double front_clear_distance_ = FLAGS_default_front_clear_distance;
-
-  common::VehicleConfig ego_vehicle_config_;
-
-  common::math::Box2d ego_box_;
+  common::VehicleState    vehicle_state_;  // ego vehicle state
+  double                  front_clear_distance_ = FLAGS_default_front_clear_distance;
+  common::VehicleConfig   ego_vehicle_config_;
+  common::math::Box2d     ego_box_;
 };
 
 }  // namespace planning

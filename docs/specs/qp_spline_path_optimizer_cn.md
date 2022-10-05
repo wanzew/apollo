@@ -40,30 +40,23 @@ s.t. \qquad & LB \leq x \leq UB \\
 \end{aligned}
 $$
 
-
 下面是将开销（cost）函数转换为QP公式的例子：
-```
 $$
 f_i(s) ＝
 \begin{vmatrix} 1 & s & s^2 & s^3 & s^4 & s^5 \end{vmatrix}
 \cdot
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}   
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}  
 $$
-```
+
 
 且
-```
 $$
 f_i'(s) =
 \begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix}
 \cdot
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}   
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
-```
-
-
 且
-```
 $$
 f_i'(s)^2 =
 \begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5}  \end{vmatrix} 
@@ -74,9 +67,9 @@ f_i'(s)^2 =
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
-```
+
+
 然后得到，
-```
 $$
 \int\limits_{0}^{d_i} f_i'(s)^2 ds ＝
 \int\limits_{0}^{d_i}
@@ -88,11 +81,9 @@ $$
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} ds
 $$
-```
 
 
 从聚合函数中提取出常量得到，
-```
 $$
 \int\limits_{0}^{d_i} f'(s)^2 ds ＝
 \begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
@@ -102,9 +93,7 @@ $$
 \cdot 
 \begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix} ds 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
-$$
-$$
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}\\
 ＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot \int\limits_{0}^{d_i}
 \begin{vmatrix} 
@@ -118,11 +107,9 @@ $$
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
-```
+
 
 最后得到，
-
-```
 $$
 \int\limits_{0}^{d_i} 
 f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
@@ -137,7 +124,7 @@ f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
-```
+
 
 请注意我们最后得到一个6介的矩阵来表示5介样条插值的衍生开销。
 应用同样的推理方法可以得到2介，3介样条插值的衍生开销。
@@ -149,41 +136,30 @@ $$
 假设第一个点为 ($s_0$, $l_0$), ($s_0$, $l'_0$) and ($s_0$, $l''_0$)，其中$l_0$ , $l'_0$ and $l''_0$表示横向的偏移，并且规划路径的起始点的第一，第二个点的衍生开销可以从$f_i(s)$, $f'_i(s)$, $f_i(s)''$计算得到。
 
 将上述约束转换为QP约束等式，使用等式：
-
-```
 $$
 A_{eq}x = b_{eq}
 $$
-```
-
 下面是转换的具体步骤：
-
-```
 $$
 f_i(s_0) = 
 \begin{vmatrix} 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \end{vmatrix} 
 \cdot 
 \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}\end{vmatrix} = l_0
 $$
-```
 且
-```
 $$
 f'_i(s_0) = 
 \begin{vmatrix} 0& 1 & 2s_0 & 3s_0^2 & 4s_0^3 &5 s_0^4 \end{vmatrix} 
 \cdot 
 \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l'_0
 $$
-```
 且 
-```
 $$
 f''_i(s_0) = 
 \begin{vmatrix} 0&0& 2 & 3\times2s_0 & 4\times3s_0^2 & 5\times4s_0^3  \end{vmatrix} 
 \cdot 
 \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l''_0
 $$
-```
 其中，i是包含$s_0$的样条段的索引值。
 
 ### 2.2  终点约束
@@ -191,8 +167,6 @@ $$
 和起始点相同，终点$(s_e, l_e)$ 也应当按照起始点的计算方法生成约束条件。
 
 将起始点和终点组合在一起，得出约束等式为：
-
-```
 $$
 \begin{vmatrix} 
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
@@ -214,19 +188,14 @@ $$
  l''_e\\
  \end{vmatrix}
 $$
-```
 
 ### 2.3  平滑节点约束
 
 该约束的目的是使样条的节点更加平滑。假设两个段$seg_k$ 和$seg_{k+1}$互相连接，且$seg_k$的累计值s为$s_k$。计算约束的等式为：
-
-```
 $$
 f_k(s_k) = f_{k+1} (s_0)
 $$
-```
 下面是计算的具体步骤：
-```
 $$
 \begin{vmatrix} 
  1 & s_k & s_k^2 & s_k^3 & s_k^4&s_k^5 \\
@@ -244,9 +213,7 @@ $$
  a_{k+1,0} \\ a_{k+1,1} \\ a_{k+1,2} \\ a_{k+1,3} \\ a_{k+1,4} \\ a_{k+1,5} 
  \end{vmatrix}
 $$
-```
 然后
-```
 $$
 \begin{vmatrix} 
  1 & s_k & s_k^2 & s_k^3 & s_k^4&s_k^5 &  -1 & -s_{0} & -s_{0}^2 & -s_{0}^3 & -s_{0}^4&-s_{0}^5\\
@@ -257,11 +224,9 @@ $$
  \end{vmatrix} 
  = 0
 $$
-```
 将$s_0$ = 0代入等式。
 
 同样地，可以为下述等式计算约束等式：
-```
 $$
 f'_k(s_k) = f'_{k+1} (s_0)
 \\
@@ -269,21 +234,14 @@ f''_k(s_k) = f''_{k+1} (s_0)
 \\
 f'''_k(s_k) = f'''_{k+1} (s_0)
 $$
-```
 
 ### 2.4  点采样边界约束
 
 在路径上均匀的取样**m**个点，检查这些点上的障碍物边界。将这些约束转换为QP约束不等式，使用不等式：
-
-```
 $$
 Ax \geq b
 $$
-```
-
 首先基于道路宽度和周围的障碍物找到点 $(s_j, l_j)$的下边界$l_{lb,j}$，且$j\in[0, m]$。计算约束的不等式为：
-
-```
 $$
 \begin{vmatrix} 
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
@@ -299,11 +257,7 @@ $$
  l_{lb,m}\\
  \end{vmatrix}
 $$
-```
-
-
 同样地，对上边界$l_{ub,j}$，计算约束的不等式为：
-```
 $$
 \begin{vmatrix} 
  -1 & -s_0 & -s_0^2 & -s_0^3 & -s_0^4&-s_0^5 \\
@@ -322,5 +276,5 @@ $$
  l_{ub,m}\\
  \end{vmatrix}
 $$
-```
+
 

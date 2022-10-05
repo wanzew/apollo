@@ -100,9 +100,7 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
   }
 
   double DeriveKappaDerivative(const size_t param_index, const double ratio) const;
-
   double DeriveDKappaDerivative(const size_t param_index, const double ratio) const;
-
   double DeriveD2KappaDerivative(const size_t param_index, const double r) const;
 
   static const size_t THETA0  = 0;

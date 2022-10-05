@@ -39,15 +39,15 @@ class TaskFactory {
                                           const std::shared_ptr<DependencyInjector>& injector);
 
  private:
+  // clang-format off
   static apollo::common::util::Factory<
       TaskConfig::TaskType,
       Task,
       Task* (*)(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector),
       std::unordered_map<TaskConfig::TaskType,
-                         Task* (*)(const TaskConfig&                          config,
-                                   const std::shared_ptr<DependencyInjector>& injector),
-                         std::hash<int>>>
-                                                                              task_factory_;
+      Task* (*)(const TaskConfig& config, const std::shared_ptr<DependencyInjector>& injector),
+                         std::hash<int>>>                                     task_factory_;
+  // clang-format on
   static std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>> default_task_configs_;
 };
 

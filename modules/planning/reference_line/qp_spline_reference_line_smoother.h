@@ -47,13 +47,9 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
 
  private:
   void Clear();
-
   bool Sampling();
-
   bool AddConstraint();
-
   bool AddKernel();
-
   bool Solve();
 
   bool ExtractEvaluatedPoints(const ReferenceLine&                  raw_reference_line,

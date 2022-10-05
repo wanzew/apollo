@@ -38,18 +38,14 @@ class DiscretizedTrajectory : public std::vector<common::TrajectoryPoint> {
    * Create a DiscretizedTrajectory based on protobuf message
    */
   explicit DiscretizedTrajectory(const ADCTrajectory& trajectory);
-
   explicit DiscretizedTrajectory(const std::vector<common::TrajectoryPoint>& trajectory_points);
+  virtual ~DiscretizedTrajectory() = default;
 
   void SetTrajectoryPoints(const std::vector<common::TrajectoryPoint>& trajectory_points);
 
-  virtual ~DiscretizedTrajectory() = default;
-
   virtual common::TrajectoryPoint StartPoint() const;
-
-  virtual double GetTemporalLength() const;
-
-  virtual double GetSpatialLength() const;
+  virtual double                  GetTemporalLength() const;
+  virtual double                  GetSpatialLength() const;
 
   virtual common::TrajectoryPoint Evaluate(const double relative_time) const;
 
@@ -71,10 +67,8 @@ class DiscretizedTrajectory : public std::vector<common::TrajectoryPoint> {
   }
 
   const common::TrajectoryPoint& TrajectoryPointAt(const size_t index) const;
-
-  size_t NumOfPoints() const;
-
-  virtual void Clear();
+  size_t                         NumOfPoints() const;
+  virtual void                   Clear();
 };
 
 inline size_t DiscretizedTrajectory::NumOfPoints() const { return size(); }

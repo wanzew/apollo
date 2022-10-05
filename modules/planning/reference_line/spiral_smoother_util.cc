@@ -82,7 +82,7 @@ class SpiralSmootherUtil {
     }
 
     if (processed_points.size() < 2) { processed_points.push_back(raw_points.back()); }
-
+    // 转换到相对于第一个点的坐标
     Eigen::Vector2d start_point = processed_points.front();
     std::for_each(processed_points.begin(), processed_points.end(),
                   [&start_point](Eigen::Vector2d& p) { p = p - start_point; });
@@ -99,8 +99,14 @@ class SpiralSmootherUtil {
     std::vector<double> opt_y;
 
     SpiralReferenceLineSmoother spiral_smoother(config);
-    auto res = spiral_smoother.SmoothStandAlone(processed_points, &opt_theta, &opt_kappa,
-                                                &opt_dkappa, &opt_s, &opt_x, &opt_y);
+
+    auto res = spiral_smoother.SmoothStandAlone(processed_points,  //
+                                                &opt_theta,        //
+                                                &opt_kappa,        //
+                                                &opt_dkappa,       //
+                                                &opt_s,            //
+                                                &opt_x,            //
+                                                &opt_y);
 
     if (!res) {
       AWARN << "Optimization failed; the result may not be smooth";
@@ -111,8 +117,13 @@ class SpiralSmootherUtil {
     std::for_each(opt_x.begin(), opt_x.end(), [&start_point](double& x) { x += start_point.x(); });
     std::for_each(opt_y.begin(), opt_y.end(), [&start_point](double& y) { y += start_point.y(); });
 
-    *ptr_smooth_points = spiral_smoother.Interpolate(opt_theta, opt_kappa, opt_dkappa, opt_s, opt_x,
-                                                     opt_y, config.resolution());
+    *ptr_smooth_points = spiral_smoother.Interpolate(opt_theta,   //
+                                                     opt_kappa,   //
+                                                     opt_dkappa,  //
+                                                     opt_s,       //
+                                                     opt_x,       //
+                                                     opt_y,       //
+                                                     config.resolution());
 
     return true;
   }

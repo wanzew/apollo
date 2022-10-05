@@ -30,6 +30,23 @@ TEST(StBoundaryTest, basic_test) {
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
 
+  /**
+   * s
+   * ^
+   * |
+   * |
+   * upper_points[0]  upper_points[1]
+   * |(5,0)            (5,10)
+   * *                   *
+   * |
+   * |
+   * |
+   * |
+   * *———————————————————*—————————————————> t
+   * (0,0)             (0,10)
+   * lower_points[0]  lower_points[1]
+   */
+
   lower_points.emplace_back(0.0, 0.0);
   lower_points.emplace_back(0.0, 10.0);
   upper_points.emplace_back(5.0, 0.0);

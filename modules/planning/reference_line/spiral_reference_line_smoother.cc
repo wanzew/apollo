@@ -225,7 +225,10 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
 
   ptop->set_default_max_point_deviation(config_.spiral().max_deviation());
   if (fixed_start_point_) {
-    ptop->set_start_point(fixed_start_x_, fixed_start_y_, fixed_start_theta_, fixed_start_kappa_,
+    ptop->set_start_point(fixed_start_x_,      //
+                          fixed_start_y_,      //
+                          fixed_start_theta_,  //
+                          fixed_start_kappa_,  //
                           fixed_start_dkappa_);
   }
 

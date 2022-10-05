@@ -277,23 +277,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view, ADCTrajectory* const p
     reference_line_provider_->Wait();
   }
   const double vehicle_state_timestamp = vehicle_state.timestamp();
-  DCHECK_GE(start_timestamp, vehicle_state_timestamp)
-      << "start_timestamp is behind vehicle_state_timestamp by "
-      << start_timestamp - vehicle_state_timestamp << " secs";
-
-  if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
-    const std::string msg = "Update VehicleStateProvider failed "
-                            "or the vehicle state is out dated.";
-    AERROR << msg;
-    ptr_trajectory_pb->mutable_decision()->mutable_main_decision()->mutable_not_ready()->set_reason(
-        msg);
-    status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
-    // TODO(all): integrate reverse gear
-    ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
-    GenerateStopTrajectory(ptr_trajectory_pb);
-    return;
-  }
 
   if (start_timestamp - vehicle_state_timestamp < FLAGS_message_latency_threshold) {
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
@@ -331,13 +314,18 @@ void OnLanePlanning::RunOnce(const LocalView& local_view, ADCTrajectory* const p
   std::string                  replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          vehicle_state, start_timestamp, planning_cycle_time,
-          FLAGS_trajectory_stitching_preserved_length, true, last_publishable_trajectory_.get(),
+          vehicle_state,                                //
+          start_timestamp,                              //
+          planning_cycle_time,                          //
+          FLAGS_trajectory_stitching_preserved_length,  //
+          true,                                         //
+          last_publishable_trajectory_.get(),           //
           &replan_reason);
 
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  status                   = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
+
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
   if (status.ok()) {
     injector_->ego_info()->CalculateFrontObstacleClearDistance(frame_->obstacles());
@@ -386,30 +374,10 @@ void OnLanePlanning::RunOnce(const LocalView& local_view, ADCTrajectory* const p
     }
   }
   status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
-  for (const auto& p : ptr_trajectory_pb->trajectory_point()) {
-    ADEBUG << p.DebugString();
-  }
-  const auto end_system_timestamp =
-      std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
-  const auto time_diff_ms = (end_system_timestamp - start_system_timestamp) * 1000;
-  ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
+  // 延迟时间
   ptr_trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: " << ptr_trajectory_pb->latency_stats().DebugString();
-
-  if (!status.ok()) {
-    status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
-    AERROR << "Planning failed:" << status.ToString();
-    if (FLAGS_publish_estop) {
-      AERROR << "Planning failed and set estop";
-      // "estop" signal check in function "Control::ProduceControlCommand()"
-      // estop_ = estop_ || local_view_.trajectory.estop().is_estop();
-      // we should add more information to ensure the estop being triggered.
-      EStop* estop = ptr_trajectory_pb->mutable_estop();
-      estop->set_is_estop(true);
-      estop->set_reason(status.error_message());
-    }
-  }
 
   ptr_trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
   if (ptr_trajectory_pb->is_replan()) { ptr_trajectory_pb->set_replan_reason(replan_reason); }
@@ -433,15 +401,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view, ADCTrajectory* const p
     }
   }
 
-  // reference line recovery only one frame
-  // bool complete_dead_end =
-  //   frame_.get()->open_space_info().destination_reached();
-  // AERROR << "complete_dead_end is: " << complete_dead_end;
-  /*
-  if (complete_dead_end) {
-    reference_line_provider_->Start();
-    wait_flag_ = true;
-  }*/
   const uint32_t n = frame_->SequenceNum();
   injector_->frame_history()->Add(n, std::move(frame_));
 }
@@ -511,11 +470,6 @@ Status OnLanePlanning::Plan(const double                        current_time_sta
                             const std::vector<TrajectoryPoint>& stitching_trajectory,
                             ADCTrajectory* const                ptr_trajectory_pb) {
   auto* ptr_debug = ptr_trajectory_pb->mutable_debug();
-  if (FLAGS_enable_record_debug) {
-    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(stitching_trajectory.back());
-    frame_->mutable_open_space_info()->set_debug(ptr_debug);
-    frame_->mutable_open_space_info()->sync_debug_instance();
-  }
 
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(), ptr_trajectory_pb);
 
@@ -524,12 +478,12 @@ Status OnLanePlanning::Plan(const double                        current_time_sta
 
   if (frame_->open_space_info().is_on_open_space_trajectory()) {
     frame_->mutable_open_space_info()->sync_debug_instance();
-    const auto& publishable_trajectory =
-        frame_->open_space_info().publishable_trajectory_data().first;
-    const auto& publishable_trajectory_gear =
-        frame_->open_space_info().publishable_trajectory_data().second;
+    // clang-format off
+    const auto& publishable_trajectory      = frame_->open_space_info().publishable_trajectory_data().first;
+    const auto& publishable_trajectory_gear = frame_->open_space_info().publishable_trajectory_data().second;
     publishable_trajectory.PopulateTrajectoryProtobuf(ptr_trajectory_pb);
     ptr_trajectory_pb->set_gear(publishable_trajectory_gear);
+    // clang-format on
 
     // TODO(QiL): refine engage advice in open space trajectory optimizer.
     auto* engage_advice = ptr_trajectory_pb->mutable_engage_advice();
@@ -548,7 +502,6 @@ Status OnLanePlanning::Plan(const double                        current_time_sta
         MainParking::IN_PARKING);
 
     if (FLAGS_enable_record_debug) {
-      // ptr_debug->MergeFrom(frame_->open_space_info().debug_instance());
       frame_->mutable_open_space_info()->RecordDebug(ptr_debug);
       ADEBUG << "Open space debug information added!";
       // call open space info load debug
@@ -1090,8 +1043,7 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory&      trajectory_pb,
 
 VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
                                             const double        curr_timestamp) const {
-  // TODO(Jinyun): use the same method in trajectory stitching
-  //               for forward prediction
+  // TODO(Jinyun): use the same method in trajectory stitching for forward prediction
   auto future_xy = injector_->vehicle_state()->EstimateFuturePosition(curr_timestamp -
                                                                       vehicle_state.timestamp());
 

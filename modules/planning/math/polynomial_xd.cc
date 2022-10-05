@@ -44,6 +44,13 @@ void PolynomialXd::SetParams(const std::vector<double>& params) {
 
 const std::vector<double>& PolynomialXd::params() const { return params_; }
 
+/**
+ * y = a_0 + a1*x + a2*x^2 + a3*x^3 + a4*x^4 + a5*x^5
+ *
+ * y' = a1 + 2a2*x + 3a3*x^2 + 4a4*x^3 + 5a5*x^4
+ *
+ * y'' = 2a2+ 6a3*x + 12a4*x^2 + 20a5*x^3
+ */
 PolynomialXd PolynomialXd::DerivedFrom(const PolynomialXd& base) {
   std::vector<double> params;
   if (base.order() <= 0) {
@@ -67,7 +74,9 @@ PolynomialXd PolynomialXd::IntegratedFrom(const PolynomialXd& base, const double
   return PolynomialXd(params);
 }
 
+// [a0, a1, a2, a3, a4, a5]
 double PolynomialXd::operator()(const double value) const {
+  // float a = a0 + (a1 + (a2 +(a3 + (a4 + (a5 + 0)x)x)x)x)x);
   double result = 0.0;
   for (auto rit = params_.rbegin(); rit != params_.rend(); ++rit) {
     result *= value;

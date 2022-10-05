@@ -40,6 +40,7 @@ using apollo::common::VehicleModel;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
 
+// cycle time 之后的车辆状态作为 规划起始点
 TrajectoryPoint
 TrajectoryStitcher::ComputeTrajectoryPointFromVehicleState(const double        planning_cycle_time,
                                                            const VehicleState& vehicle_state) {
@@ -63,14 +64,16 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory(const double        plannin
   static constexpr double kEpsilon_v = 0.1;
   static constexpr double kEpsilon_a = 0.4;
   // TODO(Jinyun/Yu): adjust kEpsilon if corrected IMU acceleration provided
+  // 车速很慢是，使用当前车辆状态作为下一时刻的车辆状态
   if (std::abs(vehicle_state.linear_velocity()) < kEpsilon_v &&
       std::abs(vehicle_state.linear_acceleration()) < kEpsilon_a) {
     reinit_point = ComputeTrajectoryPointFromVehicleState(planning_cycle_time, vehicle_state);
-  } else {
-    VehicleState predicted_vehicle_state;
-    predicted_vehicle_state = VehicleModel::Predict(planning_cycle_time, vehicle_state);
-    reinit_point =
-        ComputeTrajectoryPointFromVehicleState(planning_cycle_time, predicted_vehicle_state);
+  }
+  // 车速不慢时，使用预测的车辆状态作为下一时刻的车辆状态
+  else {
+    VehicleState predicted_veh_state;
+    predicted_veh_state = VehicleModel::Predict(planning_cycle_time, vehicle_state);
+    reinit_point = ComputeTrajectoryPointFromVehicleState(planning_cycle_time, predicted_veh_state);
   }
 
   return std::vector<TrajectoryPoint>(1, reinit_point);
@@ -120,16 +123,11 @@ TrajectoryStitcher::ComputeStitchingTrajectory(const VehicleState&          vehi
                                                const bool                   replan_by_offset,
                                                const PublishableTrajectory* prev_trajectory,
                                                std::string*                 replan_reason) {
-  if (!FLAGS_enable_trajectory_stitcher) {
+  if (!FLAGS_enable_trajectory_stitcher  //
+      || !prev_trajectory                //
+      || vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     *replan_reason = "stitch is disabled by gflag.";
-    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
-  }
-  if (!prev_trajectory) {
     *replan_reason = "replan for no previous trajectory.";
-    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
-  }
-
-  if (vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     *replan_reason = "replan for manual mode.";
     return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
@@ -205,21 +203,18 @@ TrajectoryStitcher::ComputeStitchingTrajectory(const VehicleState&          vehi
               "disabled";
   }
 
-  double forward_rel_time = veh_rel_time + planning_cycle_time;
-
+  double forward_rel_time   = veh_rel_time + planning_cycle_time;
   size_t forward_time_index = prev_trajectory->QueryLowerBoundPoint(forward_rel_time);
+  auto   matched_index      = std::min(time_matched_index, position_matched_index);
 
-  ADEBUG << "Position matched index:\t" << position_matched_index;
-  ADEBUG << "Time matched index:\t" << time_matched_index;
-
-  auto matched_index = std::min(time_matched_index, position_matched_index);
-
+  // clang-format off
   std::vector<TrajectoryPoint> stitching_trajectory(
-      prev_trajectory->begin() +
-          std::max(0, static_cast<int>(matched_index - preserved_points_num)),
+      prev_trajectory->begin() + std::max(0, static_cast<int>(matched_index - preserved_points_num)),
       prev_trajectory->begin() + forward_time_index + 1);
   ADEBUG << "stitching_trajectory size: " << stitching_trajectory.size();
+  // clang-format on
 
+  // 坐标相对转换
   const double zero_s = stitching_trajectory.back().path_point().s();
   for (auto& tp : stitching_trajectory) {
     if (!tp.has_path_point()) {

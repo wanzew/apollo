@@ -59,17 +59,11 @@ class STBoundary : public common::math::Polygon2d {
    */
   static STBoundary CreateInstanceAccurate(const std::vector<STPoint>& lower_points,
                                            const std::vector<STPoint>& upper_points);
-
-  /** @brief Default destructor.
-   */
   ~STBoundary() = default;
 
   bool IsEmpty() const { return lower_points_.empty(); }
-
   bool GetUnblockSRange(const double curr_time, double* s_upper, double* s_lower) const;
-
   bool GetBoundarySRange(const double curr_time, double* s_upper, double* s_lower) const;
-
   bool GetBoundarySlopes(const double curr_time, double* ds_upper, double* ds_lower) const;
 
   // if you need to add boundary type, make sure you modify
@@ -157,24 +151,20 @@ class STBoundary : public common::math::Polygon2d {
   FRIEND_TEST(StBoundaryTest, get_index_range);
 
  private:
-  BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
-
+  BoundaryType         boundary_type_ = BoundaryType::UNKNOWN;
   std::vector<STPoint> upper_points_;
   std::vector<STPoint> lower_points_;
-
-  std::string id_;
-  double      characteristic_length_ = 1.0;
-  double      min_s_                 = std::numeric_limits<double>::max();
-  double      max_s_                 = std::numeric_limits<double>::lowest();
-  double      min_t_                 = std::numeric_limits<double>::max();
-  double      max_t_                 = std::numeric_limits<double>::lowest();
-
-  STPoint bottom_left_point_;
-  STPoint bottom_right_point_;
-  STPoint upper_left_point_;
-  STPoint upper_right_point_;
-
-  double obstacle_road_right_ending_t_;
+  std::string          id_;
+  double               characteristic_length_ = 1.0;
+  double               min_s_                 = std::numeric_limits<double>::max();
+  double               max_s_                 = std::numeric_limits<double>::lowest();
+  double               min_t_                 = std::numeric_limits<double>::max();
+  double               max_t_                 = std::numeric_limits<double>::lowest();
+  STPoint              bottom_left_point_;
+  STPoint              bottom_right_point_;
+  STPoint              upper_left_point_;
+  STPoint              upper_right_point_;
+  double               obstacle_road_right_ending_t_;
 };
 
 }  // namespace planning

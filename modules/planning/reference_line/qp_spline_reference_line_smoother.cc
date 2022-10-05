@@ -66,11 +66,11 @@ bool QpSplineReferenceLineSmoother::Smooth(const ReferenceLine& raw_reference_li
   if (!Solve()) { AERROR << "Solve spline smoother problem failed"; }
 
   // mapping spline to reference line point
-  const double start_t = t_knots_.front();
-  const double end_t   = t_knots_.back();
+  const double start_t    = t_knots_.front();
+  const double end_t      = t_knots_.back();
+  const double resolution = (end_t - start_t) / (config_.num_of_total_points() - 1);
+  double       t          = start_t;
 
-  const double                resolution = (end_t - start_t) / (config_.num_of_total_points() - 1);
-  double                      t          = start_t;
   std::vector<ReferencePoint> ref_points;
   const auto&                 spline = spline_solver_->spline();
   for (std::uint32_t i = 0; i < config_.num_of_total_points() && t < end_t; ++i, t += resolution) {
@@ -137,6 +137,7 @@ bool QpSplineReferenceLineSmoother::AddConstraint() {
     lateral_bound.push_back(point.lateral_bound);
     xy_points.emplace_back(path_point.x() - ref_x_, path_point.y() - ref_y_);
   }
+  // 每段长度
   const double scale =
       (anchor_points_.back().path_point.s() - anchor_points_.front().path_point.s()) /
       (t_knots_.back() - t_knots_.front());

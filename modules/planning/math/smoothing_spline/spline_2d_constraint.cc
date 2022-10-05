@@ -85,11 +85,12 @@ bool Spline2dConstraint::Add2dBoundary(const std::vector<double>& t_coord,
       // lower longitudinal
       affine_inequality(4 * i + 3, index_offset + j) = -longitudinal_coef[j];
     }
-
-    affine_boundary(4 * i, 0)     = d_lateral - lateral_bound[i];
-    affine_boundary(4 * i + 1, 0) = -d_lateral - lateral_bound[i];
-    affine_boundary(4 * i + 2, 0) = d_longitudinal - longitudinal_bound[i];
+    // clang-format off
+    affine_boundary(4 * i, 0)     =  d_lateral      - lateral_bound[i];
+    affine_boundary(4 * i + 1, 0) = -d_lateral      - lateral_bound[i];
+    affine_boundary(4 * i + 2, 0) =  d_longitudinal - longitudinal_bound[i];
     affine_boundary(4 * i + 3, 0) = -d_longitudinal - longitudinal_bound[i];
+    // clang-format on
   }
   return AddInequalityConstraint(affine_inequality, affine_boundary);
 }

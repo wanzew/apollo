@@ -86,42 +86,32 @@ class GriddedPathTimeGraph {
   // get the row-range of next time step
   void GetRowRange(const StGraphPoint& point, size_t* next_highest_row, size_t* next_lowest_row);
 
+  // clang-format off
  private:
-  const StGraphData& st_graph_data_;
-
-  std::vector<double> speed_limit_by_index_;
-
-  std::vector<double> spatial_distance_by_index_;
-
-  // dp st configuration
-  DpStSpeedOptimizerConfig gridded_path_time_graph_config_;
-
-  // obstacles based on the current reference line
-  const std::vector<const Obstacle*>& obstacles_;
+  const StGraphData&                  st_graph_data_;
+  std::vector<double>                 speed_limit_by_index_;
+  std::vector<double>                 spatial_distance_by_index_;
+  DpStSpeedOptimizerConfig            gridded_path_time_graph_config_;  // dp st configuration
+  const std::vector<const Obstacle*>& obstacles_;  // obstacles based on the current reference line
 
   // vehicle configuration parameter
-  const common::VehicleParam& vehicle_param_ =
-      common::VehicleConfigHelper::GetConfig().vehicle_param();
-
-  // initial status
+  const common::VehicleParam& vehicle_param_ = common::VehicleConfigHelper::GetConfig().vehicle_param();
   common::TrajectoryPoint init_point_;
+  // clang-format on
 
   // cost utility with configuration;
   DpStCost dp_st_cost_;
-
-  double   total_length_t_ = 0.0;
-  double   unit_t_         = 0.0;
-  uint32_t dimension_t_    = 0;
-
+  double   total_length_t_     = 0.0;
+  double   unit_t_             = 0.0;
+  uint32_t dimension_t_        = 0;
   double   total_length_s_     = 0.0;
   double   dense_unit_s_       = 0.0;
   double   sparse_unit_s_      = 0.0;
   uint32_t dense_dimension_s_  = 0;
   uint32_t sparse_dimension_s_ = 0;
   uint32_t dimension_s_        = 0;
-
-  double max_acceleration_ = 0.0;
-  double max_deceleration_ = 0.0;
+  double   max_acceleration_   = 0.0;
+  double   max_deceleration_   = 0.0;
 
   // cost_table_[t][s]
   // row: s, col: t --- NOTICE: Please do NOT change.

@@ -48,27 +48,17 @@ class StGraphData {
                 const double                           total_time_by_conf,
                 planning_internal::STGraphDebug*       st_graph_debug);
 
-  bool is_initialized() const { return init_; }
-
-  const std::vector<const STBoundary*>& st_boundaries() const;
-
-  double min_s_on_st_boundaries() const;
-
+  bool                                   is_initialized() const { return init_; }
+  const std::vector<const STBoundary*>&  st_boundaries() const;
+  double                                 min_s_on_st_boundaries() const;
   const apollo::common::TrajectoryPoint& init_point() const;
-
-  const SpeedLimit& speed_limit() const;
-
-  double cruise_speed() const;
-
-  double path_length() const;
-
-  double total_time_by_conf() const;
-
-  planning_internal::STGraphDebug* mutable_st_graph_debug();
-
+  const SpeedLimit&                      speed_limit() const;
+  double                                 cruise_speed() const;
+  double                                 path_length() const;
+  double                                 total_time_by_conf() const;
+  planning_internal::STGraphDebug*       mutable_st_graph_debug();
   bool SetSTDrivableBoundary(const std::vector<std::tuple<double, double, double>>& s_boundary,
                              const std::vector<std::tuple<double, double, double>>& v_obs_info);
-
   const STDrivableBoundary& st_drivable_boundary() const;
 
  private:
@@ -82,8 +72,7 @@ class StGraphData {
   double                           path_length_by_conf_ = 0.0;
   double                           total_time_by_conf_  = 0.0;
   planning_internal::STGraphDebug* st_graph_debug_      = nullptr;
-
-  STDrivableBoundary st_drivable_boundary_;
+  STDrivableBoundary               st_drivable_boundary_;
 };
 
 }  // namespace planning

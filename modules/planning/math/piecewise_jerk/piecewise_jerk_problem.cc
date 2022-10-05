@@ -158,22 +158,22 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(std::vector<c_float>* A_dat
 
   std::vector<std::vector<std::pair<c_int, c_float>>> variables(num_of_variables);
 
+  // clang-format off
   int constraint_index = 0;  // 表示行
   //  variables[i]           // 其中的i表示列
   // set x, x', x'' bounds
   for (int i = 0; i < num_of_variables; ++i) {
     if (i < n) {
       variables[i].emplace_back(constraint_index, 1.0);
-      lower_bounds->at(constraint_index) = x_bounds_[i].first * scale_factor_[0];
+      lower_bounds->at(constraint_index) = x_bounds_[i].first  * scale_factor_[0];
       upper_bounds->at(constraint_index) = x_bounds_[i].second * scale_factor_[0];
     } else if (i < 2 * n) {
       variables[i].emplace_back(constraint_index, 1.0);
-
-      lower_bounds->at(constraint_index) = dx_bounds_[i - n].first * scale_factor_[1];
+      lower_bounds->at(constraint_index) = dx_bounds_[i - n].first  * scale_factor_[1];
       upper_bounds->at(constraint_index) = dx_bounds_[i - n].second * scale_factor_[1];
     } else {
       variables[i].emplace_back(constraint_index, 1.0);
-      lower_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].first * scale_factor_[2];
+      lower_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].first  * scale_factor_[2];
       upper_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].second * scale_factor_[2];
     }
     ++constraint_index;
@@ -184,21 +184,22 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(std::vector<c_float>* A_dat
   for (int i = 0; i + 1 < n; ++i) {
     variables[2 * n + i].emplace_back(constraint_index, -1.0);
     variables[2 * n + i + 1].emplace_back(constraint_index, 1.0);
-    lower_bounds->at(constraint_index) = dddx_bound_.first * delta_s_ * scale_factor_[2];
+    lower_bounds->at(constraint_index) = dddx_bound_.first  * delta_s_ * scale_factor_[2];
     upper_bounds->at(constraint_index) = dddx_bound_.second * delta_s_ * scale_factor_[2];
     ++constraint_index;
   }
 
   // x(i+1)' - x(i)' - 0.5 * delta_s * x(i)'' - 0.5 * delta_s * x(i+1)'' = 0
   for (int i = 0; i + 1 < n; ++i) {
-    variables[n + i].emplace_back(constraint_index, -1.0 * scale_factor_[2]);
-    variables[n + i + 1].emplace_back(constraint_index, 1.0 * scale_factor_[2]);
-    variables[2 * n + i].emplace_back(constraint_index, -0.5 * delta_s_ * scale_factor_[1]);
+    variables[n + i].emplace_back(        constraint_index, -1.0 * scale_factor_[2]);
+    variables[n + i + 1].emplace_back(    constraint_index,  1.0 * scale_factor_[2]);
+    variables[2 * n + i].emplace_back(    constraint_index, -0.5 * delta_s_ * scale_factor_[1]);
     variables[2 * n + i + 1].emplace_back(constraint_index, -0.5 * delta_s_ * scale_factor_[1]);
     lower_bounds->at(constraint_index) = 0.0;
     upper_bounds->at(constraint_index) = 0.0;
     ++constraint_index;
   }
+  // clang-format on
 
   // x(i+1) - x(i) - delta_s * x(i)' - 1/3 * delta_s^2 * x(i)'' - 1/6 * delta_s^2 * x(i+1)''
   auto delta_s_sq_ = delta_s_ * delta_s_;

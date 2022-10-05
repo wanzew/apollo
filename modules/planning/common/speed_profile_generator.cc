@@ -81,11 +81,6 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(const EgoInfo* ego_info,
   const std::vector<double>& ds  = piecewise_jerk_problem.opt_dx();
   const std::vector<double>& dds = piecewise_jerk_problem.opt_ddx();
 
-  for (size_t i = 0; i < num_of_knots; ++i) {
-    ADEBUG << "For[" << delta_t * static_cast<double>(i) << "], s = " << s[i] << ", v = " << ds[i]
-           << ", a = " << dds[i];
-  }
-
   SpeedData speed_data;
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
   for (size_t i = 1; i < num_of_knots; ++i) {
@@ -100,6 +95,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(const EgoInfo* ego_info,
   return speed_data;
 }
 
+// 如果轨迹长度不够，填充0，最短轨迹三秒钟
 void SpeedProfileGenerator::FillEnoughSpeedPoints(SpeedData* const speed_data) {
   const SpeedPoint& last_point = speed_data->back();
   if (last_point.t() >= FLAGS_fallback_total_time) { return; }

@@ -38,25 +38,25 @@ namespace planning {
 class SpiralProblemInterface : public Ipopt::TNLP {
  public:
   explicit SpiralProblemInterface(std::vector<Eigen::Vector2d> points);
-
   virtual ~SpiralProblemInterface() = default;
 
   void set_default_max_point_deviation(const double point_max_deviation);
+  void set_start_point(const double x,  //
+                       const double y,
+                       const double theta,
+                       const double kappa,
+                       const double dkappa);
 
-  void set_start_point(
-      const double x, const double y, const double theta, const double kappa, const double dkappa);
-
-  void set_end_point(
-      const double x, const double y, const double theta, const double kappa, const double dkappa);
+  void set_end_point(const double x,  //
+                     const double y,
+                     const double theta,
+                     const double kappa,
+                     const double dkappa);
 
   void set_end_point_position(const double x, const double y);
-
   void set_element_weight_curve_length(const double weight_curve_length);
-
   void set_element_weight_kappa(const double weight_kappa);
-
   void set_element_weight_dkappa(const double weight_dkappa);
-
   void get_optimization_results(std::vector<double>* ptr_theta,
                                 std::vector<double>* ptr_kappa,
                                 std::vector<double>* ptr_dkappa,
@@ -65,11 +65,19 @@ class SpiralProblemInterface : public Ipopt::TNLP {
                                 std::vector<double>* ptr_y) const;
 
   /** Method to return some info about the nlp */
-  bool get_nlp_info(
-      int& n, int& m, int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) override;
+  bool get_nlp_info(int&            n,
+                    int&            m,  //
+                    int&            nnz_jac_g,
+                    int&            nnz_h_lag,
+                    IndexStyleEnum& index_style) override;
 
   /** Method to return the bounds for my problem */
-  bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l, double* g_u) override;
+  bool get_bounds_info(int     n,  //
+                       double* x_l,
+                       double* x_u,
+                       int     m,
+                       double* g_l,
+                       double* g_u) override;
 
   /** Method to return the starting point for the algorithm */
   bool get_starting_point(int     n,
@@ -84,10 +92,8 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   /** Method to return the objective value */
   bool eval_f(int n, const double* x, bool new_x, double& obj_value) override;
-
   /** Method to return the gradient of the objective */
   bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f) override;
-
   /** Method to return the constraint residuals */
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
 
@@ -142,37 +148,40 @@ class SpiralProblemInterface : public Ipopt::TNLP {
  private:
   void update_piecewise_spiral_paths(const double* x, const int n);
 
-  std::vector<Eigen::Vector2d>                    init_points_;
-  std::vector<double>                             opt_theta_;
-  std::vector<double>                             opt_kappa_;
-  std::vector<double>                             opt_dkappa_;
-  std::vector<double>                             opt_s_;
-  std::vector<double>                             opt_x_;
-  std::vector<double>                             opt_y_;
-  std::vector<double>                             point_distances_;
-  int                                             num_of_variables_            = 0;
-  int                                             num_of_constraints_          = 0;
-  int                                             num_of_points_               = 0;
-  double                                          default_max_point_deviation_ = 0.0;
-  const int                                       num_of_internal_points_      = 5;
-  std::vector<double>                             relative_theta_;
+  std::vector<Eigen::Vector2d> init_points_;
+
+  std::vector<double> opt_theta_;
+  std::vector<double> opt_kappa_;
+  std::vector<double> opt_dkappa_;
+  std::vector<double> opt_s_;
+  std::vector<double> opt_x_;
+  std::vector<double> opt_y_;
+  std::vector<double> point_distances_;
+  int                 num_of_variables_            = 0;
+  int                 num_of_constraints_          = 0;
+  int                 num_of_points_               = 0;
+  double              default_max_point_deviation_ = 0.0;
+  const int           num_of_internal_points_      = 5;
+  std::vector<double> relative_theta_;
+  bool                has_fixed_start_point_ = false;
+
+  double start_x_                      = 0.0;
+  double start_y_                      = 0.0;
+  double start_theta_                  = 0.0;
+  double start_kappa_                  = 0.0;
+  double start_dkappa_                 = 0.0;
+  bool   has_fixed_end_point_          = false;
+  double end_x_                        = 0.0;
+  double end_y_                        = 0.0;
+  double end_theta_                    = 0.0;
+  double end_kappa_                    = 0.0;
+  double end_dkappa_                   = 0.0;
+  bool   has_fixed_end_point_position_ = false;
+  double weight_curve_length_          = 1.0;
+  double weight_kappa_                 = 1.0;
+  double weight_dkappa_                = 1.0;
+
   std::vector<QuinticSpiralPathWithDerivation<N>> piecewise_paths_;
-  bool                                            has_fixed_start_point_        = false;
-  double                                          start_x_                      = 0.0;
-  double                                          start_y_                      = 0.0;
-  double                                          start_theta_                  = 0.0;
-  double                                          start_kappa_                  = 0.0;
-  double                                          start_dkappa_                 = 0.0;
-  bool                                            has_fixed_end_point_          = false;
-  double                                          end_x_                        = 0.0;
-  double                                          end_y_                        = 0.0;
-  double                                          end_theta_                    = 0.0;
-  double                                          end_kappa_                    = 0.0;
-  double                                          end_dkappa_                   = 0.0;
-  bool                                            has_fixed_end_point_position_ = false;
-  double                                          weight_curve_length_          = 1.0;
-  double                                          weight_kappa_                 = 1.0;
-  double                                          weight_dkappa_                = 1.0;
 };
 
 }  // namespace planning

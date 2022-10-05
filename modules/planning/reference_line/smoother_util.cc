@@ -123,7 +123,8 @@ class SmootherUtil {
         AERROR << "Failed to smooth reference line";
         return false;
       }
-      ref_points_.insert(ref_points_.end(), smoothed_local_ref.reference_points().begin(),
+      ref_points_.insert(ref_points_.end(),  //
+                         smoothed_local_ref.reference_points().begin(),
                          smoothed_local_ref.reference_points().end());
     }
     return true;

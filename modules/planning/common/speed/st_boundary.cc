@@ -73,6 +73,7 @@ STBoundary STBoundary::CreateInstance(const std::vector<STPoint>& lower_points,
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
   for (size_t i = 0; i < lower_points.size(); ++i) {
+    // 可以填加 STPoint 的拷贝构造
     point_pairs.emplace_back(STPoint(lower_points.at(i).s(), lower_points.at(i).t()),
                              STPoint(upper_points.at(i).s(), upper_points.at(i).t()));
   }

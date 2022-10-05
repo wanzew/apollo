@@ -50,10 +50,8 @@ class Spline1dSolver {
   }
 
   virtual Spline1dConstraint* mutable_spline_constraint() { return &constraint_; }
-
-  virtual Spline1dKernel* mutable_spline_kernel() { return &kernel_; }
-
-  virtual bool Solve() = 0;
+  virtual Spline1dKernel*     mutable_spline_kernel() { return &kernel_; }
+  virtual bool                Solve() = 0;
 
   // output
   virtual const Spline1d& spline() const { return spline_; }
